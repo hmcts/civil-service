@@ -81,6 +81,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
@@ -92,6 +93,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.Defendan
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.NEED_FINANCIAL_DETAILS_1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.NEED_FINANCIAL_DETAILS_2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.REPAYMENT_PLAN_2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_1_ADMITS_PART_OR_FULL;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_1_PAID_LESS;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_2_ADMITS_PART_OR_FULL;
@@ -325,23 +327,31 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             }
         }
 
-        if (caseData.getShowConditionFlags().contains(CAN_ANSWER_RESPONDENT_2)
-            && caseData.getRespondent2().getType() != Party.Type.COMPANY
-            && caseData.getRespondent2().getType() != Party.Type.ORGANISATION) {
-            if (scenario == ONE_V_TWO_TWO_LEGAL_REP) {
-                if (needFinancialInfo21v2ds(caseData)) {
+        if (caseData.getShowConditionFlags().contains(CAN_ANSWER_RESPONDENT_2)) {
+            if (caseData.getRespondent2().getType() != Party.Type.COMPANY
+                && caseData.getRespondent2().getType() != Party.Type.ORGANISATION) {
+                if (scenario == ONE_V_TWO_TWO_LEGAL_REP) {
+                    if (needFinancialInfo21v2ds(caseData)) {
+                        necessary.add(NEED_FINANCIAL_DETAILS_2);
+                    }
+                } else if (scenario == ONE_V_TWO_ONE_LEGAL_REP
+                    && (needFinancialInfo21v2ds(caseData)
+                    || (needFinancialInfo1(caseData) && caseData.getRespondentResponseIsSame() == YES))) {
                     necessary.add(NEED_FINANCIAL_DETAILS_2);
                 }
-            } else if (scenario == ONE_V_TWO_ONE_LEGAL_REP
-                && (needFinancialInfo21v2ds(caseData)
-                || (needFinancialInfo1(caseData) && caseData.getRespondentResponseIsSame() == YES))) {
-                necessary.add(NEED_FINANCIAL_DETAILS_2);
+
+                if (respondent2doesNotPayImmediately(caseData, scenario)) {
+                    necessary.add(WHY_2_DOES_NOT_PAY_IMMEDIATELY);
+                }
             }
 
-            if (respondent2doesNotPayImmediately(caseData, scenario)) {
-                necessary.add(WHY_2_DOES_NOT_PAY_IMMEDIATELY);
+            if ((caseData.getRespondentResponseIsSame() == YES
+                && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == SUGGESTION_OF_REPAYMENT_PLAN)
+                || caseData.getDefenceAdmitPartPaymentTimeRouteRequired2() == SUGGESTION_OF_REPAYMENT_PLAN) {
+                necessary.add(REPAYMENT_PLAN_2);
             }
         }
+
 
         return necessary;
     }
