@@ -4,8 +4,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 
 public interface SpecReferenceNumberRepository {
 
-    @SqlQuery("SELECT next_SPEC_legal_rep_reference_number()")
+    @SqlQuery("SELECT next_reference_number()")
     String getSpecReferenceNumber();
 
 }
-
