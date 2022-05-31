@@ -84,6 +84,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPay
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -98,6 +99,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.Defendan
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_1_PAID_LESS;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_2_ADMITS_PART_OR_FULL;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_2_PAID_LESS;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.SOMEONE_DISPUTES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.WHEN_WILL_CLAIM_BE_PAID;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.WHY_2_DOES_NOT_PAY_IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -667,6 +669,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (anyAdmission.contains(caseData.getRespondent2ClaimResponseTypeForSpec())) {
             updatedShowConditions.add(RESPONDENT_2_ADMITS_PART_OR_FULL);
         }
+        if (someoneDisputes(caseData)) {
+            updatedShowConditions.add(SOMEONE_DISPUTES);
+        }
         updatedData.showConditionFlags(updatedShowConditions);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -685,7 +690,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private Set<DefendantResponseShowTag> whoDisputesPartAdmission(CaseData caseData) {
         Set<DefendantResponseShowTag> tags = new HashSet<>(caseData.getShowConditionFlags());
         removeWhoDisputesAndWhoPaidLess(tags);
-        MultiPartyScenario mpScenario = getMultiPartyScenario(caseData);
         tags.addAll(whoDisputesBcoPartAdmission(caseData));
         return tags;
     }
@@ -734,6 +738,17 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 break;
         }
         return tags;
+    }
+
+    private boolean someoneDisputes(CaseData caseData) {
+        return someoneDisputes(caseData, CAN_ANSWER_RESPONDENT_1, caseData.getRespondent1ClaimResponseTypeForSpec())
+                || someoneDisputes(caseData, CAN_ANSWER_RESPONDENT_2, caseData.getRespondent2ClaimResponseTypeForSpec());
+    }
+
+    private boolean someoneDisputes(CaseData caseData, DefendantResponseShowTag respondent,
+                                  RespondentResponseTypeSpec response) {
+        return caseData.getShowConditionFlags().contains(respondent)
+            && (response == FULL_DEFENCE || response == PART_ADMISSION);
     }
 
     private Set<DefendantResponseShowTag> whoDisputesFullDefence(CaseData caseData) {
