@@ -153,15 +153,16 @@ notifications:
   claimantSolicitorConfirmsToProceedSpec: "99786d26-ab90-43c7-aa20-9d450d8ce4eb"
   respondentSolicitorNotifyToProceedSpec: "ea6cb18e-ebba-4759-8df3-426e00f2f09c"
   applicantSolicitor1DefaultJudgmentReceived: "14a43ad4-e337-490a-bf8b-1288520dc9eb"
-  respondentSolicitor1DefaultJudgmentReceived: "25fdb679-7f34-4717-ad4d-80f8562bc7b2"
   claimantSolicitorCounterClaimForSpec: "256b6cf4-6201-48f0-bf1e-88a187712196"
   respondentSolicitorCounterClaimForSpec: "6cb3b3d5-f1aa-4236-ad03-685605a9235e"
+  respondentSolicitor1DefaultJudgmentReceived: "3f09399e-b76b-4ea4-8084-c27693e6fd28"
+  respondentSolicitor1DefaultJudgmentRequested: "9a974b63-6d0f-4714-8e5d-488554fdc8a0"
+  applicantSolicitor1DefaultJudgmentRequested: "cd0486ac-cc6a-4429-865a-7746f64bf4dd"
   interimJudgmentRequestedClaimant: "60ef146b-96c4-4630-942c-336aee5e9359"
   interimJudgmentApprovalClaimant: "b678fa7d-2a37-4d54-8163-b79b733d20d9"
   interimJudgmentRequestedDefendant: "e527acd3-8ed3-4111-b9a6-7e7c31323698"
   interimJudgmentApprovalDefendant: "725dc6ac-34ab-4878-bc88-c3dbd7b9810c"
   interimJudgmentRequested2Defendants: "64584bf4-f17d-416f-9f1b-91b3aa39a69b"
-
 
 
 sendgrid:
