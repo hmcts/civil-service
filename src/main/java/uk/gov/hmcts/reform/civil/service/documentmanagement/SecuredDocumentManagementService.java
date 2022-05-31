@@ -25,7 +25,12 @@ import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.document.utils.InMemoryMultipartFile;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Optional;
@@ -72,6 +77,10 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 documentUploadRequest
             );
 
+            File outputFile = new File("myPdf.pdf");
+            try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
+                outputStream.write(pdf.getBytes());
+            }
             Document document = response.getDocuments().stream()
                 .findFirst()
                 .orElseThrow(() -> new DocumentUploadException(originalFileName));
