@@ -42,7 +42,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @RequiredArgsConstructor
 public class DefaultJudgementSpecHandler extends CallbackHandler {
 
-    public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment until %s";
+    public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment until %s.";
     //    public static final String CPR_REQUIRED_INFO = "<br />You can only request default judgment if:"
     //        + "%n%n * The time for responding to the claim has expired. "
     //        + "%n%n * The Defendant has not responded to the claim."
@@ -54,6 +54,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     public static final String JUDGMENT_GRANTED_HEADER = "# Default Judgment Granted ";
     public static final String JUDGMENT_GRANTED = "<br /><a href=\"%s\" target=\"_blank\">Download  default judgment</a> "
         + "%n%n The defendant will be served the Default Judgment.";
+    public static final String BREATHING_SPACE = "default judgment cannot be applied while claim is in breathing space";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
     private static final int COMMENCEMENT_FIXED_COST_60 = 60;
     private static final int COMMENCEMENT_FIXED_COST_80 = 80;
@@ -119,6 +120,17 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
             errors.add(format(NOT_VALID_DJ, formattedDeadline));
         }
+
+        if (caseData.getBreathing() != null && caseData.getBreathing().getEnter() != null) {
+            errors.add(BREATHING_SPACE);
+
+        }
+        if(caseData.getBreathing().getLift() != null && caseData.getBreathing().getLift()
+            .getExpectedEnd().isBefore(LocalDate.now())) {
+            errors.remove(BREATHING_SPACE);
+            System.out.println("breathing removed");
+        }
+
         List<String> listData = new ArrayList<>();
 
         listData.add(caseData.getRespondent1().getIndividualFirstName()
