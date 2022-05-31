@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.config.AutomaticallyAssignCaseToCaaConfiguration;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -53,6 +54,8 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private OrganisationService organisationService;
 
+    @MockBean
+    private AutomaticallyAssignCaseToCaaConfiguration automaticallyAssignCaseToCaaConfiguration;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -84,6 +87,9 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldAssignCaseToApplicantSolicitorOneAndRemoveCreator() {
+        when(automaticallyAssignCaseToCaaConfiguration.isAssignCaseToCaa())
+            .thenReturn(true);
+
         when(organisationService.findUsersInOrganisation("OrgId2"))
             .thenReturn(Optional.of(buildPrdResponse()));
 
@@ -112,6 +118,9 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldRemoveSubmitterIdAfterCaseAssignment() {
+        when(automaticallyAssignCaseToCaaConfiguration.isAssignCaseToCaa())
+            .thenReturn(true);
+
         when(organisationService.findUsersInOrganisation(anyString()))
             .thenReturn(Optional.of(buildPrdResponse()));
 
@@ -124,11 +133,11 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
     private ProfessionalUsersEntityResponse buildPrdResponse() {
         List<ProfessionalUsersResponse> users = new ArrayList<>();
-            users.add(ProfessionalUsersResponse.builder()
-                          .userIdentifier("12345678")
-                          .email("hmcts.civil+organisation.2.CAA@gmail.com")
-                          .roles(Arrays.asList("caseworker", "caseworker-civil", "pui-caa"))
-                          .build());
+        users.add(ProfessionalUsersResponse.builder()
+                      .userIdentifier("12345678")
+                      .email("hmcts.civil+organisation.2.CAA@gmail.com")
+                      .roles(Arrays.asList("caseworker", "caseworker-civil", "pui-caa"))
+                      .build());
 
         users.add(ProfessionalUsersResponse.builder()
                       .email("hmcts.civil+organisation.2.superuser@gmail.com")

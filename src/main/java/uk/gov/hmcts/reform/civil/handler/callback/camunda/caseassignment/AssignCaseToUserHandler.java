@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.AutomaticallyAssignCaseToCaaConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -29,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AssignCaseToUserHandler extends CallbackHandler {
@@ -41,6 +44,7 @@ public class AssignCaseToUserHandler extends CallbackHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper objectMapper;
     private final OrganisationService organisationService;
+    private final AutomaticallyAssignCaseToCaaConfiguration automaticallyAssignCaseToCaaConfiguration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -73,7 +77,10 @@ public class AssignCaseToUserHandler extends CallbackHandler {
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(userDetails.getEmail()).build())
             .build();
 
-        getRespondentCaaAndAssignCase(caseData);
+        if (automaticallyAssignCaseToCaaConfiguration.isAssignCaseToCaa()) {
+            getRespondentCaaAndAssignCase(caseData);
+            log.info("Automatically assigned case to respondent caa");
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updated.toMap(objectMapper))
@@ -81,59 +88,45 @@ public class AssignCaseToUserHandler extends CallbackHandler {
     }
 
     private void getRespondentCaaAndAssignCase(CaseData caseData) {
-        String organisationId;
-        Optional<ProfessionalUsersEntityResponse> orgUsers;
-        List<String> caaUserIds = new ArrayList<>();
         if (caseData.getRespondent1OrgRegistered() == YES
             && caseData.getRespondent1Represented() == YES) {
-            organisationId = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
-
-            //get users in this firm
-            orgUsers = organisationService.findUsersInOrganisation(organisationId);
-
-
-            ProfessionalUsersEntityResponse professionalUsersEntityResponse = orgUsers.orElse(null);
-            if (professionalUsersEntityResponse != null) {
-                for (ProfessionalUsersResponse user : professionalUsersEntityResponse.getUsers()) {
-                    if (user.getRoles().contains(CASEWORKER_CAA_ROLE)) {
-                        caaUserIds.add(user.getUserIdentifier());
-                    }
-                }
-            }
-            if (!caaUserIds.isEmpty()) {
-                // assign case here
-                assignCaseToRespondentCaa(caseData, organisationId, caaUserIds, CaseRole.RESPONDENTSOLICITORONE);
-                System.out.println("case assigned to respondent");
-            }
+            assignCaseToRespondentCaa(caseData,
+                                      caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID(),
+                                      CaseRole.RESPONDENTSOLICITORONE);
         }
 
-        if (getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP) && caseData.getRespondent2OrgRegistered() == YES
+        if (getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)
+            && caseData.getRespondent2OrgRegistered() == YES
             && caseData.getRespondent2Represented() == YES) {
-            organisationId = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
-
-            orgUsers = organisationService.findUsersInOrganisation(organisationId);
-
-            caaUserIds = new ArrayList<>();
-            ProfessionalUsersEntityResponse professionalUsersEntityResponse = orgUsers.orElse(null);
-            if (professionalUsersEntityResponse != null) {
-                for (ProfessionalUsersResponse user : professionalUsersEntityResponse.getUsers()) {
-                    if (user.getRoles().contains(CASEWORKER_CAA_ROLE)) {
-                        caaUserIds.add(user.getUserIdentifier());
-                    }
-                }
-            }
-            if (!caaUserIds.isEmpty()) {
-                // assign case here
-                assignCaseToRespondentCaa(caseData, organisationId, caaUserIds, CaseRole.RESPONDENTSOLICITORTWO);
-                System.out.println("case assigned to respondent");
-            }
+            assignCaseToRespondentCaa(caseData,
+                                      caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID(),
+                                      CaseRole.RESPONDENTSOLICITORTWO);
         }
     }
 
-    private void assignCaseToRespondentCaa(CaseData caseData, String organisationId, List<String> caaUserIds, CaseRole caseRole) {
-        for (String caaUserId : caaUserIds) {
-            String caseId = caseData.getCcdCaseReference().toString();
-            coreCaseUserService.assignCase(caseId, caaUserId, organisationId, caseRole);
+    private void assignCaseToRespondentCaa(CaseData caseData, String organisationId, CaseRole caseRole) {
+        List<String> caaUserIds;
+        caaUserIds = new ArrayList<>();
+        String caseId = caseData.getCcdCaseReference().toString();
+
+        Optional<ProfessionalUsersEntityResponse> orgUsers =
+            organisationService.findUsersInOrganisation(organisationId);
+
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = orgUsers.orElse(null);
+
+        if (professionalUsersEntityResponse != null) {
+            for (ProfessionalUsersResponse user : professionalUsersEntityResponse.getUsers()) {
+                if (user.getRoles().contains(CASEWORKER_CAA_ROLE)) {
+                    caaUserIds.add(user.getUserIdentifier());
+                }
+            }
+        }
+        if (!caaUserIds.isEmpty()) {
+            for (String caaUserId : caaUserIds) {
+                coreCaseUserService.assignCase(caseId, caaUserId, organisationId, caseRole);
+            }
+        } else {
+            log.info("No caa users found for org ID {} for case {}", organisationId, caseId);
         }
     }
 }
