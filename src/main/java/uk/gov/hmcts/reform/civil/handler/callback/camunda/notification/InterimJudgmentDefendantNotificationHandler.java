@@ -33,9 +33,8 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     private final OrganisationService organisationService;
     private static final String BOTH_DEFENDANTS = "Both Defendants";
     private static final String CLAIM_NUMBER = "Claim number";
-    private static final String LEGAL_REP_DEF = "Legal Rep Defendant";
+    private static final String LEGAL_ORG_DEF = "Defendant LegalOrg Name";
     private static final String DEFENDANT_NAME = "Defendant Name";
-    private static final String DEFENDANT2_NAME = "Defendant2 Name";
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_INTERIM_JUDGMENT_DEFENDANT);
     private static final String REFERENCE_TEMPLATE_APPROVAL_DEF = "interim-judgment-approval-notification-def-%s";
     private static final String REFERENCE_TEMPLATE_REQUEST_DEF = "interim-judgment-requested-notification-def-%s";
@@ -57,33 +56,24 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
 
         if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YesOrNo.YES)) {
-            if (BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel())
-                && caseData.getRespondent2SameLegalRepresentative().equals(YesOrNo.YES)) {
+            if (checkDefendantRequested(caseData, caseData.getRespondent1().getPartyName())
+                || BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel())) {
                 notificationService.sendMail(caseData.getRespondentSolicitor1EmailAddress(),
-                                             notificationsProperties.getInterimJudgmentRequested2Defendants(),
-                                             addProperties2Defendants(caseData),
+                                             notificationsProperties.getInterimJudgmentRequestedDefendant(),
+                                             addProperties(caseData),
                                              String.format(REFERENCE_TEMPLATE_REQUEST_DEF,
                                                            caseData.getLegacyCaseReference()));
-            } else {
-                if (checkDefendantRequested(caseData, caseData.getRespondent1().getPartyName())
-                    || BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel())) {
-                    notificationService.sendMail(caseData.getRespondentSolicitor1EmailAddress(),
-                                                 notificationsProperties.getInterimJudgmentRequestedDefendant(),
-                                                 addProperties(caseData),
-                                                 String.format(REFERENCE_TEMPLATE_REQUEST_DEF,
-                                                               caseData.getLegacyCaseReference()));
-                }
-                if (checkDefendantRequested(caseData, caseData.getRespondent2().getPartyName())
-                    || BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel())) {
-                    notificationService.sendMail(caseData.getRespondentSolicitor2EmailAddress() != null
-                                                     ? caseData.getRespondentSolicitor2EmailAddress() :
-                                                     caseData.getRespondentSolicitor1EmailAddress(),
-                                                 notificationsProperties.getInterimJudgmentRequestedDefendant(),
-                                                 addPropertiesDefendant2(caseData),
-                                                 String.format(REFERENCE_TEMPLATE_REQUEST_DEF,
-                                                               caseData.getLegacyCaseReference())
-                    );
-                }
+            }
+            if (checkDefendantRequested(caseData, caseData.getRespondent2().getPartyName())
+                || BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel())) {
+                notificationService.sendMail(caseData.getRespondentSolicitor2EmailAddress() != null
+                                                 ? caseData.getRespondentSolicitor2EmailAddress() :
+                                                 caseData.getRespondentSolicitor1EmailAddress(),
+                                             notificationsProperties.getInterimJudgmentRequestedDefendant(),
+                                             addPropertiesDefendant2(caseData),
+                                             String.format(REFERENCE_TEMPLATE_REQUEST_DEF,
+                                                           caseData.getLegacyCaseReference())
+                );
             }
         } else {
             notificationService.sendMail(caseData.getRespondentSolicitor1EmailAddress(),
@@ -105,7 +95,7 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
         return Map.of(
-            LEGAL_REP_DEF, getLegalOrganizationName(caseData),
+            LEGAL_ORG_DEF, getLegalOrganizationName(caseData),
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
             DEFENDANT_NAME, caseData.getRespondent1().getPartyName()
         );
@@ -113,18 +103,9 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
 
     public Map<String, String> addPropertiesDefendant2(final CaseData caseData) {
         return Map.of(
-            LEGAL_REP_DEF, getLegalOrganizationNameDefendant2(caseData),
+            LEGAL_ORG_DEF, getLegalOrganizationNameDefendant2(caseData),
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
             DEFENDANT_NAME, caseData.getRespondent2().getPartyName()
-        );
-    }
-
-    public Map<String, String> addProperties2Defendants(final CaseData caseData) {
-        return Map.of(
-            LEGAL_REP_DEF, getLegalOrganizationName(caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
-            DEFENDANT2_NAME, caseData.getRespondent2().getPartyName()
         );
     }
 

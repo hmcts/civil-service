@@ -83,38 +83,11 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
                 eq("interim-judgment-requested-notification-def-000DC001"));
         }
 
-        @Test
-        void shouldNotifyClaimantSolicitor2DefendantsSameRep_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
-                .multiPartyClaimTwoDefendantSolicitors()
-                .atStateClaimIssued1v2AndSameRepresentative()
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-            handler.handle(params);
-
-            verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
-                "template-id-req2",
-                getNotificationDataMap2Def(),
-                "interim-judgment-requested-notification-def-000DC001"
-            );
-        }
-
         private Map<String, String> getNotificationDataMap() {
             return Map.of(
-                "Legal Rep Defendant", "Test Org Name",
+                "Defendant LegalOrg Name", "Test Org Name",
                 "Claim number", "000DC001",
                 "Defendant Name", "Mr. Sole Trader"
-            );
-        }
-
-        private Map<String, String> getNotificationDataMap2Def() {
-            return Map.of(
-                "Legal Rep Defendant", "Test Org Name",
-                "Claim number", "000DC001",
-                "Defendant Name", "Mr. Sole Trader",
-                "Defendant2 Name", "Mr. John Rambo"
             );
         }
     }
