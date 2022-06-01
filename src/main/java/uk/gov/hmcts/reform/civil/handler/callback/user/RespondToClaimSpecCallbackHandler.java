@@ -184,7 +184,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         CaseData.CaseDataBuilder<?, ?> updatedCase = caseData.toBuilder();
         updatedCase.showConditionFlags(whoDisputesFullDefence(caseData));
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
-            caseData = populateRespondentResponseTypeSpecPaidStatus(caseData);
+            populateRespondentResponseTypeSpecPaidStatus(caseData, updatedCase);
             if (caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
                 == RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
                 || DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
@@ -307,7 +307,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             AllocatedTrack allocatedTrack = getAllocatedTrack(caseData);
             updatedCaseData.responseClaimTrack(allocatedTrack.name());
         }
-        Set<DefendantResponseShowTag> currentShowFlags = EnumSet.copyOf(caseData.getShowConditionFlags());
+        Set<DefendantResponseShowTag> currentShowFlags = new HashSet<>(caseData.getShowConditionFlags());
         currentShowFlags.removeAll(EnumSet.of(
             NEED_FINANCIAL_DETAILS_1,
             NEED_FINANCIAL_DETAILS_2,
@@ -356,7 +356,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 necessary.add(REPAYMENT_PLAN_2);
             }
         }
-
 
         return necessary;
     }
@@ -721,12 +720,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             case ONE_V_TWO_ONE_LEGAL_REP:
                 if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
                     if (caseData.getRespondentResponseIsSame() == YES
-                        || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+                        || caseData.getRespondent2ClaimResponseTypeForSpec()
+                        == RespondentResponseTypeSpec.PART_ADMISSION) {
                         tags.add(DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE);
                     } else {
                         tags.add(ONLY_RESPONDENT_1_DISPUTES);
                     }
-                } else if (caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+                } else if (caseData.getRespondent2ClaimResponseTypeForSpec()
+                    == RespondentResponseTypeSpec.PART_ADMISSION) {
                     tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES);
                 }
                 break;
@@ -739,6 +740,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     tags.add(DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES);
                 }
                 break;
+            default:
+                throw new UnsupportedOperationException("Unknown mp scenario");
         }
         return tags;
     }
@@ -852,6 +855,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     ).ifPresent(bcoPartAdmission::add);
                 }
                 break;
+            default:
+                throw new UnsupportedOperationException("Unknown mp scenario");
         }
         tags.addAll(bcoPartAdmission);
         return tags;
@@ -888,24 +893,22 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         return Optional.empty();
     }
 
-    private CaseData populateRespondentResponseTypeSpecPaidStatus(CaseData caseData) {
+    private void populateRespondentResponseTypeSpecPaidStatus(CaseData caseData,
+                                                                  CaseData.CaseDataBuilder<?, ?> updated) {
         if (SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED.equals(caseData.getDefenceRouteRequired())
             && caseData.getRespondToClaim().getHowMuchWasPaid() != null) {
             // CIV-208 howMuchWasPaid is pence, totalClaimAmount is pounds, hence the need for conversion
             int comparison = caseData.getRespondToClaim().getHowMuchWasPaid()
                 .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount())));
             if (comparison < 0) {
-                caseData = caseData.toBuilder()
-                    .respondent1ClaimResponsePaymentAdmissionForSpec(
+                updated.respondent1ClaimResponsePaymentAdmissionForSpec(
                         RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
             } else {
-                caseData = caseData.toBuilder()
-                    .respondent1ClaimResponsePaymentAdmissionForSpec(
+                updated.respondent1ClaimResponsePaymentAdmissionForSpec(
                         RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
             }
         } else {
-            caseData = caseData.toBuilder()
-                .respondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpecPaidStatus.DID_NOT_PAY)
+            updated.respondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpecPaidStatus.DID_NOT_PAY)
                 .build();
         }
 
@@ -916,19 +919,16 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 int comparison = caseData.getRespondToClaim2().getHowMuchWasPaid()
                     .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount())));
                 if (comparison < 0) {
-                    caseData = caseData.toBuilder()
-                        .respondent1ClaimResponsePaymentAdmissionForSpec(
+                    updated.respondent1ClaimResponsePaymentAdmissionForSpec(
                             RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT).build();
                 } else {
-                    caseData = caseData.toBuilder()
-                        .respondent1ClaimResponsePaymentAdmissionForSpec(
+                    updated.respondent1ClaimResponsePaymentAdmissionForSpec(
                             RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT).build();
                 }
             } else {
-                caseData = caseData.toBuilder().respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
+                updated.respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
             }
         }
-        return caseData;
     }
 
     private AllocatedTrack getAllocatedTrack(CaseData caseData) {
@@ -1033,6 +1033,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2);
                 }
                 break;
+            default:
+                throw new UnsupportedOperationException("Unknown mp scenario");
         }
         return set;
     }
@@ -1041,7 +1043,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
             if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONESPEC)) {
-                return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
+                return validateR1Witnesses(caseData);
             } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWOSPEC)) {
                 return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
             } else if (respondent2HasSameLegalRep(caseData)) {
@@ -1053,7 +1055,18 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 }
             }
         }
-        return validateWitnesses(callbackParams.getCaseData().getRespondent1DQ());
+        return validateR1Witnesses(caseData);
+    }
+
+    private CallbackResponse validateR1Witnesses(CaseData caseData) {
+        List<String> errors = new ArrayList<>();
+        if (caseData.getRespondent1DQWitnessesRequiredSpec() == YES
+            && caseData.getRespondent1DQWitnessesDetailsSpec() == null) {
+            errors.add("Witness details required");
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
     }
 
     private CallbackResponse validateRespondentExperts(CallbackParams callbackParams) {

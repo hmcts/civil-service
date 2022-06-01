@@ -16,11 +16,11 @@ public enum DefendantResponseShowTag {
     RESPONDENT_1_PAID_LESS,
     RESPONDENT_2_PAID_LESS,
     /**
-     * pageId WhenWillClaimBePaid must be shown
+     * pageId WhenWillClaimBePaid must be shown.
      */
     WHEN_WILL_CLAIM_BE_PAID,
     /**
-     * when r1 chose admits part or admits full
+     * when r1 chose admits part or admits full.
      */
     RESPONDENT_1_ADMITS_PART_OR_FULL,
     RESPONDENT_2_ADMITS_PART_OR_FULL,
