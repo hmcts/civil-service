@@ -56,4 +56,7 @@ public class CaseDataParent implements MappableObject {
     private final List<Value<Document>> caseDocuments = new ArrayList<>();
     private final String caseDocument1Name;
 
+    //workaround for showing cases in unassigned case list
+    private final String respondent1OrganisationIDCopy;
+    private final String respondent2OrganisationIDCopy;
 }

@@ -258,6 +258,9 @@ public class CaseDataBuilder {
     private YesOrNo respondent1DQWitnessesRequiredSpec;
     private List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
 
+    private String respondent1OrganisationIDCopy;
+    private String respondent2OrganisationIDCopy;
+
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
         return this;
@@ -379,6 +382,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder caseNotes(CaseNote caseNote) {
         this.caseNotes = ElementUtils.wrapElements(caseNote);
+        return this;
+    }
+
+    public CaseDataBuilder respondent1OrganisationIDCopy(String id) {
+        this.respondent1OrganisationIDCopy = id;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2OrganisationIDCopy(String id) {
+        this.respondent2OrganisationIDCopy = id;
         return this;
     }
 
@@ -1284,6 +1297,7 @@ public class CaseDataBuilder {
         atStatePendingClaimIssued();
         claimNotificationDeadline = NOTIFICATION_DEADLINE;
         ccdState = CASE_ISSUED;
+        respondent1OrganisationIDCopy = "QWERTY R";
         return this;
     }
 
@@ -2780,6 +2794,8 @@ public class CaseDataBuilder {
             .respondent1DQWitnessesRequiredSpec(respondent1DQWitnessesRequiredSpec)
             .respondent1DQWitnessesDetailsSpec(respondent1DQWitnessesDetailsSpec)
             .applicant1ProceedWithClaimSpec2v1(applicant1ProceedWithClaimSpec2v1)
+            .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
+            .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
             .build();
     }
 }
