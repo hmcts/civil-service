@@ -1346,25 +1346,27 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private String getDefaultConfirmationBody(CaseData caseData) {
-        //catch scenario 1v2 Diff Sol - 1 Response Received
-        //responseDeadline has not been set yet
+        LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
-            return "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-                + "%n%nThe claimant has until 4pm on %s to respond to your claim. "
-                + "We will let you know when they respond."
-                + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>";
+            return format(
+                "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                    + "%n%nThe claimant has until 4pm on %s to respond to your claim. "
+                    + "We will let you know when they respond."
+                    + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
+                formatLocalDateTime(responseDeadline, DATE),
+                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+            );
+        } else {
+            return format(
+                "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                    + "%n%nThe claimant has until 4pm on %s to respond to your claim. "
+                    + "We will let you know when they respond."
+                    + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
+                formatLocalDateTime(responseDeadline, DATE),
+                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+            );
         }
-
-        LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
-        return format(
-            "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-                + "%n%nThe claimant has until 4pm on %s to respond to your claim. "
-                + "We will let you know when they respond."
-                + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
-            formatLocalDateTime(responseDeadline, DATE),
-            format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
-        );
     }
 
     private CallbackResponse validateRespondentPaymentDate(CallbackParams callbackParams) {
