@@ -307,11 +307,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             AllocatedTrack allocatedTrack = getAllocatedTrack(caseData);
             updatedCaseData.responseClaimTrack(allocatedTrack.name());
         }
-        Set<DefendantResponseShowTag> financialDetails = checkNecessaryFinancialDetails(caseData);
-        if (!financialDetails.isEmpty()) {
-            financialDetails.addAll(caseData.getShowConditionFlags());
-            updatedCaseData.showConditionFlags(financialDetails);
-        }
+        Set<DefendantResponseShowTag> currentShowFlags = EnumSet.copyOf(caseData.getShowConditionFlags());
+        currentShowFlags.removeAll(EnumSet.of(
+            NEED_FINANCIAL_DETAILS_1,
+            NEED_FINANCIAL_DETAILS_2,
+            WHY_2_DOES_NOT_PAY_IMMEDIATELY
+        ));
+        currentShowFlags.addAll(checkNecessaryFinancialDetails(caseData));
+        updatedCaseData.showConditionFlags(currentShowFlags);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
@@ -742,11 +745,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     private boolean someoneDisputes(CaseData caseData) {
         return someoneDisputes(caseData, CAN_ANSWER_RESPONDENT_1, caseData.getRespondent1ClaimResponseTypeForSpec())
-                || someoneDisputes(caseData, CAN_ANSWER_RESPONDENT_2, caseData.getRespondent2ClaimResponseTypeForSpec());
+            || someoneDisputes(caseData, CAN_ANSWER_RESPONDENT_2, caseData.getRespondent2ClaimResponseTypeForSpec());
     }
 
     private boolean someoneDisputes(CaseData caseData, DefendantResponseShowTag respondent,
-                                  RespondentResponseTypeSpec response) {
+                                    RespondentResponseTypeSpec response) {
         return caseData.getShowConditionFlags().contains(respondent)
             && (response == FULL_DEFENCE || response == PART_ADMISSION);
     }
