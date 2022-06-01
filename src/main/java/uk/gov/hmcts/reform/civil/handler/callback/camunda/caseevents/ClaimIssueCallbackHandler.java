@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
 import java.time.LocalDateTime;
@@ -40,31 +39,20 @@ public class ClaimIssueCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::addClaimNotificationDeadlineAndNextDeadline);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::addClaimNotificationDeadline);
     }
 
-    private CallbackResponse addClaimNotificationDeadlineAndNextDeadline(CallbackParams callbackParams) {
+    private CallbackResponse addClaimNotificationDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime deadline = deadlinesCalculator.addMonthsToDateAtMidnight(4, caseData.getIssueDate());
         CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder();
-        caseDataUpdated
-            .claimNotificationDeadline(deadline)
-            .nextDeadline(deadline.toLocalDate());
-
-        clearSubmitterId(caseData, caseDataUpdated);
+        caseDataUpdated.claimNotificationDeadline(deadline);
 
         // don't display cases in unassigned case list before claim notified workaround.
         clearOrganisationPolicyId(caseData, caseDataUpdated);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.build().toMap(objectMapper))
-            .build();
-    }
-
-    private void clearSubmitterId(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
-        IdamUserDetails userDetails = caseData.getApplicantSolicitor1UserDetails();
-        caseDataBuilder
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(userDetails.getEmail()).build())
             .build();
     }
 
