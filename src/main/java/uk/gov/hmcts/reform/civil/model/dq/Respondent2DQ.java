@@ -42,9 +42,6 @@ public class Respondent2DQ implements DQ {
     private final FutureApplications respondent2DQFutureApplications;
     private final HearingLRspec respondent2DQHearingFastClaim;
     private final RequestedCourt respondToCourtLocation2;
-    //private final DisclosureOfNonElectronicDocumentsLRspec specRespondent2DQDisclosureOfNonElectronicDocuments;
-    //private final DisclosureOfElectronicDocumentsLRspec specRespondent2DQDisclosureOfElectronicDocuments;
-    //private final xyz specApplicant2DQDisclosureOfNonElectronicDocuments;
 
     @Override
     @JsonProperty("respondent2DQFileDirectionsQuestionnaire")

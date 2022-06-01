@@ -573,9 +573,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             && !MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART
             .equals(caseData.getMultiPartyResponseTypeFlags())
             && (!RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT
-            .equals(caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()))
-            || (!RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT
-            .equals(caseData.getRespondent2ClaimResponsePaymentAdmissionForSpec()))) {
+            .equals(caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()))) {
             updatedData.showHowToAddTimeLinePage(YES);
         }
 
