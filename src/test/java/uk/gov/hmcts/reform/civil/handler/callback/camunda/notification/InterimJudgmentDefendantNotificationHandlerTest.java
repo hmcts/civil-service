@@ -49,7 +49,6 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
         void setup() {
             when(notificationsProperties.getInterimJudgmentRequestedDefendant()).thenReturn("template-id-req");
             when(notificationsProperties.getInterimJudgmentApprovalDefendant()).thenReturn("template-id-app");
-            when(notificationsProperties.getInterimJudgmentRequested2Defendants()).thenReturn("template-id-req2");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
         }
