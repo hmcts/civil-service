@@ -41,7 +41,6 @@ public class GeneralAppLocationRefDataService {
             return onlyEnglandAndWalesLocations(responseEntity.getBody());
         } catch (Exception e) {
             log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
-            //throw new RuntimeException(e);
         }
         return new ArrayList<>();
     }
