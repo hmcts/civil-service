@@ -33,6 +33,9 @@ public interface NotificationData {
     String LEGAL_ORG_SPECIFIED = "legalOrg";
     String CLAIM_NUMBER = "claimnumber";
     String DEFENDANT_NAME = "DefendantName";
+    String DEFENDANT_EMAIL = "DefendantLegalOrgName";
+    String CLAIMANT_EMAIL = "ClaimantLegalOrgName";
+    String LEGAL_ORG_APPLICANT1 = "legalOrgApplicant1";
 
     Map<String, String> addProperties(CaseData caseData);
 

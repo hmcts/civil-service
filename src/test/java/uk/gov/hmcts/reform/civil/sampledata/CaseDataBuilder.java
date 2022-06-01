@@ -158,6 +158,7 @@ public class CaseDataBuilder {
     protected RespondentResponseType respondent2ClaimResponseType;
     protected ResponseDocument respondent2ClaimResponseDocument;
     protected YesOrNo respondentResponseIsSame;
+    protected DynamicList defendantDetails;
     // Defendant Response 2 Applicants
     protected RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
     protected RespondentResponseTypeSpec claimant1ClaimResponseTypeForSpec;
@@ -1207,6 +1208,13 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimIssued1v2AndSameUnregisteredRepresentative() {
         atStateClaimIssued1v2AndSameRepresentative();
         respondent1OrgRegistered = NO;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssued1v2AndBothDefendantsDefaultJudgment() {
+        defendantDetails = DynamicList.builder()
+            .value(DynamicListElement.builder().label("Both Defendants").build())
+            .build();
         return this;
     }
 
@@ -2685,6 +2693,7 @@ public class CaseDataBuilder {
             .applicant2ProceedWithClaimMultiParty2v1(applicant2ProceedWithClaimMultiParty2v1)
             .applicant1DefenceResponseDocument(applicant1DefenceResponseDocument)
             .claimantDefenceResDocToDefendant2(applicant2DefenceResponseDocument)
+            .defendantDetails(defendantDetails)
 
             //Case procceds in Caseman
             .claimProceedsInCaseman(claimProceedsInCaseman)
