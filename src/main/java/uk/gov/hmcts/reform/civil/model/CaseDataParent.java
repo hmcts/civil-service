@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 
+import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -56,10 +57,15 @@ public class CaseDataParent implements MappableObject {
     private final YesOrNo respondent1DQWitnessesRequiredSpec;
     private final List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
 
+    private final LocalDateTime addLegalRepDeadline;
+
     @Builder.Default
     private final List<Value<Document>> caseDocuments = new ArrayList<>();
     private final String caseDocument1Name;
 
+    //workaround for showing cases in unassigned case list
+    private final String respondent1OrganisationIDCopy;
+    private final String respondent2OrganisationIDCopy;
     private final YesOrNo specAoSRespondent2CorrespondenceAddressRequired;
     private final Address specAoSRespondent2CorrespondenceAddressdetails;
     private final String defenceRouteRequired2;
