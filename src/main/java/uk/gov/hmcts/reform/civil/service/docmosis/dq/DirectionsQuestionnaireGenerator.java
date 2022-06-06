@@ -365,8 +365,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                     .map(FurtherInformation::getReasonForFutureApplications)
             ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
 
-        String furtherJudgeInfo = NO.equals(wantMore) ? null :
-            Stream.of(
+        String furtherJudgeInfo = Stream.of(
                 Optional.ofNullable(caseData.getAdditionalInformationForJudge()),
                 dqFurtherInformation
                     .map(FurtherInformation::getOtherInformationForJudge)
