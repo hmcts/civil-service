@@ -28,7 +28,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final String[] AUTHORITIES = {
         "caseworker-civil",
         "caseworker-civil-solicitor",
-        "caseworker"
+        "caseworker",
+        "citizen"
     };
 
     private static final String[] AUTH_WHITELIST = {
@@ -44,6 +45,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/health/readiness",
         "/status/health",
         "/",
+        "/fees/**",
         "/loggers/**"
     };
 
