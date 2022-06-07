@@ -39,12 +39,10 @@ java:
     OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443/openam/oauth2/realms/root/realms/hmcts
     FEES_API_URL: http://fees-register-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     GENAPP_LRD_URL: http://rd-location-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-    GENAPP_JRD_URL: http://rd-judicial-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     PAYMENTS_API_URL: http://payment-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     DOCMOSIS_TORNADO_URL: https://docmosis.{{ .Values.global.environment }}.platform.hmcts.net
     DOCUMENT_MANAGEMENT_URL: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-    CLAIM_STORE_URL: http://cmc-claim-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     FEIGN_CLIENT_CONFIG_REMOTERUNTIMESERVICE_URL: http://camunda-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/engine-rest/
     FEIGN_CLIENT_CONFIG_REMOTEEXTERNALTASKSERVICE_URL: http://camunda-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/engine-rest/
     FEIGN_CLIENT_CONFIG_REMOTEREPOSITORYSERVICE_URL: http://camunda-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/engine-rest/
@@ -53,7 +51,6 @@ java:
     EM_CCD_ORCHESTRATOR_URL: http://em-ccd-orchestrator-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     SOME_ENV_VARIABLE: true
     DOCUMENT_MANAGEMENT_SECURED: false
-    REST_TEMPLATE_TIMEOUT: 30000
 
   keyVaults:
     civil:
@@ -76,6 +73,4 @@ java:
         - robotics-notification-recipient
         - launch-darkly-sdk-key
         - robotics-notification-multipartyrecipient
-        - robotics-notification-recipient-spec
-        - ordnance-survey-api-key
 

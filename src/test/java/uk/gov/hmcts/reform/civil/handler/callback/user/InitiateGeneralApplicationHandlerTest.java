@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralAppSampleDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
+import uk.gov.hmcts.reform.civil.service.GeneralAppLocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -88,6 +89,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     protected GeneralAppFeesService feesService;
+
+    @MockBean
+    protected GeneralAppLocationRefDataService locationRefDataService;
 
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
     public static final String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
@@ -647,18 +651,28 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotReturnErrors_whenRespondentSolAssignedToCase() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+            given(locationRefDataService.getCourtLocations(any())).willReturn(getSampleCourLocations());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            DynamicList dynamicList = getLocationDynamicList(data);
+
             assertThat(response.getErrors()).isEmpty();
+            assertThat(data.getGeneralAppHearingDetails()).isNotNull();
+            assertThat(dynamicList).isNotNull();
+            assertThat(locationsFromDynamicList(dynamicList))
+                    .containsOnly("ABCD - RG0 0 AL", "PQRS - GU0 0EE", "WXYZ - EW0 0HE", "LMNO - NE0 0BH");
         }
 
         @Test
         void shouldReturnErrors_whenNoRespondentSolAssignedToCase() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             given(initiateGeneralAppService.respondentAssigned(any())).willReturn(false);
+            given(locationRefDataService.getCourtLocations(any())).willReturn(getSampleCourLocations());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -666,6 +680,16 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNotEmpty();
             assertThat(response.getErrors()).contains(ERROR);
+        }
+
+        private DynamicList getLocationDynamicList(CaseData responseCaseData) {
+            return responseCaseData.getGeneralAppHearingDetails().getHearingPreferredLocation();
+        }
+
+        private List<String> locationsFromDynamicList(DynamicList dynamicList) {
+            return dynamicList.getListItems().stream()
+                    .map(DynamicListElement::getLabel)
+                    .collect(Collectors.toList());
         }
     }
 }
