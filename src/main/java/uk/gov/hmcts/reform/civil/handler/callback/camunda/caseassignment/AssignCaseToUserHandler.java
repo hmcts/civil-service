@@ -116,8 +116,22 @@ public class AssignCaseToUserHandler extends CallbackHandler {
 
         if (professionalUsersEntityResponse != null) {
             for (ProfessionalUsersResponse user : professionalUsersEntityResponse.getUsers()) {
-                if (user.getRoles().contains(CASEWORKER_CAA_ROLE)) {
-                    caaUserIds.add(user.getUserIdentifier());
+                if (user != null) {
+                    if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+                        if (user.getRoles().contains(CASEWORKER_CAA_ROLE)) {
+                            caaUserIds.add(user.getUserIdentifier());
+                        } else {
+                            log.info("user roles {}", user.getRoles().toString());
+                        }
+                    } else {
+                        if (user.getRoles() == null) {
+                            log.info("userRoles is null");
+                        } else {
+                            log.info("userRoles is empty");
+                        }
+                    }
+                } else {
+                    log.info("user is null");
                 }
             }
         }
