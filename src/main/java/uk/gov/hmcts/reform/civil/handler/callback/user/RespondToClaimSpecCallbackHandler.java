@@ -1345,26 +1345,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     private String getDefaultConfirmationBody(CaseData caseData) {
         LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
-        if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
-            && isAwaitingAnotherDefendantResponse(caseData)) {
-            return format(
-                "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-                    + "%n%nThe claimant has until 4pm on %s to respond to your claim. "
-                    + "We will let you know when they respond."
-                    + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
-                formatLocalDateTime(responseDeadline, DATE),
-                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
-            );
-        } else {
-            return format(
-                "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-                    + "%n%nThe claimant has until 4pm on %s to respond to your claim. "
-                    + "We will let you know when they respond."
-                    + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
-                formatLocalDateTime(responseDeadline, DATE),
-                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
-            );
-        }
+        return format(
+            "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                + "%n%nThe claimant has until 4pm on %s to respond to your claim. "
+                + "We will let you know when they respond."
+                + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
+            formatLocalDateTime(responseDeadline, DATE),
+            format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+        );
     }
 
     private CallbackResponse validateRespondentPaymentDate(CallbackParams callbackParams) {
