@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGen
 
 import javax.validation.constraints.NotNull;
 
-
 @Api
 @Slf4j
 @RestController
@@ -35,19 +34,18 @@ public class DocumentController {
     private final CamundaRestEngineClient camundaRestEngineClient;
     private final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
 
-
     @PostMapping("/generateSealedDoc")
     public CaseDocument uploadSealedDocument(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation, @NotNull @RequestBody CaseData caseData) {
         return sealedClaimFormGeneratorForSpec.generate(caseData, authorisation);
     }
 
-
     @PostMapping(value = "/downloadSealedDoc",
         produces = MediaType.APPLICATION_PDF_VALUE)
     public @ResponseBody
     byte[] downloadSealedDocument(
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation, @NotNull @RequestBody CaseDocument caseDocument) {
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
+        @NotNull @RequestBody CaseDocument caseDocument) {
         return sealedClaimFormGeneratorForSpec.downloadDocument(caseDocument, authorisation);
     }
 }

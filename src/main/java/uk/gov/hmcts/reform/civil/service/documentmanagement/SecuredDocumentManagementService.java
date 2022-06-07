@@ -113,7 +113,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 UUID.fromString(documentPath.substring(documentPath.lastIndexOf("/") + 1))
             );
 
-            if(responseEntity == null) {
+            if (responseEntity == null) {
                 responseEntity = documentDownloadClientApi.downloadBinary(
                     authorisation,
                     authTokenGenerator.generate(),
@@ -122,7 +122,6 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                     URI.create(documentMetadata.links.binary.href).getPath().replaceFirst("/", "")
                 );
             }
-
 
             return Optional.ofNullable(responseEntity.getBody())
                 .map(ByteArrayResource.class::cast)
