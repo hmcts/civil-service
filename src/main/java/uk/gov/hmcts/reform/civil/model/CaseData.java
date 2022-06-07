@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.sdo.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -404,4 +405,16 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonUnwrapped(suffix = "Breathing")
     private final BreathingSpaceInfo breathing;
     private final String applicantVRespondentText;
+
+    //default judgement SDO fields for disposal
+    private DisposalHearingJudgesRecital disposalHearingJudgesRecitalDJ;
+    private DisposalHearingDisclosureOfDocuments disposalHearingDisclosureOfDocumentsDJ;
+    private DisposalHearingWitnessOfFact disposalHearingWitnessOfFactDJ;
+    private DisposalHearingMedicalEvidence disposalHearingMedicalEvidenceDJ;
+    private DisposalHearingQuestionsToExperts disposalHearingQuestionsToExpertsDJ;
+    private DisposalHearingSchedulesOfLoss disposalHearingSchedulesOfLossDJ;
+    private DisposalHearingStandardDisposalOrder disposalHearingStandardDisposalOrderDJ;
+    private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearingDJ;
+    private DisposalHearingBundle disposalHearingBundleDJ;
+    private DisposalHearingNotes disposalHearingNotesDJ;
 }
