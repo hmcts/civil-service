@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -118,6 +119,10 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM))
             .claimNotificationDate(claimNotificationDate);
 
+        // set organisation policy after removing it in claim issue
+        // workaround for hiding cases in CAA list before case notify
+        setOrganisationPolicy(caseData, caseDataBuilder);
+
         LocalDateTime claimDetailsNotificationDeadline = getDeadline(claimNotificationDate);
         LocalDateTime claimNotificationDeadline = caseData.getClaimNotificationDeadline();
 
@@ -132,6 +137,28 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void setOrganisationPolicy(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+        if (caseData.getRespondent1OrganisationIDCopy() != null) {
+            caseDataBuilder.respondent1OrganisationPolicy(
+                caseData.getRespondent1OrganisationPolicy().toBuilder()
+                    .organisation(Organisation.builder()
+                                      .organisationID(caseData.getRespondent1OrganisationIDCopy())
+                                      .build())
+                    .build()
+            );
+        }
+
+        if (caseData.getRespondent2OrganisationIDCopy() != null) {
+            caseDataBuilder.respondent2OrganisationPolicy(
+                caseData.getRespondent2OrganisationPolicy().toBuilder()
+                    .organisation(Organisation.builder()
+                                      .organisationID(caseData.getRespondent2OrganisationIDCopy())
+                                      .build())
+                    .build()
+            );
+        }
     }
 
     private LocalDateTime getDeadline(LocalDateTime claimNotificationDate) {
