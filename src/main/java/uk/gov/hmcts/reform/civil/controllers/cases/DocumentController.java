@@ -36,14 +36,14 @@ public class DocumentController {
     private final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
 
 
-    @PostMapping("/generateDoc")
+    @PostMapping("/generateSealedDoc")
     public CaseDocument uploadSealedDocument(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation, @NotNull @RequestBody CaseData caseData) {
         return sealedClaimFormGeneratorForSpec.generate(caseData, authorisation);
     }
 
 
-    @PostMapping(value = "/downloadDoc",
+    @PostMapping(value = "/downloadSealedDoc",
         produces = MediaType.APPLICATION_PDF_VALUE)
     public @ResponseBody
     byte[] downloadSealedDocument(
