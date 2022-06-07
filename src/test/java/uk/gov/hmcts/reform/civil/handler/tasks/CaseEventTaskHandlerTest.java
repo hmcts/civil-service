@@ -234,8 +234,7 @@ class CaseEventTaskHandlerTest {
         @ParameterizedTest
         @EnumSource(
             value = FlowState.Main.class,
-            names = {"FULL_ADMISSION", "PART_ADMISSION", "COUNTER_CLAIM",
-                "PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT", "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT",
+            names = {"FULL_ADMISSION", "PART_ADMISSION", "COUNTER_CLAIM", "PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT",
                 "PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT",
                 "FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED", "TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED",
                 "TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED", "TAKEN_OFFLINE_BY_STAFF"})
@@ -611,11 +610,13 @@ class CaseEventTaskHandlerTest {
                 return Map.of("TWO_RESPONDENT_REPRESENTATIVES", true,
                               "ONE_RESPONDENT_REPRESENTATIVE", false,
                               "RPA_CONTINUOUS_FEED", false,
-                              FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false
+                              FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
+                              FlowFlag.NOTICE_OF_CHANGE.name(), false
                 );
             }
             return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false,
-                          FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false);
+                          FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
+                          FlowFlag.NOTICE_OF_CHANGE.name(), false);
         }
 
         private CaseData getCaseData(FlowState.Main state) {

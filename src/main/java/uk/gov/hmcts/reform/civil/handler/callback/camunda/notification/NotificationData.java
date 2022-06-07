@@ -11,6 +11,7 @@ public interface NotificationData {
     String ISSUED_ON = "issuedOn";
     String CLAIM_NOTIFICATION_DEADLINE = "claimNotificationDeadline";
     String CLAIM_DETAILS_NOTIFICATION_DEADLINE = "claimDetailsNotificationDeadline";
+    String RESPONSE_DEADLINE_PLUS_28 = "responseDeadlinePlus28";
     String RESPONSE_DEADLINE = "responseDeadline";
     String NOTIFICATION_DEADLINE = "notificationDeadline";
     String AGREED_EXTENSION_DATE = "agreedExtensionDate";
@@ -33,6 +34,9 @@ public interface NotificationData {
     String LEGAL_ORG_SPECIFIED = "legalOrg";
     String CLAIM_NUMBER = "claimnumber";
     String DEFENDANT_NAME = "DefendantName";
+    String DEFENDANT_EMAIL = "DefendantLegalOrgName";
+    String CLAIMANT_EMAIL = "ClaimantLegalOrgName";
+    String LEGAL_ORG_APPLICANT1 = "legalOrgApplicant1";
 
     Map<String, String> addProperties(CaseData caseData);
 
