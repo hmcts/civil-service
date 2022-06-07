@@ -33,7 +33,7 @@ public class PartialAdmitPaidFullConfirmationText implements RespondToClaimConfi
             return Optional.empty();
         }
 
-        if (new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount)).compareTo(howMuchWasPaid) < 0) {
+        if (new BigDecimal(MonetaryConversions.poundsToPennies(totalClaimAmount)).compareTo(howMuchWasPaid) > 0) {
             return Optional.empty();
         }
 
