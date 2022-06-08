@@ -19,10 +19,7 @@ public class DisposalHearingWitnessOfFact {
     private LocalDate date1;
     private String input2;
     private String input3;
+    @Future(message = "The date entered must be in the future")
     private LocalDate date2;
     private String input4;
-    private String input5;
-    @Future(message = "The date entered must be in the future")
-    private LocalDate date3;
-    private String input6;
 }
