@@ -29,7 +29,10 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+<<<<<<< HEAD
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+=======
+>>>>>>> master
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -104,7 +107,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
-
     // This is currently a mid event but once pre states are defined it should be moved to an about to start event.
     // Once it has been moved to an about to start event the following file will need to be updated:
     // FlowStateAllowedEventService.java.
