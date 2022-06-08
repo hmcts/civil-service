@@ -1,7 +1,13 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
+import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
+import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -13,16 +19,20 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.prd.client.OrganisationApi;
+import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Optional.ofNullable;
@@ -35,10 +45,18 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
+@SuppressWarnings("unchecked")
 public class InitiateGeneralApplicationService {
 
     private final InitiateGeneralApplicationServiceHelper helper;
     private final GeneralAppsDeadlinesCalculator deadlinesCalculator;
+    private final CaseAccessDataStoreApi caseAccessDataStoreApi;
+    private final UserService userService;
+    private final CrossAccessUserConfiguration crossAccessUserConfiguration;
+
+    private final OrganisationApi organisationApi;
+    private final AuthTokenGenerator authTokenGenerator;
 
     private static final int NUMBER_OF_DEADLINE_DAYS = 5;
     public static final String URGENCY_DATE_REQUIRED = "Details of urgency consideration date required.";
@@ -55,9 +73,11 @@ public class InitiateGeneralApplicationService {
     public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after "
         + "Unavailability Date to. Please enter valid range.";
 
-    public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData, UserDetails userDetails) {
-        List<Element<GeneralApplication>> applications = addApplication(buildApplication(caseData, userDetails),
-                                                                        caseData.getGeneralApplications());
+    public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData, UserDetails userDetails,
+                                  String authToken) {
+        List<Element<GeneralApplication>> applications =
+            addApplication(buildApplication(caseData, userDetails, authToken), caseData.getGeneralApplications());
+
         return dataBuilder
             .generalApplications(applications)
             .generalAppType(GAApplicationType.builder().build())
@@ -70,10 +90,11 @@ public class InitiateGeneralApplicationService {
             .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
             .generalAppHearingDetails(GAHearingDetails.builder().build())
             .generalAppEvidenceDocument(java.util.Collections.emptyList())
+            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().build())
             .build();
     }
 
-    private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails) {
+    private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails, String authToken) {
 
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
         if (caseData.getGeneralAppEvidenceDocument() != null) {
@@ -96,15 +117,28 @@ public class InitiateGeneralApplicationService {
             .calculateApplicantResponseDeadline(
                 LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS).toString();
         if (caseData.getGeneralAppRespondentAgreement() != null
-                && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())) {
+            && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())) {
             applicationBuilder
-                    .generalAppInformOtherParty(caseData.getGeneralAppInformOtherParty())
-                    .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth());
+                .generalAppInformOtherParty(caseData.getGeneralAppInformOtherParty())
+                .generalAppStatementOfTruth(caseData.getGeneralAppStatementOfTruth());
         } else {
             applicationBuilder
-                    .generalAppInformOtherParty(GAInformOtherParty.builder().build())
-                    .generalAppStatementOfTruth(GAStatementOfTruth.builder().build());
+                .generalAppInformOtherParty(GAInformOtherParty.builder().build())
+                .generalAppStatementOfTruth(GAStatementOfTruth.builder().build());
         }
+
+        Optional<Organisation> org = findOrganisation(authToken);
+        if (org.isPresent()) {
+            applicationBuilder
+                .generalAppApplnSolicitor(GASolicitorDetailsGAspec
+                                             .builder()
+                                             .id(userDetails.getId())
+                                             .email(userDetails.getEmail())
+                                             .forename(userDetails.getForename())
+                                             .surname(userDetails.getSurname())
+                                             .organisationIdentifier(org.get().getOrganisationIdentifier()).build());
+        }
+
         GeneralApplication generalApplication = applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
             .generalAppType(caseData.getGeneralAppType())
@@ -120,12 +154,12 @@ public class InitiateGeneralApplicationService {
                                        .build())
             .build();
 
-        return helper.setApplicantAndRespondentDetailsIfExits(generalApplication, caseData, userDetails);
+        return helper.setRespondentDetailsIfPresent(generalApplication, caseData, userDetails);
     }
 
     private List<Element<GeneralApplication>> addApplication(GeneralApplication application,
                                                              List<Element<GeneralApplication>>
-                                                                     generalApplicationDetails) {
+                                                                 generalApplicationDetails) {
         List<Element<GeneralApplication>> newApplication = ofNullable(generalApplicationDetails).orElse(newArrayList());
         newApplication.add(element(application));
 
@@ -135,16 +169,16 @@ public class InitiateGeneralApplicationService {
     public List<String> validateUrgencyDates(GAUrgencyRequirement generalAppUrgencyRequirement) {
         List<String> errors = new ArrayList<>();
         if (generalAppUrgencyRequirement.getGeneralAppUrgency() == YES
-                && generalAppUrgencyRequirement.getUrgentAppConsiderationDate() == null) {
+            && generalAppUrgencyRequirement.getUrgentAppConsiderationDate() == null) {
             errors.add(URGENCY_DATE_REQUIRED);
         }
         if (generalAppUrgencyRequirement.getGeneralAppUrgency() == NO
-                && generalAppUrgencyRequirement.getUrgentAppConsiderationDate() != null) {
+            && generalAppUrgencyRequirement.getUrgentAppConsiderationDate() != null) {
             errors.add(URGENCY_DATE_SHOULD_NOT_BE_PROVIDED);
         }
 
         if (generalAppUrgencyRequirement.getGeneralAppUrgency() == YES
-                && generalAppUrgencyRequirement.getUrgentAppConsiderationDate() != null) {
+            && generalAppUrgencyRequirement.getUrgentAppConsiderationDate() != null) {
             LocalDate urgencyDate = generalAppUrgencyRequirement.getUrgentAppConsiderationDate();
             if (LocalDate.now().isAfter(urgencyDate)) {
                 errors.add(URGENCY_DATE_CANNOT_BE_IN_PAST);
@@ -156,9 +190,11 @@ public class InitiateGeneralApplicationService {
     public List<String> validateHearingScreen(GAHearingDetails hearingDetails) {
         List<String> errors = new ArrayList<>();
         validateTrialDate(errors, hearingDetails.getTrialRequiredYesOrNo(), hearingDetails.getTrialDateFrom(),
-                hearingDetails.getTrialDateTo());
+                          hearingDetails.getTrialDateTo()
+        );
         validateUnavailableDates(errors, hearingDetails.getUnavailableTrialRequiredYesOrNo(),
-                hearingDetails.getGeneralAppUnavailableDates());
+                                 hearingDetails.getGeneralAppUnavailableDates()
+        );
         return errors;
     }
 
@@ -193,5 +229,52 @@ public class InitiateGeneralApplicationService {
                 });
             }
         }
+    }
+
+    public Optional<Organisation> findOrganisation(String authToken) {
+        try {
+            return ofNullable(organisationApi.findUserOrganisation(authToken, authTokenGenerator.generate()));
+
+        } catch (FeignException.NotFound | FeignException.Forbidden ex) {
+            log.error("User not registered in MO", ex);
+            return Optional.empty();
+        }
+    }
+
+    public boolean respondentAssigned(CaseData caseData) {
+        String caseId = caseData.getCcdCaseReference().toString();
+        CaseAssignedUserRolesResource userRoles = getUserRolesOnCase(caseId);
+        List<String> respondentCaseRoles = getRespondentCaseRoles(caseData);
+
+        for (String respondentCaseRole : respondentCaseRoles) {
+            if (userRoles.getCaseAssignedUserRoles() == null
+                    || userRoles.getCaseAssignedUserRoles().stream()
+                    .noneMatch(a -> a.getCaseRole() != null && respondentCaseRole.equals(a.getCaseRole()))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private CaseAssignedUserRolesResource getUserRolesOnCase(String caseId) {
+        String accessToken = userService.getAccessToken(
+                crossAccessUserConfiguration.getUserName(),
+                crossAccessUserConfiguration.getPassword()
+        );
+        return caseAccessDataStoreApi.getUserRoles(
+                accessToken,
+                authTokenGenerator.generate(),
+                List.of(caseId)
+        );
+    }
+
+    private List<String> getRespondentCaseRoles(CaseData caseData) {
+        List<String> respondentCaseRoles = new ArrayList<>();
+        respondentCaseRoles.add(caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole());
+        if (NO.equals(caseData.getRespondent2SameLegalRepresentative())
+                && caseData.getRespondent2OrganisationPolicy() != null) {
+            respondentCaseRoles.add(caseData.getRespondent2OrganisationPolicy().getOrgPolicyCaseAssignedRole());
+        }
+        return respondentCaseRoles;
     }
 }

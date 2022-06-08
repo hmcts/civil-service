@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
@@ -47,33 +48,46 @@ public class RoboticsNotificationService {
 
     public void notifyRobotics(@NotNull CaseData caseData, boolean isMultiParty) {
         requireNonNull(caseData);
-        EmailData emailData = prepareEmailData(caseData, isMultiParty);
-        sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), emailData);
+        Optional<EmailData> emailData = prepareEmailData(caseData, isMultiParty);
+        emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
     }
 
-    private EmailData prepareEmailData(CaseData caseData, boolean isMultiParty) {
+    private boolean canSendEmailSpec() {
+        try {
+            return toggleService.isLrSpecEnabled()
+                && toggleService.isSpecRpaContinuousFeedEnabled();
+        } catch (Throwable e) {
+            log.error("Exception on launchdarkly check", e);
+            return false;
+        }
+    }
+
+    private Optional<EmailData> prepareEmailData(CaseData caseData, boolean isMultiParty) {
 
         byte[] roboticsJsonData;
         try {
             String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
             String triggerEvent;
 
-            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())  && toggleService.isLrSpecEnabled()) {
-                RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
-                triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseData.getEvents());
-                roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+                if (canSendEmailSpec()) {
+                    RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+                    triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseData.getEvents());
+                    roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
+                } else {
+                    return Optional.empty();
+                }
             } else {
                 RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
             }
-
-            return EmailData.builder()
+            return Optional.of(EmailData.builder()
                 .message(getMessage(caseData, isMultiParty))
                 .subject(getSubject(caseData, triggerEvent, isMultiParty))
-                .to(getRoboticsEmailRecipient(isMultiParty))
+                .to(getRoboticsEmailRecipient(isMultiParty, caseData.getSuperClaimType()))
                 .attachments(of(json(roboticsJsonData, fileName)))
-                .build();
+                .build());
         } catch (JsonProcessingException e) {
             throw new RoboticsDataException(e.getMessage(), e);
         }
@@ -81,17 +95,27 @@ public class RoboticsNotificationService {
 
     private String getMessage(CaseData caseData, boolean isMultiParty) {
         return isMultiParty ? String.format("Multiparty claim data for %s - %s", caseData.getLegacyCaseReference(),
-            caseData.getCcdState()) : String.format("Robotics case data JSON is attached for %s",
-                caseData.getLegacyCaseReference());
+                                            caseData.getCcdState()
+        ) : String.format(
+            "Robotics case data JSON is attached for %s",
+            caseData.getLegacyCaseReference()
+        );
     }
 
     private String getSubject(CaseData caseData, String triggerEvent, boolean isMultiParty) {
         return isMultiParty ? String.format("Multiparty claim data for %s - %s - %s", caseData.getLegacyCaseReference(),
-            caseData.getCcdState(), triggerEvent) : String.format("Robotics case data for %s",
-                caseData.getLegacyCaseReference());
+                                            caseData.getCcdState(), triggerEvent
+        ) : String.format(
+            "Robotics case data for %s",
+            caseData.getLegacyCaseReference()
+        );
     }
 
-    private String getRoboticsEmailRecipient(boolean isMultiParty) {
+    private String getRoboticsEmailRecipient(boolean isMultiParty, SuperClaimType superClaimType) {
+        if (SPEC_CLAIM.equals(superClaimType)) {
+            return isMultiParty && !toggleService.isSpecRpaContinuousFeedEnabled() ? roboticsEmailConfiguration
+                .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
+        }
         return isMultiParty && !toggleService.isRpaContinuousFeedEnabled() ? roboticsEmailConfiguration
             .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
     }
@@ -103,10 +127,10 @@ public class RoboticsNotificationService {
         List<Event> lastMiscellaneousEvent = events.stream()
             .filter(event ->
                         event.getDateReceived().equals(events.get(events.size() - 1).getDateReceived())
-                        && event.getEventCode().equals(MISCELLANEOUS.getCode()))
+                            && event.getEventCode().equals(MISCELLANEOUS.getCode()))
             .collect(Collectors.toList());
 
-        return lastMiscellaneousEvent.size() == 1 ?  lastMiscellaneousEvent.get(0).getEventDetailsText()
+        return lastMiscellaneousEvent.size() == 1 ? lastMiscellaneousEvent.get(0).getEventDetailsText()
             : events.get(events.size() - 1).getEventDetailsText();
     }
 

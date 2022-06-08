@@ -9,11 +9,15 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED;
@@ -21,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +46,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -64,6 +70,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
 
     private CallbackResponse notifyRespondentSolicitorForClaimantConfirmsToProceed(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        String template = null;
         var recipient = isCcNotification(callbackParams)
             ? caseData.getApplicantSolicitor1UserDetails().getEmail()
             : caseData.getRespondentSolicitor1EmailAddress();
@@ -84,11 +91,22 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             );
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
+        if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            template = isCcNotification(callbackParams)
+                ? notificationsProperties.getClaimantSolicitorConfirmsToProceedSpec()
+                : notificationsProperties.getRespondentSolicitorNotifyToProceedSpec();
+        } else {
+            template = notificationsProperties.getClaimantSolicitorConfirmsToProceed();
+        }
+
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
 
         notificationService.sendMail(
             recipient,
-            notificationsProperties.getClaimantSolicitorConfirmsToProceed(),
-            addProperties(caseData),
+            template,
+            SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+                ? addPropertiesSpec(caseData, caseEvent)
+                : addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -102,6 +120,15 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
         );
     }
 
+    public Map<String, String> addPropertiesSpec(CaseData caseData, CaseEvent caseEvent) {
+        return Map.of(
+            CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+        );
+    }
+
     private boolean isCcNotification(CallbackParams callbackParams) {
         return callbackParams.getRequest().getEventId()
             .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC.name());
@@ -110,5 +137,16 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
     private boolean isRespondentSolicitor2Notification(CallbackParams callbackParams) {
         return callbackParams.getRequest().getEventId()
             .equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED.name());
+    }
+
+    //finding legal org name
+    private String getLegalOrganisationName(CaseData caseData,  CaseEvent caseEvent) {
+        String organisationID;
+        organisationID = caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC)
+            ? caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID()
+            : caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+        Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
+        return organisation.isPresent() ? organisation.get().getName() :
+            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 }

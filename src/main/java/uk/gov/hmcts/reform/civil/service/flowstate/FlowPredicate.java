@@ -35,7 +35,7 @@ public class FlowPredicate {
         caseData.getSubmittedDate() != null
             && (caseData.getAddRespondent2() == null
             || caseData.getAddRespondent2() == NO
-            || caseData.getAddRespondent2() == YES && caseData.getRespondent2SameLegalRepresentative() == YES);
+            || (caseData.getAddRespondent2() == YES && caseData.getRespondent2SameLegalRepresentative() == YES));
 
     public static final Predicate<CaseData> claimSubmittedTwoRespondentRepresentatives = caseData ->
         caseData.getSubmittedDate() != null
@@ -114,7 +114,8 @@ public class FlowPredicate {
             && caseData.getRespondent1AcknowledgeNotificationDate() == null;
 
     public static final Predicate<CaseData> claimDetailsNotified = caseData ->
-        caseData.getClaimDetailsNotificationDate() != null
+        !SPEC_CLAIM.equals(caseData.getSuperClaimType())
+            && caseData.getClaimDetailsNotificationDate() != null
             && (caseData.getDefendantSolicitorNotifyClaimDetailsOptions() == null
             || hasNotifiedClaimDetailsToBoth.test(caseData));
 
@@ -138,8 +139,15 @@ public class FlowPredicate {
     }
 
     public static final Predicate<CaseData> respondentTimeExtension = caseData ->
-        (caseData.getRespondent1TimeExtensionDate() != null && caseData.getRespondent1ResponseDate() == null)
-            || (caseData.getRespondent2TimeExtensionDate() != null && caseData.getRespondent2ResponseDate() == null);
+        getPredicateForTimeExtension(caseData);
+
+    private static boolean getPredicateForTimeExtension(CaseData caseData) {
+        if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP) {
+            return caseData.getRespondent1TimeExtensionDate() != null
+                || caseData.getRespondent2TimeExtensionDate() != null;
+        }
+        return caseData.getRespondent1TimeExtensionDate() != null;
+    }
 
     public static final Predicate<CaseData> notificationAcknowledgedTimeExtension = caseData ->
         caseData.getRespondent1TimeExtensionDate() != null
@@ -449,32 +457,55 @@ public class FlowPredicate {
             && caseData.getClaimDetailsNotificationDate() == null
             && caseData.getClaimNotificationDate() != null;
 
+    public static final Predicate<CaseData> pastAddLegalRepDeadline = (caseData) ->
+        // when notify change is merged, replace with this code
+        // caseData.getAddLegalRepDeadline() != null && caseData.getAddLegalRepDeadline().isBefore(LocalDateTime.now());
+        caseData.getAddLegalRepDeadline() == null
+            ? true
+            : caseData.getAddLegalRepDeadline().isBefore(LocalDateTime.now());
+
     public static final Predicate<CaseData> claimDismissedByCamunda = caseData ->
         caseData.getClaimDismissedDate() != null;
 
+    public static final Predicate<CaseData> fullAdmissionSpec = caseData ->
+        getPredicateForResponseTypeSpec(caseData, RespondentResponseTypeSpec.FULL_ADMISSION);
+
+    public static final Predicate<CaseData> partAdmissionSpec = caseData ->
+        getPredicateForResponseTypeSpec(caseData, RespondentResponseTypeSpec.PART_ADMISSION);
+
+    public static final Predicate<CaseData> counterClaimSpec = caseData ->
+        getPredicateForResponseTypeSpec(caseData, RespondentResponseTypeSpec.COUNTER_CLAIM);
+
     public static final Predicate<CaseData> fullDefenceSpec = caseData ->
-        SPEC_CLAIM.equals(caseData.getSuperClaimType())
-            && caseData.getRespondent1ResponseDate() != null
-            && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE;
+        getPredicateForResponseTypeSpec(caseData, RespondentResponseTypeSpec.FULL_DEFENCE);
 
-    private FlowPredicate() {
-        //Utility class
-    }
+    private static boolean getPredicateForResponseTypeSpec(CaseData caseData, RespondentResponseTypeSpec responseType) {
 
-    private static boolean getPredicateForClaimantIntentionProceed(CaseData caseData) {
+        boolean basePredicate = caseData.getRespondent1ResponseDate() != null
+            && caseData.getRespondent1ClaimResponseTypeForSpec() == responseType;
+
         boolean predicate = false;
+
+        if (!SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            return false;
+        }
+
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_ONE_LEGAL_REP:
+                predicate = basePredicate && (caseData.getRespondentResponseIsSame() == YES
+                    || caseData.getRespondent2ClaimResponseTypeForSpec() == responseType);
+                break;
             case ONE_V_TWO_TWO_LEGAL_REP:
-                predicate = YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-                    || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
+                predicate = basePredicate
+                    && caseData.getRespondent2ClaimResponseTypeForSpec() == responseType;
                 break;
             case ONE_V_ONE:
-                predicate = YES.equals(caseData.getApplicant1ProceedWithClaim());
+                predicate = basePredicate;
                 break;
             case TWO_V_ONE:
-                predicate = YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
-                    || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
+                predicate = (basePredicate && caseData.getDefendantSingleResponseToBothClaimants() == YES)
+                    || (responseType.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
+                    && responseType.equals(caseData.getClaimant2ClaimResponseTypeForSpec()));
                 break;
             default:
                 break;
@@ -482,24 +513,220 @@ public class FlowPredicate {
         return predicate;
     }
 
-    private static boolean getPredicateForClaimantIntentionNotProceed(CaseData caseData) {
-        boolean predicate = false;
+    public static final Predicate<CaseData> divergentRespondWithDQAndGoOfflineSpec = caseData ->
+        isDivergentResponsesWithDQAndGoOfflineSpec(caseData);
+
+    private static boolean isDivergentResponsesWithDQAndGoOfflineSpec(CaseData caseData) {
+
+        if (!SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            return false;
+        }
+
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_ONE_LEGAL_REP:
+                //scenario: only one of them have submitted full defence response
+                return caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                    && !caseData.getRespondent1ClaimResponseTypeForSpec()
+                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+                    && NO.equals(caseData.getRespondentResponseIsSame())
+                    && (RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                    || RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
             case ONE_V_TWO_TWO_LEGAL_REP:
-                predicate = NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-                    && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
-                break;
-            case ONE_V_ONE:
-                predicate = NO.equals(caseData.getApplicant1ProceedWithClaim());
-                break;
+                //scenario: latest response is full defence
+                return caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                    && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+                    && caseData.getRespondent1ResponseDate() != null
+                    && caseData.getRespondent2ResponseDate() != null
+                    && !caseData.getRespondent1ClaimResponseTypeForSpec()
+                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+                    && ((RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+                    && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()))
+                    || (RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                    && caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate())));
             case TWO_V_ONE:
-                predicate = NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
-                    && NO.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
-                break;
+                return (RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
+                    || RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec()))
+                    && !(RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
+                    && RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec()));
             default:
-                break;
+                return false;
         }
+    }
+
+    public static final Predicate<CaseData> divergentRespondGoOfflineSpec = caseData ->
+        isDivergentResponsesGoOfflineSpec(caseData);
+
+    private static boolean isDivergentResponsesGoOfflineSpec(CaseData caseData) {
+
+        if (!SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            return false;
+        }
+
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                return caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                    && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+                    && caseData.getRespondent1ResponseDate() != null
+                    && caseData.getRespondent2ResponseDate() != null
+                    && !caseData.getRespondent1ClaimResponseTypeForSpec()
+                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+                    //scenario: latest response is not full defence
+                    && (((!RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+                    && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate())
+                    || !RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                    && caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate())))
+                    //scenario: neither responses are full defence
+                    || (!RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                    && !RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec())));
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                return caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                    && !caseData.getRespondent1ClaimResponseTypeForSpec()
+                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+                    && caseData.getRespondentResponseIsSame() != YES
+                    && (!RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                    && !RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
+            case TWO_V_ONE:
+                if ((!RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
+                    && !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec()))
+                    && (caseData.getClaimant1ClaimResponseTypeForSpec() != null
+                    && caseData.getClaimant2ClaimResponseTypeForSpec() != null)
+                    && !caseData.getClaimant1ClaimResponseTypeForSpec()
+                        .equals(caseData.getClaimant2ClaimResponseTypeForSpec())) {
+                    return true;
+                }
+                return false;
+            default:
+                return false;
+        }
+    }
+
+    public static final Predicate<CaseData> awaitingResponsesFullDefenceReceivedSpec = caseData ->
+        getPredicateForAwaitingResponsesFullDefenceReceivedSpec(caseData);
+
+    private static boolean getPredicateForAwaitingResponsesFullDefenceReceivedSpec(CaseData caseData) {
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                return (caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                    && caseData.getRespondent2ClaimResponseTypeForSpec() == null
+                    && RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
+                    ||
+                    (caseData.getRespondent1ClaimResponseTypeForSpec() == null
+                        && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+                        && RespondentResponseTypeSpec.FULL_DEFENCE
+                        .equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
+            default:
+                return false;
+        }
+    }
+
+    public static final Predicate<CaseData> awaitingResponsesNonFullDefenceReceivedSpec = caseData ->
+        getPredicateForAwaitingResponsesNonFullDefenceReceivedSpec(caseData);
+
+    private static boolean getPredicateForAwaitingResponsesNonFullDefenceReceivedSpec(CaseData caseData) {
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                return (caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                    && caseData.getRespondent2ClaimResponseTypeForSpec() == null
+                    && !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData
+                                                                           .getRespondent1ClaimResponseTypeForSpec()))
+                    ||
+                    (caseData.getRespondent1ClaimResponseTypeForSpec() == null
+                        && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+                        && !RespondentResponseTypeSpec.FULL_DEFENCE
+                        .equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
+            default:
+                return false;
+        }
+    }
+
+    public static final Predicate<CaseData> specClaim = caseData ->
+        SPEC_CLAIM.equals(caseData.getSuperClaimType());
+
+    private FlowPredicate() {
+        //Utility class
+    }
+
+    private static boolean getPredicateForClaimantIntentionProceed(CaseData caseData) {
+        boolean predicate = false;
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            switch (getMultiPartyScenario(caseData)) {
+                case ONE_V_TWO_ONE_LEGAL_REP:
+                case ONE_V_TWO_TWO_LEGAL_REP:
+                case ONE_V_ONE:
+                    predicate = YES.equals(caseData.getApplicant1ProceedWithClaim());
+                    break;
+                case TWO_V_ONE:
+                    predicate = YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1());
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            switch (getMultiPartyScenario(caseData)) {
+                case ONE_V_TWO_ONE_LEGAL_REP:
+                case ONE_V_TWO_TWO_LEGAL_REP:
+                    predicate = YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+                        || YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
+                    break;
+                case ONE_V_ONE:
+                    predicate = YES.equals(caseData.getApplicant1ProceedWithClaim());
+                    break;
+                case TWO_V_ONE:
+                    predicate = YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+                        || YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
+                    break;
+                default:
+                    break;
+            }
+        }
+        return predicate;
+    }
+
+    private static boolean getPredicateForClaimantIntentionNotProceed(CaseData caseData) {
+        boolean predicate = false;
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            switch (getMultiPartyScenario(caseData)) {
+                case ONE_V_TWO_ONE_LEGAL_REP:
+                case ONE_V_TWO_TWO_LEGAL_REP:
+                case ONE_V_ONE:
+                    predicate = NO.equals(caseData.getApplicant1ProceedWithClaim());
+                    break;
+                case TWO_V_ONE:
+                    predicate = NO.equals(caseData.getApplicant1ProceedWithClaimSpec2v1());
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            switch (getMultiPartyScenario(caseData)) {
+                case ONE_V_TWO_ONE_LEGAL_REP:
+                case ONE_V_TWO_TWO_LEGAL_REP:
+                    predicate = NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+                        && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
+                    break;
+                case ONE_V_ONE:
+                    predicate = NO.equals(caseData.getApplicant1ProceedWithClaim());
+                    break;
+                case TWO_V_ONE:
+                    predicate = NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+                        && NO.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
+                    break;
+                default:
+                    break;
+            }
+        }
+
         return predicate;
     }
 }

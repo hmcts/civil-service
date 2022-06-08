@@ -16,7 +16,7 @@ public class NotificationsProperties {
     private String respondentSolicitorClaimIssueMultipartyEmailTemplate;
 
     @NotEmpty
-    private String respondentSolicitorClaimDetailsEmailTemplateMultiParty;
+    private String respondentSolicitorClaimDetailsEmailTemplate;
 
     @NotEmpty
     private String solicitorDefendantResponseCaseTakenOffline;
@@ -70,6 +70,9 @@ public class NotificationsProperties {
     private String claimantSolicitorClaimContinuingOnlineForSpec;
 
     @NotEmpty
+    private String claimantSolicitorClaimContinuingOnline1v2ForSpec;
+
+    @NotEmpty
     private String respondentSolicitorClaimContinuingOnlineForSpec;
 
     @NotEmpty
@@ -89,4 +92,62 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String sdoOrdered;
+
+    @NotEmpty
+    private String claimantSolicitorConfirmsNotToProceedSpec;
+
+    @NotEmpty
+    private String respondentSolicitorNotifyNotToProceedSpec;
+
+    @NotEmpty
+    private String claimantSolicitorConfirmsToProceedSpec;
+
+    @NotEmpty
+    private String respondentSolicitorNotifyToProceedSpec;
+
+    @NotEmpty
+    private String applicantSolicitor1DefaultJudgmentReceived;
+
+    @NotEmpty
+    private String respondentSolicitor1DefaultJudgmentReceived;
+
+    @NotEmpty
+    private String breathingSpaceEnterDefendantEmailTemplate;
+
+    @NotEmpty
+    private String breathingSpaceEnterApplicantEmailTemplate;
+
+    @NotEmpty
+    private String breathingSpaceLiftedApplicantEmailTemplate;
+
+    @NotEmpty
+    private String breathingSpaceLiftedRespondentEmailTemplate;
+
+    @NotEmpty
+    private String claimantSolicitorCounterClaimForSpec;
+
+    @NotEmpty
+    private String respondentSolicitorCounterClaimForSpec;
+
+    @NotEmpty
+    private String respondentSolicitor1DefaultJudgmentRequested;
+
+    @NotEmpty
+    private String applicantSolicitor1DefaultJudgmentRequested;
+    
+    @NotEmpty
+    private String interimJudgmentRequestedClaimant;
+
+    @NotEmpty
+    private String interimJudgmentApprovalClaimant;
+
+    @NotEmpty
+    private String interimJudgmentRequestedDefendant;
+
+    @NotEmpty
+    private String interimJudgmentRequested2Defendants;
+
+    @NotEmpty
+    private String interimJudgmentApprovalDefendant;
+
 }

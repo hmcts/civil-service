@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -20,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static java.time.LocalDate.EPOCH;
@@ -33,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
+@SuppressWarnings("unchecked")
 public class GeneralApplicationDetailsBuilder {
 
     public static final String STRING_CONSTANT = "this is a string";
@@ -62,7 +66,12 @@ public class GeneralApplicationDetailsBuilder {
         urBuilder.urgentAppConsiderationDate(urgencyConsiderationDate);
         GAUrgencyRequirement gaUrgencyRequirement = urBuilder.build();
         return caseData.toBuilder()
-                .generalAppType(GAApplicationType.builder()
+            .ccdCaseReference(1234L)
+            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                 .organisationID(STRING_CONSTANT).build())
+                                               .orgPolicyReference(STRING_CONSTANT).build())
+            .generalAppType(GAApplicationType.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
@@ -128,7 +137,12 @@ public class GeneralApplicationDetailsBuilder {
                     .generalAppInformOtherParty(null);
         }
         return caseDataBuilder
-                .generalAppType(GAApplicationType.builder()
+            .ccdCaseReference(1234L)
+            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                 .organisationID(STRING_CONSTANT).build())
+                                               .orgPolicyReference(STRING_CONSTANT).build())
+            .generalAppType(GAApplicationType.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
                 .generalAppPBADetails(GAPbaDetails.builder()
@@ -179,9 +193,14 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseData(CaseData caseData) {
         return caseData.toBuilder()
-                .generalAppType(GAApplicationType.builder()
+            .ccdCaseReference(1234L)
+            .generalAppType(GAApplicationType.builder()
                         .types(singletonList(EXTEND_TIME))
                         .build())
+            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                 .organisationID(STRING_CONSTANT).build())
+                                               .orgPolicyReference(STRING_CONSTANT).build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                         .hasAgreed(NO)
                         .build())
@@ -250,7 +269,12 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataWithEmptyCollectionOfApps(CaseData caseData) {
         return caseData.toBuilder()
-                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
+            .ccdCaseReference(1234L)
+            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                 .organisationID(STRING_CONSTANT).build())
+                                               .orgPolicyReference(STRING_CONSTANT).build())
+            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
                 .addApplicant2(YES)
                 .applicant2(Party.builder().type(Party.Type.COMPANY).companyName("Applicant2").build())
@@ -331,7 +355,13 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement respondentOrderAgreement) {
         return CaseData.builder()
-                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
+            .ccdCaseReference(1234L)
+            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                            .organisationID(STRING_CONSTANT).build())
+                    .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                    .orgPolicyReference(STRING_CONSTANT).build())
+            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
                 .addApplicant2(YES)
                 .applicant2(Party.builder().type(Party.Type.COMPANY).companyName("Applicant2").build())
@@ -399,10 +429,12 @@ public class GeneralApplicationDetailsBuilder {
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                         .organisation(Organisation.builder()
                                 .organisationID(STRING_CONSTANT).build())
+                        .orgPolicyCaseAssignedRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
                         .orgPolicyReference(STRING_CONSTANT).build())
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                         .organisation(Organisation.builder()
                                 .organisationID(STRING_CONSTANT).build())
+                        .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
                         .orgPolicyReference(STRING_CONSTANT).build())
                 .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
                 .build();
@@ -503,6 +535,8 @@ public class GeneralApplicationDetailsBuilder {
                 .generalAppPBADetails(GAPbaDetails.builder()
                         .applicantsPbaAccounts(PBA_ACCOUNTS)
                         .pbaReference(STRING_CONSTANT)
+                        .fee(Fee.builder().code("FEE_CODE").calculatedAmountInPence(BigDecimal.valueOf(10800L))
+                                .version("1").build())
                         .build())
                 .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
                 .generalAppDetailsOfOrder(STRING_CONSTANT)

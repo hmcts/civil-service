@@ -17,8 +17,10 @@ public class Applicant1DQ implements DQ {
     private final DisclosureOfNonElectronicDocuments applicant1DQDisclosureOfNonElectronicDocuments;
     private final DisclosureReport applicant1DQDisclosureReport;
     private final Experts applicant1DQExperts;
+    private final ExpertDetails applicant1RespondToClaimExperts;
     private final Witnesses applicant1DQWitnesses;
     private final Hearing applicant1DQHearing;
+    private final HearingLRspec applicant1DQHearingLRspec;
     private final SmallClaimHearing applicant1DQSmallClaimHearing;
     private final Document applicant1DQDraftDirections;
     private final RequestedCourt applicant1DQRequestedCourt;
@@ -27,6 +29,8 @@ public class Applicant1DQ implements DQ {
     private final WelshLanguageRequirements applicant1DQLanguage;
     private final StatementOfTruth applicant1DQStatementOfTruth;
     private final VulnerabilityQuestions applicant1DQVulnerabilityQuestions;
+    private final FutureApplications applicant1DQFutureApplications;
+    private final WelshLanguageRequirements applicant1DQLanguageLRspec;
 
     @Override
     @JsonProperty("applicant1DQFileDirectionsQuestionnaire")
@@ -58,6 +62,11 @@ public class Applicant1DQ implements DQ {
         return getExperts(applicant1DQExperts);
     }
 
+    @JsonProperty("applicant1RespondToClaimExperts")
+    public ExpertDetails getSmallClaimExperts() {
+        return applicant1RespondToClaimExperts;
+    }
+
     @Override
     @JsonProperty("applicant1DQWitnesses")
     public Witnesses getWitnesses() {
@@ -67,12 +76,26 @@ public class Applicant1DQ implements DQ {
     @Override
     @JsonProperty("applicant1DQHearing")
     public Hearing getHearing() {
-        return getHearing(applicant1DQHearing);
+        if (applicant1DQHearing != null) {
+            return getHearing(applicant1DQHearing);
+        }
+        DQUtil util = new DQUtil();
+
+        if (applicant1DQHearingLRspec != null) {
+            return util.buildFastTrackHearing(applicant1DQHearingLRspec);
+        }
+        if (applicant1DQSmallClaimHearing != null) {
+            SmallClaimHearing small = getSmallClaimHearing();
+            return util.buildSmallClaimHearing(small);
+        }
+
+        return null;
     }
 
     @Override
+    @JsonProperty("applicant1DQSmallClaimHearing")
     public SmallClaimHearing getSmallClaimHearing() {
-        return null;
+        return getSmallClaimHearing(applicant1DQSmallClaimHearing);
     }
 
     @Override
@@ -82,7 +105,16 @@ public class Applicant1DQ implements DQ {
     }
 
     @Override
+    @JsonProperty("applicant1DQRequestedCourt")
     public RequestedCourt getRequestedCourt() {
+
+        if (applicant1DQRequestedCourt != null) {
+            return RequestedCourt.builder()
+                .requestHearingAtSpecificCourt(applicant1DQRequestedCourt.getRequestHearingAtSpecificCourt())
+                .responseCourtCode(applicant1DQRequestedCourt.getResponseCourtCode())
+                .reasonForHearingAtSpecificCourt(applicant1DQRequestedCourt.getReasonForHearingAtSpecificCourt())
+                .build();
+        }
         return null;
     }
 
@@ -114,5 +146,11 @@ public class Applicant1DQ implements DQ {
     @JsonProperty("applicant1DQVulnerabilityQuestions")
     public VulnerabilityQuestions getVulnerabilityQuestions() {
         return applicant1DQVulnerabilityQuestions;
+    }
+
+    @Override
+    @JsonProperty("applicant1DQLanguageLRspec")
+    public WelshLanguageRequirements getWelshLanguageRequirementsLRspec() {
+        return applicant1DQLanguageLRspec;
     }
 }

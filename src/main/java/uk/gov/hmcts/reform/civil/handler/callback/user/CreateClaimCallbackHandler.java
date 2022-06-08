@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -54,6 +56,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -90,11 +94,14 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final ObjectMapper objectMapper;
     private final Time time;
     private final ValidateEmailService validateEmailService;
+    private final DeadlinesCalculator deadlinesCalculator;
+    private final FeatureToggleService toggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(MID, "start-claim"), this::startClaim)
             .put(callbackKey(MID, "applicant"), this::validateApplicant1DateOfBirth)
             .put(callbackKey(MID, "applicant2"), this::validateApplicant2DateOfBirth)
             .put(callbackKey(MID, "fee"), this::calculateFee)
@@ -115,6 +122,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private CallbackResponse startClaim(CallbackParams callbackParams) {
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(CaseData.builder().claimStarted(YES).build().toMap(objectMapper)).build();
     }
 
     private CallbackResponse validateApplicant1DateOfBirth(CallbackParams callbackParams) {
@@ -258,15 +270,17 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private void addOrgPolicy2ForSameLegalRepresentative(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
         if (caseData.getRespondent2SameLegalRepresentative() == YES) {
-            OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
+            OrganisationPolicy.OrganisationPolicyBuilder organisationPolicy2Builder = OrganisationPolicy.builder();
 
-            OrganisationPolicy organisationPolicy2 = OrganisationPolicy.builder()
-                .organisation(respondent1OrganisationPolicy.getOrganisation())
-                .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-                .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
-                .build();
+            if (caseData.getRespondent1OrgRegistered() == YES) {
+                OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
+                organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
+                    .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
+                    .build();
+            }
 
-            caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2);
+            organisationPolicy2Builder.orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]");
+            caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2Builder.build());
         }
     }
 
@@ -302,6 +316,14 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
+        }
+
+        dataBuilder.claimStarted(null);
+
+        if (toggleService.isNoticeOfChangeEnabled()) {
+            if (areRespondentsRepresented(caseData) == false && getMultiPartyScenario(caseData) == ONE_V_ONE)  {
+                dataBuilder.addLegalRepDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(time.now()));
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -359,6 +381,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             || caseData.getRespondent1OrgRegistered() == NO
             || caseData.getRespondent2Represented() == NO
             || caseData.getRespondent2OrgRegistered() == NO);
+    }
+
+    private boolean areRespondentsRepresented(CaseData caseData) {
+        return caseData.getRespondent1Represented() == YES
+            && caseData.getRespondent1OrgRegistered() == YES;
     }
 
     private String getBody(CaseData caseData) {

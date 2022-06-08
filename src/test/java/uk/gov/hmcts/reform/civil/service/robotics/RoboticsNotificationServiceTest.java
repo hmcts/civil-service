@@ -48,6 +48,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
@@ -142,6 +143,7 @@ class RoboticsNotificationServiceTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
             .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
         when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
+        when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
@@ -260,6 +262,7 @@ class RoboticsNotificationServiceTest {
             .build();
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(roboticsCaseData);
         when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
+        when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
 
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
         service.notifyRobotics(caseData, multiPartyScenario);
@@ -275,7 +278,34 @@ class RoboticsNotificationServiceTest {
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
-        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getMultipartyrecipient());
+        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getRecipient());
+    }
+
+    @Test
+    void shouldFailGracefully_whenLDException() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YES)
+            .respondent2SameLegalRepresentative(NO)
+            .build();
+
+        String lastEventText = "event text";
+        RoboticsCaseDataSpec roboticsCaseData = RoboticsCaseDataSpec.builder()
+            .events(EventHistory.builder().miscellaneous(
+                Event.builder().eventDetailsText(lastEventText)
+                    .dateReceived(LocalDateTime.now())
+                    .build()
+            ).build())
+            .build();
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(roboticsCaseData);
+        when(featureToggleService.isLrSpecEnabled()).thenThrow(new RuntimeException());
+        when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+        boolean multiPartyScenario = isMultiPartyScenario(caseData);
+        service.notifyRobotics(caseData, multiPartyScenario);
+
+        verifyNoInteractions(sendGridClient);
     }
 
     @Test
@@ -302,7 +332,7 @@ class RoboticsNotificationServiceTest {
             "Multiparty claim data for %s - %s", reference, caseData.getCcdState()
         );
         String subject = format("Multiparty claim data for %s - %s - %s", reference, caseData.getCcdState(),
-                                "RPA Reason: [2 of 2 - 2020-08-01]  Defendant: Mr. John Rambo has responded: "
+                                "[2 of 2 - 2020-08-01] Defendant: Mr. John Rambo has responded: "
                                     + "FULL_DEFENCE; preferredCourtCode: ; stayClaim: false");
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);

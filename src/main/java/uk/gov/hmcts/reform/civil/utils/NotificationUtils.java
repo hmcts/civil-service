@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Map;
@@ -43,11 +44,16 @@ public class NotificationUtils {
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
+            String responseTypeToApplicant2 = SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+                ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
+                : caseData.getRespondent1ClaimResponseTypeToApplicant2().toString();
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                REASON, caseData.getRespondent1ClaimResponseType().getDisplayedValue()
+                REASON, SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+                        ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
+                        : caseData.getRespondent1ClaimResponseType().getDisplayedValue()
                     .concat(" against " + caseData.getApplicant1().getPartyName())
-                    .concat(" and " + caseData.getRespondent1ClaimResponseTypeToApplicant2())
+                    .concat(" and " + responseTypeToApplicant2)
                     .concat(" against " + caseData.getApplicant2().getPartyName()),
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
@@ -57,8 +63,12 @@ public class NotificationUtils {
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
-                RESPONDENT_ONE_RESPONSE, caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
-                RESPONDENT_TWO_RESPONSE, caseData.getRespondent2ClaimResponseType().getDisplayedValue(),
+                RESPONDENT_ONE_RESPONSE, SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+                    ? caseData.getRespondent1ClaimResponseTypeForSpec().getDisplayedValue()
+                    : caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
+                RESPONDENT_TWO_RESPONSE, SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+                    ? caseData.getRespondent2ClaimResponseTypeForSpec().getDisplayedValue()
+                    : caseData.getRespondent2ClaimResponseType().getDisplayedValue(),
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         }

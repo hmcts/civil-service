@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -59,9 +60,11 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -78,19 +81,20 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 
 @SpringBootTest(classes = {
     CreateClaimCallbackHandler.class,
-    JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     ClaimIssueConfiguration.class,
+    DateOfBirthValidator.class,
+    DeadlinesCalculator.class,
     ExitSurveyConfiguration.class,
     ExitSurveyContentService.class,
+    InterestCalculator.class,
+    JacksonAutoConfiguration.class,
     MockDatabaseConfiguration.class,
-    ValidationAutoConfiguration.class,
-    DateOfBirthValidator.class,
     OrgPolicyValidator.class,
     StateFlowEngine.class,
     PostcodeValidator.class,
-    InterestCalculator.class,
     StateFlowEngine.class,
+    ValidationAutoConfiguration.class,
     ValidateEmailService.class},
     properties = {"reference.database.enabled=false"})
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -123,6 +127,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private PostcodeValidator postcodeValidator;
+
+    @MockBean
+    private DeadlinesCalculator deadlinesCalculator;
 
     @Value("${civil.response-pack-url}")
     private String responsePackLink;
@@ -387,6 +394,23 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private DynamicList getDynamicList(AboutToStartOrSubmitCallbackResponse response) {
             return mapper.convertValue(response.getData().get("applicantSolicitor1PbaAccounts"), DynamicList.class);
+        }
+    }
+
+    @Nested
+    class MidEventStartClaimCallback {
+
+        private static final String PAGE_ID = "start-claim";
+
+        @Test
+        void shouldAddClaimStartedFlagToData_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("claimStarted")
+                .isEqualTo("Yes");
         }
     }
 
@@ -816,6 +840,60 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(CREATE_CLAIM.name(), "READY");
+        }
+
+        @Test
+        void shouldClearClaimStartedFlag_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData.toBuilder().claimStarted(YES).build(), ABOUT_TO_SUBMIT));
+
+            assertThat(response.getData())
+                .doesNotContainEntry("claimStarted", YES);
+        }
+
+        @Test
+        void shouldCopyRespondent1OrgPolicyReferenceForSameRegisteredSolicitorScenario_whenInvoked() {
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative().build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(
+                    caseData,
+                    ABOUT_TO_SUBMIT
+                ));
+            var respondent2OrgPolicy = response.getData().get("respondent2OrganisationPolicy");
+
+            assertThat(respondent2OrgPolicy).extracting("OrgPolicyReference").isEqualTo("org1PolicyReference");
+            assertThat(respondent2OrgPolicy)
+                .extracting("Organisation").extracting("OrganisationID")
+                .isEqualTo("org1");
+        }
+
+        @Test
+        void shouldNotCopyRespondent1OrgPolicyDetailsFor1v2SameUnregisteredSolicitorScenario_whenInvoked() {
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameUnregisteredRepresentative().build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(
+                    caseData,
+                    ABOUT_TO_SUBMIT
+                ));
+
+            var respondent2OrgPolicy = response.getData().get("respondent2OrganisationPolicy");
+
+            assertThat(respondent2OrgPolicy).extracting("OrgPolicyReference").isNull();
+            assertThat(respondent2OrgPolicy).extracting("Organisation").isNull();
+        }
+
+        @Test
+        void shouldSetAddLegalRepDeadline_whenInvoked() {
+            when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
+            caseData = CaseDataBuilder.builder().atStateProceedsOffline1v1UnrepresentedDefendant().build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+            assertThat(response.getData()).extracting("addLegalRepDeadline")
+                .isEqualTo(submittedDate.format(ISO_DATE_TIME));
         }
 
         @Nested

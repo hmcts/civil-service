@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
@@ -29,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
@@ -54,7 +57,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
 
     private CallbackResponse prepareDirectionsQuestionnaire(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (respondent2HasSameLegalRep(caseData) && NO == caseData.getRespondentResponseIsSame()) {
             if (isDefendant1DQResponse(caseData)) {
@@ -74,7 +77,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
     }
 
     private void generateAndSetDQ(CallbackParams callbackParams, CaseData caseData,
-                                  CaseData.CaseDataBuilder caseDataBuilder) {
+                                  CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         CaseDocument directionsQuestionnaire = directionsQuestionnaireGenerator.generate(
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
@@ -96,7 +99,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
     }
 
     private void generateAndSet1V2SameSolDivergentResponsesDQ(CallbackParams callbackParams, CaseData caseData,
-                                                              CaseData.CaseDataBuilder caseDataBuilder,
+                                                              CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                                               String defendantIdentifier) {
         CaseDocument directionsQuestionnaire =
             directionsQuestionnaireGenerator.generateDQFor1v2SingleSolDiffResponse(
@@ -121,13 +124,20 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
      */
     private CallbackResponse prepareDirectionsQuestionnaireV1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        if (respondent2HasSameLegalRep(caseData)) {
+        boolean claimantResponseLRspec = false;
+        if (directionsQuestionnaireGenerator.isClaimantResponse(caseData)
+            && SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            claimantResponseLRspec = true;
+        }
+
+        if (respondent2HasSameLegalRep(caseData) && !claimantResponseLRspec) {
             if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
                 if (caseData.getRespondent1DQ() != null
-                    && caseData.getRespondent1ClaimResponseType() != null
-                    && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
+                    && caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                    && caseData.getRespondent1ClaimResponseTypeForSpec()
+                    .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
                     CaseDocument directionsQuestionnaire =
                         directionsQuestionnaireGenerator.generateDQFor1v2SingleSolDiffResponse(
                             caseData,
@@ -139,12 +149,15 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                         caseData.getSystemGeneratedCaseDocuments();
                     systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
                     caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
-                    caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
+                    if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+                        caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
+                    }
                 }
 
                 if (caseData.getRespondent2DQ() != null
-                    && caseData.getRespondent2ClaimResponseType() != null
-                    && caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
+                    && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+                    && caseData.getRespondent2ClaimResponseTypeForSpec()
+                    .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
                     CaseDocument directionsQuestionnaire =
                         directionsQuestionnaireGenerator.generateDQFor1v2SingleSolDiffResponse(
                             caseData,
@@ -192,7 +205,8 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
      * @param caseData        current case data
      * @param caseDataBuilder builder for the modified case data
      */
-    private void singleResponseFile(String bearerToken, CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+    private void singleResponseFile(String bearerToken, CaseData caseData,
+                                    CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         CaseDocument directionsQuestionnaire = directionsQuestionnaireGenerator.generate(
             caseData,
             bearerToken
@@ -201,7 +215,9 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
-        caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
+        if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
+        }
     }
 
     private boolean respondent2HasSameLegalRep(CaseData caseData) {

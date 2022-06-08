@@ -40,6 +40,14 @@ public class FeatureToggleService {
         return internalClient.boolVariation("rpaContinuousFeed", createLDUser().build(), false);
     }
 
+    public boolean isSpecRpaContinuousFeedEnabled() {
+        return internalClient.boolVariation(
+            "specified-rpa-continuous-feed",
+            createLDUser().build(),
+            false
+        );
+    }
+
     public boolean isLrSpecEnabled() {
         return isFeatureEnabled("specified-lr-journey");
     }
@@ -48,6 +56,10 @@ public class FeatureToggleService {
         return new LDUser.Builder("civil-service")
             .custom("timestamp", String.valueOf(System.currentTimeMillis()))
             .custom("environment", environment);
+    }
+
+    public boolean isNoticeOfChangeEnabled() {
+        return internalClient.boolVariation("notice-of-change", createLDUser().build(), false);
     }
 
     private void close() {
