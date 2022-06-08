@@ -19,6 +19,8 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCESS_CLAIM_ISSUE;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
 @RequiredArgsConstructor
@@ -43,13 +45,44 @@ public class ClaimIssueCallbackHandler extends CallbackHandler {
     private CallbackResponse addClaimNotificationDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime deadline = deadlinesCalculator.addMonthsToDateAtMidnight(4, caseData.getIssueDate());
-        CaseData caseDataUpdated = caseData.toBuilder()
-            .claimNotificationDeadline(deadline)
-            .build();
+        CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder();
+        caseDataUpdated.claimNotificationDeadline(deadline);
+
+        // don't display cases in unassigned case list before claim notified workaround.
+        clearOrganisationPolicyId(caseData, caseDataUpdated);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataUpdated.toMap(objectMapper))
+            .data(caseDataUpdated.build().toMap(objectMapper))
             .build();
+    }
+
+    private void clearOrganisationPolicyId(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+        if (YES.equals(caseData.getRespondent1OrgRegistered())) {
+            caseDataBuilder.respondent1OrganisationIDCopy(
+                caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
+
+            caseDataBuilder.respondent1OrganisationPolicy(
+                caseData
+                    .getRespondent1OrganisationPolicy()
+                    .toBuilder()
+                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build())
+                    .build()
+            );
+        }
+
+        if (NO.equals(caseData.getRespondent2SameLegalRepresentative())
+            && YES.equals(caseData.getRespondent2OrgRegistered())) {
+            caseDataBuilder.respondent2OrganisationIDCopy(
+                caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID());
+
+            caseDataBuilder.respondent2OrganisationPolicy(
+                caseData
+                    .getRespondent2OrganisationPolicy()
+                    .toBuilder()
+                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build())
+                    .build()
+            );
+        }
     }
 
     @Override
