@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class FeesControllerTest extends BaseIntegrationTest {
+
     private static final String FEES_URL = "/fees/";
 
     @MockBean
