@@ -37,6 +37,11 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
@@ -338,6 +343,72 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
 
         updatedData.fastTrackRoadTrafficAccident(tempFastTrackRoadTrafficAccident).build();
+
+        FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
+            .input1("By serving a list with a disclosure statement by 4pm on")
+            .date1(LocalDate.now().plusWeeks(4))
+            .input2("Any request to inspect or for a copy of a document shall be made by 4pm on")
+            .date2(LocalDate.now().plusWeeks(6))
+            .input3("and complied with within 7 days of receipt of the request.")
+            .input4("Each party must serve and file with the court a list of issues relevant to")
+            .input5("By 4pm on")
+            .date3(LocalDate.now().plusWeeks(4))
+            .build();
+
+        updatedData.fastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments).build();
+
+        FastTrackWitnessOfFact tempFastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
+            .input1("Each party shall serve on every other party the witness statements of all "
+                    + "witnesses of fact on whom he intends to rely")
+            .input2("All statements to be no more than")
+            .input3("pages long, A4, double spaced and in font size 12.")
+            .input4("There shall be simultaneous exchange of such statements by 4pm on")
+            .date1(LocalDate.now().plusWeeks(8))
+            .input5("Oral evidence will not be permitted at trail from a witness whose statement has not been served "
+                    + "in accordance with this order or has been served late, except with permission from the Court.")
+            .build();
+
+        updatedData.fastTrackWitnessOfFact(tempFastTrackWitnessOfFact).build();
+
+        FastTrackSchedulesOfLoss tempFastTrackSchedulesOfLoss = FastTrackSchedulesOfLoss.builder()
+            .input1("The claimant shall serve an updated schedule of loss on the defendant(s) by 4pm on")
+            .date1(LocalDate.now().plusWeeks(10))
+            .input2("The defendant(s) shall serve a counter schedule on the Claimant by 4pm on")
+            .date2(LocalDate.now().plusWeeks(12))
+            .input3("If there is a claim for future pecuniary loss and the parties have not already set out their case "
+                    + "on periodical payments, then they must do so in the respective schedule and counter-schedule.")
+            .input4("Upon it being noted that the schedule of loss contains no claim for continuing loss and is "
+                    + "therefore final, no further schedule of loss shall be")
+            .date3(LocalDate.now().plusWeeks(12))
+            .build();
+
+        updatedData.fastTrackSchedulesOfLoss(tempFastTrackSchedulesOfLoss).build();
+
+        FastTrackTrial tempFastTrackTrial = FastTrackTrial.builder()
+            .input1("The time provisionally allowed for the trial is")
+            .date1(LocalDate.now().plusWeeks(22))
+            .date2(LocalDate.now().plusWeeks(34))
+            .input2("If either party considers that the time estimate is insufficient, they must inform the court "
+                    + "within 7 days of the date of this Order.")
+
+            .input3("Not more than seven nor less than three clear days before the trial, "
+                    + "the claimant must file at court and serve an indexed and paginated bundle of documents which "
+                        + "complies with the requirements of Rule 39.5 Civil Procedure Rules and Practice Direction 39A. "
+        + "The parties must endeavour to agree the contents of the bundle before it is filed. the bundle will include "
+        + "a case summary and a chronology")
+            .date3(LocalDate.now().plusWeeks(12))
+            .build();
+
+        updatedData.fastTrackTrial(tempFastTrackTrial).build();
+
+        FastTrackNotes tempFastTrackNotes = FastTrackNotes.builder()
+            .input1("This Order has been made without a hearing. Each party has the right to apply to have this Order "
+                    + "set aside or varied. Any such application must be received by the Court")
+            .date1(LocalDate.now().plusWeeks(1))
+            .build();
+
+        updatedData.fastTrackNotes(tempFastTrackNotes).build();
+
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
