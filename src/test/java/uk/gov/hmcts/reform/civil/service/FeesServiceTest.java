@@ -33,7 +33,6 @@ class FeesServiceTest {
     private static final BigDecimal MIN_RANGE = new BigDecimal("0.01");
     private static final BigDecimal MAX_RANGE = new BigDecimal("300");
 
-
     @Mock
     private FeesClient feesClient;
 
