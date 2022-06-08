@@ -31,7 +31,7 @@ public class FeesController {
     @ApiOperation("Gets a group of claim amount ranges and associated fees for those ranges")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 401, message = "Not Authorized"),})
+        @ApiResponse(code = 401, message = "Not Authorized")})
     public ResponseEntity<Fee2Dto[]> getFeeRanges() {
         Fee2Dto[] feeRanges = feesService.getFeeRange();
         return new ResponseEntity<>(feeRanges, HttpStatus.OK);
