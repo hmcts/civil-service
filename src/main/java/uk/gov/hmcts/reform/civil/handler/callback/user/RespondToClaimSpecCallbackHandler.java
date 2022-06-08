@@ -1348,7 +1348,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (responseDeadline == null) {
             return format(
                 "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-                    + "We will let you know when the claimant responds."
+                    + "After the other solicitor has responded and/or the time"
+                    + " for responding has passed the claimant will be notified."
                     + "%n%n<a href=\"%s\" target=\"_blank\">Download questionnaire (opens in a new tab)</a>",
                 format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
             );
