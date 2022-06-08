@@ -158,6 +158,7 @@ public class CaseDataBuilder {
     protected RespondentResponseType respondent2ClaimResponseType;
     protected ResponseDocument respondent2ClaimResponseDocument;
     protected YesOrNo respondentResponseIsSame;
+    protected DynamicList defendantDetails;
     // Defendant Response 2 Applicants
     protected RespondentResponseType respondent1ClaimResponseTypeToApplicant2;
     protected RespondentResponseTypeSpec claimant1ClaimResponseTypeForSpec;
@@ -256,6 +257,9 @@ public class CaseDataBuilder {
     private Address specAoSRespondent2HomeAddressDetails;
     private YesOrNo respondent1DQWitnessesRequiredSpec;
     private List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
+
+    private String respondent1OrganisationIDCopy;
+    private String respondent2OrganisationIDCopy;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -378,6 +382,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder caseNotes(CaseNote caseNote) {
         this.caseNotes = ElementUtils.wrapElements(caseNote);
+        return this;
+    }
+
+    public CaseDataBuilder respondent1OrganisationIDCopy(String id) {
+        this.respondent1OrganisationIDCopy = id;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2OrganisationIDCopy(String id) {
+        this.respondent2OrganisationIDCopy = id;
         return this;
     }
 
@@ -1197,6 +1211,13 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimIssued1v2AndBothDefendantsDefaultJudgment() {
+        defendantDetails = DynamicList.builder()
+            .value(DynamicListElement.builder().label("Both Defendants").build())
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimSubmitted1v2Respondent2OrgNotRegistered() {
         atStateClaimIssued();
         respondent1Represented = YES;
@@ -1276,6 +1297,7 @@ public class CaseDataBuilder {
         atStatePendingClaimIssued();
         claimNotificationDeadline = NOTIFICATION_DEADLINE;
         ccdState = CASE_ISSUED;
+        respondent1OrganisationIDCopy = "QWERTY R";
         return this;
     }
 
@@ -1547,6 +1569,12 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateRespondent2v1FullAdmission() {
         claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
         claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondent2v1FullDefence() {
+        claimant1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        claimant2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
         return this;
     }
 
@@ -2665,6 +2693,7 @@ public class CaseDataBuilder {
             .applicant2ProceedWithClaimMultiParty2v1(applicant2ProceedWithClaimMultiParty2v1)
             .applicant1DefenceResponseDocument(applicant1DefenceResponseDocument)
             .claimantDefenceResDocToDefendant2(applicant2DefenceResponseDocument)
+            .defendantDetails(defendantDetails)
 
             //Case procceds in Caseman
             .claimProceedsInCaseman(claimProceedsInCaseman)
@@ -2765,6 +2794,8 @@ public class CaseDataBuilder {
             .respondent1DQWitnessesRequiredSpec(respondent1DQWitnessesRequiredSpec)
             .respondent1DQWitnessesDetailsSpec(respondent1DQWitnessesDetailsSpec)
             .applicant1ProceedWithClaimSpec2v1(applicant1ProceedWithClaimSpec2v1)
+            .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
+            .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
             .build();
     }
 }

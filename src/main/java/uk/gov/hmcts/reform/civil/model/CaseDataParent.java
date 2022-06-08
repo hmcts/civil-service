@@ -50,9 +50,13 @@ public class CaseDataParent implements MappableObject {
     private final YesOrNo respondent1DQWitnessesRequiredSpec;
     private final List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
 
+    private final LocalDateTime addLegalRepDeadline;
+
     @Builder.Default
     private final List<Value<Document>> caseDocuments = new ArrayList<>();
     private final String caseDocument1Name;
 
-    private final LocalDateTime addLegalRepDeadline;
+    //workaround for showing cases in unassigned case list
+    private final String respondent1OrganisationIDCopy;
+    private final String respondent2OrganisationIDCopy;
 }

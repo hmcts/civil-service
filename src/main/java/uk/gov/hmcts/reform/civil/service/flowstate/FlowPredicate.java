@@ -460,7 +460,9 @@ public class FlowPredicate {
     public static final Predicate<CaseData> pastAddLegalRepDeadline = (caseData) ->
         // when notify change is merged, replace with this code
         // caseData.getAddLegalRepDeadline() != null && caseData.getAddLegalRepDeadline().isBefore(LocalDateTime.now());
-        caseData.getAddLegalRepDeadline() == null || caseData.getAddLegalRepDeadline().isBefore(LocalDateTime.now());
+        caseData.getAddLegalRepDeadline() == null
+            ? true
+            : caseData.getAddLegalRepDeadline().isBefore(LocalDateTime.now());
 
     public static final Predicate<CaseData> claimDismissedByCamunda = caseData ->
         caseData.getClaimDismissedDate() != null;
@@ -693,22 +695,38 @@ public class FlowPredicate {
 
     private static boolean getPredicateForClaimantIntentionNotProceed(CaseData caseData) {
         boolean predicate = false;
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP:
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                predicate = NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-                    && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
-                break;
-            case ONE_V_ONE:
-                predicate = NO.equals(caseData.getApplicant1ProceedWithClaim());
-                break;
-            case TWO_V_ONE:
-                predicate = NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
-                    && NO.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
-                break;
-            default:
-                break;
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            switch (getMultiPartyScenario(caseData)) {
+                case ONE_V_TWO_ONE_LEGAL_REP:
+                case ONE_V_TWO_TWO_LEGAL_REP:
+                case ONE_V_ONE:
+                    predicate = NO.equals(caseData.getApplicant1ProceedWithClaim());
+                    break;
+                case TWO_V_ONE:
+                    predicate = NO.equals(caseData.getApplicant1ProceedWithClaimSpec2v1());
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            switch (getMultiPartyScenario(caseData)) {
+                case ONE_V_TWO_ONE_LEGAL_REP:
+                case ONE_V_TWO_TWO_LEGAL_REP:
+                    predicate = NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+                        && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2());
+                    break;
+                case ONE_V_ONE:
+                    predicate = NO.equals(caseData.getApplicant1ProceedWithClaim());
+                    break;
+                case TWO_V_ONE:
+                    predicate = NO.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+                        && NO.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1());
+                    break;
+                default:
+                    break;
+            }
         }
+
         return predicate;
     }
 }

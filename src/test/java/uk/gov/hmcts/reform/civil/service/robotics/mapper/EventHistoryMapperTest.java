@@ -626,9 +626,9 @@ class EventHistoryMapperTest {
         class OneVTwoOneLegalRep {
             @Test
             void shouldHaveCorrectEvents_whenBothRepAcknowledges() {
-                String expectedMiscText1 = "RPA Reason: [1 of 2 - 2020-08-01] "
+                String expectedMiscText1 = "[1 of 2 - 2020-08-01] "
                     + "Defendant: Mr. Sole Trader has acknowledged: Defend all of the claim";
-                String expectedMiscText2 = "RPA Reason: [2 of 2 - 2020-08-01] "
+                String expectedMiscText2 = "[2 of 2 - 2020-08-01] "
                     + "Defendant: Mr. John Rambo has acknowledged: Defend all of the claim";
 
                 CaseData caseData = CaseDataBuilder.builder()
@@ -677,9 +677,9 @@ class EventHistoryMapperTest {
             @Test
             void shouldHaveCorrectEvents_whenBothRepAcknowledges() {
                 String expectedMiscText1 =
-                    "RPA Reason: Defendant: Mr. Sole Trader has acknowledged: Defend all of the claim";
+                    "Defendant: Mr. Sole Trader has acknowledged: Defend all of the claim";
                 String expectedMiscText2 =
-                    "RPA Reason: Defendant: Mr. John Rambo has acknowledged: Defend all of the claim";
+                    "Defendant: Mr. John Rambo has acknowledged: Defend all of the claim";
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged1v2SameSolicitor()
@@ -723,7 +723,7 @@ class EventHistoryMapperTest {
             @Test
             void shouldHaveCorrectEvents_whenOnlyRespondentOneRepAcknowledges() {
                 String expectedMiscText1 =
-                    "RPA Reason: Defendant: Mr. Sole Trader has acknowledged: Defend all of the claim";
+                    "Defendant: Mr. Sole Trader has acknowledged: Defend all of the claim";
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged1v2SameSolicitor()
@@ -755,7 +755,7 @@ class EventHistoryMapperTest {
             @Test
             void shouldHaveCorrectEvents_whenOnlyRespondentTwoRepAcknowledges() {
                 String expectedMiscText1 =
-                    "RPA Reason: Defendant: Mr. John Rambo has acknowledged: Defend all of the claim";
+                    "Defendant: Mr. John Rambo has acknowledged: Defend all of the claim";
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged1v2SameSolicitor()
@@ -859,7 +859,7 @@ class EventHistoryMapperTest {
 
                 Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
                     PartyUtils.respondent1Data(caseData),
-                    format("RPA Reason: Defendant: Mr. Sole Trader has agreed extension: %s",
+                    format("Defendant: Mr. Sole Trader has agreed extension: %s",
                            caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                .format(DateTimeFormatter.ofPattern("dd MM yyyy"))
                     )
@@ -879,7 +879,7 @@ class EventHistoryMapperTest {
 
                 Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
                     PartyUtils.respondent2Data(caseData),
-                    format("RPA Reason: Defendant: Mr. John Rambo has agreed extension: %s",
+                    format("Defendant: Mr. John Rambo has agreed extension: %s",
                            caseData.getRespondentSolicitor2AgreedDeadlineExtension()
                                .format(DateTimeFormatter.ofPattern("dd MM yyyy"))
                     )
@@ -899,7 +899,7 @@ class EventHistoryMapperTest {
 
                 Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
                     PartyUtils.respondent1Data(caseData),
-                    format("RPA Reason: Defendant(s) have agreed extension: %s",
+                    format("Defendant(s) have agreed extension: %s",
                            caseData.getRespondentSolicitor1AgreedDeadlineExtension()
                                .format(DateTimeFormatter.ofPattern("dd MM yyyy"))
                     )
@@ -2385,16 +2385,7 @@ class EventHistoryMapperTest {
                 .build();
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
-                    .eventSequence(3)
-                    .eventCode("999")
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .eventDetailsText(respondent1MiscText)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(respondent1MiscText)
-                                      .build())
-                    .build(),
-                Event.builder()
-                    .eventSequence(5)
+                    .eventSequence(4)
                     .eventCode("999")
                     .dateReceived(caseData.getRespondent2ResponseDate())
                     .eventDetailsText(respondent2MiscText)
@@ -2410,8 +2401,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("defenceFiled").asList()
                 .containsExactly(expectedDefenceFiled);
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0),
-                                 expectedMiscellaneousEvents.get(1));
+                .containsExactly(expectedMiscellaneousEvents.get(0));
 
             assertEmptyEvents(
                 eventHistory,
@@ -2562,15 +2552,6 @@ class EventHistoryMapperTest {
                     .eventDetails(EventDetails.builder()
                                       .miscText(respondent1MiscText)
                                       .build())
-                    .build(),
-                Event.builder()
-                    .eventSequence(6)
-                    .eventCode("999")
-                    .dateReceived(caseData.getRespondent2ResponseDate())
-                    .eventDetailsText(respondent2MiscText)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(respondent2MiscText)
-                                      .build())
                     .build()
             );
 
@@ -2585,8 +2566,7 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedDirectionsQuestionnaireFiled);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0),
-                                 expectedMiscellaneousEvents.get(1),
-                                 expectedMiscellaneousEvents.get(2));
+                                 expectedMiscellaneousEvents.get(1));
 
             assertEmptyEvents(
                 eventHistory,
@@ -2735,15 +2715,6 @@ class EventHistoryMapperTest {
                     .eventDetails(EventDetails.builder()
                                       .miscText(respondent1MiscText)
                                       .build())
-                    .build(),
-                Event.builder()
-                    .eventSequence(6)
-                    .eventCode("999")
-                    .dateReceived(caseData.getRespondent2ResponseDate())
-                    .eventDetailsText(respondent2MiscText)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(respondent2MiscText)
-                                      .build())
                     .build()
                 );
 
@@ -2758,8 +2729,7 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedDirectionsQuestionnaireFiled);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0),
-                                 expectedMiscellaneousEvents.get(1),
-                                 expectedMiscellaneousEvents.get(2));
+                                 expectedMiscellaneousEvents.get(1));
 
             assertEmptyEvents(
                 eventHistory,
