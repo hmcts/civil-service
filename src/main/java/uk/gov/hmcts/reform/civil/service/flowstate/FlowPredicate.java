@@ -184,6 +184,10 @@ public class FlowPredicate {
         isDivergentResponsesWithDQAndGoOffline(caseData);
 
     private static boolean isDivergentResponsesWithDQAndGoOffline(CaseData caseData) {
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            return false;
+        }
+
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_ONE_LEGAL_REP:
                 //scenario: either of them have submitted full defence response
@@ -211,6 +215,10 @@ public class FlowPredicate {
         isDivergentResponsesGoOffline(caseData);
 
     private static boolean isDivergentResponsesGoOffline(CaseData caseData) {
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            return false;
+        }
+
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 return !caseData.getRespondent1ClaimResponseType().equals(caseData.getRespondent2ClaimResponseType())
@@ -390,8 +398,9 @@ public class FlowPredicate {
             && caseData.getRespondent1ResponseDate() == null;
 
     public static final Predicate<CaseData> caseDismissedAfterDetailNotified = caseData ->
-        caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
-            && caseData.getRespondent1AcknowledgeNotificationDate() == null
+//        caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
+//            &&
+            caseData.getRespondent1AcknowledgeNotificationDate() == null
             && caseData.getRespondent1TimeExtensionDate() == null
             && caseData.getRespondent1ClaimResponseIntentionType() == null
             && caseData.getRespondent2AcknowledgeNotificationDate() == null
@@ -496,8 +505,8 @@ public class FlowPredicate {
                     || caseData.getRespondent2ClaimResponseTypeForSpec() == responseType);
                 break;
             case ONE_V_TWO_TWO_LEGAL_REP:
-                predicate = basePredicate
-                    && caseData.getRespondent2ClaimResponseTypeForSpec() == responseType;
+                predicate = basePredicate;
+//                    && caseData.getRespondent2ClaimResponseTypeForSpec() == responseType;
                 break;
             case ONE_V_ONE:
                 predicate = basePredicate;
@@ -620,11 +629,13 @@ public class FlowPredicate {
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 return (caseData.getRespondent1ClaimResponseTypeForSpec() != null
-                    && caseData.getRespondent2ClaimResponseTypeForSpec() == null
+//                    && caseData.getRespondent2ClaimResponseTypeForSpec() == null
+                    && caseData.getRespondent2ResponseDate() == null
                     && RespondentResponseTypeSpec.FULL_DEFENCE
                     .equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
                     ||
-                    (caseData.getRespondent1ClaimResponseTypeForSpec() == null
+                    (caseData.getRespondent1ResponseDate() == null
+//                        caseData.getRespondent1ClaimResponseTypeForSpec() == null
                         && caseData.getRespondent2ClaimResponseTypeForSpec() != null
                         && RespondentResponseTypeSpec.FULL_DEFENCE
                         .equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
