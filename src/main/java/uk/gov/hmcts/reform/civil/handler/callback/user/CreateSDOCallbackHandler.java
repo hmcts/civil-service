@@ -29,10 +29,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
-<<<<<<< HEAD
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
-=======
->>>>>>> master
 
 import java.time.LocalDate;
 import java.util.Collections;
