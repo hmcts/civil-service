@@ -67,9 +67,10 @@ public class FeesService {
 
     /**
      * Get a range of fees for the configured channel and event
+     *
      * @return an array containing a range of claim amounts with a fee for that range
      */
-    public Fee2Dto[] getFeeRange(){
+    public Fee2Dto[] getFeeRange() {
         return feesClient.findRangeGroup(feesConfiguration.getChannel(), feesConfiguration.getEvent());
     }
 

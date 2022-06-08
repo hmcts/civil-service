@@ -31,20 +31,20 @@ public class FeesControllerTest extends BaseIntegrationTest {
             .andExpect(status().isOk());
     }
 
-    private Fee2Dto[] buildFeeRangeResponse(){
+    private Fee2Dto[] buildFeeRangeResponse() {
         return new Fee2Dto[]{
             Fee2Dto
-            .builder()
-            .minRange(new BigDecimal("0.1"))
-            .maxRange(new BigDecimal("300"))
-            .currentVersion(FeeVersionDto
-                                .builder()
-                                .flatAmount(FlatAmountDto
-                                                .builder()
-                                                .amount(new BigDecimal("35"))
-                                                .build())
-                                .build())
-            .build()
+                .builder()
+                .minRange(new BigDecimal("0.1"))
+                .maxRange(new BigDecimal("300"))
+                .currentVersion(FeeVersionDto
+                                    .builder()
+                                    .flatAmount(FlatAmountDto
+                                                    .builder()
+                                                    .amount(new BigDecimal("35"))
+                                                    .build())
+                                    .build())
+                .build()
         };
     }
 }

@@ -76,13 +76,13 @@ class FeesServiceTest {
 
     @Test
     void shouldReturnFeeRangeSuccessfully() {
-        Fee2Dto [] expectedResult = buildFeeRangeResponse();
+        Fee2Dto[] expectedResult = buildFeeRangeResponse();
         Fee2Dto[] feeRange = feesService.getFeeRange();
         verify(feesClient).findRangeGroup(CHANNEL, EVENT);
         assertThat(feeRange).isEqualTo(expectedResult);
     }
 
-    private Fee2Dto[] buildFeeRangeResponse(){
+    private Fee2Dto[] buildFeeRangeResponse() {
         return new Fee2Dto[]{Fee2Dto
             .builder()
             .minRange(MIN_RANGE)

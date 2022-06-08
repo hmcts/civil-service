@@ -6,12 +6,10 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.service.FeesService;
@@ -33,7 +31,7 @@ public class FeesController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 401, message = "Not Authorized"),})
-    public ResponseEntity<Fee2Dto[]> getFeeRanges(){
+    public ResponseEntity<Fee2Dto[]> getFeeRanges() {
         Fee2Dto[] feeRanges = feesService.getFeeRange();
         return new ResponseEntity<>(feeRanges, HttpStatus.OK);
     }
