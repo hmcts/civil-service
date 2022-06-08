@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -192,6 +194,57 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "(together with the appropriate fee) by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingNotes").extracting("date")
                 .isEqualTo(LocalDate.now().plusWeeks(1).toString());
+
+            assertThat(response.getData()).extracting("disposalHearingJudgementDeductionValue").isEqualTo(null);
+            assertThat(response.getData()).extracting("disposalHearingPreferredTelephone").extracting("telephone")
+                .isEqualTo("N/A");
+            assertThat(response.getData()).extracting("disposalHearingPreferredEmail").extracting("email")
+                .isEqualTo("N/A");
+        }
+
+        @Test
+        void shouldPrePopulateDisposalHearingJudgementDeductionValueWhenDrawDirectionsOrderIsNotNull() {
+            JudgementSum tempJudgementSum = JudgementSum.builder()
+                .judgementSum(12)
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrder(tempJudgementSum)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("disposalHearingJudgementDeductionValue").extracting("value")
+                .isEqualTo("12%");
+        }
+
+        @Test
+        void shouldPrePopulateDisposalHearingPreferredTelephoneAndEmailWhenHearingSupportRequirementsDJIsNotNull() {
+            HearingSupportRequirementsDJ tempHearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
+                .hearingPreferredTelephoneNumber1("000")
+                .hearingPreferredEmail("test@email.com")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .hearingSupportRequirementsDJ(tempHearingSupportRequirementsDJ)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("disposalHearingPreferredTelephone").extracting("telephone")
+                .isEqualTo("000");
+            assertThat(response.getData()).extracting("disposalHearingPreferredEmail").extracting("email")
+                .isEqualTo("test@email.com");
         }
     }
 
