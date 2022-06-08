@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static java.time.LocalDate.EPOCH;
@@ -272,5 +274,9 @@ public class GeneralAppSampleDataBuilder {
                 .toBuilder()
                 .generalApplications(wrapElements(application))
                 .build();
+    }
+
+    protected List<String> getSampleCourLocations() {
+        return new ArrayList<>(Arrays.asList("ABCD - RG0 0 AL", "PQRS - GU0 0EE", "WXYZ - EW0 0HE", "LMNO - NE0 0BH"));
     }
 }
