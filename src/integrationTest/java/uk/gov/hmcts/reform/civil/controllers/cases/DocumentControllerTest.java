@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
+import uk.gov.hmcts.reform.ccd.document.am.model.DocumentUploadRequest;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -43,6 +44,7 @@ import java.util.UUID;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -181,31 +183,6 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
         verify(caseDocumentClientApi)
             .getDocumentBinary(anyString(), anyString(), eq(documentId));
-    }
-
-    @Test
-    void generateSealedClaimForm1v1() {
-        CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
-        CaseData caseData = caseBuilder
-            .build();
-
-        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(14)))
-            .thenReturn(caseData.getIssueDate().plusDays(17));
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2)))
-            .thenReturn(new DocmosisDocument(N2.getDocumentTitle(), bytes));
-
-        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
-            .thenReturn(CASE_DOCUMENT);
-
-        CaseDocument caseDocument = documentController.uploadSealedDocument(BEARER_TOKEN, caseData);
-        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
-
-        CaseDocument caseDocument1 = claimFormService.uploadSealedDocument(BEARER_TOKEN, caseData);
-        assertThat(caseDocument1).isNotNull().isEqualTo(CASE_DOCUMENT);
-
-        verify(representativeService).getRespondent1Representative(caseData);
-        verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
-        verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2));
     }
 
     private UUID getDocumentIdFromSelfHref(String selfHref) {
