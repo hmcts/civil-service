@@ -12,7 +12,7 @@ public class GeneralAppLRDConfiguration {
     private final String endpoint;
 
     public GeneralAppLRDConfiguration(
-            @Value("${genApp.lrd.url}") String url,
+            @Value("") String url,
             @Value("${genApp.lrd.endpoint}") String endpoint) {
         this.url = url;
         this.endpoint = endpoint;
