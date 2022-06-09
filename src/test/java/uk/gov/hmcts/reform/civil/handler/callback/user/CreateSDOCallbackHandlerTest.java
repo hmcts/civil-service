@@ -315,6 +315,91 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackRoadTrafficAccident").extracting("input")
                 .isEqualTo("Photographs and/or a plan of the location of the accident shall be prepared and "
                                + "agreed by the parties.");
+
+            assertThat(response.getData()).extracting("fastTrackJudgementDeductionValue").extracting("input")
+                .isEqualTo("District Judge Perna has considered the statements of case and the information provided by the parties,"
+                                                     + " \n\nIT IS ORDERED that:-");
+
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input1")
+                .isEqualTo("By serving a list with a disclosure statement by 4pm on ");
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date1")
+                .isEqualTo(LocalDate.now().plusWeeks(4).toString());
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input2")
+                .isEqualTo("Any request to inspect or for a copy of a document shall be made by 4pm on");
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date2")
+                .isEqualTo(LocalDate.now().plusWeeks(6).toString());
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input3")
+                .isEqualTo("and complied with within 7 days of receipt of the request.");
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input4")
+                .isEqualTo("Each party must serve and file with the court a list of issues relevant to");
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input5")
+                .isEqualTo("By 4pm on");
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date3")
+                .isEqualTo(LocalDate.now().plusWeeks(4).toString());
+
+            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input1")
+                .isEqualTo("Each party shall serve on every other party the witness statements of all "
+                               + "witnesses of fact on whom he intends to rely");
+            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input2")
+                .isEqualTo("All statements to be no more than");
+            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input3")
+                .isEqualTo(" ");
+            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input4")
+                .isEqualTo("pages long, A4, double spaced and in font size 12.");
+            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input5")
+                .isEqualTo("There shall be simultaneous exchange of such statements by 4pm on");
+            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("date1")
+                .isEqualTo(LocalDate.now().plusWeeks(8).toString());
+            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input6")
+                .isEqualTo("Oral evidence will not be permitted at trail from a witness whose statement has not been served "
+                               + "in accordance with this order or has been served late, except with permission from the Court.");
+
+            assertThat(response.getData()).extracting("fastTrackSchedulesOfLoss").extracting("input1")
+                .isEqualTo("The claimant shall serve an updated schedule of loss on the defendant(s) by 4pm on ");
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date1")
+                .isEqualTo(LocalDate.now().plusWeeks(10).toString());
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input2")
+                .isEqualTo("The defendant(s) shall serve a counter schedule on the Claimant by 4pm on");
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date2")
+                .isEqualTo(LocalDate.now().plusWeeks(12).toString());
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input3")
+                .isEqualTo("If there is a claim for future pecuniary loss and the parties have not already set out their case "
+                               + "on periodical payments, then they must do so in the respective schedule and counter-schedule.");
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input4")
+                .isEqualTo("Upon it being noted that the schedule of loss contains no claim for continuing loss and is "
+                                                   + "therefore final, no further schedule of loss shall be");
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date3")
+                .isEqualTo(LocalDate.now().plusWeeks(12).toString());
+
+            assertThat(response.getData()).extracting("fastTrackTrial").extracting("input1")
+                .isEqualTo("The time provisionally allowed for the trial is ");
+            assertThat(response.getData()).extracting("fastTrackTrial").extracting("date1")
+                .isEqualTo(LocalDate.now().plusWeeks(22).toString());
+            assertThat(response.getData()).extracting("fastTrackTrial").extracting("date2")
+                .isEqualTo(LocalDate.now().plusWeeks(34).toString());
+            assertThat(response.getData()).extracting("fastTrackTrial").extracting("input2")
+                .isEqualTo("If either party considers that the time estimate is insufficient, they must inform the court "
+                                                  + "within 7 days of the date of this Order.");
+            assertThat(response.getData()).extracting("fastTrackTrial").extracting("input3")
+                .isEqualTo("Not more than seven nor less than three clear days before the trial, "
+                                                  + "the claimant must file at court and serve an indexed and paginated bundle of documents which "
+                                                      + "complies with the requirements of Rule 39.5 Civil Procedure Rules and Practice Direction 39A. "
+                                      + "The parties must endeavour to agree the contents of the bundle before it is filed. the bundle will include "
+                                      + "a case summary and a chronology");
+           assertThat(response.getData()).extracting("fastTrackTrial").extracting("date3")
+                .isEqualTo(LocalDate.now().plusWeeks(12).toString());
+
+            assertThat(response.getData()).extracting("fastTrackNotes").extracting("input1")
+                .isEqualTo("This Order has been made without a hearing. Each party has the right to apply to have this Order "
+                                                   + "set aside or varied. Any such application must be received by the Court");
+            assertThat(response.getData()).extracting("fastTrackNotes").extracting("date1")
+                .isEqualTo(LocalDate.now().plusWeeks(1).toString());
+
+            assertThat(response.getData()).extracting("fastTrackJudgementDeductionValue").isEqualTo(null);
+            assertThat(response.getData()).extracting("fastTrackPreferredTelephone").extracting("telephone")
+                .isEqualTo("N/A");
+            assertThat(response.getData()).extracting("fastTrackPreferredEmail").extracting("email")
+                .isEqualTo("N/A");
         }
 
         @Test

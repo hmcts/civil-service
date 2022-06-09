@@ -37,11 +37,15 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPreferredEmail;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPreferredTelephone;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
@@ -253,6 +257,41 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.disposalHearingNotes(tempDisposalHearingNotes).build();
 
+        FastTrackJudgesRecital tempFastTrackJudgesRecital = FastTrackJudgesRecital.builder()
+            .input("District Judge Perna has considered the statements of case and the information provided by the parties,"
+                       + " \n\nIT IS ORDERED that:-")
+            .build();
+
+        updatedData.fastTrackJudgesRecital(tempFastTrackJudgesRecital).build();
+
+        if (judgementSum != null) {
+            FastTrackJudgementDeductionValue tempFastTrackJudgementDeductionValue =
+                FastTrackJudgementDeductionValue.builder()
+                    .value(judgementSum.getJudgementSum().toString() + "%")
+                    .build();
+
+            updatedData.fastTrackJudgementDeductionValue(tempFastTrackJudgementDeductionValue).build();
+                                  }
+        FastTrackPreferredTelephone tempFastTrackPreferredTelephone = FastTrackPreferredTelephone
+            .builder()
+            .telephone(preferredTelephone)
+            .build();
+
+        updatedData.fastTrackPreferredTelephone(tempFastTrackPreferredTelephone).build();
+
+        FastTrackPreferredEmail tempFastTrackPreferredEmail = FastTrackPreferredEmail
+            .builder()
+            .email(preferredEmail)
+            .build();
+
+        updatedData.fastTrackPreferredEmail(tempFastTrackPreferredEmail).build();
+
+        FastTrackBundle tempFastTrackBundle = FastTrackBundle.builder()
+            .input("The claimant must lodge at court at least 7 days before the disposal")
+            .build();
+
+        updatedData.fastTrackBundle(tempFastTrackBundle).build();
+
         FastTrackBuildingDispute tempFastTrackBuildingDispute = FastTrackBuildingDispute.builder()
             .input1("The claimant must prepare a Scott Schedule of the defects, items of damage "
                         + "or any other relevant matters")
@@ -361,10 +400,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input1("Each party shall serve on every other party the witness statements of all "
                     + "witnesses of fact on whom he intends to rely")
             .input2("All statements to be no more than")
-            .input3("pages long, A4, double spaced and in font size 12.")
-            .input4("There shall be simultaneous exchange of such statements by 4pm on")
+            .input3(" ")
+            .input4("pages long, A4, double spaced and in font size 12.")
+            .input5("There shall be simultaneous exchange of such statements by 4pm on")
             .date1(LocalDate.now().plusWeeks(8))
-            .input5("Oral evidence will not be permitted at trail from a witness whose statement has not been served "
+            .input6("Oral evidence will not be permitted at trail from a witness whose statement has not been served "
                     + "in accordance with this order or has been served late, except with permission from the Court.")
             .build();
 
