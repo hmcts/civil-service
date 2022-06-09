@@ -27,7 +27,7 @@ public class FeesController {
 
     private final FeesService feesService;
 
-    @GetMapping("/")
+    @GetMapping("/ranges")
     @ApiOperation("Gets a group of claim amount ranges and associated fees for those ranges")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
