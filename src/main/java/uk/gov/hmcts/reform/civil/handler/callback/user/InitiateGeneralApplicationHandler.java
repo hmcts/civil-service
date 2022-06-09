@@ -12,11 +12,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
+import uk.gov.hmcts.reform.civil.service.GeneralAppLocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
 @Service
 @RequiredArgsConstructor
@@ -53,11 +54,12 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private final OrganisationService organisationService;
     private final IdamClient idamClient;
     private final GeneralAppFeesService feesService;
+    private final GeneralAppLocationRefDataService locationRefDataService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::validateEventEnabling,
+            callbackKey(ABOUT_TO_START), this::aboutToStartValidattionAndSetup,
             callbackKey(MID, VALIDATE_URGENCY_DATE_PAGE), this::gaValidateUrgencyDate,
             callbackKey(MID, VALIDATE_HEARING_PAGE), this::gaValidateHearingScreen,
             callbackKey(MID, SET_FEES_AND_PBA), this::setFeesAndPBA,
@@ -71,14 +73,25 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse validateEventEnabling(CallbackParams callbackParams) {
+    private CallbackResponse aboutToStartValidattionAndSetup(CallbackParams callbackParams) {
+
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
         if (!initiateGeneralApplicationService.respondentAssigned(caseData)) {
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
+
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        caseDataBuilder
+                .generalAppHearingDetails(
+                        GAHearingDetails
+                                .builder()
+                                .hearingPreferredLocation(fromList(locationRefDataService.getCourtLocations(authToken)))
+                                .build());
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
+                .data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
     }
 
@@ -119,7 +132,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
         Fee feeForGA = feesService.getFeeForGA(caseData);
         caseDataBuilder.generalAppPBADetails(GAPbaDetails.builder()
-                .applicantsPbaAccounts(DynamicList.fromList(pbaNumbers))
+                .applicantsPbaAccounts(fromList(pbaNumbers))
                 .generalAppFeeToPayInText(POUND_SYMBOL + feeForGA.toPounds().toString())
                 .fee(feeForGA)
                 .build());
