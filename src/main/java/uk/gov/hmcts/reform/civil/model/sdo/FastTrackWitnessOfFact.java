@@ -5,8 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Future;
 import java.time.LocalDate;
+import javax.validation.constraints.Future;
 
 @Data
 @Builder(toBuilder = true)
@@ -20,7 +20,6 @@ public class FastTrackWitnessOfFact {
     private String input4;
     private String input5;
     @Future(message = "The date entered must be in the future")
-    private LocalDate date1;
+    private LocalDate date;
     private String input6;
-
 }
