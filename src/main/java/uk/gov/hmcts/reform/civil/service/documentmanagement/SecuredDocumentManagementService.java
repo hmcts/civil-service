@@ -105,7 +105,6 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         try {
             UserInfo userInfo = userService.getUserInfo(authorisation);
             String userRoles = String.join(",", this.documentManagementConfiguration.getUserRoles());
-            Document documentMetadata = getDocumentMetaData(authorisation, documentPath);
 
             ResponseEntity<Resource> responseEntity = caseDocumentClientApi.getDocumentBinary(
                 authorisation,
@@ -114,6 +113,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
             );
 
             if (responseEntity == null) {
+                Document documentMetadata = getDocumentMetaData(authorisation, documentPath);
                 responseEntity = documentDownloadClientApi.downloadBinary(
                     authorisation,
                     authTokenGenerator.generate(),

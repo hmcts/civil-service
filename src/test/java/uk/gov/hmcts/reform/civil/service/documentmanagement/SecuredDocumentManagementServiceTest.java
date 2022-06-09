@@ -187,7 +187,6 @@ class SecuredDocumentManagementServiceTest {
                 Document.class
             );
             String documentPath = URI.create(document.links.self.href).getPath();
-            String documentBinary = URI.create(document.links.binary.href).getPath().replaceFirst("/", "");
             UUID documentId = getDocumentIdFromSelfHref(documentPath);
 
             when(caseDocumentClientApi.getMetadataForDocument(

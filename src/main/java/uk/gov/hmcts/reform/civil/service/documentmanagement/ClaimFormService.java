@@ -1,39 +1,37 @@
-package uk.gov.hmcts.reform.civil.controllers.cases;
+package uk.gov.hmcts.reform.civil.service.documentmanagement;
 
-import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.ClaimFormService;
+import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 
 import javax.validation.constraints.NotNull;
 
-@Api
 @Slf4j
-@RestController
+@Service
 @RequiredArgsConstructor
-@RequestMapping(
-    path = "/case/document"
-)
-public class DocumentController {
+@Configuration
+@ComponentScan("uk.gov.hmcts.reform")
+public class ClaimFormService {
 
     @Autowired
-    private final ClaimFormService claimFormService;
+    private final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
 
     @PostMapping("/generateSealedDoc")
     public CaseDocument uploadSealedDocument(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation, @NotNull @RequestBody CaseData caseData) {
-        return claimFormService.uploadSealedDocument(authorisation, caseData);
+        return sealedClaimFormGeneratorForSpec.generate(caseData, authorisation);
     }
 
     @PostMapping(value = "/downloadSealedDoc",
@@ -42,6 +40,6 @@ public class DocumentController {
     byte[] downloadSealedDocument(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @NotNull @RequestBody CaseDocument caseDocument) {
-        return claimFormService.downloadSealedDocument(authorisation, caseDocument);
+        return sealedClaimFormGeneratorForSpec.downloadDocument(caseDocument, authorisation);
     }
 }
