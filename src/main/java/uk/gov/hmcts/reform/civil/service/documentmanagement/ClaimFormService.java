@@ -19,12 +19,6 @@ public class ClaimFormService {
     @Autowired
     private final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
 
-   /* @PostMapping("/generateSealedDoc")
-    public CaseDocument uploadSealedDocument(
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation, @NotNull @RequestBody CaseData caseData) {
-        return sealedClaimFormGeneratorForSpec.generate(caseData, authorisation);
-    }
-*/
     public byte[] downloadSealedDocument(String authorisation, CaseDocument caseDocument) {
         return sealedClaimFormGeneratorForSpec.downloadDocument(caseDocument, authorisation);
     }

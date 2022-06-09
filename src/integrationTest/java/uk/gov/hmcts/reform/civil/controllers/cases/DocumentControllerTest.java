@@ -16,15 +16,10 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
-import uk.gov.hmcts.reform.ccd.document.am.model.DocumentUploadRequest;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimFormForSpec;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.PDF;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -42,18 +37,14 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.lang.String.format;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2;
 import static uk.gov.hmcts.reform.civil.utils.ResourceReader.readString;
 
 @SpringBootTest(classes = {
