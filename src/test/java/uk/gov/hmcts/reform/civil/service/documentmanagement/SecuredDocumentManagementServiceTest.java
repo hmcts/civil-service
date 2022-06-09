@@ -189,13 +189,6 @@ class SecuredDocumentManagementServiceTest {
             String documentPath = URI.create(document.links.self.href).getPath();
             UUID documentId = getDocumentIdFromSelfHref(documentPath);
 
-            when(caseDocumentClientApi.getMetadataForDocument(
-                     anyString(),
-                     anyString(),
-                     eq(documentId)
-                 )
-            ).thenReturn(document);
-
             when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
 
             when(caseDocumentClientApi.getDocumentBinary(
@@ -209,8 +202,6 @@ class SecuredDocumentManagementServiceTest {
 
             assertNotNull(pdf);
             assertArrayEquals("test".getBytes(), pdf);
-
-            verify(caseDocumentClientApi).getMetadataForDocument(anyString(), anyString(), eq(documentId));
 
             verify(caseDocumentClientApi)
                 .getDocumentBinary(anyString(), anyString(), eq(documentId));
