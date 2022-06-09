@@ -705,15 +705,15 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
 
     @Test
     void shouldReturnDate_whenGeneralAppNotificationDeadlineIsInvoked() {
-        String givenDate = GeneralApplication.builder()
-            .generalAppDeadlineNotification(
-                weekdayDate.toString())
+        LocalDateTime givenDate = GeneralApplication.builder()
+            .generalAppNotificationDeadlineDate(
+                weekdayDate)
             .build()
-            .getGeneralAppDeadlineNotification();
+            .getGeneralAppNotificationDeadlineDate();
 
         String actual = "2022-02-15T12:00";
 
-        assertThat(givenDate).isEqualTo(actual).isNotNull();
+        assertThat(givenDate.toString()).isEqualTo(actual).isNotNull();
     }
 
     @Test

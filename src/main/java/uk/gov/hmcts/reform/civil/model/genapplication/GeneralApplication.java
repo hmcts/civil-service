@@ -32,7 +32,7 @@ public class GeneralApplication implements MappableObject {
     private final GASolicitorDetailsGAspec generalAppApplnSolicitor;
     private final List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors;
     private final List<Element<Document>> generalAppEvidenceDocument;
-    private final String generalAppDeadlineNotification;
+    private final LocalDateTime generalAppNotificationDeadlineDate;
     private final YesOrNo isMultiParty;
     private final YesOrNo parentClaimantIsApplicant;
     private final CaseLink caseLink;
@@ -61,7 +61,7 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("generalAppRespondentSolicitors") List<Element<GASolicitorDetailsGAspec>>
                            generalAppRespondentSolicitors,
                        @JsonProperty("generalAppEvidenceDocument") List<Element<Document>> generalAppEvidenceDocument,
-                       @JsonProperty("generalAppDeadlineNotification") String generalAppDeadlineNotification,
+                       @JsonProperty("generalAppNotificationDeadlineDate") LocalDateTime generalAppNotificationDeadlineDate,
                        @JsonProperty("isMultiParty") YesOrNo isMultiParty,
                        @JsonProperty("parentClaimantIsApplicant") YesOrNo parentClaimantIsApplicant,
                        @JsonProperty("caseLink") CaseLink caseLink,
@@ -86,7 +86,7 @@ public class GeneralApplication implements MappableObject {
         this.generalAppApplnSolicitor = generalAppApplnSolicitor;
         this.generalAppRespondentSolicitors = generalAppRespondentSolicitors;
         this.generalAppEvidenceDocument = generalAppEvidenceDocument;
-        this.generalAppDeadlineNotification = generalAppDeadlineNotification;
+        this.generalAppNotificationDeadlineDate = generalAppNotificationDeadlineDate;
         this.isMultiParty = isMultiParty;
         this.parentClaimantIsApplicant = parentClaimantIsApplicant;
         this.caseLink = caseLink;
