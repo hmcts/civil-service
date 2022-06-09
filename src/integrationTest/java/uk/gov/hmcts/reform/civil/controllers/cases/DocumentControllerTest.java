@@ -150,7 +150,6 @@ public class DocumentControllerTest extends BaseIntegrationTest {
             .getDocumentBinary(anyString(), anyString(), eq(documentId));
     }
 
-
     @Test
     void shouldDownloadDocumentFromDocumentManagement_FromCaseDocumentClientApi() throws JsonProcessingException {
 
@@ -184,7 +183,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
             .getDocumentBinary(anyString(), anyString(), eq(documentId));
     }
 
-
+    @Test
     void generateSealedClaimForm1v1() {
         CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
         CaseData caseData = caseBuilder
@@ -212,7 +211,6 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     private UUID getDocumentIdFromSelfHref(String selfHref) {
         return UUID.fromString(selfHref.substring(selfHref.length() - DOC_UUID_LENGTH));
     }
-
 
     private CaseData.CaseDataBuilder getBaseCaseDataBuilder() {
         return CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
