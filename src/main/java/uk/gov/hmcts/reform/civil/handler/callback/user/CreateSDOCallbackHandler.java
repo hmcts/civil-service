@@ -136,14 +136,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
 
-        JudgementSum judgementSum = caseData.getDrawDirectionsOrder();
-
         DisposalHearingJudgesRecital tempDisposalHearingJudgesRecital = DisposalHearingJudgesRecital.builder()
             .input("Upon considering the claim Form and Particulars of Claim/statements of case"
                        + " [and the directions questionnaires] \n\nIT IS ORDERED that:-")
             .build();
 
         updatedData.disposalHearingJudgesRecital(tempDisposalHearingJudgesRecital).build();
+
+        JudgementSum judgementSum = caseData.getDrawDirectionsOrder();
 
         if (judgementSum != null) {
             DisposalHearingJudgementDeductionValue tempDisposalHearingJudgementDeductionValue =
