@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class FeesControllerTest extends BaseIntegrationTest {
 
-    private static final String FEES_URL = "/fees/ranges/";
+    private static final String FEES_RANGES_URL = "/fees/ranges/";
 
     @MockBean
     private FeesService feesService;
@@ -27,7 +27,7 @@ public class FeesControllerTest extends BaseIntegrationTest {
     public void shouldReturnFeeRanges() {
         Fee2Dto[] response = buildFeeRangeResponse();
         when(feesService.getFeeRange()).thenReturn(response);
-        doGet(BEARER_TOKEN, FEES_URL)
+        doGet(BEARER_TOKEN, FEES_RANGES_URL)
             .andExpect(content().json(toJson(response)))
             .andExpect(status().isOk());
     }
