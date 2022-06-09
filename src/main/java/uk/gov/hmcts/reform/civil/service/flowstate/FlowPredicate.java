@@ -505,7 +505,8 @@ public class FlowPredicate {
                     || caseData.getRespondent2ClaimResponseTypeForSpec() == responseType);
                 break;
             case ONE_V_TWO_TWO_LEGAL_REP:
-                predicate = basePredicate;
+                predicate = basePredicate
+                    && caseData.getRespondent2ResponseDate() != null;
 //                    && caseData.getRespondent2ClaimResponseTypeForSpec() == responseType;
                 break;
             case ONE_V_ONE:
