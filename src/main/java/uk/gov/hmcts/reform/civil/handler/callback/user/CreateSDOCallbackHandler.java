@@ -104,6 +104,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
+
     // This is currently a mid event but once pre states are defined it should be moved to an about to start event.
     // Once it has been moved to an about to start event the following file will need to be updated:
     // FlowStateAllowedEventService.java.
@@ -112,6 +113,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     // There is no reason to add conditionals to avoid this here since having it as an about to start event will mean
     // it is only ever called once.
     // Then any changes to fields in ccd will persist in ccd regardless of backwards or forwards page navigation.
+
     private CallbackResponse prePopulateDisposalHearingPage(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
