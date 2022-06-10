@@ -127,6 +127,29 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class MidEventDisposalHearingLocationRefDataCallback extends LocationRefSampleDataBuilder {
+        private static final String PAGE_ID = "disposal-hearing";
+
+        @Test
+        void shouldPrePopulateDisposalHearingPage() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            given(locationRefDataService.getCourtLocations(any())).willReturn(getSampleCourLocations());
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            DynamicList dynamicList = getLocationDynamicListInPersonHearing(data);
+
+            assertThat(dynamicList).isNotNull();
+            assertThat(locationsFromDynamicList(dynamicList))
+                .containsOnly("ABCD - RG0 0 AL", "PQRS - GU0 0EE", "WXYZ - EW0 0HE", "LMNO - NE0 0BH");
+        }
+    }
+
+    @Nested
     class MidEventPrePopulateDisposalHearingPageCallback {
         private static final String PAGE_ID = "order-details";
 
