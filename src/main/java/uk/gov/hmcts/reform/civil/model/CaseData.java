@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.*;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -48,7 +49,16 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
-import uk.gov.hmcts.reform.civil.model.sdo.*;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -411,4 +421,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearingDJ;
     private DisposalHearingBundle disposalHearingBundleDJ;
     private DisposalHearingNotes disposalHearingNotesDJ;
+
+    //default judgement SDO fields for trial
+    private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
+    private TrialHearingDisclosureOfDocuments trialHearingDisclosureOfDocumentsDJ;
+    private TrialHearingWitnessOfFact trialHearingWitnessOfFactDJ;
+    private TrialHearingSchedulesOfLoss trialHearingSchedulesOfLossDJ;
+    private TrialHearingTrial trialHearingTrialDJ;
+    private TrialHearingNotes trialHearingNotesDJ;
+    private TrialBuildingDispute trialBuildingDispute;
+    private TrialClinicalNegligence trialClinicalNegligence;
+    private TrialCreditHire trialCreditHire;
+    private TrialPersonalInjury trialPersonalInjury;
+    private TrialRoadTrafficAccident trialRoadTrafficAccident;
 }
