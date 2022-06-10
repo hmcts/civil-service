@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.Setter;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.account.AccountSimple;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 
@@ -36,6 +37,11 @@ public class Respondent2DQ implements DQ {
     private final VulnerabilityQuestions respondent2DQVulnerabilityQuestions;
     private final List<Element<RecurringIncomeLRspec>> respondent2DQRecurringIncome;
     private final List<Element<RecurringExpenseLRspec>> respondent2DQRecurringExpenses;
+    private final List<Element<AccountSimple>> respondent2BankAccountList;
+    private final HomeDetails respondent2DQHomeDetails;
+    private final FutureApplications respondent2DQFutureApplications;
+    private final HearingLRspec respondent2DQHearingFastClaim;
+    private final RequestedCourt respondToCourtLocation2;
 
     @Override
     @JsonProperty("respondent2DQFileDirectionsQuestionnaire")
