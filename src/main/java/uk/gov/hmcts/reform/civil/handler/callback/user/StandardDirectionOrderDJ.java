@@ -24,7 +24,16 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
-import uk.gov.hmcts.reform.civil.model.sdo.*;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -98,7 +107,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
     }
 
-    private CallbackResponse populateDisposalScreen(CallbackParams callbackParams){
+    private CallbackResponse populateDisposalScreen(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
@@ -405,7 +414,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                 + " accident shall be prepared and "
                                                                 + "agreed by the parties.")
                                                      .build());
-
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
