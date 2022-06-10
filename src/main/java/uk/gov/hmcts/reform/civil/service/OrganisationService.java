@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
+import uk.gov.hmcts.reform.idam.client.IdamTokenGenerator;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 import uk.gov.hmcts.reform.prd.model.ProfessionalUsersEntityResponse;
@@ -23,6 +24,7 @@ public class OrganisationService {
     private final AuthTokenGenerator authTokenGenerator;
     private final UserService userService;
     private final PrdAdminUserConfiguration userConfig;
+    private final IdamTokenGenerator idamTokenGenerator;
 
     //WARNING! below function findOrganisation is being used by both damages and specified claims,
     // changes to this code may break one of the claim journeys, check with respective teams before changing it
@@ -50,7 +52,8 @@ public class OrganisationService {
     }
 
     public Optional<ProfessionalUsersEntityResponse> findUsersInOrganisation(String orgId) {
-        String authToken = userService.getAccessToken(userConfig.getUsername(), userConfig.getPassword());
+//        String authToken = userService.getAccessToken(userConfig.getUsername(), userConfig.getPassword());
+        String authToken = idamTokenGenerator.generate();
 
         try {
             return ofNullable(organisationApi.findUsersByOrganisation(authToken, authTokenGenerator.generate(), orgId));
