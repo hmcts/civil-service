@@ -143,6 +143,27 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
         }
 
         @Test
+        void shouldNotifyRespondentSolicitor2_whenInvoked_spec() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .setSuperClaimTypeToSpecClaim()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentsolicitor2@example.com",
+                "spec-template-id",
+                getNotificationDataMapSpec(caseData,
+                                           CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED),
+                "claimant-confirms-not-to-proceed-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
         void shouldNotifyApplicantSolicitor_whenInvokedWithCcEvent() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
