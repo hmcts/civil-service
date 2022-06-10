@@ -98,8 +98,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
-            .put(callbackKey(MID, "order-details"), this::prePopulateDisposalHearingPage)
-            .put(callbackKey(MID, "disposal-hearing"), this::fetchLocationData)
+            .put(callbackKey(MID, "order-details"), this::prePopulateOrderDetailsPages)
             .put(callbackKey(MID, "order-details-navigation"), this::setOrderDetailsFlags)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
@@ -111,17 +110,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse fetchLocationData(CallbackParams callbackParams) {
+    private List<String> fetchLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
-        List<String> locations = locationRefDataService.getCourtLocations(authToken);
-
-        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder()
-            .disposalHearingMethodInPerson(fromList(locations));
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+        return locationRefDataService.getCourtLocations(authToken);
     }
 
     // This is currently a mid event but once pre states are defined it should be moved to an about to start event.
@@ -135,6 +127,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private CallbackResponse prePopulateOrderDetailsPages(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
+
+        updatedData.disposalHearingMethodInPerson(fromList(fetchLocationData(callbackParams)));
+        updatedData.fastTrackMethodInPerson(fromList(fetchLocationData(callbackParams)));
 
         DisposalHearingJudgesRecital tempDisposalHearingJudgesRecital = DisposalHearingJudgesRecital.builder()
             .input("Upon considering the claim Form and Particulars of Claim/statements of case"

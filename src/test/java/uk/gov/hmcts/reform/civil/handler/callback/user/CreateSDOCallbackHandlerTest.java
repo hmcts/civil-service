@@ -128,7 +128,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class MidEventDisposalHearingLocationRefDataCallback extends LocationRefSampleDataBuilder {
-        private static final String PAGE_ID = "disposal-hearing";
+        private static final String PAGE_ID = "order-details";
 
         @Test
         void shouldPrePopulateDisposalHearingPage() {
@@ -150,7 +150,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class MidEventPrePopulateDisposalHearingPageCallback {
+    class MidEventPrePopulateOrderDetailsPagesCallback {
         private static final String PAGE_ID = "order-details";
 
         @Test
