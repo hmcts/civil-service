@@ -19,6 +19,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
     url = "${idam.web.url}"
 )
 public interface IdamWebApi {
+
     @GetMapping(
         value = "/o/userinfo",
         produces = APPLICATION_JSON_VALUE,

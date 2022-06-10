@@ -52,7 +52,7 @@ public class OrganisationService {
     }
 
     public Optional<ProfessionalUsersEntityResponse> findUsersInOrganisation(String orgId) {
-//        String authToken = userService.getAccessToken(userConfig.getUsername(), userConfig.getPassword());
+        // String authToken = userService.getAccessToken(userConfig.getUsername(), userConfig.getPassword());
         String authToken = idamTokenGenerator.generate();
 
         try {
