@@ -221,8 +221,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(8).toString());
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input6")
-                .isEqualTo("Oral evidence will not be permitted at trial from a " +
-                               "witness whose statement has not been served in accordance"
+                .isEqualTo("Oral evidence will not be permitted at trial from a "
+                               + "witness whose statement has not been served in accordance"
                                + " with this order or has been served late, except with "
                                + "permission from the court");
 
@@ -276,8 +276,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
             //trialHearingNotesDJ
             assertThat(response.getData()).extracting("trialHearingNotesDJ").extracting("input")
-                .isEqualTo("This order has been made without a hearing. Each party has " +
-                               "the right to apply to have this order set aside or varied."
+                .isEqualTo("This order has been made without a hearing. Each party has "
+                               + "the right to apply to have this order set aside or varied."
                                + " Any such application must be received by the court "
                                + "(together with the appropriate fee) by 4pm on");
             assertThat(response.getData()).extracting("trialHearingNotesDJ").extracting("date")
@@ -371,9 +371,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo("Photographs and/or a plan of the location of the accident shall be prepared and "
                                + "agreed by the parties.");
 
-
-
         }
     }
-
 }
