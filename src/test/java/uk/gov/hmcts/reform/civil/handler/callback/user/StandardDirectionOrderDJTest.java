@@ -168,7 +168,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class MidEventPrePopulatetrialHearingPageCallback {
+    class MidEventPrePopulateTrialHearingPageCallback {
 
         private static final String PAGE_ID = "trial-screen";
 
@@ -181,7 +181,10 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //trialHearingJudgesRecitalDJ
             assertThat(response.getData()).extracting("trialHearingJudgesRecitalDJ").extracting("input")
-                .isEqualTo("do we need JRD to populate judges name");
+                .isEqualTo("Upon considering the claim Form and "
+                               + "Particulars of Claim/statements of case"
+                               + " [and the directions questionnaires] "
+                               + "\n\nIT IS ORDERED that:-");
 
             //trialHearingDisclosureOfDocumentsDJ
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input1")

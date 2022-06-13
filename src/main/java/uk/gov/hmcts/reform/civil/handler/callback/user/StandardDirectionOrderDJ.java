@@ -221,7 +221,10 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder
             .trialHearingJudgesRecitalDJ(TrialHearingJudgesRecital
                                                 .builder()
-                                                .input("do we need JRD to populate judges name").build());
+                                                .input("Upon considering the claim Form and "
+                                                           + "Particulars of Claim/statements of case"
+                                                           + " [and the directions questionnaires] "
+                                                           + "\n\nIT IS ORDERED that:-").build());
 
         caseDataBuilder
             .trialHearingDisclosureOfDocumentsDJ(TrialHearingDisclosureOfDocuments
