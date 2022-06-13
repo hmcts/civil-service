@@ -171,7 +171,8 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
                 .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
                 .build();
-            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+            //Indu commented out
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_2, caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
