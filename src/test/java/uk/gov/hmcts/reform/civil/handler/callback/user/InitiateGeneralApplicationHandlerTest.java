@@ -19,12 +19,13 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.GeneralAppSampleDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
@@ -89,6 +90,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     protected GeneralAppFeesService feesService;
 
+    @MockBean
+    protected LocationRefDataService locationRefDataService;
+
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
     public static final String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
 
@@ -99,7 +103,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     private static final String FEE_VERSION = "1";
 
     @Nested
-    class MidEventForUrgencyCheck extends GeneralAppSampleDataBuilder {
+    class MidEventForUrgencyCheck extends LocationRefSampleDataBuilder {
 
         private static final String VALIDATE_URGENCY_DATE_PAGE = "ga-validate-urgency-date";
 
@@ -190,7 +194,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class MidEventForHearingScreenValidation extends GeneralAppSampleDataBuilder {
+    class MidEventForHearingScreenValidation extends LocationRefSampleDataBuilder {
 
         private static final String VALIDATE_HEARING_PAGE = "ga-hearing-screen-validation";
 
@@ -395,7 +399,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class MidEventForSettingFeeAndPBA extends GeneralAppSampleDataBuilder {
+    class MidEventForSettingFeeAndPBA extends LocationRefSampleDataBuilder {
 
         private final Organisation organisation = Organisation.builder()
                 .paymentAccount(List.of("12345", "98765"))
@@ -524,7 +528,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class AboutToSubmit extends GeneralAppSampleDataBuilder {
+    class AboutToSubmit extends LocationRefSampleDataBuilder {
 
         private final Fee feeFromFeeService = Fee.builder().code(FEE_CODE).calculatedAmountInPence(fee108)
                 .version(FEE_VERSION).build();
@@ -639,7 +643,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class AboutToStartCallbackHandling extends GeneralAppSampleDataBuilder {
+    class AboutToStartCallbackHandling extends LocationRefSampleDataBuilder {
         private static final String ERROR = "Application cannot be created until all the required respondent "
                 + "solicitor are assigned to the case.";
 
@@ -647,18 +651,28 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotReturnErrors_whenRespondentSolAssignedToCase() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+            given(locationRefDataService.getCourtLocations(any())).willReturn(getSampleCourLocations());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            DynamicList dynamicList = getLocationDynamicList(data);
+
             assertThat(response.getErrors()).isEmpty();
+            assertThat(data.getGeneralAppHearingDetails()).isNotNull();
+            assertThat(dynamicList).isNotNull();
+            assertThat(locationsFromDynamicList(dynamicList))
+                    .containsOnly("ABCD - RG0 0 AL", "PQRS - GU0 0EE", "WXYZ - EW0 0HE", "LMNO - NE0 0BH");
         }
 
         @Test
         void shouldReturnErrors_whenNoRespondentSolAssignedToCase() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             given(initiateGeneralAppService.respondentAssigned(any())).willReturn(false);
+            given(locationRefDataService.getCourtLocations(any())).willReturn(getSampleCourLocations());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
