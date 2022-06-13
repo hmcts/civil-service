@@ -52,7 +52,7 @@ public class UnsecuredDocumentManagementService implements DocumentManagementSer
     @Override
     public CaseDocument uploadDocument(String authorisation, PDF pdf) {
         String originalFileName = pdf.getFileBaseName();
-        log.info(" UnsecureDocumentManagementService Uploading file {}", originalFileName);
+        log.info("Uploading file {}", originalFileName);
         try {
             MultipartFile file
                 = new InMemoryMultipartFile(FILES_NAME, originalFileName, APPLICATION_PDF_VALUE, pdf.getBytes());
