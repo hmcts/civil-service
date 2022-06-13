@@ -241,6 +241,45 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class MidEventCallbackSetApplicantProceedFlag {
+
+        private static final String PAGE_ID = "set-applicant1-proceed-flag";
+
+        @Test
+        void shouldSetApplicant1Proceed_whenCaseIs2v1AndApplicantIntendsToProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateSpec2v1ClaimSubmitted()
+                .atStateRespondent2v1FullDefence()
+                .applicant1ProceedWithClaimSpec2v1(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("applicant1ProceedWithClaim"))
+                .isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldNotSetApplicant1Proceed_whenCaseIs2v1AndApplicantNotIntendsToProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateSpec2v1ClaimSubmitted()
+                .atStateRespondent2v1FullDefence()
+                .applicant1ProceedWithClaimSpec2v1(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("applicant1ProceedWithClaim"))
+                .isEqualTo(null);
+        }
+
+    }
+
+    @Nested
     class MidStatementOfTruth {
 
         @Test
