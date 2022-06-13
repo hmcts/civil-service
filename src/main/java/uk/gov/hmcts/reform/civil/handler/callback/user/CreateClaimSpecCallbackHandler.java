@@ -386,7 +386,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         dataBuilder.submittedDate(time.now());
 
         if (null != callbackParams.getRequest().getEventId()) {
-            System.out.println(" inside if condition ");
+            System.out.println(" inside if condition : CreatClaimSpecCallbackHandler ");
             dataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
             dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
         }

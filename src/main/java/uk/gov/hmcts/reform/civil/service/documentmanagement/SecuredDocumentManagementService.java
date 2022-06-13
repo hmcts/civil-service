@@ -53,7 +53,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     @Override
     public CaseDocument uploadDocument(String authorisation, PDF pdf) {
         String originalFileName = pdf.getFileBaseName();
-        log.info("Uploading file {}", originalFileName);
+        log.info("Secure Document management service Uploading file {}", originalFileName);
         try {
             MultipartFile file
                 = new InMemoryMultipartFile(FILES_NAME, originalFileName, APPLICATION_PDF_VALUE, pdf.getBytes()
