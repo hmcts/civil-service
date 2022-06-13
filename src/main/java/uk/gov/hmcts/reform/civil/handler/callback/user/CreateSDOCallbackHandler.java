@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -36,11 +37,13 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
 @Service
 @RequiredArgsConstructor
@@ -71,12 +74,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         + "<br/>%s";
 
     private final ObjectMapper objectMapper;
+    private final LocationRefDataService locationRefDataService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "order-details"), this::prePopulateDisposalHearingPage)
+            .put(callbackKey(MID, "disposal-hearing"), this::fetchLocationData)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -87,6 +92,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
+    private CallbackResponse fetchLocationData(CallbackParams callbackParams) {
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+
+        List<String> locations = locationRefDataService.getCourtLocations(authToken);
+
+        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder()
+            .disposalHearingMethodInPerson(fromList(locations));
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
     // This is currently a mid event but once pre states are defined it should be moved to an about to start event.
     // Once it has been moved to an about to start event the following file will need to be updated:
     // FlowStateAllowedEventService.java.
@@ -95,6 +113,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     // There is no reason to add conditionals to avoid this here since having it as an about to start event will mean
     // it is only ever called once.
     // Then any changes to fields in ccd will persist in ccd regardless of backwards or forwards page navigation.
+
     private CallbackResponse prePopulateDisposalHearingPage(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
@@ -184,10 +203,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.disposalHearingFinalDisposalHearing(tempDisposalHearingFinalDisposalHearing).build();
 
         HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ();
-        
+
         String preferredTelephone = hearingSupportRequirementsDJ != null
             ? hearingSupportRequirementsDJ.getHearingPreferredTelephoneNumber1() : "N/A";
-        
+
         DisposalHearingPreferredTelephone tempDisposalHearingPreferredTelephone = DisposalHearingPreferredTelephone
             .builder()
             .telephone(preferredTelephone)

@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
@@ -73,7 +74,7 @@ public class CaseDataParent implements MappableObject {
     //workaround for showing cases in unassigned case list
     private final String respondent1OrganisationIDCopy;
     private final String respondent2OrganisationIDCopy;
-    
+
     // sdo fields
     private final JudgementSum drawDirectionsOrder;
     private DisposalHearingJudgesRecital disposalHearingJudgesRecital;
@@ -89,5 +90,6 @@ public class CaseDataParent implements MappableObject {
     private DisposalHearingPreferredEmail disposalHearingPreferredEmail;
     private DisposalHearingBundle disposalHearingBundle;
     private DisposalHearingNotes disposalHearingNotes;
+    private final DynamicList disposalHearingMethodInPerson;
 
 }
