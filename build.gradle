@@ -84,6 +84,9 @@ allprojects {
 
       // CVE-2021-29425
       dependency group: 'commons-io', name: 'commons-io', version: '2.11.0'
+
+      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.3'
+      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.1'
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2020.0.4'
@@ -275,7 +278,8 @@ def versions = [
   springStatemachine : '3.0.0.M2',
   springfoxSwagger   : '2.9.2',
   lombok             : '1.18.24',
-  pact               : '3.5.24'
+  pact               : '3.5.24',
+  springSecurity     : '5.7.1'
 ]
 
 ext.libraries = [
@@ -294,6 +298,7 @@ configurations.all {
       details.useVersion versions.lombok
     }
   }
+  exclude group: 'org.springframework.security', module: 'spring-security-rsa'
 }
 
 dependencies {
@@ -344,12 +349,13 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache'
   implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.3'
 
-  implementation group: 'org.springframework.security', name: 'spring-security-web'
-  implementation group: 'org.springframework.security', name: 'spring-security-config'
+  implementation group: 'org.springframework.security', name: 'spring-security-web', version: versions.springSecurity
+  implementation group: 'org.springframework.security', name: 'spring-security-config', version: versions.springSecurity
+
   // CVE-2021-22112 - Privilege Escalation
-  implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.6.5'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client', version: '2.6.8'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: '2.6.8'
+  implementation group: 'org.springframework.security', name: 'spring-security-core', version: versions.springSecurity
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-client', version: versions.springSecurity
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-oauth2-resource-server', version: versions.springSecurity
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.22'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
