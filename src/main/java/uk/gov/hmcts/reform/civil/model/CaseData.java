@@ -227,22 +227,20 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     public RespondentResponseTypeSpec getRespondent1ClaimResponseTypeForSpec() {
 
-        if(respondent1ClaimResponseTypeForSpec == null ) {
+        if (respondent1ClaimResponseTypeForSpec == null) {
             return getRespondent1ClaimResponseTestForSpec();
+        } else {
+            return respondent1ClaimResponseTypeForSpec;
         }
-        else
-        return  respondent1ClaimResponseTypeForSpec;
-
     }
 
     public RespondentResponseTypeSpec getRespondent2ClaimResponseTypeForSpec() {
 
-        if(respondent2ClaimResponseTypeForSpec == null ) {
+        if (respondent2ClaimResponseTypeForSpec == null) {
             return getRespondent2ClaimResponseTestForSpec();
+        } else {
+            return respondent2ClaimResponseTypeForSpec;
         }
-        else
-            return  respondent2ClaimResponseTypeForSpec;
-
     }
 
     private final RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;

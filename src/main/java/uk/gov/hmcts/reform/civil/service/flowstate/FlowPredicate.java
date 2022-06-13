@@ -572,7 +572,7 @@ public class FlowPredicate {
 
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
-                 boolean result = caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                boolean result = caseData.getRespondent1ClaimResponseTypeForSpec() != null
                     && caseData.getRespondent2ClaimResponseTypeForSpec() != null
                     && caseData.getRespondent1ResponseDate() != null
                     && caseData.getRespondent2ResponseDate() != null

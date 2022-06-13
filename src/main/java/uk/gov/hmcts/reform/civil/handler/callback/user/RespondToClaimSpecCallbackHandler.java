@@ -1132,7 +1132,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-   private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
+    private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();

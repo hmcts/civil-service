@@ -115,8 +115,8 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
     }
 
-    public void generateDQ1v2SameSol(CallbackParams callbackParams, String sol)
-    {
+    public void generateDQ1v2SameSol(CallbackParams callbackParams, String sol) {
+
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         CaseDocument directionsQuestionnaire =
@@ -135,8 +135,8 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         }
     }
 
-    public void generateDQ1v2DiffSolicitor(CallbackParams callbackParams, String sol)
-    {
+    public void generateDQ1v2DiffSolicitor(CallbackParams callbackParams, String sol) {
+
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         Optional<CaseDocument> directionsQuestionnaire =
@@ -166,6 +166,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
      * @param callbackParams parameters of the callback
      * @return response of the callback
      */
+
     private CallbackResponse prepareDirectionsQuestionnaireV1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
@@ -206,32 +207,29 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
             respondent2SameLegalRepresentative == null, so respondent2HasSameLegalRep(CaseData) == false.
             I'm not sure if that is what should happen, but I'll leave that to a MP ticket
              */
-            if(!claimantResponseLRspec)
-            {
+            if (!claimantResponseLRspec) {
 
-                   if (caseData.getRespondent1DQ() != null
+                if (caseData.getRespondent1DQ() != null
                     && caseData.getRespondent1ClaimResponseTypeForSpec() != null
                     && (caseData.getRespondent1ClaimResponseTypeForSpec()
                     .equals(RespondentResponseTypeSpec.FULL_DEFENCE)
                     || caseData.getRespondent1ClaimResponseTypeForSpec()
-                       .equals(RespondentResponseTypeSpec.PART_ADMISSION)))
-                    {
-                        generateDQ1v2DiffSolicitor(callbackParams, "ONE");
+                       .equals(RespondentResponseTypeSpec.PART_ADMISSION))) {
 
-                    }
+                    generateDQ1v2DiffSolicitor(callbackParams, "ONE");
 
-                   if (caseData.getRespondent2DQ() != null
+                }
+
+                if (caseData.getRespondent2DQ() != null
                     && caseData.getRespondent2ClaimResponseTypeForSpec() != null
                     && (caseData.getRespondent2ClaimResponseTypeForSpec()
                     .equals(RespondentResponseTypeSpec.FULL_DEFENCE)
                     || caseData.getRespondent2ClaimResponseTypeForSpec()
-                    .equals(RespondentResponseTypeSpec.PART_ADMISSION)))
-                    {
-                     generateDQ1v2DiffSolicitor(callbackParams, "TWO");
-                    }
-            }
-            else {
+                    .equals(RespondentResponseTypeSpec.PART_ADMISSION))) {
 
+                    generateDQ1v2DiffSolicitor(callbackParams, "TWO");
+                }
+            } else {
 
                 singleResponseFile(
                     callbackParams.getParams().get(BEARER_TOKEN).toString(),
