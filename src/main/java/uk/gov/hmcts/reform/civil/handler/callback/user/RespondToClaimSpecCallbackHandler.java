@@ -165,7 +165,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse setSuperClaimType(CallbackParams callbackParams) {
-        System.out.println("inside ABOUT_TO_START endpoint");
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.superClaimType(SPEC_CLAIM);
@@ -957,7 +956,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse populateRespondent1Copy(CallbackParams callbackParams) {
-        System.out.println("inside V_1, ABOUT_TO_START endpoint");
         var caseData = callbackParams.getCaseData();
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
@@ -1135,7 +1133,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
    private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
-       System.out.println("inside ABOUT_TO_SUBMIT endpoints");
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
@@ -1270,7 +1267,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse setApplicantResponseDeadlineV1(CallbackParams callbackParams) {
-        System.out.println("inside V_1, ABOUT_TO_SUBMIT endpoints");
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();

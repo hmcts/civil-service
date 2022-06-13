@@ -57,23 +57,18 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
     }
 
     private CallbackResponse prepareDirectionsQuestionnaire(CallbackParams callbackParams) {
-        System.out.println("inside prepareDirectionsQuestionnaire method");
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         if (respondent2HasSameLegalRep(caseData) && NO == caseData.getRespondentResponseIsSame()) {
-            System.out.println("NOT 1v1 process document generation");
             if (isDefendant1DQResponse(caseData)) {
-                System.out.println("NOT 1 1v1 process document generation");
                 generateAndSet1V2SameSolDivergentResponsesDQ(callbackParams, caseData, caseDataBuilder, "ONE");
             }
 
             if (isDefendant2DQResponse(caseData)) {
-                System.out.println("NOT 2 1v1 process document generation");
                 generateAndSet1V2SameSolDivergentResponsesDQ(callbackParams, caseData, caseDataBuilder, "TWO");
             }
         } else {
-            System.out.println("1v1 process document generation");
             generateAndSetDQ(callbackParams, caseData, caseDataBuilder);
         }
 
@@ -122,7 +117,6 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
 
     public void generateDQ1v2SameSol(CallbackParams callbackParams, String sol)
     {
-        System.out.println("inside new generateDQ method ");
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         CaseDocument directionsQuestionnaire =
@@ -143,7 +137,6 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
 
     public void generateDQ1v2DiffSolicitor(CallbackParams callbackParams, String sol)
     {
-        System.out.println("inside newgenerateDQ1v2DiffSolicitor");
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         Optional<CaseDocument> directionsQuestionnaire =
@@ -174,7 +167,6 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
      * @return response of the callback
      */
     private CallbackResponse prepareDirectionsQuestionnaireV1(CallbackParams callbackParams) {
-        System.out.println("inside prepareDirectionsQuestionnaireV1");
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
@@ -183,9 +175,8 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
             && SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
             claimantResponseLRspec = true;
         }
-        System.out.println(" !claimantResponseLRspec value "+ !claimantResponseLRspec);
+
         if (respondent2HasSameLegalRep(caseData) && !claimantResponseLRspec) {
-            System.out.println("inside respondent2HasSameLegalRep(caseData) && !claimantResponseLRspec");
             if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
                 if (caseData.getRespondent1DQ() != null
                     && caseData.getRespondent1ClaimResponseTypeForSpec() != null
@@ -224,22 +215,20 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                     .equals(RespondentResponseTypeSpec.FULL_DEFENCE)
                     || caseData.getRespondent1ClaimResponseTypeForSpec()
                        .equals(RespondentResponseTypeSpec.PART_ADMISSION)))
-                   {
-                    System.out.println(" FULL defence and part admission respondent 1");
-                    generateDQ1v2DiffSolicitor(callbackParams, "ONE");
+                    {
+                        generateDQ1v2DiffSolicitor(callbackParams, "ONE");
 
-                }
+                    }
 
-                if (caseData.getRespondent2DQ() != null
+                   if (caseData.getRespondent2DQ() != null
                     && caseData.getRespondent2ClaimResponseTypeForSpec() != null
                     && (caseData.getRespondent2ClaimResponseTypeForSpec()
                     .equals(RespondentResponseTypeSpec.FULL_DEFENCE)
                     || caseData.getRespondent2ClaimResponseTypeForSpec()
                     .equals(RespondentResponseTypeSpec.PART_ADMISSION)))
-                   {
-                    System.out.println(" FULL defence and part admission respondent 2");
-                    generateDQ1v2DiffSolicitor(callbackParams, "TWO");
-                }
+                    {
+                     generateDQ1v2DiffSolicitor(callbackParams, "TWO");
+                    }
             }
             else {
 

@@ -124,7 +124,6 @@ public class StateFlowEngine {
     private final FeatureToggleService featureToggleService;
 
     public StateFlow build(FlowState.Main initialState) {
-        System.out.println("inside StateFlow build method ");
         return StateFlowBuilder.<FlowState.Main>flow(FLOW_NAME)
             .initial(initialState)
             .transitionTo(CLAIM_SUBMITTED)

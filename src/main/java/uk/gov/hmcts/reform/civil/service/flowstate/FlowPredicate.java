@@ -482,13 +482,9 @@ public class FlowPredicate {
         getPredicateForResponseTypeSpec(caseData, RespondentResponseTypeSpec.FULL_DEFENCE);
 
     private static boolean getPredicateForResponseTypeSpec(CaseData caseData, RespondentResponseTypeSpec responseType) {
-        System.out.println("inside getPredicateForResponseTypeSpec,  responseType is "+ responseType);
-        System.out.println("Def1's response type is " + caseData.getRespondent1ClaimResponseTypeForSpec());
-        System.out.println("Def2's response type is " + caseData.getRespondent2ClaimResponseTypeForSpec());
 
         boolean basePredicate = caseData.getRespondent1ResponseDate() != null
             && caseData.getRespondent1ClaimResponseTypeForSpec() == responseType;
-        System.out.println("basePredicate is "+ basePredicate);
         boolean predicate = false;
 
         if (!SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
@@ -518,7 +514,6 @@ public class FlowPredicate {
             default:
                 break;
         }
-        System.out.println("predicate is  "+ predicate);
         return predicate;
     }
 
@@ -570,12 +565,10 @@ public class FlowPredicate {
         isDivergentResponsesGoOfflineSpec(caseData);
 
     private static boolean isDivergentResponsesGoOfflineSpec(CaseData caseData) {
-        System.out.println("inside isDivergentResponsesGoOfflineSpec method");
 
         if (!SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
             return false;
         }
-        System.out.println("Multiparty : " + getMultiPartyScenario(caseData) + ",  " + ONE_V_TWO_TWO_LEGAL_REP);
 
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
@@ -597,7 +590,6 @@ public class FlowPredicate {
                     .equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                     && !RespondentResponseTypeSpec.FULL_DEFENCE
                     .equals(caseData.getRespondent2ClaimResponseTypeForSpec())));
-                System.out.println(" returing result is " + result);
                 return result;
             case ONE_V_TWO_ONE_LEGAL_REP:
                 return caseData.getRespondent1ClaimResponseTypeForSpec() != null
