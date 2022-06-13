@@ -79,7 +79,7 @@ public class InterimJudgmentDefendantNotificationHandlerTest extends BaseCallbac
             verify(notificationService, times(2)).sendMail(
                 anyString(),
                 eq("template-id-req"), anyMap(),
-                eq("interim-judgment-requested-notification-def-000DC001"));
+                eq("interim-judgment-approval-notification-def-000DC001"));
         }
 
         private Map<String, String> getNotificationDataMap() {

@@ -57,21 +57,25 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
 
         if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YesOrNo.YES)) {
             if (checkDefendantRequested(caseData, caseData.getRespondent1().getPartyName())
-                || BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel())) {
+                || checkIfBothDefendants(caseData)) {
                 notificationService.sendMail(caseData.getRespondentSolicitor1EmailAddress(),
                                              notificationsProperties.getInterimJudgmentRequestedDefendant(),
                                              addProperties(caseData),
-                                             String.format(REFERENCE_TEMPLATE_REQUEST_DEF,
+                                             String.format(checkIfBothDefendants(caseData)
+                                                               ? REFERENCE_TEMPLATE_APPROVAL_DEF
+                                                               : REFERENCE_TEMPLATE_REQUEST_DEF,
                                                            caseData.getLegacyCaseReference()));
             }
             if (checkDefendantRequested(caseData, caseData.getRespondent2().getPartyName())
-                || BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel())) {
+                || checkIfBothDefendants(caseData)) {
                 notificationService.sendMail(caseData.getRespondentSolicitor2EmailAddress() != null
                                                  ? caseData.getRespondentSolicitor2EmailAddress() :
                                                  caseData.getRespondentSolicitor1EmailAddress(),
                                              notificationsProperties.getInterimJudgmentRequestedDefendant(),
                                              addPropertiesDefendant2(caseData),
-                                             String.format(REFERENCE_TEMPLATE_REQUEST_DEF,
+                                             String.format(checkIfBothDefendants(caseData)
+                                                               ? REFERENCE_TEMPLATE_APPROVAL_DEF
+                                                               : REFERENCE_TEMPLATE_REQUEST_DEF,
                                                            caseData.getLegacyCaseReference())
                 );
             }
@@ -135,6 +139,10 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
             return organisation.get().getName();
         }
         return caseData.getRespondent2().getPartyName();
+    }
+
+    private Boolean checkIfBothDefendants(CaseData caseData) {
+        return BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel());
     }
 }
 
