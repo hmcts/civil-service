@@ -16,8 +16,9 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
-import uk.gov.hmcts.reform.civil.config.GeneralAppLRDConfiguration;
+import uk.gov.hmcts.reform.civil.config.LRDConfiguration;
 import uk.gov.hmcts.reform.civil.model.genapplication.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.OK;
 
 @SpringBootTest(classes = {GeneralAppFeesService.class, RestTemplate.class, GeneralAppFeesConfiguration.class})
-class GeneralAppLocationRefDataServiceTest {
+class LocationRefDataServiceTest {
 
     @Captor
     private ArgumentCaptor<URI> uriCaptor;
@@ -45,13 +46,13 @@ class GeneralAppLocationRefDataServiceTest {
     private RestTemplate restTemplate;
 
     @Mock
-    private GeneralAppLRDConfiguration lrdConfiguration;
+    private LRDConfiguration lrdConfiguration;
 
     @Mock
     private AuthTokenGenerator authTokenGenerator;
 
     @InjectMocks
-    private GeneralAppLocationRefDataService refDataService;
+    private LocationRefDataService refDataService;
 
     @BeforeEach
     void setUp() {
