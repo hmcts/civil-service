@@ -16,9 +16,9 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
-import uk.gov.hmcts.reform.civil.service.GeneralAppLocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
@@ -54,7 +54,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private final OrganisationService organisationService;
     private final IdamClient idamClient;
     private final GeneralAppFeesService feesService;
-    private final GeneralAppLocationRefDataService locationRefDataService;
+    private final LocationRefDataService locationRefDataService;
 
     @Override
     protected Map<String, Callback> callbacks() {
