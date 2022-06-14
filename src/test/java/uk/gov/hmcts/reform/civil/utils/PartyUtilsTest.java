@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -83,6 +84,130 @@ class PartyUtilsTest {
                 .type(Party.Type.SOLE_TRADER).build();
 
             assertEquals("Mr Jacob Martin", PartyUtils.getPartyNameBasedOnType(soleTrader));
+        }
+    }
+
+    @Nested
+    class ConcatenatedPartyName {
+        @Test
+        void shouldThrowNullPointer_whenPartyTypeIsNull() {
+            Party party = Party.builder().type(null).build();
+            assertThrows(NullPointerException.class, () -> PartyUtils.getConcatenatedPartyNameWithoutTitle(party));
+        }
+
+        @Test
+        void shouldProvideConcatenatedNameWithoutTitle_whenPartyTypeIsIndividual() {
+            Party individual = Party.builder()
+                .individualTitle("Mr")
+                .individualFirstName("Jacob")
+                .individualLastName("Martin")
+                .type(Party.Type.INDIVIDUAL).build();
+
+            assertEquals("Jacob Martin", PartyUtils.getConcatenatedPartyNameWithoutTitle(individual));
+        }
+
+        @Test
+        void shouldProvideConcatenatedNameWithoutTitle_whenPartyTypeIsCompany() {
+            Party individual = Party.builder()
+                .companyName("XYZ Company House")
+                .type(Party.Type.COMPANY).build();
+
+            assertEquals("XYZ Company House", PartyUtils.getConcatenatedPartyNameWithoutTitle(individual));
+        }
+
+        @Test
+        void shouldProvideConcatenatedNameWithoutTitle_whenPartyTypeIsOrganisation() {
+            Party organisation = Party.builder()
+                .organisationName("ABC Solutions")
+                .type(Party.Type.ORGANISATION).build();
+
+            assertEquals("ABC Solutions", PartyUtils.getConcatenatedPartyNameWithoutTitle(organisation));
+        }
+
+        @Test
+        void shouldProvideConcatenatedNameWithoutTitle_whenPartyTypeIsSoleTrader() {
+            Party soleTrader = Party.builder()
+                .soleTraderTitle("Mr")
+                .soleTraderFirstName("Jacob")
+                .soleTraderLastName("Martin")
+                .type(Party.Type.SOLE_TRADER).build();
+
+            assertEquals("Jacob Martin", PartyUtils.getConcatenatedPartyNameWithoutTitle(soleTrader));
+        }
+    }
+
+    @Nested
+    class PostcodeFromAddress {
+        @Test
+        void shouldThrowNullPointer_whenPartyIsNull() {
+            Party party = Party.builder().type(null).build();
+            assertThrows(NullPointerException.class, () -> PartyUtils.getPartyPostcodeFromAddress(party));
+        }
+
+        @Test
+        void shouldThrowNullPointer_whenPartyPostcodeIsNull() {
+            Party party = Party.builder().individualTitle("Mr")
+                .individualFirstName("Jacob")
+                .individualLastName("Martin")
+                .type(Party.Type.INDIVIDUAL)
+                .build();
+            assertThrows(NullPointerException.class, () -> PartyUtils.getPartyPostcodeFromAddress(party));
+        }
+
+        @Test
+        void shouldProvidePostcode_whenPartyTypeIsIndividual() {
+            Party individual = Party.builder()
+                .individualTitle("Mr")
+                .individualFirstName("Jacob")
+                .individualLastName("Martin")
+                .primaryAddress(Address.builder()
+                                    .addressLine1("abc")
+                                    .postCode("RG1 7AA")
+                                    .build())
+                .type(Party.Type.INDIVIDUAL).build();
+
+            assertEquals("RG1 7AA", PartyUtils.getPartyPostcodeFromAddress(individual));
+        }
+
+        @Test
+        void shouldProvidePostcode_whenPartyTypeIsCompany() {
+            Party individual = Party.builder()
+                .companyName("XYZ Company House")
+                .type(Party.Type.COMPANY)
+                .primaryAddress(Address.builder()
+                                    .addressLine1("abc")
+                                    .postCode("RG1 7AA")
+                                    .build()).build();
+
+            assertEquals("RG1 7AA", PartyUtils.getPartyPostcodeFromAddress(individual));
+        }
+
+        @Test
+        void shouldProvidePostcode_whenPartyTypeIsOrganisation() {
+            Party organisation = Party.builder()
+                .organisationName("ABC Solutions")
+                .type(Party.Type.ORGANISATION)
+                .primaryAddress(Address.builder()
+                                    .addressLine1("abc")
+                                    .postCode("RG1 7AA")
+                                    .build()).build();
+
+            assertEquals("RG1 7AA", PartyUtils.getPartyPostcodeFromAddress(organisation));
+        }
+
+        @Test
+        void shouldProvidePostcode_whenPartyTypeIsSoleTrader() {
+            Party soleTrader = Party.builder()
+                .soleTraderTitle("Mr")
+                .soleTraderFirstName("Jacob")
+                .soleTraderLastName("Martin")
+                .type(Party.Type.SOLE_TRADER)
+                .primaryAddress(Address.builder()
+                                    .addressLine1("abc")
+                                    .postCode("RG1 7AA")
+                                    .build()).build();
+
+            assertEquals("RG1 7AA", PartyUtils.getPartyPostcodeFromAddress(soleTrader));
         }
     }
 
