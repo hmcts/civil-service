@@ -90,6 +90,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 .claimDetailsNotificationDate(notificationDateTime)
                 .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
                 .respondent2ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
+                .nextDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime).toLocalDate())
                 .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
                     6,
                     notificationDate
@@ -100,6 +101,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS))
                 .claimDetailsNotificationDate(notificationDateTime)
                 .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
+                .nextDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime).toLocalDate())
                 .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
                     6,
                     notificationDate
