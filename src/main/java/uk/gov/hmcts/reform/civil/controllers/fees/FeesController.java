@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.controllers.fees;
 
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
