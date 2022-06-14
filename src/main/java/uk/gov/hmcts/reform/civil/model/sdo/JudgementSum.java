@@ -14,7 +14,7 @@ public class JudgementSum {
     private final Integer judgementSum;
 
     @JsonCreator
-    public JudgementSum(@JsonProperty("judgementSum") Integer judgementSum) {
-        this.judgementSum = judgementSum;
+    public JudgementSum(@JsonProperty("judgementSum") Integer judgementSum) { 
+        this.judgementSum = judgementSum; 
     }
 }
