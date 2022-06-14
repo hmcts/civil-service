@@ -14,7 +14,7 @@ public interface WitnessesValidator {
     default CallbackResponse validateWitnesses(DQ dq) {
         var experts = dq.getWitnesses();
         List<String> errors = new ArrayList<>();
-        if (experts.getWitnessesToAppear() == YES && experts.getDetails() == null) {
+        if (experts != null && experts.getWitnessesToAppear() == YES && experts.getDetails() == null) {
             errors.add("Witness details required");
         }
 
