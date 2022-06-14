@@ -267,7 +267,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                            + "case on periodical payments. "
                                                            + "then they must do so in the respective schedule "
                                                            + "and counter-schedule")
-                                               .input4("Upon it being noted that the schedule of loss contains no claim "
+                                               .input4("Upon it being noted that the schedule of loss "
+                                                           + "contains no claim "
                                                            + "for continuing loss and is therefore final, no further"
                                                            + " schedule of loss shall be served without permission "
                                                            + "to amend. The defendant shall file a counter-schedule "
@@ -298,7 +299,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.trialHearingNotesDJ(TrialHearingNotes
                                                 .builder()
                                                 .input("This order has been made without a hearing. Each party has "
-                                                           + "the right to apply to have this order set aside or varied."
+                                                           + "the right to apply to have this order set "
+                                                           + "aside or varied."
                                                            + " Any such application must be received by the court "
                                                            + "(together with the appropriate fee) by 4pm on")
                                                 .date(LocalDate.now().plusWeeks(1))
