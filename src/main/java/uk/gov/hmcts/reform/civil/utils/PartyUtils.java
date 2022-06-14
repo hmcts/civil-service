@@ -37,6 +37,25 @@ public class PartyUtils {
         }
     }
 
+    public static String getConcatenatedPartyNameWithoutTitle(Party party) {
+        switch (party.getType()) {
+            case COMPANY:
+                return party.getCompanyName();
+            case INDIVIDUAL:
+                return getIndividualNameWithoutTitle(party);
+            case SOLE_TRADER:
+                return getSoleTraderNameWithoutTitle(party);
+            case ORGANISATION:
+                return party.getOrganisationName();
+            default:
+                throw new IllegalArgumentException("Invalid Party type in " + party);
+        }
+    }
+
+    public static String getPartyPostcodeFromAddress(Party party) {
+        return party.getPrimaryAddress().getPostCode();
+    }
+
     private static String getTitle(String title) {
         return StringUtils.isBlank(title) ? "" : title + " ";
     }
@@ -80,9 +99,21 @@ public class PartyUtils {
             + party.getSoleTraderLastName();
     }
 
+    private static String getSoleTraderNameWithoutTitle(Party party) {
+        return party.getSoleTraderFirstName()
+            + " "
+            + party.getSoleTraderLastName();
+    }
+
     private static String getIndividualName(Party party) {
         return getTitle(party.getIndividualTitle())
             + party.getIndividualFirstName()
+            + " "
+            + party.getIndividualLastName();
+    }
+
+    private static String getIndividualNameWithoutTitle(Party party) {
+        return party.getIndividualFirstName()
             + " "
             + party.getIndividualLastName();
     }
