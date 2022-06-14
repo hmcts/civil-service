@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
+import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -30,6 +32,21 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPreferredEmail;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPreferredTelephone;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 
 import java.math.BigDecimal;
@@ -98,6 +115,30 @@ public class CaseDataParent implements MappableObject {
     private DisposalHearingBundle disposalHearingBundle;
     private DisposalHearingNotes disposalHearingNotes;
     private final DynamicList disposalHearingMethodInPerson;
+    private final DynamicList fastTrackMethodInPerson;
+    private final YesOrNo drawDirectionsOrderRequired;
+    private final YesOrNo drawDirectionsOrderSmallClaims;
+    private final ClaimsTrack claimsTrack;
+    private final OrderType orderType;
+    private FastTrackBuildingDispute fastTrackBuildingDispute;
+    private FastTrackClinicalNegligence fastTrackClinicalNegligence;
+    private FastTrackCreditHire fastTrackCreditHire;
+    private FastTrackHousingDisrepair fastTrackHousingDisrepair;
+    private FastTrackPersonalInjury fastTrackPersonalInjury;
+    private FastTrackRoadTrafficAccident fastTrackRoadTrafficAccident;
+    private FastTrackJudgesRecital fastTrackJudgesRecital;
+    private FastTrackJudgementDeductionValue fastTrackJudgementDeductionValue;
+    private FastTrackDisclosureOfDocuments fastTrackDisclosureOfDocuments;
+    private FastTrackWitnessOfFact fastTrackWitnessOfFact;
+    private FastTrackSchedulesOfLoss fastTrackSchedulesOfLoss;
+    private FastTrackTrial fastTrackTrial;
+    private FastTrackNotes fastTrackNotes;
+    private FastTrackPreferredTelephone fastTrackPreferredTelephone;
+    private FastTrackPreferredEmail fastTrackPreferredEmail;
+
+    // sdo ui flags
+    private final YesOrNo setSmallClaimsFlag;
+    private final YesOrNo setFastTrackFlag;
 
     private final YesOrNo specAoSRespondent2CorrespondenceAddressRequired;
     private final Address specAoSRespondent2CorrespondenceAddressdetails;
