@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class FastTrackRoadTrafficAccident {
+public class FastTrackPreferredEmail {
 
-    private String input;
+    private String email;
 }
