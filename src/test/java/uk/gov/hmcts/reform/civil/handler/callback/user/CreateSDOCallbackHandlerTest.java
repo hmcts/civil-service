@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,11 +19,14 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -64,6 +68,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private CreateSDOCallbackHandler handler;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockBean
+    protected LocationRefDataService locationRefDataService;
 
     @Nested
     class AboutToStartCallback {
@@ -245,6 +255,29 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("000");
             assertThat(response.getData()).extracting("disposalHearingPreferredEmail").extracting("email")
                 .isEqualTo("test@email.com");
+        }
+    }
+
+    @Nested
+    class MidEventDisposalHearingLocationRefDataCallback extends LocationRefSampleDataBuilder {
+        private static final String PAGE_ID = "disposal-hearing";
+
+        @Test
+        void shouldPrePopulateDisposalHearingPage() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            given(locationRefDataService.getCourtLocations(any())).willReturn(getSampleCourLocations());
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            DynamicList dynamicList = getLocationDynamicListInPersonHearing(data);
+
+            assertThat(dynamicList).isNotNull();
+            assertThat(locationsFromDynamicList(dynamicList))
+                .containsOnly("ABCD - RG0 0 AL", "PQRS - GU0 0EE", "WXYZ - EW0 0HE", "LMNO - NE0 0BH");
         }
     }
 
