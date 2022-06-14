@@ -303,17 +303,6 @@ public class DeadlinesCalculatorTest {
 
             assertThat(calculator.nextDeadline(datelines)).isTheSame(earliestDeadline);
         }
-
-        @Test
-        void shouldReturnDeadlinePlus14Days_whenNotifyClaimDetails() {
-            LocalDateTime startDate = LocalDate.of(2022, 8, 19).atTime(12, 0);
-            LocalDateTime expectedDeadline = LocalDate.of(2022, 9, 2).atTime(END_OF_BUSINESS_DAY);
-            LocalDateTime responseDeadline = calculator.plus14DaysDeadline(startDate);
-
-            assertThat(responseDeadline)
-                .isWeekday()
-                .isTheSame(expectedDeadline);
-        }
     }
 
     /**
