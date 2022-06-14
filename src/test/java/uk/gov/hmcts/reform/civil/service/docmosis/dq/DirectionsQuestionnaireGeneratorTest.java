@@ -197,8 +197,10 @@ class DirectionsQuestionnaireGeneratorTest {
             verify(representativeService).getRespondent1Representative(caseData);
             verify(documentManagementService)
                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
-            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
-                eq(N181_2V1));
+            verify(documentGeneratorService).generateDocmosisDocument(
+                any(DirectionsQuestionnaireForm.class),
+                eq(N181_2V1)
+            );
         }
 
         @Test
@@ -224,8 +226,10 @@ class DirectionsQuestionnaireGeneratorTest {
             assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
             verify(documentManagementService)
                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
-            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
-                                                                      eq(N181_MULTIPARTY_SAME_SOL));
+            verify(documentGeneratorService).generateDocmosisDocument(
+                any(DirectionsQuestionnaireForm.class),
+                eq(N181_MULTIPARTY_SAME_SOL)
+            );
         }
 
         @Test
@@ -236,7 +240,8 @@ class DirectionsQuestionnaireGeneratorTest {
                     DocmosisTemplates.DEFENDANT_RESPONSE_SPEC.getDocumentTitle(), bytes));
 
             String expectedTitle = format(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC.getDocumentTitle(),
-                   "defendant", REFERENCE_NUMBER);
+                                          "defendant", REFERENCE_NUMBER
+            );
             when(documentManagementService.uploadDocument(
                 BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE))
             ).thenReturn(CASE_DOCUMENT_DEFENDANT);
@@ -252,8 +257,10 @@ class DirectionsQuestionnaireGeneratorTest {
             assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
             verify(documentManagementService)
                 .uploadDocument(BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE));
-            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
-                                                                      eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC));
+            verify(documentGeneratorService).generateDocmosisDocument(
+                any(DirectionsQuestionnaireForm.class),
+                eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC)
+            );
         }
 
         @Nested
@@ -478,11 +485,11 @@ class DirectionsQuestionnaireGeneratorTest {
                     .build();
                 uk.gov.hmcts.reform.civil.model.dq.Expert expert1 =
                     uk.gov.hmcts.reform.civil.model.dq.Expert.builder()
-                    .name("Expert 1")
-                    .fieldOfExpertise("expertise 1")
-                    .whyRequired("Explanation")
-                    .estimatedCost(BigDecimal.valueOf(10000))
-                    .build();
+                        .name("Expert 1")
+                        .fieldOfExpertise("expertise 1")
+                        .whyRequired("Explanation")
+                        .estimatedCost(BigDecimal.valueOf(10000))
+                        .build();
                 caseData = caseData.toBuilder()
                     .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
                                        .respondent1DQExperts(uk.gov.hmcts.reform.civil.model.dq.Experts.builder()
@@ -996,20 +1003,23 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondentResponseIsSame(YesOrNo.NO)
                     .build();
                 CaseDocument caseDocument = generator.generateDQFor1v2SingleSolDiffResponse(caseData, BEARER_TOKEN,
-                                                                                            "TWO");
+                                                                                            "TWO"
+                );
 
                 assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
 
                 verify(documentManagementService)
                     .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
-                verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
-                                                                          eq(N181));
+                verify(documentGeneratorService).generateDocmosisDocument(
+                    any(DirectionsQuestionnaireForm.class),
+                    eq(N181)
+                );
             }
 
             @Test
             void when1v2DiffSolRespondsTo2ndDefendantWithDivergentResponse_shouldGetRespondentDQData() {
 
-               when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
                     .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
                 when(documentManagementService.uploadDocument(
                     BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
@@ -1027,14 +1037,17 @@ class DirectionsQuestionnaireGeneratorTest {
                     .systemGeneratedCaseDocuments(new ArrayList<>())
                     .build();
                 Optional<CaseDocument> caseDocument = generator.generateDQFor1v2DiffSol(caseData, BEARER_TOKEN,
-                                                                                        "TWO");
+                                                                                        "TWO"
+                );
 
                 assertThat(caseDocument.get()).isEqualTo(CASE_DOCUMENT_DEFENDANT);
 
                 verify(documentManagementService)
                     .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
-                verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
-                                                                          eq(N181));
+                verify(documentGeneratorService).generateDocmosisDocument(
+                    any(DirectionsQuestionnaireForm.class),
+                    eq(N181)
+                );
             }
 
             @Test
@@ -1058,16 +1071,18 @@ class DirectionsQuestionnaireGeneratorTest {
                     .systemGeneratedCaseDocuments(new ArrayList<>())
                     .build();
                 Optional<CaseDocument> caseDocument = generator.generateDQFor1v2DiffSol(caseData, BEARER_TOKEN,
-                                                                                        "ONE");
+                                                                                        "ONE"
+                );
 
                 assertThat(caseDocument.get()).isEqualTo(CASE_DOCUMENT_DEFENDANT);
 
                 verify(documentManagementService)
                     .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
-                verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
-                                                                          eq(N181));
+                verify(documentGeneratorService).generateDocmosisDocument(
+                    any(DirectionsQuestionnaireForm.class),
+                    eq(N181)
+                );
             }
-
 
             @Test
             void when1v2SolRespondsTo1stDefendantWithDivergentResponse_shouldGetRespondentDQData() {
@@ -1087,14 +1102,17 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondentResponseIsSame(YesOrNo.NO)
                     .build();
                 CaseDocument caseDocument = generator.generateDQFor1v2SingleSolDiffResponse(caseData, BEARER_TOKEN,
-                                                                                            "ONE");
+                                                                                            "ONE"
+                );
 
                 assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
 
                 verify(documentManagementService)
                     .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
-                verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
-                    eq(N181));
+                verify(documentGeneratorService).generateDocmosisDocument(
+                    any(DirectionsQuestionnaireForm.class),
+                    eq(N181)
+                );
             }
 
             @Test
@@ -1166,18 +1184,20 @@ class DirectionsQuestionnaireGeneratorTest {
             private List<Party> getRespondents(CaseData caseData) {
                 var respondent1 = caseData.getRespondent1();
                 var respondent2 = caseData.getRespondent2();
-                return List.of(Party.builder()
-                                   .name(respondent1.getPartyName())
-                                   .primaryAddress(respondent1.getPrimaryAddress())
-                                   .representative(defendant1Representative)
-                                   .litigationFriendName("respondent LF")
-                                   .build(),
-                               Party.builder()
-                                   .name(respondent2.getPartyName())
-                                   .primaryAddress(respondent2.getPrimaryAddress())
-                                   .representative(defendant2Representative)
-                                   .litigationFriendName("respondent 2 LF")
-                                   .build());
+                return List.of(
+                    Party.builder()
+                        .name(respondent1.getPartyName())
+                        .primaryAddress(respondent1.getPrimaryAddress())
+                        .representative(defendant1Representative)
+                        .litigationFriendName("respondent LF")
+                        .build(),
+                    Party.builder()
+                        .name(respondent2.getPartyName())
+                        .primaryAddress(respondent2.getPrimaryAddress())
+                        .representative(defendant2Representative)
+                        .litigationFriendName("respondent 2 LF")
+                        .build()
+                );
             }
 
             private Experts getExperts(DQ dq) {
@@ -1392,8 +1412,10 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void shouldGenerateN181Document_whenOneApplicantIntendsToProceedAgainstBothDefendant() {
-            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class),
-                                                                   eq(N181_MULTIPARTY_SAME_SOL)))
+            when(documentGeneratorService.generateDocmosisDocument(
+                any(MappableObject.class),
+                eq(N181_MULTIPARTY_SAME_SOL)
+            ))
                 .thenReturn(new DocmosisDocument(N181_MULTIPARTY_SAME_SOL.getDocumentTitle(), bytes));
             when(documentManagementService.uploadDocument(
                 BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
@@ -1414,8 +1436,10 @@ class DirectionsQuestionnaireGeneratorTest {
 
             verify(documentManagementService)
                 .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
-            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
-                eq(N181_MULTIPARTY_SAME_SOL));
+            verify(documentGeneratorService).generateDocmosisDocument(
+                any(DirectionsQuestionnaireForm.class),
+                eq(N181_MULTIPARTY_SAME_SOL)
+            );
         }
     }
 
