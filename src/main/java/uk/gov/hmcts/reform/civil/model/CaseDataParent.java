@@ -50,6 +50,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -139,6 +140,11 @@ public class CaseDataParent implements MappableObject {
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
     private final YesOrNo setFastTrackFlag;
+
+    private final LocalDate nextDeadline;
+    private final String allPartyNames;
+    private final String caseListDisplayDefendantSolicitorReferences;
+    private final String unassignedCaseListDisplayOrganisationReferences;
 
     private final YesOrNo specAoSRespondent2CorrespondenceAddressRequired;
     private final Address specAoSRespondent2CorrespondenceAddressdetails;

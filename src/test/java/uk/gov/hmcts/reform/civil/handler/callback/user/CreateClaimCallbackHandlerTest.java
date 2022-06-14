@@ -995,6 +995,71 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             }
         }
 
+        @Nested
+        class GetAllPartyNames {
+            @Test
+            void oneVOne() {
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData())
+                    .containsEntry("allPartyNames", "Mr. John Rambo V Mr. Sole Trader");
+            }
+
+            @Test
+            void oneVTwo() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDraft()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData())
+                    .containsEntry("allPartyNames", "Mr. John Rambo V Mr. Sole Trader, Mr. John Rambo");
+            }
+
+            @Test
+            void twoVOne() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDraft()
+                    .multiPartyClaimTwoApplicants()
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData())
+                    .containsEntry("allPartyNames", "Mr. John Rambo, Mr. Jason Rambo V Mr. Sole Trader");
+            }
+        }
+
+        @Test
+        void shouldUpdateCaseListAndUnassignedListData() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                                  .orgPolicyReference("CLAIMANTREF1")
+                                                  .build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyReference("DEFENDANTREF1")
+                                                   .build())
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyReference("DEFENDANTREF2")
+                                                   .build())
+                .build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+            assertThat(response.getData())
+                .containsEntry("unassignedCaseListDisplayOrganisationReferences",
+                               "CLAIMANTREF1, DEFENDANTREF1, DEFENDANTREF2");
+            assertThat(response.getData())
+                .containsEntry("caseListDisplayDefendantSolicitorReferences", "6789, 01234");
+        }
+
         @Test
         void shouldReturnExpectedErrorMessagesInResponse_whenInvokedWithNullCourtLocation() {
             CaseData data = caseData.toBuilder()

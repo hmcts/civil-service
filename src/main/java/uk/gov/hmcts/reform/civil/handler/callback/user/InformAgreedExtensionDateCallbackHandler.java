@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -151,16 +152,23 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             caseDataBuilder
                 .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE))
                 .respondent1TimeExtensionDate(time.now())
-                .respondent1ResponseDeadline(newDeadline);
+                .respondent1ResponseDeadline(newDeadline)
+                .nextDeadline(newDeadline.toLocalDate());
         } else if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
             caseDataBuilder
                 .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE))
                 .respondent2TimeExtensionDate(time.now())
-                .respondent2ResponseDeadline(newDeadline);
+                .respondent2ResponseDeadline(newDeadline)
+                .nextDeadline(deadlinesCalculator.nextDeadline(
+                    Arrays.asList(newDeadline, caseData.getRespondent1ResponseDeadline())).toLocalDate());
         } else {
-            caseDataBuilder.respondent1TimeExtensionDate(time.now())
+            caseDataBuilder
                 .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE))
-                .respondent1ResponseDeadline(newDeadline);
+                .respondent1TimeExtensionDate(time.now())
+                .respondent1ResponseDeadline(newDeadline)
+                // null safe - so will work on 1v1 and multiparty scenarios
+                .nextDeadline(deadlinesCalculator.nextDeadline(
+                    Arrays.asList(newDeadline, caseData.getRespondent2ResponseDeadline())).toLocalDate());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
