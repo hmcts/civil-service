@@ -179,7 +179,7 @@ os-postcode-lookup:
 stitching:
   api:
     url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/api/stitch-ccd-bundles"
-  enabled: ${STITCHING_API_ENABLED:true}
+  enabled: ${STITCHING_API_ENABLED:false}
 
 launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:}
@@ -188,7 +188,7 @@ launchdarkly:
 
 testing:
   support:
-    enabled: ${TESTING_SUPPORT_ENABLED:false}
+    enabled: ${TESTING_SUPPORT_ENABLED:true}
 
 exit-survey:
   applicant-link: https://www.smartsurvey.co.uk/s/CivilDamages_ExitSurvey_Claimant/
