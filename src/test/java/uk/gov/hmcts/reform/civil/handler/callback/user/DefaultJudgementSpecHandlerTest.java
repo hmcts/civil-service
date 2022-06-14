@@ -17,6 +17,9 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -66,7 +69,15 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_WhenAboutToStartIsInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            BreathingSpaceLiftInfo breathingSpaceLiftInfo = BreathingSpaceLiftInfo.builder()
+                .expectedEnd(LocalDate.now().minusDays(5))
+                .build();
+            BreathingSpaceInfo breathingSpaceInfo = BreathingSpaceInfo.builder()
+                .lift(breathingSpaceLiftInfo)
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .breathing(breathingSpaceInfo)
+                .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -75,7 +86,14 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotReturnError_WhenAboutToStartIsInvokedOneDefendant() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            BreathingSpaceLiftInfo breathingSpaceLiftInfo = BreathingSpaceLiftInfo.builder()
+                .expectedEnd(LocalDate.now().minusDays(5))
+                .build();
+            BreathingSpaceInfo breathingSpaceInfo = BreathingSpaceInfo.builder()
+                .lift(breathingSpaceLiftInfo)
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .breathing(breathingSpaceInfo)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15)).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -85,7 +103,14 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnDefendantDetails_WhenAboutToStartIsInvokedOneDefendant() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            BreathingSpaceLiftInfo breathingSpaceLiftInfo = BreathingSpaceLiftInfo.builder()
+                .expectedEnd(LocalDate.now().minusDays(5))
+                .build();
+            BreathingSpaceInfo breathingSpaceInfo = BreathingSpaceInfo.builder()
+                .lift(breathingSpaceLiftInfo)
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .breathing(breathingSpaceInfo)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15)).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -95,7 +120,14 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnDefendantDetails_WhenAboutToStartIsInvokedTwoDefendant() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+            BreathingSpaceLiftInfo breathingSpaceLiftInfo = BreathingSpaceLiftInfo.builder()
+                .expectedEnd(LocalDate.now().minusDays(5))
+                .build();
+            BreathingSpaceInfo breathingSpaceInfo = BreathingSpaceInfo.builder()
+                .lift(breathingSpaceLiftInfo)
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .breathing(breathingSpaceInfo)
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(YES)
@@ -104,6 +136,26 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getData().get("defendantDetailsSpec")).isNotNull();
+        }
+
+        @Test
+        void shouldReturnError_WhenAboutToStartAndInBreathingSpace() {
+            BreathingSpaceEnterInfo breathingSpaceEnterInfo = BreathingSpaceEnterInfo.builder()
+                .start(LocalDate.now().minusDays(10))
+                .build();
+            BreathingSpaceInfo breathingSpaceInfo = BreathingSpaceInfo.builder()
+                .enter(breathingSpaceEnterInfo)
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .breathing(breathingSpaceInfo)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getErrors().contains("Default judgment cannot be applied for while claim is "
+                                                         + "in breathing space"));
         }
 
     }
