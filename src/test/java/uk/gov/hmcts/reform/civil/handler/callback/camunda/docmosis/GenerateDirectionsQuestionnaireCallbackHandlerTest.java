@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireGene
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -263,50 +264,58 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
         @Test
         void shouldAddDocumentToSystemGeneratedDocuments_when1v2DiffSolRespondent1() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-                .respondent2SameLegalRepresentative(YesOrNo.NO)
-                .respondent1DQ(Respondent1DQ.builder().build())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                .systemGeneratedCaseDocuments(new ArrayList<>())
-                .build();
-            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+            for (RespondentResponseTypeSpec responseType : EnumSet.of(RespondentResponseTypeSpec.FULL_DEFENCE,
+                                                                      RespondentResponseTypeSpec.PART_ADMISSION)) {
+                CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .respondent2SameLegalRepresentative(YesOrNo.NO)
+                    .respondent1DQ(Respondent1DQ.builder().build())
+                    .respondent1ClaimResponseTypeForSpec(responseType)
+                    .systemGeneratedCaseDocuments(new ArrayList<>())
+                    .build();
+                CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
 
-            CaseDocument generatedDocument = mock(CaseDocument.class);
-            when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(
-                caseData,
-                params.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                "ONE"
-            )).thenReturn(Optional.of(generatedDocument));
+                CaseDocument generatedDocument = mock(CaseDocument.class);
+                when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(
+                    caseData,
+                    params.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                    "ONE"
+                )).thenReturn(Optional.of(generatedDocument));
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(updatedData.getSystemGeneratedCaseDocuments().size()).isEqualTo(1);
+                assertThat(updatedData.getSystemGeneratedCaseDocuments().size()).isEqualTo(1);
+            }
         }
 
         @Test
         void shouldAddDocumentToSystemGeneratedDocuments_when1v2DiffSolRespondent2() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-                .respondent2SameLegalRepresentative(YesOrNo.NO)
-                .respondent2DQ(Respondent2DQ.builder().build())
-                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .systemGeneratedCaseDocuments(new ArrayList<>())
-                .build();
-            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+            for (RespondentResponseTypeSpec responseType : EnumSet.of(RespondentResponseTypeSpec.FULL_DEFENCE,
+                                                                      RespondentResponseTypeSpec.PART_ADMISSION)) {
+                CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .respondent2SameLegalRepresentative(YesOrNo.NO)
+                    .respondent2DQ(Respondent2DQ.builder().build())
+                    .respondent2ClaimResponseTypeForSpec(responseType)
+                    .systemGeneratedCaseDocuments(new ArrayList<>())
+                    .build();
+                CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
 
-            CaseDocument generatedDocument = mock(CaseDocument.class);
-            when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(
-                caseData,
-                params.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                "TWO"
-            )).thenReturn(Optional.of(generatedDocument));
+                CaseDocument generatedDocument = mock(CaseDocument.class);
+                when(directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(
+                    caseData,
+                    params.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                    "TWO"
+                )).thenReturn(Optional.of(generatedDocument));
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(updatedData.getSystemGeneratedCaseDocuments().size()).isEqualTo(1);
+                assertThat(updatedData.getSystemGeneratedCaseDocuments().size()).isEqualTo(1);
+            }
         }
 
         @Test

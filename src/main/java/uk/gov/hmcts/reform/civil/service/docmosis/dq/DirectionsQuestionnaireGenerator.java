@@ -165,9 +165,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                                             .getMultiPartyScenario(caseData)) ? N181_2V1 : N181;
         String fileName = getFileName(caseData, templateId);
         LocalDateTime responseDate;
-        if (respondent.equals("ONE")) {
+        if ("ONE".equals(respondent)) {
             responseDate = caseData.getRespondent1ResponseDate();
-        } else if (respondent.equals("TWO")) {
+        } else if ("TWO".equals(respondent)) {
             responseDate = caseData.getRespondent2ResponseDate();
         } else {
             throw new IllegalArgumentException("Respondent argument is expected to be one of ONE or TWO");
@@ -186,10 +186,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         DirectionsQuestionnaireForm templateData;
         if (respondent.equals("ONE")) {
             templateData = getRespondent1TemplateData(caseData, "ONE");
-        } else if (respondent.equals("TWO")) {
-            templateData = getRespondent2TemplateData(caseData, "TWO");
         } else {
-            throw new IllegalArgumentException("Respondent argument is expected to be one of ONE or TWO");
+            // TWO
+            templateData = getRespondent2TemplateData(caseData, "TWO");
         }
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N181);
@@ -232,10 +231,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
 
-        boolean claimantResponseLRspec = false;
-        if (isClaimantResponse(caseData) && SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-            claimantResponseLRspec = true;
-        }
+        boolean claimantResponseLRspec = isClaimantResponse(caseData)
+            && SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType());
 
         DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = DirectionsQuestionnaireForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
@@ -729,7 +726,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         if (isClaimantResponse(caseData)) {
             expertRequired = caseData.getApplicant1ClaimExpertSpecRequired();
         }
-        Expert expertDetails = null;
+        Expert expertDetails;
         if (experts != null) {
             expertDetails = Expert.builder()
                 .name(experts.getExpertName())

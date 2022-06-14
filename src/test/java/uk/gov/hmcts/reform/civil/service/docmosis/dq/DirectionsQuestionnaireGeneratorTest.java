@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
+import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -1116,6 +1117,57 @@ class DirectionsQuestionnaireGeneratorTest {
                 verify(documentGeneratorService).generateDocmosisDocument(
                     any(DirectionsQuestionnaireForm.class),
                     eq(N181)
+                );
+            }
+
+            @Test
+            void when1v2DiffSol_shouldAcceptOneOrTwo() {
+
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
+                    .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
+                when(documentManagementService.uploadDocument(
+                    BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+                ).thenReturn(CASE_DOCUMENT_DEFENDANT);
+
+                LocalDateTime createdDate = LocalDateTime.parse("2020-07-16T14:05:15.000550439");
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
+                    .applicant2LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent2LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .respondent2ResponseDate(createdDate)
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2SameLegalRepresentative(YES)
+                    .respondentResponseIsSame(YesOrNo.NO)
+                    .systemGeneratedCaseDocuments(new ArrayList<>())
+                    .build();
+                Assert.assertThrows(
+                    IllegalArgumentException.class,
+                    () -> generator.generateDQFor1v2DiffSol(caseData, BEARER_TOKEN, null)
+                );
+            }
+
+            @Test
+            void when1v2DiffSol2withoutResponseDate_shouldFail() {
+
+                when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
+                    .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
+                when(documentManagementService.uploadDocument(
+                    BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+                ).thenReturn(CASE_DOCUMENT_DEFENDANT);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
+                    .applicant2LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent2LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2SameLegalRepresentative(YES)
+                    .respondentResponseIsSame(YesOrNo.NO)
+                    .respondent2ResponseDate(null)
+                    .systemGeneratedCaseDocuments(new ArrayList<>())
+                    .build();
+                Assert.assertThrows(
+                    NullPointerException.class,
+                    () -> generator.generateDQFor1v2DiffSol(caseData, BEARER_TOKEN, "TWO")
                 );
             }
 

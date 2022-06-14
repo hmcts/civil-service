@@ -174,7 +174,6 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                     generateDQ1v2SameSol(callbackParams, "TWO");
                 }
             } else {
-                // TODO explore the possibility of this being redundant and remove if so
                 singleResponseFile(
                     callbackParams.getParams().get(BEARER_TOKEN).toString(),
                     caseData,
