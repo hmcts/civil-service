@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.civil.controllers.fees;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,6 +26,9 @@ public class FeesController {
 
     @GetMapping("/ranges")
     @ApiOperation("Gets a group of claim amount ranges and associated fees for those ranges")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "Authorization", value = "Authorization token",
+            required = true, dataType = "string", paramType = "header") })
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 401, message = "Not Authorized")})
