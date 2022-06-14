@@ -6,12 +6,12 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-public class GeneralAppLRDConfiguration {
+public class LRDConfiguration {
 
     private final String url;
     private final String endpoint;
 
-    public GeneralAppLRDConfiguration(
+    public LRDConfiguration(
             @Value("${genApp.lrd.url}") String url,
             @Value("${genApp.lrd.endpoint}") String endpoint) {
         this.url = url;
