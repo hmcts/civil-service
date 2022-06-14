@@ -45,6 +45,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -133,4 +134,8 @@ public class CaseDataParent implements MappableObject {
     private final YesOrNo setSmallClaimsFlag;
     private final YesOrNo setFastTrackFlag;
 
+    private final LocalDate nextDeadline;
+    private final String allPartyNames;
+    private final String caseListDisplayDefendantSolicitorReferences;
+    private final String unassignedCaseListDisplayOrganisationReferences;
 }
