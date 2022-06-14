@@ -84,10 +84,10 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     @Nested
     class MidEventPrePopulateDisposalHearingPageCallback {
 
-        private static final String PAGE_ID = "disposal-screen";
+        private static final String PAGE_ID = "trial-disposal-screen";
 
         @Test
-        void shouldPrePopulateDJDisposalHearingPage() {
+        void shouldPrePopulateDJDisposalAndTrialHearingPage() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -164,27 +164,12 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingNotesDJ").extracting("date")
                 .isEqualTo(LocalDate.now().plusWeeks(1).toString());
 
-        }
-    }
-
-    @Nested
-    class MidEventPrePopulateTrialHearingPageCallback {
-
-        private static final String PAGE_ID = "trial-screen";
-
-        @Test
-        void shouldPrePopulateDJDisposalHearingPage() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //trialHearingJudgesRecitalDJ
             assertThat(response.getData()).extracting("trialHearingJudgesRecitalDJ").extracting("input")
-                .isEqualTo("Upon considering the claim Form and "
-                               + "Particulars of Claim/statements of case"
-                               + " [and the directions questionnaires] "
-                               + "\n\nIT IS ORDERED that:-");
+                .isEqualTo("[Title] [your name] has considered the statements of "
+                               + "the case and the information provided "
+                               + "by the parties, \n\n "
+                               + "IT IS ORDERED THAT:");
 
             //trialHearingDisclosureOfDocumentsDJ
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input1")
