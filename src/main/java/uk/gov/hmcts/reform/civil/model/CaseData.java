@@ -63,7 +63,6 @@ import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 @Jacksonized
 @EqualsAndHashCode(callSuper = true)
 @Data
-@SuppressWarnings("unchecked")
 public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -325,6 +324,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo claimantResponseDocumentToDefendant2Flag;
     private YesOrNo claimant2ResponseFlag;
     private RespondentResponseTypeSpec atLeastOneClaimResponseTypeForSpecIsFullDefence;
+    // used only in 2v1
     private YesOrNo specFullAdmissionOrPartAdmission;
     private YesOrNo sameSolicitorSameResponse;
     private YesOrNo specPaidLessAmountOrDisputesOrPartAdmission;

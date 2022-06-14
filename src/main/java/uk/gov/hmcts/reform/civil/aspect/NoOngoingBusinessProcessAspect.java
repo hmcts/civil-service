@@ -49,7 +49,7 @@ public class NoOngoingBusinessProcessAspect {
         if (callbackParams.getType() == SUBMITTED
             || caseEvent.isCamundaEvent()
             || caseData.hasNoOngoingBusinessProcess()
-            || valueOf(CaseEvent.INITIATE_GENERAL_APPLICATION).equals(callbackParams.getRequest().getEventId())
+            || generalAppsOrSDO(callbackParams)
         ) {
             return joinPoint.proceed();
         }
@@ -63,5 +63,10 @@ public class NoOngoingBusinessProcessAspect {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(List.of(ERROR_MESSAGE))
             .build();
+    }
+
+    private boolean generalAppsOrSDO(CallbackParams callbackParams) {
+        return (valueOf(CaseEvent.INITIATE_GENERAL_APPLICATION).equals(callbackParams.getRequest().getEventId())
+            || valueOf(CaseEvent.CREATE_SDO).equals(callbackParams.getRequest().getEventId()));
     }
 }
