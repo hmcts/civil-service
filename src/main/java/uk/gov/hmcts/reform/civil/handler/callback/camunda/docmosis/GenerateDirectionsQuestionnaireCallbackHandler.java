@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
@@ -147,90 +148,99 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        boolean claimantResponseLRspec =
-            DirectionsQuestionnaireGenerator.isClaimantResponse(caseData)
-                && SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType());
-
-        if (respondent2HasSameLegalRep(caseData) && !claimantResponseLRspec) {
-            if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
-                if (caseData.getRespondent1DQ() != null
-                    && caseData.getRespondent1ClaimResponseTypeForSpec() != null
-                    && caseData.getRespondent1ClaimResponseTypeForSpec()
-                    .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
-                    generateDQ1v2SameSol(callbackParams, "ONE");
-
-                }
-
-                if (caseData.getRespondent2DQ() != null
-                    && caseData.getRespondent2ClaimResponseTypeForSpec() != null
-                    && caseData.getRespondent2ClaimResponseTypeForSpec()
-                    .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
-                    generateDQ1v2SameSol(callbackParams, "TWO");
-                }
-            } else {
-                // TODO explore the possibility of this being redundant and remove if so
-                singleResponseFile(
-                    callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                    caseData,
-                    caseDataBuilder
-                );
-            }
+        MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
+        if (scenario == MultiPartyScenario.ONE_V_ONE || scenario == MultiPartyScenario.TWO_V_ONE) {
+            singleResponseFile(
+                callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                caseData,
+                caseDataBuilder
+            );
         } else {
-            /*
-            for MultiParty, when there is a single respondent, this block is executed (when only one respondent
-            respondent2SameLegalRepresentative == null, so respondent2HasSameLegalRep(CaseData) == false.
-            I'm not sure if that is what should happen, but I'll leave that to a MP ticket
-             */
-            if (!claimantResponseLRspec) {
+            boolean claimantResponseLRspec =
+                DirectionsQuestionnaireGenerator.isClaimantResponse(caseData)
+                    && SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType());
 
-                ArrayList<Element<CaseDocument>> updatedDocuments =
-                    new ArrayList<>(caseData.getSystemGeneratedCaseDocuments());
+            if (respondent2HasSameLegalRep(caseData) && !claimantResponseLRspec) {
+                if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
+                    if (caseData.getRespondent1DQ() != null
+                        && caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                        && caseData.getRespondent1ClaimResponseTypeForSpec()
+                        .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
+                        generateDQ1v2SameSol(callbackParams, "ONE");
 
-                if (caseData.getRespondent1DQ() != null
-                    && caseData.getRespondent1ClaimResponseTypeForSpec() != null
-                    && (caseData.getRespondent1ClaimResponseTypeForSpec()
-                    .equals(RespondentResponseTypeSpec.FULL_DEFENCE)
-                    || caseData.getRespondent1ClaimResponseTypeForSpec()
-                    .equals(RespondentResponseTypeSpec.PART_ADMISSION))) {
+                    }
 
-                    directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(
-                        caseData,
+                    if (caseData.getRespondent2DQ() != null
+                        && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+                        && caseData.getRespondent2ClaimResponseTypeForSpec()
+                        .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
+                        generateDQ1v2SameSol(callbackParams, "TWO");
+                    }
+                } else {
+                    // TODO explore the possibility of this being redundant and remove if so
+                    singleResponseFile(
                         callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                        "ONE"
-                    ).ifPresent(document -> {
-                        updatedDocuments.add(element(document));
-                        caseDataBuilder.respondent1GeneratedResponseDocument(document);
-                    });
-                }
-
-                if (caseData.getRespondent2DQ() != null
-                    && caseData.getRespondent2ClaimResponseTypeForSpec() != null
-                    && (caseData.getRespondent2ClaimResponseTypeForSpec()
-                    .equals(RespondentResponseTypeSpec.FULL_DEFENCE)
-                    || caseData.getRespondent2ClaimResponseTypeForSpec()
-                    .equals(RespondentResponseTypeSpec.PART_ADMISSION))) {
-
-                    directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(
                         caseData,
-                        callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                        "TWO"
-                    ).ifPresent(document -> {
-                        updatedDocuments.add(element(document));
-                        // TODO this field will probably be created during I2P 1v2 different solicitor
-                        // caseDataBuilder
-                        // .respondent2GeneratedResponseDocument(document)
-                        ;
-                    });;
+                        caseDataBuilder
+                    );
                 }
-
-                caseDataBuilder.systemGeneratedCaseDocuments(updatedDocuments);
             } else {
+                /*
+                for MultiParty, when there is a single respondent, this block is executed (when only one respondent
+                respondent2SameLegalRepresentative == null, so respondent2HasSameLegalRep(CaseData) == false.
+                I'm not sure if that is what should happen, but I'll leave that to a MP ticket
+                 */
+                if (!claimantResponseLRspec) {
 
-                singleResponseFile(
-                    callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                    caseData,
-                    caseDataBuilder
-                );
+                    ArrayList<Element<CaseDocument>> updatedDocuments =
+                        new ArrayList<>(caseData.getSystemGeneratedCaseDocuments());
+
+                    if (caseData.getRespondent1DQ() != null
+                        && caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                        && (caseData.getRespondent1ClaimResponseTypeForSpec()
+                        .equals(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        || caseData.getRespondent1ClaimResponseTypeForSpec()
+                        .equals(RespondentResponseTypeSpec.PART_ADMISSION))) {
+
+                        directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(
+                            caseData,
+                            callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                            "ONE"
+                        ).ifPresent(document -> {
+                            updatedDocuments.add(element(document));
+                            caseDataBuilder.respondent1GeneratedResponseDocument(document);
+                        });
+                    }
+
+                    if (caseData.getRespondent2DQ() != null
+                        && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+                        && (caseData.getRespondent2ClaimResponseTypeForSpec()
+                        .equals(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        || caseData.getRespondent2ClaimResponseTypeForSpec()
+                        .equals(RespondentResponseTypeSpec.PART_ADMISSION))) {
+
+                        directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(
+                            caseData,
+                            callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                            "TWO"
+                        ).ifPresent(document -> {
+                            updatedDocuments.add(element(document));
+                            // TODO this field will probably be created during I2P 1v2 different solicitor
+                            // caseDataBuilder
+                            // .respondent2GeneratedResponseDocument(document)
+                            ;
+                        });;
+                    }
+
+                    caseDataBuilder.systemGeneratedCaseDocuments(updatedDocuments);
+                } else {
+
+                    singleResponseFile(
+                        callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                        caseData,
+                        caseDataBuilder
+                    );
+                }
             }
         }
 

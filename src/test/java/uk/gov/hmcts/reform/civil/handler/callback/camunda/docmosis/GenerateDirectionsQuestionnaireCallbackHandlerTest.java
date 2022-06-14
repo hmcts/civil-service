@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -174,8 +175,8 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence()
                 .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
                 .build();
-            //Indu commented out
-            CallbackParams params = callbackParamsOf(CallbackVersion.V_2, caseData, ABOUT_TO_SUBMIT);
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -190,6 +191,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
         @Test
         void shouldAddDocumentToSystemGeneratedDocuments_whenSameLRDiffResponseRespondent1DQ() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+                .respondent2(mock(Party.class))
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .respondentResponseIsSame(YesOrNo.NO)
                 .respondent1DQ(Respondent1DQ.builder().build())
@@ -214,6 +216,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
         void shouldAddDocumentToSystemGeneratedDocuments_whenSameLRDiffResponseRespondent2DQ() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentAdmitPartOfClaimFastTrack().build().toBuilder()
+                .respondent2(mock(Party.class))
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .respondentResponseIsSame(YesOrNo.NO)
                 .respondent2DQ(Respondent2DQ.builder().build())
@@ -306,6 +309,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
         @Test
         void shouldAddDocumentToSystemGeneratedDocuments_when1v2DiffSolBothRespondents() {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+                .respondent2(mock(Party.class))
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .respondent1DQ(Respondent1DQ.builder().build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
