@@ -353,6 +353,7 @@ dependencies {
   // CVE-2021-0341
   implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.3'
 
+
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.22'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
