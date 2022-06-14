@@ -132,7 +132,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             errors.add(BREATHING_SPACE);
 
         }
-        if(caseData.getBreathing().getLift() != null && (caseData.getBreathing().getLift()
+        if (caseData.getBreathing().getLift() != null && (caseData.getBreathing().getLift()
             .getExpectedEnd().isBefore(LocalDate.now()) || caseData.getBreathing().getLift()
             .getExpectedEnd().isEqual(LocalDate.now()))) {
             errors.remove(BREATHING_SPACE);
