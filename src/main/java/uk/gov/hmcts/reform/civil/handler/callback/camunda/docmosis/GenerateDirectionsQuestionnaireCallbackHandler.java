@@ -17,9 +17,9 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireGenerator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -32,7 +32,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings("unchecked")
 public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
@@ -104,10 +103,10 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                                                               String defendantIdentifier) {
         CaseDocument directionsQuestionnaire =
             directionsQuestionnaireGenerator.generateDQFor1v2SingleSolDiffResponse(
-            caseData,
-            callbackParams.getParams().get(BEARER_TOKEN).toString(),
-            defendantIdentifier
-        );
+                caseData,
+                callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                defendantIdentifier
+            );
 
         List<Element<CaseDocument>> systemGeneratedCaseDocuments =
             caseData.getSystemGeneratedCaseDocuments();
@@ -135,29 +134,6 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         }
     }
 
-    public void generateDQ1v2DiffSolicitor(CallbackParams callbackParams, String sol) {
-
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        Optional<CaseDocument> directionsQuestionnaire =
-            directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(
-                caseData,
-                callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                sol
-            );
-
-        directionsQuestionnaire.ifPresent(document -> {
-            List<Element<CaseDocument>> systemGeneratedCaseDocuments =
-                caseData.getSystemGeneratedCaseDocuments();
-            systemGeneratedCaseDocuments.add(element(document));
-            caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
-        });
-
-        //TO DO this will be revisited
-        /*if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-            caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
-        }*/
-    }
     /**
      * Next version for prepareDirectionsQuestionnaire. The main difference is storing the generated document
      * not only in the generated documents list but also in respondent1GeneratedResponseDocument, so we can use
@@ -171,11 +147,9 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        boolean claimantResponseLRspec = false;
-        if (directionsQuestionnaireGenerator.isClaimantResponse(caseData)
-            && SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-            claimantResponseLRspec = true;
-        }
+        boolean claimantResponseLRspec =
+            DirectionsQuestionnaireGenerator.isClaimantResponse(caseData)
+                && SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType());
 
         if (respondent2HasSameLegalRep(caseData) && !claimantResponseLRspec) {
             if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
@@ -209,15 +183,24 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
              */
             if (!claimantResponseLRspec) {
 
+                ArrayList<Element<CaseDocument>> updatedDocuments =
+                    new ArrayList<>(caseData.getSystemGeneratedCaseDocuments());
+
                 if (caseData.getRespondent1DQ() != null
                     && caseData.getRespondent1ClaimResponseTypeForSpec() != null
                     && (caseData.getRespondent1ClaimResponseTypeForSpec()
                     .equals(RespondentResponseTypeSpec.FULL_DEFENCE)
                     || caseData.getRespondent1ClaimResponseTypeForSpec()
-                       .equals(RespondentResponseTypeSpec.PART_ADMISSION))) {
+                    .equals(RespondentResponseTypeSpec.PART_ADMISSION))) {
 
-                    generateDQ1v2DiffSolicitor(callbackParams, "ONE");
-
+                    directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(
+                        caseData,
+                        callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                        "ONE"
+                    ).ifPresent(document -> {
+                        updatedDocuments.add(element(document));
+                        caseDataBuilder.respondent1GeneratedResponseDocument(document);
+                    });
                 }
 
                 if (caseData.getRespondent2DQ() != null
@@ -227,8 +210,20 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                     || caseData.getRespondent2ClaimResponseTypeForSpec()
                     .equals(RespondentResponseTypeSpec.PART_ADMISSION))) {
 
-                    generateDQ1v2DiffSolicitor(callbackParams, "TWO");
+                    directionsQuestionnaireGenerator.generateDQFor1v2DiffSol(
+                        caseData,
+                        callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                        "TWO"
+                    ).ifPresent(document -> {
+                        updatedDocuments.add(element(document));
+                        // TODO this field will probably be created during I2P 1v2 different solicitor
+                        // caseDataBuilder
+                        // .respondent2GeneratedResponseDocument(document)
+                        ;
+                    });;
                 }
+
+                caseDataBuilder.systemGeneratedCaseDocuments(updatedDocuments);
             } else {
 
                 singleResponseFile(
