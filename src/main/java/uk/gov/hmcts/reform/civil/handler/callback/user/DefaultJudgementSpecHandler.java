@@ -43,17 +43,12 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment until %s.";
-    //    public static final String CPR_REQUIRED_INFO = "<br />You can only request default judgment if:"
-    //        + "%n%n * The time for responding to the claim has expired. "
-    //        + "%n%n * The Defendant has not responded to the claim."
-    //        + "%n%n * There is no outstanding application by the Defendant to strike out the claim for summary
-    //        judgment."
-    //        + "%n%n * The Defendant has not satisfied the whole claim, including costs."
-    //        + "%n%n * The Defendant has not filed an admission together with request for time to pay."
-    //        + "%n%n You can make another default judgment request when you know all these statements have been met.";
     public static final String JUDGMENT_GRANTED_HEADER = "# Default Judgment Granted ";
     public static final String JUDGMENT_GRANTED = "<br /><a href=\"%s\" target=\"_blank\">Download  default judgment</a> "
         + "%n%n The defendant will be served the Default Judgment.";
+    public static final String JUDGMENT_REQUESTED_HEADER = "# Default judgment requested";
+    public static final String JUDGMENT_REQUESTED = "A default judgment has been sent to %s. "
+        + "The claim will now progress offline (on paper)";
     public static final String BREATHING_SPACE = "Default judgment cannot be applied for while claim is in"
         + " breathing space";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
@@ -89,26 +84,37 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader())
-            .confirmationBody(getBody(callbackParams.getCaseData()))
+            .confirmationHeader(getHeader(caseData))
+            .confirmationBody(getBody(caseData))
             .build();
     }
 
-    private String getHeader() {
+    private String getHeader(CaseData caseData) {
+        if (caseData.getRespondent2() != null
+            && !caseData.getDefendantDetailsSpec().getValue()
+            .getLabel().startsWith("Both")) {
+            return format(JUDGMENT_REQUESTED_HEADER);
 
-        return format(JUDGMENT_GRANTED_HEADER);
-        //return format("# You cannot request default judgment");
+        } else {
+            return format(JUDGMENT_GRANTED_HEADER);
+        }
+
     }
 
     private String getBody(CaseData caseData) {
-
-        return format(JUDGMENT_GRANTED, format(
-            "/cases/case-details/%s#Claim documents",
-            caseData.getCcdCaseReference()
-        ));
-        // return format(CPR_REQUIRED_INFO);
+        if (caseData.getRespondent2() != null
+            && !caseData.getDefendantDetailsSpec().getValue()
+            .getLabel().startsWith("Both")) {
+            return format(JUDGMENT_REQUESTED, caseData.getDefendantDetailsSpec().getValue().getLabel());
+        } else {
+            return format(JUDGMENT_GRANTED, format(
+                "/cases/case-details/%s#Claim documents",
+                caseData.getCcdCaseReference()
+            ));
+        }
     }
 
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
