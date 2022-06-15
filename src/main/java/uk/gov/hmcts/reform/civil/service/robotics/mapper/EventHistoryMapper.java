@@ -57,8 +57,6 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CONSENT_EXTENSI
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_AND_COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.INTENTION_TO_PROCEED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.INTENTION_TO_PROCEED_STATES_PAID;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_BREATHING_SPACE_ENTERED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_BREATHING_SPACE_LIFTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
@@ -356,7 +354,7 @@ public class EventHistoryMapper {
                         .litigiousPartyID(respondentID)
                         .build());
                 break;
-            case INTENTION_TO_PROCEED:
+            /*case INTENTION_TO_PROCEED:
                 builder.receiptOfAdmission(
                     Event.builder()
                         .eventSequence(prepareEventSequence(builder.build()))
@@ -373,7 +371,7 @@ public class EventHistoryMapper {
                         .dateReceived(respondentResponseDate)
                         .litigiousPartyID(respondentID)
                         .build());
-                break;
+                break;*/
             default:
                 break;
         }
