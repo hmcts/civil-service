@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.model.ClaimantResponseDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -30,6 +32,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -51,6 +54,7 @@ import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenari
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_ENTERED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CONSENT_EXTENSION_FILING_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_AND_COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
@@ -192,6 +196,7 @@ public class EventHistoryMapper {
                 }
             });
 
+        buildBreathingSpace(builder, caseData);
         buildRespondent1LitigationFriendEvent(builder, caseData);
         buildRespondent2LitigationFriendEvent(builder, caseData);
         buildCaseNotesEvents(builder, caseData);
@@ -539,6 +544,36 @@ public class EventHistoryMapper {
         }
     }
 
+    private void buildBreathingSpace(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        String detailsText = "Breathing space reference ";
+        List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
+        if (caseData.getBreathing().getEnter() != null) {
+            builder.breathingSpaceEntered(
+                Event.builder()
+                    .litigiousPartyID(applicantDetails.get(0).getLitigiousPartyID())
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(BREATHING_SPACE_ENTERED.getCode())
+                    .dateReceived(caseData.getIssueDate().atStartOfDay())
+                    .eventDetailsText(detailsText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(detailsText)
+                                      .build())
+                    .build());
+
+            String miscText = "RPA Reason: Breathing Space Entered";
+            builder.miscellaneous(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(caseData.getIssueDate().atStartOfDay())
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build());
+        }
+    }
+
     private void buildClaimTakenOfflinePastApplicantResponse(EventHistory.EventHistoryBuilder builder,
                                                              CaseData caseData) {
         String detailsText = "RPA Reason: Claim dismissed after no response from applicant past response deadline.";
@@ -631,6 +666,7 @@ public class EventHistoryMapper {
         currentSequence = getCurrentSequence(history.getReceiptOfAdmission(), currentSequence);
         currentSequence = getCurrentSequence(history.getReplyToDefence(), currentSequence);
         currentSequence = getCurrentSequence(history.getDirectionsQuestionnaireFiled(), currentSequence);
+        currentSequence = getCurrentSequence(history.getBreathingSpaceEntered(), currentSequence);
         return currentSequence + 1;
     }
 
