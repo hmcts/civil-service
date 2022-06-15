@@ -39,14 +39,16 @@ public class ClaimIssueCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::addClaimNotificationDeadline);
+        return Map.of(callbackKey(ABOUT_TO_SUBMIT), this::addClaimNotificationDeadlineAndNextDeadline);
     }
 
-    private CallbackResponse addClaimNotificationDeadline(CallbackParams callbackParams) {
+    private CallbackResponse addClaimNotificationDeadlineAndNextDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime deadline = deadlinesCalculator.addMonthsToDateAtMidnight(4, caseData.getIssueDate());
         CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder();
-        caseDataUpdated.claimNotificationDeadline(deadline);
+        caseDataUpdated
+            .claimNotificationDeadline(deadline)
+            .nextDeadline(deadline.toLocalDate());
 
         // don't display cases in unassigned case list before claim notified workaround.
         clearOrganisationPolicyId(caseData, caseDataUpdated);
