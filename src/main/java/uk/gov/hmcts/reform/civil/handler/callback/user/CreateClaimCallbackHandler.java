@@ -321,7 +321,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         dataBuilder.claimStarted(null);
 
         if (toggleService.isNoticeOfChangeEnabled()) {
-            if (areRespondentsRepresented(caseData) == false && getMultiPartyScenario(caseData) == ONE_V_ONE)  {
+            // LiP are not represented or registered
+            if (areRespondentsRepresentedAndRegistered(caseData) == false)  {
                 dataBuilder.addLegalRepDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(time.now()));
             }
         }
@@ -381,11 +382,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             || caseData.getRespondent1OrgRegistered() == NO
             || caseData.getRespondent2Represented() == NO
             || caseData.getRespondent2OrgRegistered() == NO);
-    }
-
-    private boolean areRespondentsRepresented(CaseData caseData) {
-        return caseData.getRespondent1Represented() == YES
-            && caseData.getRespondent1OrgRegistered() == YES;
     }
 
     private String getBody(CaseData caseData) {
