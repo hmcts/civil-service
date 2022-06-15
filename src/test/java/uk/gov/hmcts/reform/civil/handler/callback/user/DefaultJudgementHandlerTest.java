@@ -160,7 +160,20 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("hearingSupportRequirementsDJ")).isNotNull();
         }
+    }
 
+    @Nested
+    class MidEventShowCPRAcceptCallback {
+
+        private static final String PAGE_ID = "acceptCPR";
+
+        @Test
+        void shouldReturnError_whenCPRisNotAccepted() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNotNull();
+        }
     }
 
     @Nested
