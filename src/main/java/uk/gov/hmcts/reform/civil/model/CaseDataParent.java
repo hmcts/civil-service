@@ -145,7 +145,6 @@ public class CaseDataParent implements MappableObject {
     private final String allPartyNames;
     private final String caseListDisplayDefendantSolicitorReferences;
     private final String unassignedCaseListDisplayOrganisationReferences;
-
     private final YesOrNo specAoSRespondent2CorrespondenceAddressRequired;
     private final Address specAoSRespondent2CorrespondenceAddressdetails;
     private final String defenceRouteRequired2;
