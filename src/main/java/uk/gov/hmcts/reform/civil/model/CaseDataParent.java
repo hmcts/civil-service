@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -30,6 +32,21 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPreferredEmail;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPreferredTelephone;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 
 import java.math.BigDecimal;
@@ -98,6 +115,83 @@ public class CaseDataParent implements MappableObject {
     private DisposalHearingBundle disposalHearingBundle;
     private DisposalHearingNotes disposalHearingNotes;
     private final DynamicList disposalHearingMethodInPerson;
+    private final DynamicList fastTrackMethodInPerson;
+    private final YesOrNo drawDirectionsOrderRequired;
+    private final YesOrNo drawDirectionsOrderSmallClaims;
+    private final ClaimsTrack claimsTrack;
+    private final OrderType orderType;
+    private FastTrackBuildingDispute fastTrackBuildingDispute;
+    private FastTrackClinicalNegligence fastTrackClinicalNegligence;
+    private FastTrackCreditHire fastTrackCreditHire;
+    private FastTrackHousingDisrepair fastTrackHousingDisrepair;
+    private FastTrackPersonalInjury fastTrackPersonalInjury;
+    private FastTrackRoadTrafficAccident fastTrackRoadTrafficAccident;
+    private FastTrackJudgesRecital fastTrackJudgesRecital;
+    private FastTrackJudgementDeductionValue fastTrackJudgementDeductionValue;
+    private FastTrackDisclosureOfDocuments fastTrackDisclosureOfDocuments;
+    private FastTrackWitnessOfFact fastTrackWitnessOfFact;
+    private FastTrackSchedulesOfLoss fastTrackSchedulesOfLoss;
+    private FastTrackTrial fastTrackTrial;
+    private FastTrackNotes fastTrackNotes;
+    private FastTrackPreferredTelephone fastTrackPreferredTelephone;
+    private FastTrackPreferredEmail fastTrackPreferredEmail;
+
+    // sdo ui flags
+    private final YesOrNo setSmallClaimsFlag;
+    private final YesOrNo setFastTrackFlag;
+
+    private final YesOrNo specAoSRespondent2CorrespondenceAddressRequired;
+    private final Address specAoSRespondent2CorrespondenceAddressdetails;
+    private final String defenceRouteRequired2;
+
+    private final YesOrNo showHowToAddTimeLinePage;
+    private final YesOrNo fullAdmissionAndFullAmountPaid;
+    private final YesOrNo specDefenceFullAdmitted2Required;
+    private final YesOrNo partAdmittedByEitherRespondents;
+    private final YesOrNo specDefenceAdmitted2Required;
+
+    private final String specDefenceRouteAdmittedAmountClaimed2Label;
+    private final RespondToClaim respondToAdmittedClaim2;
+    private final RespondToClaim respondToClaim2;
+    /**
+     * money amount in pence.
+     */
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal respondToAdmittedClaimOwingAmount2;
+    private final String detailsOfWhyDoesYouDisputeTheClaim2;
+    private final String specDefenceRouteUploadDocumentLabel3;
+    private final ResponseSpecDocument respondent2SpecDefenceResponseDocument;
+    private final String specClaimResponseTimelineList2;
+    private final List<TimelineOfEvents> specResponseTimelineOfEvents2;
+    private final String responseClaimMediationSpecLabelRes2;
+    private final YesOrNo responseClaimMediationSpec2Required;
+    private final YesOrNo responseClaimExpertSpecRequired2;
+    private final YesOrNo responseClaimCourtLocation2Required;
+    private final String responseClaimWitnesses2;
+    private final String smallClaimHearingInterpreterDescription2;
+    private final String additionalInformationForJudge2;
+    private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired2;
+    private final RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec2;
+    private final YesOrNo defenceAdmitPartEmploymentType2Required;
+    private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspec2;
+    private final UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec2;
+    private final Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer2;
+    private final YesOrNo respondent2DQCarerAllowanceCredit;
+    /**
+     * This field is not used.
+     *
+     * @deprecated this field is not used and it was in a screen no longer presented to the user.
+     *     It is kept here to devote a single jira to its removal, to ensure said removal won't cause
+     *     any problem when bringing info from db.
+     */
+    @Deprecated
+    private final YesOrNo respondent2DQCarerAllowanceCreditFullAdmission;
+    private final String responseToClaimAdmitPartWhyNotPayLRspec2;
+    private final YesOrNo neitherCompanyNorOrganisation;
+    private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteGeneric;
+    private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspecGeneric;
+    @Builder.Default
+    private final Set<DefendantResponseShowTag> showConditionFlags = new HashSet<>();
 
     private final YesOrNo specAoSRespondent2CorrespondenceAddressRequired;
     private final Address specAoSRespondent2CorrespondenceAddressdetails;

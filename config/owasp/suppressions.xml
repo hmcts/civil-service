@@ -37,8 +37,12 @@
     <cve>CVE-2022-25647</cve>
   </suppress>
   <suppress until="2022-07-01">
-    <notes>latest spring security core 5.6.5 still has internal dependencies which are cauing the Vulnerability</notes>
+    <notes>latest spring security core 5.6.5 still has internal dependencies which are causing the Vulnerability</notes>
     <cve>CVE-2022-22976</cve>
+  </suppress>
+  <suppress until="2022-07-01">
+    <notes>Latest supported springboot 2.5.14 version inherited still got the vulnerability for oauth2 client</notes>
+    <cve>CVE-2022-22978</cve>
   </suppress>
   <suppress>
     <notes><![CDATA[
