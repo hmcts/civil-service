@@ -142,11 +142,13 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
     //finding legal org name
     private String getLegalOrganisationName(CaseData caseData,  CaseEvent caseEvent) {
         String organisationID;
-        organisationID = caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC)
-            ? caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID()
-            : caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED)
-            ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
-            : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+        if (caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC)) {
+            organisationID = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+        } else {
+            organisationID =  caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED)
+                ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
+                : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+        }
         Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
         return organisation.isPresent() ? organisation.get().getName() :
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
