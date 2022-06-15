@@ -11,7 +11,6 @@ import javax.validation.constraints.PastOrPresent;
 
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getConcatenatedPartyNameWithoutTitle;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyPostcodeFromAddress;
 
 @Data
 @Builder(toBuilder = true)
@@ -41,8 +40,6 @@ public class Party {
 
     private final String partyFirstAndLastName;
 
-    private final String partyPostcode;
-
     public enum Type {
         INDIVIDUAL,
         COMPANY,
@@ -60,10 +57,6 @@ public class Party {
 
     public String getPartyFirstAndLastName() {
         return getConcatenatedPartyNameWithoutTitle(this);
-    }
-
-    public String getPartyPostcode() {
-        return getPartyPostcodeFromAddress(this);
     }
 
     public String getPartyTypeDisplayValue() {

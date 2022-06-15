@@ -52,10 +52,6 @@ public class PartyUtils {
         }
     }
 
-    public static String getPartyPostcodeFromAddress(Party party) {
-        return party.getPrimaryAddress().getPostCode();
-    }
-
     private static String getTitle(String title) {
         return StringUtils.isBlank(title) ? "" : title + " ";
     }
