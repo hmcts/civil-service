@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.IdamTokenGeneratorService;
+import uk.gov.hmcts.reform.civil.service.CustomScopeIdamTokenGeneratorService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
@@ -72,7 +72,7 @@ class NotifyRoboticsOnCaseHandedOfflineHandlerTest extends BaseCallbackHandlerTe
     @MockBean
     PrdAdminUserConfiguration userConfig;
     @MockBean
-    IdamTokenGeneratorService idamTokenGeneratorService;
+    CustomScopeIdamTokenGeneratorService tokenGenerator;
 
     @Nested
     class ValidJsonPayload {

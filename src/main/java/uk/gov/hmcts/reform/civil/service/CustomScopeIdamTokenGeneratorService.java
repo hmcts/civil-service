@@ -12,13 +12,15 @@ import static uk.gov.hmcts.reform.idam.client.IdamClient.BEARER_AUTH_TYPE;
 import static uk.gov.hmcts.reform.idam.client.IdamClient.OPENID_GRANT_TYPE;
 
 @Service
-public class IdamTokenGeneratorService {
+public class CustomScopeIdamTokenGeneratorService {
 
     private final IdamApi idamApi;
     private final OAuth2Configuration oauth2Configuration;
 
+    private static final String ADDITIONAL_SCOPES = " search-user create-user manage-user";
+
     @Autowired
-    public IdamTokenGeneratorService(IdamApi idamApi, OAuth2Configuration oauth2Configuration) {
+    public CustomScopeIdamTokenGeneratorService(IdamApi idamApi, OAuth2Configuration oauth2Configuration) {
         this.idamApi = idamApi;
         this.oauth2Configuration = oauth2Configuration;
     }
@@ -37,7 +39,7 @@ public class IdamTokenGeneratorService {
                 oauth2Configuration.getRedirectUri(),
                 username,
                 password,
-                oauth2Configuration.getClientScope() + " create-user",
+                oauth2Configuration.getClientScope() + ADDITIONAL_SCOPES,
                 null,
                 null
             ));

@@ -60,7 +60,7 @@ class OrganisationServiceTest {
     private PrdAdminUserConfiguration userConfig;
 
     @Mock
-    private IdamTokenGeneratorService idamTokenGeneratorService;
+    private CustomScopeIdamTokenGeneratorService tokenGenerator;
 
     @InjectMocks
     private OrganisationService organisationService;
@@ -73,7 +73,7 @@ class OrganisationServiceTest {
         given(authTokenGenerator.generate()).willReturn(SERVICE_AUTH_TOKEN);
         when(userService.getAccessToken(userConfig.getUsername(), userConfig.getPassword())).thenReturn(
             PRD_ADMIN_AUTH_TOKEN);
-        when(idamTokenGeneratorService.getAccessToken(userConfig.getUsername(), userConfig.getPassword())).thenReturn(
+        when(tokenGenerator.getAccessToken(userConfig.getUsername(), userConfig.getPassword())).thenReturn(
             PRD_ADMIN_AUTH_TOKEN);
     }
 
@@ -128,7 +128,7 @@ class OrganisationServiceTest {
         void shouldReturnUsersInOrganisation_whenInvoked() {
             var orgUsers = organisationService.findUsersInOrganisation(ORG_ID);
 
-            verify(idamTokenGeneratorService).getAccessToken(userConfig.getUsername(), userConfig.getPassword());
+            verify(tokenGenerator).getAccessToken(userConfig.getUsername(), userConfig.getPassword());
             verify(organisationApi).findUsersByOrganisation(PRD_ADMIN_AUTH_TOKEN, SERVICE_AUTH_TOKEN, ORG_ID);
 
             assertThat(orgUsers).isEqualTo(Optional.of(expectedUsersInOrg));
@@ -139,7 +139,7 @@ class OrganisationServiceTest {
             given(organisationApi.findUsersByOrganisation(any(), any(), any())).willThrow(notFoundFeignException);
             var organisation = organisationService.findUsersInOrganisation(ORG_ID);
 
-            verify(idamTokenGeneratorService).getAccessToken(userConfig.getUsername(), userConfig.getPassword());
+            verify(tokenGenerator).getAccessToken(userConfig.getUsername(), userConfig.getPassword());
             verify(organisationApi).findUsersByOrganisation(PRD_ADMIN_AUTH_TOKEN, SERVICE_AUTH_TOKEN, ORG_ID);
             assertThat(organisation).isEmpty();
         }

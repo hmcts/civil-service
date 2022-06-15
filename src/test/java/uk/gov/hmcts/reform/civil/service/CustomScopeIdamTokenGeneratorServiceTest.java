@@ -14,7 +14,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class IdamTokenGeneratorServiceTest {
+public class CustomScopeIdamTokenGeneratorServiceTest {
 
     private static final String SUB = "user-idam@reform.local";
 
@@ -29,18 +29,18 @@ public class IdamTokenGeneratorServiceTest {
     private IdamApi idamApi;
     @Mock
     private OAuth2Configuration oauth2Configuration;
-    private IdamTokenGeneratorService idamTokenGeneratorService;
+    private CustomScopeIdamTokenGeneratorService tokenGenerator;
 
     @BeforeEach
     public void setup() {
-        idamTokenGeneratorService = new IdamTokenGeneratorService(idamApi, oauth2Configuration);
+        tokenGenerator = new CustomScopeIdamTokenGeneratorService(idamApi, oauth2Configuration);
     }
 
     @Test
     void shouldReturnAccessToken_whenValidUserDetailsAreGiven() {
         when(idamApi.generateOpenIdToken(any())).thenReturn(tokenResponse);
 
-        String accessToken = idamTokenGeneratorService.getAccessToken(SUB, PASSWORD);
+        String accessToken = tokenGenerator.getAccessToken(SUB, PASSWORD);
 
         assertThat(accessToken).isEqualTo(AUTHORISATION);
     }

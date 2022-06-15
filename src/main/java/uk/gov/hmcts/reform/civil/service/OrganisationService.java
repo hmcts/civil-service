@@ -23,7 +23,7 @@ public class OrganisationService {
     private final AuthTokenGenerator authTokenGenerator;
     private final UserService userService;
     private final PrdAdminUserConfiguration userConfig;
-    private final IdamTokenGeneratorService idamTokenGeneratorService;
+    private final CustomScopeIdamTokenGeneratorService tokenGenerator;
 
     //WARNING! below function findOrganisation is being used by both damages and specified claims,
     // changes to this code may break one of the claim journeys, check with respective teams before changing it
@@ -51,7 +51,7 @@ public class OrganisationService {
     }
 
     public Optional<ProfessionalUsersEntityResponse> findUsersInOrganisation(String orgId) {
-        String authToken = idamTokenGeneratorService.getAccessToken(userConfig.getUsername(), userConfig.getPassword());
+        String authToken = tokenGenerator.getAccessToken(userConfig.getUsername(), userConfig.getPassword());
 
         try {
             return ofNullable(organisationApi.findUsersByOrganisation(authToken, authTokenGenerator.generate(), orgId));
