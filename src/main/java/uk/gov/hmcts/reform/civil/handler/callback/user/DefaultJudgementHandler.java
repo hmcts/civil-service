@@ -235,7 +235,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
         if (Objects.nonNull(caseData.getHearingSupportRequirementsDJ())) {
             HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ()
                 .toBuilder().hearingTemporaryLocation(null).build();
-            caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT))
+            caseDataBuilder
+                .businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT))
                 .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
         } else {
             caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT));
