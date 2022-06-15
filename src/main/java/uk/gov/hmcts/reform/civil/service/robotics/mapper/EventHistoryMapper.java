@@ -43,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
@@ -104,6 +105,14 @@ public class EventHistoryMapper {
                     case TAKEN_OFFLINE_UNREGISTERED_DEFENDANT:
                         buildUnregisteredDefendant(builder, caseData);
                         break;
+                    // Notice of change:
+                    case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT: {
+                        // this would change in CIV-1620
+                        if (featureToggleService.isNoticeOfChangeEnabled()) {
+                            buildClaimIssued(builder, caseData);
+                        }
+                        break;
+                    }
                     case CLAIM_ISSUED:
                         buildClaimIssued(builder, caseData);
                         break;
@@ -216,16 +225,18 @@ public class EventHistoryMapper {
                                              respondent1ResponseDate, RESPONDENT_ID);
             }
 
-            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
-            builder.miscellaneous((Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(respondent1ResponseDate)
-                .eventDetailsText(miscText)
-                .eventDetails(EventDetails.builder()
-                                  .miscText(miscText)
-                                  .build())
-                .build()));
+            if (!FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())) {
+                miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
+                builder.miscellaneous((Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(respondent1ResponseDate)
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build()));
+            }
         }
 
         if (defendant2ResponseExists.test(caseData)) {
@@ -238,16 +249,18 @@ public class EventHistoryMapper {
                                              respondent2ResponseDate, RESPONDENT2_ID);
             }
 
-            miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
-            builder.miscellaneous((Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(respondent2ResponseDate)
-                .eventDetailsText(miscText)
-                .eventDetails(EventDetails.builder()
-                                  .miscText(miscText)
-                                  .build())
-                .build()));
+            if (!FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType())) {
+                miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
+                builder.miscellaneous((Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(respondent2ResponseDate)
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build()));
+            }
         }
     }
 
@@ -422,7 +435,9 @@ public class EventHistoryMapper {
         if (scenario.equals(ONE_V_ONE) || scenario.equals(TWO_V_ONE)) {
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 switch (scenario.equals(TWO_V_ONE)
-                    ? caseData.getClaimant1ClaimResponseTypeForSpec()
+                    ? YES.equals(caseData.getDefendantSingleResponseToBothClaimants())
+                    ? caseData.getRespondent1ClaimResponseTypeForSpec()
+                    : caseData.getClaimant1ClaimResponseTypeForSpec()
                     : caseData.getRespondent1ClaimResponseTypeForSpec()) {
                     case COUNTER_CLAIM:
                         defaultText = "RPA Reason: Defendant rejects and counter claims.";
@@ -1167,14 +1182,14 @@ public class EventHistoryMapper {
                 List<Event> events = new ArrayList<>();
                 if (defendant1AckExists.test(caseData)) {
                     events.add(buildAcknowledgementOfServiceEvent(builder, caseData, true, format(
-                        "RPA Reason: Defendant: %s has acknowledged: %s",
+                        "Defendant: %s has acknowledged: %s",
                         caseData.getRespondent1().getPartyName(),
                         caseData.getRespondent1ClaimResponseIntentionType().getLabel()
                     )));
                 }
                 if (defendant2AckExists.test(caseData)) {
                     events.add(buildAcknowledgementOfServiceEvent(builder, caseData, false, format(
-                        "RPA Reason: Defendant: %s has acknowledged: %s",
+                        "Defendant: %s has acknowledged: %s",
                         caseData.getRespondent2().getPartyName(),
                         caseData.getRespondent2ClaimResponseIntentionType().getLabel()
                     )));
@@ -1191,7 +1206,7 @@ public class EventHistoryMapper {
                         List.of(
                             buildAcknowledgementOfServiceEvent(
                                 builder, caseData, true, format(
-                                    "RPA Reason: [1 of 2 - %s] Defendant: %s has acknowledged: %s",
+                                    "[1 of 2 - %s] Defendant: %s has acknowledged: %s",
                                     currentTime,
                                     caseData.getRespondent1().getPartyName(),
                                     caseData.getRespondent1ClaimResponseIntentionType().getLabel()
@@ -1199,7 +1214,7 @@ public class EventHistoryMapper {
                             ),
                             buildAcknowledgementOfServiceEvent(
                                 builder, caseData, false, format(
-                                    "RPA Reason: [2 of 2 - %s] Defendant: %s has acknowledged: %s",
+                                    "[2 of 2 - %s] Defendant: %s has acknowledged: %s",
                                     currentTime,
                                     caseData.getRespondent2().getPartyName(),
                                     caseData.getRespondent2ClaimResponseIntentionType().getLabel()
@@ -1445,9 +1460,9 @@ public class EventHistoryMapper {
             .format(DateTimeFormatter.ofPattern("dd MM yyyy"));
         switch (scenario) {
             case ONE_V_TWO_ONE_LEGAL_REP:
-                return format("RPA Reason: Defendant(s) have agreed extension: %s", extensionDate);
+                return format("Defendant(s) have agreed extension: %s", extensionDate);
             case ONE_V_TWO_TWO_LEGAL_REP:
-                return format("RPA Reason: Defendant: %s has agreed extension: %s", party.getDetails().getPartyName(),
+                return format("Defendant: %s has agreed extension: %s", party.getDetails().getPartyName(),
                               extensionDate
                 );
             default:

@@ -51,11 +51,10 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-
         return Map.of(
             callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility,
             callbackKey(MID, "showcertifystatement"), this::checkStatus,
-            callbackKey(MID, "hearingTypeSelection"), this::populateText,
+            callbackKey(MID, "acceptCPR"), this::acceptCPR,
             callbackKey(MID, "HearingSupportRequirementsDJ"), this::validateDateValues,
             callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm,
             callbackKey(SUBMITTED), this::buildConfirmation
@@ -155,16 +154,17 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     }
 
-    private CallbackResponse populateText(CallbackParams callbackParams) {
-        var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.detailsOfDirectionDisposal(DISPOSAL_TEXT);
-        caseDataBuilder.detailsOfDirectionTrial(TRIAL_TEXT);
-
+    private CallbackResponse acceptCPR(CallbackParams callbackParams) {
+        List<String> errors = new ArrayList<>();
+        var acceptance = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance");
+        var acceptance2Def = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance2Def");
+        if (Objects.isNull(acceptance) && Objects.isNull(acceptance2Def)) {
+            errors.add("To apply for default judgment, all of the statements must apply to the defendant "
+                           + "- if they do not apply, close this page and apply for default judgment when they do");
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .errors(errors)
             .build();
-
     }
 
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimResponseFormGeneratorForSpec;
+import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDate;
@@ -34,13 +36,11 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final SealedClaimResponseFormGeneratorForSpec formGenerator;
 
-    /*
-    TODO see below, these are used by 943's form
     private final CivilDocumentStitchingService civilDocumentStitchingService;
 
     @Value("${stitching.enabled:true}")
     private boolean stitchEnabled;
-*/
+
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
@@ -61,20 +61,20 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        // TODO CIV-943 quickly commented out just not to block release, fails on stitching
-        //        if (stitchEnabled) {
-        //            List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
-        //            CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
-        //                documentMetaDataList,
-        //                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-        //                sealedForm.getDocumentName(),
-        //                sealedForm.getDocumentName(),
-        //                caseData
-        //            );
-        //            caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
-        //        } else {
-        caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(sealedForm));
-        //        }
+
+        if (stitchEnabled) {
+            List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
+            CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
+                documentMetaDataList,
+                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                sealedForm.getDocumentName(),
+                sealedForm.getDocumentName(),
+                caseData
+            );
+            caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
+        } else {
+            caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(sealedForm));
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))

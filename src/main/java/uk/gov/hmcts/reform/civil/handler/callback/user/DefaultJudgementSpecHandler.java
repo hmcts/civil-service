@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -42,18 +43,15 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 @RequiredArgsConstructor
 public class DefaultJudgementSpecHandler extends CallbackHandler {
 
-    public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment until %s";
-    //    public static final String CPR_REQUIRED_INFO = "<br />You can only request default judgment if:"
-    //        + "%n%n * The time for responding to the claim has expired. "
-    //        + "%n%n * The Defendant has not responded to the claim."
-    //        + "%n%n * There is no outstanding application by the Defendant to strike out the claim for summary
-    //        judgment."
-    //        + "%n%n * The Defendant has not satisfied the whole claim, including costs."
-    //        + "%n%n * The Defendant has not filed an admission together with request for time to pay."
-    //        + "%n%n You can make another default judgment request when you know all these statements have been met.";
+    public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment until %s.";
     public static final String JUDGMENT_GRANTED_HEADER = "# Default Judgment Granted ";
     public static final String JUDGMENT_GRANTED = "<br /><a href=\"%s\" target=\"_blank\">Download  default judgment</a> "
         + "%n%n The defendant will be served the Default Judgment.";
+    public static final String JUDGMENT_REQUESTED_HEADER = "# Default judgment requested";
+    public static final String JUDGMENT_REQUESTED = "A default judgment has been sent to %s. "
+        + "The claim will now progress offline (on paper)";
+    public static final String BREATHING_SPACE = "Default judgment cannot be applied for while claim is in"
+        + " breathing space";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
     private static final int COMMENCEMENT_FIXED_COST_60 = 60;
     private static final int COMMENCEMENT_FIXED_COST_80 = 80;
@@ -71,6 +69,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility,
             callbackKey(MID, "showCertifyStatementSpec"), this::checkStatus,
+            callbackKey(MID, "acceptCPRSpec"), this::acceptCPRSpec,
             callbackKey(MID, "claimPartialPayment"), this::partialPayment,
             callbackKey(MID, "repaymentBreakdown"), this::repaymentBreakdownCalculate,
             callbackKey(MID, "repaymentTotal"), this::overallTotalAndDate,
@@ -87,26 +86,37 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader())
-            .confirmationBody(getBody(callbackParams.getCaseData()))
+            .confirmationHeader(getHeader(caseData))
+            .confirmationBody(getBody(caseData))
             .build();
     }
 
-    private String getHeader() {
+    private String getHeader(CaseData caseData) {
+        if (caseData.getRespondent2() != null
+            && !caseData.getDefendantDetailsSpec().getValue()
+            .getLabel().startsWith("Both")) {
+            return format(JUDGMENT_REQUESTED_HEADER);
 
-        return format(JUDGMENT_GRANTED_HEADER);
-        //return format("# You cannot request default judgment");
+        } else {
+            return format(JUDGMENT_GRANTED_HEADER);
+        }
+
     }
 
     private String getBody(CaseData caseData) {
-
-        return format(JUDGMENT_GRANTED, format(
-            "/cases/case-details/%s#Claim documents",
-            caseData.getCcdCaseReference()
-        ));
-        // return format(CPR_REQUIRED_INFO);
+        if (caseData.getRespondent2() != null
+            && !caseData.getDefendantDetailsSpec().getValue()
+            .getLabel().startsWith("Both")) {
+            return format(JUDGMENT_REQUESTED, caseData.getDefendantDetailsSpec().getValue().getLabel());
+        } else {
+            return format(JUDGMENT_GRANTED, format(
+                "/cases/case-details/%s#Claim documents",
+                caseData.getCcdCaseReference()
+            ));
+        }
     }
 
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
@@ -119,6 +129,17 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
             errors.add(format(NOT_VALID_DJ, formattedDeadline));
         }
+
+        if (caseData.getBreathing() != null && caseData.getBreathing().getEnter() != null) {
+            errors.add(BREATHING_SPACE);
+
+        }
+        if (caseData.getBreathing().getLift() != null && (caseData.getBreathing().getLift()
+            .getExpectedEnd().isBefore(LocalDate.now()) || caseData.getBreathing().getLift()
+            .getExpectedEnd().isEqual(LocalDate.now()))) {
+            errors.remove(BREATHING_SPACE);
+        }
+
         List<String> listData = new ArrayList<>();
 
         listData.add(caseData.getRespondent1().getIndividualFirstName()
@@ -141,12 +162,38 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private CallbackResponse checkStatus(CallbackParams callbackParams) {
-
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
+        caseDataBuilder.bothDefendantsSpec("One");
+        // populate the title of next screen if only one defendant chosen
+        var currentDefendantString = ("Has " + caseData.getDefendantDetailsSpec()
+            .getValue().getLabel() +  " paid some of the amount owed?");
+        var currentDefendantName = (caseData.getDefendantDetailsSpec()
+            .getValue().getLabel());
+        if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
+            caseDataBuilder.bothDefendantsSpec(caseData.getDefendantDetailsSpec().getValue().getLabel());
+            // populate the title of next screen if both defendants chosen
+            currentDefendantString = ("Have the defendants paid some of the amount owed?");
+            currentDefendantName = ("both defendants");
+        }
+        caseDataBuilder.currentDefendant(currentDefendantString);
+        caseDataBuilder.currentDefendantName(currentDefendantName);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse acceptCPRSpec(CallbackParams callbackParams) {
+        List<String> listErrors = new ArrayList<>();
+
+        var acceptance2DefSpec = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance2Def");
+        var acceptanceSpec = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance");
+        if (Objects.isNull(acceptanceSpec) && Objects.isNull(acceptance2DefSpec)) {
+            listErrors.add("To apply for default judgment, all of the statements must apply to the defendant "
+                           + "- if they do not apply, close this page and apply for default judgment when they do");
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(listErrors)
             .build();
     }
 
@@ -244,8 +291,17 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         }
         theOverallTotal = subTotal.subtract(partialPaymentPounds);
         //creates  the text on the page, based on calculated values
-        StringBuilder repaymentBreakdown = new StringBuilder("The judgment will order the defendant to pay £").append(
-                theOverallTotal).append(", including the claim fee and interest, if applicable, as shown:")
+        StringBuilder repaymentBreakdown = new StringBuilder();
+        if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
+            repaymentBreakdown.append("The judgment will order the defendants to pay £").append(
+                theOverallTotal);
+        } else {
+            repaymentBreakdown.append("The judgment will order " + caseData.getDefendantDetailsSpec()
+                .getValue().getLabel() + " to pay £").append(
+                theOverallTotal);
+        }
+
+        repaymentBreakdown.append(", including the claim fee and interest, if applicable, as shown:")
             .append("\n").append("### Claim amount \n £").append(caseData.getTotalClaimAmount().setScale(2));
 
         if (interest.compareTo(BigDecimal.ZERO) != 0) {

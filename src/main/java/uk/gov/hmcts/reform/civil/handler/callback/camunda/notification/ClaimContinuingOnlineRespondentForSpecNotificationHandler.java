@@ -86,7 +86,9 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
             targetEmail = caseData.getRespondentSolicitor1EmailAddress();
         }
 
-        if(isRespondent1Event(callbackParams) || (isRespondent2Event(callbackParams) && YesOrNo.YES.equals(caseData.getAddRespondent2()))) {
+        if (isRespondent1Event(callbackParams)
+            || (isRespondent2Event(callbackParams)
+            && YesOrNo.YES.equals(caseData.getAddRespondent2()))) {
             notificationService.sendMail(
                 targetEmail,
                 notificationsProperties.getRespondentSolicitorClaimContinuingOnlineForSpec(),
@@ -94,7 +96,6 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
         }
-
 
         if (!isRespondent1Event(callbackParams) && !YesOrNo.YES.equals(caseData.getAddRespondent2())) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -116,7 +117,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
             map.put(CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
                 caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()));
         } else {
-            if(caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
+            if (caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES) {
                 map.put(CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
                     caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()));
             } else {
