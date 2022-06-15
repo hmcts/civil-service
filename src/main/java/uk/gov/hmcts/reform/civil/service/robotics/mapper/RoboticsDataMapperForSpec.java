@@ -197,6 +197,7 @@ public class RoboticsDataMapperForSpec {
             .id(id)
             .isPayee(true)
             .organisationId(organisationId.orElse(null))
+            .contactEmailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
             .reference(ofNullable(caseData.getSolicitorReferences())
                            .map(SolicitorReferences::getApplicantSolicitor1Reference)
                            .orElse(null)
