@@ -102,9 +102,9 @@ public class RoboticsDataMapperForSpec {
     private CaseHeader buildCaseHeader(CaseData caseData) {
         return CaseHeader.builder()
             .caseNumber(caseData.getLegacyCaseReference())
-            .owningCourtCode("700")
-            .owningCourtName("Online Civil Money Claim")
-            .caseType("CLAIM - SPEC ONLY")
+            .owningCourtCode("")
+            .owningCourtName("")
+            .caseType("SPECIFIED CLAIM")
             .preferredCourtCode("")
             .caseAllocatedTo("")
             .build();
