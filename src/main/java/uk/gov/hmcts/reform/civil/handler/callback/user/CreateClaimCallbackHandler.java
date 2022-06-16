@@ -38,8 +38,6 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -60,8 +58,8 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
+import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
 
 @Service
 @RequiredArgsConstructor
@@ -309,10 +307,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         // moving statement of truth value to correct field, this was not possible in mid event.
         // resetting statement of truth to make sure it's empty the next time it appears in the UI.
         StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-        dataBuilder.uiStatementOfTruth(StatementOfTruth.builder().build());
-        dataBuilder.applicantSolicitor1ClaimStatementOfTruth(statementOfTruth);
+        dataBuilder
+            .uiStatementOfTruth(StatementOfTruth.builder().build())
+            .applicantSolicitor1ClaimStatementOfTruth(statementOfTruth)
+            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
 
-        dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+        // data for case list and unassigned list
+        dataBuilder
+            .allPartyNames(getAllPartyNames(caseData))
+            .unassignedCaseListDisplayOrganisationReferences(getAllOrganisationPolicyReferences(caseData))
+            .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData));
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
@@ -329,6 +333,17 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private String getAllPartyNames(CaseData caseData) {
+        return format("%s%s V %s%s",
+                      caseData.getApplicant1().getPartyName(),
+                      YES.equals(caseData.getAddApplicant2())
+                          ? ", " + caseData.getApplicant2().getPartyName() : "",
+                      caseData.getRespondent1().getPartyName(),
+                      YES.equals(caseData.getAddRespondent2())
+                          && NO.equals(caseData.getRespondent2SameLegalRepresentative())
+                            ? ", " + caseData.getRespondent2().getPartyName() : "");
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
@@ -389,16 +404,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private String getBody(CaseData caseData) {
-        LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
-        String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
-
         return format(
             areRespondentsRepresentedAndRegistered(caseData)
                 ? CONFIRMATION_SUMMARY
                 : LIP_CONFIRMATION_BODY,
             format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
-            claimIssueConfiguration.getResponsePackLink(),
-            formattedServiceDeadline
+            claimIssueConfiguration.getResponsePackLink()
         ) + exitSurveyContentService.applicantSurvey();
     }
 
