@@ -692,6 +692,10 @@ public class EventHistoryMapper {
         currentSequence = getCurrentSequence(history.getReceiptOfPartAdmission(), currentSequence);
         currentSequence = getCurrentSequence(history.getReceiptOfAdmission(), currentSequence);
         currentSequence = getCurrentSequence(history.getReplyToDefence(), currentSequence);
+        currentSequence = getCurrentSequence(history.getBreathingSpaceEntered(), currentSequence);
+        currentSequence = getCurrentSequence(history.getBreathingSpaceLifted(), currentSequence);
+        currentSequence = getCurrentSequence(history.getBreathingSpaceMentalHealthEntered(), currentSequence);
+        currentSequence = getCurrentSequence(history.getBreathingSpaceMentalHealthLifted(), currentSequence);
         currentSequence = getCurrentSequence(history.getDirectionsQuestionnaireFiled(), currentSequence);
         return currentSequence + 1;
     }
