@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
-import static org.apache.logging.log4j.util.Strings.concat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -252,8 +251,9 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
         return fromList(locations.stream()
-                            .map(location -> concat(concat(location.getSiteName(), " - "),
-                                                    location.getPostcode()))
+                            .map(location -> location.getSiteName()
+                                + " - " + location.getCourtAddress()
+                                + " - " + location.getPostcode())
                             .collect(Collectors.toList()));
     }
 
@@ -272,8 +272,9 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private Boolean checkLocation(final LocationRefData location, String locationTempLabel) {
-        String locationLabel = concat(concat(location.getSiteName(), " - "),
-                                      location.getPostcode());
+        String locationLabel = location.getSiteName()
+            + " - " + location.getCourtAddress()
+            + " - " + location.getPostcode();
         return locationLabel.equals(locationTempLabel);
     }
 

@@ -316,7 +316,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
 
         @Test
-        public void shouldCallExternalTask_whenAboutToSubmit() {
+        void shouldCallExternalTask_whenAboutToSubmit() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .addRespondent2(NO)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
@@ -329,7 +329,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        public void shouldCallExternalTaskAndDeleteLocationList_whenAboutToSubmit() {
+        void shouldCallExternalTaskAndDeleteLocationList_whenAboutToSubmit() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .addRespondent2(NO)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
