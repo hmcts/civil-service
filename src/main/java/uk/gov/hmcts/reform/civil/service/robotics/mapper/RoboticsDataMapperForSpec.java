@@ -37,6 +37,7 @@ import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPounds;
 
 /**
@@ -196,6 +197,7 @@ public class RoboticsDataMapperForSpec {
             .id(id)
             .isPayee(true)
             .organisationId(organisationId.orElse(null))
+            .contactEmailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
             .reference(ofNullable(caseData.getSolicitorReferences())
                            .map(SolicitorReferences::getApplicantSolicitor1Reference)
                            .orElse(null)
@@ -209,6 +211,9 @@ public class RoboticsDataMapperForSpec {
     }
 
     private List<LitigiousParty> buildLitigiousParties(CaseData caseData) {
+        String respondent1SolicitorId = caseData.getSpecRespondent1Represented() == YES
+            ? RESPONDENT_SOLICITOR_ID : null;
+
         return List.of(
             buildLitigiousParty(
                 caseData.getApplicant1(),
@@ -224,7 +229,7 @@ public class RoboticsDataMapperForSpec {
                 caseData.getRespondent1OrganisationPolicy(),
                 "Defendant",
                 RESPONDENT_ID,
-                RESPONDENT_SOLICITOR_ID
+                respondent1SolicitorId
             )
         );
     }
