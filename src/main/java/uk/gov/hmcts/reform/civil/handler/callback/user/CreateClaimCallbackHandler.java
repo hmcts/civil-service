@@ -322,7 +322,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         if (toggleService.isNoticeOfChangeEnabled()) {
             // LiP are not represented or registered
-            if (areRespondentsRepresentedAndRegistered(caseData) == false)  {
+            if (areAnyRespondentsLitigantInPerson(caseData) == true)  {
                 dataBuilder.addLegalRepDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(time.now()));
             }
         }
@@ -382,6 +382,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             || caseData.getRespondent1OrgRegistered() == NO
             || caseData.getRespondent2Represented() == NO
             || caseData.getRespondent2OrgRegistered() == NO);
+    }
+
+    private boolean areAnyRespondentsLitigantInPerson(CaseData caseData) {
+        boolean isRespondent1LiP =
+            caseData.getRespondent1Represented() == NO && caseData.getRespondent1OrgRegistered() == NO;
+        boolean isRespondent2LiP =
+            YES.equals(caseData.getAddRespondent2())
+                ? (caseData.getRespondent2Represented() == NO && caseData.getRespondent2OrgRegistered() == NO)
+                : false;
+        return isRespondent1LiP || isRespondent2LiP;
     }
 
     private String getBody(CaseData caseData) {

@@ -805,7 +805,7 @@ public class CaseDataBuilder {
             case FULL_DEFENCE_NOT_PROCEED:
                 return atStateApplicantRespondToDefenceAndNotProceed();
             case TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT:
-                return atStateProceedsOfflineUnrepresentedDefendants();
+                return atStateClaimIssuedUnrepresentedDefendants();
             case TAKEN_OFFLINE_UNREGISTERED_DEFENDANT:
                 return atStateProceedsOfflineUnregisteredDefendants();
             case TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT:
@@ -854,7 +854,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendants() {
+    public CaseDataBuilder atStateClaimIssuedUnrepresentedDefendants() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
         respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
@@ -865,15 +865,15 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateProceedsOffline1v1UnrepresentedDefendant() {
-        atStateProceedsOfflineUnrepresentedDefendants();
+    public CaseDataBuilder atStateClaimIssued1v1UnrepresentedDefendant() {
+        atStateClaimIssuedUnrepresentedDefendants();
         addRespondent2 = NO;
         respondent2 = null;
         respondent2Represented = null;
         return this;
     }
 
-    public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant1() {
+    public CaseDataBuilder atStateClaimIssuedUnrepresentedDefendant1() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
@@ -888,7 +888,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant2() {
+    public CaseDataBuilder atStateClaimIssuedUnrepresentedDefendant2() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
         respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;

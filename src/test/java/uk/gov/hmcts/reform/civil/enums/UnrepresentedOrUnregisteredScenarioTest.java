@@ -18,7 +18,7 @@ class UnrepresentedOrUnregisteredScenarioTest {
     class Unrepresented {
         @Test
         void shouldReturnUnrepresentedDefendantNames_WhenBothDefendantsUnrepresentedScenario() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendants().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
 
             assertThat(getDefendantNames(UNREPRESENTED, caseData)).isEqualTo(
                 List.of(
@@ -30,7 +30,7 @@ class UnrepresentedOrUnregisteredScenarioTest {
 
         @Test
         void shouldReturnUnrepresentedDefendantNames_WhenDefendant1UnrepresentedScenario() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant1().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().build();
 
             assertThat(getDefendantNames(UNREPRESENTED, caseData)).isEqualTo(
                 List.of(
@@ -41,7 +41,7 @@ class UnrepresentedOrUnregisteredScenarioTest {
 
         @Test
         void shouldReturnUnrepresentedDefendantNames_WhenDefendant2UnrepresentedScenario() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant2().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant2().build();
 
             assertThat(getDefendantNames(UNREPRESENTED, caseData)).isEqualTo(
                 List.of(

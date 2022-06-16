@@ -205,7 +205,7 @@ class StateFlowEngineTest {
         // 1v1 Unrepresented
         @Test
         void shouldReturnProceedsWithOfflineJourney_1v1_whenCaseDataAtStateClaimDraftIssuedAndResUnrepresented() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOffline1v1UnrepresentedDefendant().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant().build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -263,7 +263,7 @@ class StateFlowEngineTest {
         // 1. Both def1 and def2 unrepresented
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRespondentsNotRepresented() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendants().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -292,7 +292,7 @@ class StateFlowEngineTest {
         // 2. Def1 unrepresented, Def2 registered
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRespondent1NotRepresented() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant1().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -321,7 +321,7 @@ class StateFlowEngineTest {
         // 3. Def1 registered, Def 2 unrepresented
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRespondent2NotRepresented() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant2().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant2().build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
