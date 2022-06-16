@@ -121,16 +121,9 @@ public class DefaultJudgementHandler extends CallbackHandler {
         LocationRefData location = fillPreferredLocationData(locations, caseData.getHearingSupportRequirementsDJ());
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (Objects.nonNull(location)) {
-            caseDataBuilder
-                .hearingSupportRequirementsDJ(
-                    caseData
-                        .getHearingSupportRequirementsDJ()
-                        .toBuilder()
+            caseDataBuilder.hearingSupportRequirementsDJ(caseData.getHearingSupportRequirementsDJ().toBuilder()
                         .hearingPreferredLocation(caseData.getHearingSupportRequirementsDJ()
-                                .getHearingTemporaryLocation()
-                                .getValue()
-                                .getLabel())
-                        .build())
+                                .getHearingTemporaryLocation().getValue().getLabel()).build())
                 .hearingPreferredRegionId(location.getRegionId())
                 .hearingPreferredCourtVenueId(location.getCourtVenueId());
         }
@@ -248,11 +241,10 @@ public class DefaultJudgementHandler extends CallbackHandler {
             HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ()
                 .toBuilder().hearingTemporaryLocation(null).build();
             caseDataBuilder
-                .businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT))
                 .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
-        } else {
-            caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT));
         }
+        caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT));
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -275,8 +267,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
             locations
                 .stream()
                 .filter(locationRefData -> checkLocation(locationRefData,
-                                                         locationLabel)).findFirst().get();
-        return preferredLocation;
+                                                         locationLabel)).findFirst();
+        return preferredLocation.orElse(null);
     }
 
     private Boolean checkLocation(final LocationRefData location, String locationTempLabel) {

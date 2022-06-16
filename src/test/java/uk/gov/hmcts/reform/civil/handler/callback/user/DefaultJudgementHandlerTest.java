@@ -281,6 +281,35 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
         }
+
+        @Test
+        void shouldNotReturnError_whenLocationsProvided() {
+            HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
+                LocalDate.now().plusMonths(1)).hearingUnavailableUntil(
+                LocalDate.now().plusMonths(2)).build();
+            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ
+                .builder().hearingDates(
+                    wrapElements(hearingDates)).build();
+            List<String> temporaryLocationList = List.of("Loc 1", "Loc 2");
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ
+                                                  .builder()
+                                                  .hearingTemporaryLocation(
+                                                      DynamicList.fromList(temporaryLocationList)).build())
+                .build();
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder()
+                              .courtName("Court Name").region("Region").regionId("1").courtVenueId("000").build());
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+        }
     }
 
     @Nested
@@ -292,6 +321,20 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 .addRespondent2(NO)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                           .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo("DEFAULT_JUDGEMENT");
+        }
+
+        @Test
+        public void shouldCallExternalTaskAndDeleteLocationList_whenAboutToSubmit() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .addRespondent2(NO)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
