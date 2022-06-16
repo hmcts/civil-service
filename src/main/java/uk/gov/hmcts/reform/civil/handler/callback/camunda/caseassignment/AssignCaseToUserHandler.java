@@ -116,22 +116,19 @@ public class AssignCaseToUserHandler extends CallbackHandler {
 
         if (professionalUsersEntityResponse != null) {
             for (ProfessionalUsersResponse user : professionalUsersEntityResponse.getUsers()) {
-                log.info("about to get roles for user {}", user.getEmail());
+                log.info("About to get roles for user");
                 if (user.getRoles() != null) {
                     if (!user.getRoles().isEmpty()) {
-                        log.info("user {} roles {}", user.getEmail(), user.getRoles().toString());
                         if (user.getRoles().contains(CASEWORKER_CAA_ROLE)) {
                             caaUserIds.add(user.getUserIdentifier());
                             log.info(
-                                "assigning case to caa user {}",
-                                user.getEmail()
-                            );
+                                "Assigning case to caa user");
                         }
                     } else {
-                        log.info("user {} has empty roles", user.getEmail());
+                        log.info("User has empty roles, looking for next caa user");
                     }
                 } else {
-                    log.info("user {} has null roles", user.getEmail());
+                    log.info("User has null roles, looking for next caa user");
                 }
             }
         } else {
@@ -140,7 +137,7 @@ public class AssignCaseToUserHandler extends CallbackHandler {
         if (!caaUserIds.isEmpty()) {
             for (String caaUserId : caaUserIds) {
                 coreCaseUserService.assignCase(caseId, caaUserId, organisationId, caseRole);
-                log.info("case assigned to user");
+                log.info("Case assigned to caa user");
             }
         } else {
             log.info("No caa users found for org ID {} for case {}", organisationId, caseId);
