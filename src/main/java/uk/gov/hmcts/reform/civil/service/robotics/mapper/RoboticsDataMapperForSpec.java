@@ -75,7 +75,7 @@ public class RoboticsDataMapperForSpec {
                                 .orElse(null);
                     builder.breathingSpace(RPABreathingSpace.builder()
                                                .type(type)
-                                               .endDate(endDate)
+                                               .endDate(null)
                                                .build());
                 });
         }
@@ -101,9 +101,9 @@ public class RoboticsDataMapperForSpec {
     private CaseHeader buildCaseHeader(CaseData caseData) {
         return CaseHeader.builder()
             .caseNumber(caseData.getLegacyCaseReference())
-            .owningCourtCode("")
-            .owningCourtName("")
-            .caseType("SPECIFIED CLAIM")
+            .owningCourtCode("700")
+            .owningCourtName("Online Civil Money Claim")
+            .caseType("CLAIM - SPEC ONLY")
             .preferredCourtCode("")
             .caseAllocatedTo("")
             .build();
