@@ -73,10 +73,16 @@ public class EventHistorySequencer {
                 case DIRECTIONS_QUESTIONNAIRE_FILED:
                     builder.directionsQuestionnaire(event);
                     break;
+                case GENERAL_FORM_OF_APPLICATION:
+                    builder.generalFormOfApplication(event);
+                    break;
                 default:
                     throw new IllegalStateException("Unexpected event type: " + eventType);
             }
         });
+        if (isEmpty(builder.build().getGeneralFormOfApplication())) {
+            builder.generalFormOfApplication(List.of(Event.builder().build()));
+        }
         if (isEmpty(builder.build().getDirectionsQuestionnaireFiled())) {
             builder.directionsQuestionnaireFiled(List.of(Event.builder().build()));
         }
@@ -126,7 +132,8 @@ public class EventHistorySequencer {
             eventHistory.getReceiptOfPartAdmission(),
             eventHistory.getReceiptOfAdmission(),
             eventHistory.getReplyToDefence(),
-            eventHistory.getDirectionsQuestionnaireFiled()
+            eventHistory.getDirectionsQuestionnaireFiled(),
+            eventHistory.getGeneralFormOfApplication()
         );
         return eventsList.stream()
             .filter(Objects::nonNull)

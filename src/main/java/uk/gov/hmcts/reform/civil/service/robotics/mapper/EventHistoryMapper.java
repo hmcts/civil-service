@@ -83,7 +83,9 @@ public class EventHistoryMapper {
 
     public EventHistory buildEvents(CaseData caseData) {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
-            .directionsQuestionnaireFiled(List.of(Event.builder().build()));
+            .directionsQuestionnaireFiled(List.of(Event.builder().build()))
+            .generalFormOfApplication(List.of(Event.builder().build()));
+
 
         stateFlowEngine.evaluate(caseData).getStateHistory()
             .forEach(state -> {

@@ -442,6 +442,18 @@
             }
           ],
           "description": ""
+        },
+        "generalFormOfApplication": {
+          "$id": "#/properties/events/properties/generalFormOfApplication",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/generalFormOfApplicationEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
         }
       },
       "additionalProperties": false
@@ -1240,6 +1252,69 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventDetailsText",
+            "type": ["string", "null"],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "generalFormOfApplicationEventType": {
+      "$id": "#/definitions/generalFormOfApplicationEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/generalFormOfApplicationEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/generalFormOfApplicationEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/generalFormOfApplicationEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "136",
+            "description": "The CASEMAN code for the generalFormOfApplication event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/generalFormOfApplicationEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/generalFormOfApplicationEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+
+          "eventDetails": {
+            "$id": "#/definitions/generalFormOfApplicationEventType/items/properties/eventDetails",
+            "type": "object",
+            "required": [
+
+            ],
+            "properties": {
+              "miscText": {
+                "$id": "#/definitions/generalFormOfApplicationEventType/items/properties/eventDetails/properties/miscText",
+                "type": "string",
+                "maxLength": 250,
+                "description": "The text for the miscellaneous event can contain any supporting explanatory text."
+              }
+            },
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/generalFormOfApplicationEventType/items/properties/eventDetailsText",
             "type": ["string", "null"],
             "maxLength": 250,
             "description": ""
