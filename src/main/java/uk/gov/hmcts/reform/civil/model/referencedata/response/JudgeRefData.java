@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.referencedata.response;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -20,7 +21,16 @@ public class JudgeRefData {
     private String isMagistrate;
 
     @JsonCreator
-    public JudgeRefData(String title, String knownAs, String surname, String fullName, String emailId, String idamId, String personalCode, String isJudge, String isPanelMember, String isMagistrate) {
+    public JudgeRefData(@JsonProperty("post_nominals") String title,
+                        @JsonProperty("known_as") String knownAs,
+                        @JsonProperty("surname") String surname,
+                        @JsonProperty("full_name") String fullName,
+                        @JsonProperty("ejudiciary_email") String emailId,
+                        @JsonProperty("sidam_id") String idamId,
+                        @JsonProperty("personal_code") String personalCode,
+                        @JsonProperty("is_judge") String isJudge,
+                        @JsonProperty("is_panel_member") String isPanelMember,
+                        @JsonProperty("is_magistrate") String isMagistrate) {
         this.title = title;
         this.knownAs = knownAs;
         this.surname = surname;
