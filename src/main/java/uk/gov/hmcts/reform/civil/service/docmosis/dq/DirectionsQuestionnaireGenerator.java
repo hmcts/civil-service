@@ -44,10 +44,12 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.text.NumberFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -154,6 +156,52 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         );
     }
 
+    // return optional, if you get an empty optional, you didn't need to generate the doc
+    public Optional<CaseDocument> generateDQFor1v2DiffSol(CaseData caseData,
+                                                          String authorisation,
+                                                          String respondent) {
+        // TODO check if this is the correct template, I just copy-pasted from generateDQFor1v2SingleSolDiffResponse
+        DocmosisTemplates templateId = TWO_V_ONE.equals(MultiPartyScenario
+                                                            .getMultiPartyScenario(caseData)) ? N181_2V1 : N181;
+        String fileName = getFileName(caseData, templateId);
+        LocalDateTime responseDate;
+        if ("ONE".equals(respondent)) {
+            responseDate = caseData.getRespondent1ResponseDate();
+        } else if ("TWO".equals(respondent)) {
+            responseDate = caseData.getRespondent2ResponseDate();
+        } else {
+            throw new IllegalArgumentException("Respondent argument is expected to be one of ONE or TWO");
+        }
+        if (responseDate == null) {
+            throw new NullPointerException("Response date should not be null");
+        }
+        if (caseData.getSystemGeneratedCaseDocuments().stream()
+            .anyMatch(element ->
+                          Objects.equals(element.getValue().getCreatedDatetime(), responseDate)
+                              && fileName.equals(element.getValue().getDocumentName()))) {
+            // this DQ is already generated
+            return Optional.empty();
+        }
+
+        DirectionsQuestionnaireForm templateData;
+        if (respondent.equals("ONE")) {
+            templateData = getRespondent1TemplateData(caseData, "ONE");
+        } else {
+            // TWO
+            templateData = getRespondent2TemplateData(caseData, "TWO");
+        }
+
+        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N181);
+        CaseDocument document = documentManagementService.uploadDocument(
+            authorisation,
+            new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
+                    DocumentType.DIRECTIONS_QUESTIONNAIRE
+            )
+        );
+        // set the create date time equal to the response date time, so we can check it afterwards
+        return Optional.of(document.toBuilder().createdDatetime(responseDate).build());
+    }
+
     private String getFileName(CaseData caseData, DocmosisTemplates templateId) {
         String userPrefix = isRespondentState(caseData) ? "defendant" : "claimant";
         return String.format(templateId.getDocumentTitle(), userPrefix, caseData.getLegacyCaseReference());
@@ -183,10 +231,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
 
-        boolean claimantResponseLRspec = false;
-        if (isClaimantResponse(caseData) && SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-            claimantResponseLRspec = true;
-        }
+        boolean claimantResponseLRspec = isClaimantResponse(caseData)
+            && SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType());
 
         DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = DirectionsQuestionnaireForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
@@ -680,7 +726,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         if (isClaimantResponse(caseData)) {
             expertRequired = caseData.getApplicant1ClaimExpertSpecRequired();
         }
-        Expert expertDetails = null;
+        Expert expertDetails;
         if (experts != null) {
             expertDetails = Expert.builder()
                 .name(experts.getExpertName())

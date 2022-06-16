@@ -959,6 +959,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         var caseData = callbackParams.getCaseData();
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
+            .respondent1ClaimResponseTestForSpec(caseData.getRespondent1ClaimResponseTypeForSpec())
+            .respondent2ClaimResponseTestForSpec(caseData.getRespondent2ClaimResponseTypeForSpec())
             .showConditionFlags(getInitialShowTags(callbackParams));
 
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
@@ -1156,7 +1158,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             var updatedRespondent2 = caseData.getRespondent2().toBuilder()
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
                 .build();
-
             updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
             updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
         }
@@ -1183,7 +1184,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         } else {
-            updatedData = caseData.toBuilder()
+            updatedData
                 .respondent1ResponseDate(responseDate)
                 .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
