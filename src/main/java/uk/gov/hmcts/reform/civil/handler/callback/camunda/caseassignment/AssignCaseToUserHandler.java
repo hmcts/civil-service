@@ -119,12 +119,11 @@ public class AssignCaseToUserHandler extends CallbackHandler {
                 log.info("about to get roles for user {}", user.getEmail());
                 if (user.getRoles() != null) {
                     if (!user.getRoles().isEmpty()) {
-                        log.info("user ID {} roles {}", user.getEmail(), user.getRoles().toString());
+                        log.info("user {} roles {}", user.getEmail(), user.getRoles().toString());
                         if (user.getRoles().contains(CASEWORKER_CAA_ROLE)) {
                             caaUserIds.add(user.getUserIdentifier());
                             log.info(
-                                "adding caa user with ID {}, username {}",
-                                user.getUserIdentifier(),
+                                "assigning case to caa user {}",
                                 user.getEmail()
                             );
                         }
@@ -136,11 +135,12 @@ public class AssignCaseToUserHandler extends CallbackHandler {
                 }
             }
         } else {
-            log.info("prof users entity response is null");
+            log.info("no users in response");
         }
         if (!caaUserIds.isEmpty()) {
             for (String caaUserId : caaUserIds) {
                 coreCaseUserService.assignCase(caseId, caaUserId, organisationId, caseRole);
+                log.info("case assigned to user");
             }
         } else {
             log.info("No caa users found for org ID {} for case {}", organisationId, caseId);
