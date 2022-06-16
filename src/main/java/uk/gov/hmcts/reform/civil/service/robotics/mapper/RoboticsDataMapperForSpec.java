@@ -102,9 +102,9 @@ public class RoboticsDataMapperForSpec {
     private CaseHeader buildCaseHeader(CaseData caseData) {
         return CaseHeader.builder()
             .caseNumber(caseData.getLegacyCaseReference())
-            .owningCourtCode("")
-            .owningCourtName("")
-            .caseType("SPECIFIED CLAIM")
+            .owningCourtCode("700")
+            .owningCourtName("Online Civil Money Claim")
+            .caseType("CLAIM - SPEC ONLY")
             .preferredCourtCode("")
             .caseAllocatedTo("")
             .build();
@@ -214,6 +214,8 @@ public class RoboticsDataMapperForSpec {
         String respondent1SolicitorId = caseData.getSpecRespondent1Represented() == YES
             ? RESPONDENT_SOLICITOR_ID : null;
 
+        LocalDate dateOfService = caseData.getIssueDate();
+
         return List.of(
             buildLitigiousParty(
                 caseData.getApplicant1(),
@@ -221,7 +223,8 @@ public class RoboticsDataMapperForSpec {
                 caseData.getApplicant1OrganisationPolicy(),
                 "Claimant",
                 APPLICANT_ID,
-                APPLICANT_SOLICITOR_ID
+                APPLICANT_SOLICITOR_ID,
+                dateOfService
             ),
             buildLitigiousParty(
                 caseData.getRespondent1(),
@@ -229,7 +232,8 @@ public class RoboticsDataMapperForSpec {
                 caseData.getRespondent1OrganisationPolicy(),
                 "Defendant",
                 RESPONDENT_ID,
-                respondent1SolicitorId
+                respondent1SolicitorId,
+                dateOfService
             )
         );
     }
@@ -240,7 +244,8 @@ public class RoboticsDataMapperForSpec {
         OrganisationPolicy organisationPolicy,
         String type,
         String id,
-        String solicitorId
+        String solicitorId,
+        LocalDate dateOfService
     ) {
         return LitigiousParty.builder()
             .id(id)
@@ -250,6 +255,9 @@ public class RoboticsDataMapperForSpec {
             .dateOfBirth(PartyUtils.getDateOfBirth(party).map(d -> d.format(ISO_DATE)).orElse(null))
             .addresses(addressMapper.toRoboticsAddresses(party.getPrimaryAddress()))
             .solicitorOrganisationID(getOrganisationId(organisationPolicy).orElse(null))
+            .dateOfService(ofNullable(dateOfService)
+                               .map(d -> d.format(ISO_DATE))
+                               .orElse(null))
             .build();
     }
 }
