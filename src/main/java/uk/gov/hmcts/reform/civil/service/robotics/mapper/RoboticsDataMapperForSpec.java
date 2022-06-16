@@ -65,20 +65,6 @@ public class RoboticsDataMapperForSpec {
             .solicitors(buildSolicitors(caseData))
             .claimDetails(buildClaimDetails(caseData))
             .events(eventHistoryMapper.buildEvents(caseData));
-        if (featureToggleService.isSpecRpaContinuousFeedEnabled()) {
-            Optional.ofNullable(caseData.getBreathing())
-                .map(BreathingSpaceInfo::getEnter)
-                .map(BreathingSpaceEnterInfo::getType)
-                .ifPresent(type -> {
-                    LocalDate endDate = Optional.ofNullable(caseData.getBreathing().getLift())
-                            .map(BreathingSpaceLiftInfo::getExpectedEnd)
-                                .orElse(null);
-                    builder.breathingSpace(RPABreathingSpace.builder()
-                                               .type(type)
-                                               .endDate(endDate)
-                                               .build());
-                });
-        }
         return builder.build();
     }
 
