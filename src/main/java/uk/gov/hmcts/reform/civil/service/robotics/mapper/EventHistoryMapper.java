@@ -55,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_ENTERED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_LIFTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CONSENT_EXTENSION_FILING_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_AND_COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
@@ -545,9 +546,12 @@ public class EventHistoryMapper {
     }
 
     private void buildBreathingSpace(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        String detailsText = "Breathing space reference ";
+        String detailsText;
+        String miscText = "";
         List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
         if (caseData.getBreathing().getEnter() != null) {
+            detailsText = "Breathing space reference " + caseData.getBreathing().getEnter().getReference()
+                + ", actual start date " + caseData.getBreathing().getEnter().getStart();
             builder.breathingSpaceEntered(
                 Event.builder()
                     .litigiousPartyID(applicantDetails.get(0).getLitigiousPartyID())
@@ -560,18 +564,35 @@ public class EventHistoryMapper {
                                       .build())
                     .build());
 
-            String miscText = "RPA Reason: Breathing Space Entered";
-            builder.miscellaneous(
+            miscText = "RPA Reason: Breathing Space Entered";
+        }
+        if (caseData.getBreathing().getLift() != null) {
+            detailsText = "Breathing space reference " + caseData.getBreathing().getEnter().getReference()
+                + ", actual end date " + caseData.getBreathing().getLift().getExpectedEnd();
+            builder.breathingSpaceLifted(
                 Event.builder()
+                    .litigiousPartyID(applicantDetails.get(0).getLitigiousPartyID())
                     .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(MISCELLANEOUS.getCode())
+                    .eventCode(BREATHING_SPACE_LIFTED.getCode())
                     .dateReceived(caseData.getIssueDate().atStartOfDay())
-                    .eventDetailsText(miscText)
+                    .eventDetailsText(detailsText)
                     .eventDetails(EventDetails.builder()
-                                      .miscText(miscText)
+                                      .miscText(detailsText)
                                       .build())
                     .build());
+
+            miscText = "RPA Reason: Breathing Space Lifted";
         }
+        builder.miscellaneous(
+            Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(caseData.getIssueDate().atStartOfDay())
+                .eventDetailsText(miscText)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(miscText)
+                                  .build())
+                .build());
     }
 
     private void buildClaimTakenOfflinePastApplicantResponse(EventHistory.EventHistoryBuilder builder,

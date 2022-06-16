@@ -76,6 +76,9 @@ public class EventHistorySequencer {
                 case BREATHING_SPACE_ENTERED:
                     builder.breathingSpaceEntered(event);
                     break;
+                case BREATHING_SPACE_LIFTED:
+                    builder.breathingSpaceLifted(event);
+                    break;
                 default:
                     throw new IllegalStateException("Unexpected event type: " + eventType);
             }
@@ -107,6 +110,9 @@ public class EventHistorySequencer {
         if (isEmpty(builder.build().getBreathingSpaceEntered())) {
             builder.breathingSpaceEntered(List.of(Event.builder().build()));
         }
+        if (isEmpty(builder.build().getBreathingSpaceEntered())) {
+            builder.breathingSpaceLifted(List.of(Event.builder().build()));
+        }
         return builder
             .build();
     }
@@ -133,7 +139,8 @@ public class EventHistorySequencer {
             eventHistory.getReceiptOfAdmission(),
             eventHistory.getReplyToDefence(),
             eventHistory.getDirectionsQuestionnaireFiled(),
-            eventHistory.getBreathingSpaceEntered()
+            eventHistory.getBreathingSpaceEntered(),
+            eventHistory.getBreathingSpaceLifted()
         );
         return eventsList.stream()
             .filter(Objects::nonNull)
