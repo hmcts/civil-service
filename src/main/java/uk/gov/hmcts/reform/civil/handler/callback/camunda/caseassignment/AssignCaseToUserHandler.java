@@ -2,48 +2,54 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
+import uk.gov.hmcts.reform.civil.config.AutomaticallyAssignCaseToCaaConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.prd.model.ProfessionalUsersEntityResponse;
+import uk.gov.hmcts.reform.prd.model.ProfessionalUsersResponse;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import static java.util.Collections.singletonMap;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AssignCaseToUserHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(ASSIGN_CASE_TO_APPLICANT_SOLICITOR1);
     public static final String TASK_ID = "CaseAssignmentToApplicantSolicitor1";
+    private static final String CASEWORKER_CAA_ROLE = "pui-caa";
 
     private final CoreCaseUserService coreCaseUserService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper objectMapper;
-    private final CoreCaseDataService coreCaseDataService;
-    private final PaymentsConfiguration paymentsConfiguration;
-    private final FeatureToggleService toggleService;
+    private final OrganisationService organisationService;
+    private final AutomaticallyAssignCaseToCaaConfiguration automaticallyAssignCaseToCaaConfiguration;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(SUBMITTED), this::assignSolicitorCaseRole
+            callbackKey(ABOUT_TO_SUBMIT), this::assignSolicitorCaseRole
         );
     }
 
@@ -66,20 +72,78 @@ public class AssignCaseToUserHandler extends CallbackHandler {
 
         coreCaseUserService.assignCase(caseId, submitterId, organisationId, CaseRole.APPLICANTSOLICITORONE);
         coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, submitterId, organisationId);
-        // This sets the "supplementary_data" value "HmctsServiceId to the Unspec service ID AAA7
-        if (toggleService.isGlobalSearchEnabled()) {
-            setSupplementaryData(caseData.getCcdCaseReference());
+
+        CaseData updated = caseData.toBuilder()
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(userDetails.getEmail()).build())
+            .build();
+
+        if (automaticallyAssignCaseToCaaConfiguration.isAssignCaseToCaa()) {
+            getRespondentCaaAndAssignCase(caseData);
+            log.info("Automatically assigned case to respondent caa");
         }
 
-        return SubmittedCallbackResponse.builder().build();
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updated.toMap(objectMapper))
+            .build();
     }
 
-    private void setSupplementaryData(Long caseId) {
-        Map<String, Map<String, Map<String, Object>>> supplementaryDataCivil = new HashMap<>();
-        supplementaryDataCivil.put("supplementary_data_updates",
-                                   singletonMap("$set", singletonMap("HMCTSServiceId",
-                                                                     paymentsConfiguration.getSiteId())));
-        coreCaseDataService.setSupplementaryData(caseId, supplementaryDataCivil);
+    private void getRespondentCaaAndAssignCase(CaseData caseData) {
+        if (caseData.getRespondent1OrgRegistered() == YES
+            && caseData.getRespondent1Represented() == YES) {
+            assignCaseToRespondentCaa(caseData,
+                                      caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID(),
+                                      CaseRole.RESPONDENTSOLICITORONE);
+        }
 
+        if (getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)
+            && caseData.getRespondent2OrgRegistered() == YES
+            && caseData.getRespondent2Represented() == YES) {
+            assignCaseToRespondentCaa(caseData,
+                                      caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID(),
+                                      CaseRole.RESPONDENTSOLICITORTWO);
+        }
+    }
+
+    private void assignCaseToRespondentCaa(CaseData caseData, String organisationId, CaseRole caseRole) {
+        List<String> caaUserIds;
+        caaUserIds = new ArrayList<>();
+        String caseId = caseData.getCcdCaseReference().toString();
+
+        Optional<ProfessionalUsersEntityResponse> orgUsers =
+            organisationService.findUsersInOrganisation(organisationId);
+
+        ProfessionalUsersEntityResponse professionalUsersEntityResponse = orgUsers.orElse(null);
+
+        if (professionalUsersEntityResponse != null) {
+            for (ProfessionalUsersResponse user : professionalUsersEntityResponse.getUsers()) {
+                log.info("about to get roles for user {}", user.getEmail());
+                if (user.getRoles() != null) {
+                    if (!user.getRoles().isEmpty()) {
+                        log.info("user {} roles {}", user.getEmail(), user.getRoles().toString());
+                        if (user.getRoles().contains(CASEWORKER_CAA_ROLE)) {
+                            caaUserIds.add(user.getUserIdentifier());
+                            log.info(
+                                "assigning case to caa user {}",
+                                user.getEmail()
+                            );
+                        }
+                    } else {
+                        log.info("user {} has empty roles", user.getEmail());
+                    }
+                } else {
+                    log.info("user {} has null roles", user.getEmail());
+                }
+            }
+        } else {
+            log.info("no users in response");
+        }
+        if (!caaUserIds.isEmpty()) {
+            for (String caaUserId : caaUserIds) {
+                coreCaseUserService.assignCase(caseId, caaUserId, organisationId, caseRole);
+                log.info("case assigned to user");
+            }
+        } else {
+            log.info("No caa users found for org ID {} for case {}", organisationId, caseId);
+        }
     }
 }
