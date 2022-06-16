@@ -122,7 +122,8 @@ public class RoboticsDataMapperForSpec {
         ofNullable(buildRespondentSolicitor(caseData, RESPONDENT_SOLICITOR_ID))
             .ifPresent(solicitorsList::add);
 
-        if (YES == caseData.getSpecRespondent2Represented() && YES != caseData.getRespondent2SameLegalRepresentative()) {
+        if (YES == caseData.getSpecRespondent2Represented()
+            && YES != caseData.getRespondent2SameLegalRepresentative()) {
             ofNullable(buildRespondent2Solicitor(caseData, RESPONDENT2_SOLICITOR_ID))
                 .ifPresent(solicitorsList::add);
         }
@@ -265,7 +266,7 @@ public class RoboticsDataMapperForSpec {
                 caseData.getRespondent1OrganisationPolicy(),
                 "Defendant",
                 RESPONDENT_ID,
-                RESPONDENT_SOLICITOR_ID,
+                respondent1SolicitorId,
                 dateOfService
             )
         ));
