@@ -51,20 +51,14 @@ import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenari
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_ENTERED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_LIFTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CONSENT_EXTENSION_FILING_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_AND_COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.INTENTION_TO_PROCEED_STATES_PAID;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_BREATHING_SPACE_ENTERED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_BREATHING_SPACE_LIFTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.REPLY_TO_DEFENCE;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT2_ID;
@@ -310,7 +304,7 @@ public class EventHistoryMapper {
                         .litigiousPartyID(respondentID)
                         .build());
                 break;
-            case STATES_PAID:
+            /*case STATES_PAID:
                 builder.statesPaid(
                     Event.builder()
                         .eventSequence(prepareEventSequence(builder.build()))
@@ -365,7 +359,7 @@ public class EventHistoryMapper {
                         .build());
                 break;
             default:
-                break;
+                break;*/
         }
     }
 
