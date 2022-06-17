@@ -565,6 +565,16 @@ public class EventHistoryMapper {
                     .build());
 
             miscText = "RPA Reason: Breathing Space Entered";
+            builder.miscellaneous(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(caseData.getIssueDate().atStartOfDay())
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build());
         }
         if (caseData.getBreathing().getLift() != null) {
             detailsText = "Breathing space reference " + caseData.getBreathing().getEnter().getReference()
@@ -582,17 +592,17 @@ public class EventHistoryMapper {
                     .build());
 
             miscText = "RPA Reason: Breathing Space Lifted";
+            builder.miscellaneous(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(caseData.getIssueDate().atStartOfDay())
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build());
         }
-        builder.miscellaneous(
-            Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(caseData.getIssueDate().atStartOfDay())
-                .eventDetailsText(miscText)
-                .eventDetails(EventDetails.builder()
-                                  .miscText(miscText)
-                                  .build())
-                .build());
     }
 
     private void buildClaimTakenOfflinePastApplicantResponse(EventHistory.EventHistoryBuilder builder,
