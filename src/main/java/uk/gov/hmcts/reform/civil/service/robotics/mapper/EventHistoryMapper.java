@@ -264,45 +264,16 @@ public class EventHistoryMapper {
                                               String respondentID) {
         switch (respondentResponseType) {
             case FULL_DEFENCE:
-                builder.defenceFiled(buildDefenceFiledEvent(builder, respondentResponseDate, respondentID));
-                if (respondentID.equals(RESPONDENT_ID)) {
-                    builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
-                        builder, caseData, respondentResponseDate, respondentID,
-                        caseData.getRespondent1DQ(), caseData.getRespondent1(), true
-                    ));
-                } else {
-                    builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
-                        builder, caseData, respondentResponseDate, respondentID,
-                        caseData.getRespondent2DQ(), caseData.getRespondent2(), false
-                    ));
-                }
+                buildDefenceFiled(builder, caseData, respondentResponseDate, respondentID);
                 break;
             case COUNTER_CLAIM:
-                builder.defenceAndCounterClaim(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
-                        .dateReceived(respondentResponseDate)
-                        .litigiousPartyID(respondentID)
-                        .build());
+                buildDefenceAndCounterClaim(builder, caseData, respondentResponseDate, respondentID);
                 break;
             case PART_ADMISSION:
-                builder.receiptOfPartAdmission(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
-                        .dateReceived(respondentResponseDate)
-                        .litigiousPartyID(respondentID)
-                        .build());
+                buildReceiptOfPartAdmission(builder, caseData, respondentResponseDate, respondentID);
                 break;
             case FULL_ADMISSION:
-                builder.receiptOfAdmission(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(RECEIPT_OF_ADMISSION.getCode())
-                        .dateReceived(respondentResponseDate)
-                        .litigiousPartyID(respondentID)
-                        .build());
+                buildReceiptOfAdmission(builder, caseData, respondentResponseDate, respondentID);
                 break;
             /*case STATES_PAID:
                 builder.statesPaid(
@@ -348,6 +319,15 @@ public class EventHistoryMapper {
                         .dateReceived(respondentResponseDate)
                         .litigiousPartyID(respondentID)
                         .build());
+                break;*/
+            /*case INTENTION_TO_PROCEED:
+                builder.receiptOfAdmission(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(INTENTION_TO_PROCEED.getCode())
+                        .dateReceived(respondentResponseDate)
+                        .litigiousPartyID(respondentID)
+                        .build());
                 break;
             case INTENTION_TO_PROCEED_STATES_PAID:
                 builder.receiptOfAdmission(
@@ -370,47 +350,75 @@ public class EventHistoryMapper {
                                               String respondentID) {
         switch (respondentResponseTypeSpec) {
             case FULL_DEFENCE:
-                builder.defenceFiled(buildDefenceFiledEvent(builder, respondentResponseDate, respondentID));
-                if (respondentID.equals(RESPONDENT_ID)) {
-                    builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
-                        builder, caseData, respondentResponseDate, respondentID,
-                        caseData.getRespondent1DQ(), caseData.getRespondent1(), true));
-                } else {
-                    builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
-                        builder, caseData, respondentResponseDate, respondentID,
-                        caseData.getRespondent2DQ(), caseData.getRespondent2(), false));
-                }
+                buildDefenceFiled(builder, caseData, respondentResponseDate, respondentID);
                 break;
             case COUNTER_CLAIM:
-                builder.defenceAndCounterClaim(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
-                        .dateReceived(respondentResponseDate)
-                        .litigiousPartyID(respondentID)
-                        .build());
+                buildDefenceAndCounterClaim(builder, caseData, respondentResponseDate, respondentID);
                 break;
             case PART_ADMISSION:
-                builder.receiptOfPartAdmission(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
-                        .dateReceived(respondentResponseDate)
-                        .litigiousPartyID(respondentID)
-                        .build());
+                buildReceiptOfPartAdmission(builder, caseData, respondentResponseDate, respondentID);
                 break;
             case FULL_ADMISSION:
-                builder.receiptOfAdmission(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(RECEIPT_OF_ADMISSION.getCode())
-                        .dateReceived(respondentResponseDate)
-                        .litigiousPartyID(respondentID)
-                        .build());
+                buildReceiptOfAdmission(builder, caseData, respondentResponseDate, respondentID);
                 break;
             default:
                 break;
         }
+    }
+
+    private void buildDefenceFiled(EventHistory.EventHistoryBuilder builder,
+                                   CaseData caseData,
+                                   LocalDateTime respondentResponseDate,
+                                   String respondentID) {
+        builder.defenceFiled(buildDefenceFiledEvent(builder, respondentResponseDate, respondentID));
+        if (respondentID.equals(RESPONDENT_ID)) {
+            builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
+                builder, caseData, respondentResponseDate, respondentID,
+                caseData.getRespondent1DQ(), caseData.getRespondent1(), true));
+        } else {
+            builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
+                builder, caseData, respondentResponseDate, respondentID,
+                caseData.getRespondent2DQ(), caseData.getRespondent2(), false));
+        }
+    }
+
+    private void buildDefenceAndCounterClaim(EventHistory.EventHistoryBuilder builder,
+                                   CaseData caseData,
+                                   LocalDateTime respondentResponseDate,
+                                   String respondentID) {
+        builder.defenceAndCounterClaim(
+            Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
+                .dateReceived(respondentResponseDate)
+                .litigiousPartyID(respondentID)
+                .build());
+    }
+
+    private void buildReceiptOfPartAdmission(EventHistory.EventHistoryBuilder builder,
+                                             CaseData caseData,
+                                             LocalDateTime respondentResponseDate,
+                                             String respondentID) {
+        builder.receiptOfPartAdmission(
+            Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
+                .dateReceived(respondentResponseDate)
+                .litigiousPartyID(respondentID)
+                .build());
+    }
+
+    private void buildReceiptOfAdmission(EventHistory.EventHistoryBuilder builder,
+                                             CaseData caseData,
+                                             LocalDateTime respondentResponseDate,
+                                             String respondentID) {
+        builder.receiptOfAdmission(
+            Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(RECEIPT_OF_ADMISSION.getCode())
+                .dateReceived(respondentResponseDate)
+                .litigiousPartyID(respondentID)
+                .build());
     }
 
     public String prepareRespondentResponseText(CaseData caseData, Party respondent, boolean isRespondent1) {

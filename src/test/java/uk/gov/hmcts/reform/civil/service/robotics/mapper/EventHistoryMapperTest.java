@@ -2357,7 +2357,7 @@ class EventHistoryMapperTest {
     class RespondentDivergentResponseSpec {
 
         @Test
-        void shouldPrepareExpectedEvents_whenClaimWith1v2DiffSolicitorResp1FullyAdmitsResp2FullDef() {
+        void shouldPrepareExpectedEvents_whenClaimWith1v2DiffSolicitorResp1PartAdmitsResp2FullDef() {
             CaseData caseData = CaseDataBuilder.builder()
                 .setSuperClaimTypeToSpecClaim()
                 .atState(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
@@ -2365,6 +2365,62 @@ class EventHistoryMapperTest {
                 .atStateRespondent1v2FullDefence_AdmitPart()
                 .atState1v2DivergentResponseSpec(RespondentResponseTypeSpec.FULL_DEFENCE,
                                                  RespondentResponseTypeSpec.PART_ADMISSION)
+                .respondent2DQ()
+                .respondent1DQ()
+                .respondent1(PartyBuilder.builder().individual()
+                                 .individualDateOfBirth(LocalDate.now().plusDays(1))
+                                 .build())
+                .build();
+
+            String respondent1MiscText =
+                mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
+            String respondent2MiscText =
+                mapper.prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
+
+            Event expectedDefenceFiled = Event.builder()
+                .eventSequence(1)
+                .eventCode("50")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID("002")
+                .build();
+            List<Event> expectedMiscellaneousEvents = List.of(
+                Event.builder()
+                    .eventSequence(4)
+                    .eventCode("999")
+                    .dateReceived(caseData.getRespondent2ResponseDate())
+                    .eventDetailsText(respondent2MiscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(respondent2MiscText)
+                                      .build())
+                    .build()
+            );
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("defenceFiled").asList()
+                .containsExactly(expectedDefenceFiled);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents.get(0));
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceAndCounterClaim",
+                "replyToDefence",
+                "consentExtensionFilingDefence",
+                "acknowledgementOfServiceReceived"
+            );
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenClaimWith1v2DiffSolicitorResp1FullyAdmitsResp2FullDef() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atState(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondent1v2FullDefence_AdmitFull()
+                .atState1v2DivergentResponseSpec(RespondentResponseTypeSpec.FULL_DEFENCE,
+                                                 RespondentResponseTypeSpec.FULL_ADMISSION)
                 .respondent2DQ()
                 .respondent1DQ()
                 .respondent1(PartyBuilder.builder().individual()
