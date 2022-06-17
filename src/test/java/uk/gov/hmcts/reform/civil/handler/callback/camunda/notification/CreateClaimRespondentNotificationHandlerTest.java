@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
 import java.util.Map;
@@ -47,8 +46,7 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
     private NotificationsProperties notificationsProperties;
     @MockBean
     private FeatureToggleService featureToggleService;
-    @MockBean
-    private DeadlinesCalculator deadlinesCalculator;
+
     @Autowired
     private CreateClaimRespondentNotificationHandler handler;
 

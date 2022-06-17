@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
 import java.util.List;
@@ -45,7 +44,6 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final ObjectMapper objectMapper;
-    private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -139,10 +137,9 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIM_NOTIFICATION_DEADLINE,
-            formatLocalDate(deadlinesCalculator.plus14DaysAt4pmDeadline(
-                caseData.getIssueDate()
-                    .atTime(23, 59))
-                    .toLocalDate(), DATE),
+            formatLocalDate(caseData
+                                .getClaimDetailsNotificationDeadline()
+                                .toLocalDate(), DATE),
             PARTY_REFERENCES, buildPartiesReferences(caseData)
         );
     }
