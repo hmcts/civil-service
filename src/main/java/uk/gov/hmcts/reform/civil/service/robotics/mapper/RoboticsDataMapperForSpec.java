@@ -75,7 +75,7 @@ public class RoboticsDataMapperForSpec {
                                 .orElse(null);
                     builder.breathingSpace(RPABreathingSpace.builder()
                                                .type(type)
-                                               .endDate(null)
+                                               .endDate(endDate)
                                                .build());
                 });
         }
