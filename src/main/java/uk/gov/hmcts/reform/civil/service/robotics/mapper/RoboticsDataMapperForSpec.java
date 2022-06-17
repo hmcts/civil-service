@@ -209,7 +209,7 @@ public class RoboticsDataMapperForSpec {
     }
 
     private List<LitigiousParty> buildLitigiousParties(CaseData caseData) {
-        return List.of(
+        var respondentParties = new ArrayList<>(List.of(
             buildLitigiousParty(
                 caseData.getApplicant1(),
                 caseData.getApplicant1LitigationFriend(),
@@ -225,8 +225,20 @@ public class RoboticsDataMapperForSpec {
                 "Defendant",
                 RESPONDENT_ID,
                 RESPONDENT_SOLICITOR_ID
-            )
-        );
+            )));
+
+        if (caseData.getRespondent2() != null) {
+            respondentParties.add(
+                buildLitigiousParty(
+                caseData.getRespondent2(),
+                caseData.getRespondent2LitigationFriend(),
+                caseData.getRespondent2OrganisationPolicy(),
+                "Defendant",
+                RESPONDENT_ID,
+                RESPONDENT_SOLICITOR_ID
+            ));
+        }
+        return respondentParties;
     }
 
     private LitigiousParty buildLitigiousParty(
