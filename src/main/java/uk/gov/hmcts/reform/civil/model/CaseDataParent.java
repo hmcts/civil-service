@@ -74,6 +74,8 @@ public class CaseDataParent implements MappableObject {
     private final Respondent1DebtLRspec specDefendant2Debts;
     private final Respondent1SelfEmploymentLRspec specDefendant2SelfEmploymentDetails;
     private final RespondentResponseTypeSpec respondentClaimResponseTypeForSpecGeneric;
+    private final RespondentResponseTypeSpec respondent1ClaimResponseTestForSpec;
+    private final RespondentResponseTypeSpec respondent2ClaimResponseTestForSpec;
     private final YesOrNo respondent1CourtOrderPaymentOption;
     private final List<Element<Respondent1CourtOrderDetails>> respondent1CourtOrderDetails;
     private final YesOrNo respondent2CourtOrderPaymentOption;
