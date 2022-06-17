@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataMaxEdgeCasesBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataMinEdgeCasesBuilder;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.civil.service.CustomScopeIdamTokenGeneratorService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -70,6 +71,8 @@ class RpaContinuousFeedConsumerTest extends BaseRpaTest {
     PrdAdminUserConfiguration userConfig;
     @MockBean
     private Time time;
+    @MockBean
+    CustomScopeIdamTokenGeneratorService tokenGenerator;
 
     LocalDateTime localDateTime;
 
