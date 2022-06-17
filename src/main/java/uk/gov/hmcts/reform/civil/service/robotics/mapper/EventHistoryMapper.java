@@ -149,10 +149,22 @@ public class EventHistoryMapper {
                         buildRespondentDivergentResponse(builder, caseData);
                         break;
                     case FULL_DEFENCE_NOT_PROCEED:
-                        buildFullDefenceNotProceed(builder, caseData);
+                        buildNotProceed(builder, caseData);
                         break;
                     case FULL_DEFENCE_PROCEED:
-                        buildFullDefenceProceed(builder, caseData);
+                        buildProceed(builder, caseData);
+                        break;
+                    case PART_ADMIT_PROCEED:
+                    case FULL_ADMIT_PROCEED:
+                        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+                            buildProceed(builder, caseData);
+                        }
+                        break;
+                    case PART_ADMIT_NOT_PROCEED:
+                    case FULL_ADMIT_NOT_PROCEED:
+                        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+                            buildNotProceed(builder, caseData);
+                        }
                         break;
                     case TAKEN_OFFLINE_BY_STAFF:
                         buildTakenOfflineByStaff(builder, caseData);
@@ -748,7 +760,7 @@ public class EventHistoryMapper {
             ));
     }
 
-    private void buildFullDefenceProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+    private void buildProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
         List<String> miscEventText = prepMultipartyProceedMiscText(caseData);
 
@@ -920,7 +932,7 @@ public class EventHistoryMapper {
             .orElse("");
     }
 
-    private void buildFullDefenceNotProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+    private void buildNotProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         String miscText = getMultiPartyScenario(caseData).equals(TWO_V_ONE)
             ? "RPA Reason: Claimants intend not to proceed."
             : "RPA Reason: Claimant intends not to proceed.";

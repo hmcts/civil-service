@@ -1359,6 +1359,129 @@ class EventHistoryMapperTest {
         }
 
         @Test
+        void shouldPrepareExpectedEvents_whenClaimFullAdmissionProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullAdmissionSpec()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .applicant1ProceedWithClaim(YES)
+                .build();
+            caseData = caseData.toBuilder()
+                .applicant1ResponseDate(LocalDateTime.now())
+                .build();
+
+            Event expectedReceiptOfAdmission = Event.builder()
+                .eventSequence(4)
+                .eventCode("40")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID("002")
+                .build();
+
+            Event expectedMiscellaneousEvents1 = Event.builder()
+                .eventSequence(5)
+                .eventCode("999")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .eventDetailsText("RPA Reason: Defendant fully admits.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("RPA Reason: Defendant fully admits.")
+                                  .build())
+                .build();
+            Event expectedMiscellaneousEvents2 = Event.builder()
+                .eventSequence(3)
+                .eventCode("999")
+                .dateReceived(caseData.getApplicant1ResponseDate())
+                .eventDetailsText("RPA Reason: Claimant proceeds.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("RPA Reason: Claimant proceeds.")
+                                  .build())
+                .build();
+
+            Event replyToDefence = Event.builder()
+                .eventSequence(1)
+                .eventCode("66")
+                .dateReceived(caseData.getApplicant1ResponseDate())
+                .litigiousPartyID("001")
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("receiptOfAdmission").asList()
+                .containsExactly(expectedReceiptOfAdmission);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents2,
+                                 expectedMiscellaneousEvents1);
+            assertThat(eventHistory).extracting("replyToDefence").asList()
+                .containsExactly(replyToDefence);
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "consentExtensionFilingDefence"
+            );
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenClaimFullAdmissionNotProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullAdmissionSpec()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .applicant1ProceedWithClaim(NO)
+                .build();
+            caseData = caseData.toBuilder()
+                .applicant1ResponseDate(LocalDateTime.now())
+                .build();
+
+            Event expectedReceiptOfAdmission = Event.builder()
+                .eventSequence(2)
+                .eventCode("40")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID("002")
+                .build();
+
+            Event expectedMiscellaneousEvents1 = Event.builder()
+                .eventSequence(3)
+                .eventCode("999")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .eventDetailsText("RPA Reason: Defendant fully admits.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("RPA Reason: Defendant fully admits.")
+                                  .build())
+                .build();
+            Event expectedMiscellaneousEvents2 = Event.builder()
+                .eventSequence(1)
+                .eventCode("999")
+                .dateReceived(caseData.getApplicant1ResponseDate())
+                .eventDetailsText("RPA Reason: Claimant intends not to proceed.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("RPA Reason: Claimant intends not to proceed.")
+                                  .build())
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("receiptOfAdmission").asList()
+                .containsExactly(expectedReceiptOfAdmission);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents2,
+                                 expectedMiscellaneousEvents1);
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceFiled",
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "consentExtensionFilingDefence"
+            );
+        }
+
+        @Test
         void shouldPrepareExpectedEvents_when2v1ClaimWithRespondentFullAdmissionToBoth() {
             CaseData caseData = CaseDataBuilder.builder()
                 .setSuperClaimTypeToSpecClaim()

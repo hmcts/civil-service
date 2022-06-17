@@ -1,5 +1,6 @@
 {
   "flagValues": {
-    "specified-lr-journey": true
+    "specified-lr-journey": true,
+    "specified-rpa-continuous-feed": true
   }
 }
