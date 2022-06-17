@@ -357,9 +357,9 @@ public class EventHistoryMapper {
                         .dateReceived(respondentResponseDate)
                         .litigiousPartyID(respondentID)
                         .build());
-                break;
-            default:
                 break;*/
+            default:
+                break;
         }
     }
 
