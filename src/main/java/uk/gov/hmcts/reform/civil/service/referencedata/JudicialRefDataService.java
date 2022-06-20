@@ -3,7 +3,11 @@ package uk.gov.hmcts.reform.civil.service.referencedata;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -35,10 +39,10 @@ public class JudicialRefDataService {
 
         try {
             ResponseEntity<List<JudgeRefData>> responseEntity = restTemplate.exchange(
-                    buildURI(),
-                    HttpMethod.POST,
-                    request,
-                    new ParameterizedTypeReference<List<JudgeRefData>>() {});
+                buildURI(),
+                HttpMethod.POST,
+                request,
+                new ParameterizedTypeReference<List<JudgeRefData>>() {});
 
             return responseEntity.getBody();
         } catch (Exception e) {
