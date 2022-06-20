@@ -333,7 +333,8 @@
         "receiptOfPartAdmission",
         "receiptOfAdmission",
         "replyToDefence",
-        "directionsQuestionnaireFiled"
+        "directionsQuestionnaireFiled",
+        "generalFormOfApplication"
       ],
       "properties": {
         "miscellaneous": {
