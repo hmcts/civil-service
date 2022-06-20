@@ -68,6 +68,7 @@ public class LocationRefDataService {
     }
 
     private String getDisplayEntry(LocationRefData location) {
-        return concat(concat(location.getSiteName(), " - "), location.getPostcode());
+        return concat(concat(concat(location.getSiteName(), " - "), concat(location.getCourtAddress(), " - ")),
+                      location.getPostcode());
     }
 }
