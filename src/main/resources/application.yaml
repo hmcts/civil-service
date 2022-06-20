@@ -188,8 +188,6 @@ launchdarkly:
   offline-mode: false
   env: ${LAUNCH_DARKLY_ENV:default}
 
-auto-assign-caa: true
-
 testing:
   support:
     enabled: ${TESTING_SUPPORT_ENABLED:false}
@@ -210,8 +208,6 @@ spring:
     username: ${CMC_DB_USERNAME:ccd}
     password: ${CMC_DB_PASSWORD:ccd}
     url: jdbc:postgresql://${CMC_DB_HOST:localhost}:${CMC_DB_PORT:5050}/${CMC_DB_NAME:cmc}
-
-auto-assign-caa: false
 
 feign:
   client:
