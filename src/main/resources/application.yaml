@@ -303,7 +303,7 @@ genApp:
   lrd:
     url: http://fake-rd-location-ref-api
   jrd:
-    url: http://fake-rd-judicial-ref-api
+    url: http://fake-rd-judicial-api
 
 payments:
   api:
