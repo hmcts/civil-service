@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
-import uk.gov.hmcts.reform.civil.config.AutomaticallyAssignCaseToCaaConfiguration;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -24,21 +23,11 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.prd.model.ProfessionalUsersEntityResponse;
-import uk.gov.hmcts.reform.prd.model.ProfessionalUsersResponse;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -54,12 +43,6 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private CoreCaseUserService coreCaseUserService;
-
-    @MockBean
-    private OrganisationService organisationService;
-
-    @MockBean
-    private AutomaticallyAssignCaseToCaaConfiguration automaticallyAssignCaseToCaaConfiguration;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -95,51 +78,20 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAssignCaseToApplicantSolicitorOneAndRespondentOrgCaaAndRemoveCreator() {
-            when(automaticallyAssignCaseToCaaConfiguration.isAssignCaseToCaa())
-                .thenReturn(true);
-
-            when(organisationService.findUsersInOrganisation("OrgId2"))
-                .thenReturn(Optional.of(buildPrdResponse()));
-
             assignCaseToUserHandler.handle(params);
 
             verifyApplicantSolicitorOneRoles();
-
-            verify(coreCaseUserService).assignCase(
-                caseData.getCcdCaseReference().toString(),
-                "12345678",
-                "OrgId2",
-                CaseRole.RESPONDENTSOLICITORONE
-            );
-
         }
 
         @Test
         void shouldAssignCaseToApplicantSolicitorOneAndRemoveCreator() {
-            when(automaticallyAssignCaseToCaaConfiguration.isAssignCaseToCaa())
-                .thenReturn(false);
-
             assignCaseToUserHandler.handle(params);
 
             verifyApplicantSolicitorOneRoles();
-
-            verify(coreCaseUserService, never()).assignCase(
-                caseData.getCcdCaseReference().toString(),
-                "12345678",
-                "OrgId2",
-                CaseRole.RESPONDENTSOLICITORONE
-            );
-
         }
 
         @Test
         void shouldRemoveSubmitterIdAfterCaseAssignment() {
-            when(automaticallyAssignCaseToCaaConfiguration.isAssignCaseToCaa())
-                .thenReturn(true);
-
-            when(organisationService.findUsersInOrganisation(anyString()))
-                .thenReturn(Optional.of(buildPrdResponse()));
-
             AboutToStartOrSubmitCallbackResponse response
                 = (AboutToStartOrSubmitCallbackResponse) assignCaseToUserHandler.handle(params);
 
@@ -174,20 +126,9 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAssignCaseToApplicantSolicitorOneAndRespondentOrgCaaAndRemoveCreator() {
-            when(automaticallyAssignCaseToCaaConfiguration.isAssignCaseToCaa())
-                .thenReturn(true);
-
             assignCaseToUserHandler.handle(params);
 
             verifyApplicantSolicitorOneRoles();
-
-            verify(coreCaseUserService, never()).assignCase(
-                caseData.getCcdCaseReference().toString(),
-                "12345678",
-                "OrgId2",
-                CaseRole.RESPONDENTSOLICITORONE
-            );
-
         }
     }
 
@@ -217,22 +158,10 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
             });
 
             params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
-            when(automaticallyAssignCaseToCaaConfiguration.isAssignCaseToCaa())
-                .thenReturn(true);
-
-            when(organisationService.findUsersInOrganisation("OrgId2"))
-                .thenReturn(Optional.of(buildPrdResponse()));
 
             assignCaseToUserHandler.handle(params);
 
             verifyApplicantSolicitorOneRoles();
-
-            verify(coreCaseUserService).assignCase(
-                caseData.getCcdCaseReference().toString(),
-                "12345678",
-                "OrgId2",
-                CaseRole.RESPONDENTSOLICITORONE
-            );
         }
 
         @Test
@@ -264,32 +193,9 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
             params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
 
-            when(automaticallyAssignCaseToCaaConfiguration.isAssignCaseToCaa())
-                .thenReturn(true);
-
-            when(organisationService.findUsersInOrganisation("OrgId2"))
-                .thenReturn(Optional.of(buildPrdResponse()));
-
-            when(organisationService.findUsersInOrganisation("OrgId3"))
-                .thenReturn(Optional.of(buildPrdResponseForOrg3()));
-
             assignCaseToUserHandler.handle(params);
 
             verifyApplicantSolicitorOneRoles();
-
-            verify(coreCaseUserService).assignCase(
-                caseData.getCcdCaseReference().toString(),
-                "12345678",
-                "OrgId2",
-                CaseRole.RESPONDENTSOLICITORONE
-            );
-
-            verify(coreCaseUserService).assignCase(
-                caseData.getCcdCaseReference().toString(),
-                "gggggggg",
-                "OrgId3",
-                CaseRole.RESPONDENTSOLICITORTWO
-            );
         }
 
         @Test
@@ -318,76 +224,10 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
             params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
 
-            when(automaticallyAssignCaseToCaaConfiguration.isAssignCaseToCaa())
-                .thenReturn(true);
-
-            when(organisationService.findUsersInOrganisation("OrgId2"))
-                .thenReturn(Optional.of(buildPrdResponse()));
-
             assignCaseToUserHandler.handle(params);
 
             verifyApplicantSolicitorOneRoles();
-
-            verify(coreCaseUserService).assignCase(
-                caseData.getCcdCaseReference().toString(),
-                "12345678",
-                "OrgId2",
-                CaseRole.RESPONDENTSOLICITORONE
-            );
-
-            verify(coreCaseUserService, never()).assignCase(
-                caseData.getCcdCaseReference().toString(),
-                "gggggggg",
-                "OrgId3",
-                CaseRole.RESPONDENTSOLICITORTWO
-            );
         }
-
-        private ProfessionalUsersEntityResponse buildPrdResponseForOrg3() {
-            List<ProfessionalUsersResponse> users = new ArrayList<>();
-            users.add(ProfessionalUsersResponse.builder()
-                          .userIdentifier("gggggggg")
-                          .email("hmcts.civil+organisation.3.CAA@gmail.com")
-                          .roles(Arrays.asList("caseworker", "caseworker-civil", "pui-caa"))
-                          .build());
-
-            users.add(ProfessionalUsersResponse.builder()
-                          .email("hmcts.civil+organisation.3.solicitor.1@gmail.com")
-                          .userIdentifier("aaaaaaaa")
-                          .roles(Arrays.asList("caseworker", "caseworker-civil", "caseworker-civil-solicitor"))
-                          .build());
-
-            return ProfessionalUsersEntityResponse.builder()
-                .organisationIdentifier("OrgId3")
-                .users(users)
-                .build();
-        }
-    }
-
-    private ProfessionalUsersEntityResponse buildPrdResponse() {
-        List<ProfessionalUsersResponse> users = new ArrayList<>();
-        users.add(ProfessionalUsersResponse.builder()
-                      .userIdentifier("12345678")
-                      .email("hmcts.civil+organisation.2.CAA@gmail.com")
-                      .roles(Arrays.asList("caseworker", "caseworker-civil", "pui-caa"))
-                      .build());
-
-        users.add(ProfessionalUsersResponse.builder()
-                      .email("hmcts.civil+organisation.2.superuser@gmail.com")
-                      .userIdentifier("abcdefg")
-                      .roles(Arrays.asList("caseworker", "caseworker-civil", "pui-organisation-manager"))
-                      .build());
-
-        users.add(ProfessionalUsersResponse.builder()
-                      .email("hmcts.civil+organisation.2.solicitor.1@gmail.com")
-                      .userIdentifier("a1b2c3")
-                      .roles(Arrays.asList("caseworker", "caseworker-civil", "caseworker-civil-solicitor"))
-                      .build());
-
-        return ProfessionalUsersEntityResponse.builder()
-            .organisationIdentifier("OrgId2")
-            .users(users)
-            .build();
     }
 
     private void verifyApplicantSolicitorOneRoles() {
