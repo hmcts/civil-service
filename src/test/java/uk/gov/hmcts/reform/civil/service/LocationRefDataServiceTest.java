@@ -62,53 +62,83 @@ class LocationRefDataServiceTest {
 
     private ResponseEntity<List<LocationRefData>> getAllLocationsRefDataResponse() {
         List<LocationRefData> responseData = new ArrayList<LocationRefData>();
-        responseData.add(getLocationRefData("site_name_01", "London", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_02", "London", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_03", "Midlands", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_04", "Midlands", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_05", "North East", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_06", "South East", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_07", "North West", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_08", "South West", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_09", "Wales", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_10", "London", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_11", "Scotland", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_12", "Scotland", "AA0 0BB"));
+        responseData.add(getLocationRefData("site_name_01", "London", "AA0 0BB",
+                                            "court address 1111"));
+        responseData.add(getLocationRefData("site_name_02", "London", "AA0 0BB",
+                                            "court address 2222"));
+        responseData.add(getLocationRefData("site_name_03", "Midlands", "AA0 0BB",
+                                            "court address 3333"));
+        responseData.add(getLocationRefData("site_name_04", "Midlands", "AA0 0BB",
+                                            "court address 4444"));
+        responseData.add(getLocationRefData("site_name_05", "North East", "AA0 0BB",
+                                            "court address 5555"));
+        responseData.add(getLocationRefData("site_name_06", "South East", "AA0 0BB",
+                                            "court address 6666"));
+        responseData.add(getLocationRefData("site_name_07", "North West", "AA0 0BB",
+                                            "court address 7777"));
+        responseData.add(getLocationRefData("site_name_08", "South West", "AA0 0BB",
+                                            "court address 8888"));
+        responseData.add(getLocationRefData("site_name_09", "Wales", "AA0 0BB",
+                                            "court address 9999"));
+        responseData.add(getLocationRefData("site_name_10", "London", "AA0 0BB",
+                                            "court address 1001"));
+        responseData.add(getLocationRefData("site_name_11", "Scotland", "AA0 0BB",
+                                            "court address 1011"));
+        responseData.add(getLocationRefData("site_name_12", "Scotland", "AA0 0BB",
+                                            "court address 1012"));
 
         return new ResponseEntity<List<LocationRefData>>(responseData, OK);
     }
 
     private ResponseEntity<List<LocationRefData>> getNonScotlandLocationsRefDataResponse() {
         List<LocationRefData> responseData = new ArrayList<LocationRefData>();
-        responseData.add(getLocationRefData("site_name_01", "London", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_02", "London", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_03", "Midlands", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_04", "Midlands", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_05", "North East", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_06", "South East", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_07", "North West", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_08", "South West", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_09", "Wales", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_10", "London", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_11", "Midlands", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_12", "Wales", "AA0 0BB"));
+        responseData.add(getLocationRefData("site_name_01", "London", "AA0 0BB",
+                                            "court address 1111"));
+        responseData.add(getLocationRefData("site_name_02", "London", "AA0 0BB",
+                                            "court address 2222"));
+        responseData.add(getLocationRefData("site_name_03", "Midlands", "AA0 0BB",
+                                            "court address 3333"));
+        responseData.add(getLocationRefData("site_name_04", "Midlands", "AA0 0BB",
+                                            "court address 4444"));
+        responseData.add(getLocationRefData("site_name_05", "North East", "AA0 0BB",
+                                            "court address 5555"));
+        responseData.add(getLocationRefData("site_name_06", "South East", "AA0 0BB",
+                                            "court address 6666"));
+        responseData.add(getLocationRefData("site_name_07", "North West", "AA0 0BB",
+                                            "court address 7777"));
+        responseData.add(getLocationRefData("site_name_08", "South West", "AA0 0BB",
+                                            "court address 8888"));
+        responseData.add(getLocationRefData("site_name_09", "Wales", "AA0 0BB",
+                                            "court address 9999"));
+        responseData.add(getLocationRefData("site_name_10", "London", "AA0 0BB",
+                                            "court address 1001"));
+        responseData.add(getLocationRefData("site_name_11", "Midlands", "AA0 0BB",
+                                            "court address 1011"));
+        responseData.add(getLocationRefData("site_name_12", "Wales", "AA0 0BB",
+                                            "court address 1012"));
 
         return new ResponseEntity<List<LocationRefData>>(responseData, OK);
     }
 
     private ResponseEntity<List<LocationRefData>> getOnlyScotlandLocationsRefDataResponse() {
         List<LocationRefData> responseData = new ArrayList<LocationRefData>();
-        responseData.add(getLocationRefData("site_name_01", "Scotland", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_02", "Scotland", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_03", "Scotland", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_04", "Scotland", "AA0 0BB"));
-        responseData.add(getLocationRefData("site_name_05", "Scotland", "AA0 0BB"));
+        responseData.add(getLocationRefData("site_name_01", "Scotland", "AA0 0BB",
+                                            "court address 1111"));
+        responseData.add(getLocationRefData("site_name_02", "Scotland", "AA0 0BB",
+                                            "court address 2222"));
+        responseData.add(getLocationRefData("site_name_03", "Scotland", "AA0 0BB",
+                                            "court address 3333"));
+        responseData.add(getLocationRefData("site_name_04", "Scotland", "AA0 0BB",
+                                            "court address 4444"));
+        responseData.add(getLocationRefData("site_name_05", "Scotland", "AA0 0BB",
+                                            "court address 5555"));
 
         return new ResponseEntity<List<LocationRefData>>(responseData, OK);
     }
 
-    private LocationRefData getLocationRefData(String siteName, String region, String postcode) {
-        return LocationRefData.builder().siteName(siteName).region(region).postcode(postcode).build();
+    private LocationRefData getLocationRefData(String siteName, String region, String postcode, String courtAddress) {
+        return LocationRefData.builder().siteName(siteName).region(region)
+            .postcode(postcode).courtAddress(courtAddress).build();
     }
 
     @Test
@@ -124,9 +154,16 @@ class LocationRefDataServiceTest {
         List<String> courtLocations = refDataService.getCourtLocations("user_token");
 
         assertThat(courtLocations.size()).isEqualTo(10);
-        assertThat(courtLocations).containsOnly("site_name_01 - AA0 0BB", "site_name_02 - AA0 0BB",
-                "site_name_03 - AA0 0BB", "site_name_04 - AA0 0BB", "site_name_05 - AA0 0BB", "site_name_06 - AA0 0BB",
-                "site_name_07 - AA0 0BB", "site_name_08 - AA0 0BB", "site_name_09 - AA0 0BB", "site_name_10 - AA0 0BB");
+        assertThat(courtLocations).containsOnly("site_name_01 - court address 1111 - AA0 0BB",
+                                                "site_name_02 - court address 2222 - AA0 0BB",
+                                                "site_name_03 - court address 3333 - AA0 0BB",
+                                                "site_name_04 - court address 4444 - AA0 0BB",
+                                                "site_name_05 - court address 5555 - AA0 0BB",
+                                                "site_name_06 - court address 6666 - AA0 0BB",
+                                                "site_name_07 - court address 7777 - AA0 0BB",
+                                                "site_name_08 - court address 8888 - AA0 0BB",
+                                                "site_name_09 - court address 9999 - AA0 0BB",
+                                                "site_name_10 - court address 1001 - AA0 0BB");
         verify(lrdConfiguration, times(1)).getUrl();
         verify(lrdConfiguration, times(1)).getEndpoint();
         assertThat(uriCaptor.getValue().toString())
@@ -150,10 +187,18 @@ class LocationRefDataServiceTest {
         List<String> courtLocations = refDataService.getCourtLocations("user_token");
 
         assertThat(courtLocations.size()).isEqualTo(12);
-        assertThat(courtLocations).containsOnly("site_name_01 - AA0 0BB", "site_name_02 - AA0 0BB",
-                "site_name_03 - AA0 0BB", "site_name_04 - AA0 0BB", "site_name_05 - AA0 0BB", "site_name_06 - AA0 0BB",
-                "site_name_07 - AA0 0BB", "site_name_08 - AA0 0BB", "site_name_09 - AA0 0BB", "site_name_10 - AA0 0BB",
-                "site_name_11 - AA0 0BB", "site_name_12 - AA0 0BB");
+        assertThat(courtLocations).containsOnly("site_name_01 - court address 1111 - AA0 0BB",
+                                                "site_name_02 - court address 2222 - AA0 0BB",
+                                                "site_name_03 - court address 3333 - AA0 0BB",
+                                                "site_name_04 - court address 4444 - AA0 0BB",
+                                                "site_name_05 - court address 5555 - AA0 0BB",
+                                                "site_name_06 - court address 6666 - AA0 0BB",
+                                                "site_name_07 - court address 7777 - AA0 0BB",
+                                                "site_name_08 - court address 8888 - AA0 0BB",
+                                                "site_name_09 - court address 9999 - AA0 0BB",
+                                                "site_name_10 - court address 1001 - AA0 0BB",
+                                                "site_name_11 - court address 1011 - AA0 0BB",
+                                                "site_name_12 - court address 1012 - AA0 0BB");
         verify(lrdConfiguration, times(1)).getUrl();
         verify(lrdConfiguration, times(1)).getEndpoint();
         assertThat(uriCaptor.getValue().toString())
