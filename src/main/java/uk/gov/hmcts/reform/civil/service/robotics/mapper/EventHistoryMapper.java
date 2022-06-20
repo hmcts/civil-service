@@ -50,15 +50,7 @@ import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenari
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CONSENT_EXTENSION_FILING_DEFENCE;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_AND_COUNTER_CLAIM;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.REPLY_TO_DEFENCE;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.*;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT2_ID;
@@ -118,7 +110,12 @@ public class EventHistoryMapper {
                         buildTakenOfflineAfterClaimNotified(builder, caseData);
                         break;
                     case CLAIM_DETAILS_NOTIFIED:
-                        buildClaimDetailsNotified(builder, caseData);
+                        if(!caseData.getGeneralApplications().isEmpty()){
+                            buildGeneralApplicationRPA(builder, caseData);
+                        }else{
+                            buildClaimDetailsNotified(builder, caseData);
+                        }
+
                         break;
                     case NOTIFICATION_ACKNOWLEDGED:
                         buildAcknowledgementOfServiceReceived(builder, caseData);
@@ -189,6 +186,7 @@ public class EventHistoryMapper {
                     case TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE:
                         buildClaimTakenOfflinePastApplicantResponse(builder, caseData);
                         break;
+
                     default:
                         break;
                 }
@@ -517,6 +515,20 @@ public class EventHistoryMapper {
         }
     }
 
+    private void buildGeneralApplicationRPA(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        String miscText = "APPLICATION TO " + caseData.getClaimType();
+        builder.miscellaneous(
+            Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(GENERAL_FORM_OF_APPLICATION.getCode())
+                .dateReceived(caseData.getClaimDetailsNotificationDate())
+                .eventDetailsText(miscText)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(miscText)
+                                  .build())
+                .build());
+    }
+
     private boolean rpaEnabledForClaim(CaseData caseData) {
         if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
             return featureToggleService.isSpecRpaContinuousFeedEnabled();
@@ -633,6 +645,7 @@ public class EventHistoryMapper {
         currentSequence = getCurrentSequence(history.getReceiptOfAdmission(), currentSequence);
         currentSequence = getCurrentSequence(history.getReplyToDefence(), currentSequence);
         currentSequence = getCurrentSequence(history.getDirectionsQuestionnaireFiled(), currentSequence);
+        currentSequence = getCurrentSequence(history.getGeneralFormOfApplication(), currentSequence);
         return currentSequence + 1;
     }
 
