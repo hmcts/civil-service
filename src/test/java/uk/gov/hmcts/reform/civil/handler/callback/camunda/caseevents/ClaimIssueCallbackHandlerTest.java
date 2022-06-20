@@ -63,6 +63,7 @@ class ClaimIssueCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getClaimNotificationDeadline()).isEqualTo(deadline);
+        assertThat(updatedData.getNextDeadline()).isEqualTo(deadline.toLocalDate());
     }
 
     @Test

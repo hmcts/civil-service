@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getDaysToAddToDeadline;
 
@@ -55,5 +57,12 @@ public class DeadlinesCalculator {
 
     private boolean is4pmOrAfter(LocalDateTime dateOfService) {
         return dateOfService.getHour() >= 16;
+    }
+
+    public LocalDateTime nextDeadline(List<LocalDateTime> deadlines) {
+        return deadlines.stream()
+            .filter(Objects::nonNull)
+            .min(LocalDateTime::compareTo)
+            .orElse(null);
     }
 }

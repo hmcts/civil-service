@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -37,19 +38,21 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
 public class DefaultJudgementSpecHandler extends CallbackHandler {
 
-    public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment until %s";
-
+    public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment until %s.";
     public static final String JUDGMENT_GRANTED_HEADER = "# Default Judgment Granted ";
     public static final String JUDGMENT_GRANTED = "<br /><a href=\"%s\" target=\"_blank\">Download  default judgment</a> "
         + "%n%n The defendant will be served the Default Judgment.";
     public static final String JUDGMENT_REQUESTED_HEADER = "# Default judgment requested";
     public static final String JUDGMENT_REQUESTED = "A default judgment has been sent to %s. "
         + "The claim will now progress offline (on paper)";
+    public static final String BREATHING_SPACE = "Default judgment cannot be applied for while claim is in"
+        + " breathing space";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
     private static final int COMMENCEMENT_FIXED_COST_60 = 60;
     private static final int COMMENCEMENT_FIXED_COST_80 = 80;
@@ -67,6 +70,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility,
             callbackKey(MID, "showCertifyStatementSpec"), this::checkStatus,
+            callbackKey(MID, "acceptCPRSpec"), this::acceptCPRSpec,
             callbackKey(MID, "claimPartialPayment"), this::partialPayment,
             callbackKey(MID, "repaymentBreakdown"), this::repaymentBreakdownCalculate,
             callbackKey(MID, "repaymentTotal"), this::overallTotalAndDate,
@@ -126,15 +130,22 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
             String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
             errors.add(format(NOT_VALID_DJ, formattedDeadline));
         }
+
+        if (caseData.getBreathing() != null && caseData.getBreathing().getEnter() != null) {
+            errors.add(BREATHING_SPACE);
+
+        }
+        if (caseData.getBreathing().getLift() != null && (caseData.getBreathing().getLift()
+            .getExpectedEnd().isBefore(LocalDate.now()) || caseData.getBreathing().getLift()
+            .getExpectedEnd().isEqual(LocalDate.now()))) {
+            errors.remove(BREATHING_SPACE);
+        }
+
         List<String> listData = new ArrayList<>();
 
-        listData.add(caseData.getRespondent1().getIndividualFirstName()
-                         + " "
-                         + caseData.getRespondent1().getIndividualLastName());
+        listData.add(getPartyNameBasedOnType(caseData.getRespondent1()));
         if (nonNull(caseData.getRespondent2())) {
-            listData.add(caseData.getRespondent2().getIndividualFirstName()
-                             + " "
-                             + caseData.getRespondent2().getIndividualLastName());
+            listData.add(getPartyNameBasedOnType(caseData.getRespondent2()));
             listData.add("Both Defendants");
             caseDataBuilder.defendantDetailsSpec(DynamicList.fromList(listData));
         }
@@ -166,6 +177,20 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         caseDataBuilder.currentDefendantName(currentDefendantName);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse acceptCPRSpec(CallbackParams callbackParams) {
+        List<String> listErrors = new ArrayList<>();
+
+        var acceptance2DefSpec = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance2Def");
+        var acceptanceSpec = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance");
+        if (Objects.isNull(acceptanceSpec) && Objects.isNull(acceptance2DefSpec)) {
+            listErrors.add("To apply for default judgment, all of the statements must apply to the defendant "
+                           + "- if they do not apply, close this page and apply for default judgment when they do");
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(listErrors)
             .build();
     }
 
