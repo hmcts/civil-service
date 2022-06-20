@@ -48,7 +48,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
-import uk.gov.hmcts.reform.civil.service.referencedata.JudicialRefDataService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
@@ -95,7 +94,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
-    private final JudicialRefDataService judicialRefDataService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -547,11 +545,5 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
         return locationRefDataService.getCourtLocations(authToken);
-    }
-
-    private List<JudgeRefData> fetchJudicialData(CallbackParams callbackParams, String searchString) {
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-
-        return judicialRefDataService.getJudgeReferenceData(searchString, authToken);
     }
 }
