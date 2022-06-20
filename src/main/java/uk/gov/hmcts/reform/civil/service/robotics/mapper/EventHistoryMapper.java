@@ -544,7 +544,7 @@ public class EventHistoryMapper {
 
     private void buildBreathingSpace(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         String detailsText;
-        String miscText = "";
+        String miscText;
         List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
         if (caseData.getBreathing().getEnter() != null) {
             detailsText = "Breathing space reference " + caseData.getBreathing().getEnter().getReference()
