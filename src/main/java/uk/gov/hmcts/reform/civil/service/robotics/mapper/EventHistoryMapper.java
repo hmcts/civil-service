@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.model.ClaimantResponseDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -20,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
@@ -27,6 +30,7 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,10 +55,14 @@ import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenari
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_ENTERED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_LIFTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CONSENT_EXTENSION_FILING_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_AND_COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_BREATHING_SPACE_ENTERED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_BREATHING_SPACE_LIFTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
@@ -80,6 +88,10 @@ public class EventHistoryMapper {
     private final FeatureToggleService featureToggleService;
     private final EventHistorySequencer eventHistorySequencer;
     private final Time time;
+    private final String BS_EVENT_DETAILS_REFERENCE = "Breathing space reference";
+    private final String BS_EVENT_DETAILS_START_DATE = "actual start date";
+    private final String BS_EVENT_DETAILS_END_DATE = "actual end date";
+
 
     public EventHistory buildEvents(CaseData caseData) {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
@@ -195,8 +207,100 @@ public class EventHistoryMapper {
         buildRespondent1LitigationFriendEvent(builder, caseData);
         buildRespondent2LitigationFriendEvent(builder, caseData);
         buildCaseNotesEvents(builder, caseData);
+        if(null != caseData.getBreathing()) {
+            if(null != caseData.getBreathing().getEnter() && null == caseData.getBreathing().getLift()) {
+                if(BreathingSpaceType.STANDARD.equals(caseData.getBreathing().getEnter().getType())) {
+                    buildBreathingSpaceEvent(builder, caseData, BREATHING_SPACE_ENTERED, "Enter");
+                } else if(BreathingSpaceType.MENTAL_HEALTH.equals(caseData.getBreathing().getEnter().getType())){
+                    buildBreathingSpaceEvent(builder, caseData,
+                                             MENTAL_HEALTH_BREATHING_SPACE_ENTERED, "Enter");
+                }
+            } else if(null != caseData.getBreathing().getLift()) {
+                if(BreathingSpaceType.STANDARD.equals(caseData.getBreathing().getEnter().getType())) {
+                    buildBreathingSpaceEvent(builder, caseData, BREATHING_SPACE_LIFTED, "Lifted");
+                } else if(BreathingSpaceType.MENTAL_HEALTH.equals(caseData.getBreathing().getEnter().getType())){
+                    buildBreathingSpaceEvent(builder, caseData, MENTAL_HEALTH_BREATHING_SPACE_LIFTED, "Lifted");
+                }
+            }
+        }
 
         return eventHistorySequencer.sortEvents(builder.build());
+    }
+
+    private void buildBreathingSpaceEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
+                                          EventType eventType, String bsStatus) {
+        String eventDetails = null;
+        if (caseData.getBreathing().getEnter().getReference() != null) {
+            eventDetails = eventDetails + BS_EVENT_DETAILS_REFERENCE + " "
+                + caseData.getBreathing().getEnter().getReference() + ",";
+        }
+
+        if(bsStatus.equals("Enter")) {
+            if (caseData.getBreathing().getEnter().getStart() != null) {
+                if (eventDetails == null) {
+                    eventDetails = StringUtils.capitalize(BS_EVENT_DETAILS_START_DATE) + " "
+                        + caseData.getBreathing().getEnter().getStart();
+                } else {
+                    eventDetails = eventDetails + BS_EVENT_DETAILS_START_DATE + " "
+                        + caseData.getBreathing().getEnter().getStart();
+                }
+            }
+        } else if(bsStatus.equals("Lifted")) {
+            if (caseData.getBreathing().getEnter().getStart() != null) {
+                if (eventDetails == null) {
+                    eventDetails = StringUtils.capitalize(BS_EVENT_DETAILS_END_DATE) + " "
+                        + caseData.getBreathing().getEnter().getStart();
+                } else {
+                    eventDetails = eventDetails + BS_EVENT_DETAILS_END_DATE + " "
+                        + caseData.getBreathing().getEnter().getStart();
+                }
+            }
+        }
+
+        switch (eventType) {
+            case BREATHING_SPACE_ENTERED:
+                builder.breathingSpaceEntered((Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(eventType.getCode())
+                    .dateReceived(caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now()))
+                    .eventDetailsText(null)
+                    .eventDetails(EventDetails.builder().miscText(eventDetails)
+                                      .build())
+                    .build()));
+                break;
+            case BREATHING_SPACE_LIFTED:
+                builder.breathingSpaceEntered((Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(eventType.getCode())
+                    .dateReceived(caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now()))
+                    .eventDetailsText(null)
+                    .eventDetails(EventDetails.builder().miscText(eventDetails)
+                                      .build())
+                    .build()));
+                break;
+            case MENTAL_HEALTH_BREATHING_SPACE_ENTERED:
+                builder.breathingSpaceEntered((Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(eventType.getCode())
+                    .dateReceived(caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now()))
+                    .eventDetailsText(null)
+                    .eventDetails(EventDetails.builder().miscText(eventDetails)
+                                      .build())
+                    .build()));
+                break;
+            case MENTAL_HEALTH_BREATHING_SPACE_LIFTED:
+                builder.breathingSpaceEntered((Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(eventType.getCode())
+                    .dateReceived(caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now()))
+                    .eventDetailsText(null)
+                    .eventDetails(EventDetails.builder().miscText(eventDetails)
+                                      .build())
+                    .build()));
+                break;
+            default:
+                break;
+        }
     }
 
     private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
