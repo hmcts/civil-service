@@ -2,7 +2,11 @@ package uk.gov.hmcts.reform.civil.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -21,7 +25,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.OK;
 
 @SpringBootTest(classes = {GeneralAppFeesService.class, RestTemplate.class, GeneralAppFeesConfiguration.class})
