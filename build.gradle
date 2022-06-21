@@ -41,6 +41,7 @@ allprojects {
     reportsDir = file("$buildDir/reports/jacoco")
   }
 
+
 // before committing a change, make sure task still works
   dependencyUpdates {
     def isNonStable = { String version ->
