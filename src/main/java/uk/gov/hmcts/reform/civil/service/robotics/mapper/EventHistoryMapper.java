@@ -12,11 +12,13 @@ import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.model.ClaimantResponseDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -516,26 +518,35 @@ public class EventHistoryMapper {
     }
 
     private void buildGeneralApplicationRPA(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
+        var generalApplications = caseData.getGeneralApplications();
 
-        String miscText = "APPLICATION TO " + caseData.getClaimType();
-        List<Event> rpaGeneralApplication = IntStream.range(0, applicantDetails.size())
-            .mapToObj(index ->
-                          Event.builder()
-                              .eventSequence(prepareEventSequence(builder.build()))
-                              .eventCode(GENERAL_FORM_OF_APPLICATION.getCode())
-                              .dateReceived(applicantDetails.get(index).getResponseDate())
-                              .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
-                              .eventDetailsText(miscText)
-                              .eventDetails(EventDetails.builder()
-                                                .miscText(miscText)
-                                                .build())
-                              .build())
+
+        List<Event> generalApplicationsEvents = IntStream.range(0, generalApplications.size())
+            .mapToObj(index -> {
+                String miscText = "APPLICATION TO " + caseData.getGeneralApplicationsDetails().get(index).getValue().getGeneralApplicationType();
+                return Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(GENERAL_FORM_OF_APPLICATION.getCode())
+                    .dateReceived(caseData.getGeneralApplications().get(index).getValue().getGeneralAppSubmittedDateGAspec())
+                    .litigiousPartyID(getLitigiousPartyIDGA(caseData.getGeneralApplications().get(index)))
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build();
+            })
+
             .collect(Collectors.toList());
-        builder.generalFormOfApplication(rpaGeneralApplication);
 
+        builder.generalFormOfApplication(generalApplicationsEvents);
     }
 
+    private String getLitigiousPartyIDGA(Element<GeneralApplication> generalApplication){
+        if (generalApplication.getValue().getApplicantPartyName() != null){
+            return APPLICANT_ID;
+        }
+        return RESPONDENT_ID;
+    }
     private boolean rpaEnabledForClaim(CaseData caseData) {
         if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
             return featureToggleService.isSpecRpaContinuousFeedEnabled();
