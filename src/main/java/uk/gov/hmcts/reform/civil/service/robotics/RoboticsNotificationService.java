@@ -81,6 +81,7 @@ public class RoboticsNotificationService {
                 RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
+                System.out.println(roboticsCaseData.toJsonString());
             }
             return Optional.of(EmailData.builder()
                 .message(getMessage(caseData, isMultiParty))

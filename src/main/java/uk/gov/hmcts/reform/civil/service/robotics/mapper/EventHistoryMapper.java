@@ -516,17 +516,24 @@ public class EventHistoryMapper {
     }
 
     private void buildGeneralApplicationRPA(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
+
         String miscText = "APPLICATION TO " + caseData.getClaimType();
-        builder.miscellaneous(
-            Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(GENERAL_FORM_OF_APPLICATION.getCode())
-                .dateReceived(caseData.getClaimDetailsNotificationDate())
-                .eventDetailsText(miscText)
-                .eventDetails(EventDetails.builder()
-                                  .miscText(miscText)
-                                  .build())
-                .build());
+        List<Event> rpaGeneralApplication = IntStream.range(0, applicantDetails.size())
+            .mapToObj(index ->
+                          Event.builder()
+                              .eventSequence(prepareEventSequence(builder.build()))
+                              .eventCode(GENERAL_FORM_OF_APPLICATION.getCode())
+                              .dateReceived(applicantDetails.get(index).getResponseDate())
+                              .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
+                              .eventDetailsText(miscText)
+                              .eventDetails(EventDetails.builder()
+                                                .miscText(miscText)
+                                                .build())
+                              .build())
+            .collect(Collectors.toList());
+        builder.generalFormOfApplication(rpaGeneralApplication);
+
     }
 
     private boolean rpaEnabledForClaim(CaseData caseData) {
