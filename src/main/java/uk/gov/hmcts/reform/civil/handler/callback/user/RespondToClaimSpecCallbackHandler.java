@@ -635,7 +635,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 updatedShowConditions.add(RESPONDENT_2_ADMITS_PART_OR_FULL);
             }
         }
-        if (anyAdmission.contains(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+        if (caseData.getShowConditionFlags().contains(CAN_ANSWER_RESPONDENT_2)
+            && anyAdmission.contains(caseData.getRespondent2ClaimResponseTypeForSpec())) {
             updatedShowConditions.add(RESPONDENT_2_ADMITS_PART_OR_FULL);
         }
         if (someoneDisputes(caseData)) {
