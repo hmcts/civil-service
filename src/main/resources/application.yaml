@@ -166,6 +166,7 @@ notifications:
   interimJudgmentRequestedDefendant: "e527acd3-8ed3-4111-b9a6-7e7c31323698"
   interimJudgmentApprovalDefendant: "725dc6ac-34ab-4878-bc88-c3dbd7b9810c"
   interimJudgmentRequested2Defendants: "64584bf4-f17d-416f-9f1b-91b3aa39a69b"
+  standardDirectionOrderDJTemplate: "1518a883-d035-46c8-9dc0-a52538ca4545"
 
 
 sendgrid:
