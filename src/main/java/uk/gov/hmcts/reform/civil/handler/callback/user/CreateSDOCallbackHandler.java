@@ -110,6 +110,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
+    private List<String> fetchLocationData(CallbackParams callbackParams) {
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+
+        return locationRefDataService.getCourtLocations(authToken);
+    }
+
     // This is currently a mid event but once pre states are defined it should be moved to an about to start event.
     // Once it has been moved to an about to start event the following file will need to be updated:
     // FlowStateAllowedEventService.java.
@@ -538,11 +544,5 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 respondent1Name
             );
         }
-    }
-
-    private List<String> fetchLocationData(CallbackParams callbackParams) {
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-
-        return locationRefDataService.getCourtLocations(authToken);
     }
 }
