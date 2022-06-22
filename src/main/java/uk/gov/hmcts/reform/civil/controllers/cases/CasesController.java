@@ -97,7 +97,7 @@ public class CasesController {
         return new ResponseEntity<>(ocmcClaims, HttpStatus.OK);
     }
 
-    @GetMapping(path="/defendant/{submitterId")
+    @GetMapping(path="/defendant/{submitterId}")
     @ApiOperation("Gets basic claim information for defendant")
     public ResponseEntity<List<ClaimInfo>> getClaimsForDefendant(@PathVariable("submitterId") String submitterId,
                                                                  @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
