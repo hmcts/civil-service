@@ -27,7 +27,7 @@ public class ClaimStoreService {
             .claimNumber(cmcClaim.getReferenceNumber())
             .claimantName(cmcClaim.getClaimantName())
             .defendantName(cmcClaim.getDefendantName())
-            .responseDeadLine(cmcClaim.getReferenceNumber())
+            .responseDeadLine(cmcClaim.getResponseDeadline())
             .build()
         ).collect(Collectors.toList());
     }
