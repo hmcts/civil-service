@@ -77,9 +77,7 @@ public class EventHistoryMapper {
 
     public EventHistory buildEvents(CaseData caseData) {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
-            .directionsQuestionnaireFiled(List.of(Event.builder().build()))
-            .generalFormOfApplication(List.of(Event.builder().build()));
-
+            .directionsQuestionnaireFiled(List.of(Event.builder().build()));
 
         stateFlowEngine.evaluate(caseData).getStateHistory()
             .forEach(state -> {
@@ -112,7 +110,7 @@ public class EventHistoryMapper {
                         buildTakenOfflineAfterClaimNotified(builder, caseData);
                         break;
                     case CLAIM_DETAILS_NOTIFIED:
-                        if(!caseData.getGeneralApplications().isEmpty()){
+                        if(caseData.getGeneralApplications() != null){
                             buildGeneralApplicationRPA(builder, caseData);
                         }else{
                             buildClaimDetailsNotified(builder, caseData);
@@ -539,6 +537,7 @@ public class EventHistoryMapper {
             .collect(Collectors.toList());
 
         builder.generalFormOfApplication(generalApplicationsEvents);
+
     }
 
     private String getLitigiousPartyIDGA(Element<GeneralApplication> generalApplication){

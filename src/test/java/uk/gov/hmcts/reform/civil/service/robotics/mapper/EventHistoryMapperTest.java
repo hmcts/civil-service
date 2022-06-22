@@ -4935,4 +4935,92 @@ class EventHistoryMapperTest {
             "directionsQuestionnaireFiled"
         );
     }
+
+    @Nested
+    class GeneralApplicationRpa {
+
+
+        @Test
+        void shouldPrepareMiscellaneousEvent_whenGeneralApplicationLitigiousPartyID002() {
+            String eventDetailText = "APPLICATION TO Strike Out";
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .getGeneralApplication()
+                .getGeneralApplicationsDetails()
+                .build();
+
+
+            Event claimNotifiedEvent = Event.builder()
+                .eventSequence(2)
+                .eventCode("999")
+                .dateReceived(caseData.getClaimNotificationDate())
+                .eventDetailsText("Claimant has notified defendant.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Claimant has notified defendant.")
+                                  .build())
+                .build();
+            Event generalApplicationEvent = Event.builder()
+                .eventSequence(1)
+                .eventCode("136")
+                .litigiousPartyID("002")
+                .dateReceived(caseData.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
+                .eventDetailsText(eventDetailText)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(eventDetailText)
+                                  .build())
+                .build();
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory)
+                .extracting("miscellaneous")
+                .asList()
+                .containsExactly(claimNotifiedEvent);
+
+            assertThat(eventHistory.getGeneralFormOfApplication()).isEqualTo(List.of(generalApplicationEvent));
+
+
+        }
+        @Test
+        void shouldPrepareMiscellaneousEvent_whenGeneralApplicationLitigiousPartyID001() {
+            String eventDetailText = "APPLICATION TO Strike Out";
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .getGeneralApplicationWithPartyName()
+                .getGeneralApplicationsDetails()
+                .build();
+
+            Event claimNotifiedEvent = Event.builder()
+                .eventSequence(2)
+                .eventCode("999")
+                .dateReceived(caseData.getClaimNotificationDate())
+                .eventDetailsText("Claimant has notified defendant.")
+                .eventDetails(EventDetails.builder()
+                                  .miscText("Claimant has notified defendant.")
+                                  .build())
+                .build();
+            Event generalApplicationEvent = Event.builder()
+                .eventSequence(1)
+                .eventCode("136")
+                .litigiousPartyID("001")
+                .dateReceived(caseData.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
+                .eventDetailsText(eventDetailText)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(eventDetailText)
+                                  .build())
+                .build();
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory)
+                .extracting("miscellaneous")
+                .asList()
+                .containsExactly(claimNotifiedEvent);
+
+            assertThat(eventHistory.getGeneralFormOfApplication()).isEqualTo(List.of(generalApplicationEvent));
+
+
+        }
+
+    }
 }
