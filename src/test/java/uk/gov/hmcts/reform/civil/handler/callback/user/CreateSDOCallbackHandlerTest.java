@@ -429,6 +429,50 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackRoadTrafficAccident").extracting("input")
                 .isEqualTo("Photographs and/or a plan of the location of the accident shall be prepared and "
                                + "agreed by the parties.");
+
+            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input1")
+                .isEqualTo("1. If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
+                               + "claimant's disclosure as ordered earlier in this order must include:\n"
+                               + "a. Evidence of all income from all sources for a period of 3 months prior to the "
+                               + "commencement of hire until the earlier of i) 3 months after cessation of hire or ii) "
+                               + "the repair/replacement of the claimant's vehicle;\n"
+                               + "b. Copy statements of all blank, credit care and savings accounts for a period of "
+                               + "3 months prior to the commencement of hire until the earlier of i) 3 months after "
+                               + "cessation of hire or ii) the repair/replacement of the claimant's vehicle;\n"
+                               + "c. Evidence of any loan, overdraft or other credit facilities available to the "
+                               + "claimant");
+            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input2")
+                .isEqualTo("3. The claimant must file and serve a witness statement addressing, (a) need to hire a "
+                               + "replacement vehicle and (b) impecuniosity no later than 4pm on");
+            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date1")
+                .isEqualTo(LocalDate.now().plusWeeks(4).toString());
+            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input3")
+                .isEqualTo("Failure to comply with the paragraph above will result in the claimant being debarred from "
+                               + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
+                               + "save with permission of the Trial Judge.");
+            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input4")
+                .isEqualTo("4. The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
+                               + "later than 4pm on.");
+            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date2")
+                .isEqualTo(LocalDate.now().plusWeeks(6).toString());
+            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input5")
+                .isEqualTo("5. If the parties fail to agree rates subject to liability and/or other issues pursuant to "
+                               + "the paragraph above, each party may rely upon written evidence by way of witness "
+                               + "statement of one witness to provide evidence of basic hire rates available within "
+                               + "the claimant's geographical location, from a mainstream (or, if none available, a "
+                               + "local reputable) supplier. The defendant's evidence to be served by 4pm on");
+            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date3")
+                .isEqualTo(LocalDate.now().plusWeeks(8).toString());
+            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input6")
+                .isEqualTo("and the claimant's evidence in reply if so advised to be served by 4pm on");
+            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date4")
+                .isEqualTo(LocalDate.now().plusWeeks(10).toString());
+            assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input7")
+                .isEqualTo("This witness statement is limited to 10 pages per party (to include any appendices).");
+
+            assertThat(response.getData()).extracting("smallClaimsRoadTrafficAccident").extracting("input")
+                .isEqualTo("Photographs and/or a plan of the location of the accident shall be prepared and "
+                               + "agreed by the parties.");
         }
 
         @Test
