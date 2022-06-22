@@ -31,10 +31,6 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     private final NotificationsProperties notificationsProperties;
     private final ObjectMapper objectMapper;
     private final OrganisationService organisationService;
-    private static final String BOTH_DEFENDANTS = "Both Defendants";
-    private static final String CLAIM_NUMBER = "Claim number";
-    private static final String LEGAL_ORG_DEF = "Defendant LegalOrg Name";
-    private static final String DEFENDANT_NAME = "Defendant Name";
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_INTERIM_JUDGMENT_DEFENDANT);
     private static final String REFERENCE_TEMPLATE_APPROVAL_DEF = "interim-judgment-approval-notification-def-%s";
     private static final String REFERENCE_TEMPLATE_REQUEST_DEF = "interim-judgment-requested-notification-def-%s";
@@ -59,7 +55,9 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
             if (checkDefendantRequested(caseData, caseData.getRespondent1().getPartyName())
                 || checkIfBothDefendants(caseData)) {
                 notificationService.sendMail(caseData.getRespondentSolicitor1EmailAddress(),
-                                             notificationsProperties.getInterimJudgmentRequestedDefendant(),
+                                             checkIfBothDefendants(caseData)
+                                                 ? notificationsProperties.getInterimJudgmentApprovalDefendant()
+                                                 : notificationsProperties.getInterimJudgmentRequestedDefendant(),
                                              addProperties(caseData),
                                              String.format(checkIfBothDefendants(caseData)
                                                                ? REFERENCE_TEMPLATE_APPROVAL_DEF
@@ -71,7 +69,9 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
                 notificationService.sendMail(caseData.getRespondentSolicitor2EmailAddress() != null
                                                  ? caseData.getRespondentSolicitor2EmailAddress() :
                                                  caseData.getRespondentSolicitor1EmailAddress(),
-                                             notificationsProperties.getInterimJudgmentRequestedDefendant(),
+                                             checkIfBothDefendants(caseData)
+                                                 ? notificationsProperties.getInterimJudgmentApprovalDefendant()
+                                                 : notificationsProperties.getInterimJudgmentRequestedDefendant(),
                                              addPropertiesDefendant2(caseData),
                                              String.format(checkIfBothDefendants(caseData)
                                                                ? REFERENCE_TEMPLATE_APPROVAL_DEF
@@ -100,16 +100,16 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     public Map<String, String> addProperties(final CaseData caseData) {
         return Map.of(
             LEGAL_ORG_DEF, getLegalOrganizationName(caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, caseData.getRespondent1().getPartyName()
+            CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
+            DEFENDANT_NAME_INTERIM, caseData.getRespondent1().getPartyName()
         );
     }
 
     public Map<String, String> addPropertiesDefendant2(final CaseData caseData) {
         return Map.of(
             LEGAL_ORG_DEF, getLegalOrganizationNameDefendant2(caseData),
-            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
-            DEFENDANT_NAME, caseData.getRespondent2().getPartyName()
+            CLAIM_NUMBER_INTERIM, caseData.getLegacyCaseReference(),
+            DEFENDANT_NAME_INTERIM, caseData.getRespondent2().getPartyName()
         );
     }
 
