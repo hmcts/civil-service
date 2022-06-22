@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 @Builder
 @AllArgsConstructor
 @EqualsAndHashCode
-public class LiPForm implements MappableObject {
+public class LitigantInPersonForm implements MappableObject {
 
     @JsonProperty("courtseal")
     private final String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR

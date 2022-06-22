@@ -15,13 +15,11 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LiPFormGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGenerator;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 
-import java.lang.reflect.Array;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +28,6 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_CLAIM_FORM;
-import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.LITIGANT_IN_PERSON_FORM;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
@@ -47,7 +44,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
 
     private final CivilDocumentStitchingService civilDocumentStitchingService;
     private final SealedClaimFormGenerator sealedClaimFormGenerator;
-    private final LiPFormGenerator liPFormGenerator;
+    private final LitigantInPersonFormGenerator litigantInPersonFormGenerator;
     private final ObjectMapper objectMapper;
     private final Time time;
 
@@ -80,7 +77,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
         if (caseData.getRespondent1Represented().equals(YesOrNo.NO)
             || caseData.getRespondent2Represented().equals(YesOrNo.NO)) {
 
-            CaseDocument lipForm = liPFormGenerator.generate(
+            CaseDocument lipForm = litigantInPersonFormGenerator.generate(
                 caseDataBuilder.build(),
                 callbackParams.getParams().get(BEARER_TOKEN).toString());
 

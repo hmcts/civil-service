@@ -28,7 +28,7 @@ public enum DocmosisTemplates {
         "CV-SPC-HRN-ENG-01064.docx", "%s_response_sealed_form.pdf"
     ),
     CLAIMANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01062.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    LITIGANT_IN_PERSON_CLAIM_FORM("placeholder-doc-name.docx","%s_litigant_in_person_claim_form_%s.pdf");
+    LIP_CLAIM_FORM("placeholder-doc-name.docx", "litigant_in_person_claim_form_%s.pdf");
 
     private final String template;
     private final String documentTitle;
