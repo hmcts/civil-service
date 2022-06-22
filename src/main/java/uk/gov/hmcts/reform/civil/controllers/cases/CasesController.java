@@ -22,7 +22,11 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
+import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
+import uk.gov.hmcts.reform.cmc.model.ClaimInfo;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
+
+import java.util.List;
 
 import static java.util.Collections.emptyList;
 
@@ -39,6 +43,7 @@ public class CasesController {
     private final RoleAssignmentsService roleAssignmentsService;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final ClaimStoreService claimStoreService;
 
     @GetMapping(path = {
         "/{caseId}",
@@ -82,5 +87,21 @@ public class CasesController {
         log.info("Received ActorId: {}", actorId);
         var roleAssignmentResponse = roleAssignmentsService.getRoleAssignments(actorId, authorization);
         return new ResponseEntity<>(roleAssignmentResponse, HttpStatus.OK);
+    }
+
+    @GetMapping(path="/claimant/{submitterId}")
+    @ApiOperation("Gets basic claim information for claimant")
+    public ResponseEntity<List<ClaimInfo>> getClaimsForClaimant(@PathVariable("submitterId") String submitterId,
+                                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        List<ClaimInfo> ocmcClaims = claimStoreService.getClaimsForClaimant(authorization, submitterId);
+        return new ResponseEntity<>(ocmcClaims, HttpStatus.OK);
+    }
+
+    @GetMapping(path="/defendant/{submitterId")
+    @ApiOperation("Gets basic claim information for defendant")
+    public ResponseEntity<List<ClaimInfo>> getClaimsForDefendant(@PathVariable("submitterId") String submitterId,
+                                                                 @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        List<ClaimInfo> ocmcClaims = claimStoreService.getClaimsForDefendant(authorization, submitterId);
+        return new ResponseEntity<>(ocmcClaims, HttpStatus.OK);
     }
 }
