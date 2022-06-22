@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.robotics;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.Callback;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
@@ -43,11 +42,6 @@ public class NotifyRoboticsGeneralApplicationHandler extends NotifyRoboticsHandl
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT), this::notifyRobotics
         );
-    }
-
-    @Override
-    public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
     }
 
     @Override
