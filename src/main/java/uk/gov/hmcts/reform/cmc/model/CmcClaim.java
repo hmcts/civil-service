@@ -29,4 +29,12 @@ public class CmcClaim {
     private LocalDate responseDeadline;
     private boolean moreTimeRequested;
     private String submitterEmail;
+
+    public String getClaimantName(){
+        return claimData.getClaimantName();
+    }
+
+    public String getDefendantName(){
+        return claimData.getDefendantName();
+    }
 }

@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -17,4 +18,19 @@ public class ClaimData {
     private Amount amount;
     private List<CmcParty> claimants;
     private List<CmcParty> defendants;
+
+    public String getClaimantName(){
+       return getPartyName(claimants);
+    }
+
+    public String getDefendantName(){
+        return getPartyName(defendants);
+    }
+
+    private String getPartyName(List<CmcParty> parties){
+        if(parties.isEmpty()) {
+            return "";
+        }
+        return parties.stream().map(party -> party.getName()).collect(Collectors.joining(", "));
+    }
 }
