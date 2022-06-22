@@ -271,11 +271,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedCaseData.respondToClaimAdmitPartEmploymentTypeLRspecGeneric(
                 caseData.getRespondToClaimAdmitPartEmploymentTypeLRspec2());
         }
-        if (caseData.getRespondToAdmittedClaimOwingAmount() != null) {
-            BigDecimal valuePounds = MonetaryConversions
-                .penniesToPounds(caseData.getRespondToAdmittedClaimOwingAmount());
-            updatedCaseData.respondToAdmittedClaimOwingAmountPounds(valuePounds);
-        }
+        Optional.ofNullable(caseData.getRespondToAdmittedClaimOwingAmount())
+            .map(MonetaryConversions::penniesToPounds)
+            .ifPresent(updatedCaseData::respondToAdmittedClaimOwingAmountPounds);
+        Optional.ofNullable(caseData.getRespondToAdmittedClaimOwingAmount2())
+            .map(MonetaryConversions::penniesToPounds)
+            .ifPresent(updatedCaseData::respondToAdmittedClaimOwingAmountPounds2);
         if (RespondentResponseTypeSpecPaidStatus.PAID_LESS_THAN_CLAIMED_AMOUNT
             == caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()
             || DISPUTES_THE_CLAIM.equals(caseData.getDefenceRouteRequired())
@@ -634,7 +635,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 updatedShowConditions.add(RESPONDENT_2_ADMITS_PART_OR_FULL);
             }
         }
-        if (anyAdmission.contains(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+        if (caseData.getShowConditionFlags().contains(CAN_ANSWER_RESPONDENT_2)
+            && anyAdmission.contains(caseData.getRespondent2ClaimResponseTypeForSpec())) {
             updatedShowConditions.add(RESPONDENT_2_ADMITS_PART_OR_FULL);
         }
         if (someoneDisputes(caseData)) {
@@ -1095,11 +1097,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
             && YES.equals(caseData.getAddRespondent2())) {
-            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWOSPEC)) {
-                //work around: treat this as if it was a 1v2 same solicitor single response
-                updatedData.sameSolicitorSameResponse(NO).build();
-            } else {
+            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWOSPEC)
+                && solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONESPEC)) {
                 updatedData.sameSolicitorSameResponse(YES).build();
+            } else {
+                updatedData.sameSolicitorSameResponse(NO).build();
             }
         } else if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
             && YES.equals(caseData.getAddRespondent2())) {

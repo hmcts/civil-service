@@ -61,6 +61,7 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
@@ -118,6 +119,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private StateFlow mockedStateFlow;
     @Mock
     private StateFlowEngine stateFlowEngine;
+    @Mock
+    private DateOfBirthValidator dateOfBirthValidator;
 
     @Spy
     private List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextGenerators = List.of(
@@ -1031,6 +1034,23 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getConfirmationBody())
                 .doesNotContain(caseData.getApplicant1().getPartyName())
                 .contains("You've chosen to counterclaim - this means your defence cannot continue online.");
+        }
+    }
+
+    @Nested
+    class ValidateDateOfBirth {
+
+        @Test
+        void when1v1_thenSameSolSameResponseNull() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "confirm-details");
+            when(dateOfBirthValidator.validate(any())).thenReturn(Collections.emptyList());
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData())
+                .extracting("sameSolicitorSameResponse").isNull();
         }
     }
 }
