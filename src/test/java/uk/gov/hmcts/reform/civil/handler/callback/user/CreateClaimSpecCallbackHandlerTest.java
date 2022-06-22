@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -36,6 +37,7 @@ import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -70,6 +72,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.CONFIRMATION_SUMMARY;
@@ -98,7 +102,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     properties = {"reference.database.enabled=false"})
 class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    public static final String REFERENCE_NUMBER = "000DC001";
+    public static final String REFERENCE_NUMBER = "000MC001";
 
     public static final String LIP_CONFIRMATION_SCREEN = "<br />Your claim will not be issued"
         + " until payment is confirmed."
@@ -1109,6 +1113,9 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddCaseReferenceSubmittedDateAndAllocatedTrack_whenInvoked() {
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_CLAIM_SPEC.name()).build())
+                .build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
@@ -1300,6 +1307,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .respondent1Represented(YES)
                     .respondent1OrgRegistered(NO)
+                    .legacyCaseReference("000MC001")
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
