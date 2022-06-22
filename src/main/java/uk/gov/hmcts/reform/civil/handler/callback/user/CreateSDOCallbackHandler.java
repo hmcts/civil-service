@@ -46,6 +46,14 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredEmail;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredTelephone;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
@@ -479,6 +487,78 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
 
         updatedData.smallClaimsRoadTrafficAccident(tempSmallClaimsRoadTrafficAccident).build();
+        SmallClaimsJudgesRecital tempSmallClaimsJudgesRecital = SmallClaimsJudgesRecital.builder()
+            .input("District Judge Perna has considered the statements of case and the information provided by the "
+                       + "parties,"
+                       + " \n\nIT IS ORDERED that:-")
+            .build();
+
+        updatedData.smallClaimsJudgesRecital(tempSmallClaimsJudgesRecital).build();
+
+        if (judgementSum != null) {
+            SmallClaimsJudgementDeductionValue tempSmallClaimsJudgementDeductionValue =
+                SmallClaimsJudgementDeductionValue.builder()
+                    .value(judgementSum.getJudgementSum().toString() + "%")
+                    .build();
+
+            updatedData.smallClaimsJudgementDeductionValue(tempSmallClaimsJudgementDeductionValue).build();
+        }
+
+        SmallClaimsDocuments tempSmallClaimsDocuments = SmallClaimsDocuments.builder()
+            .input1("Each party must send to the other party(ies) and to the court office to be received not less "
+                    + "than 14 days before the hearing, copies of all documents which they wish the court to "
+                    + "consider when reaching its decision.")
+            .input2("The court may refuse to consider any document which has not been sent to the other "
+                    +"party/ies and the court as set out above.")
+            .build();
+
+        updatedData.smallClaimsDocuments(tempSmallClaimsDocuments).build();
+
+        SmallClaimsWitnessStatement tempSmallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
+            .input1("Each party must send to the other party(ies) and to the court office to be received not less "
+                        + "than 14 days before the hearing, copies of the statements of any witness (including "
+                        + "themselves) upon whose evidence they intend to rely at the hearing. This is limited to")
+            .input2("")
+            .input3("")
+            .input4("For this limitation, a party is counted as a witness.")
+            .build();
+
+        updatedData.smallClaimsWitnessStatement(tempSmallClaimsWitnessStatement).build();
+
+        SmallClaimsHearing tempSmallClaimsHearing =
+            SmallClaimsHearing.builder()
+                .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
+                       + "The hearing will have a time estimate of")
+                .input2("The claimant must by no later than 14 days before the hearing date, pay the court the required "
+                       + "hearing fee or submit a fully completed application for Help with Fees. If the claimant "
+                       + "fails to pay the fee or obtain a fee exemption by that time the claim will be struck "
+                       + "without further order.")
+                .build();
+
+        updatedData.smallClaimsHearing(tempSmallClaimsHearing).build();
+
+        SmallClaimsNotes tempSmallClaimsNotes = SmallClaimsNotes.builder()
+            .input("This Order has been made without a hearing. Each party has the right to apply to have this Order "
+                       + "set aside or varied. Any such application must be received by the Court "
+                       + "(together with the appropriate fee) by 4pm on")
+            .date(LocalDate.now().plusWeeks(1))
+            .build();
+
+        updatedData.smallClaimsNotes(tempSmallClaimsNotes).build();
+
+        SmallClaimsPreferredTelephone tempSmallClaimsPreferredTelephone = SmallClaimsPreferredTelephone
+            .builder()
+            .telephone(preferredTelephone)
+            .build();
+
+        updatedData.smallClaimsPreferredTelephone(tempSmallClaimsPreferredTelephone).build();
+
+        SmallClaimsPreferredEmail tempSmallClaimsPreferredEmail = SmallClaimsPreferredEmail
+            .builder()
+            .email(preferredEmail)
+            .build();
+
+        updatedData.smallClaimsPreferredEmail(tempSmallClaimsPreferredEmail).build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))

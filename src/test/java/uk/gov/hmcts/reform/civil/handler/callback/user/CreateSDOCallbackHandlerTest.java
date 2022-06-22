@@ -473,6 +473,49 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("smallClaimsRoadTrafficAccident").extracting("input")
                 .isEqualTo("Photographs and/or a plan of the location of the accident shall be prepared and "
                                + "agreed by the parties.");
+            assertThat(response.getData()).extracting("smallClaimsJudgesRecital").extracting("input")
+                .isEqualTo("District Judge Perna has considered the statements of case and the information "
+                               + "provided by the parties,"
+                               + " \n\nIT IS ORDERED that:-");
+
+            assertThat(response.getData()).extracting("smallClaimsDocuments").extracting("input1")
+                .isEqualTo("Each party must send to the other party(ies) and to the court office to be received not "
+                               + "less than 14 days before the hearing, copies of all documents which they wish "
+                               + "the court to consider when reaching its decision.");
+            assertThat(response.getData()).extracting("smallClaimsDocuments").extracting("input2")
+                .isEqualTo("The court may refuse to consider any document which has not been sent to the other "
+                               +"party/ies and the court as set out above.");
+
+            assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("input1")
+                .isEqualTo("Each party must send to the other party(ies) and to the court office to be received not "
+                               + "less than 14 days before the hearing, copies of the statements of any witness "
+                               + "(including themselves) upon whose evidence they intend to rely at the hearing. "
+                               + "This is limited to");
+            assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("input2")
+                .isEqualTo(null);
+            assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("input3")
+                .isEqualTo(null);
+            assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("input4")
+                .isEqualTo("For this limitation, a party is counted as a witness.");
+
+            assertThat(response.getData()).extracting("smallClaimsHearing").extracting("input1")
+                .isEqualTo("The hearing of the claim will be on a date to be notified to you by a separate "
+                               + "notification. The hearing will have a time estimate of");
+            assertThat(response.getData()).extracting("smallClaimsHearing").extracting("input2")
+                .isEqualTo("The claimant must by no later than 14 days before the hearing date, pay the court the "
+                               + "required hearing fee or submit a fully completed application for Help with Fees. "
+                               + "If the claimant fails to pay the fee or obtain a fee exemption by that time the "
+                               + "claim will be struck without further order.");
+
+            assertThat(response.getData()).extracting("smallClaimsNotes").extracting("input")
+                .isEqualTo("This Order has been made without a hearing. Each party has the right to apply to have "
+                               + "this Order set aside or varied. Any such application must be received by the Court "
+                               + "(together with the appropriate fee) by 4pm on");
+            assertThat(response.getData()).extracting("smallClaimsJudgementDeductionValue").isEqualTo(null);
+            assertThat(response.getData()).extracting("smallClaimsPreferredTelephone").extracting("telephone")
+                .isEqualTo("N/A");
+            assertThat(response.getData()).extracting("smallClaimsPreferredEmail").extracting("email")
+                .isEqualTo("N/A");
         }
 
         @Test

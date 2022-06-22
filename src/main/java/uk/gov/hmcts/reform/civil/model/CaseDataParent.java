@@ -43,6 +43,14 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredEmail;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredTelephone;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
@@ -133,6 +141,14 @@ public class CaseDataParent implements MappableObject {
     private FastTrackPreferredEmail fastTrackPreferredEmail;
     private SmallClaimsCreditHire smallClaimsCreditHire;
     private SmallClaimsRoadTrafficAccident smallClaimsRoadTrafficAccident;
+    private SmallClaimsJudgementDeductionValue smallClaimsJudgementDeductionValue;
+    private SmallClaimsJudgesRecital smallClaimsJudgesRecital;
+    private SmallClaimsHearing smallClaimsHearing;
+    private SmallClaimsPreferredEmail smallClaimsPreferredEmail;
+    private SmallClaimsPreferredTelephone smallClaimsPreferredTelephone;
+    private SmallClaimsDocuments smallClaimsDocuments;
+    private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
+    private SmallClaimsNotes smallClaimsNotes;
 
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
