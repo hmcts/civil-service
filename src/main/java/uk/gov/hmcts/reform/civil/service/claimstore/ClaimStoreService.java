@@ -15,13 +15,20 @@ public class ClaimStoreService {
     private final ClaimStoreApi claimStoreApi;
 
     public List<ClaimInfo> getClaimsForClaimant(String authorisation, String claimantId){
-          List<CmcClaim> cmcClaims = claimStoreApi.getClaimsForClaimant(authorisation, claimantId);
-          return cmcClaims.stream().map(cmcClaim -> ClaimInfo.builder()
-              .claimNumber(cmcClaim.getReferenceNumber())
-              .claimantName(cmcClaim.getClaimantName())
-              .defendantName(cmcClaim.getDefendantName())
-              .responseDeadLine(cmcClaim.getReferenceNumber())
-              .build()
-          ).collect(Collectors.toList());
+          return translateCmcClaimToClaimInfo(claimStoreApi.getClaimsForClaimant(authorisation, claimantId));
+    }
+
+    public List<ClaimInfo> getClaimsForDefendant(String authorisation, String defendantId){
+        return translateCmcClaimToClaimInfo(claimStoreApi.getClaimsForDefendant(authorisation, defendantId));
+    }
+
+    private List<ClaimInfo> translateCmcClaimToClaimInfo(List<CmcClaim> cmcClaims){
+        return cmcClaims.stream().map(cmcClaim -> ClaimInfo.builder()
+            .claimNumber(cmcClaim.getReferenceNumber())
+            .claimantName(cmcClaim.getClaimantName())
+            .defendantName(cmcClaim.getDefendantName())
+            .responseDeadLine(cmcClaim.getReferenceNumber())
+            .build()
+        ).collect(Collectors.toList());
     }
 }

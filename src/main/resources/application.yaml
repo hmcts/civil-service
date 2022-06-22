@@ -238,6 +238,10 @@ payments:
   api:
     url: http://localhost:8765
 
+cmc-claim-store:
+  api:
+    url: http://localhost:8765
+
 idam:
   web:
     url: http://localhost:9002
