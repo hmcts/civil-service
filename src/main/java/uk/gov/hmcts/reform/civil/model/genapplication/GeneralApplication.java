@@ -20,7 +20,6 @@ public class GeneralApplication implements MappableObject {
 
     private final GAApplicationType generalAppType;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
-    private final String respondentSolicitor1EmailAddress;
     private final BusinessProcess businessProcess;
     private final GAPbaDetails generalAppPBADetails;
     private final String generalAppDetailsOfOrder;
@@ -32,7 +31,7 @@ public class GeneralApplication implements MappableObject {
     private final GASolicitorDetailsGAspec generalAppApplnSolicitor;
     private final List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors;
     private final List<Element<Document>> generalAppEvidenceDocument;
-    private final String generalAppDeadlineNotification;
+    private final LocalDateTime generalAppDateDeadline;
     private final YesOrNo isMultiParty;
     private final YesOrNo parentClaimantIsApplicant;
     private final CaseLink caseLink;
@@ -48,7 +47,6 @@ public class GeneralApplication implements MappableObject {
     GeneralApplication(@JsonProperty("generalAppType") GAApplicationType generalAppType,
                        @JsonProperty("generalAppRespondentAgreement")
                            GARespondentOrderAgreement generalAppRespondentAgreement,
-                       @JsonProperty("respondentSolicitor1EmailAddress") String respondentSolicitor1EmailAddress,
                        @JsonProperty("businessProcess") BusinessProcess businessProcess,
                        @JsonProperty("generalAppPBADetails") GAPbaDetails generalAppPBADetails,
                        @JsonProperty("generalAppDetailsOfOrder") String generalAppDetailsOfOrder,
@@ -61,7 +59,7 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("generalAppRespondentSolicitors") List<Element<GASolicitorDetailsGAspec>>
                            generalAppRespondentSolicitors,
                        @JsonProperty("generalAppEvidenceDocument") List<Element<Document>> generalAppEvidenceDocument,
-                       @JsonProperty("generalAppDeadlineNotification") String generalAppDeadlineNotification,
+                       @JsonProperty("generalAppDateDeadline") LocalDateTime generalAppDateDeadline,
                        @JsonProperty("isMultiParty") YesOrNo isMultiParty,
                        @JsonProperty("parentClaimantIsApplicant") YesOrNo parentClaimantIsApplicant,
                        @JsonProperty("caseLink") CaseLink caseLink,
@@ -74,7 +72,6 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("defendant2PartyName") String defendant2PartyName) {
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
-        this.respondentSolicitor1EmailAddress = respondentSolicitor1EmailAddress;
         this.businessProcess = businessProcess;
         this.generalAppPBADetails = generalAppPBADetails;
         this.generalAppDetailsOfOrder = generalAppDetailsOfOrder;
@@ -86,7 +83,7 @@ public class GeneralApplication implements MappableObject {
         this.generalAppApplnSolicitor = generalAppApplnSolicitor;
         this.generalAppRespondentSolicitors = generalAppRespondentSolicitors;
         this.generalAppEvidenceDocument = generalAppEvidenceDocument;
-        this.generalAppDeadlineNotification = generalAppDeadlineNotification;
+        this.generalAppDateDeadline = generalAppDateDeadline;
         this.isMultiParty = isMultiParty;
         this.parentClaimantIsApplicant = parentClaimantIsApplicant;
         this.caseLink = caseLink;

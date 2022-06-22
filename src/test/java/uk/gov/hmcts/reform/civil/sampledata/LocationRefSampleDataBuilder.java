@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.sampledata;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
@@ -15,7 +16,10 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.time.LocalDate.EPOCH;
 import static java.util.Collections.singletonList;
@@ -27,7 +31,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-public class GeneralAppSampleDataBuilder {
+public class LocationRefSampleDataBuilder {
 
     protected static final String STRING_CONSTANT = "this is a string";
     protected static final String STRING_NUM_CONSTANT = "123456789";
@@ -272,5 +276,23 @@ public class GeneralAppSampleDataBuilder {
                 .toBuilder()
                 .generalApplications(wrapElements(application))
                 .build();
+    }
+
+    protected List<String> getSampleCourLocations() {
+        return new ArrayList<>(Arrays.asList("ABCD - RG0 0 AL", "PQRS - GU0 0EE", "WXYZ - EW0 0HE", "LMNO - NE0 0BH"));
+    }
+
+    protected DynamicList getLocationDynamicList(CaseData responseCaseData) {
+        return responseCaseData.getGeneralAppHearingDetails().getHearingPreferredLocation();
+    }
+
+    protected DynamicList getLocationDynamicListInPersonHearing(CaseData responseCaseData) {
+        return responseCaseData.getDisposalHearingMethodInPerson();
+    }
+
+    protected List<String> locationsFromDynamicList(DynamicList dynamicList) {
+        return dynamicList.getListItems().stream()
+            .map(DynamicListElement::getLabel)
+            .collect(Collectors.toList());
     }
 }

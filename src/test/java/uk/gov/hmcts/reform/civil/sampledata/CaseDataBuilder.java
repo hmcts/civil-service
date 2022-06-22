@@ -105,7 +105,7 @@ public class CaseDataBuilder {
     public static final LocalDate CLAIM_ISSUED_DATE = now();
     public static final LocalDateTime DEADLINE = LocalDate.now().atStartOfDay().plusDays(14);
     public static final LocalDate PAST_DATE = now().minusDays(1);
-    public static final LocalDateTime NOTIFICATION_DEADLINE = LocalDate.now().atStartOfDay().plusDays(1);
+    public static final LocalDateTime NOTIFICATION_DEADLINE = LocalDate.now().atStartOfDay().plusDays(14);
     public static final BigDecimal FAST_TRACK_CLAIM_AMOUNT = BigDecimal.valueOf(10000);
     public static final LocalDate FUTURE_DATE = LocalDate.now().plusYears(1);
 
@@ -258,6 +258,9 @@ public class CaseDataBuilder {
     private YesOrNo respondent1DQWitnessesRequiredSpec;
     private List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
 
+    private String respondent1OrganisationIDCopy;
+    private String respondent2OrganisationIDCopy;
+
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
         return this;
@@ -379,6 +382,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder caseNotes(CaseNote caseNote) {
         this.caseNotes = ElementUtils.wrapElements(caseNote);
+        return this;
+    }
+
+    public CaseDataBuilder respondent1OrganisationIDCopy(String id) {
+        this.respondent1OrganisationIDCopy = id;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2OrganisationIDCopy(String id) {
+        this.respondent2OrganisationIDCopy = id;
         return this;
     }
 
@@ -1284,6 +1297,7 @@ public class CaseDataBuilder {
         atStatePendingClaimIssued();
         claimNotificationDeadline = NOTIFICATION_DEADLINE;
         ccdState = CASE_ISSUED;
+        respondent1OrganisationIDCopy = "QWERTY R";
         return this;
     }
 
@@ -1661,6 +1675,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses() {
         atStateRespondentFullDefence();
+        respondent2ResponseDeadline = RESPONSE_DEADLINE;
         respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
         respondent2ResponseDate = LocalDateTime.now();
         respondent2ClaimResponseDocument = ResponseDocument.builder()
@@ -1838,6 +1853,7 @@ public class CaseDataBuilder {
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
         respondent1DQ();
+        respondent2ResponseDeadline = RESPONSE_DEADLINE.plusDays(2);
         return this;
     }
 
@@ -2616,6 +2632,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder removeSolicitorReferences() {
+        this.solicitorReferences = null;
+        this.respondentSolicitor2Reference = null;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -2780,6 +2802,8 @@ public class CaseDataBuilder {
             .respondent1DQWitnessesRequiredSpec(respondent1DQWitnessesRequiredSpec)
             .respondent1DQWitnessesDetailsSpec(respondent1DQWitnessesDetailsSpec)
             .applicant1ProceedWithClaimSpec2v1(applicant1ProceedWithClaimSpec2v1)
+            .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
+            .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
             .build();
     }
 }
