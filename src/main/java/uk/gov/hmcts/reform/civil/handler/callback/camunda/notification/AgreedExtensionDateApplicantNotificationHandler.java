@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
 import java.time.LocalDate;
@@ -27,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSINESS_DAY;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @Service
@@ -43,6 +45,7 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -97,9 +100,12 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
             }
         }
 
+        LocalDate agreedExtension = deadlinesCalculator.calculateFirstWorkingDay(extensionDate)
+            .atTime(END_OF_BUSINESS_DAY).toLocalDate();
+
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE),
+            AGREED_EXTENSION_DATE, formatLocalDate(agreedExtension, DATE),
             PARTY_REFERENCES, buildPartiesReferences(caseData)
         );
     }
