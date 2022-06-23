@@ -149,13 +149,13 @@ public class PartyUtils {
     private static Predicate<CaseData> defendantSolicitor2Reference = caseData -> caseData
         .getRespondentSolicitor2Reference() != null;
 
-    public static String getResponseType(CaseData caseData, Party respondent) {
-        String responseType = "";
+    public static Object getResponseType(CaseData caseData, Party respondent) {
+        Object responseType = "";
 
         if (caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
-            responseType = getResponseTypeForRespondentSpec(caseData, respondent).getDisplayedValue();
+            responseType = getResponseTypeForRespondentSpec(caseData, respondent);
         } else {
-            responseType = getResponseTypeForRespondent(caseData, respondent).getDisplayedValue();
+            responseType = getResponseTypeForRespondent(caseData, respondent);
         }
 
         return responseType;
