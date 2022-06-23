@@ -63,7 +63,6 @@ import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
-import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
