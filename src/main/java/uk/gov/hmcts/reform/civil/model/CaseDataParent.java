@@ -201,4 +201,10 @@ public class CaseDataParent implements MappableObject {
     @Builder.Default
     private final Set<DefendantResponseShowTag> showConditionFlags = new HashSet<>();
 
+    /**
+     * money amount in pounds. Waiting here until we address the issue with CaseData having
+     * too many fields
+     */
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal respondToAdmittedClaimOwingAmountPounds2;
 }
