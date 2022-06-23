@@ -41,20 +41,22 @@ public class CasesControllerTest extends BaseIntegrationTest {
         + "}";
     private static final String CLAIMANT_CLAIMS_URL = "/cases//claimant/{submitterId}";
     private static final String DEFENDANT_CLAIMS_URL = "/cases/defendant/{submitterId}";
-    private static final List<DashboardClaimInfo> claimResults = Collections.singletonList(DashboardClaimInfo.builder()
-                                                                                               .claimAmount(new BigDecimal(
-                                                                                                   "1000"))
-                                                                                               .claimNumber("4786")
-                                                                                               .claimantName(
-                                                                                                   "Mr. James Bond")
-                                                                                               .defendantName(
-                                                                                                   "Mr. Roger Moore")
-                                                                                               .responseDeadLine(
-                                                                                                   LocalDate.of(2022,
-                                                                                                                1,
-                                                                                                                1
-                                                                                                   ))
-                                                                                               .build());
+    private static final List<DashboardClaimInfo> claimResults =
+        Collections.singletonList(DashboardClaimInfo.builder()
+                                      .claimAmount(new BigDecimal(
+                                          "1000"))
+                                      .claimNumber("4786")
+                                      .claimantName(
+                                          "Mr. James Bond")
+                                      .defendantName(
+                                          "Mr. Roger Moore")
+                                      .responseDeadLine(
+                                          LocalDate.of(
+                                              2022,
+                                              1,
+                                              1
+                                          ))
+                                      .build());
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;
