@@ -46,6 +46,10 @@ import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Witness;
+import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -84,6 +88,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
 class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -222,6 +227,9 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).isNotNull();
             assertThat(response.getData().get("responseClaimTrack")).isEqualTo(AllocatedTrack.FAST_CLAIM.name());
+            // need to be non-null to ensure previous data is cleaned
+            assertThat(response.getData().get("respondent1ClaimResponsePaymentAdmissionForSpec"))
+                .isNotNull();
         }
 
         @Test
@@ -579,6 +587,54 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
                 .isEqualTo("FULL_DEFENCE");
+        }
+    }
+
+    @Nested
+    class MidEventCallbackValidateWitnesses {
+
+        private static final String PAGE_ID = "witnesses";
+
+        @Test
+        void shouldReturnError_whenWitnessRequiredAndNullDetails() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1DQ(Respondent1DQ.builder().build())
+                .respondent1DQWitnessesRequiredSpec(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly("Witness details required");
+        }
+
+        @Test
+        void shouldReturnNoError_whenWitnessRequiredAndDetailsProvided() {
+            List<Element<Witness>> testWitness = wrapElements(Witness.builder().name("test witness").build());
+            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).details(testWitness).build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1DQ(Respondent1DQ.builder().build())
+                .respondent1DQWitnessesRequiredSpec(YES)
+                .respondent1DQWitnessesDetailsSpec(testWitness)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnNoError_whenWitnessNotRequired() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1DQ(Respondent1DQ.builder().build())
+                .respondent1DQWitnessesRequiredSpec(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
         }
     }
 

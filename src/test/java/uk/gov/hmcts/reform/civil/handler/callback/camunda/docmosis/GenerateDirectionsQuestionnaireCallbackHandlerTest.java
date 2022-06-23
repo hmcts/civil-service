@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -188,7 +189,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .respondentResponseIsSame(YesOrNo.NO)
                 .respondent1DQ(Respondent1DQ.builder().build())
-                .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
                 .build();
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
@@ -212,7 +213,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .respondentResponseIsSame(YesOrNo.NO)
                 .respondent2DQ(Respondent2DQ.builder().build())
-                .respondent2ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
                 .build();
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
@@ -235,7 +236,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
                 .atStateRespondentAdmitPartOfClaimFastTrack().build().toBuilder()
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .respondentResponseIsSame(YesOrNo.YES)
-                .respondent2ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
                 .build();
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);

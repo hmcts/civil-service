@@ -16,7 +16,7 @@ public class NotificationsProperties {
     private String respondentSolicitorClaimIssueMultipartyEmailTemplate;
 
     @NotEmpty
-    private String respondentSolicitorClaimDetailsEmailTemplateMultiParty;
+    private String respondentSolicitorClaimDetailsEmailTemplate;
 
     @NotEmpty
     private String solicitorDefendantResponseCaseTakenOffline;
@@ -116,4 +116,38 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String breathingSpaceEnterApplicantEmailTemplate;
+
+    @NotEmpty
+    private String breathingSpaceLiftedApplicantEmailTemplate;
+
+    @NotEmpty
+    private String breathingSpaceLiftedRespondentEmailTemplate;
+
+    @NotEmpty
+    private String claimantSolicitorCounterClaimForSpec;
+
+    @NotEmpty
+    private String respondentSolicitorCounterClaimForSpec;
+
+    @NotEmpty
+    private String respondentSolicitor1DefaultJudgmentRequested;
+
+    @NotEmpty
+    private String applicantSolicitor1DefaultJudgmentRequested;
+    
+    @NotEmpty
+    private String interimJudgmentRequestedClaimant;
+
+    @NotEmpty
+    private String interimJudgmentApprovalClaimant;
+
+    @NotEmpty
+    private String interimJudgmentRequestedDefendant;
+
+    @NotEmpty
+    private String interimJudgmentRequested2Defendants;
+
+    @NotEmpty
+    private String interimJudgmentApprovalDefendant;
+
 }
