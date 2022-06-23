@@ -152,10 +152,10 @@ public class PartyUtils {
     public static String getResponseType(CaseData caseData, Party respondent) {
         String responseType = "";
 
-        if(caseData.getSuperClaimType() == null) {
-            responseType = getResponseTypeForRespondent(caseData, respondent).getDisplayedValue();
-        } else if(caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+        if (caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
             responseType = getResponseTypeForRespondentSpec(caseData, respondent).getDisplayedValue();
+        } else {
+            responseType = getResponseTypeForRespondent(caseData, respondent).getDisplayedValue();
         }
 
         return responseType;
