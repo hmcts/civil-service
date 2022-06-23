@@ -135,6 +135,7 @@ public class RoboticsDataMapperForSpec {
             caseData.getRespondentSolicitor1OrganisationDetails()
         );
         if (organisationId.isEmpty() && organisationDetails.isEmpty()) {
+            System.out.println("hiya");
             return null;
         }
         var solicitorEmail = ofNullable(
