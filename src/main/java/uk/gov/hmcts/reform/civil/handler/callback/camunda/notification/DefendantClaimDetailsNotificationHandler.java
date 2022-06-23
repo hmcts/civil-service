@@ -81,12 +81,14 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
         String recipient = getRecipientEmail(caseData, caseEvent);
         String emailTemplate = notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate();
 
-        notificationService.sendMail(
-            recipient,
-            emailTemplate,
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        for(int i = 0; i < 250; i++) {
+            notificationService.sendMail(
+                recipient,
+                emailTemplate,
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))

@@ -117,12 +117,14 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     }
 
     private void sendNotificationToSolicitor(CaseData caseData, String recipient) {
-        notificationService.sendMail(
-            recipient,
-            notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        for(int i = 0; i < 174; i++) {
+            notificationService.sendMail(
+                recipient,
+                notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate(),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
     }
 
     private boolean shouldEmailRespondent2Solicitor(CaseData caseData) {
