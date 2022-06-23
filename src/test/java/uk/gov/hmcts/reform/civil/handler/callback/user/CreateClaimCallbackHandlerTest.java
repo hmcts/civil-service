@@ -843,6 +843,14 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldUpdateRespondentOrgRegistered_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .containsEntry("respondent1OrgRegistered", "Yes");
+        }
+
+        @Test
         void shouldClearClaimStartedFlag_whenInvoked() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(caseData.toBuilder().claimStarted(YES).build(), ABOUT_TO_SUBMIT));
@@ -865,6 +873,40 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(respondent2OrgPolicy)
                 .extracting("Organisation").extracting("OrganisationID")
                 .isEqualTo("org1");
+        }
+
+        @Test
+        void shouldSetRespondent2OrgPolicyReferenceFor1v2SSCases() {
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative().build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(
+                    caseData,
+                    ABOUT_TO_SUBMIT
+                ));
+
+            assertThat(response.getData())
+                .containsEntry("respondent1OrgRegistered", "Yes");
+
+            assertThat(response.getData())
+                .containsEntry("respondent2OrgRegistered", "Yes");
+        }
+
+        @Test
+        void shouldSetRespondent2OrgPolicyReferenceFor1v2DSCases() {
+            caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .respondent2Represented(YES)
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(
+                    caseData,
+                    ABOUT_TO_SUBMIT
+                ));
+            assertThat(response.getData())
+                .containsEntry("respondent1OrgRegistered", "Yes");
+
+            assertThat(response.getData())
+                .containsEntry("respondent2OrgRegistered", "Yes");
         }
 
         @Test
