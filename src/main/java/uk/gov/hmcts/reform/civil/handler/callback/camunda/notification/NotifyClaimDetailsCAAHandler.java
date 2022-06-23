@@ -12,9 +12,8 @@ import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsPro
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.utils.OrganisationUtils;
 import uk.gov.hmcts.reform.prd.model.Organisation;
-import uk.gov.hmcts.reform.prd.model.ProfessionalUsersResponse;
-import uk.gov.hmcts.reform.prd.model.ProfessionalUsersEntityResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,20 +21,22 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CAA_RESPONDENT_1_ORG;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_1_ORG;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_2_ORG;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @Service
 @RequiredArgsConstructor
-public class NotifyCaseAccessAdmin extends CallbackHandler implements NotificationData {
+public class NotifyClaimDetailsCAAHandler extends CallbackHandler implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CAA_RESPONDENT_1_ORG);
+    private static Map<CaseEvent, String> EVENT_TASK_ID_MAP = Map.of(
+        NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_1_ORG, "NotifyClaimDetailsRespondent1OrgCAA",
+        NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_2_ORG, "NotifyClaimDetailsRespondent2OrgCAA"
+    );
 
-    private static final String TASK_ID = "TakeCaseOfflineNotifyApplicantSolicitor1";
     private static final String REFERENCE_TEMPLATE = "case-ready-for-assignment-%s";
-    private static final String CASEWORKER_CAA = "pui-caa";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -50,54 +51,47 @@ public class NotifyCaseAccessAdmin extends CallbackHandler implements Notificati
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        return EVENT_TASK_ID_MAP.get(CaseEvent.valueOf(callbackParams.getRequest().getEventId()));
     }
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return EVENTS;
+        return new ArrayList<>(EVENT_TASK_ID_MAP.keySet());
     }
 
     private CallbackResponse notifyCAAUser(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        var caseData = callbackParams.getCaseData();
 
-        //get org ID for respondent 1
-        var organisationId = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
-
-        //get users in this firm
-        Optional<ProfessionalUsersEntityResponse> orgUsers =
-            organisationService.findUsersInOrganisation(organisationId);
-
-        //identify caa users based on user roles
-        List<String> caaEmails = new ArrayList<>();
-        for (ProfessionalUsersResponse user : orgUsers.orElse(null).getUsers()){
-            if (user.getRoles().contains(CASEWORKER_CAA)) {
-                String email = user.getEmail();
-                caaEmails.add(email);
-            }
-        }
-        System.out.print(caaEmails);
-
-        String recipient;
-        if (caaEmails.isEmpty()) {
-            //no caa defined, use superuser for the firm
-            System.out.println("NO CAA DEFINED");
-            Optional<Organisation> organisation = organisationService.findOrganisationById(organisationId);
-            recipient = organisation.get().getSuperUser().getEmail();
-        } else {
-            System.out.println("TAKING FIRST CAA FROM LIST");
-            recipient = caaEmails.get(0);
-        }
-
-        System.out.println("About to send email to user: " + recipient);
+        getRecipients(callbackParams).stream().forEach(recipient -> System.out.println("About to send email to user: " + recipient));
 
         notificationService.sendMail(
-            recipient,
+            getRecipients(callbackParams),
             notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplateMultiParty(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
+
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private String getOrganisationId(CallbackParams callbackParams) {
+        return isFirstRespondentCAA(callbackParams) ?
+            callbackParams.getCaseData().getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
+            : callbackParams.getCaseData().getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+    }
+
+    private List<String> getRecipients(CallbackParams callbackParams) {
+        var organisationId = getOrganisationId(callbackParams);
+        var caaEmails = OrganisationUtils.getCaaEmails(organisationService.findUsersInOrganisation(organisationId));
+        if (caaEmails.isEmpty()) {
+            Optional<Organisation> organisation = organisationService.findOrganisationById(organisationId);
+            caaEmails.add(organisation.get().getSuperUser().getEmail());
+        }
+        return caaEmails;
+    }
+
+    private boolean isFirstRespondentCAA(CallbackParams callbackParams) {
+        return CaseEvent.valueOf(callbackParams.getRequest().getEventId()) == NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_1_ORG;
     }
 
     @Override

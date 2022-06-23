@@ -125,5 +125,4 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
             PARTY_REFERENCES, buildPartiesReferences(caseData)
         );
     }
-
 }
