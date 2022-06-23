@@ -15,20 +15,21 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClaimData {
+
     private Amount amount;
     private List<CmcParty> claimants;
     private List<CmcParty> defendants;
 
-    public String getClaimantName(){
-       return getPartyName(claimants);
+    public String getClaimantName() {
+        return getPartyName(claimants);
     }
 
-    public String getDefendantName(){
+    public String getDefendantName() {
         return getPartyName(defendants);
     }
 
-    private String getPartyName(List<CmcParty> parties){
-        if(parties.isEmpty()) {
+    private String getPartyName(List<CmcParty> parties) {
+        if (parties.isEmpty()) {
             return "";
         }
         return parties.stream().map(party -> party.getName()).collect(Collectors.joining(", "));

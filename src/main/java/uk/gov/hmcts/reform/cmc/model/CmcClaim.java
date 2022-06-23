@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -32,18 +31,18 @@ public class CmcClaim {
     @JsonProperty("claim")
     private ClaimData claimData;
 
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate responseDeadline;
     private boolean moreTimeRequested;
     private String submitterEmail;
 
-    public String getClaimantName(){
+    public String getClaimantName() {
         return claimData.getClaimantName();
     }
 
-    public String getDefendantName(){
+    public String getDefendantName() {
         return claimData.getDefendantName();
     }
 }
