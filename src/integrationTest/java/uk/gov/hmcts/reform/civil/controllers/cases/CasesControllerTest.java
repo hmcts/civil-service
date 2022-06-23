@@ -42,12 +42,19 @@ public class CasesControllerTest extends BaseIntegrationTest {
     private static final String CLAIMANT_CLAIMS_URL = "/cases//claimant/{submitterId}";
     private static final String DEFENDANT_CLAIMS_URL = "/cases/defendant/{submitterId}";
     private static final List<DashboardClaimInfo> claimResults = Collections.singletonList(DashboardClaimInfo.builder()
-                                                                                      .claimAmount(new BigDecimal("1000"))
-                                                                                      .claimNumber("4786")
-                                                                                      .claimantName("Mr. James Bond")
-                                                                                      .defendantName("Mr. Roger Moore")
-                                                                                      .responseDeadLine(LocalDate.of(2022, 1, 1))
-                                                                                      .build());
+                                                                                               .claimAmount(new BigDecimal(
+                                                                                                   "1000"))
+                                                                                               .claimNumber("4786")
+                                                                                               .claimantName(
+                                                                                                   "Mr. James Bond")
+                                                                                               .defendantName(
+                                                                                                   "Mr. Roger Moore")
+                                                                                               .responseDeadLine(
+                                                                                                   LocalDate.of(2022,
+                                                                                                                1,
+                                                                                                                1
+                                                                                                   ))
+                                                                                               .build());
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;
@@ -124,16 +131,16 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
-    void shouldReturnClaimsForClaimantSuccessfully(){
-      when(claimStoreService.getClaimsForClaimant(any(), any())).thenReturn(claimResults);
-      doGet(BEARER_TOKEN, CLAIMANT_CLAIMS_URL, "123")
-          .andExpect(content().json(toJson(claimResults)))
-          .andExpect(status().isOk());
+    void shouldReturnClaimsForClaimantSuccessfully() {
+        when(claimStoreService.getClaimsForClaimant(any(), any())).thenReturn(claimResults);
+        doGet(BEARER_TOKEN, CLAIMANT_CLAIMS_URL, "123")
+            .andExpect(content().json(toJson(claimResults)))
+            .andExpect(status().isOk());
     }
 
     @Test
     @SneakyThrows
-    void shouldReturnClaimsForDefendantSuccessfully(){
+    void shouldReturnClaimsForDefendantSuccessfully() {
         when(claimStoreService.getClaimsForDefendant(any(), any())).thenReturn(claimResults);
         doGet(BEARER_TOKEN, DEFENDANT_CLAIMS_URL, "123")
             .andExpect(content().json(toJson(claimResults)))
