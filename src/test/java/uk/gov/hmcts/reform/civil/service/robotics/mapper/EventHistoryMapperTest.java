@@ -4977,6 +4977,7 @@ class EventHistoryMapperTest {
 
             assertThat(eventHistory.getGeneralFormOfApplication()).isEqualTo(List.of(generalApplicationEvent));
         }
+
         @Test
         void shouldPrepareMiscellaneousEvent_whenGeneralApplicationLitigiousPartyID001() {
             String eventDetailText = "APPLICATION TO Strike Out";
