@@ -64,7 +64,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapp
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseTypeForRespondent;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseType;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1AckExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ExtensionExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
@@ -467,7 +467,7 @@ public class EventHistoryMapper {
                 "RPA Reason: %sDefendant: %s has responded: %s",
                 paginatedMessage,
                 respondent.getPartyName(),
-                getResponseTypeForRespondent(caseData, respondent)
+                getResponseType(caseData, respondent)
             ));
         }
         return defaultText;
@@ -1029,12 +1029,13 @@ public class EventHistoryMapper {
         if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
             paginatedMessage = getPaginatedMessageFor1v2SameSolicitor(caseData, isRespondent1);
         }
+
         return (format(
             "%sDefendant: %s has responded: %s; "
                 + "preferredCourtCode: %s; stayClaim: %s",
             paginatedMessage,
             respondent.getPartyName(),
-            getResponseTypeForRespondent(caseData, respondent),
+            getResponseType(caseData, respondent),
             getPreferredCourtCode(dq),
             isStayClaim(dq)
         ));

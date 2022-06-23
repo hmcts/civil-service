@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -15,6 +16,7 @@ import java.util.function.Predicate;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 
 public class PartyUtils {
 
@@ -147,11 +149,31 @@ public class PartyUtils {
     private static Predicate<CaseData> defendantSolicitor2Reference = caseData -> caseData
         .getRespondentSolicitor2Reference() != null;
 
+    public static String getResponseType(CaseData caseData, Party respondent) {
+        String responseType = "";
+
+        if(caseData.getSuperClaimType() == null) {
+            responseType = getResponseTypeForRespondent(caseData, respondent).getDisplayedValue();
+        } else if(caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+            responseType = getResponseTypeForRespondentSpec(caseData, respondent).getDisplayedValue();
+        }
+
+        return responseType;
+    }
+
     public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent) {
         if (caseData.getRespondent1().equals(respondent)) {
             return caseData.getRespondent1ClaimResponseType();
         } else {
             return caseData.getRespondent2ClaimResponseType();
+        }
+    }
+
+    public static RespondentResponseTypeSpec getResponseTypeForRespondentSpec(CaseData caseData, Party respondent) {
+        if (caseData.getRespondent1().equals(respondent)) {
+            return caseData.getRespondent1ClaimResponseTypeForSpec();
+        } else {
+            return caseData.getRespondent2ClaimResponseTypeForSpec();
         }
     }
 }
