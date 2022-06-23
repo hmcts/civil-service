@@ -7,7 +7,7 @@ import java.util.Collections;
 
 public class CmcClaimTest {
 
-    private final String PARTY_NAME = "Mr John Clark";
+    private static final String PARTY_NAME = "Mr John Clark";
 
     @Test
     void shouldReturnClaimantNameWhenClaimantExists() {
