@@ -11,13 +11,9 @@ import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
-import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
-import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.ClaimDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
-import uk.gov.hmcts.reform.civil.model.robotics.RPABreathingSpace;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
@@ -27,7 +23,6 @@ import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.prd.model.DxAddress;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -65,20 +60,6 @@ public class RoboticsDataMapperForSpec {
             .solicitors(buildSolicitors(caseData))
             .claimDetails(buildClaimDetails(caseData))
             .events(eventHistoryMapper.buildEvents(caseData));
-        if (featureToggleService.isSpecRpaContinuousFeedEnabled()) {
-            Optional.ofNullable(caseData.getBreathing())
-                .map(BreathingSpaceInfo::getEnter)
-                .map(BreathingSpaceEnterInfo::getType)
-                .ifPresent(type -> {
-                    LocalDate endDate = Optional.ofNullable(caseData.getBreathing().getLift())
-                            .map(BreathingSpaceLiftInfo::getExpectedEnd)
-                                .orElse(null);
-                    builder.breathingSpace(RPABreathingSpace.builder()
-                                               .type(type)
-                                               .endDate(endDate)
-                                               .build());
-                });
-        }
         return builder.build();
     }
 
