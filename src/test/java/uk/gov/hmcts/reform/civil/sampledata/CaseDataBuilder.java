@@ -269,9 +269,8 @@ public class CaseDataBuilder {
     private String respondent1OrganisationIDCopy;
     private String respondent2OrganisationIDCopy;
 
-    private List<Element<GeneralApplication>> generalApplications ;
+    private List<Element<GeneralApplication>> generalApplications;
     private List<Element<GeneralApplicationsDetails>> generalApplicationsDetails;
-
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1345,6 +1344,7 @@ public class CaseDataBuilder {
         this.generalApplications = generalApplicationValues;
         return this;
     }
+
     public CaseDataBuilder getGeneralApplicationWithPartyName() {
         List<GeneralApplicationTypes> types = Arrays.asList(STRIKE_OUT);
         List<Element<GeneralApplication>> generalApplicationValues = wrapElements(
@@ -1363,6 +1363,7 @@ public class CaseDataBuilder {
         this.generalApplications = generalApplicationValues;
         return this;
     }
+
     public CaseDataBuilder getGeneralApplicationsDetails() {
         List<GeneralApplicationTypes> types = Arrays.asList(STRIKE_OUT);
         List<Element<GeneralApplicationsDetails>> generalApplicationsDetails = wrapElements(

@@ -4938,8 +4938,6 @@ class EventHistoryMapperTest {
 
     @Nested
     class GeneralApplicationRpa {
-
-
         @Test
         void shouldPrepareMiscellaneousEvent_whenGeneralApplicationLitigiousPartyID002() {
             String eventDetailText = "APPLICATION TO Strike Out";
@@ -4948,7 +4946,6 @@ class EventHistoryMapperTest {
                 .getGeneralApplication()
                 .getGeneralApplicationsDetails()
                 .build();
-
 
             Event claimNotifiedEvent = Event.builder()
                 .eventSequence(2)
@@ -4959,6 +4956,7 @@ class EventHistoryMapperTest {
                                   .miscText("Claimant has notified defendant.")
                                   .build())
                 .build();
+
             Event generalApplicationEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("136")
@@ -4978,8 +4976,6 @@ class EventHistoryMapperTest {
                 .containsExactly(claimNotifiedEvent);
 
             assertThat(eventHistory.getGeneralFormOfApplication()).isEqualTo(List.of(generalApplicationEvent));
-
-
         }
         @Test
         void shouldPrepareMiscellaneousEvent_whenGeneralApplicationLitigiousPartyID001() {
@@ -5018,9 +5014,6 @@ class EventHistoryMapperTest {
                 .containsExactly(claimNotifiedEvent);
 
             assertThat(eventHistory.getGeneralFormOfApplication()).isEqualTo(List.of(generalApplicationEvent));
-
-
         }
-
     }
 }
