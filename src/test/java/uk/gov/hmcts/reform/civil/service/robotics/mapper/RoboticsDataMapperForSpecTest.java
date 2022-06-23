@@ -70,8 +70,5 @@ public class RoboticsDataMapperForSpecTest {
                               .anyMatch(p -> p.getName().equals(caseData.getApplicant1().getPartyName())));
         Assert.assertTrue(mapped.getLitigiousParties().stream()
                               .anyMatch(p -> p.getName().equals(caseData.getRespondent1().getPartyName())));
-        Assert.assertEquals(caseData.getBreathing().getEnter().getType(), mapped.getBreathingSpace().getType());
-        Assert.assertEquals(caseData.getBreathing().getLift().getExpectedEnd(),
-                            mapped.getBreathingSpace().getEndDate());
     }
 }

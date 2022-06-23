@@ -88,10 +88,9 @@ public class EventHistoryMapper {
     private final FeatureToggleService featureToggleService;
     private final EventHistorySequencer eventHistorySequencer;
     private final Time time;
-    private final String BS_EVENT_DETAILS_REFERENCE = "Breathing space reference";
-    private final String BS_EVENT_DETAILS_START_DATE = "actual start date";
-    private final String BS_EVENT_DETAILS_END_DATE = "actual end date";
-
+    public static final String BS_REF = "Breathing space reference";
+    public static final String BS_START_DT = "actual start date";
+    public static final String BS_END_DATE = "actual end date";
 
     public EventHistory buildEvents(CaseData caseData) {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
@@ -207,18 +206,18 @@ public class EventHistoryMapper {
         buildRespondent1LitigationFriendEvent(builder, caseData);
         buildRespondent2LitigationFriendEvent(builder, caseData);
         buildCaseNotesEvents(builder, caseData);
-        if(null != caseData.getBreathing()) {
-            if(null != caseData.getBreathing().getEnter() && null == caseData.getBreathing().getLift()) {
-                if(BreathingSpaceType.STANDARD.equals(caseData.getBreathing().getEnter().getType())) {
+        if (null != caseData.getBreathing()) {
+            if (null != caseData.getBreathing().getEnter() && null == caseData.getBreathing().getLift()) {
+                if (BreathingSpaceType.STANDARD.equals(caseData.getBreathing().getEnter().getType())) {
                     buildBreathingSpaceEvent(builder, caseData, BREATHING_SPACE_ENTERED, "Enter");
-                } else if(BreathingSpaceType.MENTAL_HEALTH.equals(caseData.getBreathing().getEnter().getType())){
+                } else if (BreathingSpaceType.MENTAL_HEALTH.equals(caseData.getBreathing().getEnter().getType())) {
                     buildBreathingSpaceEvent(builder, caseData,
                                              MENTAL_HEALTH_BREATHING_SPACE_ENTERED, "Enter");
                 }
-            } else if(null != caseData.getBreathing().getLift()) {
-                if(BreathingSpaceType.STANDARD.equals(caseData.getBreathing().getEnter().getType())) {
+            } else if (null != caseData.getBreathing().getLift()) {
+                if (BreathingSpaceType.STANDARD.equals(caseData.getBreathing().getEnter().getType())) {
                     buildBreathingSpaceEvent(builder, caseData, BREATHING_SPACE_LIFTED, "Lifted");
-                } else if(BreathingSpaceType.MENTAL_HEALTH.equals(caseData.getBreathing().getEnter().getType())){
+                } else if (BreathingSpaceType.MENTAL_HEALTH.equals(caseData.getBreathing().getEnter().getType())) {
                     buildBreathingSpaceEvent(builder, caseData, MENTAL_HEALTH_BREATHING_SPACE_LIFTED, "Lifted");
                 }
             }
@@ -231,27 +230,27 @@ public class EventHistoryMapper {
                                           EventType eventType, String bsStatus) {
         String eventDetails = null;
         if (caseData.getBreathing().getEnter().getReference() != null) {
-            eventDetails = eventDetails + BS_EVENT_DETAILS_REFERENCE + " "
+            eventDetails = eventDetails + BS_REF + " "
                 + caseData.getBreathing().getEnter().getReference() + ",";
         }
 
-        if(bsStatus.equals("Enter")) {
+        if (bsStatus.equals("Enter")) {
             if (caseData.getBreathing().getEnter().getStart() != null) {
                 if (eventDetails == null) {
-                    eventDetails = StringUtils.capitalize(BS_EVENT_DETAILS_START_DATE) + " "
+                    eventDetails = StringUtils.capitalize(BS_START_DT) + " "
                         + caseData.getBreathing().getEnter().getStart();
                 } else {
-                    eventDetails = eventDetails + BS_EVENT_DETAILS_START_DATE + " "
+                    eventDetails = eventDetails + BS_START_DT + " "
                         + caseData.getBreathing().getEnter().getStart();
                 }
             }
-        } else if(bsStatus.equals("Lifted")) {
+        } else if (bsStatus.equals("Lifted")) {
             if (caseData.getBreathing().getEnter().getStart() != null) {
                 if (eventDetails == null) {
-                    eventDetails = StringUtils.capitalize(BS_EVENT_DETAILS_END_DATE) + " "
+                    eventDetails = StringUtils.capitalize(BS_END_DATE) + " "
                         + caseData.getBreathing().getEnter().getStart();
                 } else {
-                    eventDetails = eventDetails + BS_EVENT_DETAILS_END_DATE + " "
+                    eventDetails = eventDetails + BS_END_DATE + " "
                         + caseData.getBreathing().getEnter().getStart();
                 }
             }
