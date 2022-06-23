@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
 import uk.gov.hmcts.reform.cmc.model.ClaimData;
-import uk.gov.hmcts.reform.cmc.model.ClaimInfo;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
 import uk.gov.hmcts.reform.cmc.model.CmcParty;
 
@@ -36,7 +36,7 @@ public class ClaimStoreServiceTest {
     private static final String REFERENCE_NUMBER = "256MC007";
     private static final BigDecimal TOTAL_AMOUNT = new BigDecimal("1000");
     private static final LocalDate RESPONSE_DEADLINE = LocalDate.of(2021,1,1);
-    private static final List<ClaimInfo> EXPECTED_CLAIM_RESULT = Arrays.asList(ClaimInfo.builder()
+    private static final List<DashboardClaimInfo> EXPECTED_CLAIM_RESULT = Arrays.asList(DashboardClaimInfo.builder()
                                                                                    .claimNumber(REFERENCE_NUMBER)
                                                                                    .claimAmount(TOTAL_AMOUNT)
                                                                                    .claimantName(CLAIMANT_NAME)
@@ -61,7 +61,7 @@ public class ClaimStoreServiceTest {
 
     @Test
     void shouldReturnClaimsForClaimantsSuccessfully(){
-        List<ClaimInfo> resultClaims = claimStoreService.getClaimsForClaimant("23746486", "1234");
+        List<DashboardClaimInfo> resultClaims = claimStoreService.getClaimsForClaimant("23746486", "1234");
         verify(claimStoreApi).getClaimsForClaimant("23746486", "1234");
         assertThat(resultClaims.size()).isEqualTo(1);
         assertThat(resultClaims.get(0)).isEqualTo(EXPECTED_CLAIM_RESULT.get(0));
@@ -69,7 +69,7 @@ public class ClaimStoreServiceTest {
 
     @Test
     void shouldReturnClaimsForDefendantSuccessfully(){
-        List<ClaimInfo> resultClaims = claimStoreService.getClaimsForDefendant("23746486", "1234");
+        List<DashboardClaimInfo> resultClaims = claimStoreService.getClaimsForDefendant("23746486", "1234");
         verify(claimStoreApi).getClaimsForDefendant("23746486", "1234");
         assertThat(resultClaims.size()).isEqualTo(1);
         assertThat(resultClaims.get(0)).isEqualTo(EXPECTED_CLAIM_RESULT.get(0));

@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
-import uk.gov.hmcts.reform.cmc.model.ClaimInfo;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 
 import java.util.List;
@@ -91,17 +91,17 @@ public class CasesController {
 
     @GetMapping(path="/claimant/{submitterId}")
     @ApiOperation("Gets basic claim information for claimant")
-    public ResponseEntity<List<ClaimInfo>> getClaimsForClaimant(@PathVariable("submitterId") String submitterId,
-                                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-        List<ClaimInfo> ocmcClaims = claimStoreService.getClaimsForClaimant(authorization, submitterId);
+    public ResponseEntity<List<DashboardClaimInfo>> getClaimsForClaimant(@PathVariable("submitterId") String submitterId,
+                                                                         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForClaimant(authorization, submitterId);
         return new ResponseEntity<>(ocmcClaims, HttpStatus.OK);
     }
 
     @GetMapping(path="/defendant/{submitterId}")
     @ApiOperation("Gets basic claim information for defendant")
-    public ResponseEntity<List<ClaimInfo>> getClaimsForDefendant(@PathVariable("submitterId") String submitterId,
-                                                                 @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-        List<ClaimInfo> ocmcClaims = claimStoreService.getClaimsForDefendant(authorization, submitterId);
+    public ResponseEntity<List<DashboardClaimInfo>> getClaimsForDefendant(@PathVariable("submitterId") String submitterId,
+                                                                          @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForDefendant(authorization, submitterId);
         return new ResponseEntity<>(ocmcClaims, HttpStatus.OK);
     }
 }

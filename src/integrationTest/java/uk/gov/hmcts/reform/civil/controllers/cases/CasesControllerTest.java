@@ -10,10 +10,15 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
+import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -34,6 +39,15 @@ public class CasesControllerTest extends BaseIntegrationTest {
         + "\n"
         + " }\n"
         + "}";
+    private static final String CLAIMANT_CLAIMS_URL = "/cases//claimant/{submitterId}";
+    private static final String DEFENDANT_CLAIMS_URL = "/cases/defendant/{submitterId}";
+    private static final List<DashboardClaimInfo> claimResults = Collections.singletonList(DashboardClaimInfo.builder()
+                                                                                      .claimAmount(new BigDecimal("1000"))
+                                                                                      .claimNumber("4786")
+                                                                                      .claimantName("Mr. James Bond")
+                                                                                      .defendantName("Mr. Roger Moore")
+                                                                                      .responseDeadLine(LocalDate.of(2022, 1, 1))
+                                                                                      .build());
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;
@@ -43,6 +57,9 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @MockBean
     private RoleAssignmentsService roleAssignmentsService;
+
+    @MockBean
+    private ClaimStoreService claimStoreService;
 
     @Test
     @SneakyThrows
@@ -102,6 +119,24 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .thenReturn(expectedCaseDetails);
         doPost(BEARER_TOKEN, ELASTICSEARCH, CLAIMS_LIST_URL, "")
             .andExpect(content().json(toJson(expectedCaseData)))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldReturnClaimsForClaimantSuccessfully(){
+      when(claimStoreService.getClaimsForClaimant(any(), any())).thenReturn(claimResults);
+      doGet(BEARER_TOKEN, CLAIMANT_CLAIMS_URL, "123")
+          .andExpect(content().json(toJson(claimResults)))
+          .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldReturnClaimsForDefendantSuccessfully(){
+        when(claimStoreService.getClaimsForDefendant(any(), any())).thenReturn(claimResults);
+        doGet(BEARER_TOKEN, DEFENDANT_CLAIMS_URL, "123")
+            .andExpect(content().json(toJson(claimResults)))
             .andExpect(status().isOk());
     }
 }

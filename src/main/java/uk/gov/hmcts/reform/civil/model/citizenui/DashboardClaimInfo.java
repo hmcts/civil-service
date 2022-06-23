@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.cmc.model;
+package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ClaimInfo {
+public class DashboardClaimInfo {
     private String claimNumber;
     private String claimantName;
     private String defendantName;
