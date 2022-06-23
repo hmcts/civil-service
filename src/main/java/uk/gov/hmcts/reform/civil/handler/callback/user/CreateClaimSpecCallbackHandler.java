@@ -382,11 +382,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1UserDetails.getEmail()).build());
         }
 
-        dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
         dataBuilder.submittedDate(time.now());
 
         if (null != callbackParams.getRequest().getEventId()) {
-            System.out.println(" inside if condition ");
             dataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
             dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
         }
