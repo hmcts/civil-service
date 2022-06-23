@@ -60,8 +60,8 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUES
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.REPLY_TO_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.GENERAL_FORM_OF_APPLICATION;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.REPLY_TO_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT2_ID;
@@ -526,14 +526,21 @@ public class EventHistoryMapper {
     private void buildGeneralApplicationRPA(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         var generalApplications = caseData.getGeneralApplications();
 
-
         List<Event> generalApplicationsEvents = IntStream.range(0, generalApplications.size())
             .mapToObj(index -> {
-                String miscText = "APPLICATION TO " + caseData.getGeneralApplicationsDetails().get(index).getValue().getGeneralApplicationType();
+                String miscText = "APPLICATION TO " + caseData
+                    .getGeneralApplicationsDetails()
+                    .get(index)
+                    .getValue()
+                    .getGeneralApplicationType();
                 return Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(GENERAL_FORM_OF_APPLICATION.getCode())
-                    .dateReceived(caseData.getGeneralApplications().get(index).getValue().getGeneralAppSubmittedDateGAspec())
+                    .dateReceived(caseData
+                                      .getGeneralApplications()
+                                      .get(index)
+                                      .getValue()
+                                      .getGeneralAppSubmittedDateGAspec())
                     .litigiousPartyID(getLitigiousPartyIDGA(caseData.getGeneralApplications().get(index)))
                     .eventDetailsText(miscText)
                     .eventDetails(EventDetails.builder()
