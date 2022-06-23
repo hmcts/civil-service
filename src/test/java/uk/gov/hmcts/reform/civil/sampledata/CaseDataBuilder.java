@@ -260,6 +260,7 @@ public class CaseDataBuilder {
 
     private String respondent1OrganisationIDCopy;
     private String respondent2OrganisationIDCopy;
+    private LocalDateTime addLegalRepDeadline;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -708,6 +709,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addLegalRepDeadline(LocalDateTime date) {
+        this.addLegalRepDeadline = date;
+        return this;
+    }
+
     public CaseDataBuilder takenOfflineByStaffDate(LocalDateTime takenOfflineByStaffDate) {
         this.takenOfflineByStaffDate = takenOfflineByStaffDate;
         return this;
@@ -862,6 +868,7 @@ public class CaseDataBuilder {
         respondent1OrganisationPolicy = null;
         respondent2OrganisationPolicy = null;
         respondentSolicitor1OrganisationDetails = null;
+        addRespondent2 = YES;
         return this;
     }
 
@@ -870,11 +877,13 @@ public class CaseDataBuilder {
         addRespondent2 = NO;
         respondent2 = null;
         respondent2Represented = null;
+        respondent2OrganisationPolicy = null;
         return this;
     }
 
     public CaseDataBuilder atStateClaimIssuedUnrepresentedDefendant1() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
+        addRespondent2 = YES;
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondentSolicitor1OrganisationDetails = null;
@@ -890,6 +899,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimIssuedUnrepresentedDefendant2() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
+        addRespondent2 = YES;
         respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
@@ -906,6 +916,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendants() {
         atStatePendingClaimIssuedUnregisteredDefendant();
+        addRespondent2 = YES;
         respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
@@ -988,6 +999,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
+        addRespondent2 = YES;
         respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
@@ -2747,6 +2759,7 @@ public class CaseDataBuilder {
             .takenOfflineDate(takenOfflineDate)
             .takenOfflineByStaffDate(takenOfflineByStaffDate)
             .claimDismissedDate(claimDismissedDate)
+            .addLegalRepDeadline(addLegalRepDeadline)
             .applicantSolicitor1ServiceAddress(applicantSolicitor1ServiceAddress)
             .respondentSolicitor1ServiceAddress(respondentSolicitor1ServiceAddress)
             .respondentSolicitor2ServiceAddress(respondentSolicitor2ServiceAddress)

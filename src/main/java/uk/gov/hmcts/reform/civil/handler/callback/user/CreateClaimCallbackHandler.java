@@ -383,13 +383,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private boolean areAnyRespondentsLitigantInPerson(CaseData caseData) {
-        boolean isRespondent1LiP =
-            caseData.getRespondent1Represented() == NO && caseData.getRespondent1OrgRegistered() == NO;
-        boolean isRespondent2LiP =
-            YES.equals(caseData.getAddRespondent2())
-                ? (caseData.getRespondent2Represented() == NO && caseData.getRespondent2OrgRegistered() == NO)
-                : false;
-        return isRespondent1LiP || isRespondent2LiP;
+        return caseData.getRespondent1Represented() == NO
+            || (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
     }
 
     private String getBody(CaseData caseData) {
