@@ -18,6 +18,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DashboardClaimInfo {
+
     private String claimNumber;
     private String claimantName;
     private String defendantName;
@@ -30,3 +31,4 @@ public class DashboardClaimInfo {
     private LocalDate responseDeadLine;
 
 }
+

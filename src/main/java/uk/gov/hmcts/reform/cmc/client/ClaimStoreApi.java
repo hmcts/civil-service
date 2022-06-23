@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
 
-
 import java.util.List;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;

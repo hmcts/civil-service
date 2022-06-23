@@ -19,11 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 
 import java.util.List;
@@ -67,7 +67,7 @@ public class CasesController {
     @PostMapping(path = "/")
     @ApiOperation("get list of the cases from CCD")
     public ResponseEntity<SearchResult> getCaseList(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-                                                @RequestBody String searchString) {
+                                                    @RequestBody String searchString) {
 
         log.info("Received getCaseList");
 
@@ -81,7 +81,7 @@ public class CasesController {
     @GetMapping(path = "/actors/{actorId}")
     @ApiOperation("Gets credentials for actorId from RAS")
     public ResponseEntity<RoleAssignmentServiceResponse>
-        getRoleAssignmentsByActorId(@PathVariable("actorId") String actorId,
+    getRoleAssignmentsByActorId(@PathVariable("actorId") String actorId,
                                 @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
 
         log.info("Received ActorId: {}", actorId);
@@ -89,7 +89,7 @@ public class CasesController {
         return new ResponseEntity<>(roleAssignmentResponse, HttpStatus.OK);
     }
 
-    @GetMapping(path="/claimant/{submitterId}")
+    @GetMapping(path = "/claimant/{submitterId}")
     @ApiOperation("Gets basic claim information for claimant")
     public ResponseEntity<List<DashboardClaimInfo>> getClaimsForClaimant(@PathVariable("submitterId") String submitterId,
                                                                          @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
@@ -97,7 +97,7 @@ public class CasesController {
         return new ResponseEntity<>(ocmcClaims, HttpStatus.OK);
     }
 
-    @GetMapping(path="/defendant/{submitterId}")
+    @GetMapping(path = "/defendant/{submitterId}")
     @ApiOperation("Gets basic claim information for defendant")
     public ResponseEntity<List<DashboardClaimInfo>> getClaimsForDefendant(@PathVariable("submitterId") String submitterId,
                                                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
