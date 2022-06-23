@@ -21,6 +21,7 @@ public class AdmitProceedConfText implements RespondToResponseConfirmationTextGe
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
         if (YesOrNo.NO.equals(caseData.getApplicant1ProceedWithClaim())
+            || YesOrNo.NO.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())
             || !ADMISSION.contains(caseData.getRespondent1ClaimResponseTypeForSpec())) {
             return Optional.empty();
         }

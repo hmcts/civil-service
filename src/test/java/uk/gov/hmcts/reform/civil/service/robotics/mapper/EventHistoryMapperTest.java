@@ -1544,10 +1544,10 @@ class EventHistoryMapperTest {
                 .eventSequence(2)
                 .eventCode("999")
                 .dateReceived(caseData.getRespondent1ResponseDate())
-                .eventDetailsText("RPA Reason: [1 of 2 - 2020-08-01] Defendant: Mr. Sole Trader has responded: null")
+                .eventDetailsText("RPA Reason: [1 of 2 - 2020-08-01] Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
                 .eventDetails(EventDetails.builder()
                                   .miscText("RPA Reason: [1 of 2 - 2020-08-01] "
-                                                + "Defendant: Mr. Sole Trader has responded: null")
+                                                + "Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
                                   .build())
                 .build();
 

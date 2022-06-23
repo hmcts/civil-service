@@ -12,4 +12,18 @@ public enum RespondentResponseTypeSpec {
     COUNTER_CLAIM("Reject all of the claim and wants to counterclaim");
 
     private final String displayedValue;
+
+    public RespondentResponseType translate() {
+        switch (this) {
+            case PART_ADMISSION:
+                return RespondentResponseType.PART_ADMISSION;
+            case FULL_ADMISSION:
+                return RespondentResponseType.FULL_ADMISSION;
+            case COUNTER_CLAIM:
+                return RespondentResponseType.COUNTER_CLAIM;
+            case FULL_DEFENCE:
+                return RespondentResponseType.FULL_DEFENCE;
+        }
+        return null;
+    }
 }

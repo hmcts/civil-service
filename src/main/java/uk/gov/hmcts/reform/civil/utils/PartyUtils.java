@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -148,10 +150,20 @@ public class PartyUtils {
         .getRespondentSolicitor2Reference() != null;
 
     public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent) {
-        if (caseData.getRespondent1().equals(respondent)) {
-            return caseData.getRespondent1ClaimResponseType();
+        if (SuperClaimType.SPEC_CLAIM == caseData.getSuperClaimType()) {
+            if (caseData.getRespondent1().equals(respondent)) {
+                return Optional.ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())
+                    .map(RespondentResponseTypeSpec::translate).orElse(null);
+            } else {
+                return Optional.ofNullable(caseData.getRespondent2ClaimResponseTypeForSpec())
+                    .map(RespondentResponseTypeSpec::translate).orElse(null);
+            }
         } else {
-            return caseData.getRespondent2ClaimResponseType();
+            if (caseData.getRespondent1().equals(respondent)) {
+                return caseData.getRespondent1ClaimResponseType();
+            } else {
+                return caseData.getRespondent2ClaimResponseType();
+            }
         }
     }
 }
