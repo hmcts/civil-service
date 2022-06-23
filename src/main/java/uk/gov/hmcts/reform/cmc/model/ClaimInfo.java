@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -19,9 +20,12 @@ import java.time.LocalDate;
 public class ClaimInfo {
     private String claimNumber;
     private String claimantName;
+    private String defendantName;
 
+    @JsonFormat(shape=JsonFormat.Shape.STRING)
+    private BigDecimal claimAmount;
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate responseDeadLine;
-    private String defendantName;
+
 }

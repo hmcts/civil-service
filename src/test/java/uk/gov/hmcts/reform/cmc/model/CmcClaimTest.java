@@ -45,5 +45,4 @@ public class CmcClaimTest {
         String defendantName = cmcClaim.getDefendantName();
         assert(defendantName).equals("");
     }
-
 }

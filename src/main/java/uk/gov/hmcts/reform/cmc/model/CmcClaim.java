@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -27,6 +28,7 @@ public class CmcClaim {
     private String defendantId;
     private String externalId;
     private String referenceNumber;
+    private BigDecimal totalAmountTillToday;
     @JsonProperty("claim")
     private ClaimData claimData;
 

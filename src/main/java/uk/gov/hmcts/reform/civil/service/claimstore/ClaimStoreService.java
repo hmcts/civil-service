@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ClaimStoreService {
+
     private final ClaimStoreApi claimStoreApi;
 
     public List<ClaimInfo> getClaimsForClaimant(String authorisation, String claimantId){
@@ -28,6 +29,7 @@ public class ClaimStoreService {
             .claimantName(cmcClaim.getClaimantName())
             .defendantName(cmcClaim.getDefendantName())
             .responseDeadLine(cmcClaim.getResponseDeadline())
+            .claimAmount(cmcClaim.getTotalAmountTillToday())
             .build()
         ).collect(Collectors.toList());
     }
