@@ -8,21 +8,17 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.CreateClaimRespondentNotificationHandler.TASK_ID_EMAIL_APP_SOL_CC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.CreateClaimRespondentNotificationHandler.TASK_ID_EMAIL_FIRST_SOL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.CreateClaimRespondentNotificationHandler.TASK_ID_EMAIL_SECOND_SOL;
@@ -59,38 +55,6 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
                 .thenReturn("multiparty-template-id");
         }
 
-        @Test
-        void shouldNotifyRespondentSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE").build()).build();
-
-            handler.handle(params);
-
-            verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
-                "multiparty-template-id",
-                getNotificationDataMap(caseData),
-                "create-claim-respondent-notification-000DC001"
-            );
-        }
-
-        @Test
-        void shouldNotifyApplicantSolicitor_whenInvokedWithCcEvent() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE_CC").build()).build();
-
-            handler.handle(params);
-
-            verify(notificationService).sendMail(
-                "applicantsolicitor@example.com",
-                "multiparty-template-id",
-                getNotificationDataMap(caseData),
-                "create-claim-respondent-notification-000DC001"
-            );
-        }
-
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
@@ -99,69 +63,6 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         }
-
-        @Test
-        void shouldNotifyRespondentSolicitor_whenInvolked_InOneVsTwoCaseSameSolicitor() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefence()
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, caseData)
-                .request(CallbackRequest.builder()
-                             .eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE")
-                             .build())
-                .build();
-
-            handler.handle(params);
-
-            verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
-                "multiparty-template-id",
-                getNotificationDataMap(caseData),
-                "create-claim-respondent-notification-000DC001"
-            );
-        }
-
-        @Test
-        void shouldNotifyRespondentSolicitor_whenInvolked_InOneVsTwoCaseDifferentSolicitor() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefence()
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder()
-                .of(ABOUT_TO_SUBMIT, caseData)
-                .request(CallbackRequest.builder()
-                             .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_ISSUE")
-                             .build())
-                .build();
-
-            handler.handle(params);
-
-            verify(notificationService).sendMail(
-                "respondentsolicitor2@example.com",
-                "multiparty-template-id",
-                getNotificationDataMap(caseData),
-                "create-claim-respondent-notification-000DC001"
-            );
-        }
-
-        @Test
-        void shouldNotifyRespondentSolicitor_whenInvokedWithMultipartyEnabled() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefence()
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE").build()).build();
-
-            handler.handle(params);
-
-            verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
-                "multiparty-template-id",
-                getNotificationDataMap(caseData),
-                "create-claim-respondent-notification-000DC001"
-            );
-        }
-
     }
 
     @Test

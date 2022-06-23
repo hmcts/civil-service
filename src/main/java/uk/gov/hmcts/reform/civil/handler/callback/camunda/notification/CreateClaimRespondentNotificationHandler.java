@@ -117,7 +117,7 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     }
 
     private void sendNotificationToSolicitor(CaseData caseData, String recipient) {
-        for(int i = 0; i < 174; i++) {
+        for (int i = 0; i < 174; i++) {
             notificationService.sendMail(
                 recipient,
                 notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate(),

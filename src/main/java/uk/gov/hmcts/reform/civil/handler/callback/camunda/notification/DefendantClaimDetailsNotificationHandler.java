@@ -81,7 +81,7 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
         String recipient = getRecipientEmail(caseData, caseEvent);
         String emailTemplate = notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate();
 
-        for(int i = 0; i < 250; i++) {
+        for (int i = 0; i < 250; i++) {
             notificationService.sendMail(
                 recipient,
                 emailTemplate,
