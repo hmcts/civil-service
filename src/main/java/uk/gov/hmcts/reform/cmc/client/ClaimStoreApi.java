@@ -14,8 +14,10 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 public interface ClaimStoreApi {
 
     @GetMapping("/claims/claimant/{submitterId}")
-    List<CmcClaim> getClaimsForClaimant(@RequestHeader(AUTHORIZATION) String authorisation, @PathVariable String submitterId);
+    List<CmcClaim> getClaimsForClaimant(@RequestHeader(AUTHORIZATION) String authorisation,
+                                        @PathVariable String submitterId);
 
     @GetMapping("/claims/defendant/{submitterId}")
-    List<CmcClaim> getClaimsForDefendant(@RequestHeader(AUTHORIZATION) String authorisation, @PathVariable String submitterId);
+    List<CmcClaim> getClaimsForDefendant(@RequestHeader(AUTHORIZATION) String authorisation,
+                                         @PathVariable String submitterId);
 }
