@@ -14,14 +14,12 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
 import java.time.LocalDate;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -39,8 +37,6 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 })
 class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
-    private DeadlinesCalculator deadlinesCalculator;
     @MockBean
     private NotificationService notificationService;
     @MockBean
@@ -67,10 +63,8 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
             @BeforeEach
             void setup() {
                 caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent1TimeExtension().build();
-                when(deadlinesCalculator.calculateFirstWorkingDay(any()))
-                    .thenReturn(LocalDate.now());
                 expectedNotificationData = getNotificationDataMap(
-                    caseData.getRespondentSolicitor1AgreedDeadlineExtension());
+                    caseData.getRespondent1ResponseDeadline().toLocalDate());
             }
 
             @Test
@@ -117,7 +111,7 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
                     .build();
 
                 Map<String, String> expectedNotificationData = getNotificationDataMap(
-                    caseData.getRespondentSolicitor2AgreedDeadlineExtension()
+                    caseData.getRespondent2ResponseDeadline().toLocalDate()
                 );
 
                 invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_CC");
@@ -137,10 +131,8 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
             @BeforeEach
             void setup() {
                 caseData = CaseDataBuilder.builder().atStateNotificationAcknowledgedRespondent2TimeExtension().build();
-                when(deadlinesCalculator.calculateFirstWorkingDay(any()))
-                    .thenReturn(LocalDate.now());
                 expectedNotificationData = getNotificationDataMap(
-                    caseData.getRespondentSolicitor2AgreedDeadlineExtension());
+                    caseData.getRespondent2ResponseDeadline().toLocalDate());
             }
 
             @Test
@@ -187,7 +179,7 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
                     .build();
 
                 expectedNotificationData = getNotificationDataMap(
-                    caseData.getRespondentSolicitor2AgreedDeadlineExtension()
+                    caseData.getRespondent2ResponseDeadline().toLocalDate()
                 );
 
                 invokeAboutToSubmitWithEvent("NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC");
