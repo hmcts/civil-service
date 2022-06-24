@@ -37,7 +37,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_CLAIM_FORM);
     private static final String TASK_ID = "GenerateClaimForm";
-    private static final String bundleName = "Sealed Claim Form with LiP Claim Form";
+    private static final String BUNDLE_NAME = "Sealed Claim Form with LiP Claim Form";
 
     private final CivilDocumentStitchingService civilDocumentStitchingService;
     private final LitigantInPersonFormGenerator litigantInPersonFormGenerator;
@@ -98,7 +98,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
                     documents,
                     callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
                     sealedClaim.getDocumentName(),
-                    bundleName,
+                    BUNDLE_NAME,
                     caseData
                 );
 

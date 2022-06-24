@@ -128,15 +128,36 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
     void setup() {
         when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
         when(litigantInPersonFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(LIP_FORM);
+        when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
+                                                  any(CaseData.class))).thenReturn(STITCHED_DOC);
         when(time.now()).thenReturn(issueDate.atStartOfDay());
     }
 
     @Nested
-    class GenerateClaimForm {
+    class GenerateClaimFormOnly {
 
         @Test
-        void shouldGenerateClaimForm_withoutLipForm_whenAboutToSubmitEventIsCalled() {
+        void shouldGenerateClaimForm_whenOneVsOne_andDefendantRepresented() {
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
+            assertThat(updatedData.getIssueDate()).isEqualTo(issueDate);
+
+            verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
+            verifyNoInteractions(litigantInPersonFormGenerator);
+            verifyNoInteractions(civilDocumentStitchingService);
+        }
+
+        @Test
+        void shouldGenerateClaimForm_whenOneVsTwo_andBothPartiesRepresented() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssued()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -153,12 +174,6 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class GenerateAndStitchLitigantInPersonForm {
-
-        @BeforeEach
-        void setupStitchingApiMock() {
-            when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
-                                                      any(CaseData.class))).thenReturn(STITCHED_DOC);
-        }
 
         @Test
         void shouldStitchClaimFormWithLipForm_whenOneVsOne_withLitigantInPerson() {
@@ -213,22 +228,21 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotStitchClaimFormWithLipForm_whenOneVsTwo_andBothPartiesRepresented() {
+        void shouldStitchClaimFormWithLipForm_whenOneVsTwo_andBothDefendantsAreLitigantInPerson() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStatePendingClaimIssued()
-                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateClaimSubmittedNoRespondentRepresented()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
-            assertThat(updatedData.getIssueDate()).isEqualTo(issueDate);
 
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(STITCHED_DOC);
             verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
-            verifyNoInteractions(litigantInPersonFormGenerator);
-            verifyNoInteractions(civilDocumentStitchingService);
+            verify(litigantInPersonFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
+            verify(civilDocumentStitchingService).bundle(eq(documents), anyString(), anyString(), anyString(),
+                                                         eq(caseData)
+            );
         }
     }
 
