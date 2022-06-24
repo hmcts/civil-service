@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
 @Setter
 @Data
 @Builder(toBuilder = true)
