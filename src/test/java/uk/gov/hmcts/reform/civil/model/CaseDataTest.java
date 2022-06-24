@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.model;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
