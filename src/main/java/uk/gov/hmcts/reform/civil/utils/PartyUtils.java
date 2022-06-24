@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.PartyData;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 
 import java.time.LocalDate;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -150,15 +151,11 @@ public class PartyUtils {
         .getRespondentSolicitor2Reference() != null;
 
     public static Object getResponseType(CaseData caseData, Party respondent) {
-        Object responseType = "";
-
-        if (caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
-            responseType = getResponseTypeForRespondentSpec(caseData, respondent);
-        } else {
-            responseType = getResponseTypeForRespondent(caseData, respondent);
+        if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+            return getResponseTypeForRespondentSpec(caseData, respondent);
         }
 
-        return responseType;
+        return getResponseTypeForRespondent(caseData, respondent);
     }
 
     public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent) {
