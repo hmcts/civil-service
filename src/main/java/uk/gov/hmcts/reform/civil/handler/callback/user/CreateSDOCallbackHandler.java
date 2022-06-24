@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackDisclosureOfDocumentsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -262,6 +263,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
             updatedData.fastTrackJudgementDeductionValue(tempFastTrackJudgementDeductionValue).build();
         }
+
+        List<FastTrackDisclosureOfDocumentsToggle> testList = Arrays.asList(FastTrackDisclosureOfDocumentsToggle.SHOW);
+
+        updatedData.fastTrackDisclosureOfDocumentsToggle(testList).build();
 
         FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
             .input1("By serving a list with a disclosure statement by 4pm on")

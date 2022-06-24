@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackDisclosureOfDocumentsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -129,6 +130,7 @@ public class CaseDataParent implements MappableObject {
     private FastTrackNotes fastTrackNotes;
     private FastTrackPreferredTelephone fastTrackPreferredTelephone;
     private FastTrackPreferredEmail fastTrackPreferredEmail;
+    private List<FastTrackDisclosureOfDocumentsToggle> fastTrackDisclosureOfDocumentsToggle;
 
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
