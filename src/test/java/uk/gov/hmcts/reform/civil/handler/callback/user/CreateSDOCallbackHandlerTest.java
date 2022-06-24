@@ -506,9 +506,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("input4")
                 .isEqualTo("For this limitation, a party is counted as a witness.");
             assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("text")
-                .isEqualTo("A witness statement must: \na)Start with the name of the case and the claim number;"
-                               + "\nb)State the full name and address of the witness; "
-                               + "\nc)Set out the witness's evidence clearly in numbered paragraphs on numbered pages;"
+                .isEqualTo("A witness statement must: \na) Start with the name of the case and the claim number;"
+                               + "\nb) State the full name and address of the witness; "
+                               + "\nc) Set out the witness's evidence clearly in numbered paragraphs on numbered pages;"
                                + "\nd) End with this paragraph: 'I believe that the facts stated in this witness "
                                + "statement are true. I understand that proceedings for contempt of court may be "
                                + "brought against anyone who makes, or causes to be made, a false statement in a "
