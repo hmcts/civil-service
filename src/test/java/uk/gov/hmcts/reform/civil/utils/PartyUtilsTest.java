@@ -4,9 +4,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -17,14 +15,12 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
