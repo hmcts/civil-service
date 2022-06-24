@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
@@ -51,6 +52,7 @@ public class RoboticsDataMapperForSpecTest {
                              .type(Party.Type.COMPANY)
                              .companyName("company 2")
                              .build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
             .breathing(BreathingSpaceInfo.builder()
                            .enter(BreathingSpaceEnterInfo.builder()
                                       .type(BreathingSpaceType.STANDARD)

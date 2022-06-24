@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -880,12 +881,13 @@ public class EventHistoryMapper {
                                   .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
                                   .eventDetails(EventDetails.builder()
                                                     .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
-                                                    .preferredCourtCode("")
+                                                    .preferredCourtCode(
+                                                        getPreferredCourtCode(caseData.getApplicant1DQ()))
                                                     .preferredCourtName("")
                                                     .build())
                                   .eventDetailsText(prepareEventDetailsText(
                                       applicantDetails.get(index).getDq(),
-                                      ""
+                                      getPreferredCourtCode(caseData.getApplicant1DQ())
                                   ))
                                   .build())
                 .collect(Collectors.toList());
@@ -981,11 +983,20 @@ public class EventHistoryMapper {
                 break;
             }
             case TWO_V_ONE: {
+                YesOrNo app1Proceeds;
+                YesOrNo app2Proceeds;
+                if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+                    app1Proceeds = caseData.getApplicant1ProceedWithClaimSpec2v1();
+                    app2Proceeds = app1Proceeds;
+                } else {
+                    app1Proceeds = caseData.getApplicant1ProceedWithClaimMultiParty2v1();
+                    app2Proceeds = caseData.getApplicant2ProceedWithClaimMultiParty2v1();
+                }
                 eventDetailsText.add(String.format(
                     "RPA Reason: [1 of 2 - %s] Claimant: %s has provided intention: %s",
                     currentTime,
                     caseData.getApplicant1().getPartyName(),
-                    YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+                    YES.equals(app1Proceeds)
                         ? "proceed"
                         : "not proceed"
                 ));
@@ -993,7 +1004,7 @@ public class EventHistoryMapper {
                     "RPA Reason: [2 of 2 - %s] Claimant: %s has provided intention: %s",
                     currentTime,
                     caseData.getApplicant2().getPartyName(),
-                    YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
+                    YES.equals(app2Proceeds)
                         ? "proceed"
                         : "not proceed"
                 ));

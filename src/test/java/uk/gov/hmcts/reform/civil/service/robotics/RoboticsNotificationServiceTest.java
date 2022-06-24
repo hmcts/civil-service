@@ -73,7 +73,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     properties = {
         "sendgrid.api-key:some-key",
         "robotics.notification.sender:no-reply@exaple.com",
-        "robotics.notification.recipient:recipient@example.com",
+        "robotics.notification.recipient:multipartyrecipient@example.com",
         "robotics.notification.multipartyrecipient:multipartyrecipient@example.com"
     }
 )
