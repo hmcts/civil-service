@@ -541,7 +541,11 @@ public class EventHistoryMapper {
                                       .get(index)
                                       .getValue()
                                       .getGeneralAppSubmittedDateGAspec())
-                    .litigiousPartyID(getLitigiousPartyIDGA(caseData.getGeneralApplications().get(index)))
+                    .litigiousPartyID(caseData
+                                          .getGeneralApplications()
+                                          .get(index)
+                                          .getValue()
+                                          .getGeneralApplicationParties().getLitigiousPartyID())
                     .eventDetailsText(miscText)
                     .eventDetails(EventDetails.builder()
                                       .miscText(miscText)
@@ -553,13 +557,6 @@ public class EventHistoryMapper {
 
         builder.generalFormOfApplication(generalApplicationsEvents);
 
-    }
-
-    private String getLitigiousPartyIDGA(Element<GeneralApplication> generalApplication) {
-        if (generalApplication.getValue().getApplicantPartyName() != null) {
-            return APPLICANT_ID;
-        }
-        return RESPONDENT_ID;
     }
 
     private boolean rpaEnabledForClaim(CaseData caseData) {
