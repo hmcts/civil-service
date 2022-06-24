@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -24,8 +23,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_CLAIM_FORM;
@@ -35,9 +34,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 @RequiredArgsConstructor
 @SuppressWarnings("unchecked")
 public class GenerateClaimFormCallbackHandler extends CallbackHandler {
-
-    @Value("${stitching.enabled:false}")
-    private boolean stitchEnabled;
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_CLAIM_FORM);
     private static final String TASK_ID = "GenerateClaimForm";
@@ -76,36 +72,38 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
         );
 
         if (caseData.getRespondent1Represented().equals(YesOrNo.NO)
-            || Optional.ofNullable(caseData.getRespondent2Represented()).equals(YesOrNo.NO)) {
+            || ofNullable(caseData.getRespondent2Represented()).isPresent()
+            && caseData.getRespondent2Represented().equals(YesOrNo.NO)) {
 
             CaseDocument lipForm = litigantInPersonFormGenerator.generate(
                 caseDataBuilder.build(),
-                callbackParams.getParams().get(BEARER_TOKEN).toString());
+                callbackParams.getParams().get(BEARER_TOKEN).toString()
+            );
 
-            if (stitchEnabled) {
-                List<DocumentMetaData> documents = Arrays.asList(
-                    new DocumentMetaData(
-                        sealedClaim.getDocumentLink(),
-                        "Sealed Claim Form",
-                        LocalDate.now().toString()
-                    ),
-                    new DocumentMetaData(
-                        lipForm.getDocumentLink(),
-                        "Litigant in person claim form",
-                        LocalDate.now().toString()
-                    ));
+            List<DocumentMetaData> documents = Arrays.asList(
+                new DocumentMetaData(
+                    sealedClaim.getDocumentLink(),
+                    "Sealed Claim Form",
+                    LocalDate.now().toString()
+                ),
+                new DocumentMetaData(
+                    lipForm.getDocumentLink(),
+                    "Litigant in person claim form",
+                    LocalDate.now().toString()
+                )
+            );
 
-                CaseDocument sealedClaimFormWithLiPForm =
-                    civilDocumentStitchingService.bundle(
-                        documents,
-                        callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                        sealedClaim.getDocumentName(),
-                        bundleName,
-                        caseData
+            CaseDocument sealedClaimFormWithLiPForm =
+                civilDocumentStitchingService.bundle(
+                    documents,
+                    callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                    sealedClaim.getDocumentName(),
+                    bundleName,
+                    caseData
                 );
 
-                caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaimFormWithLiPForm));
-            }
+            caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaimFormWithLiPForm));
+
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
         }
