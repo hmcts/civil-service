@@ -9,11 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class SmallClaimsWitnessStatement {
+public class SmallClaimsOrderAndHearingDetails {
 
-    private String input1;
-    private String input2;
-    private String input3;
-    private String input4;
     private String text;
 }

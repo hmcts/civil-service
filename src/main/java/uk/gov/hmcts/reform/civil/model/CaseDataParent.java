@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsOrderAndHearingDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredEmail;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredTelephone;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
@@ -146,6 +147,7 @@ public class CaseDataParent implements MappableObject {
     private SmallClaimsJudgementDeductionValue smallClaimsJudgementDeductionValue;
     private SmallClaimsJudgesRecital smallClaimsJudgesRecital;
     private SmallClaimsNotes smallClaimsNotes;
+    private SmallClaimsOrderAndHearingDetails smallClaimsOrderAndHearingDetails;
     private SmallClaimsPreferredEmail smallClaimsPreferredEmail;
     private SmallClaimsPreferredTelephone smallClaimsPreferredTelephone;
     private SmallClaimsWitnessStatement smallClaimsWitnessStatement;

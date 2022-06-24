@@ -429,6 +429,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackRoadTrafficAccident").extracting("input")
                 .isEqualTo("Photographs and/or a plan of the location of the accident shall be prepared and "
                                + "agreed by the parties.");
+            assertThat(response.getData()).extracting("smallClaimsOrderAndHearingDetails").extracting("text")
+                .isEqualTo("Warning: you must comply with the terms imposed upon you by this order otherwise "
+                               + "your claim or the defence of it is liable to be struck out or some "
+                               + "other sanction imposed. If you cannot comply you are expected to make "
+                               + "formal application to the court before any deadline imposed upon you expires."
+                               + "\n\nYou are encouraged to try to settle the case with the other side. You may also "
+                               + "contact the Small Claims Mediation Service to arrange a mediation appointment. "
+                               + "The service is free and it can be contacted on 01604795511.");
 
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input1")
                 .isEqualTo("1. If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
@@ -497,6 +505,25 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(null);
             assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("input4")
                 .isEqualTo("For this limitation, a party is counted as a witness.");
+            assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("text")
+                .isEqualTo("A witness statement must: \na)Start with the name of the case and the claim number;"
+                               + "\nb)State the full name and address of the witness; "
+                               + "\nc)Set out the witness's evidence clearly in numbered paragraphs on numbered pages;"
+                               + "\nd) End with this paragraph: 'I believe that the facts stated in this witness "
+                               + "statement are true. I understand that proceedings for contempt of court may be "
+                               + "brought against anyone who makes, or causes to be made, a false statement in a "
+                               + "document verified by a statement of truth without an honest belief in its truth'."
+                               + "\ne) be signed by the witness and dated."
+                               + "\nf) if a witness is unable to read the statement there must be a certificate that "
+                               + "it has been read or interpreted to the witness by a suitably qualified person and "
+                               + "at the final hearing there must be an independent interpreter who will not be "
+                               + "provided by the Court."
+                               + "\n\nThe judge may refuse to allow a witness to give evidence or consider any "
+                               + "statement of any witness whose statement has not been sent to the court and the "
+                               + "other party/ies in accordance with the paragraphs above."
+                               + "\n\nA witness whose statement is sent in accordance with the above should attend "
+                               + "the hearing, If they do not attend, it will be for the court to decide how much "
+                               + "reliance, if any, to place on their evidence.");
 
             assertThat(response.getData()).extracting("smallClaimsHearing").extracting("input1")
                 .isEqualTo("The hearing of the claim will be on a date to be notified to you by a separate "
