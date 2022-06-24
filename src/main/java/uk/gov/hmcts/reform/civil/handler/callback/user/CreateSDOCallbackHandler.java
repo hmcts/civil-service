@@ -12,13 +12,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackDisclosureOfDocumentsToggle;
-import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
-import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.enums.sdo.*;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
@@ -51,6 +46,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -264,9 +260,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.fastTrackJudgementDeductionValue(tempFastTrackJudgementDeductionValue).build();
         }
 
-        List<FastTrackDisclosureOfDocumentsToggle> testList = Arrays.asList(FastTrackDisclosureOfDocumentsToggle.SHOW);
+        FastTrackMasterToggle fastTrackMasterToggle = FastTrackMasterToggle.builder()
+            .fastTrackDisclosureOfDocumentsToggle(FastTrackDisclosureOfDocumentsToggle.SHOW)
+            .fastTrackAnotherFieldSetToggle(FastTrackAnotherFieldSetToggle.HIDE)
+            .build();
 
-        updatedData.fastTrackDisclosureOfDocumentsToggle(testList).build();
+        updatedData.fastTrackMasterToggle(fastTrackMasterToggle).build();
 
         FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
             .input1("By serving a list with a disclosure statement by 4pm on")
