@@ -55,6 +55,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 import javax.validation.Valid;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
@@ -63,7 +65,6 @@ import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 @Jacksonized
 @EqualsAndHashCode(callSuper = true)
 @Data
-@SuppressWarnings("unchecked")
 public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -403,4 +404,21 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonUnwrapped(suffix = "Breathing")
     private final BreathingSpaceInfo breathing;
+
+    /**
+     * There are several fields that can hold the I2P of applicant1 depending
+     * on multiparty scenario, which complicates all conditions depending on it.
+     * This method tries to simplify those conditions since only one field will be
+     * meaningful for that.
+     *
+     * @return value set among the fields that hold the I2P of applicant1
+     */
+    public YesOrNo getApplicant1ProceedsWithClaimSpec() {
+        return Stream.of(
+                applicant1ProceedWithClaim,
+                getApplicant1ProceedWithClaimSpec2v1()
+            )
+            .filter(Objects::nonNull)
+            .findFirst().orElse(null);
+    }
 }
