@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.utils;
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
@@ -18,7 +17,6 @@ import java.util.function.Predicate;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 
 public class PartyUtils {
 
@@ -152,7 +150,7 @@ public class PartyUtils {
         .getRespondentSolicitor2Reference() != null;
 
     public static Object getResponseType(CaseData caseData, Party respondent) {
-        if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+        if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SuperClaimType.SPEC_CLAIM)) {
             return getResponseTypeForRespondentSpec(caseData, respondent);
         }
 
