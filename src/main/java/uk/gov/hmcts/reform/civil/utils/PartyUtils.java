@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.model.PartyData;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 
 import java.time.LocalDate;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Predicate;
 
