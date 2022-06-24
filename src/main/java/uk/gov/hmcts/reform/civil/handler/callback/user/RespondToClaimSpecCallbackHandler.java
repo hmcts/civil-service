@@ -1222,6 +1222,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
+        if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWOSPEC)
+            && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+            updatedData.defenceAdmitPartPaymentTimeRouteRequired(null);
+        }
 
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
