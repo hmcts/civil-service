@@ -27,6 +27,17 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingSchedulesOfLoss;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -426,4 +437,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearingDJ;
     private DisposalHearingBundle disposalHearingBundleDJ;
     private DisposalHearingNotes disposalHearingNotesDJ;
+
+    //default judgement SDO fields for trial
+    private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
+    private TrialHearingDisclosureOfDocuments trialHearingDisclosureOfDocumentsDJ;
+    private TrialHearingWitnessOfFact trialHearingWitnessOfFactDJ;
+    private TrialHearingSchedulesOfLoss trialHearingSchedulesOfLossDJ;
+    private TrialHearingTrial trialHearingTrialDJ;
+    private TrialHearingNotes trialHearingNotesDJ;
+    private TrialBuildingDispute trialBuildingDispute;
+    private TrialClinicalNegligence trialClinicalNegligence;
+    private TrialCreditHire trialCreditHire;
+    private TrialPersonalInjury trialPersonalInjury;
+    private TrialRoadTrafficAccident trialRoadTrafficAccident;
 }
