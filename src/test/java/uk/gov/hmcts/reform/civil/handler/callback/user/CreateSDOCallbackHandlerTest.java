@@ -484,7 +484,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "the court to consider when reaching its decision.");
             assertThat(response.getData()).extracting("smallClaimsDocuments").extracting("input2")
                 .isEqualTo("The court may refuse to consider any document which has not been sent to the other "
-                               +"party/ies and the court as set out above.");
+                               + "party/ies and the court as set out above.");
 
             assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("input1")
                 .isEqualTo("Each party must send to the other party(ies) and to the court office to be received not "

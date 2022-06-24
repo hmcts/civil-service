@@ -46,16 +46,17 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredEmail;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredTelephone;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredEmail;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredTelephone;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
@@ -509,7 +510,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                     + "than 14 days before the hearing, copies of all documents which they wish the court to "
                     + "consider when reaching its decision.")
             .input2("The court may refuse to consider any document which has not been sent to the other "
-                    +"party/ies and the court as set out above.")
+                    + "party/ies and the court as set out above.")
             .build();
 
         updatedData.smallClaimsDocuments(tempSmallClaimsDocuments).build();
@@ -529,10 +530,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             SmallClaimsHearing.builder()
                 .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
                        + "The hearing will have a time estimate of")
-                .input2("The claimant must by no later than 14 days before the hearing date, pay the court the required "
-                       + "hearing fee or submit a fully completed application for Help with Fees. If the claimant "
-                       + "fails to pay the fee or obtain a fee exemption by that time the claim will be struck "
-                       + "without further order.")
+                .input2("The claimant must by no later than 14 days before the hearing date, pay the court the "
+                       + "required hearing fee or submit a fully completed application for Help with Fees. If the "
+                       + "claimant fails to pay the fee or obtain a fee exemption by that time the claim will be "
+                       + "struck without further order.")
                 .build();
 
         updatedData.smallClaimsHearing(tempSmallClaimsHearing).build();

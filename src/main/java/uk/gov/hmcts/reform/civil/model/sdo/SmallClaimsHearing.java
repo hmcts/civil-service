@@ -6,9 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsTimeEstimate;
 
-import javax.validation.constraints.Future;
-import java.time.LocalDate;
-
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
