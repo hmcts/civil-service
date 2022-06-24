@@ -63,6 +63,7 @@ import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAParties;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
@@ -1344,11 +1345,15 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder getGeneralApplicationWithPartyName() {
+    public CaseDataBuilder getGeneralApplicationWithLitigiousPartyID001() {
         List<GeneralApplicationTypes> types = Arrays.asList(STRIKE_OUT);
         List<Element<GeneralApplication>> generalApplicationValues = wrapElements(
             GeneralApplication.builder()
                 .applicantPartyName("partyName")
+                .generalApplicationParties(GAParties.builder()
+                                               .litigiousPartyID("001")
+                                               .applicantPartyName("partyName")
+                                               .build())
                 .generalAppDateDeadline(DEADLINE)
                 .generalAppSubmittedDateGAspec(SUBMITTED_DATE_TIME)
                 .generalAppType(GAApplicationType.builder()

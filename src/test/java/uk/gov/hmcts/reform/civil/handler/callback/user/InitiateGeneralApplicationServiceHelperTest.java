@@ -279,7 +279,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         assertThat(result.getGeneralAppRespondentSolicitors().get(0).getValue()
                        .getOrganisationIdentifier()).isEqualTo("345");
-        assertThat(result.getApplicantPartyName()).isEqualTo("Applicant1");
+        assertThat(result.getGeneralApplicationParties().getApplicantPartyName()).isEqualTo("Applicant1");
 
     }
 
@@ -329,7 +329,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         assertThat(result.getGeneralAppRespondentSolicitors().get(0).getValue()
                        .getOrganisationIdentifier()).isEqualTo("123");
 
-        assertThat(result.getApplicantPartyName()).isEqualTo("Respondent1");
+        assertThat(result.getGeneralApplicationParties().getApplicantPartyName()).isEqualTo("Respondent1");
 
     }
 
@@ -389,7 +389,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
         respOrgs.forEach(org -> assertThat(result.getGeneralAppRespondentSolicitors()
                 .stream().filter(e -> org.equals(e.getValue().getOrganisationIdentifier()))
                 .count()).isEqualTo(1));
-        assertThat(result.getApplicantPartyName()).isEqualTo("Respondent2");
+        assertThat(result.getGeneralApplicationParties().getApplicantPartyName()).isEqualTo("Respondent2");
     }
 
     @Test
