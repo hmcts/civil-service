@@ -186,7 +186,7 @@ class StateFlowEngineTest {
         @Test
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmittedOnlySecondRespondentIsRepresented() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimSubmitted1v2AndSecondRespondentIsRepresented()
+                .atStateClaimSubmitted1v2AndOnlySecondRespondentIsRepresented()
                 .build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
