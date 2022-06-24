@@ -126,11 +126,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder builder = caseData.toBuilder()
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC))
             .applicant1ResponseDate(time.now());
-
-        if (caseData.getApplicant1ProceedWithClaim() == YES) {
+        if (caseData.getApplicant1ProceedWithClaim() == YES
+            || caseData.getApplicant1ProceedWithClaimSpec2v1() == YES) {
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Applicant1DQ dq = caseData.getApplicant1DQ().toBuilder()
@@ -183,7 +183,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private String getDefaultConfirmationText(CaseData caseData) {
-        if (YesOrNo.YES.equals(caseData.getApplicant1ProceedWithClaim())) {
+        if (YesOrNo.YES.equals(caseData.getApplicant1ProceedWithClaim())
+            || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
             return "<h2 class=\"govuk-heading-m\">What happens next</h2>"
                 + "We'll review the case and contact you about what to do next.<br>"
                 + format(
@@ -202,7 +203,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private String getDefaultConfirmationHeader(CaseData caseData) {
         String claimNumber = caseData.getLegacyCaseReference();
-        if (YesOrNo.YES.equals(caseData.getApplicant1ProceedWithClaim())) {
+        if (YesOrNo.YES.equals(caseData.getApplicant1ProceedWithClaim())
+            || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
             return format(
                 "# You have decided to proceed with the claim%n## Claim number: %s",
                 claimNumber
