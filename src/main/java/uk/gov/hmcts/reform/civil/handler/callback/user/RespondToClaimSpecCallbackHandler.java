@@ -347,9 +347,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     necessary.add(NEED_FINANCIAL_DETAILS_2);
                 }
 
-                if (respondent2doesNotPayImmediately(caseData, scenario)) {
-                    necessary.add(WHY_2_DOES_NOT_PAY_IMMEDIATELY);
-                }
+            }
+
+            if (respondent2doesNotPayImmediately(caseData, scenario)) {
+                necessary.add(WHY_2_DOES_NOT_PAY_IMMEDIATELY);
             }
 
             if ((caseData.getRespondentResponseIsSame() == YES
