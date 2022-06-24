@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
@@ -413,6 +414,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
      *
      * @return value set among the fields that hold the I2P of applicant1
      */
+    @JsonIgnore
     public YesOrNo getApplicant1ProceedsWithClaimSpec() {
         return Stream.of(
                 applicant1ProceedWithClaim,
