@@ -23,7 +23,8 @@ public enum RespondentResponseTypeSpec {
                 return RespondentResponseType.COUNTER_CLAIM;
             case FULL_DEFENCE:
                 return RespondentResponseType.FULL_DEFENCE;
+            default:
+                return null;
         }
-        return null;
     }
 }
