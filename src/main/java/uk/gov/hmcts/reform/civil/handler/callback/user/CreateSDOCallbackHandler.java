@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackDisclosureOfDocumentsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -100,6 +101,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "order-details"), this::prePopulateOrderDetailsPages)
             .put(callbackKey(MID, "order-details-navigation"), this::setOrderDetailsFlags)
+            .put(callbackKey(MID, "toggle"), this::testToggle)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -108,6 +110,21 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private CallbackResponse testToggle(CallbackParams callbackParams) {
+        System.out.println("hit test toggle callback");
+
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
+
+        System.out.println("caseData.getFastTrackDisclosureOfDocumentsToggle(): ");
+        System.out.println(caseData.getFastTrackDisclosureOfDocumentsToggle());
+        System.out.println(caseData.getFastTrackDisclosureOfDocumentsToggle() instanceof List);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
+            .build();
     }
 
     // This is currently a mid event but once pre states are defined it should be moved to an about to start event.
@@ -262,6 +279,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
             updatedData.fastTrackJudgementDeductionValue(tempFastTrackJudgementDeductionValue).build();
         }
+
+        // preopulates the toggle to show the section
+        caseData.getFastTrackDisclosureOfDocumentsToggle().add(FastTrackDisclosureOfDocumentsToggle.SHOW);
 
         FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
             .input1("By serving a list with a disclosure statement by 4pm on")
