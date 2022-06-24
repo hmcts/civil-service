@@ -137,10 +137,14 @@ public class RoboticsDataMapperForSpec {
         if (organisationId.isEmpty() && organisationDetails.isEmpty()) {
             return null;
         }
+        var solicitorEmail = ofNullable(
+            caseData.getRespondentSolicitor1EmailAddress()
+        );
         solicitorBuilder
             .id(id)
             .isPayee(false)
             .organisationId(organisationId.orElse(null))
+            .contactEmailAddress(solicitorEmail.orElse(null))
             .reference(ofNullable(caseData.getSolicitorReferences())
                            .map(SolicitorReferences::getRespondentSolicitor1Reference)
                            .orElse(null)
