@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -43,8 +44,8 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
     private static final String bundleName = "Sealed Claim Form with LiP Claim Form";
 
     private final CivilDocumentStitchingService civilDocumentStitchingService;
-    private final SealedClaimFormGenerator sealedClaimFormGenerator;
     private final LitigantInPersonFormGenerator litigantInPersonFormGenerator;
+    private final SealedClaimFormGenerator sealedClaimFormGenerator;
     private final ObjectMapper objectMapper;
     private final Time time;
 
@@ -75,7 +76,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
         );
 
         if (caseData.getRespondent1Represented().equals(YesOrNo.NO)
-            || caseData.getRespondent2Represented().equals(YesOrNo.NO)) {
+            || Optional.ofNullable(caseData.getRespondent2Represented()).equals(YesOrNo.NO)) {
 
             CaseDocument lipForm = litigantInPersonFormGenerator.generate(
                 caseDataBuilder.build(),
