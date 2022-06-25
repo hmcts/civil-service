@@ -149,6 +149,14 @@ public class PartyUtils {
     private static Predicate<CaseData> defendantSolicitor2Reference = caseData -> caseData
         .getRespondentSolicitor2Reference() != null;
 
+    public static Object getResponseType(CaseData caseData, Party respondent) {
+        if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SuperClaimType.SPEC_CLAIM)) {
+            return getResponseTypeForRespondentSpec(caseData, respondent);
+        }
+
+        return getResponseTypeForRespondent(caseData, respondent);
+    }
+
     public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent) {
         if (SuperClaimType.SPEC_CLAIM == caseData.getSuperClaimType()) {
             if (caseData.getRespondent1().equals(respondent)) {
@@ -164,6 +172,14 @@ public class PartyUtils {
             } else {
                 return caseData.getRespondent2ClaimResponseType();
             }
+        }
+    }
+
+    public static RespondentResponseTypeSpec getResponseTypeForRespondentSpec(CaseData caseData, Party respondent) {
+        if (caseData.getRespondent1().equals(respondent)) {
+            return caseData.getRespondent1ClaimResponseTypeForSpec();
+        } else {
+            return caseData.getRespondent2ClaimResponseTypeForSpec();
         }
     }
 }
