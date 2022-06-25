@@ -4,9 +4,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -17,14 +15,12 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
@@ -314,38 +310,85 @@ class PartyUtilsTest {
         }
 
         @Test
-        void shouldReturnCorrectResponseTypeFor1v2CasesSpec() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefence()
-                .multiPartyClaimTwoDefendantSolicitors()
-                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-                .build()
-                .toBuilder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
-                .build();
+        void shouldReturnCorrectResponseTypeFor1v1CasesSpec() {
+            CaseData fullDefenceCaseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build();
 
-            Map<RespondentResponseTypeSpec, RespondentResponseType> specToUnspec = Map.of(
-                RespondentResponseTypeSpec.FULL_DEFENCE, FULL_DEFENCE,
-                RespondentResponseTypeSpec.PART_ADMISSION, PART_ADMISSION,
-                RespondentResponseTypeSpec.FULL_ADMISSION, FULL_ADMISSION,
-                RespondentResponseTypeSpec.COUNTER_CLAIM, COUNTER_CLAIM
+            assertEquals(RespondentResponseTypeSpec.FULL_DEFENCE,
+                         PartyUtils.getResponseTypeForRespondentSpec(
+                             fullDefenceCaseData,
+                             fullDefenceCaseData.getRespondent1()
+                         )
             );
 
-            specToUnspec.forEach((specResponse, unspecEquivalent) -> {
-                CaseData currentCase = caseData.toBuilder()
-                    .respondent1ClaimResponseTypeForSpec(specResponse)
-                    .respondent2ClaimResponseTypeForSpec(specResponse)
-                    .build();
-                assertEquals(PartyUtils.getResponseTypeForRespondent(
-                    currentCase,
-                    caseData.getRespondent1()
-                ), unspecEquivalent);
+            CaseData partAdmissionCaseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build();
 
-                assertEquals(PartyUtils.getResponseTypeForRespondent(
-                    currentCase,
-                    caseData.getRespondent2()
-                ), unspecEquivalent);
-            });
+            assertEquals(RespondentResponseTypeSpec.PART_ADMISSION,
+                         PartyUtils.getResponseTypeForRespondentSpec(
+                             partAdmissionCaseData,
+                             partAdmissionCaseData.getRespondent1()
+                         )
+            );
+
+            CaseData fullAdmissionCaseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
+
+            assertEquals(RespondentResponseTypeSpec.FULL_ADMISSION,
+                         PartyUtils.getResponseTypeForRespondentSpec(
+                             fullAdmissionCaseData,
+                             fullAdmissionCaseData.getRespondent1()
+                         )
+            );
+
+            CaseData counterClaimCaseData = CaseDataBuilder.builder().atStateRespondentCounterClaimSpec().build();
+
+            assertEquals(RespondentResponseTypeSpec.COUNTER_CLAIM,
+                         PartyUtils.getResponseTypeForRespondentSpec(
+                             counterClaimCaseData,
+                             counterClaimCaseData.getRespondent1()
+                         )
+            );
+        }
+
+        @Test
+        void shouldReturnCorrectResponseTypeFor1v2CasesSpec() {
+            CaseData divergentResponseCaseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullAdmissionSpec()
+                .respondent2RespondsSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .build();
+
+            assertEquals(RespondentResponseTypeSpec.FULL_ADMISSION,
+                         PartyUtils.getResponseTypeForRespondentSpec(
+                             divergentResponseCaseData,
+                             divergentResponseCaseData.getRespondent1()
+                         )
+            );
+
+            assertEquals(RespondentResponseTypeSpec.PART_ADMISSION,
+                         PartyUtils.getResponseTypeForRespondentSpec(
+                             divergentResponseCaseData,
+                             divergentResponseCaseData.getRespondent2()
+                         )
+            );
+
+            CaseData counterClaimCaseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentCounterClaimSpec()
+                .respondent2RespondsSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+                .build();
+
+            assertEquals(RespondentResponseTypeSpec.COUNTER_CLAIM,
+                         PartyUtils.getResponseTypeForRespondentSpec(
+                             counterClaimCaseData,
+                             counterClaimCaseData.getRespondent1()
+                         )
+            );
+
+            assertEquals(RespondentResponseTypeSpec.COUNTER_CLAIM,
+                         PartyUtils.getResponseTypeForRespondentSpec(
+                             counterClaimCaseData,
+                             counterClaimCaseData.getRespondent2()
+                         )
+            );
         }
     }
 

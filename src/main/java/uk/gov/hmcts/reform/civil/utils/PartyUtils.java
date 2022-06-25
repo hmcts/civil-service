@@ -166,4 +166,12 @@ public class PartyUtils {
             }
         }
     }
+
+    public static RespondentResponseTypeSpec getResponseTypeForRespondentSpec(CaseData caseData, Party respondent) {
+        if (caseData.getRespondent1().equals(respondent)) {
+            return caseData.getRespondent1ClaimResponseTypeForSpec();
+        } else {
+            return caseData.getRespondent2ClaimResponseTypeForSpec();
+        }
+    }
 }
