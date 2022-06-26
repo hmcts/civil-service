@@ -1352,7 +1352,17 @@
               "object",
               "null"
             ],
-            "required": [],
+            "required": [
+              "miscText"
+            ],
+            "properties": {
+              "miscText": {
+                "$id": "#/definitions/miscellaneousEventType/items/properties/eventDetails/properties/miscText",
+                "type": "string",
+                "maxLength": 250,
+                "description": "The text for the miscellaneous event can contain any supporting explanatory text."
+              }
+            },
             "additionalProperties": false
           },
           "eventDetailsText": {
@@ -1407,7 +1417,17 @@
               "object",
               "null"
             ],
-            "required": [],
+            "required": [
+              "miscText"
+            ],
+            "properties": {
+              "miscText": {
+                "$id": "#/definitions/miscellaneousEventType/items/properties/eventDetails/properties/miscText",
+                "type": "string",
+                "maxLength": 250,
+                "description": "The text for the miscellaneous event can contain any supporting explanatory text."
+              }
+            },
             "additionalProperties": false
           },
           "eventDetailsText": {
@@ -1444,7 +1464,7 @@
             "$id": "#/definitions/breathingSpaceLiftedEventType/items/properties/eventCode",
             "type": "string",
             "const": "721",
-            "description": "The CASEMAN code for the states paid event."
+            "description": "The CASEMAN code for the breathing space enter event."
           },
           "dateReceived": {
             "$id": "#/definitions/breathingSpaceLiftedEventType/items/properties/dateReceived",
@@ -1462,7 +1482,17 @@
               "object",
               "null"
             ],
-            "required": [],
+            "required": [
+              "miscText"
+            ],
+            "properties": {
+              "miscText": {
+                "$id": "#/definitions/miscellaneousEventType/items/properties/eventDetails/properties/miscText",
+                "type": "string",
+                "maxLength": 250,
+                "description": "The text for the miscellaneous event can contain any supporting explanatory text."
+              }
+            },
             "additionalProperties": false
           },
           "eventDetailsText": {
@@ -1517,7 +1547,17 @@
               "object",
               "null"
             ],
-            "required": [],
+            "required": [
+              "miscText"
+            ],
+            "properties": {
+              "miscText": {
+                "$id": "#/definitions/miscellaneousEventType/items/properties/eventDetails/properties/miscText",
+                "type": "string",
+                "maxLength": 250,
+                "description": "The text for the miscellaneous event can contain any supporting explanatory text."
+              }
+            },
             "additionalProperties": false
           },
           "eventDetailsText": {
@@ -1572,7 +1612,17 @@
               "object",
               "null"
             ],
-            "required": [],
+            "required": [
+              "miscText"
+            ],
+            "properties": {
+              "miscText": {
+                "$id": "#/definitions/miscellaneousEventType/items/properties/eventDetails/properties/miscText",
+                "type": "string",
+                "maxLength": 250,
+                "description": "The text for the miscellaneous event can contain any supporting explanatory text."
+              }
+            },
             "additionalProperties": false
           },
           "eventDetailsText": {
