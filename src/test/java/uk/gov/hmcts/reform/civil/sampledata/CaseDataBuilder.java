@@ -1984,17 +1984,27 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder addLiftBreathingSpace() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+            .type(BreathingSpaceType.STANDARD)
+            .reference("12345")
+            .start(LocalDate.now())
+            .build();
         this.lift = BreathingSpaceLiftInfo.builder().expectedEnd(LocalDate.now()).build();
 
-        this.breathing = BreathingSpaceInfo.builder().lift(this.lift).build();
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).lift(this.lift).build();
 
         return this;
     }
 
     public CaseDataBuilder addLiftMentalBreathingSpace() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+            .type(BreathingSpaceType.MENTAL_HEALTH)
+            .reference("12345")
+            .start(LocalDate.now())
+            .build();
         this.lift = BreathingSpaceLiftInfo.builder().expectedEnd(LocalDate.now()).build();
 
-        this.breathing = BreathingSpaceInfo.builder().lift(this.lift).build();
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).lift(this.lift).build();
 
         return this;
     }

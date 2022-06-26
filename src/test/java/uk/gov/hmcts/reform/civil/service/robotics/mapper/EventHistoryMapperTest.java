@@ -5023,6 +5023,7 @@ class EventHistoryMapperTest {
                 .setSuperClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
+                .addEnterBreathingSpace()
                 .addLiftBreathingSpace()
                 .build();
 
