@@ -1960,11 +1960,11 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder addEnterBreathingSpace() {
-        this.enter = BreathingSpaceEnterInfo.builder().
-                        type(BreathingSpaceType.STANDARD).
-                        reference("12345").
-                        start(LocalDate.now()).
-                        build();
+        this.enter = BreathingSpaceEnterInfo.builder()
+                    .type(BreathingSpaceType.STANDARD)
+                    .reference("12345")
+                    .start(LocalDate.now())
+                    .build();
 
         this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
 
@@ -1972,11 +1972,11 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder addEnterMentalHealthBreathingSpace() {
-        this.enter = BreathingSpaceEnterInfo.builder().
-            type(BreathingSpaceType.MENTAL_HEALTH).
-            reference("12345").
-            start(LocalDate.now()).
-            build();
+        this.enter = BreathingSpaceEnterInfo.builder()
+                    .type(BreathingSpaceType.MENTAL_HEALTH)
+                    .reference("12345")
+                    .start(LocalDate.now())
+                    .build();
 
         this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
 

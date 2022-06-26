@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -5010,20 +5009,7 @@ class EventHistoryMapperTest {
             LocalDateTime currentTime = LocalDateTime.now();
             when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
 
-            /*Event breathingSpaceEntered = Event.builder()
-                .eventSequence(2)
-                .eventCode("720")
-                .dateReceived(currentTime)
-                .litigiousPartyID("001")
-                .eventDetails(EventDetails.builder().
-                                  miscText("Breathing space reference 12345, " +
-                                               "actual start date " + LocalDate.now()).build())
-                .eventDetailsText("Breathing space reference 12345, " +
-                                                   "actual start date " + LocalDate.now())
-                .build();*/
-
             var eventHistory = mapper.buildEvents(caseData);
-
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceEntered").asList()
@@ -5043,20 +5029,7 @@ class EventHistoryMapperTest {
             LocalDateTime currentTime = LocalDateTime.now();
             when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
 
-           /* Event breathingSpaceEntered = Event.builder()
-                .eventSequence(2)
-                .eventCode("721")
-                .dateReceived(currentTime)
-                .litigiousPartyID("001")
-                .eventDetails(EventDetails.builder().
-                                  miscText("Breathing space reference 12345, " +
-                                               "actual start date " + LocalDate.now()).build())
-                .eventDetailsText("Breathing space reference 12345, " +
-                                      "actual start date " + LocalDate.now())
-                .build();*/
-
             var eventHistory = mapper.buildEvents(caseData);
-
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceLifted").asList()
@@ -5076,20 +5049,7 @@ class EventHistoryMapperTest {
             LocalDateTime currentTime = LocalDateTime.now();
             when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
 
-           /* Event breathingSpaceEntered = Event.builder()
-                .eventSequence(2)
-                .eventCode("721")
-                .dateReceived(currentTime)
-                .litigiousPartyID("001")
-                .eventDetails(EventDetails.builder().
-                                  miscText("Breathing space reference 12345, " +
-                                               "actual start date " + LocalDate.now()).build())
-                .eventDetailsText("Breathing space reference 12345, " +
-                                      "actual start date " + LocalDate.now())
-                .build();*/
-
             var eventHistory = mapper.buildEvents(caseData);
-
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceMentalHealthEntered").asList()
@@ -5109,20 +5069,7 @@ class EventHistoryMapperTest {
             LocalDateTime currentTime = LocalDateTime.now();
             when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
 
-           /* Event breathingSpaceEntered = Event.builder()
-                .eventSequence(2)
-                .eventCode("721")
-                .dateReceived(currentTime)
-                .litigiousPartyID("001")
-                .eventDetails(EventDetails.builder().
-                                  miscText("Breathing space reference 12345, " +
-                                               "actual start date " + LocalDate.now()).build())
-                .eventDetailsText("Breathing space reference 12345, " +
-                                      "actual start date " + LocalDate.now())
-                .build();*/
-
             var eventHistory = mapper.buildEvents(caseData);
-
 
             assertThat(eventHistory).isNotNull();
             assertThat(eventHistory).extracting("breathingSpaceMentalHealthLifted").asList()
