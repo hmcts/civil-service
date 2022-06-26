@@ -3291,6 +3291,7 @@ class EventHistoryMapperTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                     .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
+                    .applicant1ProceedWithClaim(YES)
                     .build();
                 Event expectedReplyToDefence = Event.builder()
                     .eventSequence(6)
@@ -3394,12 +3395,13 @@ class EventHistoryMapperTest {
             @Test
             void shouldPrepareMiscellaneousEvents_whenClaimantProceedsWithOnlyFirstDefendant() {
                 String expectedMiscText1 = "RPA Reason: [1 of 2 - 2020-08-01] "
-                    + "Claimant has provided intention: proceed against defendant: Mr. Sole Trader";
+                    + "Claimant has provided intention: not proceed against defendant: Mr. Sole Trader";
                 String expectedMiscText2 = "RPA Reason: [2 of 2 - 2020-08-01] "
                     + "Claimant has provided intention: not proceed against defendant: Mr. John Rambo";
                 CaseData caseData = CaseDataBuilder.builder()
                     .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                     .atStateApplicantRespondToDefenceAndProceedVsDefendant1Only_1v2()
+                    .applicant1ProceedWithClaim(NO)
                     .build();
                 List<Event> expectedMiscEvents = List.of(
                     Event.builder()
@@ -3441,10 +3443,11 @@ class EventHistoryMapperTest {
                 String expectedMiscText1 = "RPA Reason: [1 of 2 - 2020-08-01] "
                     + "Claimant has provided intention: not proceed against defendant: Mr. Sole Trader";
                 String expectedMiscText2 = "RPA Reason: [2 of 2 - 2020-08-01] "
-                    + "Claimant has provided intention: proceed against defendant: Mr. John Rambo";
+                    + "Claimant has provided intention: not proceed against defendant: Mr. John Rambo";
                 CaseData caseData = CaseDataBuilder.builder()
                     .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                     .atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2()
+                    .applicant1ProceedWithClaim(NO)
                     .build();
                 List<Event> expectedMiscEvents = List.of(
                     Event.builder()
