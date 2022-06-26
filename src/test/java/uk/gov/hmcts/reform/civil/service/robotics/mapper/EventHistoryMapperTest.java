@@ -4992,4 +4992,89 @@ class EventHistoryMapperTest {
             "directionsQuestionnaireFiled"
         );
     }
+
+    @Nested
+    class BreathingSpaceEvents {
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseEntersBreathingSpace() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .addEnterBreathingSpace()
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("breathingSpaceEntered").asList()
+                .isNotNull();
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseLiftsBreathingSpace() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .addEnterBreathingSpace()
+                .addLiftBreathingSpace()
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("breathingSpaceLifted").asList()
+                .isNotNull();
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseEntersMentalBreathingSpace() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .addEnterMentalHealthBreathingSpace()
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("breathingSpaceMentalHealthEntered").asList()
+                .isNotNull();
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseLiftsMentalHealthBreathingSpace() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .addLiftMentalBreathingSpace()
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("breathingSpaceMentalHealthLifted").asList()
+                .isNotNull();
+        }
+    }
 }

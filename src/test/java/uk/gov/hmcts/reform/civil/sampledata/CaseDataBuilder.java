@@ -41,6 +41,10 @@ import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnemployedComplexTypeLRspec;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -191,6 +195,9 @@ public class CaseDataBuilder {
     protected LitigationFriend respondent1LitigationFriend;
     protected LitigationFriend respondent2LitigationFriend;
     protected LitigationFriend genericLitigationFriend;
+    protected BreathingSpaceInfo breathing;
+    protected BreathingSpaceEnterInfo enter;
+    protected BreathingSpaceLiftInfo lift;
 
     protected List<Element<CaseNote>> caseNotes;
 
@@ -1959,6 +1966,56 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addEnterBreathingSpace() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+                    .type(BreathingSpaceType.STANDARD)
+                    .reference("12345")
+                    .start(LocalDate.now())
+                    .build();
+
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
+
+        return this;
+    }
+
+    public CaseDataBuilder addEnterMentalHealthBreathingSpace() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+                    .type(BreathingSpaceType.MENTAL_HEALTH)
+                    .reference("12345")
+                    .start(LocalDate.now())
+                    .build();
+
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
+
+        return this;
+    }
+
+    public CaseDataBuilder addLiftBreathingSpace() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+            .type(BreathingSpaceType.STANDARD)
+            .reference("12345")
+            .start(LocalDate.now())
+            .build();
+        this.lift = BreathingSpaceLiftInfo.builder().expectedEnd(LocalDate.now()).build();
+
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).lift(this.lift).build();
+
+        return this;
+    }
+
+    public CaseDataBuilder addLiftMentalBreathingSpace() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+            .type(BreathingSpaceType.MENTAL_HEALTH)
+            .reference("12345")
+            .start(LocalDate.now())
+            .build();
+        this.lift = BreathingSpaceLiftInfo.builder().expectedEnd(LocalDate.now()).build();
+
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).lift(this.lift).build();
+
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondentFullAdmissionAfterNotifyDetails() {
         atStateClaimDetailsNotified();
         respondent1ClaimResponseType = RespondentResponseType.FULL_ADMISSION;
@@ -2430,6 +2487,7 @@ public class CaseDataBuilder {
         LocalDateTime tomrrowsDateTime = LocalDateTime.now().plusDays(1);
         this.respondent1LitigationFriendDate = tomrrowsDateTime;
         this.respondent1LitigationFriendCreatedDate = tomrrowsDateTime;
+
         return this;
     }
 
@@ -2831,6 +2889,7 @@ public class CaseDataBuilder {
             .applicant1ProceedWithClaimSpec2v1(applicant1ProceedWithClaimSpec2v1)
             .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
+            .breathing(breathing)
             .build();
     }
 }

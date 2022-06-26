@@ -214,6 +214,13 @@ public class RoboticsDataMapper {
         String respondent1SolicitorId = caseData.getRespondent1Represented() == YES
             ? RESPONDENT_SOLICITOR_ID : null;
 
+        /*LocalDateTime dateOfService = null;
+        if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+            dateOfService = caseData.getIssueDate().atStartOfDay();
+        } else {
+            dateOfService = caseData.getClaimDetailsNotificationDate();
+        }*/
+
         var respondentParties = new ArrayList<>(List.of(
             buildLitigiousParty(
                 caseData.getApplicant1(),
