@@ -73,6 +73,18 @@ public class EventHistorySequencer {
                 case DIRECTIONS_QUESTIONNAIRE_FILED:
                     builder.directionsQuestionnaire(event);
                     break;
+                case BREATHING_SPACE_ENTERED:
+                    builder.breathingSpaceEntered(event);
+                    break;
+                case BREATHING_SPACE_LIFTED:
+                    builder.breathingSpaceLifted(event);
+                    break;
+                case MENTAL_HEALTH_BREATHING_SPACE_ENTERED:
+                    builder.breathingSpaceMentalHealthLifted(event);
+                    break;
+                case MENTAL_HEALTH_BREATHING_SPACE_LIFTED:
+                    builder.breathingSpaceMentalHealthLifted(event);
+                    break;
                 default:
                     throw new IllegalStateException("Unexpected event type: " + eventType);
             }
@@ -101,6 +113,18 @@ public class EventHistorySequencer {
         if (isEmpty(builder.build().getReplyToDefence())) {
             builder.replyToDefence(List.of(Event.builder().build()));
         }
+        if (isEmpty(builder.build().getBreathingSpaceEntered())) {
+            builder.breathingSpaceEntered(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getBreathingSpaceLifted())) {
+            builder.breathingSpaceLifted(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getBreathingSpaceMentalHealthEntered())) {
+            builder.breathingSpaceMentalHealthEntered(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getBreathingSpaceMentalHealthLifted())) {
+            builder.breathingSpaceMentalHealthLifted(List.of(Event.builder().build()));
+        }
         return builder
             .build();
     }
@@ -126,7 +150,12 @@ public class EventHistorySequencer {
             eventHistory.getReceiptOfPartAdmission(),
             eventHistory.getReceiptOfAdmission(),
             eventHistory.getReplyToDefence(),
-            eventHistory.getDirectionsQuestionnaireFiled()
+            eventHistory.getDirectionsQuestionnaireFiled(),
+            eventHistory.getBreathingSpaceEntered(),
+            eventHistory.getBreathingSpaceLifted(),
+            eventHistory.getBreathingSpaceMentalHealthEntered(),
+            eventHistory.getBreathingSpaceMentalHealthLifted()
+
         );
         return eventsList.stream()
             .filter(Objects::nonNull)

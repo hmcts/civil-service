@@ -231,8 +231,8 @@ public class EventHistoryMapper {
                                           EventType eventType, String bsStatus) {
         String eventDetails = null;
         if (caseData.getBreathing().getEnter().getReference() != null) {
-            eventDetails = eventDetails + BS_REF + " "
-                + caseData.getBreathing().getEnter().getReference() + ",";
+            eventDetails = BS_REF + " "
+                + caseData.getBreathing().getEnter().getReference() + ", ";
         }
 
         if (bsStatus.equals("Enter")) {
@@ -263,37 +263,41 @@ public class EventHistoryMapper {
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(eventType.getCode())
                     .dateReceived(caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now()))
-                    .eventDetailsText(null)
+                    .litigiousPartyID("001")
+                    .eventDetailsText(eventDetails)
                     .eventDetails(EventDetails.builder().miscText(eventDetails)
                                       .build())
                     .build()));
                 break;
             case BREATHING_SPACE_LIFTED:
-                builder.breathingSpaceEntered((Event.builder()
+                builder.breathingSpaceLifted((Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(eventType.getCode())
                     .dateReceived(caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now()))
-                    .eventDetailsText(null)
+                    .eventDetailsText(eventDetails)
+                    .litigiousPartyID("001")
                     .eventDetails(EventDetails.builder().miscText(eventDetails)
                                       .build())
                     .build()));
                 break;
             case MENTAL_HEALTH_BREATHING_SPACE_ENTERED:
-                builder.breathingSpaceEntered((Event.builder()
+                builder.breathingSpaceMentalHealthEntered((Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(eventType.getCode())
                     .dateReceived(caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now()))
-                    .eventDetailsText(null)
+                    .eventDetailsText(eventDetails)
+                    .litigiousPartyID("001")
                     .eventDetails(EventDetails.builder().miscText(eventDetails)
                                       .build())
                     .build()));
                 break;
             case MENTAL_HEALTH_BREATHING_SPACE_LIFTED:
-                builder.breathingSpaceEntered((Event.builder()
+                builder.breathingSpaceMentalHealthLifted((Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(eventType.getCode())
                     .dateReceived(caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now()))
-                    .eventDetailsText(null)
+                    .eventDetailsText(eventDetails)
+                    .litigiousPartyID("001")
                     .eventDetails(EventDetails.builder().miscText(eventDetails)
                                       .build())
                     .build()));
