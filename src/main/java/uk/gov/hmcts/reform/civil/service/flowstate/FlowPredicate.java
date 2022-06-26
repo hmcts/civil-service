@@ -662,6 +662,7 @@ public class FlowPredicate {
         if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
             switch (getMultiPartyScenario(caseData)) {
                 case ONE_V_TWO_ONE_LEGAL_REP:
+                    predicate = YES.equals(caseData.getApplicant1ProceedWithClaim());
                 case ONE_V_TWO_TWO_LEGAL_REP:
                 case ONE_V_ONE:
                     predicate = YES.equals(caseData.getApplicant1ProceedWithClaim());
@@ -698,6 +699,7 @@ public class FlowPredicate {
         if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
             switch (getMultiPartyScenario(caseData)) {
                 case ONE_V_TWO_ONE_LEGAL_REP:
+                    predicate = NO.equals(caseData.getApplicant1ProceedWithClaim());
                 case ONE_V_TWO_TWO_LEGAL_REP:
                 case ONE_V_ONE:
                     predicate = NO.equals(caseData.getApplicant1ProceedWithClaim());

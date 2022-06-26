@@ -854,7 +854,25 @@ public class EventHistoryMapper {
         String currentTime = time.now().toLocalDate().toString();
 
         switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP:
+            case ONE_V_TWO_ONE_LEGAL_REP: {
+                eventDetailsText.add(String.format(
+                    "RPA Reason: [1 of 2 - %s] Claimant has provided intention: %s against defendant: %s",
+                    currentTime,
+                    YES.equals(caseData.getApplicant1ProceedWithClaim())
+                        ? "proceed"
+                        : "not proceed",
+                    caseData.getRespondent1().getPartyName()
+                ));
+                eventDetailsText.add(String.format(
+                    "RPA Reason: [2 of 2 - %s] Claimant has provided intention: %s against defendant: %s",
+                    currentTime,
+                    YES.equals(caseData.getApplicant1ProceedWithClaim())
+                        ? "proceed"
+                        : "not proceed",
+                    caseData.getRespondent2().getPartyName()
+                ));
+                break;
+            }
             case ONE_V_TWO_TWO_LEGAL_REP: {
                 eventDetailsText.add(String.format(
                     "RPA Reason: [1 of 2 - %s] Claimant has provided intention: %s against defendant: %s",
