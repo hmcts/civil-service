@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import java.time.LocalDateTime;
 
 import static java.lang.String.format;
+import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -156,7 +157,8 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .containsEntry("claimNotificationDate", notificationDate.format(ISO_DATE_TIME))
-                    .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME));
+                    .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME))
+                    .containsEntry("nextDeadline", deadline.format(ISO_DATE));
             }
 
             @Test
@@ -174,7 +176,8 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDateTime expectedTime = claimNotificationDeadline.toLocalDate().atTime(END_OF_BUSINESS_DAY);
 
                 assertThat(response.getData())
-                    .containsEntry("claimDetailsNotificationDeadline", expectedTime.format(ISO_DATE_TIME));
+                    .containsEntry("claimDetailsNotificationDeadline", expectedTime.format(ISO_DATE_TIME))
+                    .containsEntry("nextDeadline", expectedTime.format(ISO_DATE));
             }
 
             @Test
@@ -189,7 +192,8 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
-                    .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME));
+                    .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME))
+                    .containsEntry("nextDeadline", deadline.format(ISO_DATE));
             }
         }
 
