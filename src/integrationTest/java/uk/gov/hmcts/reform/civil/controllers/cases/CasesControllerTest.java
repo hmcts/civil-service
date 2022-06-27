@@ -39,7 +39,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
         + "\n"
         + " }\n"
         + "}";
-    private static final String CLAIMANT_CLAIMS_URL = "/cases//claimant/{submitterId}";
+    private static final String CLAIMANT_CLAIMS_URL = "/cases/claimant/{submitterId}";
     private static final String DEFENDANT_CLAIMS_URL = "/cases/defendant/{submitterId}";
     private static final List<DashboardClaimInfo> claimResults =
         Collections.singletonList(DashboardClaimInfo.builder()
