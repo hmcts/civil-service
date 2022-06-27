@@ -220,7 +220,6 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                     "TWO"
                 ).ifPresent(document -> {
                     updatedDocuments.add(element(document));
-                    // TODO this field will probably be created during I2P 1v2 different solicitor
                     caseDataBuilder.respondent2GeneratedResponseDocument(document);
                 });
             }
