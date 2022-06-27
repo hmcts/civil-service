@@ -66,8 +66,6 @@ genApp:
       consentedOrWithoutNotice: GeneralAppWithoutNotice
   lrd:
     endpoint: /refdata/location/court-venues
-  jrd:
-    endpoint: /refdata/judicial/users/search
 
 
 payments:
@@ -165,9 +163,8 @@ notifications:
   applicantSolicitor1DefaultJudgmentRequested: "cd0486ac-cc6a-4429-865a-7746f64bf4dd"
   interimJudgmentRequestedClaimant: "60ef146b-96c4-4630-942c-336aee5e9359"
   interimJudgmentApprovalClaimant: "b678fa7d-2a37-4d54-8163-b79b733d20d9"
-  interimJudgmentRequestedDefendant: "e527acd3-8ed3-4111-b9a6-7e7c31323698"
-  interimJudgmentApprovalDefendant: "725dc6ac-34ab-4878-bc88-c3dbd7b9810c"
-  interimJudgmentRequested2Defendants: "64584bf4-f17d-416f-9f1b-91b3aa39a69b"
+  interimJudgmentRequestedDefendant: "d9e33565-ecdc-4475-a77b-e50cd4c07b61"
+  interimJudgmentApprovalDefendant: "2e98fa16-ba9e-4229-b99f-fc72d40303f8"
 
 
 sendgrid:
@@ -230,8 +227,6 @@ fees:
 
 genApp:
   lrd:
-    url: http://localhost:8765
-  jrd:
     url: http://localhost:8765
 
 payments:
@@ -298,8 +293,6 @@ fees:
 genApp:
   lrd:
     url: http://fake-rd-location-ref-api
-  jrd:
-    url: http://fake-rd-judicial-api
 
 payments:
   api:
