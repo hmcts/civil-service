@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.civil.config.referencedata.LRDConfiguration;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.config.LRDConfiguration;
+import uk.gov.hmcts.reform.civil.model.genapplication.LocationRefData;
 
 import java.net.URI;
 import java.util.ArrayList;
