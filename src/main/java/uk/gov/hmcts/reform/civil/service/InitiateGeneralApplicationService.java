@@ -113,9 +113,9 @@ public class InitiateGeneralApplicationService {
         if (YES.equals(caseData.getAddRespondent2())) {
             applicationBuilder.defendant2PartyName(caseData.getRespondent2().getPartyName());
         }
-        String deadline = deadlinesCalculator
+        LocalDateTime deadline = deadlinesCalculator
             .calculateApplicantResponseDeadline(
-                LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS).toString();
+                LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS);
         if (caseData.getGeneralAppRespondentAgreement() != null
             && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())) {
             applicationBuilder
@@ -148,7 +148,7 @@ public class InitiateGeneralApplicationService {
             .generalAppReasonsOfOrder(caseData.getGeneralAppReasonsOfOrder())
             .generalAppHearingDetails(caseData.getGeneralAppHearingDetails())
             .generalAppPBADetails(caseData.getGeneralAppPBADetails())
-            .generalAppDeadlineNotification(deadline)
+            .generalAppDateDeadline(deadline)
             .generalAppSubmittedDateGAspec(LocalDateTime.now())
             .civilServiceUserRoles(IdamUserDetails.builder().id(userDetails.getId()).email(userDetails.getEmail())
                                        .build())
