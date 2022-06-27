@@ -78,15 +78,6 @@ public class CasesController {
         return new ResponseEntity<>(claims, HttpStatus.OK);
     }
 
-    @PostMapping("/defendant")
-    @ApiOperation("Get list of cases for defendant")
-    public ResponseEntity<SearchResult> getCasesForDefendant(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-                                                             @RequestBody String submitterId) {
-
-        SearchResult ocmcClaims = coreCaseDataService.searchCasesForDefendant(submitterId, 0, authorization);
-        return new ResponseEntity<>(ocmcClaims, HttpStatus.OK);
-    }
-
     @GetMapping(path = "/actors/{actorId}")
     @ApiOperation("Gets credentials for actorId from RAS")
     public ResponseEntity<RoleAssignmentServiceResponse>

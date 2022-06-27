@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -20,9 +19,7 @@ import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
-import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CMC_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
 
 @Service
@@ -76,12 +73,6 @@ public class CoreCaseDataService {
 
     public SearchResult searchCases(Query query, String authorization) {
         return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CASE_TYPE, query.toString());
-    }
-
-    public SearchResult searchCasesForDefendant(String submitterId, int index, String authorization) {
-        Query ocmcQuery = new Query(QueryBuilders.boolQuery()
-            .must(QueryBuilders.matchQuery("data.id", "1638199478521121")), emptyList(), index);
-        return coreCaseDataApi.searchCases(authorization, authTokenGenerator.generate(), CMC_CASE_TYPE,  "{ \"query\": { \"match_all\": {} } }");
     }
 
     public SearchResult searchCases(Query query) {
