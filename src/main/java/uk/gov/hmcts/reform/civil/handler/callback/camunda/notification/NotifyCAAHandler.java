@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -23,8 +23,6 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_CAA_RESPONDENT_1_ORG;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_CAA_RESPONDENT_2_ORG;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_1_ORG;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_2_ORG;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
@@ -65,9 +63,22 @@ public class NotifyCAAHandler extends CallbackHandler implements NotificationDat
     private CallbackResponse notifyCAAUser(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         var caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        var organisationId = getOrganisationId(caseData, caseEvent);
+        List<String> recipients = new ArrayList<>();
 
-        getRecipients(caseData, organisationId, caseEvent).stream().forEach(recipient -> {
+        switch(caseEvent) {
+            case NOTIFY_CLAIM_CAA_RESPONDENT_1_ORG:
+                recipients.addAll(getRecipients(
+                    getOrganisationId(caseData, !shouldNotifyOnlyRespondent2Caa(caseData))));
+                break;
+            case NOTIFY_CLAIM_CAA_RESPONDENT_2_ORG:
+                recipients.addAll(getRecipients(getOrganisationId(caseData, false)));
+                break;
+            default:
+                throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
+        }
+
+
+        recipients.forEach(recipient -> {
             System.out.println("About to send email to user: " + recipient);
             notificationService.sendMail(
                 recipient,
@@ -77,10 +88,11 @@ public class NotifyCAAHandler extends CallbackHandler implements NotificationDat
             );
         });
 
-        return AboutToStartOrSubmitCallbackResponse.builder().build();
+        //return AboutToStartOrSubmitCallbackResponse.builder().build();
+        throw new CallbackException("COMPLETED!!");
     }
 
-    private List<String> getRecipients(CaseData caseData, String organisationId, CaseEvent caseEvent) {
+    private List<String> getRecipients(String organisationId) {
         var caaEmails = OrganisationUtils.getCaaEmails(organisationService.findUsersInOrganisation(organisationId));
         if (caaEmails.isEmpty()) {
             Optional<Organisation> organisation = organisationService.findOrganisationById(organisationId);
@@ -89,14 +101,16 @@ public class NotifyCAAHandler extends CallbackHandler implements NotificationDat
         return caaEmails;
     }
 
-    private String getOrganisationId(CaseData caseData, CaseEvent caseEvent) {
-        return isFirstRespondentCAA(caseEvent) ?
-            caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
-            : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+    private boolean shouldNotifyOnlyRespondent2Caa(CaseData caseData) {
+        return caseData.getDefendantSolicitorNotifyClaimOptions() != null
+            && caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel()
+            .startsWith("Defendant Two:");
     }
 
-    private boolean isFirstRespondentCAA(CaseEvent caseEvent) {
-        return caseEvent == NOTIFY_CLAIM_CAA_RESPONDENT_1_ORG || caseEvent == NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_1_ORG;
+    private String getOrganisationId(CaseData caseData, boolean isRespondent1) {
+        return isRespondent1 ?
+            caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
+            : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
     }
 
     @Override
