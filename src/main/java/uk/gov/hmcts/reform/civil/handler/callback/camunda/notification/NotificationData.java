@@ -35,6 +35,11 @@ public interface NotificationData {
     String LEGAL_ORG_SPECIFIED = "legalOrg";
     String CLAIM_NUMBER = "claimnumber";
     String DEFENDANT_NAME = "DefendantName";
+    String BOTH_DEFENDANTS = "Both Defendants";
+    String CLAIM_NUMBER_INTERIM = "Claim number";
+    String LEGAL_ORG_DEF = "Defendant LegalOrg Name";
+    String DEFENDANT_NAME_INTERIM = "Defendant Name";
+    String LEGAL_REP_CLAIMANT = "Legal Rep Claimant";
     String DEFENDANT_EMAIL = "DefendantLegalOrgName";
     String CLAIMANT_EMAIL = "ClaimantLegalOrgName";
     String LEGAL_ORG_APPLICANT1 = "legalOrgApplicant1";
