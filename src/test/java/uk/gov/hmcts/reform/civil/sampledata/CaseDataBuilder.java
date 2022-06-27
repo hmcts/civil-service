@@ -1364,6 +1364,13 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimDetailsNotified_1v2_andNotifyOnlySecondSolicitor() {
+        atStateClaimDetailsNotified();
+        multiPartyClaimTwoDefendantSolicitors();
+        defendantSolicitorNotifyClaimDetailsOptions("Defendant Two: Solicitor");
+        return this;
+    }
+
     public CaseDataBuilder atStateAwaitingResponseFullDefenceReceived() {
         atStateClaimDetailsNotified();
         respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;

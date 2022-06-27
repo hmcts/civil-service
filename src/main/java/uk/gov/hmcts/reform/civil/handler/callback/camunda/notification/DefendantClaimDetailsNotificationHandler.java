@@ -15,12 +15,18 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.utils.OrganisationUtils;
+import uk.gov.hmcts.reform.prd.model.Organisation;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_1_ORG;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_2_ORG;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_DETAILS;
@@ -35,18 +41,23 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS,
         NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_DETAILS,
-        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS_CC
+        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS_CC,
+        NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_1_ORG,
+        NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_2_ORG
     );
 
     public static final String TASK_ID_EMAIL_FIRST_SOL = "NotifyClaimDetailsRespondentSolicitor1";
     public static final String TASK_ID_EMAIL_APP_SOL_CC = "NotifyClaimDetailsApplicantSolicitor1CC";
     public static final String TASK_ID_EMAIL_SECOND_SOL = "NotifyClaimDetailsRespondentSolicitor2";
+    public static final String TASK_ID_EMAIL_FIRST_CAA = "NotifyClaimDetailsRespondent1OrgCAA";
+    public static final String TASK_ID_EMAIL_SECOND_CAA = "NotifyClaimDetailsRespondent2OrgCAA";
 
     private static final String REFERENCE_TEMPLATE = "claim-details-respondent-notification-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final ObjectMapper objectMapper;
+    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -65,6 +76,10 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
                 return TASK_ID_EMAIL_APP_SOL_CC;
             case NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_DETAILS:
                 return TASK_ID_EMAIL_SECOND_SOL;
+            case NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_1_ORG:
+                return TASK_ID_EMAIL_FIRST_CAA;
+            case NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_2_ORG:
+                return TASK_ID_EMAIL_SECOND_CAA;
             default:
                 throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
         }
@@ -78,43 +93,56 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
     private CallbackResponse notifyRespondentSolicitorForClaimDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        String recipient = getRecipientEmail(caseData, caseEvent);
         String emailTemplate = notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate();
 
-        notificationService.sendMail(
-            recipient,
-            emailTemplate,
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        getRecipientEmails(caseData, caseEvent)
+            .forEach(recipient -> notificationService.sendMail(
+                recipient,
+                emailTemplate, addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            ));
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
-            .build();
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private String getRecipientEmail(CaseData caseData, CaseEvent caseEvent) {
-
+    private List<String> getRecipientEmails(CaseData caseData, CaseEvent caseEvent) {
         switch (caseEvent) {
             case NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS:
-                return shouldEmailRespondent2Solicitor(caseData)
-                    ? caseData.getRespondentSolicitor2EmailAddress()
-                    : caseData.getRespondentSolicitor1EmailAddress();
+                return Arrays.asList(shouldNotifyOnlyRespondent2Party(caseData)
+                    ? caseData.getRespondentSolicitor2EmailAddress() : caseData.getRespondentSolicitor1EmailAddress());
             case NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS_CC:
-                return caseData.getApplicantSolicitor1UserDetails().getEmail();
+                return Arrays.asList(caseData.getApplicantSolicitor1UserDetails().getEmail());
             case NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_DETAILS:
-                return caseData.getRespondentSolicitor2EmailAddress();
+                return Arrays.asList(caseData.getRespondentSolicitor2EmailAddress());
+            case NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_1_ORG:
+                return getCaaEmails(getOrganisationId(caseData, !shouldNotifyOnlyRespondent2Party(caseData)));
+            case NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_2_ORG:
+                return getCaaEmails(getOrganisationId(caseData, false));
             default:
                 throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
         }
     }
 
-    private boolean shouldEmailRespondent2Solicitor(CaseData caseData) {
+    private boolean shouldNotifyOnlyRespondent2Party(CaseData caseData) {
         return Optional.ofNullable(caseData.getDefendantSolicitorNotifyClaimDetailsOptions())
             .map(DynamicList::getValue)
             .map(DynamicListElement::getLabel)
             .orElse("")
             .startsWith("Defendant Two:");
+    }
+
+    private String getOrganisationId(CaseData caseData, boolean isRespondent1) {
+        return isRespondent1 ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
+            : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+    }
+
+    private List<String> getCaaEmails(String organisationId) {
+        var caaEmails = OrganisationUtils.getCaaEmails(organisationService.findUsersInOrganisation(organisationId));
+        if (caaEmails.isEmpty()) {
+            Optional<Organisation> organisation = organisationService.findOrganisationById(organisationId);
+            caaEmails.add(organisation.get().getSuperUser().getEmail());
+        }
+        return caaEmails;
     }
 
     @Override
