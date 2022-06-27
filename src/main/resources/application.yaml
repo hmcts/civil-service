@@ -45,6 +45,10 @@ spring:
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
+cmc-claim-store:
+  api:
+    url: ${CLAIM_STORE_URL:http://localhost:8765}
+
 fees:
   api:
     service: civil money claims
@@ -232,10 +236,6 @@ genApp:
 payments:
   api:
     url: http://localhost:8765
-
-cmc-claim-store:
-  api:
-    url: ${CLAIM_STORE_URL:http://localhost:8765}
 
 idam:
   web:
