@@ -73,7 +73,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
-            params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
         }
 
         @Test
@@ -90,8 +90,11 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
             verifyApplicantSolicitorOneRoles();
         }
 
+        //ToDo: Remove after ccd merge
         @Test
         void shouldRemoveSubmitterIdAfterCaseAssignment() {
+            Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {});
+            params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response
                 = (AboutToStartOrSubmitCallbackResponse) assignCaseToUserHandler.handle(params);
 
@@ -121,7 +124,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
-            params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
         }
 
         @Test
@@ -137,6 +140,36 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAssignCaseToApplicantSolicitorOneAndRespondentOrgCaaAndRemoveCreator1v2SS() {
+            caseData = new CaseDataBuilder().atStateClaimDraft()
+                .caseReference(CaseDataBuilder.CASE_ID)
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder()
+                                                    .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                                                    .email("applicant@someorg.com")
+                                                    .build())
+                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                                  .organisation(Organisation.builder().organisationID("OrgId1").build())
+                                                  .build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .organisation(Organisation.builder()
+                                                                     .organisationID("OrgId2").build())
+                                                   .build())
+                .multiPartyClaimOneDefendantSolicitor()
+                .build();
+
+            Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
+            });
+
+            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
+
+            assignCaseToUserHandler.handle(params);
+
+            verifyApplicantSolicitorOneRoles();
+        }
+
+        // ToDo: Remove after ccd merge
+        @Test
+        void shouldAssignCaseToApplicantSolicitorOneAndRespondentOrgCaaAndRemoveCreator1v2SSOld() {
             caseData = new CaseDataBuilder().atStateClaimDraft()
                 .caseReference(CaseDataBuilder.CASE_ID)
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder()
@@ -191,7 +224,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
 
-            params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
 
             assignCaseToUserHandler.handle(params);
 
@@ -222,12 +255,44 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
 
-            params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
 
             assignCaseToUserHandler.handle(params);
 
             verifyApplicantSolicitorOneRoles();
         }
+    }
+
+    //ToDo: Remove after ccd merge
+    @Test
+    void shouldAssignCaseToApplicantSolicitorOneAndRemoveCreator1v2DSUnregisteredRespondent2Old() {
+        caseData = new CaseDataBuilder().atStateClaimDraft()
+            .caseReference(CaseDataBuilder.CASE_ID)
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
+                                                .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                                                .email("applicant@someorg.com")
+                                                .build())
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                              .organisation(Organisation.builder().organisationID("OrgId1").build())
+                                              .build())
+            .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                               .organisation(Organisation.builder()
+                                                                 .organisationID("OrgId2").build())
+                                               .build())
+            .multiPartyClaimTwoDefendantSolicitors()
+            .respondent2Represented(NO)
+            .respondent2OrgRegistered(NO)
+            .build();
+
+        Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
+        });
+
+        params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+
+        assignCaseToUserHandler.handle(params);
+
+        verifyApplicantSolicitorOneRoles();
     }
 
     private void verifyApplicantSolicitorOneRoles() {
