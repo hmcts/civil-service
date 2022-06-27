@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
@@ -65,7 +66,7 @@ public class NotifyCAAHandler extends CallbackHandler implements NotificationDat
         var caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         List<String> recipients = new ArrayList<>();
 
-        switch(caseEvent) {
+        switch (caseEvent) {
             case NOTIFY_CLAIM_CAA_RESPONDENT_1_ORG:
                 recipients.addAll(getRecipients(
                     getOrganisationId(caseData, !shouldNotifyOnlyRespondent2Caa(caseData))));
@@ -77,9 +78,7 @@ public class NotifyCAAHandler extends CallbackHandler implements NotificationDat
                 throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
         }
 
-
         recipients.forEach(recipient -> {
-            System.out.println("About to send email to user: " + recipient);
             notificationService.sendMail(
                 recipient,
                 notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate(),
@@ -88,8 +87,7 @@ public class NotifyCAAHandler extends CallbackHandler implements NotificationDat
             );
         });
 
-        //return AboutToStartOrSubmitCallbackResponse.builder().build();
-        throw new CallbackException("COMPLETED!!");
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     private List<String> getRecipients(String organisationId) {
@@ -108,8 +106,7 @@ public class NotifyCAAHandler extends CallbackHandler implements NotificationDat
     }
 
     private String getOrganisationId(CaseData caseData, boolean isRespondent1) {
-        return isRespondent1 ?
-            caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
+        return isRespondent1 ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
             : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
     }
 
@@ -118,8 +115,10 @@ public class NotifyCAAHandler extends CallbackHandler implements NotificationDat
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            CLAIM_NOTIFICATION_DEADLINE,
-            formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE),
+            CLAIM_DETAILS_NOTIFICATION_DEADLINE,
+            formatLocalDate(caseData
+                                .getClaimDetailsNotificationDeadline()
+                                .toLocalDate(), DATE),
             PARTY_REFERENCES, buildPartiesReferences(caseData)
         );
     }

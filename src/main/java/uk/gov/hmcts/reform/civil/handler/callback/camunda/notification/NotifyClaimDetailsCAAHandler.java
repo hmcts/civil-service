@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -61,27 +62,38 @@ public class NotifyClaimDetailsCAAHandler extends CallbackHandler implements Not
 
     private CallbackResponse notifyCAAUser(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
+        var caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        List<String> recipients = new ArrayList<>();
+        switch (caseEvent) {
+            case NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_1_ORG:
+                recipients.addAll(getRecipients(
+                    getOrganisationId(caseData, !shouldNotifyOnlyRespondent2Caa(caseData))));
+                break;
+            case NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_2_ORG:
+                recipients.addAll(getRecipients(getOrganisationId(caseData, false)));
+                break;
+            default:
+                throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
+        }
 
-        getRecipients(callbackParams).stream().forEach(recipient -> System.out.println("About to send email to user: " + recipient));
-
-        notificationService.sendMail(
-            getRecipients(callbackParams),
-            notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        recipients.forEach(recipient -> {
+            notificationService.sendMail(
+                recipient,
+                notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate(),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        });
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    private String getOrganisationId(CallbackParams callbackParams) {
-        return isFirstRespondentCAA(callbackParams) ?
-            callbackParams.getCaseData().getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
-            : callbackParams.getCaseData().getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+    private String getOrganisationId(CaseData caseData, boolean isRespondent1) {
+        return isRespondent1 ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
+            : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
     }
 
-    private List<String> getRecipients(CallbackParams callbackParams) {
-        var organisationId = getOrganisationId(callbackParams);
+    private List<String> getRecipients(String organisationId) {
         var caaEmails = OrganisationUtils.getCaaEmails(organisationService.findUsersInOrganisation(organisationId));
         if (caaEmails.isEmpty()) {
             Optional<Organisation> organisation = organisationService.findOrganisationById(organisationId);
@@ -90,8 +102,10 @@ public class NotifyClaimDetailsCAAHandler extends CallbackHandler implements Not
         return caaEmails;
     }
 
-    private boolean isFirstRespondentCAA(CallbackParams callbackParams) {
-        return CaseEvent.valueOf(callbackParams.getRequest().getEventId()) == NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_1_ORG;
+    private boolean shouldNotifyOnlyRespondent2Caa(CaseData caseData) {
+        return caseData.getDefendantSolicitorNotifyClaimOptions() != null
+            && caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel()
+            .startsWith("Defendant Two:");
     }
 
     @Override

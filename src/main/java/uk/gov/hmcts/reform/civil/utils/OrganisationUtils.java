@@ -7,10 +7,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
 public class OrganisationUtils {
 
     private static final String CASEWORKER_CAA = "pui-caa";
+
+    private OrganisationUtils() {
+        //NO-OP
+    }
 
     public static List<String> getCaaEmails(Optional<ProfessionalUsersEntityResponse> orgUsersResponse) {
         if (orgUsersResponse.isPresent()) {
