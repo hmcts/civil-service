@@ -130,7 +130,6 @@ public class InitiateGeneralApplicationServiceHelper {
                 GASolicitorDetailsGAspec gaSolicitorDetailsGAspec = specBuilder.build();
                 respondentSols.add(element(gaSolicitorDetailsGAspec));
             });
-            //applicationBuilder.applicantPartyName(getApplicantPartyName(userRoles, userDetails, caseData));
             applicationBuilder.generalApplicationParties(getApplicantPartyName(userRoles, userDetails, caseData));
             applicationBuilder.generalAppRespondentSolicitors(respondentSols);
         }
