@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.CustomScopeIdamTokenGeneratorService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -81,8 +80,6 @@ class RoboticsDataMapperTest {
     PrdAdminUserConfiguration userConfig;
     @MockBean
     private Time time;
-    @MockBean
-    CustomScopeIdamTokenGeneratorService tokenGenerator;
 
     LocalDateTime localDateTime;
 
