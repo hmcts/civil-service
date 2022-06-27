@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.config;
+package uk.gov.hmcts.reform.civil.config.referencedata;
 
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
