@@ -498,7 +498,8 @@ public class FlowPredicate {
                 break;
             case ONE_V_TWO_TWO_LEGAL_REP:
                 predicate = basePredicate
-                    && caseData.getRespondent2ClaimResponseTypeForSpec() == responseType;
+                    && caseData.getRespondent2ClaimResponseTypeForSpec() == responseType
+                    && responseType == RespondentResponseTypeSpec.FULL_DEFENCE;
                 break;
             case ONE_V_ONE:
                 predicate = basePredicate;
@@ -576,20 +577,11 @@ public class FlowPredicate {
                     && caseData.getRespondent2ClaimResponseTypeForSpec() != null
                     && caseData.getRespondent1ResponseDate() != null
                     && caseData.getRespondent2ResponseDate() != null
-                    && !caseData.getRespondent1ClaimResponseTypeForSpec()
+                    && (!caseData.getRespondent1ClaimResponseTypeForSpec()
                     .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
                     //scenario: latest response is not full defence
-                    && (((!RespondentResponseTypeSpec.FULL_DEFENCE
-                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-                    && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate())
-                    || !RespondentResponseTypeSpec.FULL_DEFENCE
-                    .equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                    && caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate())))
-                    //scenario: neither responses are full defence
-                    || (!RespondentResponseTypeSpec.FULL_DEFENCE
-                    .equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                    && !RespondentResponseTypeSpec.FULL_DEFENCE
-                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec())));
+                    || caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_DEFENCE
+                    || caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_DEFENCE);
             case ONE_V_TWO_ONE_LEGAL_REP:
                 return caseData.getRespondent1ClaimResponseTypeForSpec() != null
                     && !caseData.getRespondent1ClaimResponseTypeForSpec()
