@@ -57,6 +57,47 @@ class OrganisationUtilsTest {
         }
 
         @Test
+        void shouldLimitExpectedCaaEmails_whenLimitIsGreaterThanNumberOfUsers() {
+            var mockUsers = new ArrayList<ProfessionalUsersResponse>();
+            mockUsers.addAll(caaUsers);
+
+            var professionalUsers =
+                ProfessionalUsersEntityResponse.builder().users(mockUsers).build();
+            var emailLimit = 100;
+
+            assertThat(OrganisationUtils.getCaaEmails(Optional.of(professionalUsers), emailLimit).size())
+                .isEqualTo(mockUsers.size());
+        }
+
+        @Test
+        void shouldLimitExpectedCaaEmails_whenLimitIsLessThanNumberOfUsers() {
+            var mockUsers = new ArrayList<ProfessionalUsersResponse>();
+            mockUsers.addAll(caaUsers);
+            mockUsers.addAll(caaUsers);
+            mockUsers.addAll(caaUsers);
+
+            var professionalUsers =
+                ProfessionalUsersEntityResponse.builder().users(mockUsers).build();
+            var emailLimit = 2;
+
+            assertThat(OrganisationUtils.getCaaEmails(Optional.of(professionalUsers), emailLimit).size())
+                .isEqualTo(emailLimit);
+        }
+
+        @Test
+        void shouldLimitExpectedCaaEmails_whenLimitIsSameAsNumberOfUsers() {
+            var mockUsers = new ArrayList<ProfessionalUsersResponse>();
+            mockUsers.addAll(caaUsers);
+
+            var professionalUsers =
+                ProfessionalUsersEntityResponse.builder().users(mockUsers).build();
+            var emailLimit = 3;
+
+            assertThat(OrganisationUtils.getCaaEmails(Optional.of(professionalUsers), emailLimit).size())
+                .isEqualTo(mockUsers.size());
+        }
+
+        @Test
         void shouldReturnEmptyList() {
             var professionalUsers =
                 ProfessionalUsersEntityResponse.builder().users(otherUsers).build();

@@ -53,6 +53,7 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
     public static final String TASK_ID_EMAIL_SECOND_CAA = "NotifyClaimDetailsRespondent2OrgCAA";
 
     private static final String REFERENCE_TEMPLATE = "claim-details-respondent-notification-%s";
+    private static final int EMAIL_LIMIT = 100;
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -137,12 +138,22 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
     }
 
     private List<String> getCaaEmails(String organisationId) {
-        var caaEmails = OrganisationUtils.getCaaEmails(organisationService.findUsersInOrganisation(organisationId));
+        var caaEmails = OrganisationUtils.getCaaEmails(
+            organisationService.findUsersInOrganisation(organisationId),
+            EMAIL_LIMIT
+        );
         if (caaEmails.isEmpty()) {
-            Optional<Organisation> organisation = organisationService.findOrganisationById(organisationId);
-            caaEmails.add(organisation.get().getSuperUser().getEmail());
+            caaEmails.add(getSuperUserEmail(organisationId));
         }
         return caaEmails;
+    }
+
+    private String getSuperUserEmail(String organisationId) {
+        Optional<Organisation> organisation = organisationService.findOrganisationById(organisationId);
+        if (!organisation.isPresent()) {
+            throw new CallbackException("Organisation is not was found");
+        }
+        return  organisation.get().getSuperUser().getEmail();
     }
 
     @Override

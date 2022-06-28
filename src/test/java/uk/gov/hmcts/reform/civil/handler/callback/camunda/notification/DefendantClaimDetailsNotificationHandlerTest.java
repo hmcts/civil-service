@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -29,6 +30,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -260,6 +262,23 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
             }
 
             @Test
+            void shouldThrowException_whenOrganisationObjectNotPopulated_whenInvokedWithCaaRespondentOneEvent() {
+                var mockOrganisationsResponse = ProfessionalUsersEntityResponse.builder()
+                    .users(new ArrayList<>()).build();
+                var params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                    .request(
+                        CallbackRequest.builder().eventId(NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_1_ORG.name()).build()
+                    ).build();
+
+                when(organisationService.findUsersInOrganisation(respondent1OrgId))
+                    .thenReturn(Optional.of(mockOrganisationsResponse));
+                when(organisationService.findOrganisationById(respondent1OrgId))
+                    .thenReturn(Optional.empty());
+
+                assertThrows(CallbackException.class, () -> handler.handle(params));
+            }
+
+            @Test
             void shouldNotifyRespondentTwoCAAs_whenInvokedWithCaaRespondentTwoEvent() {
                 var params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
@@ -295,6 +314,22 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
                 verifyAllNotificationsSent(Arrays.asList(mockOrganisation.getSuperUser().getEmail()), caseData);
             }
 
+            @Test
+            void shouldThrowException_whenOrganisationObjectNotPopulated_whenInvokedWithCaaRespondentTwoEvent() {
+                var mockOrganisationsResponse = ProfessionalUsersEntityResponse.builder()
+                    .users(new ArrayList<>()).build();
+                var params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                    .request(
+                        CallbackRequest.builder().eventId(NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_2_ORG.name()).build()
+                    ).build();
+
+                when(organisationService.findUsersInOrganisation(respondent2OrgId))
+                    .thenReturn(Optional.of(mockOrganisationsResponse));
+                when(organisationService.findOrganisationById(respondent2OrgId))
+                    .thenReturn(Optional.empty());
+
+                assertThrows(CallbackException.class, () -> handler.handle(params));
+            }
         }
 
         @Test
