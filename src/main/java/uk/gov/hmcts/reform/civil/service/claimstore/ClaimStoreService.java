@@ -31,6 +31,7 @@ public class ClaimStoreService {
             .defendantName(cmcClaim.getDefendantName())
             .responseDeadline(cmcClaim.getResponseDeadline())
             .claimAmount(cmcClaim.getTotalAmountTillToday())
+            .ocmc(true)
             .build()
         ).collect(Collectors.toList());
     }

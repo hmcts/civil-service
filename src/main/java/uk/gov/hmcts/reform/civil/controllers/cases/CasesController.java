@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
+import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 
@@ -43,7 +44,7 @@ public class CasesController {
     private final RoleAssignmentsService roleAssignmentsService;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final ClaimStoreService claimStoreService;
+    private final DashboardClaimInfoService dashboardClaimInfoService;
 
     @GetMapping(path = {
         "/{caseId}",
@@ -94,7 +95,7 @@ public class CasesController {
     public ResponseEntity<List<DashboardClaimInfo>>
         getClaimsForClaimant(@PathVariable("submitterId") String submitterId,
                             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-        List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForClaimant(authorization, submitterId);
+        List<DashboardClaimInfo> ocmcClaims = dashboardClaimInfoService.getClaimsForClaimant(authorization, submitterId);
         return new ResponseEntity<>(ocmcClaims, HttpStatus.OK);
     }
 
@@ -103,7 +104,7 @@ public class CasesController {
     public ResponseEntity<List<DashboardClaimInfo>>
         getClaimsForDefendant(@PathVariable("submitterId") String submitterId,
                               @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-        List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForDefendant(authorization, submitterId);
-        return new ResponseEntity<>(ocmcClaims, HttpStatus.OK);
+        List<DashboardClaimInfo> defendantClaims = dashboardClaimInfoService.getClaimsForDefendant(authorization, submitterId);
+        return new ResponseEntity<>(defendantClaims, HttpStatus.OK);
     }
 }
