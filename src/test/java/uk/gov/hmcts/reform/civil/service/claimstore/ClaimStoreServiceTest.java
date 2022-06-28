@@ -44,7 +44,7 @@ public class ClaimStoreServiceTest {
                                                                                             .claimantName(CLAIMANT_NAME)
                                                                                             .defendantName(
                                                                                                 DEFENDANT_NAME)
-                                                                                            .responseDeadLine(
+                                                                                            .responseDeadline(
                                                                                                 RESPONSE_DEADLINE)
                                                                                             .build());
 

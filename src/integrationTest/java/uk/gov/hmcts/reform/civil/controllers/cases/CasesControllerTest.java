@@ -50,7 +50,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
                                           "Mr. James Bond")
                                       .defendantName(
                                           "Mr. Roger Moore")
-                                      .responseDeadLine(
+                                      .responseDeadline(
                                           LocalDate.of(
                                               2022,
                                               1,
