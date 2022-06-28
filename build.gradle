@@ -130,6 +130,15 @@ sourceSets {
     }
     resources.srcDir file('src/contractTest/resources')
   }
+
+  smokeTest {
+    java {
+      compileClasspath += main.output
+      runtimeClasspath += main.output
+      srcDir file('src/smokeTest/java')
+    }
+    resources.srcDir file('src/smokeTest/resources')
+  }
 }
 
 tasks.withType(JavaCompile) {
