@@ -112,7 +112,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                     templateId = N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
                 }
                 break;
-                //FALL-THROUGH
+            //FALL-THROUGH
             case ONE_V_TWO_ONE_LEGAL_REP:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
@@ -160,7 +160,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     private DQ getDQAndSetSubmittedOn(DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder,
-                                     CaseData caseData) {
+                                      CaseData caseData) {
         if (isClaimantResponse(caseData)) {
             if (onlyApplicant2IsProceeding(caseData)) {
                 builder.submittedOn(caseData.getApplicant2ResponseDate().toLocalDate());
@@ -197,6 +197,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .applicants(claimantResponseLRspec ? getApplicants(caseData) : null)
             .allocatedTrack(caseData.getAllocatedTrack());
 
+        if (!SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            builder.statementOfTruthText(isRespondentState(caseData) ? getDefendantStatementOfTruth() : getClaimantStatementOfTruth());
+        }
         DQ dq = getDQAndSetSubmittedOn(builder, caseData);
 
         if (!claimantResponseLRspec) {
@@ -815,4 +818,21 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""))
             .build();
     }
+
+    private String getClaimantStatementOfTruth() {
+        return "The claimant believes that the facts this claim are true.\n\n\n"
+            + "I am duly authorised by the claimant to sign this statement.\n\n"
+            + "The claimant understands that proceedings for contempt of court may be brought against anyone who makes,"
+            + "or causes to be made, a false statement in a document verified by a statement of truth without an honest"
+            + "belief in its truth.";
+    }
+
+    private String getDefendantStatementOfTruth() {
+        return "The defendant believes that the facts stated in the response are true.\n\n\n"
+            + "I am duly authorised by the defendant to sign this statement.\n\n"
+            + "The defendant understands that proceedings for contempt of court may be brought against anyone who makes,"
+            + "or causes to be made, a false statement in a document verified by a statement of truth without an honest"
+            + "belief in its truth.";
+    }
+
 }
