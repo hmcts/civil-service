@@ -92,8 +92,9 @@ public class FlowPredicate {
         caseData.getIssueDate() != null
             && caseData.getRespondent1Represented() == YES
             && caseData.getRespondent1OrgRegistered() == YES
-            && caseData.getRespondent2Represented() != NO
-            && caseData.getRespondent2OrgRegistered() != NO;
+            && (caseData.getRespondent2() == null
+            || (caseData.getRespondent2Represented() == YES
+            && caseData.getRespondent2OrgRegistered() == YES));
 
     public static final Predicate<CaseData> claimNotified = caseData ->
         !SPEC_CLAIM.equals(caseData.getSuperClaimType())
@@ -199,9 +200,9 @@ public class FlowPredicate {
                     && caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate())));
             case TWO_V_ONE:
                 return (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
-                            || FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()))
-                        && !(FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
-                            && FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()));
+                    || FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()))
+                    && !(FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
+                    && FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()));
             default:
                 return false;
         }
@@ -257,8 +258,8 @@ public class FlowPredicate {
                     && RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType()))
                     ||
                     (caseData.getRespondent1ClaimResponseType() == null
-                    && caseData.getRespondent2ClaimResponseType() != null
-                    && RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()));
+                        && caseData.getRespondent2ClaimResponseType() != null
+                        && RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()));
             default:
                 return false;
         }
@@ -275,8 +276,8 @@ public class FlowPredicate {
                     && !RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType()))
                     ||
                     (caseData.getRespondent1ClaimResponseType() == null
-                    && caseData.getRespondent2ClaimResponseType() != null
-                    && !RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()));
+                        && caseData.getRespondent2ClaimResponseType() != null
+                        && !RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()));
             default:
                 return false;
         }
@@ -401,9 +402,9 @@ public class FlowPredicate {
     public static final Predicate<CaseData> caseDismissedAfterDetailNotifiedExtension = caseData ->
         caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
             && ((caseData.getRespondent1AcknowledgeNotificationDate() == null
-                && caseData.getRespondent1TimeExtensionDate() != null)
-                    || (caseData.getRespondent2AcknowledgeNotificationDate() == null
-                        && caseData.getRespondent2TimeExtensionDate() != null))
+            && caseData.getRespondent1TimeExtensionDate() != null)
+            || (caseData.getRespondent2AcknowledgeNotificationDate() == null
+            && caseData.getRespondent2TimeExtensionDate() != null))
             && caseData.getRespondent1ClaimResponseIntentionType() == null
             && caseData.getRespondent2ClaimResponseIntentionType() == null;
 
@@ -430,7 +431,7 @@ public class FlowPredicate {
                     && caseData.getRespondent1AcknowledgeNotificationDate() != null
                     && caseData.getRespondent2AcknowledgeNotificationDate() != null
                     && (caseData.getRespondent1TimeExtensionDate() != null
-                        || caseData.getRespondent2TimeExtensionDate() != null);
+                    || caseData.getRespondent2TimeExtensionDate() != null);
             default:
                 return caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
                     && caseData.getRespondent1TimeExtensionDate() != null
@@ -604,7 +605,7 @@ public class FlowPredicate {
                     && (caseData.getClaimant1ClaimResponseTypeForSpec() != null
                     && caseData.getClaimant2ClaimResponseTypeForSpec() != null)
                     && !caseData.getClaimant1ClaimResponseTypeForSpec()
-                        .equals(caseData.getClaimant2ClaimResponseTypeForSpec())) {
+                    .equals(caseData.getClaimant2ClaimResponseTypeForSpec())) {
                     return true;
                 }
                 return false;

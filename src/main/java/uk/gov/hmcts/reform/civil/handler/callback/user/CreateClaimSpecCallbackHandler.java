@@ -357,6 +357,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         if (callbackParams.getRequest().getEventId() != null) {
             var respondent1Represented = caseData.getSpecRespondent1Represented();
             dataBuilder.respondent1Represented(respondent1Represented);
+            var respondent2Represented = caseData.getSpecRespondent2Represented();
+            dataBuilder.respondent2Represented(respondent2Represented);
         }
 
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
