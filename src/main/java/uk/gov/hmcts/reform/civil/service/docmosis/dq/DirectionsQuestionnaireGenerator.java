@@ -67,6 +67,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_MULTIPARTY_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
@@ -537,7 +538,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             || state.equals(FULL_DEFENCE.fullName())
             || state.equals(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
             || state.equals(ALL_RESPONSES_RECEIVED.fullName())
-            || state.equals(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName());
+            || state.equals(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName())
+            || state.equals(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName());
     }
 
     private boolean isRespondent2(CaseData caseData) {
