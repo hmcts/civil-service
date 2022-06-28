@@ -347,9 +347,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     necessary.add(NEED_FINANCIAL_DETAILS_2);
                 }
 
-                if (respondent2doesNotPayImmediately(caseData, scenario)) {
-                    necessary.add(WHY_2_DOES_NOT_PAY_IMMEDIATELY);
-                }
+            }
+
+            if (respondent2doesNotPayImmediately(caseData, scenario)) {
+                necessary.add(WHY_2_DOES_NOT_PAY_IMMEDIATELY);
             }
 
             if ((caseData.getRespondentResponseIsSame() == YES
@@ -1221,6 +1222,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.respondent1DQ(dq);
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
+        }
+        if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWOSPEC)
+            && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+            updatedData.defenceAdmitPartPaymentTimeRouteRequired(null);
         }
 
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP

@@ -13,12 +13,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.prd.model.Organisation;
-import uk.gov.hmcts.reform.prd.model.ProfessionalUsersEntityResponse;
-import uk.gov.hmcts.reform.prd.model.ProfessionalUsersResponse;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -45,7 +40,6 @@ class OrganisationServiceTest {
     private final Organisation expectedOrganisation = Organisation.builder()
         .organisationIdentifier(ORG_ID)
         .build();
-    private final ProfessionalUsersEntityResponse expectedUsersInOrg = buildExpectedUsers();
 
     @Mock
     private OrganisationApi organisationApi;
@@ -59,9 +53,6 @@ class OrganisationServiceTest {
     @Mock
     private PrdAdminUserConfiguration userConfig;
 
-    @Mock
-    private CustomScopeIdamTokenGeneratorService tokenGenerator;
-
     @InjectMocks
     private OrganisationService organisationService;
 
@@ -69,11 +60,8 @@ class OrganisationServiceTest {
     void setUp() {
         given(organisationApi.findUserOrganisation(any(), any())).willReturn(expectedOrganisation);
         given(organisationApi.findOrganisationById(any(), any(), any())).willReturn(expectedOrganisation);
-        given(organisationApi.findUsersByOrganisation(any(), any(), any())).willReturn(expectedUsersInOrg);
         given(authTokenGenerator.generate()).willReturn(SERVICE_AUTH_TOKEN);
         when(userService.getAccessToken(userConfig.getUsername(), userConfig.getPassword())).thenReturn(
-            PRD_ADMIN_AUTH_TOKEN);
-        when(tokenGenerator.getAccessToken(userConfig.getUsername(), userConfig.getPassword())).thenReturn(
             PRD_ADMIN_AUTH_TOKEN);
     }
 
@@ -119,54 +107,5 @@ class OrganisationServiceTest {
             verify(organisationApi).findOrganisationById(PRD_ADMIN_AUTH_TOKEN, SERVICE_AUTH_TOKEN, ORG_ID);
             assertThat(organisation).isEmpty();
         }
-    }
-
-    @Nested
-    class FindUsersInOrganisation {
-
-        @Test
-        void shouldReturnUsersInOrganisation_whenInvoked() {
-            var orgUsers = organisationService.findUsersInOrganisation(ORG_ID);
-
-            verify(tokenGenerator).getAccessToken(userConfig.getUsername(), userConfig.getPassword());
-            verify(organisationApi).findUsersByOrganisation(PRD_ADMIN_AUTH_TOKEN, SERVICE_AUTH_TOKEN, ORG_ID);
-
-            assertThat(orgUsers).isEqualTo(Optional.of(expectedUsersInOrg));
-        }
-
-        @Test
-        void shouldReturnEmptyOptional_whenOrganisationNotFound() {
-            given(organisationApi.findUsersByOrganisation(any(), any(), any())).willThrow(notFoundFeignException);
-            var organisation = organisationService.findUsersInOrganisation(ORG_ID);
-
-            verify(tokenGenerator).getAccessToken(userConfig.getUsername(), userConfig.getPassword());
-            verify(organisationApi).findUsersByOrganisation(PRD_ADMIN_AUTH_TOKEN, SERVICE_AUTH_TOKEN, ORG_ID);
-            assertThat(organisation).isEmpty();
-        }
-
-    }
-
-    private ProfessionalUsersEntityResponse buildExpectedUsers() {
-        List<ProfessionalUsersResponse> users = new ArrayList<>();
-
-        users.add(ProfessionalUsersResponse.builder()
-                      .email("hmcts.civil+organisation.2.CAA@gmail.com")
-                      .roles(Arrays.asList("caseworker", "caseworker-civil", "pui-caa"))
-                      .build());
-
-        users.add(ProfessionalUsersResponse.builder()
-                      .email("hmcts.civil+organisation.2.superuser@gmail.com")
-                      .roles(Arrays.asList("caseworker", "caseworker-civil", "pui-organisation-manager"))
-                      .build());
-
-        users.add(ProfessionalUsersResponse.builder()
-                      .email("hmcts.civil+organisation.2.solicitor.1@gmail.com")
-                      .roles(Arrays.asList("caseworker", "caseworker-civil", "caseworker-civil-solicitor"))
-                      .build());
-
-        return ProfessionalUsersEntityResponse.builder()
-            .organisationIdentifier("12345")
-            .users(users)
-            .build();
     }
 }
