@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -26,7 +25,6 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -73,7 +71,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
-            params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
         }
 
         @Test
@@ -88,15 +86,6 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
             assignCaseToUserHandler.handle(params);
 
             verifyApplicantSolicitorOneRoles();
-        }
-
-        @Test
-        void shouldRemoveSubmitterIdAfterCaseAssignment() {
-            AboutToStartOrSubmitCallbackResponse response
-                = (AboutToStartOrSubmitCallbackResponse) assignCaseToUserHandler.handle(params);
-
-            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
-            assertThat(data.getApplicantSolicitor1UserDetails().getId()).isNull();
         }
     }
 
@@ -121,7 +110,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
-            params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
         }
 
         @Test
@@ -157,7 +146,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
 
-            params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
 
             assignCaseToUserHandler.handle(params);
 
@@ -191,7 +180,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
 
-            params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
 
             assignCaseToUserHandler.handle(params);
 
@@ -222,7 +211,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
 
-            params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
 
             assignCaseToUserHandler.handle(params);
 
