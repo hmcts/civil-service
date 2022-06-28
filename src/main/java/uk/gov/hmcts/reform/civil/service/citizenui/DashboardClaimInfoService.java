@@ -44,10 +44,10 @@ public class DashboardClaimInfoService {
         if(claims.getTotal() == 0){
             return Collections.emptyList();
         }
-        return translateSearchResultClaimsToDashboardItems(claims);
+        return translateSearchResultToDashboardItems(claims);
     }
 
-    private List<DashboardClaimInfo> translateSearchResultClaimsToDashboardItems(SearchResult claims){
+    private List<DashboardClaimInfo> translateSearchResultToDashboardItems(SearchResult claims){
         return claims.getCases().stream().map(caseDetails -> translateCaseDataToDashboardClaimInfo(caseDetails)).collect(
             Collectors.toList());
     }
