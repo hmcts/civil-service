@@ -198,7 +198,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .allocatedTrack(caseData.getAllocatedTrack());
 
         if (!SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-            builder.statementOfTruthText(isRespondentState(caseData) ? getDefendantStatementOfTruth() : getClaimantStatementOfTruth());
+            builder.statementOfTruthText(isRespondentState(caseData)
+                                             ? getDefendantStatementOfTruth()
+                                             : getClaimantStatementOfTruth());
         }
         DQ dq = getDQAndSetSubmittedOn(builder, caseData);
 
@@ -830,9 +832,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     private String getDefendantStatementOfTruth() {
         return "The defendant believes that the facts stated in the response are true.\n\n\n"
             + "I am duly authorised by the defendant to sign this statement.\n\n"
-            + "The defendant understands that proceedings for contempt of court may be brought against anyone who makes,"
-            + "or causes to be made, a false statement in a document verified by a statement of truth without an honest"
-            + "belief in its truth.";
+            + "The defendant understands that proceedings for contempt of court may be brought against anyone who "
+            + "makes, or causes to be made, a false statement in a document verified by a statement of truth without "
+            + "an honest belief in its truth.";
     }
 
 }
