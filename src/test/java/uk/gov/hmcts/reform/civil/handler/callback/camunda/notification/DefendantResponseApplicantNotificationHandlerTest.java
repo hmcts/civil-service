@@ -136,7 +136,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 handler.handle(params);
 
                 verify(notificationService).sendMail(
-                    "respondentsolicitor@example.com",
+                    "respondentsolicitor2@example.com",
                     "template-id",
                     getNotificationDataMap(caseData),
                     "defendant-response-applicant-notification-000DC001"
@@ -268,14 +268,14 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
-                                 .eventId("NOTIFY_APPLICANT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC")
+                                 .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC")
                                  .build())
                     .build();
 
                 handler.handle(params);
 
                 verify(notificationService).sendMail(
-                    "respondentsolicitor@example.com",
+                    "respondentsolicitor2@example.com",
                     "template-id",
                     getNotificationDataMap(caseData),
                     "defendant-response-applicant-notification-000DC001"
