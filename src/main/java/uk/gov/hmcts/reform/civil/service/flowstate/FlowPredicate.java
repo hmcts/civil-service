@@ -97,6 +97,9 @@ public class FlowPredicate {
             && (caseData.getRespondent2OrgRegistered() == YES
             || caseData.getRespondent2SameLegalRepresentative() == YES)));
 
+    public static final Predicate<CaseData> bothDefSameLegalRep = caseData ->
+       caseData.getRespondent2SameLegalRepresentative() == YES;
+
     public static final Predicate<CaseData> claimNotified = caseData ->
         !SPEC_CLAIM.equals(caseData.getSuperClaimType())
             && caseData.getClaimNotificationDate() != null
