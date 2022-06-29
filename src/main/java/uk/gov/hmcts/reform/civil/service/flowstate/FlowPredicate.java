@@ -94,7 +94,8 @@ public class FlowPredicate {
             && caseData.getRespondent1OrgRegistered() == YES
             && (caseData.getRespondent2() == null
             || (caseData.getRespondent2Represented() == YES
-            && caseData.getRespondent2OrgRegistered() == YES));
+            && (caseData.getRespondent2OrgRegistered() == YES
+            || caseData.getRespondent2SameLegalRepresentative() == YES)));
 
     public static final Predicate<CaseData> claimNotified = caseData ->
         !SPEC_CLAIM.equals(caseData.getSuperClaimType())

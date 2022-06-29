@@ -1967,4 +1967,18 @@ class FlowPredicateTest {
 
         Assertions.assertTrue(pendingClaimIssued.test(caseData));
     }
+
+    @Test
+    public void when1v2ss_thenPendingClaimIssued() {
+        CaseData caseData = CaseData.builder()
+            .build();
+
+//        caseData.getIssueDate() != null
+//            && caseData.getRespondent1Represented() == YES
+//            && caseData.getRespondent1OrgRegistered() == YES
+//            && caseData.getRespondent2Represented() != NO
+//            && caseData.getRespondent2OrgRegistered() != NO
+
+        pendingClaimIssued.test(caseData);
+    }
 }
