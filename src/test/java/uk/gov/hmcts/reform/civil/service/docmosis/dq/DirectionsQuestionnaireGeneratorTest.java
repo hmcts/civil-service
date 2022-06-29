@@ -374,6 +374,31 @@ class DirectionsQuestionnaireGeneratorTest {
             }
 
             @Test
+            void whenCaseStateIsFullDefence1v2_TWO_LR_Applicant1ProceedsLRSpec_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimOneDefendantSolicitor()
+                    .atStateApplicantRespondToDefenceAndNotProceed_1v2_DiffSol()
+                    .applicant1DQ()
+                    .build()
+                    .toBuilder()
+                    .businessProcess(BusinessProcess.builder()
+                                         .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .applicant1ProceedWithClaim(YES)
+                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .respondent2SameLegalRepresentative(NO)
+                    .build();
+
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                assertEquals(
+                    templateData.getFileDirectionsQuestionnaire(),
+                    caseData.getApplicant1DQ().getFileDirectionQuestionnaire()
+                );
+            }
+
+            @Test
             void whenCaseStateIsFullDefence1v2ApplicantProceedsAgainstRes1_shouldGetRespondentDQData() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
