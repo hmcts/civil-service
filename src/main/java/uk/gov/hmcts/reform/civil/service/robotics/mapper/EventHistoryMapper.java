@@ -227,6 +227,7 @@ public class EventHistoryMapper {
                 }
             }
         }
+        buildInformAgreedExtensionDateForSpec(builder, caseData);
 
         return eventHistorySequencer.sortEvents(builder.build());
     }
@@ -1559,6 +1560,14 @@ public class EventHistoryMapper {
         }
 
         builder.consentExtensionFilingDefence(events);
+    }
+
+    private void buildInformAgreedExtensionDateForSpec(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())
+            && (caseData.getRespondentSolicitor1AgreedDeadlineExtension() != null
+            || caseData.getRespondentSolicitor2AgreedDeadlineExtension() != null)) {
+            buildConsentExtensionFilingDefence(builder, caseData);
+        }
     }
 
     private Event buildConsentExtensionFilingDefenceEvent(

@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
+import static java.time.LocalDate.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -5416,4 +5417,32 @@ class EventHistoryMapperTest {
                 .isNotNull();
         }
     }
+
+    @Nested
+    class InformAgreedExtensionDateForSpecEvents {
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseInformAgreedExtensionDate() {
+            LocalDate extensionDateRespondent1 = now().plusDays(14);
+            LocalDateTime datetime = LocalDateTime.now();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)
+                .respondent1TimeExtensionDate(datetime)
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
+                .extracting("eventCode").asString().contains("45");
+        }
+    }
+
 }
