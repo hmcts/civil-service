@@ -118,6 +118,12 @@ class RoboticsNotificationServiceTest {
     @SneakyThrows
     void shouldSendNotificationEmail_whenCaseDataIsProvided() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+        if (caseData.getRespondent2OrgRegistered() != null
+            && caseData.getRespondent2Represented() == null) {
+            caseData = caseData.toBuilder()
+                .respondent2Represented(YES)
+                .build();
+        }
         service.notifyRobotics(caseData, false);
 
         verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
@@ -142,6 +148,12 @@ class RoboticsNotificationServiceTest {
     void shouldSendNotificationEmailLRSpec_whenCaseDataIsProvided() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
             .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
+        if (caseData.getRespondent2OrgRegistered() != null
+            && caseData.getRespondent2Represented() == null) {
+            caseData = caseData.toBuilder()
+                .respondent2Represented(YES)
+                .build();
+        }
         when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
         when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
         String lastEventText = "event text";
@@ -188,7 +200,12 @@ class RoboticsNotificationServiceTest {
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(NO)
             .build();
-
+        if (caseData.getRespondent2OrgRegistered() != null
+            && caseData.getRespondent2Represented() == null) {
+            caseData = caseData.toBuilder()
+                .respondent2Represented(YES)
+                .build();
+        }
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
         service.notifyRobotics(caseData, multiPartyScenario);
 
@@ -219,7 +236,12 @@ class RoboticsNotificationServiceTest {
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(NO)
             .build();
-
+        if (caseData.getRespondent2OrgRegistered() != null
+            && caseData.getRespondent2Represented() == null) {
+            caseData = caseData.toBuilder()
+                .respondent2Represented(YES)
+                .build();
+        }
         service.notifyRobotics(caseData, isMultiPartyScenario(caseData));
 
         verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
@@ -289,7 +311,12 @@ class RoboticsNotificationServiceTest {
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(NO)
             .build();
-
+        if (caseData.getRespondent2OrgRegistered() != null
+            && caseData.getRespondent2Represented() == null) {
+            caseData = caseData.toBuilder()
+                .respondent2Represented(YES)
+                .build();
+        }
         String lastEventText = "event text";
         RoboticsCaseDataSpec roboticsCaseData = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder().miscellaneous(
@@ -320,7 +347,12 @@ class RoboticsNotificationServiceTest {
             .respondent2DQ(Respondent2DQ.builder().build())
             .respondent2ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
             .build();
-
+        if (caseData.getRespondent2OrgRegistered() != null
+            && caseData.getRespondent2Represented() == null) {
+            caseData = caseData.toBuilder()
+                .respondent2Represented(YES)
+                .build();
+        }
         service.notifyRobotics(caseData, isMultiPartyScenario(caseData));
 
         verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
