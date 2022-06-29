@@ -77,8 +77,6 @@ class RoboticsDataMapperTest {
     @MockBean
     FeatureToggleService featureToggleService;
     @MockBean
-    FeatureToggleService featureToggleService;
-    @MockBean
     PrdAdminUserConfiguration userConfig;
     @MockBean
     private Time time;
@@ -148,30 +146,6 @@ class RoboticsDataMapperTest {
     }
 
     @Test
-    void atStatePaymentSuccessfulWithCopyOrganisationIdPresent() {
-        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessfulWithCopyOrganisationOnly().build();
-
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
-
-        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
-        assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
-
-        var firstSolicitor = roboticsCaseData.getSolicitors().get(0);
-        assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
-        assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
-        assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
-        CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
-            .isEqualTo(firstSolicitor.getAddresses().getContactAddress());
-
-        var secondSolicitor = roboticsCaseData.getSolicitors().get(1);
-        assertThat(secondSolicitor.getOrganisationId()).isEqualTo("QWERTY R");
-        assertThat(secondSolicitor.getName()).isEqualTo("Org Name");
-        assertThat(secondSolicitor.getContactDX()).isEqualTo("DX 12345");
-        CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
-            .isEqualTo(secondSolicitor.getAddresses().getContactAddress());
-    }
-
-    @Test
     void shouldMapToRoboticsCaseData_whenOrganisationPolicyIsPresentWithProvidedServiceAddress() {
         var solicitorServiceAddress = Address.builder()
             .addressLine1("line 1 provided")
@@ -205,49 +179,12 @@ class RoboticsDataMapperTest {
         assertThat(secondSolicitor.getContactDX()).isEqualTo("DX 12345");
         CustomAssertions.assertThat(List.of(contactInformation))
             .isEqualTo(secondSolicitor.getAddresses().getContactAddress());
-    }
-
-    @Test
-    void shouldMapToRoboticsCaseData_whenOrganisationPolicyIsPresentWithProvidedServiceAddress() {
-        var solicitorServiceAddress = Address.builder()
-            .addressLine1("line 1 provided")
-            .addressLine2("line 2")
-            .postCode("AB1 2XY")
-            .county("My county")
-            .build();
-
-        ContactInformation contactInformation = CONTACT_INFORMATION.toBuilder().addressLine1("line 1 provided").build();
-
-        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful()
-            .applicantSolicitor1ServiceAddress(solicitorServiceAddress)
-            .respondentSolicitor1ServiceAddress(solicitorServiceAddress)
-            .build();
-
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
-
-        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
-        assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
-        roboticsCaseData.getSolicitors()
-            .stream()
-            .forEach(
-                solicitor -> {
-                    assertThat(solicitor.getOrganisationId())
-                        .isEqualTo("QWERTY");
-                    assertThat(solicitor.getName())
-                        .isEqualTo("Org Name");
-                    assertThat(solicitor.getContactDX())
-                        .isEqualTo("DX 12345");
-                    CustomAssertions.assertThat(List.of(contactInformation))
-                        .isEqualTo(solicitor.getAddresses().getContactAddress());
-                });
     }
 
     @Test
     void shouldMapToRoboticsCaseData_whenOrganisationPolicyIsNotPresent() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants()
-            .respondent1OrganisationPolicy(null)
-            .respondentSolicitor1OrganisationDetails(null)
-            .respondent1OrganisationIDCopy(null).build();
+            .respondent1OrganisationPolicy(null).respondentSolicitor1OrganisationDetails(null).build();
 
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
 

@@ -1249,7 +1249,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1DoesNotHaveRepresentation() {
-                CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendants()
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants()
                     .legacyCaseReference("000MC001")
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
