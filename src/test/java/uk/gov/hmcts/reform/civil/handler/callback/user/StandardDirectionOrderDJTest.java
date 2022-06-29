@@ -97,7 +97,9 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPrePopulateDJDisposalAndTrialHearingPage() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearing().build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -367,7 +369,17 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("trialRoadTrafficAccident").extracting("input")
                 .isEqualTo("Photographs and/or a plan of the location of the accident shall be prepared and "
                                + "agreed by the parties.");
+        }
 
+        @Test
+        void shouldPrePopulateDJTrialHearingToggle() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .atStateClaimIssuedTrialHearing().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("trialHearingAllocationDJToggle").isNotNull();
         }
     }
 

@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -453,4 +454,34 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingDisclosureOfDocumentsDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingWitnessOfFactDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingMedicalEvidenceDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingQuestionsToExpertsDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingSchedulesOfLossDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingStandardDisposalOrderDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingFinalDisposalHearingDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingBundleDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingClaimSettlingDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingCostsDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingApplicationsDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingNotesDJToggle;
+
+    private List<DisposalAndTrialHearingDJToggle> trialHearingAllocationDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialHearingAlternativeDisputeDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialHearingVariationsDirectionsDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialHearingSettlementDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialHearingDisclosureOfDocumentsDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialHearingWitnessOfFactDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialHearingSchedulesOfLossDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialHearingCostsToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialHearingTrialDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialHearingNotesDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialBuildingDisputeDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialClinicalNegligenceDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialCreditHireDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialEmployerDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialPersonalInjuryDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialRoadTrafficAccidentDJToggle;
+
 }

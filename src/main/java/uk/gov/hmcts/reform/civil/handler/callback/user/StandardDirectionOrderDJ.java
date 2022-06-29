@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
@@ -61,13 +62,12 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     String participantString;
-    public static final String BOTH_DEFENDANTS = "Both Defendants";
+    public static final String DISPOSAL_HEARING = "DISPOSAL_HEARING";
     public static final String ORDER_1_CLAI = "The directions order has been sent to: "
         + "%n%n ## Claimant 1 %n%n %s";
     public static final String ORDER_1_DEF = "%n%n ## Defendant 1 %n%n %s";
     public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
-    public static final String DOCUMENT_ORDER_LINK = "<br /><a href=\"%s\" target=\"_blank\">Download   judgment</a>";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -141,8 +141,14 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
     private CallbackResponse populateDisposalTrialScreen(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
+        List<DisposalAndTrialHearingDJToggle> checkList = List.of(
+            DisposalAndTrialHearingDJToggle.SHOW);
+        if (caseData.getCaseManagementOrderSelection().equals(DISPOSAL_HEARING)) {
+            caseData = fillDisposalToggle(caseData, checkList);
+        } else {
+            caseData = fillTrialToggle(caseData, checkList);
+        }
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         //populates the disposal screen
         caseDataBuilder
             .disposalHearingJudgesRecitalDJ(DisposalHearingJudgesRecital
@@ -478,5 +484,45 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .confirmationHeader(getHeader(caseData))
             .confirmationBody(getBody(caseData))
             .build();
+    }
+
+    private CaseData fillDisposalToggle(CaseData caseData, List<DisposalAndTrialHearingDJToggle> checkList) {
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        caseDataBuilder.disposalHearingDisclosureOfDocumentsDJToggle(checkList);
+        caseDataBuilder.disposalHearingWitnessOfFactDJToggle(checkList);
+        caseDataBuilder.disposalHearingMedicalEvidenceDJToggle(checkList);
+        caseDataBuilder.disposalHearingQuestionsToExpertsDJToggle(checkList);
+        caseDataBuilder.disposalHearingSchedulesOfLossDJToggle(checkList);
+        caseDataBuilder.disposalHearingStandardDisposalOrderDJToggle(checkList);
+        caseDataBuilder.disposalHearingFinalDisposalHearingDJToggle(checkList);
+        caseDataBuilder.disposalHearingBundleDJToggle(checkList);
+        caseDataBuilder.disposalHearingClaimSettlingDJToggle(checkList);
+        caseDataBuilder.disposalHearingCostsDJToggle(checkList);
+        caseDataBuilder.disposalHearingApplicationsDJToggle(checkList);
+        caseDataBuilder.disposalHearingNotesDJToggle(checkList);
+        return caseDataBuilder.build();
+    }
+
+    private CaseData fillTrialToggle(CaseData caseData, List<DisposalAndTrialHearingDJToggle> checkList) {
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.trialHearingAllocationDJToggle(checkList);
+        caseDataBuilder.trialHearingAlternativeDisputeDJToggle(checkList);
+        caseDataBuilder.trialHearingVariationsDirectionsDJToggle(checkList);
+        caseDataBuilder.trialHearingSettlementDJToggle(checkList);
+        caseDataBuilder.trialHearingDisclosureOfDocumentsDJToggle(checkList);
+        caseDataBuilder.trialHearingWitnessOfFactDJToggle(checkList);
+        caseDataBuilder.trialHearingSchedulesOfLossDJToggle(checkList);
+        caseDataBuilder.trialHearingCostsToggle(checkList);
+        caseDataBuilder.trialHearingTrialDJToggle(checkList);
+        caseDataBuilder.trialHearingNotesDJToggle(checkList);
+        caseDataBuilder.trialBuildingDisputeDJToggle(checkList);
+        caseDataBuilder.trialClinicalNegligenceDJToggle(checkList);
+        caseDataBuilder.trialCreditHireDJToggle(checkList);
+        caseDataBuilder.trialEmployerDJToggle(checkList);
+        caseDataBuilder.trialPersonalInjuryDJToggle(checkList);
+        caseDataBuilder.trialRoadTrafficAccidentDJToggle(checkList);
+
+        return caseDataBuilder.build();
     }
 }
