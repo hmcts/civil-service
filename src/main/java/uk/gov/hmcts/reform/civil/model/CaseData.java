@@ -452,5 +452,5 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private TrialRoadTrafficAccident trialRoadTrafficAccident;
 
     private String caseManagementOrderSelection;
-    private Document orderDoc;
+    private Document orderSDODocumentDJ;
 }

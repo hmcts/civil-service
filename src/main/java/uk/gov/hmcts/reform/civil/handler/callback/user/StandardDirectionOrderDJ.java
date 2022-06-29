@@ -456,7 +456,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
         CaseDocument document = defaultJudgmentOrderFormGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-        caseDataBuilder.orderDoc(document.getDocumentLink());
+        caseDataBuilder.orderSDODocumentDJ(document.getDocumentLink());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();

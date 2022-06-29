@@ -385,7 +385,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .build();
             when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("orderDoc").isNotNull();
+            assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
         }
     }
 }

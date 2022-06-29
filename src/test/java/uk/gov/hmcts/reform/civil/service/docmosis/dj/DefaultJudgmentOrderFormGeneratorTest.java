@@ -65,6 +65,7 @@ public class DefaultJudgmentOrderFormGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .atStateClaimIssuedDisposalHearing()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
@@ -83,6 +84,7 @@ public class DefaultJudgmentOrderFormGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .atStateClaimIssuedTrialHearing()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
