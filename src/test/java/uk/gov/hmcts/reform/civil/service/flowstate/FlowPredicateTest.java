@@ -1973,12 +1973,6 @@ class FlowPredicateTest {
         CaseData caseData = CaseData.builder()
             .build();
 
-//        caseData.getIssueDate() != null
-//            && caseData.getRespondent1Represented() == YES
-//            && caseData.getRespondent1OrgRegistered() == YES
-//            && caseData.getRespondent2Represented() != NO
-//            && caseData.getRespondent2OrgRegistered() != NO
-
         pendingClaimIssued.test(caseData);
     }
 }
