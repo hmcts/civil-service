@@ -251,7 +251,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 handler.handle(params);
 
                 verify(notificationService).sendMail(
-                    "respondentsolicitor@example.com",
+                    "applicantsolicitor@example.com",
                     "template-id",
                     getNotificationDataMap(caseData),
                     "defendant-response-applicant-notification-000DC001"
