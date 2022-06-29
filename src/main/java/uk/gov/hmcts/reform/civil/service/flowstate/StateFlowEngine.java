@@ -184,7 +184,7 @@ public class StateFlowEngine {
                             .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
                     .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
                             .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
-                            .and (bothDefSameLegalRep.negate()))
+                            .and(bothDefSameLegalRep.negate()))
             // Unrepresented and Unregistered
             // 1. Def1 unrepresented, Def2 unregistered
             // 2. Def1 unregistered, Def 2 unrepresented
