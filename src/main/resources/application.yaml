@@ -45,6 +45,10 @@ spring:
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
+cmc-claim-store:
+  api:
+    url: ${CLAIM_STORE_URL:http://localhost:8765}
+
 fees:
   api:
     service: civil money claims
@@ -66,6 +70,8 @@ genApp:
       consentedOrWithoutNotice: GeneralAppWithoutNotice
   lrd:
     endpoint: /refdata/location/court-venues
+  jrd:
+    endpoint: /refdata/judicial/users/search
 
 
 payments:
@@ -228,6 +234,8 @@ fees:
 genApp:
   lrd:
     url: http://localhost:8765
+  jrd:
+    url: http://localhost:8765
 
 payments:
   api:
@@ -293,6 +301,8 @@ fees:
 genApp:
   lrd:
     url: http://fake-rd-location-ref-api
+  jrd:
+    url: http://fake-rd-judicial-api
 
 payments:
   api:

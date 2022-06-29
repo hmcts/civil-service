@@ -48,6 +48,8 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -136,6 +138,8 @@ public class CaseDataParent implements MappableObject {
     private FastTrackNotes fastTrackNotes;
     private FastTrackPreferredTelephone fastTrackPreferredTelephone;
     private FastTrackPreferredEmail fastTrackPreferredEmail;
+    private SmallClaimsCreditHire smallClaimsCreditHire;
+    private SmallClaimsRoadTrafficAccident smallClaimsRoadTrafficAccident;
 
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
