@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
@@ -57,6 +58,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -569,8 +571,14 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
             if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
                 && !ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
-                if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
-                    && YES.equals(caseData.getRespondentResponseIsSame())) {
+                if ((ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+                    && YES.equals(caseData.getRespondentResponseIsSame()))
+                    || (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+                    && RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                    && RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
+                    ) {
                     respondents.add(Party.builder()
                                         .name(caseData.getRespondent1().getPartyName())
                                         .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
