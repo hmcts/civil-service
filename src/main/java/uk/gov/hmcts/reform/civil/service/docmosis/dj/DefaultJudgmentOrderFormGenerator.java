@@ -72,7 +72,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .disposalHearingSchedulesOfLossDJ(caseData.getDisposalHearingSchedulesOfLossDJ())
             .disposalHearingWitnessOfFactDJ(caseData.getDisposalHearingWitnessOfFactDJ())
             .applicant(caseData.getApplicant1().getPartyName())
-            .respondent(caseData.getRespondent1().getPartyName()).build();
+            .respondent(checkDefendantRequested(caseData)).build();
     }
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormTrial(CaseData caseData) {
@@ -90,7 +90,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialRoadTrafficAccident(caseData.getTrialRoadTrafficAccident())
             .trialHearingWitnessOfFactDJ(caseData.getTrialHearingWitnessOfFactDJ())
             .applicant(caseData.getApplicant1().getPartyName())
-            .respondent(caseData.getRespondent1().getPartyName()).build();
+            .respondent(checkDefendantRequested(caseData)).build();
     }
 
     private DocmosisTemplates getDocmosisTemplate() {
@@ -101,15 +101,16 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         return DJ_SDO_TRIAL;
     }
 
-    private Boolean checkIfBothDefendants(CaseData caseData) {
-        return BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel());
-    }
-
-    private String checkDefendantRequested(final CaseData caseData, String defendantName) {
-        if (BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel())) {
-            return String.format(caseData.getRespondent1().getPartyName()
-                                     + " \n "
-                                     + caseData.getRespondent2().getPartyName());
+    private String checkDefendantRequested(final CaseData caseData) {
+        String defendantName = caseData.getDefendantDetails().getValue().getLabel();
+        if (BOTH_DEFENDANTS.equals(defendantName)) {
+            return caseData.getRespondent1().getPartyName()
+                + ", "
+                + caseData.getRespondent2().getPartyName();
+        } else if (defendantName.equals(caseData.getRespondent1().getPartyName())) {
+            return caseData.getRespondent1().getPartyName();
+        } else {
+            return caseData.getRespondent2().getPartyName();
         }
     }
 }
