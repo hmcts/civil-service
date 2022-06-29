@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.model.ClaimantResponseDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
@@ -30,11 +31,13 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -68,6 +71,7 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.REPLY_TO_DEFENCE;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT2_ID;
@@ -214,7 +218,8 @@ public class EventHistoryMapper {
                     buildBreathingSpaceEvent(builder, caseData, BREATHING_SPACE_ENTERED, "Enter");
                 } else if (BreathingSpaceType.MENTAL_HEALTH.equals(caseData.getBreathing().getEnter().getType())) {
                     buildBreathingSpaceEvent(builder, caseData,
-                                             MENTAL_HEALTH_BREATHING_SPACE_ENTERED, "Enter");
+                                             MENTAL_HEALTH_BREATHING_SPACE_ENTERED, "Enter"
+                    );
                 }
             } else if (null != caseData.getBreathing().getLift()) {
                 if (BreathingSpaceType.STANDARD.equals(caseData.getBreathing().getEnter().getType())) {
@@ -222,7 +227,8 @@ public class EventHistoryMapper {
                     buildBreathingSpaceEvent(builder, caseData, BREATHING_SPACE_LIFTED, "Lifted");
                 } else if (BreathingSpaceType.MENTAL_HEALTH.equals(caseData.getBreathing().getEnter().getType())) {
                     buildBreathingSpaceEvent(builder, caseData,
-                                             MENTAL_HEALTH_BREATHING_SPACE_ENTERED, "Enter");
+                                             MENTAL_HEALTH_BREATHING_SPACE_ENTERED, "Enter"
+                    );
                     buildBreathingSpaceEvent(builder, caseData, MENTAL_HEALTH_BREATHING_SPACE_LIFTED, "Lifted");
                 }
             }
@@ -324,10 +330,12 @@ public class EventHistoryMapper {
                         : caseData.getRespondent1ClaimResponseTypeForSpec();
 
                 buildRespondentResponseEventForSpec(builder, caseData, respondent1SpecResponseType,
-                                             respondent1ResponseDate, RESPONDENT_ID);
+                                                    respondent1ResponseDate, RESPONDENT_ID
+                );
             } else {
                 buildRespondentResponseEvent(builder, caseData, caseData.getRespondent1ClaimResponseType(),
-                                             respondent1ResponseDate, RESPONDENT_ID);
+                                             respondent1ResponseDate, RESPONDENT_ID
+                );
             }
 
             if (!FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())) {
@@ -348,10 +356,12 @@ public class EventHistoryMapper {
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 buildRespondentResponseEventForSpec(builder, caseData,
                                                     caseData.getRespondent2ClaimResponseTypeForSpec(),
-                                                    respondent2ResponseDate, RESPONDENT2_ID);
+                                                    respondent2ResponseDate, RESPONDENT2_ID
+                );
             } else {
                 buildRespondentResponseEvent(builder, caseData, caseData.getRespondent2ClaimResponseType(),
-                                             respondent2ResponseDate, RESPONDENT2_ID);
+                                             respondent2ResponseDate, RESPONDENT2_ID
+                );
             }
 
             if (!FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType())) {
@@ -456,10 +466,10 @@ public class EventHistoryMapper {
     }
 
     private void buildRespondentResponseEventForSpec(EventHistory.EventHistoryBuilder builder,
-                                              CaseData caseData,
-                                              RespondentResponseTypeSpec respondentResponseTypeSpec,
-                                              LocalDateTime respondentResponseDate,
-                                              String respondentID) {
+                                                     CaseData caseData,
+                                                     RespondentResponseTypeSpec respondentResponseTypeSpec,
+                                                     LocalDateTime respondentResponseDate,
+                                                     String respondentID) {
         switch (respondentResponseTypeSpec) {
             case FULL_DEFENCE:
                 buildDefenceFiled(builder, caseData, respondentResponseDate, respondentID);
@@ -482,22 +492,36 @@ public class EventHistoryMapper {
                                    CaseData caseData,
                                    LocalDateTime respondentResponseDate,
                                    String respondentID) {
-        builder.defenceFiled(buildDefenceFiledEvent(builder, respondentResponseDate, respondentID));
         if (respondentID.equals(RESPONDENT_ID)) {
+            builder.defenceFiled(buildDefenceFiledEvent(
+                builder, respondentResponseDate, respondentID,
+                isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())
+            ));
             builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
                 builder, caseData, respondentResponseDate, respondentID,
-                caseData.getRespondent1DQ(), caseData.getRespondent1(), true));
+                caseData.getRespondent1DQ(), caseData.getRespondent1(), true
+            ));
         } else {
+            builder.defenceFiled(buildDefenceFiledEvent(
+                builder, respondentResponseDate, respondentID,
+                isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim2())));
             builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
                 builder, caseData, respondentResponseDate, respondentID,
-                caseData.getRespondent2DQ(), caseData.getRespondent2(), false));
+                caseData.getRespondent2DQ(), caseData.getRespondent2(), false
+            ));
         }
     }
 
+    private boolean isAllPaid(BigDecimal totalClaimAmount, RespondToClaim claimResponse) {
+        return totalClaimAmount != null
+            && Optional.ofNullable(claimResponse).map(RespondToClaim::getHowMuchWasPaid)
+            .map(paid -> paid.compareTo(totalClaimAmount) >= 0).orElse(false);
+    }
+
     private void buildDefenceAndCounterClaim(EventHistory.EventHistoryBuilder builder,
-                                   CaseData caseData,
-                                   LocalDateTime respondentResponseDate,
-                                   String respondentID) {
+                                             CaseData caseData,
+                                             LocalDateTime respondentResponseDate,
+                                             String respondentID) {
         builder.defenceAndCounterClaim(
             Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
@@ -521,9 +545,9 @@ public class EventHistoryMapper {
     }
 
     private void buildReceiptOfAdmission(EventHistory.EventHistoryBuilder builder,
-                                             CaseData caseData,
-                                             LocalDateTime respondentResponseDate,
-                                             String respondentID) {
+                                         CaseData caseData,
+                                         LocalDateTime respondentResponseDate,
+                                         String respondentID) {
         builder.receiptOfAdmission(
             Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
@@ -1078,7 +1102,8 @@ public class EventHistoryMapper {
                 buildDefenceFiledEvent(
                     builder,
                     respondent1ResponseDate,
-                    RESPONDENT_ID
+                    RESPONDENT_ID,
+                    isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())
                 ));
             directionsQuestionnaireFiledEvents.add(
                 buildDirectionsQuestionnaireFiledEvent(builder, caseData,
@@ -1099,7 +1124,8 @@ public class EventHistoryMapper {
                 buildDefenceFiledEvent(
                     builder,
                     respondent2ResponseDate,
-                    RESPONDENT2_ID
+                    RESPONDENT2_ID,
+                    isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim2())
                 ));
             directionsQuestionnaireFiledEvents.add(
                 buildDirectionsQuestionnaireFiledEvent(builder, caseData,
@@ -1142,10 +1168,11 @@ public class EventHistoryMapper {
 
     private Event buildDefenceFiledEvent(EventHistory.EventHistoryBuilder builder,
                                          LocalDateTime respondentResponseDate,
-                                         String litigiousPartyID) {
+                                         String litigiousPartyID,
+                                         boolean statesPaid) {
         return Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
-            .eventCode(DEFENCE_FILED.getCode())
+            .eventCode(statesPaid ? STATES_PAID.getCode() : DEFENCE_FILED.getCode())
             .dateReceived(respondentResponseDate)
             .litigiousPartyID(litigiousPartyID)
             .build();
