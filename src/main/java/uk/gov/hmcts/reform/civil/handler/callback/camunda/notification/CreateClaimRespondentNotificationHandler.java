@@ -107,7 +107,7 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     private CallbackResponse notifyARespondentSolicitorForClaimIssue(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        getRecipients(caseData, caseEvent).forEach(recipient -> sendNotificationToSolicitor(caseData, recipient));
+        sendNotifications(caseData, getRecipients(caseData, caseEvent));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
@@ -125,9 +125,9 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
             case NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_ISSUE:
                 return Arrays.asList(caseData.getRespondentSolicitor2EmailAddress());
             case NOTIFY_CLAIM_CAA_RESPONDENT_1_ORG:
-                return getCaaRecipients(getOrganisationId(caseData, !shouldEmailRespondent2Party(caseData)));
+                return getCaaRecipients(getRespondentOrganisationId(caseData, !shouldEmailRespondent2Party(caseData)));
             case NOTIFY_CLAIM_CAA_RESPONDENT_2_ORG:
-                return getCaaRecipients(getOrganisationId(caseData, false));
+                return getCaaRecipients(getRespondentOrganisationId(caseData, false));
             default:
                 throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
         }
@@ -147,19 +147,19 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
     private String getSuperUserEmail(String organisationId) {
         Optional<Organisation> organisation = organisationService.findOrganisationById(organisationId);
         if (!organisation.isPresent()) {
-            throw new CallbackException("Organisation is not was found");
+            throw new CallbackException("Organisation was not found");
         }
         return  organisation.get().getSuperUser().getEmail();
     }
 
-    private String getOrganisationId(CaseData caseData, boolean isRespondent1) {
+    private String getRespondentOrganisationId(CaseData caseData, boolean isRespondent1) {
         return isRespondent1 ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
             : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
     }
 
-    private void sendNotificationToSolicitor(CaseData caseData, String recipient) {
-        notificationService.sendMail(
-            recipient,
+    private void sendNotifications(CaseData caseData, List<String> recipients) {
+        notificationService.sendNotifications(
+            recipients,
             notificationsProperties.getRespondentSolicitorClaimIssueMultipartyEmailTemplate(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())

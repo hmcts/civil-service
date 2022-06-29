@@ -98,7 +98,7 @@ class OrganisationUtilsTest {
         }
 
         @Test
-        void shouldReturnEmptyList() {
+        void shouldReturnEmptyList_whenGivenOnlyNonCaaUsers() {
             var professionalUsers =
                 ProfessionalUsersEntityResponse.builder().users(otherUsers).build();
 

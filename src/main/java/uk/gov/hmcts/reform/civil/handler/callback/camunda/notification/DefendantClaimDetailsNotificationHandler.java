@@ -96,12 +96,11 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         String emailTemplate = notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate();
 
-        getRecipientEmails(caseData, caseEvent)
-            .forEach(recipient -> notificationService.sendMail(
-                recipient,
-                emailTemplate, addProperties(caseData),
-                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-            ));
+        notificationService.sendNotifications(
+            getRecipientEmails(caseData, caseEvent),
+            emailTemplate, addProperties(caseData),
+            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+        );
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
@@ -116,9 +115,9 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
             case NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_DETAILS:
                 return Arrays.asList(caseData.getRespondentSolicitor2EmailAddress());
             case NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_1_ORG:
-                return getCaaEmails(getOrganisationId(caseData, !shouldNotifyOnlyRespondent2Party(caseData)));
+                return getCaaEmails(getRespondentOrganisationId(caseData, !shouldNotifyOnlyRespondent2Party(caseData)));
             case NOTIFY_CLAIM_DETAILS_CAA_RESPONDENT_2_ORG:
-                return getCaaEmails(getOrganisationId(caseData, false));
+                return getCaaEmails(getRespondentOrganisationId(caseData, false));
             default:
                 throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
         }
@@ -132,7 +131,7 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
             .startsWith("Defendant Two:");
     }
 
-    private String getOrganisationId(CaseData caseData, boolean isRespondent1) {
+    private String getRespondentOrganisationId(CaseData caseData, boolean isRespondent1) {
         return isRespondent1 ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
             : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
     }
@@ -151,7 +150,7 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
     private String getSuperUserEmail(String organisationId) {
         Optional<Organisation> organisation = organisationService.findOrganisationById(organisationId);
         if (!organisation.isPresent()) {
-            throw new CallbackException("Organisation is not was found");
+            throw new CallbackException("Organisation was not found");
         }
         return  organisation.get().getSuperUser().getEmail();
     }

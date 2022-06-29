@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class OrganisationUtils {
 
-    private static final String CASEWORKER_CAA = "pui-caa";
+    private static final String PUI_CAA = "pui-caa";
 
     private OrganisationUtils() {
         //NO-OP
@@ -20,7 +20,7 @@ public class OrganisationUtils {
         if (orgUsersResponse.isPresent()) {
             return orgUsersResponse
                 .get().getUsers().stream()
-                .filter(user -> user.getRoles().contains(CASEWORKER_CAA))
+                .filter(user -> user.getRoles().contains(PUI_CAA))
                 .map(user -> user.getEmail())
                 .sorted(Comparator.naturalOrder())
                 .collect(Collectors.toList());

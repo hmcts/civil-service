@@ -91,8 +91,8 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
             handler.handle(params);
 
-            verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
+            verify(notificationService).sendNotifications(
+                Arrays.asList("respondentsolicitor@example.com"),
                 templateId,
                 getNotificationDataMap(caseData),
                 REFERENCE
@@ -108,8 +108,8 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
             handler.handle(params);
 
-            verify(notificationService).sendMail(
-                "applicantsolicitor@example.com",
+            verify(notificationService).sendNotifications(
+                Arrays.asList("applicantsolicitor@example.com"),
                 templateId,
                 getNotificationDataMap(caseData),
                 REFERENCE
@@ -131,8 +131,8 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
             handler.handle(params);
 
-            verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
+            verify(notificationService).sendNotifications(
+                Arrays.asList("respondentsolicitor@example.com"),
                 templateId,
                 getNotificationDataMap(caseData),
                 REFERENCE
@@ -154,8 +154,8 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
             handler.handle(params);
 
-            verify(notificationService).sendMail(
-                "respondentsolicitor2@example.com",
+            verify(notificationService).sendNotifications(
+                Arrays.asList("respondentsolicitor2@example.com"),
                 templateId,
                 getNotificationDataMap(caseData),
                 REFERENCE
@@ -177,8 +177,8 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
 
             handler.handle(params);
 
-            verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
+            verify(notificationService).sendNotifications(
+                Arrays.asList("respondentsolicitor@example.com"),
                 templateId,
                 getNotificationDataMap(caseData),
                 "claim-details-respondent-notification-000DC001"
@@ -366,16 +366,12 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
         }
 
         private void verifyAllNotificationsSent(List<String> emailAddresses, CaseData caseData) {
-            if (emailAddresses.isEmpty()) {
-                verify(false);
-            }
-            emailAddresses.forEach(
-                email -> verify(notificationService).sendMail(
-                    email,
-                    templateId,
-                    getNotificationDataMap(caseData),
-                    REFERENCE
-                ));
+            verify(notificationService).sendNotifications(
+                emailAddresses,
+                templateId,
+                getNotificationDataMap(caseData),
+                REFERENCE
+            );
         }
     }
 

@@ -83,8 +83,8 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
             handler.handle(params);
 
-            verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
+            verify(notificationService).sendNotifications(
+                Arrays.asList("respondentsolicitor@example.com"),
                 "multiparty-template-id",
                 getNotificationDataMap(caseData),
                 "create-claim-respondent-notification-000DC001"
@@ -99,8 +99,8 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
             handler.handle(params);
 
-            verify(notificationService).sendMail(
-                "applicantsolicitor@example.com",
+            verify(notificationService).sendNotifications(
+                Arrays.asList("applicantsolicitor@example.com"),
                 "multiparty-template-id",
                 getNotificationDataMap(caseData),
                 "create-claim-respondent-notification-000DC001"
@@ -121,8 +121,8 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
             handler.handle(params);
 
-            verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
+            verify(notificationService).sendNotifications(
+                Arrays.asList("respondentsolicitor@example.com"),
                 "multiparty-template-id",
                 getNotificationDataMap(caseData),
                 "create-claim-respondent-notification-000DC001"
@@ -143,8 +143,8 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
             handler.handle(params);
 
-            verify(notificationService).sendMail(
-                "respondentsolicitor2@example.com",
+            verify(notificationService).sendNotifications(
+                Arrays.asList("respondentsolicitor2@example.com"),
                 "multiparty-template-id",
                 getNotificationDataMap(caseData),
                 "create-claim-respondent-notification-000DC001"
@@ -161,8 +161,8 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
 
             handler.handle(params);
 
-            verify(notificationService).sendMail(
-                "respondentsolicitor@example.com",
+            verify(notificationService).sendNotifications(
+                Arrays.asList("respondentsolicitor@example.com"),
                 "multiparty-template-id",
                 getNotificationDataMap(caseData),
                 "create-claim-respondent-notification-000DC001"
@@ -328,16 +328,12 @@ class CreateClaimRespondentNotificationHandlerTest extends BaseCallbackHandlerTe
     }
 
     private void verifyAllNotificationsSent(List<String> emailAddresses, CaseData caseData) {
-        if (emailAddresses.isEmpty()) {
-            verify(false);
-        }
-        emailAddresses.forEach(
-            email -> verify(notificationService).sendMail(
-                email,
+        verify(notificationService).sendNotifications(
+                emailAddresses,
                 "multiparty-template-id",
                 getNotificationDataMap(caseData),
                 "create-claim-respondent-notification-000DC001"
-            ));
+        );
     }
 
     private ProfessionalUsersEntityResponse mockProfessionalUsersEntityResponse(List<String> emails) {
