@@ -44,7 +44,6 @@ import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
-
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -575,8 +574,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 if ((ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
                     && YES.equals(caseData.getRespondentResponseIsSame()))
                     || (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
-                    && RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                    && RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
+                    && RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                    && RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
                     ) {
                     respondents.add(Party.builder()
                                         .name(caseData.getRespondent1().getPartyName())
