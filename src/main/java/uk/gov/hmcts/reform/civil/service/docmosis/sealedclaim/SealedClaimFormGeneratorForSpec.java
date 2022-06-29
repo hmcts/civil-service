@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -73,6 +74,14 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             authorisation,
             new PDF(getFileName(caseData), docmosisDocument.getBytes(), DocumentType.SEALED_CLAIM)
         );
+    }
+
+    public byte[] downloadDocument(CaseDocument caseDocument, String authorisation) {
+        String documentPath = URI.create(caseDocument.getDocumentLink().getDocumentUrl()).getPath();
+
+        byte[] file = documentManagementService.downloadDocument(authorisation, documentPath);
+        return file;
+
     }
 
     @NotNull
