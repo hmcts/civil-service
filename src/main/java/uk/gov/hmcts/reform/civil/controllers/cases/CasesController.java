@@ -59,7 +59,7 @@ public class CasesController {
         );
 
         var caseDataResponse = caseDetailsConverter
-            .toCaseData(coreCaseDataService.getCase(caseId, authorisation).getData());
+            .toCaseData(coreCaseDataService.getCase(caseId, authorisation));
 
         return new ResponseEntity<>(caseDataResponse, HttpStatus.OK);
     }

@@ -78,7 +78,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
         when(coreCaseDataService.getCase(1L, BEARER_TOKEN))
             .thenReturn(expectedCaseDetails);
-        when(caseDetailsConverter.toCaseData(expectedCaseDetails.getData()))
+        when(caseDetailsConverter.toCaseData(expectedCaseDetails))
             .thenReturn(expectedCaseData);
         doGet(BEARER_TOKEN, CASES_URL, 1L)
             .andExpect(content().json(toJson(expectedCaseData)))
