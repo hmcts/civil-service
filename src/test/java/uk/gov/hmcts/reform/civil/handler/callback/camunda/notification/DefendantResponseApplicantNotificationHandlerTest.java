@@ -234,7 +234,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 );
             }
 
-
             @Test
             void shouldNotifyRespondentSolicitor1In1v2ScenarioApplicant_whenV1CallbackInvoked() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -282,8 +281,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
-
-
 
             @Test
             void shouldNotifyRespondentSolicitor2In1v2Scenario_whenV1CallbackInvoked() {
