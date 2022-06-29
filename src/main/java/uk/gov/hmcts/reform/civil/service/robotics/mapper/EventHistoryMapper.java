@@ -218,8 +218,11 @@ public class EventHistoryMapper {
                 }
             } else if (null != caseData.getBreathing().getLift()) {
                 if (BreathingSpaceType.STANDARD.equals(caseData.getBreathing().getEnter().getType())) {
+                    buildBreathingSpaceEvent(builder, caseData, BREATHING_SPACE_ENTERED, "Enter");
                     buildBreathingSpaceEvent(builder, caseData, BREATHING_SPACE_LIFTED, "Lifted");
                 } else if (BreathingSpaceType.MENTAL_HEALTH.equals(caseData.getBreathing().getEnter().getType())) {
+                    buildBreathingSpaceEvent(builder, caseData,
+                                             MENTAL_HEALTH_BREATHING_SPACE_ENTERED, "Enter");
                     buildBreathingSpaceEvent(builder, caseData, MENTAL_HEALTH_BREATHING_SPACE_LIFTED, "Lifted");
                 }
             }
