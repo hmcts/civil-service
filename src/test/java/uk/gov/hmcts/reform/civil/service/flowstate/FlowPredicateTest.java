@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
@@ -1969,10 +1970,42 @@ class FlowPredicateTest {
     }
 
     @Test
-    public void when1v2ss_thenPendingClaimIssued() {
+    public void when1v2ssIssued_thenPendingClaimIssued() {
         CaseData caseData = CaseData.builder()
+            .issueDate(LocalDate.now())
+            .respondent1Represented(YES)
+            .respondent1OrgRegistered(YES)
+            .respondent2(Party.builder().build())
+            .respondent2Represented(YES)
+            .respondent2SameLegalRepresentative(YES)
             .build();
 
-        pendingClaimIssued.test(caseData);
+        Assertions.assertTrue(pendingClaimIssued.test(caseData));
+    }
+
+    @Test
+    public void when1v2dsIssued_thenPendingClaimIssued() {
+        CaseData caseData = CaseData.builder()
+            .issueDate(LocalDate.now())
+            .respondent1Represented(YES)
+            .respondent1OrgRegistered(YES)
+            .respondent2(Party.builder().build())
+            .respondent2Represented(YES)
+            .respondent2SameLegalRepresentative(NO)
+            .respondent2OrgRegistered(YES)
+            .build();
+
+        Assertions.assertTrue(pendingClaimIssued.test(caseData));
+    }
+
+    @Test
+    public void whenXv1Issued_thenPendingClaimIssued() {
+        CaseData caseData = CaseData.builder()
+            .issueDate(LocalDate.now())
+            .respondent1Represented(YES)
+            .respondent1OrgRegistered(YES)
+            .build();
+
+        Assertions.assertTrue(pendingClaimIssued.test(caseData));
     }
 }
