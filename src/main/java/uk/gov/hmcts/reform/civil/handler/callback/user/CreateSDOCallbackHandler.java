@@ -314,7 +314,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         FastTrackTrial tempFastTrackTrial = FastTrackTrial.builder()
             .input1("The time provisionally allowed for the trial is")
             .date1(LocalDate.now().plusWeeks(22))
-            .date2(LocalDate.now().plusWeeks(34))
+            .date2(LocalDate.now().plusWeeks(30))
             .input2("If either party considers that the time estimate is insufficient, they must inform the court "
                         + "within 7 days of the date of this Order.")
 
@@ -374,8 +374,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "prior to the commencement of hire until the earlier of i) 3 months after cessation of hire "
                         + "or ii) the repair/replacement of the claimant's vehicle;\n"
                         + "c. Evidence of any loan, overdraft or other credit facilities available to the claimant")
-            .input2("The claimant must file and serve a witness statement addressing, (a) need to hire a replacement "
-                        + "vehicle and (b) impecuniosity no later than 4pm on")
+            .input2("3. The claimant must file and serve a witness statement addressing, (a) need to hire a replacement"
+                        + " vehicle and (b) impecuniosity no later than 4pm on")
             .date1(LocalDate.now().plusWeeks(8))
             .input3("Failure to comply with the paragraph above will result in the claimant being debarred from "
                         + "asserting need or relying on impecuniosity as the case may be at the final hearing, "

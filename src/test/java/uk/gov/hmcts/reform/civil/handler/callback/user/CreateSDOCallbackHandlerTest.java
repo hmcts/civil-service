@@ -304,7 +304,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(22).toString());
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("date2")
-                .isEqualTo(LocalDate.now().plusWeeks(34).toString());
+                .isEqualTo(LocalDate.now().plusWeeks(30).toString());
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("input2")
                 .isEqualTo("If either party considers that the time estimate is insufficient, they must inform the "
                                + "court within 7 days of the date of this Order.");
@@ -371,7 +371,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "c. Evidence of any loan, overdraft or other credit facilities available to the "
                                + "claimant");
             assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input2")
-                .isEqualTo("The claimant must file and serve a witness statement addressing, (a) need to hire a "
+                .isEqualTo("3. The claimant must file and serve a witness statement addressing, (a) need to hire a "
                                + "replacement vehicle and (b) impecuniosity no later than 4pm on");
             assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(8).toString());
