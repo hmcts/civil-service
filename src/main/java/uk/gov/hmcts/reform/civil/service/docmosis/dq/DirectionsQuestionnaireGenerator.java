@@ -49,6 +49,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
@@ -112,7 +113,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                     templateId = N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
                 }
                 break;
-           case ONE_V_TWO_ONE_LEGAL_REP:
+            case ONE_V_TWO_ONE_LEGAL_REP:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
                     templateId = N181_MULTIPARTY_SAME_SOL;
@@ -197,9 +198,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .allocatedTrack(caseData.getAllocatedTrack());
 
         if (!SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-            builder.statementOfTruthText(isRespondentState(caseData)
-                                             ? getDefendantStatementOfTruth()
-                                             : getClaimantStatementOfTruth());
+            builder.statementOfTruthText(createStatementOfTruthText(isRespondentState(caseData)));
         }
         DQ dq = getDQAndSetSubmittedOn(builder, caseData);
 
@@ -820,20 +819,18 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .build();
     }
 
-    private String getClaimantStatementOfTruth() {
-        return "The claimant believes that the facts this claim are true.\n\n\n"
-            + "I am duly authorised by the claimant to sign this statement.\n\n"
-            + "The claimant understands that proceedings for contempt of court may be brought against anyone who makes,"
-            + "or causes to be made, a false statement in a document verified by a statement of truth without an honest"
-            + "belief in its truth.";
-    }
-
-    private String getDefendantStatementOfTruth() {
-        return "The defendant believes that the facts stated in the response are true.\n\n\n"
-            + "I am duly authorised by the defendant to sign this statement.\n\n"
-            + "The defendant understands that proceedings for contempt of court may be brought against anyone who "
-            + "makes, or causes to be made, a false statement in a document verified by a statement of truth without "
-            + "an honest belief in its truth.";
+    private String createStatementOfTruthText(Boolean respondentState) {
+        String role = respondentState ? "defendant" : "claimant";
+        String statementOfTruth = role.equals("defendant")
+            ? "The defendant believes that the facts stated in the response are true."
+            : "The claimant believes that the facts this claim are true.";
+        statementOfTruth += String.format("\n\n\nI am duly authorised by the %s to sign this statement.\n\n"
+                                              + "The %s understands that proceedings for contempt of court "
+                                              + "may be brought against anyone who makes, or causes to be made, "
+                                              + "a false statement in a document verified by a statement of truth "
+                                              + "without an honest belief in its truth.",
+                                          IntStream.range(0, 2).mapToObj(i -> role).toArray());
+        return statementOfTruth;
     }
 
 }

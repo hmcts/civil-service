@@ -56,12 +56,14 @@ import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.IntStream;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -220,8 +222,10 @@ class DirectionsQuestionnaireGeneratorTest {
             CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
             assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT_DEFENDANT);
-            verify(documentManagementService)
-                .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentManagementService).uploadDocument(BEARER_TOKEN,
+                                                             new PDF(FILE_NAME_DEFENDANT,
+                                                                     bytes,
+                                                                     DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
                                                                       eq(N181_MULTIPARTY_SAME_SOL));
         }
@@ -284,7 +288,6 @@ class DirectionsQuestionnaireGeneratorTest {
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
                 verify(representativeService).getRespondent1Representative(caseData);
-                assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
             }
 
             @Test
@@ -1354,4 +1357,50 @@ class DirectionsQuestionnaireGeneratorTest {
         }
     }
 
+    @Nested
+    class StatementOfTruthText {
+        @Test
+        void checkStatementOfTruthTextForClaimant() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build()
+                .toBuilder()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE").build())
+                .build();
+
+            DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+            assertNotEquals(caseData.getSuperClaimType(), SuperClaimType.SPEC_CLAIM);
+            assertEquals(templateData.getStatementOfTruthText(), createStatementOfTruthText("claimant"));
+        }
+
+        @Test
+        void checkStatementOfTruthTextForDefendent() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence()
+                .build()
+                .toBuilder()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("DEFENDANT_RESPONSE").build())
+                .build();
+
+            DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+            assertNotEquals(caseData.getSuperClaimType(), SuperClaimType.SPEC_CLAIM);
+            assertEquals(templateData.getStatementOfTruthText(), createStatementOfTruthText("defendant"));
+        }
+
+        @Test
+        private String createStatementOfTruthText(String role) {
+            String statementOfTruth = role.equals("defendant")
+                ? "The defendant believes that the facts stated in the response are true."
+                : "The claimant believes that the facts this claim are true.";
+            statementOfTruth += String.format("\n\n\nI am duly authorised by the %s to sign this statement.\n\n"
+                                                  + "The %s understands that proceedings for contempt of court "
+                                                  + "may be brought against anyone who makes, or causes to be made, "
+                                                  + "a false statement in a document verified by a statement of truth "
+                                                  + "without an honest belief in its truth.",
+                                              IntStream.range(0, 2).mapToObj(i -> role).toArray());
+            return statementOfTruth;
+        }
+    }
 }
