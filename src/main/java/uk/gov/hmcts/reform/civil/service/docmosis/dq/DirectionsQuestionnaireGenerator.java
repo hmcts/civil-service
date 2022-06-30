@@ -112,8 +112,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                     templateId = N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
                 }
                 break;
-            //FALL-THROUGH
-            case ONE_V_TWO_ONE_LEGAL_REP:
+           case ONE_V_TWO_ONE_LEGAL_REP:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
                     templateId = N181_MULTIPARTY_SAME_SOL;
