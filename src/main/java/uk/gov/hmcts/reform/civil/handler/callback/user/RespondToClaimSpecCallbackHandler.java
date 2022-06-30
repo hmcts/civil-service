@@ -1337,17 +1337,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         );
     }
 
-    private boolean solicitorHasCaseRole(CallbackParams callbackParams, CaseRole caseRole) {
-        CaseData caseData = callbackParams.getCaseData();
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
-        return coreCaseUserService.userHasCaseRole(
-            caseData.getCcdCaseReference().toString(),
-            userInfo.getUid(),
-            caseRole
-        );
-    }
-
     private LocalDateTime getApplicant1ResponseDeadline(LocalDateTime responseDate, AllocatedTrack allocatedTrack) {
         return deadlinesCalculator.calculateApplicantResponseDeadline(responseDate, allocatedTrack);
     }

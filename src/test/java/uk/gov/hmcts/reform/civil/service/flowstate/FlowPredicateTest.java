@@ -762,34 +762,11 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void shouldReturnTrue_whenPredicateDivergentRespondGoOfflineBothNotFullDefence1v2_1() {
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondent1v2AdmitAll_AdmitPart().build().toBuilder()
-                        .respondent2ResponseDate(LocalDateTime.now())
-                        .respondent1ResponseDate(LocalDateTime.now().plusHours(1))
-                        .build();
-
-                    assertTrue(divergentRespondGoOfflineSpec.test(caseData));
-                }
-
-                @Test
                 void shouldReturnTrue_whenPredicateDivergentRespondGoOfflineBothNotFullDefence1v2_2() {
                     CaseData caseData = caseDataBuilder
                         .atStateRespondent1v2AdmitAll_AdmitPart().build().toBuilder()
                         .respondent1ResponseDate(LocalDateTime.now())
                         .respondent2ResponseDate(LocalDateTime.now().plusHours(1))
-                        .build();
-
-                    assertTrue(divergentRespondGoOfflineSpec.test(caseData));
-                }
-
-                @Test
-                void shouldReturnTrue_whenPredicateDivergentRespondGoOfflineBothNotFullDefence1v2_3() {
-                    LocalDateTime localDateTime = LocalDateTime.now();
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondent1v2AdmitAll_AdmitPart().build().toBuilder()
-                        .respondent2ResponseDate(localDateTime)
-                        .respondent1ResponseDate(localDateTime)
                         .build();
 
                     assertTrue(divergentRespondGoOfflineSpec.test(caseData));
@@ -802,29 +779,9 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void shouldGenerateDQAndGoOffline_whenDivergentAndFirstefendantRespondedWithFullDefence() {
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondent1v2FullDefence_AdmitPart().build().toBuilder()
-                        .respondent2ResponseDate(LocalDateTime.now())
-                        .respondent1ResponseDate(LocalDateTime.now().plusHours(1))
-                        .build();
-
-                    assertTrue(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
-                }
-
-                @Test
                 void shouldReturnFalse_whenPredicateDivergentRespondWithDQAndGoOffline_default() {
                     CaseData caseData = CaseData.builder().build();
                     assertFalse(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
-                }
-
-                @Test
-                void awaitingRespondent2ResponsesFullDefenceReceivedShouldReturnTrue() {
-                    CaseData caseData = caseDataBuilder
-                        .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                        .build();
-
-                    assertTrue(awaitingResponsesFullDefenceReceivedSpec.test(caseData));
                 }
 
                 @Test
@@ -837,15 +794,6 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void awaitingSecondDefendantResponsesNonFullDefenceReceivedShouldReturnTrue() {
-                    CaseData caseData = caseDataBuilder
-                        .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                        .build();
-
-                    assertTrue(awaitingResponsesNonFullDefenceReceivedSpec.test(caseData));
-                }
-
-                @Test
                 void awaitingFirstDefendantResponsesNonFullDefenceReceivedShouldReturnTrue() {
                     CaseData caseData = caseDataBuilder
                         .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
@@ -854,98 +802,6 @@ class FlowPredicateTest {
                     assertTrue(awaitingResponsesNonFullDefenceReceivedSpec.test(caseData));
                 }
 
-                @Test
-                void shouldReturnTrue_whenPredicateDivergentRespondGoOfflineBothNotFullDefence1v2_1() {
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondent1v2AdmitAll_AdmitPart().build().toBuilder()
-                        .respondent2ResponseDate(LocalDateTime.now())
-                        .respondent1ResponseDate(LocalDateTime.now().plusHours(1))
-                        .build();
-
-                    assertTrue(divergentRespondGoOfflineSpec.test(caseData));
-                }
-
-                @Test
-                void shouldReturnTrue_whenPredicateDivergentRespondGoOfflineBothNotFullDefence1v2_2() {
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondent1v2AdmitAll_AdmitPart().build().toBuilder()
-                        .respondent1ResponseDate(LocalDateTime.now())
-                        .respondent2ResponseDate(LocalDateTime.now().plusHours(1))
-                        .build();
-
-                    assertTrue(divergentRespondGoOfflineSpec.test(caseData));
-                }
-
-                @Test
-                void shouldReturnTrue_whenPredicateDivergentRespondGoOfflineBothNotFullDefence1v2_3() {
-                    LocalDateTime localDateTime = LocalDateTime.now();
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondent1v2AdmitAll_AdmitPart().build().toBuilder()
-                        .respondent2ResponseDate(localDateTime)
-                        .respondent1ResponseDate(localDateTime)
-                        .build();
-
-                    assertTrue(divergentRespondGoOfflineSpec.test(caseData));
-                }
-
-                @Test
-                void shouldReturnFalse_whenPredicateDivergentRespondGoOffline_default() {
-                    CaseData caseData = CaseData.builder().build();
-                    assertFalse(divergentRespondGoOfflineSpec.test(caseData));
-                }
-
-                @Test
-                void shouldGenerateDQAndGoOffline_whenDivergentAndFirstefendantRespondedWithFullDefence() {
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondent1v2FullDefence_AdmitPart().build().toBuilder()
-                        .respondent2ResponseDate(LocalDateTime.now())
-                        .respondent1ResponseDate(LocalDateTime.now().plusHours(1))
-                        .build();
-
-                    assertTrue(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
-                }
-
-                @Test
-                void shouldReturnFalse_whenPredicateDivergentRespondWithDQAndGoOffline_default() {
-                    CaseData caseData = CaseData.builder().build();
-                    assertFalse(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
-                }
-
-                @Test
-                void awaitingRespondent2ResponsesFullDefenceReceivedShouldReturnTrue() {
-                    CaseData caseData = caseDataBuilder
-                        .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                        .build();
-
-                    assertTrue(awaitingResponsesFullDefenceReceivedSpec.test(caseData));
-                }
-
-                @Test
-                void awaitingRespondent1ResponsesFullDefenceReceivedShouldReturnTrue() {
-                    CaseData caseData = caseDataBuilder
-                        .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-                        .build();
-
-                    assertTrue(awaitingResponsesFullDefenceReceivedSpec.test(caseData));
-                }
-
-                @Test
-                void awaitingSecondDefendantResponsesNonFullDefenceReceivedShouldReturnTrue() {
-                    CaseData caseData = caseDataBuilder
-                        .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                        .build();
-
-                    assertTrue(awaitingResponsesNonFullDefenceReceivedSpec.test(caseData));
-                }
-
-                @Test
-                void awaitingFirstDefendantResponsesNonFullDefenceReceivedShouldReturnTrue() {
-                    CaseData caseData = caseDataBuilder
-                        .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                        .build();
-
-                    assertTrue(awaitingResponsesNonFullDefenceReceivedSpec.test(caseData));
-                }
             }
 
             @Nested
