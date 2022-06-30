@@ -115,6 +115,11 @@ public class InitiateGeneralApplicationService {
         if (YES.equals(caseData.getAddRespondent2())) {
             applicationBuilder.defendant2PartyName(caseData.getRespondent2().getPartyName());
         }
+        if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+            caseType = "SPEC_CLAIM";
+        } else {
+            caseType = "UNSPEC_CLAIM";
+        }
         LocalDateTime deadline = deadlinesCalculator
             .calculateApplicantResponseDeadline(
                 LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS);
@@ -127,12 +132,6 @@ public class InitiateGeneralApplicationService {
             applicationBuilder
                 .generalAppInformOtherParty(GAInformOtherParty.builder().build())
                 .generalAppStatementOfTruth(GAStatementOfTruth.builder().build());
-        }
-
-        if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
-            caseType = "SPEC_CLAIM";
-        } else {
-            caseType = "UNSPEC_CLAIM";
         }
 
         Optional<Organisation> org = findOrganisation(authToken);
