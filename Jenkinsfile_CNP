@@ -108,6 +108,9 @@ withPipeline(type, product, component) {
 
   after('smoketest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+    sh """
+      eval \$(cp  /opt/jenkins/workspace/CTS_a_to_c_civil-service_PR-${CHANGE_ID}/output/smoke.html test-results/smokeTest/**/*)
+    """
   }
 
   before('functionalTest:preview') {
