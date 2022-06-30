@@ -406,7 +406,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
-        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppSuperClaimType()).isEqualTo("SPEC_CLAIM");
+        assertThat(result.getGeneralApplications().get(0).getValue()
+                       .getGeneralAppSuperClaimType()).isEqualTo("SPEC_CLAIM");
     }
 
     @Test
@@ -418,7 +419,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertThat(result.getGeneralApplications().size()).isEqualTo(1);
-        assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppSuperClaimType()).isEqualTo("UNSPEC_CLAIM");
+        assertThat(result.getGeneralApplications().get(0).getValue()
+                       .getGeneralAppSuperClaimType()).isEqualTo("UNSPEC_CLAIM");
     }
 
     @Test

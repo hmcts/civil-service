@@ -448,7 +448,8 @@ public class GeneralApplicationDetailsBuilder {
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
                                                .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
-                                               .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                                               .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO
+                                                                              .getFormattedName())
                                                .orgPolicyReference(STRING_CONSTANT).build())
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
             .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
@@ -496,8 +497,10 @@ public class GeneralApplicationDetailsBuilder {
                                           .trialRequiredYesOrNo(YES)
                                           .hearingDetailsEmailID(STRING_CONSTANT)
                                           .generalAppUnavailableDates(wrapElements(GAUnavailabilityDates.builder()
-                                                                                       .unavailableTrialDateFrom(APP_DATE_EPOCH)
-                                                                                       .unavailableTrialDateTo(APP_DATE_EPOCH).build()))
+                                                                                       .unavailableTrialDateFrom(
+                                                                                           APP_DATE_EPOCH)
+                                                                                       .unavailableTrialDateTo(
+                                                                                           APP_DATE_EPOCH).build()))
                                           .supportRequirementOther(STRING_CONSTANT)
                                           .hearingPreferredLocation(DynamicList.builder().build())
                                           .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
@@ -518,12 +521,14 @@ public class GeneralApplicationDetailsBuilder {
             .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                                               .organisation(Organisation.builder()
                                                                 .organisationID(STRING_CONSTANT).build())
-                                              .orgPolicyCaseAssignedRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
+                                              .orgPolicyCaseAssignedRole(CaseRole.APPLICANTSOLICITORONE
+                                                                             .getFormattedName())
                                               .orgPolicyReference(STRING_CONSTANT).build())
             .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                                .organisation(Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
-                                               .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                                               .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE
+                                                                              .getFormattedName())
                                                .orgPolicyReference(STRING_CONSTANT).build())
             .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
             .build();
