@@ -30,4 +30,4 @@ node_modules/
 # test_output
 output/
 test-results/
-functional/
+smokeTest/
