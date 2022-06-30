@@ -465,9 +465,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private List<DisposalAndTrialHearingDJToggle> disposalHearingClaimSettlingDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingCostsDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingApplicationsDJToggle;
-    private List<DisposalAndTrialHearingDJToggle> disposalHearingNotesDJToggle;
 
-    private List<DisposalAndTrialHearingDJToggle> trialHearingAllocationDJToggle;
     private List<DisposalAndTrialHearingDJToggle> trialHearingAlternativeDisputeDJToggle;
     private List<DisposalAndTrialHearingDJToggle> trialHearingVariationsDirectionsDJToggle;
     private List<DisposalAndTrialHearingDJToggle> trialHearingSettlementDJToggle;
@@ -476,12 +474,5 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private List<DisposalAndTrialHearingDJToggle> trialHearingSchedulesOfLossDJToggle;
     private List<DisposalAndTrialHearingDJToggle> trialHearingCostsToggle;
     private List<DisposalAndTrialHearingDJToggle> trialHearingTrialDJToggle;
-    private List<DisposalAndTrialHearingDJToggle> trialHearingNotesDJToggle;
-    private List<DisposalAndTrialHearingDJToggle> trialBuildingDisputeDJToggle;
-    private List<DisposalAndTrialHearingDJToggle> trialClinicalNegligenceDJToggle;
-    private List<DisposalAndTrialHearingDJToggle> trialCreditHireDJToggle;
-    private List<DisposalAndTrialHearingDJToggle> trialEmployerDJToggle;
-    private List<DisposalAndTrialHearingDJToggle> trialPersonalInjuryDJToggle;
-    private List<DisposalAndTrialHearingDJToggle> trialRoadTrafficAccidentDJToggle;
 
 }

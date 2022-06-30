@@ -379,7 +379,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).extracting("trialHearingAllocationDJToggle").isNotNull();
+            assertThat(response.getData()).extracting("trialHearingVariationsDirectionsDJToggle").isNotNull();
         }
     }
 

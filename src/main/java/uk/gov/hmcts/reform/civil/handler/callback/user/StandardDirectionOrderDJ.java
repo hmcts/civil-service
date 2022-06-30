@@ -500,13 +500,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.disposalHearingClaimSettlingDJToggle(checkList);
         caseDataBuilder.disposalHearingCostsDJToggle(checkList);
         caseDataBuilder.disposalHearingApplicationsDJToggle(checkList);
-        caseDataBuilder.disposalHearingNotesDJToggle(checkList);
         return caseDataBuilder.build();
     }
 
     private CaseData fillTrialToggle(CaseData caseData, List<DisposalAndTrialHearingDJToggle> checkList) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.trialHearingAllocationDJToggle(checkList);
         caseDataBuilder.trialHearingAlternativeDisputeDJToggle(checkList);
         caseDataBuilder.trialHearingVariationsDirectionsDJToggle(checkList);
         caseDataBuilder.trialHearingSettlementDJToggle(checkList);
@@ -515,13 +513,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.trialHearingSchedulesOfLossDJToggle(checkList);
         caseDataBuilder.trialHearingCostsToggle(checkList);
         caseDataBuilder.trialHearingTrialDJToggle(checkList);
-        caseDataBuilder.trialHearingNotesDJToggle(checkList);
-        caseDataBuilder.trialBuildingDisputeDJToggle(checkList);
-        caseDataBuilder.trialClinicalNegligenceDJToggle(checkList);
-        caseDataBuilder.trialCreditHireDJToggle(checkList);
-        caseDataBuilder.trialEmployerDJToggle(checkList);
-        caseDataBuilder.trialPersonalInjuryDJToggle(checkList);
-        caseDataBuilder.trialRoadTrafficAccidentDJToggle(checkList);
 
         return caseDataBuilder.build();
     }
