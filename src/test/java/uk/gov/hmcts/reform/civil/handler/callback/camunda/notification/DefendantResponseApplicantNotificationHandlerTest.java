@@ -36,7 +36,10 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.*;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID_CC;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID_CC_RESP1;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID_CC_RESP2;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -419,8 +422,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
     }
 
     @Test
-    void shoulldReturnPartyInformation_whenCaseEventIsInvoked()
-    {
+    void shoulldReturnPartyInformation_whenCaseEventIsInvoked() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged().build();
         caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM)
@@ -428,19 +430,16 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
             .build();
-
 
         assertThat(handler.addPropertiesSpec(caseData,
                                              CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC))
             .containsEntry("legalOrgName", "Signer Name")
             .containsEntry("claimReferenceNumber",  "000DC001")
             .containsEntry("defendantName", "my company");
-
     }
 
     @Test
-    void shoulldReturnPartyInformationSecondScenerio_whenCaseEventIsInvoked()
-    {
+    void shoulldReturnPartyInformationSecondScenerio_whenCaseEventIsInvoked() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged().build();
         caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM)
@@ -449,18 +448,15 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
             .build();
 
-
         assertThat(handler.addPropertiesSpec(caseData,
                                              CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC))
             .containsEntry("legalOrgName", "Signer Name")
             .containsEntry("claimReferenceNumber",  "000DC001")
             .containsEntry("defendantName", "my company");
-
     }
 
     @Test
-    void shoulldReturnPartyInformationThirdScenerio_whenCaseEventIsInvoked()
-    {
+    void shoulldReturnPartyInformationThirdScenerio_whenCaseEventIsInvoked() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged().build();
         caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM)
@@ -469,12 +465,10 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
             .build();
 
-
         assertThat(handler.addPropertiesSpec(caseData,
                                              CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC))
             .containsEntry("legalOrgName", "Signer Name")
             .containsEntry("claimReferenceNumber",  "000DC001")
             .containsEntry("defendantName", "my company");
-
     }
 }
