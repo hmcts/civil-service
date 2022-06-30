@@ -169,6 +169,10 @@ class EventHistoryMapperTest {
 
     @Nested
     class UnregisteredDefendant {
+        @BeforeEach
+        public void setup() {
+            when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+        }
 
         @Test
         void shouldPrepareMiscellaneousEvent_whenClaimWith1v1UnregisteredDefendant() {
@@ -249,15 +253,234 @@ class EventHistoryMapperTest {
                 "directionsQuestionnaireFiled"
             );
         }
+
+        @Nested
+        class ToBeRemovedAfterNOC {
+            @BeforeEach
+            public void setup() {
+                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(false);
+            }
+
+            @Test
+            void prod_shouldPrepareMiscellaneousEvent_whenClaimWith1v1UnregisteredDefendant() {
+                CaseData caseData = CaseDataBuilder.builder().atStateProceedsOffline1v1UnregisteredDefendant()
+                    .respondent1OrganisationPolicy(null)
+                    .respondent2OrganisationPolicy(null)
+                    .build();
+                Event expectedEvent = Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getSubmittedDate())
+                    .eventDetailsText("RPA Reason: Unregistered defendant solicitor firm: Mr. Sole Trader")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: Unregistered defendant solicitor firm: Mr. Sole Trader")
+                                      .build())
+                    .build();
+
+                var eventHistory = mapper.buildEvents(caseData);
+
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory)
+                    .extracting("miscellaneous")
+                    .asList()
+                    .containsExactly(expectedEvent);
+                assertEmptyEvents(
+                    eventHistory,
+                    "acknowledgementOfServiceReceived",
+                    "consentExtensionFilingDefence",
+                    "defenceFiled",
+                    "defenceAndCounterClaim",
+                    "receiptOfPartAdmission",
+                    "receiptOfAdmission",
+                    "replyToDefence",
+                    "directionsQuestionnaireFiled"
+                );
+            }
+
+            @Test
+            void prod_shouldPrepareMiscellaneousEvent_whenClaimWith2UnregisteredDefendants() {
+                CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnregisteredDefendants()
+                    .respondent1OrganisationPolicy(null)
+                    .respondent2OrganisationPolicy(null)
+                    .build();
+                Event expectedEvent1 = Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getSubmittedDate())
+                    .eventDetailsText("RPA Reason: [1 of 2 - 2020-08-01] "
+                                          + "Unregistered defendant solicitor firm: Mr. Sole Trader")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: [1 of 2 - 2020-08-01] "
+                                                    + "Unregistered defendant solicitor firm: Mr. Sole Trader")
+                                      .build())
+                    .build();
+
+                Event expectedEvent2 = Event.builder()
+                    .eventSequence(2)
+                    .eventCode("999")
+                    .dateReceived(caseData.getSubmittedDate())
+                    .eventDetailsText("RPA Reason: [2 of 2 - 2020-08-01] "
+                                          + "Unregistered defendant solicitor firm: Mr. John Rambo")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: [2 of 2 - 2020-08-01] "
+                                                    + "Unregistered defendant solicitor firm: Mr. John Rambo")
+                                      .build())
+                    .build();
+
+                var eventHistory = mapper.buildEvents(caseData);
+
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory)
+                    .extracting("miscellaneous")
+                    .asList()
+                    .containsExactly(expectedEvent1, expectedEvent2);
+                assertEmptyEvents(
+                    eventHistory,
+                    "acknowledgementOfServiceReceived",
+                    "consentExtensionFilingDefence",
+                    "defenceFiled",
+                    "defenceAndCounterClaim",
+                    "receiptOfPartAdmission",
+                    "receiptOfAdmission",
+                    "replyToDefence",
+                    "directionsQuestionnaireFiled"
+                );
+            }
+        }
     }
 
     @Nested
     class UnrepresentedAndUnregisteredDefendant {
+        @BeforeEach
+        public void setup() {
+            when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+        }
+
+        // Remove after NOC
+        @Nested
+        class ToBeRemovedAfterNOC {
+            @BeforeEach
+            public void setup() {
+                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(false);
+            }
+
+            @Test
+            void prod_shouldPrepareMiscellaneousEvent_whenClaimWithUnrepresentedDefendant1UnregisteredDefendant2() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2()
+                    .respondent1OrganisationPolicy(null)
+                    .respondent2OrganisationPolicy(null)
+                    .build();
+                Event expectedEvent1 = Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getSubmittedDate())
+                    .eventDetailsText("RPA Reason: [1 of 2 - 2020-08-01] "
+                                          + "Unrepresented defendant and unregistered defendant solicitor firm. "
+                                          + "Unrepresented defendant: Mr. Sole Trader")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: [1 of 2 - 2020-08-01] "
+                                            + "Unrepresented defendant and unregistered defendant solicitor firm. "
+                                            + "Unrepresented defendant: Mr. Sole Trader")
+                                      .build())
+                    .build();
+
+                Event expectedEvent2 = Event.builder()
+                    .eventSequence(2)
+                    .eventCode("999")
+                    .dateReceived(caseData.getSubmittedDate())
+                    .eventDetailsText("RPA Reason: [2 of 2 - 2020-08-01] "
+                                          + "Unrepresented defendant and unregistered defendant solicitor firm. "
+                                          + "Unregistered defendant solicitor firm: Mr. John Rambo")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: [2 of 2 - 2020-08-01] "
+                                            + "Unrepresented defendant and unregistered defendant solicitor firm. "
+                                            + "Unregistered defendant solicitor firm: Mr. John Rambo")
+                                      .build())
+                    .build();
+
+                var eventHistory = mapper.buildEvents(caseData);
+
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory)
+                    .extracting("miscellaneous")
+                    .asList()
+                    .containsExactly(expectedEvent1, expectedEvent2);
+                assertEmptyEvents(
+                    eventHistory,
+                    "acknowledgementOfServiceReceived",
+                    "consentExtensionFilingDefence",
+                    "defenceFiled",
+                    "defenceAndCounterClaim",
+                    "receiptOfPartAdmission",
+                    "receiptOfAdmission",
+                    "replyToDefence",
+                    "directionsQuestionnaireFiled"
+                );
+            }
+
+            @Test
+            void prod_shouldPrepareMiscellaneousEvent_whenClaimWithUnregisteredDefendant1UnrepresentedDefendant2() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateProceedsOfflineUnregisteredDefendant1UnrepresentedDefendant2()
+                    .respondent1OrganisationPolicy(null)
+                    .respondent2OrganisationPolicy(null)
+                    .build();
+                Event expectedEvent1 = Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getSubmittedDate())
+                    .eventDetailsText("RPA Reason: [1 of 2 - 2020-08-01] "
+                                          + "Unrepresented defendant and unregistered defendant solicitor firm. "
+                                          + "Unrepresented defendant: Mr. John Rambo")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: [1 of 2 - 2020-08-01] "
+                                            + "Unrepresented defendant and unregistered defendant solicitor firm. "
+                                            + "Unrepresented defendant: Mr. John Rambo")
+                                      .build())
+                    .build();
+
+                Event expectedEvent2 = Event.builder()
+                    .eventSequence(2)
+                    .eventCode("999")
+                    .dateReceived(caseData.getSubmittedDate())
+                    .eventDetailsText("RPA Reason: [2 of 2 - 2020-08-01] "
+                                          + "Unrepresented defendant and unregistered defendant solicitor firm. "
+                                          + "Unregistered defendant solicitor firm: Mr. Sole Trader")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("RPA Reason: [2 of 2 - 2020-08-01] "
+                                            + "Unrepresented defendant and unregistered defendant solicitor firm. "
+                                            + "Unregistered defendant solicitor firm: Mr. Sole Trader")
+                                      .build())
+                    .build();
+
+                var eventHistory = mapper.buildEvents(caseData);
+
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory)
+                    .extracting("miscellaneous")
+                    .asList()
+                    .containsExactly(expectedEvent1, expectedEvent2);
+                assertEmptyEvents(
+                    eventHistory,
+                    "acknowledgementOfServiceReceived",
+                    "consentExtensionFilingDefence",
+                    "defenceFiled",
+                    "defenceAndCounterClaim",
+                    "receiptOfPartAdmission",
+                    "receiptOfAdmission",
+                    "replyToDefence",
+                    "directionsQuestionnaireFiled"
+                );
+            }
+
+        }
 
         @Test
         void shouldPrepareMiscellaneousEvent_whenClaimWithUnrepresentedDefendant1UnregisteredDefendant2() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2().build();
+                .atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2()
+                .build();
             Event expectedEvent1 = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")
@@ -357,6 +580,7 @@ class EventHistoryMapperTest {
                 "directionsQuestionnaireFiled"
             );
         }
+
     }
 
     @Nested

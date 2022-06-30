@@ -327,6 +327,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             if (areAnyRespondentsLitigantInPerson(caseData) == true)  {
                 dataBuilder.addLegalRepDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(time.now()));
             }
+            populateBlankOrgPolicies(dataBuilder, caseData);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -343,6 +344,19 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                       YES.equals(caseData.getAddRespondent2())
                           && NO.equals(caseData.getRespondent2SameLegalRepresentative())
                             ? ", " + caseData.getRespondent2().getPartyName() : "");
+    }
+
+    private void populateBlankOrgPolicies(CaseData.CaseDataBuilder dataBuilder, CaseData caseData) {
+        if (caseData.getRespondent1OrganisationPolicy() == null) {
+            dataBuilder
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]").build());
+        }
+        if (caseData.getRespondent2OrganisationPolicy() == null) {
+            dataBuilder
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]").build());
+        }
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {

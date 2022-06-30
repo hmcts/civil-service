@@ -229,6 +229,7 @@ class CaseEventTaskHandlerTest {
             );
 
             when(mockTask.getAllVariables()).thenReturn(variables);
+            when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
         }
 
         @ParameterizedTest
@@ -399,6 +400,86 @@ class CaseEventTaskHandlerTest {
                 .isEqualTo("Unrepresented defendant and unregistered defendant solicitor firm. "
                                + "Unrepresented defendant: Mr. John Rambo. "
                                + "Unregistered defendant solicitor firm: Mr. Sole Trader.");
+        }
+
+        @Nested
+        class ToBeRemovedAfterNOC {
+            @BeforeEach
+            public void setup() {
+                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(false);
+            }
+
+            @Test
+            void prod_shouldHaveCorrectDescription_whenInUnregisteredSolicitorState() {
+                FlowState.Main state = PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
+                VariableMap variables = Variables.createVariables();
+                variables.putValue(FLOW_STATE, state.fullName());
+                variables.putValue(
+                    FLOW_FLAGS,
+                    getFlowFlags(state)
+                );
+
+                when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStatePendingClaimIssuedUnregisteredDefendant()
+                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .respondent1OrganisationPolicy(null)
+                    .respondent2OrganisationPolicy(null)
+                    .build();
+
+                CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+                when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
+                    .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
+                                    .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
+
+                when(coreCaseDataService.submitUpdate(eq(CASE_ID), caseDataContentArgumentCaptor.capture()))
+                    .thenReturn(caseData);
+
+                caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+                CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
+                Event event = caseDataContent.getEvent();
+                assertThat(event.getDescription()).isEqualTo("Unregistered defendant solicitor firm: Mr. Sole Trader");
+            }
+
+            @Test
+            void prod_shouldHaveCorrectDescription_whenInUnrepresentedDefendantAndUnregisteredSolicitorState() {
+                FlowState.Main state = PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT;
+                VariableMap variables = Variables.createVariables();
+                variables.putValue(FLOW_STATE, state.fullName());
+                variables.putValue(
+                    FLOW_FLAGS,
+                    getFlowFlags(state)
+                );
+
+                when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStatePendingClaimIssuedUnrepresentedUnregisteredDefendant()
+                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .respondent1OrganisationPolicy(null)
+                    .respondent2OrganisationPolicy(null)
+                    .build();
+                CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+                when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
+                    .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
+                                    .eventId(PROCEEDS_IN_HERITAGE_SYSTEM.name()).build());
+
+                when(coreCaseDataService.submitUpdate(eq(CASE_ID), caseDataContentArgumentCaptor.capture()))
+                    .thenReturn(caseData);
+
+                caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+                CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
+                Event event = caseDataContent.getEvent();
+                assertThat(event.getDescription())
+                    .isEqualTo("Unrepresented defendant and unregistered defendant solicitor firm. "
+                                   + "Unrepresented defendant: Mr. John Rambo. "
+                                   + "Unregistered defendant solicitor firm: Mr. Sole Trader.");
+            }
         }
 
         @Nested
@@ -611,12 +692,12 @@ class CaseEventTaskHandlerTest {
                               "ONE_RESPONDENT_REPRESENTATIVE", false,
                               "RPA_CONTINUOUS_FEED", false,
                               FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
-                              FlowFlag.NOTICE_OF_CHANGE.name(), false
+                              FlowFlag.NOTICE_OF_CHANGE.name(), true
                 );
             }
             return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false,
                           FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
-                          FlowFlag.NOTICE_OF_CHANGE.name(), false);
+                          FlowFlag.NOTICE_OF_CHANGE.name(), true);
         }
 
         private CaseData getCaseData(FlowState.Main state) {

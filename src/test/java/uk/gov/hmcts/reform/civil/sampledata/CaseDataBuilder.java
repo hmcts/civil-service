@@ -865,10 +865,14 @@ public class CaseDataBuilder {
         respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
-        respondent1OrganisationPolicy = null;
-        respondent2OrganisationPolicy = null;
         respondentSolicitor1OrganisationDetails = null;
         addRespondent2 = YES;
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
         return this;
     }
 
@@ -887,13 +891,17 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondentSolicitor1OrganisationDetails = null;
-        respondent1OrganisationPolicy = null;
         respondent2Represented = YES;
         respondent2OrgRegistered = YES;
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R").build())
-            .build();
         respondentSolicitor1OrganisationDetails = null;
+
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("QWERTY R2").build())
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
         return this;
     }
 
@@ -904,13 +912,17 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondentSolicitor2OrganisationDetails = null;
-        respondent2OrganisationPolicy = null;
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
+        respondentSolicitor1OrganisationDetails = null;
+
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY R").build())
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
             .build();
-        respondentSolicitor1OrganisationDetails = null;
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
         return this;
     }
 
@@ -920,8 +932,12 @@ public class CaseDataBuilder {
         respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
-        respondent1OrganisationPolicy = null;
-        respondent2OrganisationPolicy = null;
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
         respondent1OrgRegistered = NO;
         respondent2OrgRegistered = NO;
         respondent1Represented = YES;
@@ -959,7 +975,9 @@ public class CaseDataBuilder {
         atStatePendingClaimIssuedUnregisteredDefendant();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
-        respondent1OrganisationPolicy = null;
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
@@ -981,7 +999,9 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1OrgRegistered = YES;
-        respondent2OrganisationPolicy = null;
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
         respondent2Represented = YES;
         respondent2OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
@@ -1006,8 +1026,12 @@ public class CaseDataBuilder {
         respondent2Represented = YES;
         respondent2OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
-        respondent1OrganisationPolicy = null;
-        respondent2OrganisationPolicy = null;
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
 
         respondentSolicitor2OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg2@email.com")
@@ -1028,8 +1052,12 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
-        respondent1OrganisationPolicy = null;
-        respondent2OrganisationPolicy = null;
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
 
         respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg2@email.com")
@@ -1136,9 +1164,11 @@ public class CaseDataBuilder {
             .build();
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY R").build())
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
             .build();
         respondent2OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY R2").build())
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
             .build();
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
         respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
@@ -1274,9 +1304,13 @@ public class CaseDataBuilder {
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
-        respondent1OrganisationPolicy = null;
         respondent2OrgRegistered = NO;
-        respondent2OrganisationPolicy = null;
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
         return this;
     }
 
@@ -1285,10 +1319,14 @@ public class CaseDataBuilder {
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = NO;
         respondent1OrgRegistered = NO;
-        respondent1OrganisationPolicy = null;
         respondent2Represented = NO;
         respondent2OrgRegistered = NO;
-        respondent2OrganisationPolicy = null;
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
         return this;
     }
 
@@ -1297,11 +1335,15 @@ public class CaseDataBuilder {
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
-        respondent1OrganisationPolicy = null;
         respondent2Represented = NO;
         respondent2OrgRegistered = NO;
-        respondent2OrganisationPolicy = null;
         respondent2 = PartyBuilder.builder().individual().build();
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
         return this;
     }
 
