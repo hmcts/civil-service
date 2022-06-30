@@ -167,8 +167,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
     public Map<String, String> addPropertiesSpec(CaseData caseData, CaseEvent caseEvent) {
         if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE)) {
-            return Map.of(
-                CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
+            return Map.of(                CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
             );
