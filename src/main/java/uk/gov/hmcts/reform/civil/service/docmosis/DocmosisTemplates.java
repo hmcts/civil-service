@@ -3,13 +3,13 @@ package uk.gov.hmcts.reform.civil.service.docmosis;
 import javax.validation.constraints.NotNull;
 
 public enum DocmosisTemplates {
-    N1("CV-UNS-CLM-ENG-01104.docx", "sealed_claim_form_%s.pdf"),
+    N1("CV-UNS-CLM-ENG-01123.docx", "sealed_claim_form_%s.pdf"),
     N2("CV-SPC-CLM-ENG-01074.docx", "sealed_claim_form_spec%s.pdf"),
     N2_1V2_DIFFERENT_SOL("CV-SPC-CLM-ENG-01075.docx", "sealed_claim_form_spec%s.pdf"),
     N2_1V2_SAME_SOL("CV-SPC-CLM-ENG-01076.docx", "sealed_claim_form_spec%s.pdf"),
     N2_2V1("CV-SPC-CLM-ENG-01077.docx", "sealed_claim_form_spec%s.pdf"),
     N10("CV-SPEC-ACK-ENG-00001-v01.docx", "acknowledgement_of_service_form_spec_%s.pdf"),
-    N1_MULTIPARTY_SAME_SOL("CV-UNS-CLM-ENG-01105.docx", "sealed_claim_form_%s.pdf"),
+    N1_MULTIPARTY_SAME_SOL("CV-UNS-CLM-ENG-01124.docx", "sealed_claim_form_%s.pdf"),
     N9("CV-UNS-ACK-ENG-00653.docx", "acknowledgement_of_claim_form_%s.pdf"),
     N181("CV-UNS-CLM-ENG-01113.docx", "%s_directions_questionnaire_form_%s.pdf"),
     N181_MULTIPARTY_SAME_SOL("CV-UNS-CLM-ENG-01116.docx", "%s_directions_questionnaire_form_%s.pdf"),
