@@ -30,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaiting
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullDefenceReceivedSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceivedSpec;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.bothDefSameLegalRep;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledgedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
@@ -62,6 +63,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentS
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingClaimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondentTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
@@ -136,7 +138,8 @@ class FlowPredicateTest {
             assertFalse(claimNotified.test(caseData));
         }
 
-        @Test // 1v1 Case / 1v2 Same Solicitor (Field is null)
+        // 1v1 Case / 1v2 Same Solicitor (Field is null)
+        @Test
         void shouldBeClaimNotified_whenSolicitorOptions_isNull() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified_1v1()
@@ -145,7 +148,8 @@ class FlowPredicateTest {
             assertTrue(claimNotified.test(caseData));
         }
 
-        @Test //1v2 - Notify Both Sol
+        //1v2 - Notify Both Sol
+        @Test
         void shouldBeClaimNotified_when1v2DifferentSolicitor_andNotifySolicitorOptions_isBoth() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified_1v2_andNotifyBothSolicitors()
@@ -154,7 +158,8 @@ class FlowPredicateTest {
             assertTrue(claimNotified.test(caseData));
         }
 
-        @Test //1v2 - Notify One Sol
+        //1v2 - Notify One Sol
+        @Test
         void shouldHandOffline_when1v2DifferentSolicitor_andNotifySolicitorOptions_isOneSolicitor() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor()
@@ -1981,6 +1986,14 @@ class FlowPredicateTest {
             .build();
 
         Assertions.assertTrue(pendingClaimIssued.test(caseData));
+        Assertions.assertFalse(
+            ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
+                .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                .and(bothDefSameLegalRep.negate()).test(caseData));
     }
 
     @Test
@@ -1996,6 +2009,14 @@ class FlowPredicateTest {
             .build();
 
         Assertions.assertTrue(pendingClaimIssued.test(caseData));
+        Assertions.assertFalse(
+            ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
+                .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                .and(bothDefSameLegalRep.negate()).test(caseData));
     }
 
     @Test
@@ -2007,5 +2028,13 @@ class FlowPredicateTest {
             .build();
 
         Assertions.assertTrue(pendingClaimIssued.test(caseData));
+        Assertions.assertFalse(
+            ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
+                .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                .and(bothDefSameLegalRep.negate()).test(caseData));
     }
 }
