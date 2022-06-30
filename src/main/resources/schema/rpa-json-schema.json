@@ -40,10 +40,7 @@
         },
         "owningCourtName": {
           "$id": "#/properties/header/properties/owningCourtName",
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "description": "The court description. When not using owningCourtCode, this should be populated with the court name as found in CASEMAN. Mismatches will result in an exception record for manual resolution."
         },
         "caseType": {
@@ -62,10 +59,7 @@
         },
         "preferredCourtName": {
           "$id": "#/properties/header/properties/preferredCourtName",
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "description": "The court description. When not using preferredCourtCode, this should be populated with the court name as found in CASEMAN. Mismatches will result in an exception record for manual resolution."
         },
         "caseAllocatedTo": {
@@ -231,10 +225,7 @@
           },
           "name": {
             "$id": "#/properties/solicitors/items/properties/name",
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string","null"],
             "description": ""
           },
           "addresses": {
@@ -319,10 +310,7 @@
         },
         "courtFee": {
           "$id": "#/properties/claimDetails/properties/courtFee",
-          "type": [
-            "number",
-            "null"
-          ],
+          "type": ["number", "null"],
           "maxLength": 99999999999,
           "description": ""
         }
@@ -614,19 +602,14 @@
     },
     "solicitorIDType": {
       "$id": "#/definitions/solicitorIDType",
-      "type": [
-        "string",
-        "null"
-      ],
+      "type": ["string",
+        "null"],
       "description": "Identifies the solicitor object in the json document.",
       "default": ""
     },
     "courtCodeType": {
       "$id": "#/definitions/courtCodeType",
-      "type": [
-        "string",
-        "null"
-      ],
+      "type": ["string", "null"],
       "pattern": "^(?:\\d{3}|)$",
       "description": "The HMCTS 3 digit court location code."
     },
@@ -685,10 +668,7 @@
     },
     "solicitorOrganisationIDType": {
       "$id": "#/definitions/solicitorOrganisationIDType",
-      "type": [
-        "string",
-        "null"
-      ],
+      "type": ["string", "null"],
       "description": "Where a solicitor organisation is registered in HMCTS, the organisation ID will be provided here. This is not intended to match to any CASEMAN solicitor ID. Where a solicitor organisation is not registered, a system generated pseudo value will be provided. This identifier is used to indicate which solicitor firm represents which litigant. Links the solicitor object in the json document to the litigant object."
     },
     "addressLineType": {
@@ -708,10 +688,7 @@
     },
     "postCodeType": {
       "$id": "#/definitions/postCodeType",
-      "type": [
-        "string",
-        "null"
-      ],
+      "type": ["string", "null"],
       "description": ""
     },
     "contactAddressType": {
@@ -761,10 +738,7 @@
     },
     "addressesType": {
       "$id": "#/definitions/addressesType",
-      "type": [
-        "object",
-        "null"
-      ],
+      "type": ["object", "null"],
       "required": [
         "contactAddress"
       ],
@@ -880,10 +854,7 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/miscellaneousEventType/items/properties/eventDetailsText",
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "maxLength": 250
           }
         },
@@ -949,10 +920,7 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/eventDetailsText",
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": [ "null", "string"],
             "maxLength": 250,
             "description": ""
           }
@@ -1019,10 +987,7 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/eventDetailsText",
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "maxLength": 250,
             "description": ""
           }
@@ -1077,10 +1042,7 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/defenceFiledEventType/items/properties/eventDetailsText",
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "maxLength": 250,
             "description": ""
           }
@@ -1135,10 +1097,7 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/defenceAndCounterClaimEventType/items/properties/eventDetailsText",
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "maxLength": 250,
             "description": ""
           }
@@ -1193,10 +1152,7 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/receiptOfPartAdmissionEventType/items/properties/eventDetailsText",
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "maxLength": 250,
             "description": ""
           }
@@ -1251,10 +1207,7 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/receiptOfAdmissionEventType/items/properties/eventDetailsText",
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "maxLength": 250,
             "description": ""
           }
@@ -1309,10 +1262,7 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/replyToDefenceEventType/items/properties/eventDetailsText",
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "maxLength": 250,
             "description": ""
           }
@@ -1391,10 +1341,7 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventDetailsText",
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "maxLength": 250,
             "description": ""
           }
@@ -1459,10 +1406,7 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/statesPaidFiledEventType/items/properties/eventDetailsText",
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "maxLength": 250,
             "description": ""
           }
@@ -1527,10 +1471,7 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/breathingSpaceEnteredEventType/items/properties/eventDetailsText",
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "maxLength": 250,
             "description": ""
           }
@@ -1595,10 +1536,7 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/breathingSpaceLiftedEventType/items/properties/eventDetailsText",
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "maxLength": 250,
             "description": ""
           }
@@ -1663,10 +1601,7 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/breathingSpaceMentalHealthEnteredEventType/items/properties/eventDetailsText",
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "maxLength": 250,
             "description": ""
           }
@@ -1731,10 +1666,7 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/breathingSpaceMentalHealthLiftedEventType/items/properties/eventDetailsText",
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "maxLength": 250,
             "description": ""
           }
@@ -1916,7 +1848,7 @@
                   "WK",
                   null
                 ],
-                "default": null,
+                "default" : null,
                 "description": ""
               },
               "firstInstallmentAmount": {
@@ -1948,6 +1880,7 @@
                 "default": "true",
                 "description": ""
               }
+
             },
             "additionalProperties": false
           },
@@ -2000,10 +1933,13 @@
             "$ref": "#/definitions/litigiousPartyIDType",
             "description": ""
           },
+
           "eventDetails": {
             "$id": "#/definitions/generalFormOfApplicationEventType/items/properties/eventDetails",
             "type": "object",
-            "required": [],
+            "required": [
+
+            ],
             "properties": {
               "miscText": {
                 "$id": "#/definitions/generalFormOfApplicationEventType/items/properties/eventDetails/properties/miscText",
@@ -2016,10 +1952,7 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/generalFormOfApplicationEventType/items/properties/eventDetailsText",
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": ["string", "null"],
             "maxLength": 250,
             "description": ""
           }
