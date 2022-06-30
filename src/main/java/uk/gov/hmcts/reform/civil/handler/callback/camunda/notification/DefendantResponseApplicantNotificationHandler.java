@@ -20,7 +20,10 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -81,31 +84,26 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     private CallbackResponse notifySolicitorsForDefendantResponse(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String recipient;
-        System.out.println("inside notifySolicitorsForDefendantResponse method");
         //determine recipient for notification, based on Camunda Event ID
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         switch (caseEvent) {
             case NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE:
-                System.out.println(" NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE : Applicant ");
                 recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
                 break;
             case NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC:
-                System.out.println("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC : Defendant 1");
                 recipient = caseData.getRespondentSolicitor1EmailAddress();
                 break;
             case NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC:
-                System.out.println("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC : Defendant 1_new_block");
                 if (caseData.getRespondent1DQ() != null
                     && caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
-                       var emailAddress = Optional.ofNullable(caseData.getRespondentSolicitor1EmailAddress());
-                       recipient = emailAddress.orElse(null);
+                    var emailAddress = Optional.ofNullable(caseData.getRespondentSolicitor1EmailAddress());
+                    recipient = emailAddress.orElse(null);
                 } else {
-                   var emailAddress = Optional.ofNullable(caseData.getRespondentSolicitor2EmailAddress());
-                   recipient = emailAddress.orElse(null);
+                    var emailAddress = Optional.ofNullable(caseData.getRespondentSolicitor2EmailAddress());
+                    recipient = emailAddress.orElse(null);
                 }
                 break;
             case NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC:
-                System.out.println("NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC : Defendant 2");
                 recipient = caseData.getRespondentSolicitor2EmailAddress();
                 break;
             default:
@@ -113,10 +111,8 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
         }
 
         if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-            System.out.println(" SPEC_Claim");
             sendNotificationToSolicitorSpec(caseData, recipient, caseEvent);
         } else {
-            System.out.println(" Not SPEC_Claim");
             sendNotificationToSolicitor(caseData, recipient);
         }
 
@@ -134,15 +130,12 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
     private void sendNotificationToSolicitorSpec(CaseData caseData, String recipient, CaseEvent caseEvent) {
         String emailTemplate;
-        System.out.println("inside endNotificationToSolicitorSpe");
         //TODO if template has to be changed for def1, this is the place to change it
-        if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE))
-        {
+        if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE)) {
             emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
         } else {
             emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
         }
-        System.out.println("inside endNotificationToSolicitorSpe template id : " + emailTemplate );
         notificationService.sendMail(
             recipient,
             emailTemplate,
@@ -173,33 +166,27 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     }
 
     public Map<String, String> addPropertiesSpec(CaseData caseData, CaseEvent caseEvent) {
-        System.out.println("inside addPropertiesSpec method");
         if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE)) {
-            System.out.println("inside addPropertiesSpec method 11");
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
             );
         } else if (caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC)) {
-            System.out.println("inside addPropertiesSpec method 22");
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent2())
             );
         } else {
-            System.out.println("inside addPropertiesSpec method 33");
             if (caseData.getRespondent1DQ() != null
                 && caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
-                System.out.println("inside addPropertiesSpec method 44");
                 return Map.of(
                     CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
                     CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                     RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
                 );
             } else {
-                System.out.println("inside addPropertiesSpec method 55");
                 return Map.of(
                     CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
                     CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
@@ -211,12 +198,11 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
     //finding legal org name
     private String getLegalOrganisationName(CaseData caseData,  CaseEvent caseEvent) {
-        System.out.println("inside getLegalOrganisationName method ");
         String organisationID;
         if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE)) {
             organisationID = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
-        } else if (caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC)){
-             organisationID = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+        } else if (caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC)) {
+            organisationID = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
         } else {
             if (caseData.getRespondent1DQ() != null
                 && caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
@@ -226,7 +212,6 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
             }
         }
         Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
-        System.out.println("inside getLegalOrganisationName method " + organisation.get().getName());
         return organisation.isPresent() ? organisation.get().getName() :
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
