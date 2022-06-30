@@ -52,6 +52,16 @@
     <cve>CVE-2020-36518</cve>
   </suppress>
   <suppress>
+    <notes>Suppressed because at the time of writing there is no better version</notes>
+    <packageUrl regex="true">^(pkg:maven/org\.springframework\.security/spring-security-rsa@1\.0\.10\.RELEASE|pkg:maven/org\.springframework\.boot/spring-boot-starter-oauth2-client@2\.7\.0|pkg:maven/org\.springframework\.boot/spring-boot-starter-oauth2-resource-server@2\.7\.0).*$</packageUrl>
+    <cve>CVE-2022-22978</cve>
+  </suppress>
+  <suppress>
+    <notes>Suppressed because at the time of writing there is no better version</notes>
+    <packageUrl regex="true">^(pkg:maven/org\.springframework\.security/spring-security-crypto@5\.5\.8).*$</packageUrl>
+    <cve>CVE-2020-5408</cve>
+  </suppress>
+  <suppress>
     <cve>CVE-2022-34305</cve>
   </suppress>
 </suppressions>
