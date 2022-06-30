@@ -90,7 +90,7 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareMiscellaneousEvent_whenClaimWith1v1UnrepresentedDefendant() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOffline1v1UnrepresentedDefendant().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant().build();
             Event expectedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")
@@ -123,7 +123,7 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareMiscellaneousEvent_whenClaimWith2UnrepresentedDefendants() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendants().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
 
             Event expectedEvent1 = Event.builder()
                 .eventSequence(1)
@@ -4762,7 +4762,7 @@ class EventHistoryMapperTest {
     @Test
     public void specCaseEvents() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateProceedsOffline1v1UnrepresentedDefendant()
+            .atStateClaimIssued1v1UnrepresentedDefendant()
             .build().toBuilder()
             .superClaimType(SuperClaimType.SPEC_CLAIM)
             .build();

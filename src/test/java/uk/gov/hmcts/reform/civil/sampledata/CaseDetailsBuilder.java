@@ -141,7 +141,7 @@ public class CaseDetailsBuilder {
     }
 
     public CaseDetailsBuilder atStateProceedsOffline() {
-        CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendants().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = PROCEEDS_IN_HERITAGE_SYSTEM.name();
         return this;
