@@ -43,7 +43,9 @@ public class NotificationService {
     ) {
         ExecutorService executorService = Executors.newFixedThreadPool(3);
         List<Future> tasks = new ArrayList<>();
+        log.info("About to send " + targetEmails.size() + " notifications.");
         targetEmails.forEach(email -> {
+            log.info("Preparing to send notification: " + email);
             Future task = executorService.submit(() -> sendMail(email, emailTemplate, parameters, reference));
             tasks.add(task);
         });
