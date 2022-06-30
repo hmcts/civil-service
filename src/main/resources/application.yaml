@@ -127,7 +127,7 @@ notifications:
   breathingSpaceLiftedApplicantEmailTemplate: "bd717149-5cba-40e8-ba93-1257033e5e86"
   breathingSpaceLiftedRespondentEmailTemplate: "a9975259-be57-482f-8a31-0c5583ad0779"
   respondentSolicitorClaimIssueMultipartyEmailTemplate: "6e63242f-a26a-442e-ad2c-f201072195e2"
-  respondentSolicitorClaimDetailsEmailTemplate: "a5ad6311-a1b7-4d30-bc70-b41c0340f1fc"
+  respondentSolicitorClaimDetailsEmailTemplate: "17151a5a-00b1-48b7-8e45-38a5f20b6ec0"
   solicitorDefendantResponseCaseTakenOffline: "e41ab7af-71ab-4e87-a636-25c134a2d11d"
   claimantSolicitorDefendantResponseFullDefence: "27040d5f-8e43-4a00-b6dc-bcd3b21b66bc"
   solicitorDefendantResponseCaseTakenOfflineMultiparty: "7e1e7b92-84aa-4231-92c1-a61516e93c31"
