@@ -135,6 +135,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     private void sendNotificationToSolicitorSpec(CaseData caseData, String recipient, CaseEvent caseEvent) {
         String emailTemplate;
         System.out.println("inside endNotificationToSolicitorSpe");
+        //TODO if template has to be changed for def1, this is the place to change it
         if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE))
         {
             emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
@@ -225,7 +226,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
             }
         }
         Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
-        System.out.println("inside getLegalOrganisationName method " + organisation);
+        System.out.println("inside getLegalOrganisationName method " + organisation.get().getName());
         return organisation.isPresent() ? organisation.get().getName() :
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
