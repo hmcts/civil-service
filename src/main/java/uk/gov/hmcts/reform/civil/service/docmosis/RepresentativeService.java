@@ -19,7 +19,8 @@ public class RepresentativeService {
     private final OrganisationService organisationService;
 
     public Representative getRespondent1Representative(CaseData caseData) {
-        if (caseData.getRespondent1OrganisationPolicy() != null) {
+        if (caseData.getRespondent1OrganisationPolicy() != null
+            && caseData.getRespondent1OrganisationPolicy().getOrganisation() != null) {
             var organisationId = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
             var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
                                                       .orElseThrow(RuntimeException::new));
@@ -43,7 +44,8 @@ public class RepresentativeService {
     }
 
     public Representative getRespondent2Representative(CaseData caseData) {
-        if (caseData.getRespondent2OrganisationPolicy() != null) {
+        if (caseData.getRespondent1OrganisationPolicy() != null
+            && caseData.getRespondent2OrganisationPolicy().getOrganisation() != null) {
             var organisationId = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
             var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
                                                       .orElseThrow(RuntimeException::new));
