@@ -130,7 +130,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
     private void sendNotificationToSolicitorSpec(CaseData caseData, String recipient, CaseEvent caseEvent) {
         String emailTemplate;
-        //TODO if template has to be changed for def1, this is the place to change it
+        //if template has to be changed for def1, this is the place to change it
         if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE)) {
             emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
         } else {
