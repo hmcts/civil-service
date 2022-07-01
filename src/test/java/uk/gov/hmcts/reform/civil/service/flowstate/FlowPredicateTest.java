@@ -769,7 +769,7 @@ class FlowPredicateTest {
                         .respondent2ResponseDate(LocalDateTime.now().plusHours(1))
                         .build();
 
-                    assertTrue(divergentRespondGoOfflineSpec.test(caseData));
+                    assertTrue(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
                 }
 
                 @Test
@@ -1640,7 +1640,7 @@ class FlowPredicateTest {
                         .respondent1ResponseDate(LocalDateTime.now().plusHours(1))
                         .build();
 
-                    assertTrue(divergentRespondGoOfflineSpec.test(caseData));
+                    assertTrue(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
                 }
 
                 @Test
@@ -1651,7 +1651,7 @@ class FlowPredicateTest {
                         .respondent2ResponseDate(LocalDateTime.now().plusHours(1))
                         .build();
 
-                    assertTrue(divergentRespondGoOfflineSpec.test(caseData));
+                    assertTrue(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
                 }
 
                 @Test
@@ -1663,7 +1663,7 @@ class FlowPredicateTest {
                         .respondent1ResponseDate(localDateTime)
                         .build();
 
-                    assertTrue(divergentRespondGoOfflineSpec.test(caseData));
+                    assertTrue(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
                 }
 
                 @Test

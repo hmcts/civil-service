@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -1842,8 +1843,8 @@ class StateFlowEngineTest {
             );
         }
 
-        @Test
         //1v2 Different solicitor scenario-both responses FullDefence received and with time extension
+        @Test
         void shouldAwaitResponse_1v2DiffSol_whenBothRespondFullDefenceAndTimeExtension() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotifiedTimeExtension_Defendent2()
@@ -2692,8 +2693,8 @@ class StateFlowEngineTest {
         @Nested
         class DefendantResponseMultiparty {
 
-            @Test
             //1v2 Different solicitor scenario-first response FullDefence received
+            @Test
             void shouldGenerateDQ_1v2DiffSol_whenFirstResponseIsFullDefence() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
@@ -2730,8 +2731,8 @@ class StateFlowEngineTest {
                 );
             }
 
-            @Test
             //1v2 Different solicitor scenario-first response FullDefence received
+            @Test
             void shouldGenerateDQ_1v2DiffSol_whenFirstResponseIsNotFullDefence() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentCounterClaim()
@@ -2768,8 +2769,8 @@ class StateFlowEngineTest {
                 );
             }
 
-            @Test
             //1v2 Different solicitor scenario-first response FullDefence received
+            @Test
             void shouldGenerateDQ_in1v2Scenario_whenFirstPartySubmitFullDefenceResponse() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
@@ -2807,9 +2808,9 @@ class StateFlowEngineTest {
                 );
             }
 
-            @Test
             //1v2 Different solicitor scenario-first party acknowledges, not responds
             // second party submits response FullDefence
+            @Test
             void shouldGenerateDQ_in1v2Scenario_whenSecondPartySubmitFullDefenceResponse() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefenceRespondent2()
@@ -2846,8 +2847,8 @@ class StateFlowEngineTest {
                 );
             }
 
-            @Test
             //Respondent 1 submits FULL DEFENCE, Respondent 2 submits FULL DEFENCE
+            @Test
             void shouldReturnFullDefence_in1v2Scenario_whenBothPartiesSubmitFullDefenceResponses() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
@@ -2885,8 +2886,8 @@ class StateFlowEngineTest {
                 );
             }
 
-            @Test
             //Respondent 1 and 2 acknowledges claim, then submits  FULL DEFENCE
+            @Test
             void shouldReturnFullDefence_in1v2Scenario_whenBothPartiesAcknowledgedAndSubmitFullDefenceResponses() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
@@ -2924,8 +2925,8 @@ class StateFlowEngineTest {
                 );
             }
 
-            @Test
             //Respondent 1 acknowledges claim, then Respondent 1 & 2 submits  FULL DEFENCE
+            @Test
             void shouldReturnFullDefence_in1v2Scenario_whenRep1AcknowledgedAndBothSubmitFullDefenceResponses() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
@@ -2964,8 +2965,8 @@ class StateFlowEngineTest {
                 );
             }
 
-            @Test
             // Respondent 2 acknowledges claim, Respondent 1 & 2 submits  FULL DEFENCE
+            @Test
             void shouldReturnFullDefence_in1v2Scenario_whenRep2AcknowledgedAndBothSubmitFullDefenceResponses() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
@@ -3005,8 +3006,8 @@ class StateFlowEngineTest {
                 );
             }
 
-            @Test
             //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
+            @Test
             void shouldReturnDivergentResponseAndGoOffline_1v2Scenario_whenFirstRespondentSubmitsFullDefenceResponse() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
@@ -3043,8 +3044,8 @@ class StateFlowEngineTest {
                 );
             }
 
-            @Test
             //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
+            @Test
             void shouldReturnDivergentResponse_in1v2SameSolicitorScenario_whenOneRespondentSubmitsFullDefence() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateDivergentResponseWithFullDefence1v2SameSol_NotSingleDQ()
@@ -3162,6 +3163,48 @@ class StateFlowEngineTest {
 
     @Nested
     class AmbiguousErrors {
+
+        /**
+         * 1v2 different solicitor should behave for each sol as it does for 1v1,
+         * so DQ should be generated both when the first def responds and when the second one
+         * does, even if the case goes offline, so, from claim_issued, divergent response
+         * should go to divergent_respond_generate_dq_go_offline.
+         */
+        @Test
+        void when1v2dsDivergent_thenAlwaysGeneratesDQ() {
+            CaseData caseData = CaseData.builder()
+                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .respondent1(Party.builder().build())
+                .respondent1Represented(YES)
+                .respondent1OrgRegistered(YES)
+                .addRespondent2(YES)
+                .respondent2(Party.builder().build())
+                .respondent2Represented(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .respondent2OrgRegistered(YES)
+                .submittedDate(LocalDateTime.now())
+                .paymentSuccessfulDate(LocalDateTime.now())
+                .issueDate(LocalDate.now())
+                .claimNotificationDeadline(LocalDateTime.now().plusDays(40))
+                .build();
+
+            Assertions.assertEquals(
+                CLAIM_ISSUED.fullName(),
+                stateFlowEngine.evaluate(caseData).getState().getName()
+            );
+
+            caseData = caseData.toBuilder()
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent2ResponseDate(LocalDateTime.now())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .build();
+
+            Assertions.assertEquals(
+                DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName(),
+                stateFlowEngine.evaluate(caseData).getState().getName()
+            );
+        }
 
         @Test
         void claimIssue_fullAdmitAndDivergentRespondGoOffline() {
@@ -3284,4 +3327,5 @@ class StateFlowEngineTest {
             builder.applicant1ProceedWithClaim(NO);
         }
     }
+
 }
