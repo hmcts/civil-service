@@ -74,4 +74,7 @@
     <packageUrl regex="true">^(pkg:maven/org\.springframework\.security/spring-security-crypto@5\.5\.8).*$</packageUrl>
     <cve>CVE-2020-5408</cve>
   </suppress>
+  <suppress until="2022-08-01">
+    <cve>CVE-2022-33915</cve>
+  </suppress>
 </suppressions>
