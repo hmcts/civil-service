@@ -20,10 +20,13 @@ class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
     @Override
     protected Query buildQuery(int fromValue) {
         BoolQueryBuilder query = boolQuery()
-            .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
-            .must(boolQuery()
-                      .minimumShouldMatch(1)
-                      .should(matchQuery("state", "AWAITING_APPLICANT_INTENTION")));
+            .minimumShouldMatch(1)
+            .should(boolQuery()
+                .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
+                .must(boolQuery().must(matchQuery("state", "AWAITING_APPLICANT_INTENTION"))))
+            .should(boolQuery()
+                .must(rangeQuery("data.addLegalRepDeadline").lt("now"))
+                .must(boolQuery().must(matchQuery("state", "CASE_ISSUED"))));
 
         return new Query(query, List.of("reference"), fromValue);
     }
