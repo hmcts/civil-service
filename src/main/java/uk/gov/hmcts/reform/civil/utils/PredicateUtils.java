@@ -5,6 +5,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.function.Predicate;
 
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+
 public class PredicateUtils {
 
     private PredicateUtils() {
@@ -32,4 +34,6 @@ public class PredicateUtils {
         caseData.getRespondent2() != null && (caseData.getRespondent2ResponseDate() != null
             || (caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES
             && caseData.getRespondent1ResponseDate() != null));
+
+
 }
