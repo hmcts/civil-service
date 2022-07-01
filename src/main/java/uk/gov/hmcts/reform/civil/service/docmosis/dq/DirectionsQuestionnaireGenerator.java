@@ -881,7 +881,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             ? "The defendant believes that the facts stated in the response are true."
             : "The claimant believes that the facts in this claim are true.";
         statementOfTruth += String.format("\n\n\nI am duly authorised by the %s to sign this statement.\n\n"
-                                              + "The %s understands that proceedings for contempt of court "
+                                              + "The %s understands that the proceedings for contempt of court "
                                               + "may be brought against anyone who makes, or causes to be made, "
                                               + "a false statement in a document verified by a statement of truth "
                                               + "without an honest belief in its truth.",

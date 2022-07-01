@@ -1608,7 +1608,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
             String statementOfTruth = "The claimant believes that the facts in this claim are true."
                 + "\n\n\nI am duly authorised by the claimant to sign this statement.\n\n"
-                + "The claimant understands that proceedings for contempt of court "
+                + "The claimant understands that the proceedings for contempt of court "
                 + "may be brought against anyone who makes, or causes to be made, "
                 + "a false statement in a document verified by a statement of truth "
                 + "without an honest belief in its truth.";
@@ -1630,7 +1630,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
             String statementOfTruth = "The defendant believes that the facts stated in the response are true."
                 + "\n\n\nI am duly authorised by the defendant to sign this statement.\n\n"
-                + "The defendant understands that proceedings for contempt of court "
+                + "The defendant understands that the proceedings for contempt of court "
                 + "may be brought against anyone who makes, or causes to be made, "
                 + "a false statement in a document verified by a statement of truth "
                 + "without an honest belief in its truth.";
