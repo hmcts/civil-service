@@ -456,7 +456,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DisposalHearingBundle disposalHearingBundleDJ;
     private DisposalHearingNotes disposalHearingNotesDJ;
 
-    //default judgement SDO fields for trial
+    //default judgement SDO fields for trial screen
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
     private TrialHearingDisclosureOfDocuments trialHearingDisclosureOfDocumentsDJ;
     private TrialHearingWitnessOfFact trialHearingWitnessOfFactDJ;
