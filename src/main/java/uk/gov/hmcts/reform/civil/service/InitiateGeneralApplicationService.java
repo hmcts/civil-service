@@ -3,11 +3,13 @@ package uk.gov.hmcts.reform.civil.service;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -39,8 +41,11 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -105,6 +110,12 @@ public class InitiateGeneralApplicationService {
         } else {
             applicationBuilder.isMultiParty(NO);
         }
+
+        Pair<String, String> workAllocationLocation = getWorkAllocationLocation(caseData);
+        //Setting Work Allocation location and location name
+        applicationBuilder.workAllocationLocation(workAllocationLocation.getKey());
+        applicationBuilder.workAllocationLocationName(workAllocationLocation.getValue());
+
         applicationBuilder.claimant1PartyName(caseData.getApplicant1().getPartyName());
         applicationBuilder.defendant1PartyName(caseData.getRespondent1().getPartyName());
         if (YES.equals(caseData.getAddApplicant2())) {
@@ -276,5 +287,43 @@ public class InitiateGeneralApplicationService {
             respondentCaseRoles.add(caseData.getRespondent2OrganisationPolicy().getOrgPolicyCaseAssignedRole());
         }
         return respondentCaseRoles;
+
+    }
+
+    private Pair<String, String> getWorkAllocationLocation(CaseData caseData) {
+        boolean afterSDO = hasSDOBeenMade(caseData.getCcdState());
+        if (!afterSDO) {
+            return Pair.of("CCMCC", "");
+        } else {
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+                //TODO: Adding dummy value until location PR-1113 is merged
+                if (INDIVIDUAL.equals(caseData.getApplicant1().getType())
+                        || SOLE_TRADER.equals(caseData.getApplicant1().getType())) {
+                    return Pair.of("claimant's preferred court location as specified in the DQs", "");
+                } else {
+                    return Pair.of("defendant's preferred court location as specified in the DQs", "");
+                }
+
+            } else {
+                //TODO: Adding dummy value until location PR-1113 is merged
+                return Pair.of("claimant's preferred court location as specified in the DQs", "");
+            }
+        }
+    }
+
+    private boolean hasSDOBeenMade(CaseState state) {
+        switch (state) {
+            case PENDING_CASE_ISSUED :
+            case CASE_ISSUED :
+            case AWAITING_CASE_DETAILS_NOTIFICATION :
+            case AWAITING_RESPONDENT_ACKNOWLEDGEMENT :
+            case CASE_DISMISSED :
+            case AWAITING_APPLICANT_INTENTION :
+            case PROCEEDS_IN_HERITAGE_SYSTEM :
+                return false;
+            default:
+                return true;
+        }
+
     }
 }
