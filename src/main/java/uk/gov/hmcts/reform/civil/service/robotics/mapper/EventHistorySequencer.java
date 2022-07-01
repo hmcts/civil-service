@@ -56,6 +56,7 @@ public class EventHistorySequencer {
                     builder.consentExtensionFilingDefence(event);
                     break;
                 case DEFENCE_FILED:
+                case STATES_PAID:
                     builder.defenceFiled(List.of(event));
                     break;
                 case DEFENCE_AND_COUNTER_CLAIM:
