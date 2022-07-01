@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -158,6 +159,15 @@ public class CaseDataParent implements MappableObject {
     private SmallClaimsPreferredEmail smallClaimsPreferredEmail;
     private SmallClaimsPreferredTelephone smallClaimsPreferredTelephone;
     private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackAltDisputeResolutionToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackVariationOfDirectionsToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackSettlementToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackDisclosureOfDocumentsToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackWitnessOfFactToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackSchedulesOfLossToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackCostsToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackTrialToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackMethodToggle;
 
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;

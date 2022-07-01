@@ -161,6 +161,16 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            assertThat(response.getData()).extracting("fastTrackAltDisputeResolutionToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackVariationOfDirectionsToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackSettlementToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocumentsToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackWitnessOfFactToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackSchedulesOfLossToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackCostsToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackTrialToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackMethodToggle").isNotNull();
+
             assertThat(response.getData()).extracting("disposalHearingJudgesRecital").extracting("input")
                 .isEqualTo("Upon considering the claim Form and Particulars of Claim/statements of case "
                                + "[and the directions questionnaires] \n\n"
