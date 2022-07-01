@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -132,6 +134,29 @@ public class PredicateUtilsTest {
                 .respondent1AcknowledgeNotificationDate(null)
                 .build();
             assertFalse(defendant2ResponseExists.test(caseData));
+        }
+    }
+
+    @Nested
+    class Defendant2ResponseExists {
+
+        @Test
+        public void when1v2differentSol_thenExists() {
+            CaseData caseData = CaseData.builder()
+                .respondent2(Party.builder().build())
+                .respondent2ResponseDate(LocalDateTime.now())
+                .build();
+            Assertions.assertTrue(defendant2ResponseExists.test(caseData));
+        }
+
+        @Test
+        public void when1v2sameSol_thenExists() {
+            CaseData caseData = CaseData.builder()
+                .respondent2(Party.builder().build())
+                .respondent2SameLegalRepresentative(YES)
+                .respondent1ResponseDate(LocalDateTime.now())
+                .build();
+            Assertions.assertTrue(defendant2ResponseExists.test(caseData));
         }
     }
 }
