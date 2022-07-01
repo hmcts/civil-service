@@ -84,6 +84,7 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1Extension
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1v2SameSolicitorSameResponse;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2AckExists;
+import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2DivergentResponseExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ExtensionExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
 
@@ -354,7 +355,7 @@ public class EventHistoryMapper {
             }
         }
 
-        if (defendant2ResponseExists.test(caseData)) {
+        if (defendant2DivergentResponseExists.test(caseData)) {
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 buildRespondentResponseEventForSpec(builder, caseData,
                                                     caseData.getRespondent2ClaimResponseTypeForSpec(),
@@ -1118,12 +1119,13 @@ public class EventHistoryMapper {
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
                 Party respondent2 = caseData.getRespondent2();
                 Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
-                LocalDateTime respondent2ResponseDate = caseData.getRespondent1ResponseDate();
+                LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
+                    ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
 
                 defenceFiledEvents.add(
                     buildDefenceFiledEvent(
                         builder,
-                        respondent1ResponseDate,
+                        respondent2ResponseDate,
                         RESPONDENT2_ID,
                         isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim2())
                     ));
@@ -1487,17 +1489,19 @@ public class EventHistoryMapper {
                                 .build());
 
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
+                LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
+                    ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
                 miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
                 builder.receiptOfAdmission(Event.builder()
                                                .eventSequence(prepareEventSequence(builder.build()))
                                                .eventCode(RECEIPT_OF_ADMISSION.getCode())
-                                               .dateReceived(caseData.getRespondent1ResponseDate())
+                                               .dateReceived(respondent2ResponseDate)
                                                .litigiousPartyID(RESPONDENT2_ID)
                                                .build()
                 ).miscellaneous(Event.builder()
                                     .eventSequence(prepareEventSequence(builder.build()))
                                     .eventCode(MISCELLANEOUS.getCode())
-                                    .dateReceived(caseData.getRespondent1ResponseDate())
+                                    .dateReceived(respondent2ResponseDate)
                                     .eventDetailsText(miscText)
                                     .eventDetails(EventDetails.builder()
                                                       .miscText(miscText)
@@ -1546,18 +1550,20 @@ public class EventHistoryMapper {
                                                   .build())
                                 .build());
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
+                LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
+                    ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
                 miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
                 builder.receiptOfPartAdmission(
                     Event.builder()
                         .eventSequence(prepareEventSequence(builder.build()))
                         .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
-                        .dateReceived(caseData.getRespondent1ResponseDate())
+                        .dateReceived(respondent2ResponseDate)
                         .litigiousPartyID(RESPONDENT2_ID)
                         .build()
                 ).miscellaneous(Event.builder()
                                     .eventSequence(prepareEventSequence(builder.build()))
                                     .eventCode(MISCELLANEOUS.getCode())
-                                    .dateReceived(caseData.getRespondent1ResponseDate())
+                                    .dateReceived(respondent2ResponseDate)
                                     .eventDetailsText(miscText)
                                     .eventDetails(EventDetails.builder()
                                                       .miscText(miscText)
@@ -1607,20 +1613,22 @@ public class EventHistoryMapper {
                                                   .build())
                                 .build());
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
+                LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
+                    ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
                 miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
                 builder.defenceAndCounterClaim(
                     List.of(
                         Event.builder()
                             .eventSequence(prepareEventSequence(builder.build()))
                             .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
-                            .dateReceived(caseData.getRespondent1ResponseDate())
+                            .dateReceived(respondent2ResponseDate)
                             .litigiousPartyID(RESPONDENT2_ID)
                             .build()
                     )
                 ).miscellaneous(Event.builder()
                                     .eventSequence(prepareEventSequence(builder.build()))
                                     .eventCode(MISCELLANEOUS.getCode())
-                                    .dateReceived(caseData.getRespondent1ResponseDate())
+                                    .dateReceived(respondent2ResponseDate)
                                     .eventDetailsText(miscText)
                                     .eventDetails(EventDetails.builder()
                                                       .miscText(miscText)

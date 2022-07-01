@@ -155,9 +155,10 @@ public class PredicateUtilsTest {
             CaseData caseData = CaseData.builder()
                 .respondent2(Party.builder().build())
                 .respondent2SameLegalRepresentative(YES)
+                .respondentResponseIsSame(YES)
                 .respondent1ResponseDate(LocalDateTime.now())
                 .build();
-            Assertions.assertTrue(defendant2ResponseExists.test(caseData));
+            Assertions.assertTrue(defendant1v2SameSolicitorSameResponse.test(caseData));
         }
     }
 }

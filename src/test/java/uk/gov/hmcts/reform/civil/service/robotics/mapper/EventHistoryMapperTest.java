@@ -3725,6 +3725,7 @@ class EventHistoryMapperTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                     .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
+                    .respondentResponseIsSame(YES)
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
@@ -3771,7 +3772,7 @@ class EventHistoryMapperTest {
                     .litigiousPartyID("003")
                     .eventDetailsText(mapper.prepareFullDefenceEventText(
                         caseData.getRespondent2DQ(), caseData,
-                        false, caseData.getRespondent2()))
+                        true, caseData.getRespondent2()))
                     .eventDetails(EventDetails.builder()
                                       .stayClaim(mapper.isStayClaim(caseData.getRespondent2DQ()))
                                       .preferredCourtCode(mapper.getPreferredCourtCode(caseData.getRespondent2DQ()))
@@ -3863,7 +3864,7 @@ class EventHistoryMapperTest {
                 }
                 List<Event> expectedMiscEvents = List.of(
                     Event.builder()
-                        .eventSequence(3)
+                        .eventSequence(1)
                         .eventCode("999")
                         .dateReceived(caseData.getClaimNotificationDate())
                         .eventDetailsText("Claimant has notified defendant.")
@@ -3872,7 +3873,7 @@ class EventHistoryMapperTest {
                                           .build())
                         .build(),
                     Event.builder()
-                        .eventSequence(9)
+                        .eventSequence(7)
                         .eventCode("999")
                         .dateReceived(caseData.getApplicant1ResponseDate())
                         .eventDetailsText(expectedMiscText1)
@@ -3881,7 +3882,7 @@ class EventHistoryMapperTest {
                                           .build())
                         .build(),
                     Event.builder()
-                        .eventSequence(10)
+                        .eventSequence(8)
                         .eventCode("999")
                         .dateReceived(caseData.getApplicant1ResponseDate())
                         .eventDetailsText(expectedMiscText2)
@@ -3905,6 +3906,7 @@ class EventHistoryMapperTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                     .atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2()
+                    .respondentResponseIsSame(YES)
                     .build();
                 if (caseData.getRespondent2OrgRegistered() != null
                     && caseData.getRespondent2Represented() == null) {
