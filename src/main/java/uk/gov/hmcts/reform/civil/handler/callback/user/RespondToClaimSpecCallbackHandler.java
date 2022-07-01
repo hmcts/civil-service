@@ -89,20 +89,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_AD
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.NEED_FINANCIAL_DETAILS_1;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.NEED_FINANCIAL_DETAILS_2;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.REPAYMENT_PLAN_2;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_1_ADMITS_PART_OR_FULL;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_1_PAID_LESS;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_2_ADMITS_PART_OR_FULL;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_2_PAID_LESS;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.SOMEONE_DISPUTES;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.WHEN_WILL_CLAIM_BE_PAID;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.WHY_2_DOES_NOT_PAY_IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.*;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
@@ -313,6 +300,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         currentShowFlags.removeAll(EnumSet.of(
             NEED_FINANCIAL_DETAILS_1,
             NEED_FINANCIAL_DETAILS_2,
+            WHY_1_DOES_NOT_PAY_IMMEDIATELY,
             WHY_2_DOES_NOT_PAY_IMMEDIATELY
         ));
         currentShowFlags.addAll(checkNecessaryFinancialDetails(caseData));
@@ -349,6 +337,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
             }
 
+            if (respondent1doesNotPayImmediately(caseData, scenario)) {
+                necessary.add(WHY_1_DOES_NOT_PAY_IMMEDIATELY);
+            }
+
             if (respondent2doesNotPayImmediately(caseData, scenario)) {
                 necessary.add(WHY_2_DOES_NOT_PAY_IMMEDIATELY);
             }
@@ -361,6 +353,18 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         }
 
         return necessary;
+    }
+
+    private boolean respondent1doesNotPayImmediately(CaseData caseData, MultiPartyScenario scenario) {
+        if (caseData.getRespondentClaimResponseTypeForSpecGeneric() != COUNTER_CLAIM
+            && caseData.getRespondentClaimResponseTypeForSpecGeneric() != FULL_DEFENCE) {
+            if (scenario != ONE_V_TWO_ONE_LEGAL_REP || caseData.getRespondentResponseIsSame() == YES) {
+                return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != IMMEDIATELY
+                    && caseData.getSpecDefenceFullAdmittedRequired() != YES
+                    && caseData.getSpecDefenceAdmittedRequired() != YES;
+            }
+        }
+        return false;
     }
 
     private boolean respondent2doesNotPayImmediately(CaseData caseData, MultiPartyScenario scenario) {
@@ -643,6 +647,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (someoneDisputes(caseData)) {
             updatedShowConditions.add(SOMEONE_DISPUTES);
         }
+        if ((anyAdmission.contains(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && YES.equals(caseData.getIsRespondent1()))
+            || (anyAdmission.contains(caseData.getRespondent2ClaimResponseTypeForSpec())
+            && YES.equals(caseData.getIsRespondent2()))) {
+            updatedShowConditions.add(CURRENT_ADMITS_PART_OR_FULL);
+        }
         updatedData.showConditionFlags(updatedShowConditions);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -723,7 +733,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private boolean someoneDisputes(CaseData caseData, DefendantResponseShowTag respondent,
                                     RespondentResponseTypeSpec response) {
         return caseData.getShowConditionFlags().contains(respondent)
-            && (response == FULL_DEFENCE || response == PART_ADMISSION);
+            && (response == FULL_DEFENCE
+            || (response == PART_ADMISSION && !NO.equals(caseData.getRespondentResponseIsSame())));
     }
 
     private Set<DefendantResponseShowTag> whoDisputesFullDefence(CaseData caseData) {
