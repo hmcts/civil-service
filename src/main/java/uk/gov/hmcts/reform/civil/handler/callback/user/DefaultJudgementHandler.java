@@ -198,15 +198,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT));
 
-        var state = "PROCEEDS_IN_HERITAGE_SYSTEM";
-        if (caseData.getRespondent2() == null || caseData.getRespondent2() != null
-            && caseData.getDefendantDetails().getValue()
-            .getLabel().startsWith("Both")) {
-            state = "JUDICIAL_REFERRAL";
-        }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .state(state)
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
