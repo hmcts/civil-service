@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.genapplication.LocationRefData;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
