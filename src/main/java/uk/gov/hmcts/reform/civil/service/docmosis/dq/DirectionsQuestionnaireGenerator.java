@@ -823,7 +823,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         String role = respondentState ? "defendant" : "claimant";
         String statementOfTruth = role.equals("defendant")
             ? "The defendant believes that the facts stated in the response are true."
-            : "The claimant believes that the facts this claim are true.";
+            : "The claimant believes that the facts in this claim are true.";
         statementOfTruth += String.format("\n\n\nI am duly authorised by the %s to sign this statement.\n\n"
                                               + "The %s understands that proceedings for contempt of court "
                                               + "may be brought against anyone who makes, or causes to be made, "
