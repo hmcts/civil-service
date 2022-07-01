@@ -241,7 +241,11 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
                         TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
                     );
-                assertThat(stateFlow.getFlags()).hasSize(0);
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                );
             }
 
             // 1v2
@@ -265,7 +269,11 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
                         TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
                     );
-                assertThat(stateFlow.getFlags()).hasSize(0);
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                );
             }
 
             // Unrepresented
@@ -288,7 +296,11 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
                         TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
                     );
-                assertThat(stateFlow.getFlags()).hasSize(0);
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                );
             }
 
             // Unrepresented
@@ -311,7 +323,11 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
                         TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
                     );
-                assertThat(stateFlow.getFlags()).hasSize(0);
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                );
             }
         }
 
@@ -532,7 +548,11 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT.fullName(),
                         TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
                     );
-                assertThat(stateFlow.getFlags()).hasSize(0);
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                );
             }
 
             // Unregistered
@@ -621,7 +641,11 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName(),
                         TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName()
                     );
-                assertThat(stateFlow.getFlags()).hasSize(0);
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                );
             }
 
             // Unrepresented and Unregistered
@@ -651,8 +675,7 @@ class StateFlowEngineTest {
                         TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
-                assertThat(stateFlow.getFlags()).hasSize(4).contains(
-                    entry("ONE_RESPONDENT_REPRESENTATIVE", true),
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
                     entry("RPA_CONTINUOUS_FEED", true),
                     entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                     entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)

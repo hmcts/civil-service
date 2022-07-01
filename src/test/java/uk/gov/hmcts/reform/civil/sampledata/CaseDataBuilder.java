@@ -1030,6 +1030,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendant1UnrepresentedDefendant2() {
         respondent2 = PartyBuilder.builder().individual().build();
         atStatePendingClaimIssuedUnrepresentedDefendant();
+        addRespondent2 = YES;
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1Represented = YES;
