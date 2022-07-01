@@ -1124,7 +1124,8 @@ public class EventHistoryMapper {
                     buildDefenceFiledEvent(
                         builder,
                         respondent1ResponseDate,
-                        RESPONDENT2_ID
+                        RESPONDENT2_ID,
+                        isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim2())
                     ));
                 directionsQuestionnaireFiledEvents.add(
                     buildDirectionsQuestionnaireFiledEvent(builder, caseData,
