@@ -7,40 +7,24 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
-    DefaultJudgmentOrderFormGenerator.class,
     StandardDirectionOrderDJ.class,
     JacksonAutoConfiguration.class
 })
@@ -51,10 +35,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
     private StandardDirectionOrderDJ handler;
-    @MockBean
-    private DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
-    @MockBean
-    private LocationRefDataService locationRefDataService;
 
     @Nested
     class AboutToStartCallback {
@@ -108,12 +88,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPrePopulateDJDisposalAndTrialHearingPage() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .atStateClaimIssuedDisposalHearing().build();
-            List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().courtName("Court Name").region("Region").build());
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -382,69 +358,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("trialRoadTrafficAccident").extracting("input")
                 .isEqualTo("Photographs and/or a plan of the location of the accident shall be prepared and "
                                + "agreed by the parties.");
-        }
 
-        @Test
-        void shouldPrePopulateDJTrialHearingToggle() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .atStateClaimIssuedTrialHearing().build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("trialHearingVariationsDirectionsDJToggle").isNotNull();
-        }
-    }
-
-    @Nested
-    class MidEventCreateOrderCallback {
-        private static final String PAGE_ID = "create-order";
-
-        @Test
-        void shouldCreateAndSaveSDOOrder() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            CaseDocument order = CaseDocument.builder().documentLink(
-                Document.builder().documentUrl("url").build())
-                .build();
-            when(defaultJudgmentOrderFormGenerator.generate(any(), any())).thenReturn(order);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
-        }
-    }
-
-    @Nested
-    class AboutToSubmitCallback {
-        @Test
-        void shouldFinishBusinessProcess() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("businessProcess").isNotNull();
-        }
-    }
-
-    @Nested
-    class SubmittedCallback {
-        @Test
-        void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked1v1() {
-            String body = "The directions order has been sent to: %n%n ## Claimant 1 %n%n Mr. John Rambo%n%n "
-                + "## Defendant 1 %n%n Mr. Sole Trader";
-            String header = "# Your order has been issued %n%n ## Claim number %n%n # 000DC001";
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment().build().toBuilder()
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-            assertThat(response).usingRecursiveComparison().isEqualTo(
-                SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format(header))
-                    .confirmationBody(format(body))
-                    .build());
         }
     }
 }
-
