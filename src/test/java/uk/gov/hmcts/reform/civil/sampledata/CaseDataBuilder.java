@@ -105,7 +105,7 @@ public class CaseDataBuilder {
     public static final LocalDate CLAIM_ISSUED_DATE = now();
     public static final LocalDateTime DEADLINE = LocalDate.now().atStartOfDay().plusDays(14);
     public static final LocalDate PAST_DATE = now().minusDays(1);
-    public static final LocalDateTime NOTIFICATION_DEADLINE = LocalDate.now().atStartOfDay().plusDays(1);
+    public static final LocalDateTime NOTIFICATION_DEADLINE = LocalDate.now().atStartOfDay().plusDays(14);
     public static final BigDecimal FAST_TRACK_CLAIM_AMOUNT = BigDecimal.valueOf(10000);
     public static final LocalDate FUTURE_DATE = LocalDate.now().plusYears(1);
 
@@ -260,6 +260,7 @@ public class CaseDataBuilder {
 
     private String respondent1OrganisationIDCopy;
     private String respondent2OrganisationIDCopy;
+    private LocalDateTime addLegalRepDeadline;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -708,6 +709,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addLegalRepDeadline(LocalDateTime date) {
+        this.addLegalRepDeadline = date;
+        return this;
+    }
+
     public CaseDataBuilder takenOfflineByStaffDate(LocalDateTime takenOfflineByStaffDate) {
         this.takenOfflineByStaffDate = takenOfflineByStaffDate;
         return this;
@@ -805,7 +811,7 @@ public class CaseDataBuilder {
             case FULL_DEFENCE_NOT_PROCEED:
                 return atStateApplicantRespondToDefenceAndNotProceed();
             case TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT:
-                return atStateProceedsOfflineUnrepresentedDefendants();
+                return atStateClaimIssuedUnrepresentedDefendants();
             case TAKEN_OFFLINE_UNREGISTERED_DEFENDANT:
                 return atStateProceedsOfflineUnregisteredDefendants();
             case TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT:
@@ -854,7 +860,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendants() {
+    public CaseDataBuilder atStateClaimIssuedUnrepresentedDefendants() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
         respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
@@ -862,19 +868,22 @@ public class CaseDataBuilder {
         respondent1OrganisationPolicy = null;
         respondent2OrganisationPolicy = null;
         respondentSolicitor1OrganisationDetails = null;
+        addRespondent2 = YES;
         return this;
     }
 
-    public CaseDataBuilder atStateProceedsOffline1v1UnrepresentedDefendant() {
-        atStateProceedsOfflineUnrepresentedDefendants();
+    public CaseDataBuilder atStateClaimIssued1v1UnrepresentedDefendant() {
+        atStateClaimIssuedUnrepresentedDefendants();
         addRespondent2 = NO;
         respondent2 = null;
         respondent2Represented = null;
+        respondent2OrganisationPolicy = null;
         return this;
     }
 
-    public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant1() {
+    public CaseDataBuilder atStateClaimIssuedUnrepresentedDefendant1() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
+        addRespondent2 = YES;
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondentSolicitor1OrganisationDetails = null;
@@ -888,8 +897,9 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant2() {
+    public CaseDataBuilder atStateClaimIssuedUnrepresentedDefendant2() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
+        addRespondent2 = YES;
         respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
@@ -906,6 +916,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendants() {
         atStatePendingClaimIssuedUnregisteredDefendant();
+        addRespondent2 = YES;
         respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
@@ -988,6 +999,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
+        addRespondent2 = YES;
         respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
@@ -1739,6 +1751,13 @@ public class CaseDataBuilder {
         respondent2ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateApplicantRespondToDefenceAndNotProceed_1v2_DiffSol() {
+        atStateApplicantRespondToDefenceAndNotProceed_1v2();
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
         return this;
     }
 
@@ -2755,6 +2774,7 @@ public class CaseDataBuilder {
             .takenOfflineDate(takenOfflineDate)
             .takenOfflineByStaffDate(takenOfflineByStaffDate)
             .claimDismissedDate(claimDismissedDate)
+            .addLegalRepDeadline(addLegalRepDeadline)
             .applicantSolicitor1ServiceAddress(applicantSolicitor1ServiceAddress)
             .respondentSolicitor1ServiceAddress(respondentSolicitor1ServiceAddress)
             .respondentSolicitor2ServiceAddress(respondentSolicitor2ServiceAddress)

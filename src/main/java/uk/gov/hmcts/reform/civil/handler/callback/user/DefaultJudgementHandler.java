@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
@@ -214,13 +215,9 @@ public class DefaultJudgementHandler extends CallbackHandler {
             errors.add(format(NOT_VALID_DJ, formattedDeadline));
         }
         List<String> listData = new ArrayList<>();
-        listData.add(caseData.getRespondent1().getIndividualFirstName()
-                         + " "
-                         + caseData.getRespondent1().getIndividualLastName());
+        listData.add(getPartyNameBasedOnType(caseData.getRespondent1()));
         if (nonNull(caseData.getRespondent2())) {
-            listData.add(caseData.getRespondent2().getIndividualFirstName()
-                             + " "
-                             + caseData.getRespondent2().getIndividualLastName());
+            listData.add(getPartyNameBasedOnType(caseData.getRespondent2()));
             listData.add("Both Defendants");
             caseDataBuilder.defendantDetails(DynamicList.fromList(listData));
         }

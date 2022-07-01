@@ -63,7 +63,6 @@ import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 @Jacksonized
 @EqualsAndHashCode(callSuper = true)
 @Data
-@SuppressWarnings("unchecked")
 public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -226,6 +225,24 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final ResponseDocument respondent1SpecDefenceResponseDocument;
 
+    public RespondentResponseTypeSpec getRespondent1ClaimResponseTypeForSpec() {
+
+        if (respondent1ClaimResponseTypeForSpec == null) {
+            return getRespondent1ClaimResponseTestForSpec();
+        } else {
+            return respondent1ClaimResponseTypeForSpec;
+        }
+    }
+
+    public RespondentResponseTypeSpec getRespondent2ClaimResponseTypeForSpec() {
+
+        if (respondent2ClaimResponseTypeForSpec == null) {
+            return getRespondent2ClaimResponseTestForSpec();
+        } else {
+            return respondent2ClaimResponseTypeForSpec;
+        }
+    }
+
     private final RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
     private final RespondentResponseTypeSpec respondent2ClaimResponseTypeForSpec;
     private final RespondentResponseTypeSpec claimant1ClaimResponseTypeForSpec;
@@ -325,6 +342,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo claimantResponseDocumentToDefendant2Flag;
     private YesOrNo claimant2ResponseFlag;
     private RespondentResponseTypeSpec atLeastOneClaimResponseTypeForSpecIsFullDefence;
+    // used only in 2v1
     private YesOrNo specFullAdmissionOrPartAdmission;
     private YesOrNo sameSolicitorSameResponse;
     private YesOrNo specPaidLessAmountOrDisputesOrPartAdmission;
@@ -405,4 +423,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonUnwrapped(suffix = "Breathing")
     private final BreathingSpaceInfo breathing;
+
+
 }
