@@ -1606,7 +1606,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                      .camundaEvent("CLAIMANT_RESPONSE").build())
                 .build();
 
-            String statementOfTruth = "The claimant believes that the facts this claim are true."
+            String statementOfTruth = "The claimant believes that the facts in this claim are true."
                 + "\n\n\nI am duly authorised by the claimant to sign this statement.\n\n"
                 + "The claimant understands that proceedings for contempt of court "
                 + "may be brought against anyone who makes, or causes to be made, "
