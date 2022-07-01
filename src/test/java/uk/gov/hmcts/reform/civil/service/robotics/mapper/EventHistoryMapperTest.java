@@ -2220,7 +2220,7 @@ class EventHistoryMapperTest {
                     .eventDetailsText(mapper.prepareFullDefenceEventText(
                         caseData.getRespondent2DQ(),
                         caseData,
-                        false,
+                        true,
                         caseData.getRespondent2()
                     ))
                     .eventDetails(EventDetails.builder()

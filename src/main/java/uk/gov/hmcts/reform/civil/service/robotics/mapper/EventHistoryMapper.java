@@ -68,6 +68,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseTypeForRespo
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1AckExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ExtensionExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1ResponseExists;
+import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant1v2SameSolicitorSameResponse;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2AckExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ExtensionExists;
 import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseExists;
@@ -960,6 +961,26 @@ public class EventHistoryMapper {
                                                        respondent1,
                                                        isRespondent1
                 ));
+            if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
+                Party respondent2 = caseData.getRespondent2();
+                Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
+                LocalDateTime respondent2ResponseDate = caseData.getRespondent1ResponseDate();
+
+                defenceFiledEvents.add(
+                    buildDefenceFiledEvent(
+                        builder,
+                        respondent1ResponseDate,
+                        RESPONDENT2_ID
+                    ));
+                directionsQuestionnaireFiledEvents.add(
+                    buildDirectionsQuestionnaireFiledEvent(builder, caseData,
+                                                           respondent2ResponseDate,
+                                                           RESPONDENT2_ID,
+                                                           respondent2DQ,
+                                                           respondent2,
+                                                           isRespondent1
+                    ));
+            }
         }
         if (defendant2ResponseExists.test(caseData)) {
             isRespondent1 = false;
@@ -1307,6 +1328,25 @@ public class EventHistoryMapper {
                                                   .miscText(miscText)
                                                   .build())
                                 .build());
+
+            if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
+                miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
+                builder.receiptOfAdmission(Event.builder()
+                                               .eventSequence(prepareEventSequence(builder.build()))
+                                               .eventCode(RECEIPT_OF_ADMISSION.getCode())
+                                               .dateReceived(caseData.getRespondent1ResponseDate())
+                                               .litigiousPartyID(RESPONDENT2_ID)
+                                               .build()
+                ).miscellaneous(Event.builder()
+                                    .eventSequence(prepareEventSequence(builder.build()))
+                                    .eventCode(MISCELLANEOUS.getCode())
+                                    .dateReceived(caseData.getRespondent1ResponseDate())
+                                    .eventDetailsText(miscText)
+                                    .eventDetails(EventDetails.builder()
+                                                      .miscText(miscText)
+                                                      .build())
+                                    .build());
+            }
         }
         if (defendant2ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
@@ -1348,6 +1388,25 @@ public class EventHistoryMapper {
                                                   .miscText(miscText)
                                                   .build())
                                 .build());
+            if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
+                miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
+                builder.receiptOfPartAdmission(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
+                        .dateReceived(caseData.getRespondent1ResponseDate())
+                        .litigiousPartyID(RESPONDENT2_ID)
+                        .build()
+                ).miscellaneous(Event.builder()
+                                    .eventSequence(prepareEventSequence(builder.build()))
+                                    .eventCode(MISCELLANEOUS.getCode())
+                                    .dateReceived(caseData.getRespondent1ResponseDate())
+                                    .eventDetailsText(miscText)
+                                    .eventDetails(EventDetails.builder()
+                                                      .miscText(miscText)
+                                                      .build())
+                                    .build());
+            }
         }
         if (defendant2ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
@@ -1390,6 +1449,27 @@ public class EventHistoryMapper {
                                                   .miscText(miscText)
                                                   .build())
                                 .build());
+            if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
+                miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
+                builder.defenceAndCounterClaim(
+                    List.of(
+                        Event.builder()
+                            .eventSequence(prepareEventSequence(builder.build()))
+                            .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
+                            .dateReceived(caseData.getRespondent1ResponseDate())
+                            .litigiousPartyID(RESPONDENT2_ID)
+                            .build()
+                    )
+                ).miscellaneous(Event.builder()
+                                    .eventSequence(prepareEventSequence(builder.build()))
+                                    .eventCode(MISCELLANEOUS.getCode())
+                                    .dateReceived(caseData.getRespondent1ResponseDate())
+                                    .eventDetailsText(miscText)
+                                    .eventDetails(EventDetails.builder()
+                                                      .miscText(miscText)
+                                                      .build())
+                                    .build());
+            }
         }
         if (defendant2ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
