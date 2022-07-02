@@ -2451,7 +2451,7 @@ class EventHistoryMapperTest {
                 .totalClaimAmount(BigDecimal.valueOf(1200))
                 .build().toBuilder()
                 .respondToClaim(RespondToClaim.builder()
-                                    .howMuchWasPaid(BigDecimal.valueOf(1200))
+                                    .howMuchWasPaid(BigDecimal.valueOf(120000))
                                     .build())
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
