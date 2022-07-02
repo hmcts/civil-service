@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.math.BigDecimal;
@@ -531,7 +532,7 @@ public class EventHistoryMapper {
     private boolean isAllPaid(BigDecimal totalClaimAmount, RespondToClaim claimResponse) {
         return totalClaimAmount != null
             && Optional.ofNullable(claimResponse).map(RespondToClaim::getHowMuchWasPaid)
-            .map(paid -> paid.compareTo(totalClaimAmount) >= 0).orElse(false);
+            .map(paid -> MonetaryConversions.penniesToPounds(paid).compareTo(totalClaimAmount) >= 0).orElse(false);
     }
 
     private void buildDefenceAndCounterClaim(EventHistory.EventHistoryBuilder builder,
