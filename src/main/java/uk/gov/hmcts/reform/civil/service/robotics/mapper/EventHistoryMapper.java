@@ -496,18 +496,31 @@ public class EventHistoryMapper {
                                    LocalDateTime respondentResponseDate,
                                    String respondentID) {
         if (respondentID.equals(RESPONDENT_ID)) {
-            builder.defenceFiled(buildDefenceFiledEvent(
-                builder, respondentResponseDate, respondentID,
-                isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())
-            ));
+            if (isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())) {
+                builder.statesPaid(buildDefenceFiledEvent(
+                    builder, respondentResponseDate, respondentID,
+                    isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())
+                ));
+            } else {
+                builder.defenceFiled(buildDefenceFiledEvent(
+                    builder, respondentResponseDate, respondentID,
+                    false
+                ));
+            }
             builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
                 builder, caseData, respondentResponseDate, respondentID,
                 caseData.getRespondent1DQ(), caseData.getRespondent1(), true
             ));
         } else {
-            builder.defenceFiled(buildDefenceFiledEvent(
-                builder, respondentResponseDate, respondentID,
-                isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim2())));
+            if (isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())) {
+                builder.statesPaid(buildDefenceFiledEvent(
+                    builder, respondentResponseDate, respondentID,
+                    isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim2())));
+            } else {
+                builder.defenceFiled(buildDefenceFiledEvent(
+                    builder, respondentResponseDate, respondentID,
+                    false));
+            }
             builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
                 builder, caseData, respondentResponseDate, respondentID,
                 caseData.getRespondent2DQ(), caseData.getRespondent2(), false
@@ -838,6 +851,7 @@ public class EventHistoryMapper {
         currentSequence = getCurrentSequence(history.getBreathingSpaceMentalHealthEntered(), currentSequence);
         currentSequence = getCurrentSequence(history.getBreathingSpaceMentalHealthLifted(), currentSequence);
         currentSequence = getCurrentSequence(history.getDirectionsQuestionnaireFiled(), currentSequence);
+        currentSequence = getCurrentSequence(history.getStatesPaid(), currentSequence);
         return currentSequence + 1;
     }
 
@@ -1093,6 +1107,7 @@ public class EventHistoryMapper {
 
     private void buildRespondentFullDefence(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         List<Event> defenceFiledEvents = new ArrayList<>();
+        List<Event> statesPaidEvents = new ArrayList<>();
         List<Event> directionsQuestionnaireFiledEvents = new ArrayList<>();
         boolean isRespondent1;
         if (defendant1ResponseExists.test(caseData)) {
@@ -1101,13 +1116,22 @@ public class EventHistoryMapper {
             Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
             LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
 
-            defenceFiledEvents.add(
-                buildDefenceFiledEvent(
+            if (isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())) {
+                statesPaidEvents.add(buildDefenceFiledEvent(
                     builder,
                     respondent1ResponseDate,
                     RESPONDENT_ID,
-                    isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())
+                    true
                 ));
+            } else {
+                defenceFiledEvents.add(
+                    buildDefenceFiledEvent(
+                        builder,
+                        respondent1ResponseDate,
+                        RESPONDENT_ID,
+                        false
+                    ));
+            }
             directionsQuestionnaireFiledEvents.add(
                 buildDirectionsQuestionnaireFiledEvent(builder, caseData,
                                                        respondent1ResponseDate,
@@ -1122,12 +1146,20 @@ public class EventHistoryMapper {
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
 
+                if (isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim2())) {
+                    statesPaidEvents.add(buildDefenceFiledEvent(
+                        builder,
+                        respondent1ResponseDate,
+                        RESPONDENT2_ID,
+                        true
+                    ));
+                }
                 defenceFiledEvents.add(
                     buildDefenceFiledEvent(
                         builder,
                         respondent2ResponseDate,
                         RESPONDENT2_ID,
-                        isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim2())
+                        false
                     ));
                 directionsQuestionnaireFiledEvents.add(
                     buildDirectionsQuestionnaireFiledEvent(builder, caseData,
@@ -1145,13 +1177,23 @@ public class EventHistoryMapper {
             Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
             LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
 
-            defenceFiledEvents.add(
-                buildDefenceFiledEvent(
-                    builder,
-                    respondent2ResponseDate,
-                    RESPONDENT2_ID,
-                    isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim2())
-                ));
+            if (isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim2())) {
+                statesPaidEvents.add(
+                    buildDefenceFiledEvent(
+                        builder,
+                        respondent2ResponseDate,
+                        RESPONDENT2_ID,
+                        true
+                    ));
+            } else {
+                defenceFiledEvents.add(
+                    buildDefenceFiledEvent(
+                        builder,
+                        respondent2ResponseDate,
+                        RESPONDENT2_ID,
+                        false
+                    ));
+            }
             directionsQuestionnaireFiledEvents.add(
                 buildDirectionsQuestionnaireFiledEvent(builder, caseData,
                                                        respondent2ResponseDate,
@@ -1162,6 +1204,7 @@ public class EventHistoryMapper {
                 ));
         }
         builder.defenceFiled(defenceFiledEvents);
+        builder.statesPaid(statesPaidEvents);
         builder.clearDirectionsQuestionnaireFiled().directionsQuestionnaireFiled(directionsQuestionnaireFiledEvents);
     }
 
