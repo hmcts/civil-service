@@ -2498,7 +2498,7 @@ class EventHistoryMapperTest {
             var eventHistory = mapper.buildEvents(caseData);
 
             assertThat(eventHistory).isNotNull();
-            assertThat(eventHistory).extracting("defenceFiled").asList()
+            assertThat(eventHistory).extracting("statesPaid").asList()
                 .containsExactly(expectedDefenceFiled);
             assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
                 .containsExactly(expectedDirectionsQuestionnaireFiled);

@@ -56,8 +56,10 @@ public class EventHistorySequencer {
                     builder.consentExtensionFilingDefence(event);
                     break;
                 case DEFENCE_FILED:
-                case STATES_PAID:
                     builder.defenceFiled(List.of(event));
+                    break;
+                case STATES_PAID:
+                    builder.statesPaid(List.of(event));
                     break;
                 case DEFENCE_AND_COUNTER_CLAIM:
                     builder.defenceAndCounterClaim(List.of(event));
@@ -95,6 +97,9 @@ public class EventHistorySequencer {
         }
         if (isEmpty(builder.build().getDefenceFiled())) {
             builder.defenceFiled(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getStatesPaid())) {
+            builder.statesPaid(List.of(Event.builder().build()));
         }
         if (isEmpty(builder.build().getReceiptOfAdmission())) {
             builder.receiptOfAdmission(List.of(Event.builder().build()));
@@ -151,12 +156,12 @@ public class EventHistorySequencer {
             eventHistory.getReceiptOfPartAdmission(),
             eventHistory.getReceiptOfAdmission(),
             eventHistory.getReplyToDefence(),
+            eventHistory.getStatesPaid(),
             eventHistory.getDirectionsQuestionnaireFiled(),
             eventHistory.getBreathingSpaceEntered(),
             eventHistory.getBreathingSpaceLifted(),
             eventHistory.getBreathingSpaceMentalHealthEntered(),
             eventHistory.getBreathingSpaceMentalHealthLifted()
-
         );
         return eventsList.stream()
             .filter(Objects::nonNull)
