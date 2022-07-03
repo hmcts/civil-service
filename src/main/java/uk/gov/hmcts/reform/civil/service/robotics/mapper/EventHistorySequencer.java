@@ -156,12 +156,12 @@ public class EventHistorySequencer {
             eventHistory.getReceiptOfPartAdmission(),
             eventHistory.getReceiptOfAdmission(),
             eventHistory.getReplyToDefence(),
+            eventHistory.getStatesPaid(),
             eventHistory.getDirectionsQuestionnaireFiled(),
             eventHistory.getBreathingSpaceEntered(),
             eventHistory.getBreathingSpaceLifted(),
             eventHistory.getBreathingSpaceMentalHealthEntered(),
-            eventHistory.getBreathingSpaceMentalHealthLifted(),
-            eventHistory.getStatesPaid()
+            eventHistory.getBreathingSpaceMentalHealthLifted()
         );
         return eventsList.stream()
             .filter(Objects::nonNull)
