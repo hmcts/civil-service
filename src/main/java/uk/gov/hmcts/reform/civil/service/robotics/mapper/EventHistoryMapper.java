@@ -851,8 +851,8 @@ public class EventHistoryMapper {
         currentSequence = getCurrentSequence(history.getBreathingSpaceLifted(), currentSequence);
         currentSequence = getCurrentSequence(history.getBreathingSpaceMentalHealthEntered(), currentSequence);
         currentSequence = getCurrentSequence(history.getBreathingSpaceMentalHealthLifted(), currentSequence);
-        currentSequence = getCurrentSequence(history.getDirectionsQuestionnaireFiled(), currentSequence);
         currentSequence = getCurrentSequence(history.getStatesPaid(), currentSequence);
+        currentSequence = getCurrentSequence(history.getDirectionsQuestionnaireFiled(), currentSequence);
         return currentSequence + 1;
     }
 
