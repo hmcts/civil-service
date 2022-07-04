@@ -25,7 +25,11 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -82,7 +86,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-            caseDataBuilder
+        caseDataBuilder
                 .generalAppHearingDetails(
                     GAHearingDetails
                         .builder()
@@ -160,13 +164,16 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             CaseData newCaseData = caseData.toBuilder().generalAppPBADetails(generalAppPBADetails).build();
             caseData = newCaseData;
         }
-        if(caseData.getGeneralAppHearingDetails().getHearingPreferredLocation().getValue().getLabel()!=null){
-            List<String> applicationLocationList = List.of(caseData.getGeneralAppHearingDetails().getHearingPreferredLocation().getValue().getLabel());
+        if (caseData.getGeneralAppHearingDetails().getHearingPreferredLocation().getValue().getLabel() != null) {
+            List<String> applicationLocationList = List.of(caseData.getGeneralAppHearingDetails()
+                                                               .getHearingPreferredLocation()
+                                                               .getValue().getLabel());
             DynamicList dynamicLocationList = fromList(applicationLocationList);
             Optional<DynamicListElement> first = dynamicLocationList.getListItems().stream()
                 .filter(l -> l.getLabel().equals(applicationLocationList.get(0))).findFirst();
             first.ifPresent(dynamicLocationList::setValue);
-            GAHearingDetails generalAppHearingDetails = caseData.getGeneralAppHearingDetails().toBuilder().hearingPreferredLocation(dynamicLocationList).build();
+            GAHearingDetails generalAppHearingDetails = caseData.getGeneralAppHearingDetails().toBuilder()
+                                                                .hearingPreferredLocation(dynamicLocationList).build();
             CaseData updatedCaseData = caseData.toBuilder().generalAppHearingDetails(generalAppHearingDetails).build();
             caseData = updatedCaseData;
         }

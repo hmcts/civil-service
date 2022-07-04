@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
@@ -24,6 +25,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 import static java.time.LocalDate.EPOCH;
 import static java.util.Collections.singletonList;
@@ -34,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OT
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SuppressWarnings("unchecked")
@@ -111,7 +115,7 @@ public class GeneralApplicationDetailsBuilder {
                                 .unavailableTrialDateFrom(APP_DATE_EPOCH)
                                 .unavailableTrialDateTo(APP_DATE_EPOCH).build()))
                         .supportRequirementOther(STRING_CONSTANT)
-                        .hearingPreferredLocation(DynamicList.builder().build())
+                        .hearingPreferredLocation(getPreferredLoc())
                         .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
                         .reasonForPreferredHearingType(STRING_CONSTANT)
                         .telephoneHearingPreferredType(STRING_CONSTANT)
@@ -178,7 +182,7 @@ public class GeneralApplicationDetailsBuilder {
                                 .unavailableTrialDateFrom(APP_DATE_EPOCH)
                                 .unavailableTrialDateTo(APP_DATE_EPOCH).build()))
                         .supportRequirementOther(STRING_CONSTANT)
-                        .hearingPreferredLocation(DynamicList.builder().build())
+                        .hearingPreferredLocation(getPreferredLoc())
                         .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
                         .reasonForPreferredHearingType(STRING_CONSTANT)
                         .telephoneHearingPreferredType(STRING_CONSTANT)
@@ -192,6 +196,7 @@ public class GeneralApplicationDetailsBuilder {
     }
 
     public CaseData getTestCaseData(CaseData caseData) {
+
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
             .generalAppType(GAApplicationType.builder()
@@ -255,7 +260,7 @@ public class GeneralApplicationDetailsBuilder {
                                 .unavailableTrialDateTo(APP_DATE_EPOCH)
                                 .unavailableTrialDateFrom(APP_DATE_EPOCH).build()))
                         .supportRequirementOther(STRING_CONSTANT)
-                        .hearingPreferredLocation(DynamicList.builder().build())
+                        .hearingPreferredLocation(getPreferredLoc())
                         .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
                         .reasonForPreferredHearingType(STRING_CONSTANT)
                         .telephoneHearingPreferredType(STRING_CONSTANT)
@@ -341,7 +346,7 @@ public class GeneralApplicationDetailsBuilder {
                                 .unavailableTrialDateFrom(APP_DATE_EPOCH)
                                 .unavailableTrialDateTo(APP_DATE_EPOCH).build()))
                         .supportRequirementOther(STRING_CONSTANT)
-                        .hearingPreferredLocation(DynamicList.builder().build())
+                        .hearingPreferredLocation(getPreferredLoc())
                         .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
                         .reasonForPreferredHearingType(STRING_CONSTANT)
                         .telephoneHearingPreferredType(STRING_CONSTANT)
@@ -410,7 +415,7 @@ public class GeneralApplicationDetailsBuilder {
                                 .unavailableTrialDateFrom(APP_DATE_EPOCH)
                                 .unavailableTrialDateTo(APP_DATE_EPOCH).build()))
                         .supportRequirementOther(STRING_CONSTANT)
-                        .hearingPreferredLocation(DynamicList.builder().build())
+                        .hearingPreferredLocation(getPreferredLoc())
                         .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
                         .reasonForPreferredHearingType(STRING_CONSTANT)
                         .telephoneHearingPreferredType(STRING_CONSTANT)
@@ -491,7 +496,7 @@ public class GeneralApplicationDetailsBuilder {
                                 .unavailableTrialDateTo(APP_DATE_EPOCH)
                                 .unavailableTrialDateFrom(APP_DATE_EPOCH).build()))
                         .supportRequirementOther(STRING_CONSTANT)
-                        .hearingPreferredLocation(DynamicList.builder().build())
+                        .hearingPreferredLocation(getPreferredLoc())
                         .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
                         .reasonForPreferredHearingType(STRING_CONSTANT)
                         .telephoneHearingPreferredType(STRING_CONSTANT)
@@ -576,7 +581,7 @@ public class GeneralApplicationDetailsBuilder {
                                 .unavailableTrialDateFrom(APP_DATE_EPOCH)
                                 .unavailableTrialDateTo(APP_DATE_EPOCH).build()))
                         .supportRequirementOther(STRING_CONSTANT)
-                        .hearingPreferredLocation(DynamicList.builder().build())
+                        .hearingPreferredLocation(getPreferredLoc())
                         .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
                         .reasonForPreferredHearingType(STRING_CONSTANT)
                         .telephoneHearingPreferredType(STRING_CONSTANT)
@@ -586,6 +591,16 @@ public class GeneralApplicationDetailsBuilder {
                         .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                         .build())
                 .build();
+    }
+
+    public DynamicList getPreferredLoc() {
+        DynamicList dynamicList = fromList(List.of("ABCD - RG0 0AL",
+                                                   "PQRS - GU0 0EE",
+                                                   "WXYZ - EW0 0HE",
+                                                   "LMNO - NE0 0BH"));
+        Optional<DynamicListElement> first = dynamicList.getListItems().stream().findFirst();
+        first.ifPresent(dynamicList::setValue);
+        return dynamicList;
     }
 
 }
