@@ -396,7 +396,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             && caseData.getRespondentClaimResponseTypeForSpecGeneric() != FULL_DEFENCE
             && caseData.getRespondentClaimResponseTypeForSpecGeneric() != RespondentResponseTypeSpec.COUNTER_CLAIM
             && caseData.getMultiPartyResponseTypeFlags() != MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART
-            && caseData.getSameSolicitorSameResponse() != NO
+            && (caseData.getSameSolicitorSameResponse() != NO
+            || MultiPartyScenario.getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP)
             && caseData.getDefendantSingleResponseToBothClaimants() != NO;
     }
 
