@@ -1956,7 +1956,15 @@ public class CaseDataBuilder {
         respondent2Responds(respondent2Response);
         respondent1ResponseDate = LocalDateTime.now().plusDays(1);
         respondentResponseIsSame(NO);
-        respondent2ResponseDate = respondent1ResponseDate;
+        if (superClaimType != SPEC_CLAIM) {
+            // at least in spec claims, respondent2 response date is null by front-end
+            respondent2ResponseDate = respondent1ResponseDate;
+        } else {
+            respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec
+                .valueOf(respondent1Response.name());
+            respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec
+                .valueOf(respondent2ClaimResponseType.name());
+        }
         return this;
     }
 

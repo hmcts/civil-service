@@ -323,7 +323,8 @@ public class EventHistoryMapper {
 
     private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
-        LocalDateTime respondent2ResponseDate = caseData.getRespondent2ResponseDate();
+        LocalDateTime respondent2ResponseDate = ONE_V_TWO_ONE_LEGAL_REP == MultiPartyScenario.getMultiPartyScenario(caseData) ?
+            caseData.getRespondent1ResponseDate() : caseData.getRespondent2ResponseDate();
         String miscText;
 
         if (defendant1ResponseExists.test(caseData)) {
