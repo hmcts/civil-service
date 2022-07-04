@@ -323,8 +323,13 @@ public class EventHistoryMapper {
 
     private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
-        LocalDateTime respondent2ResponseDate = ONE_V_TWO_ONE_LEGAL_REP == MultiPartyScenario.getMultiPartyScenario(caseData) ?
-            caseData.getRespondent1ResponseDate() : caseData.getRespondent2ResponseDate();
+        LocalDateTime respondent2ResponseDate;
+        if (ONE_V_TWO_ONE_LEGAL_REP == MultiPartyScenario.getMultiPartyScenario(caseData)) {
+            // even if response is not the same, the date is
+            respondent2ResponseDate = caseData.getRespondent1ResponseDate();
+        } else {
+            respondent2ResponseDate = caseData.getRespondent2ResponseDate();
+        }
         String miscText;
 
         if (defendant1ResponseExists.test(caseData)) {
@@ -498,10 +503,11 @@ public class EventHistoryMapper {
                                    LocalDateTime respondentResponseDate,
                                    String respondentID) {
         if (respondentID.equals(RESPONDENT_ID)) {
-            if (isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())) {
+            RespondToClaim respondToClaim = caseData.getRespondToClaim();
+            if (isAllPaid(caseData.getTotalClaimAmount(), respondToClaim)) {
                 builder.statesPaid(buildDefenceFiledEvent(
                     builder, respondentResponseDate, respondentID,
-                    isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())
+                    isAllPaid(caseData.getTotalClaimAmount(), respondToClaim)
                 ));
             } else {
                 builder.defenceFiled(buildDefenceFiledEvent(
@@ -514,14 +520,23 @@ public class EventHistoryMapper {
                 caseData.getRespondent1DQ(), caseData.getRespondent1(), true
             ));
         } else {
-            if (isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())) {
+            RespondToClaim respondToClaim;
+            if (ONE_V_TWO_ONE_LEGAL_REP.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
+                && caseData.getSameSolicitorSameResponse() == YES) {
+                respondToClaim = caseData.getRespondToClaim();
+            } else {
+                respondToClaim = caseData.getRespondToClaim2();
+            }
+            if (isAllPaid(caseData.getTotalClaimAmount(), respondToClaim)) {
                 builder.statesPaid(buildDefenceFiledEvent(
                     builder, respondentResponseDate, respondentID,
-                    isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim2())));
+                    isAllPaid(caseData.getTotalClaimAmount(), respondToClaim)
+                ));
             } else {
                 builder.defenceFiled(buildDefenceFiledEvent(
                     builder, respondentResponseDate, respondentID,
-                    false));
+                    false
+                ));
             }
             builder.directionsQuestionnaire(buildDirectionsQuestionnaireFiledEvent(
                 builder, caseData, respondentResponseDate, respondentID,
@@ -1148,7 +1163,7 @@ public class EventHistoryMapper {
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
 
-                if (isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim2())) {
+                if (isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())) {
                     statesPaidEvents.add(buildDefenceFiledEvent(
                         builder,
                         respondent1ResponseDate,
