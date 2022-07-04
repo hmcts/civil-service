@@ -779,8 +779,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             return (caseData.getClaimant1ClaimResponseTypeForSpec() == FULL_DEFENCE
                 || caseData.getClaimant2ClaimResponseTypeForSpec() == FULL_DEFENCE);
         } else {
-            return someoneDisputes(caseData, CAN_ANSWER_RESPONDENT_1, caseData.getRespondent1ClaimResponseTypeForSpec())
-                || someoneDisputes(caseData, CAN_ANSWER_RESPONDENT_2, caseData.getRespondent2ClaimResponseTypeForSpec());
+            return someoneDisputes(caseData, CAN_ANSWER_RESPONDENT_1,
+                                   caseData.getRespondent1ClaimResponseTypeForSpec())
+                || someoneDisputes(caseData, CAN_ANSWER_RESPONDENT_2,
+                                   caseData.getRespondent2ClaimResponseTypeForSpec());
         }
     }
 
