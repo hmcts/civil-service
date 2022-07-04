@@ -552,8 +552,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
         if (YES.equals(caseData.getIsRespondent2())) {
             updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent2ClaimResponseTypeForSpec());
-        } else {
-            updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
         }
 
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE
@@ -777,8 +775,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private boolean someoneDisputes(CaseData caseData) {
-        return someoneDisputes(caseData, CAN_ANSWER_RESPONDENT_1, caseData.getRespondent1ClaimResponseTypeForSpec())
-            || someoneDisputes(caseData, CAN_ANSWER_RESPONDENT_2, caseData.getRespondent2ClaimResponseTypeForSpec());
+        if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
+            return (caseData.getClaimant1ClaimResponseTypeForSpec() == FULL_DEFENCE
+                || caseData.getClaimant2ClaimResponseTypeForSpec() == FULL_DEFENCE);
+        } else {
+            return someoneDisputes(caseData, CAN_ANSWER_RESPONDENT_1, caseData.getRespondent1ClaimResponseTypeForSpec())
+                || someoneDisputes(caseData, CAN_ANSWER_RESPONDENT_2, caseData.getRespondent2ClaimResponseTypeForSpec());
+        }
     }
 
     private boolean someoneDisputes(CaseData caseData, DefendantResponseShowTag respondent,
