@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
@@ -172,7 +173,7 @@ public class CaseDataParent implements MappableObject {
     private final String detailsOfWhyDoesYouDisputeTheClaim2;
     private final String specDefenceRouteUploadDocumentLabel3;
     private final ResponseSpecDocument respondent2SpecDefenceResponseDocument;
-    private final String specClaimResponseTimelineList2;
+    private final TimelineUploadTypeSpec specClaimResponseTimelineList2;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents2;
     private final String responseClaimMediationSpecLabelRes2;
     private final YesOrNo responseClaimMediationSpec2Required;

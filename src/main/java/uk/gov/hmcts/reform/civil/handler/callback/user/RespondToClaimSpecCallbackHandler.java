@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
+import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationTextSpecGenerator;
@@ -89,7 +90,24 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_AD
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.*;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.CURRENT_ADMITS_PART_OR_FULL;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.NEED_FINANCIAL_DETAILS_1;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.NEED_FINANCIAL_DETAILS_2;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.REPAYMENT_PLAN_2;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_1_ADMITS_PART_OR_FULL;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_1_PAID_LESS;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_2_ADMITS_PART_OR_FULL;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_2_PAID_LESS;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.SOMEONE_DISPUTES;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.TIMELINE_MANUALLY;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.TIMELINE_UPLOAD;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.WHEN_WILL_CLAIM_BE_PAID;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.WHY_1_DOES_NOT_PAY_IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.WHY_2_DOES_NOT_PAY_IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
@@ -145,6 +163,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "validate-repayment-plan"), this::validateDefendant1RepaymentPlan)
             .put(callbackKey(MID, "validate-repayment-plan-2"), this::validateDefendant2RepaymentPlan)
             .put(callbackKey(MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlag)
+            .put(callbackKey(MID, "set-upload-timeline-type-flag"), this::setUploadTimelineTypeFlag)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadlineV1)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
@@ -314,11 +333,16 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private Set<DefendantResponseShowTag> checkNecessaryFinancialDetails(CaseData caseData) {
         Set<DefendantResponseShowTag> necessary = EnumSet.noneOf(DefendantResponseShowTag.class);
         MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
-        if (caseData.getShowConditionFlags().contains(CAN_ANSWER_RESPONDENT_1)
-            && caseData.getRespondent1().getType() != Party.Type.COMPANY
-            && caseData.getRespondent1().getType() != Party.Type.ORGANISATION) {
-            if (needFinancialInfo1(caseData)) {
-                necessary.add(NEED_FINANCIAL_DETAILS_1);
+        if (caseData.getShowConditionFlags().contains(CAN_ANSWER_RESPONDENT_1)) {
+            if (caseData.getRespondent1().getType() != Party.Type.COMPANY
+                && caseData.getRespondent1().getType() != Party.Type.ORGANISATION) {
+                if (needFinancialInfo1(caseData)) {
+                    necessary.add(NEED_FINANCIAL_DETAILS_1);
+                }
+            }
+
+            if (respondent1doesNotPayImmediately(caseData, scenario)) {
+                necessary.add(WHY_1_DOES_NOT_PAY_IMMEDIATELY);
             }
         }
 
@@ -334,11 +358,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     || (needFinancialInfo1(caseData) && caseData.getRespondentResponseIsSame() == YES))) {
                     necessary.add(NEED_FINANCIAL_DETAILS_2);
                 }
-
-            }
-
-            if (respondent1doesNotPayImmediately(caseData, scenario)) {
-                necessary.add(WHY_1_DOES_NOT_PAY_IMMEDIATELY);
             }
 
             if (respondent2doesNotPayImmediately(caseData, scenario)) {
@@ -356,7 +375,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private boolean respondent1doesNotPayImmediately(CaseData caseData, MultiPartyScenario scenario) {
-        if (caseData.getRespondentClaimResponseTypeForSpecGeneric() != COUNTER_CLAIM
+        if (YES.equals(caseData.getIsRespondent1())
+            && caseData.getRespondentClaimResponseTypeForSpecGeneric() != COUNTER_CLAIM
             && caseData.getRespondentClaimResponseTypeForSpecGeneric() != FULL_DEFENCE) {
             if (scenario != ONE_V_TWO_ONE_LEGAL_REP || caseData.getRespondentResponseIsSame() == YES) {
                 return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != IMMEDIATELY
@@ -652,7 +672,37 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             && YES.equals(caseData.getIsRespondent1()))
             || (anyAdmission.contains(caseData.getRespondent2ClaimResponseTypeForSpec())
             && YES.equals(caseData.getIsRespondent2()))) {
+            updatedShowConditions.removeIf(EnumSet.of(
+                CURRENT_ADMITS_PART_OR_FULL
+            )::contains);
             updatedShowConditions.add(CURRENT_ADMITS_PART_OR_FULL);
+        }
+        updatedData.showConditionFlags(updatedShowConditions);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse setUploadTimelineTypeFlag(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+        Set<DefendantResponseShowTag> updatedShowConditions = new HashSet<>(caseData.getShowConditionFlags());
+        updatedShowConditions.removeIf(EnumSet.of(
+            TIMELINE_UPLOAD,
+            TIMELINE_MANUALLY
+        )::contains);
+
+        if ((YES.equals(caseData.getIsRespondent1())
+            && caseData.getSpecClaimResponseTimelineList() == TimelineUploadTypeSpec.UPLOAD)
+            || (YES.equals(caseData.getIsRespondent2())
+            && caseData.getSpecClaimResponseTimelineList2() == TimelineUploadTypeSpec.UPLOAD)) {
+            updatedShowConditions.add(TIMELINE_UPLOAD);
+        } else if ((YES.equals(caseData.getIsRespondent1())
+            && caseData.getSpecClaimResponseTimelineList() == TimelineUploadTypeSpec.MANUAL)
+            || (YES.equals(caseData.getIsRespondent2())
+            && caseData.getSpecClaimResponseTimelineList2() == TimelineUploadTypeSpec.MANUAL)) {
+            updatedShowConditions.add(TIMELINE_MANUALLY);
         }
         updatedData.showConditionFlags(updatedShowConditions);
 
