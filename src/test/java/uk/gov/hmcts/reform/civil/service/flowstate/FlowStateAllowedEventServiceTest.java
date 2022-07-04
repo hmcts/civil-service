@@ -40,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
@@ -155,7 +156,8 @@ class FlowStateAllowedEventServiceTest {
                     CLAIM_SUBMITTED,
                     new CaseEvent[]{
                         ADD_CASE_NOTE,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO
                     }
                 ),
                 of(
@@ -166,14 +168,16 @@ class FlowStateAllowedEventServiceTest {
                         DISCONTINUE_CLAIM,
                         AMEND_PARTY_DETAILS,
                         ADD_CASE_NOTE,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO
                     }
                 ),
                 of(
                     CLAIM_ISSUED_PAYMENT_SUCCESSFUL,
                     new CaseEvent[]{
                         ADD_CASE_NOTE,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO
                     }
                 ),
                 of(
@@ -189,7 +193,8 @@ class FlowStateAllowedEventServiceTest {
                         WITHDRAW_CLAIM,
                         ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO
                     }
                 ),
                 of(
@@ -205,6 +210,7 @@ class FlowStateAllowedEventServiceTest {
                         WITHDRAW_CLAIM,
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL
                     }
@@ -223,6 +229,7 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL,
                         STANDARD_DIRECTION_ORDER_DJ
@@ -243,6 +250,7 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INFORM_AGREED_EXTENSION_DATE,
                         INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL
 
@@ -263,6 +271,7 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
                         DEFAULT_JUDGEMENT
                     }
                 ),
@@ -281,6 +290,7 @@ class FlowStateAllowedEventServiceTest {
                         INFORM_AGREED_EXTENSION_DATE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO,
                         DEFAULT_JUDGEMENT
                     }
                 ),
@@ -298,7 +308,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO
                     }
                 ),
                 of(
@@ -315,7 +326,8 @@ class FlowStateAllowedEventServiceTest {
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO
                     }
                 ),
                 of(
@@ -330,7 +342,8 @@ class FlowStateAllowedEventServiceTest {
                         TAKE_CASE_OFFLINE,
                         ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO
                     }
                 ),
                 of(
@@ -343,7 +356,8 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO
                     }
                 ),
                 of(
@@ -356,7 +370,8 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO
                     }
                 ),
                 of(
@@ -369,7 +384,8 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO
                     }
                 ),
                 of(
@@ -382,7 +398,8 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO
                     }
                 ),
                 of(
@@ -395,7 +412,8 @@ class FlowStateAllowedEventServiceTest {
                         AMEND_PARTY_DETAILS,
                         ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO
                     }
                 ),
                 of(
@@ -403,7 +421,8 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[]{
                         CASE_PROCEEDS_IN_CASEMAN,
                         ADD_CASE_NOTE,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO
                     }
                 ),
                 of(
@@ -411,7 +430,8 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[]{
                         CASE_PROCEEDS_IN_CASEMAN,
                         ADD_CASE_NOTE,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO
                     }
                 ),
                 of(
@@ -425,7 +445,8 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[]{
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO
                     }
                 ),
                 of(
@@ -433,7 +454,8 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[]{
                         DISMISS_CLAIM,
                         ADD_CASE_NOTE,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        CREATE_SDO
                     }
                 ),
                 of(

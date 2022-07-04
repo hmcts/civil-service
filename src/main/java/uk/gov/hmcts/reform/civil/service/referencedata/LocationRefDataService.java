@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service;
+package uk.gov.hmcts.reform.civil.service.referencedata;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.civil.config.GeneralAppLRDConfiguration;
-import uk.gov.hmcts.reform.civil.model.genapplication.LocationRefData;
+import uk.gov.hmcts.reform.civil.config.referencedata.LRDConfiguration;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -25,10 +25,10 @@ import static org.apache.logging.log4j.util.Strings.concat;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class GeneralAppLocationRefDataService {
+public class LocationRefDataService {
 
     private final RestTemplate restTemplate;
-    private final GeneralAppLRDConfiguration lrdConfiguration;
+    private final LRDConfiguration lrdConfiguration;
     private final AuthTokenGenerator authTokenGenerator;
 
     public List<String> getCourtLocations(String authToken) {
@@ -68,6 +68,7 @@ public class GeneralAppLocationRefDataService {
     }
 
     private String getDisplayEntry(LocationRefData location) {
-        return concat(concat(location.getSiteName(), " - "), location.getPostcode());
+        return concat(concat(concat(location.getSiteName(), " - "), concat(location.getCourtAddress(), " - ")),
+                      location.getPostcode());
     }
 }
