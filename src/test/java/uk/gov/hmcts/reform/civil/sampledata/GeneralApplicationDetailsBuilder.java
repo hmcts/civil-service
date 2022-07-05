@@ -14,6 +14,9 @@ import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
@@ -276,8 +279,18 @@ public class GeneralApplicationDetailsBuilder {
                                                .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
                                                .orgPolicyReference(STRING_CONSTANT).build())
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
+                .applicant1DQ(Applicant1DQ.builder()
+                        .applicant1DQRequestedCourt(RequestedCourt.builder()
+                                .responseCourtCode("applicant1DQRequestedCourt")
+                                .build())
+                        .build())
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
+                .respondent1DQ(Respondent1DQ.builder()
+                        .respondent1DQRequestedCourt(RequestedCourt.builder()
+                                .responseCourtCode("respondent1DQRequestedCourt")
+                                .build())
+                        .build())
                 .addApplicant2(YES)
                 .applicant2(Party.builder().type(Party.Type.COMPANY).companyName("Applicant2").build())
                 .addRespondent2(YES)
@@ -364,7 +377,17 @@ public class GeneralApplicationDetailsBuilder {
                     .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
                     .orgPolicyReference(STRING_CONSTANT).build())
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
+            .applicant1DQ(Applicant1DQ.builder()
+                        .applicant1DQRequestedCourt(RequestedCourt.builder()
+                                .responseCourtCode("applicant1DQRequestedCourt")
+                                .build())
+                        .build())
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
+                .respondent1DQ(Respondent1DQ.builder()
+                        .respondent1DQRequestedCourt(RequestedCourt.builder()
+                                .responseCourtCode("respondent1DQRequestedCourt")
+                                .build())
+                        .build())
                 .addApplicant2(YES)
                 .applicant2(Party.builder().type(Party.Type.COMPANY).companyName("Applicant2").build())
                 .addRespondent2(YES)
@@ -442,7 +465,11 @@ public class GeneralApplicationDetailsBuilder {
                 .build();
     }
 
-    public CaseData getCaseDataForWorkAllocation(CaseState state, SuperClaimType claimType, Party.Type claimant1Type) {
+    public CaseData getCaseDataForWorkAllocation(CaseState state,
+                                                 SuperClaimType claimType,
+                                                 Party.Type claimant1Type,
+                                                 String applicant1DQRequestedCourt,
+                                                 String respondent1DQRequestedCourt) {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
                 .ccdCaseReference(1234L)
                 .respondent2OrganisationPolicy(OrganisationPolicy.builder()
@@ -529,6 +556,20 @@ public class GeneralApplicationDetailsBuilder {
                 .ccdState(state);
         if (claimType != null) {
             builder.superClaimType(SuperClaimType.SPEC_CLAIM);
+        }
+        if (applicant1DQRequestedCourt != null) {
+            builder.applicant1DQ(Applicant1DQ.builder()
+                    .applicant1DQRequestedCourt(RequestedCourt.builder()
+                            .responseCourtCode(applicant1DQRequestedCourt)
+                            .build())
+                    .build());
+        }
+        if (respondent1DQRequestedCourt != null) {
+            builder.respondent1DQ(Respondent1DQ.builder()
+                    .respondent1DQRequestedCourt(RequestedCourt.builder()
+                            .responseCourtCode(respondent1DQRequestedCourt)
+                            .build())
+                    .build());
         }
         return builder.build();
     }

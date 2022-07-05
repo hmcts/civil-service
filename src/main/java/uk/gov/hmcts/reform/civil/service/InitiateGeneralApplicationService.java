@@ -303,26 +303,44 @@ public class InitiateGeneralApplicationService {
     }
 
     private Pair<String, String> getWorkAllocationLocation(CaseData caseData) {
-        boolean afterSDO = hasSDOBeenMade(caseData.getCcdState());
-        if (!afterSDO) {
-            return Pair.of("CCMCC", "");
-        } else {
+        if (hasSDOBeenMade(caseData.getCcdState())) {
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-                //TODO: Adding dummy value until location PR-1113 is merged
+                //TODO : Adding dummy value until there is no location in Applicant1DQ
                 if (INDIVIDUAL.equals(caseData.getApplicant1().getType())
                         || SOLE_TRADER.equals(caseData.getApplicant1().getType())) {
-                    return Pair.of("claimant's preferred court location as specified in the DQs", "");
+                    return Pair.of(getClaimant1PreferredLocation(caseData), "");
                 } else {
-                    return Pair.of("defendant's preferred court location as specified in the DQs", "");
+                    //TODO : Adding dummy value until there is no location in Respondent1DQ
+                    return Pair.of(getDefendant1PreferredLocation(caseData), "");
                 }
             } else {
-                //TODO: Adding dummy value until location PR-1113 is merged
-                return Pair.of("claimant's preferred court location as specified in the DQs", "");
+                //TODO : Adding dummy value until there is no location in Applicant1DQ
+                return Pair.of(getClaimant1PreferredLocation(caseData), "");
             }
+        } else {
+            return Pair.of("CCMCC", "");
         }
     }
 
     private boolean hasSDOBeenMade(CaseState state) {
         return !statesBeforeSDO.contains(state);
+    }
+
+    private String getClaimant1PreferredLocation(CaseData caseData) {
+        if (caseData.getApplicant1DQ() == null
+                || caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() == null
+                || caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode() == null) {
+            return "null";
+        }
+        return caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode();
+    }
+
+    private String getDefendant1PreferredLocation(CaseData caseData) {
+        if (caseData.getRespondent1DQ() == null
+                || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() == null
+                || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode() == null) {
+            return "null";
+        }
+        return caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode();
     }
 }
