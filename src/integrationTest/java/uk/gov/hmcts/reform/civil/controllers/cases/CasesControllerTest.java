@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
+import uk.gov.hmcts.reform.civil.service.citizenui.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
@@ -41,6 +42,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
         + "}";
     private static final String CLAIMANT_CLAIMS_URL = "/cases/claimant/{submitterId}";
     private static final String DEFENDANT_CLAIMS_URL = "/cases/defendant/{submitterId}";
+    private static final String GET_EVENT_TOKEN_URL = "/cases/defendant/{submitterId}/response/submit/{caseId}/token";
     private static final List<DashboardClaimInfo> claimResults =
         Collections.singletonList(DashboardClaimInfo.builder()
                                       .claimAmount(new BigDecimal(
@@ -57,6 +59,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
                                               1
                                           ))
                                       .build());
+    private static final String EVENT_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOi";
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;
@@ -69,6 +72,9 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @MockBean
     private ClaimStoreService claimStoreService;
+
+    @MockBean
+    private CaseEventService caseEventService;
 
     @Test
     @SneakyThrows
@@ -146,6 +152,15 @@ public class CasesControllerTest extends BaseIntegrationTest {
         when(claimStoreService.getClaimsForDefendant(any(), any())).thenReturn(claimResults);
         doGet(BEARER_TOKEN, DEFENDANT_CLAIMS_URL, "123")
             .andExpect(content().json(toJson(claimResults)))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldReturnEventTokenSuccessfully() {
+        when(caseEventService.getDefendantResponseSpecEventToken(any(), any(), any())).thenReturn(EVENT_TOKEN);
+        doGet(BEARER_TOKEN, GET_EVENT_TOKEN_URL, "1213", "123")
+            .andExpect(content().string(EVENT_TOKEN))
             .andExpect(status().isOk());
     }
 }
