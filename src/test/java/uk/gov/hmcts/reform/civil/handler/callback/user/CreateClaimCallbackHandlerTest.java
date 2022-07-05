@@ -883,17 +883,47 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(respondent2OrgPolicy).extracting("Organisation").isNull();
         }
 
-        @Test
-        void shouldSetAddLegalRepDeadline_whenInvoked() {
-            when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
-            caseData = CaseDataBuilder.builder().atStateProceedsOffline1v1UnrepresentedDefendant().build();
+        @Nested
+        class AddLegalRepDeadline {
+            @Test
+            void shouldSetAddLegalRepDeadline_whenInvoked() {
+                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
+                caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant().build();
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
 
-            assertThat(response.getData()).extracting("addLegalRepDeadline")
-                .isEqualTo(submittedDate.format(ISO_DATE_TIME));
+                assertThat(response.getData()).extracting("addLegalRepDeadline")
+                    .isEqualTo(submittedDate.format(ISO_DATE_TIME));
+            }
+
+            @Test
+            void shouldSetAddLegalRepDeadline_1v2_2LiPs_whenInvoked() {
+                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
+                caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData()).extracting("addLegalRepDeadline")
+                    .isEqualTo(submittedDate.format(ISO_DATE_TIME));
+            }
+
+            @Test
+            void shouldSetAddLegalRepDeadline_1v2_1LiP_whenInvoked() {
+                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
+                caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData()).extracting("addLegalRepDeadline")
+                    .isEqualTo(submittedDate.format(ISO_DATE_TIME));
+            }
+
         }
 
         @Nested
@@ -995,6 +1025,71 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             }
         }
 
+        @Nested
+        class GetAllPartyNames {
+            @Test
+            void oneVOne() {
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData())
+                    .containsEntry("allPartyNames", "Mr. John Rambo V Mr. Sole Trader");
+            }
+
+            @Test
+            void oneVTwo() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDraft()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData())
+                    .containsEntry("allPartyNames", "Mr. John Rambo V Mr. Sole Trader, Mr. John Rambo");
+            }
+
+            @Test
+            void twoVOne() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDraft()
+                    .multiPartyClaimTwoApplicants()
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData())
+                    .containsEntry("allPartyNames", "Mr. John Rambo, Mr. Jason Rambo V Mr. Sole Trader");
+            }
+        }
+
+        @Test
+        void shouldUpdateCaseListAndUnassignedListData() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                                  .orgPolicyReference("CLAIMANTREF1")
+                                                  .build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyReference("DEFENDANTREF1")
+                                                   .build())
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyReference("DEFENDANTREF2")
+                                                   .build())
+                .build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+            assertThat(response.getData())
+                .containsEntry("unassignedCaseListDisplayOrganisationReferences",
+                               "CLAIMANTREF1, DEFENDANTREF1, DEFENDANTREF2");
+            assertThat(response.getData())
+                .containsEntry("caseListDisplayDefendantSolicitorReferences", "6789, 01234");
+        }
+
         @Test
         void shouldReturnExpectedErrorMessagesInResponse_whenInvokedWithNullCourtLocation() {
             CaseData data = caseData.toBuilder()
@@ -1028,7 +1123,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldReturnExpectedSubmittedCallbackResponse_whenRespondentsDoesNotHaveRepresentation() {
-                CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendants().build();
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
@@ -1084,7 +1179,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldReturnExpectedSubmittedCallbackResponse_whenRespondentsDoesNotHaveRepresentation() {
-                CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant1().build();
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().build();
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
@@ -1138,7 +1233,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent2DoesNotHaveRepresentation() {
-                CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendants().build();
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
