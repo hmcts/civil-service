@@ -12,27 +12,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOfflineSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
@@ -51,8 +44,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGE
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_NOT_PROCEED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
@@ -224,7 +215,11 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
                         TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
                     );
-                assertThat(stateFlow.getFlags()).hasSize(0);
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                );
             }
 
             // 1v2
@@ -248,7 +243,11 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
                         TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
                     );
-                assertThat(stateFlow.getFlags()).hasSize(0);
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                );
             }
 
             // Unrepresented
@@ -271,7 +270,11 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
                         TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
                     );
-                assertThat(stateFlow.getFlags()).hasSize(0);
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                );
             }
 
             // Unrepresented
@@ -294,7 +297,11 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
                         TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
                     );
-                assertThat(stateFlow.getFlags()).hasSize(0);
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                );
             }
         }
 
@@ -511,7 +518,11 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT.fullName(),
                         TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
                     );
-                assertThat(stateFlow.getFlags()).hasSize(0);
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                );
             }
 
             // Unregistered
@@ -595,7 +606,11 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName(),
                         TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName()
                     );
-                assertThat(stateFlow.getFlags()).hasSize(0);
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                );
             }
 
             // Unrepresented and Unregistered
@@ -620,8 +635,7 @@ class StateFlowEngineTest {
                         TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
-                assertThat(stateFlow.getFlags()).hasSize(4).contains(
-                    entry("ONE_RESPONDENT_REPRESENTATIVE", true),
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
                     entry("RPA_CONTINUOUS_FEED", true),
                     entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                     entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
@@ -2877,131 +2891,6 @@ class StateFlowEngineTest {
                     entry(FlowFlag.NOTICE_OF_CHANGE.name(), false)
                 );
             }
-        }
-    }
-
-    @Nested
-    class AmbiguousErrors {
-
-        @Test
-        void claimIssue_fullAdmitAndDivergentRespondGoOffline() {
-            CaseData caseData = CaseData.builder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
-                .applicant1(Party.builder().build())
-                .respondent1(Party.builder().build())
-                .respondent2(Party.builder().build())
-                .respondent2SameLegalRepresentative(YesOrNo.YES)
-                .respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .respondentResponseIsSame(YesOrNo.YES)
-                .build();
-            assertThat(FlowPredicate.fullAdmissionSpec.test(caseData))
-                .isTrue();
-            assertThat(divergentRespondGoOfflineSpec.and(specClaim).test(caseData))
-                .isFalse();
-        }
-
-        @Test
-        public void claim1v1_reachFullAdmitProceed() {
-            CaseData.CaseDataBuilder<?, ?> builder = claim1v1Submitted();
-
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
-                .isEqualTo(CLAIM_SUBMITTED.fullName());
-
-            payPBA(builder);
-
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
-                .isEqualTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
-
-            issuedAndRepresented(builder);
-
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
-                .isEqualTo(PENDING_CLAIM_ISSUED.fullName());
-
-            issued(builder);
-
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
-                .isEqualTo(CLAIM_ISSUED.fullName());
-
-            fullAdmit1v1(builder);
-
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
-                .isEqualTo(FULL_ADMISSION.fullName());
-
-            applicantProceeds1v1(builder);
-
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
-                .isEqualTo(FULL_ADMIT_PROCEED.fullName());
-        }
-
-        @Test
-        public void claim1v1_reachFullAdmitNoProceed() {
-            CaseData.CaseDataBuilder<?, ?> builder = claim1v1Submitted();
-
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
-                .isEqualTo(CLAIM_SUBMITTED.fullName());
-
-            payPBA(builder);
-
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
-                .isEqualTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
-
-            issuedAndRepresented(builder);
-
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
-                .isEqualTo(PENDING_CLAIM_ISSUED.fullName());
-
-            issued(builder);
-
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
-                .isEqualTo(CLAIM_ISSUED.fullName());
-
-            fullAdmit1v1(builder);
-
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
-                .isEqualTo(FULL_ADMISSION.fullName());
-
-            applicantDoesntProceed1v1(builder);
-
-            assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
-                .isEqualTo(FULL_ADMIT_NOT_PROCEED.fullName());
-        }
-
-        private CaseData.CaseDataBuilder<?, ?> claim1v1Submitted() {
-            return CaseData.builder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
-                .applicant1(Party.builder().build())
-                .respondent1(Party.builder().build())
-                .submittedDate(LocalDateTime.now());
-        }
-
-        private void payPBA(CaseData.CaseDataBuilder<?, ?> builder) {
-            builder.paymentSuccessfulDate(LocalDateTime.now());
-        }
-
-        private void issuedAndRepresented(CaseData.CaseDataBuilder<?, ?> builder) {
-            builder
-                .issueDate(LocalDate.now())
-                .respondent1Represented(YesOrNo.YES)
-                .respondent1OrgRegistered(YesOrNo.YES);
-        }
-
-        private void issued(CaseData.CaseDataBuilder<?, ?> builder) {
-            builder
-                .claimNotificationDeadline(LocalDateTime.now().plusDays(14));
-        }
-
-        private void fullAdmit1v1(CaseData.CaseDataBuilder<?, ?> builder) {
-            builder.respondent1ResponseDate(LocalDateTime.now())
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
-        }
-
-        private void applicantProceeds1v1(CaseData.CaseDataBuilder<?, ?> builder) {
-            builder.applicant1ProceedWithClaim(YesOrNo.YES);
-        }
-
-        private void applicantDoesntProceed1v1(CaseData.CaseDataBuilder<?, ?> builder) {
-            builder.applicant1ProceedWithClaim(YesOrNo.NO);
         }
     }
 }
