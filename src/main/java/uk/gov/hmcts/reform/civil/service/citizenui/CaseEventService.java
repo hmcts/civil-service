@@ -18,15 +18,16 @@ public class CaseEventService {
     private final CoreCaseDataApi coreCaseDataApi;
     private final AuthTokenGenerator authTokenGenerator;
 
-    private StartEventResponse startEvent(String authorisation, String userId, String caseId, CaseEvent event){
-        return coreCaseDataApi.startEventForCitizen(authorisation,
-                                                    authTokenGenerator.generate(),
-                                                    userId,
-                                                    JURISDICTION,
-                                                    CASE_TYPE,
-                                                    caseId,
-                                                    event.name()
-                                                    );
+    private StartEventResponse startEvent(String authorisation, String userId, String caseId, CaseEvent event) {
+        return coreCaseDataApi.startEventForCitizen(
+            authorisation,
+            authTokenGenerator.generate(),
+            userId,
+            JURISDICTION,
+            CASE_TYPE,
+            caseId,
+            event.name()
+        );
     }
 
     public String getDefendantResponseSpecEventToken(String authorisation, String userId, String caseId) {

@@ -111,15 +111,15 @@ public class CasesController {
         return new ResponseEntity<>(ocmcClaims, HttpStatus.OK);
     }
 
-    @GetMapping(path ="/defendant/{submitterId}/response/submit/{caseId}/token")
+    @GetMapping(path = "/defendant/{submitterId}/response/submit/{caseId}/token")
     @ApiOperation("Gets event token for defendant submit response event")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 401, message = "Not Authorized")})
     public ResponseEntity<String>
-       getSubmitResponseToken(@PathVariable("submitterId") String submitterId,
-                                                         @PathVariable("caseId") String caseId,
-                                                         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        getSubmitResponseToken(@PathVariable("submitterId") String submitterId,
+                           @PathVariable("caseId") String caseId,
+                           @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
         String eventToken = caseEventService.getDefendantResponseSpecEventToken(authorization, submitterId, caseId);
         return new ResponseEntity<>(eventToken, HttpStatus.OK);
     }
