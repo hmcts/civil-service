@@ -60,6 +60,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -482,7 +483,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
         }
         //this logic to be removed when ccd supports AND-OR combinations
-        if (ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        if (ONE_V_ONE.equals(multiPartyScenario)) {
             updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
             if (caseData.getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
                 updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
@@ -495,7 +497,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         }
 
         Set<RespondentResponseTypeSpec> someAdmission = EnumSet.of(PART_ADMISSION, FULL_ADMISSION);
-        if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))
+        if (TWO_V_ONE.equals(multiPartyScenario)
             && someAdmission.contains(caseData.getRespondent1ClaimResponseTypeForSpec())
             && someAdmission.contains(caseData.getRespondent2ClaimResponseTypeForSpec())) {
             updatedData.specFullAdmissionOrPartAdmission(YES);
@@ -503,14 +505,24 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.specFullAdmissionOrPartAdmission(NO);
         }
 
-        if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+        if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario)
+            && Objects.equals(
+            caseData.getRespondent1ClaimResponseTypeForSpec(),
+            caseData.getRespondent2ClaimResponseTypeForSpec()
+        )) {
+            updatedData.respondentResponseIsSame(YES);
+            caseData = caseData.toBuilder()
+                .respondentResponseIsSame(YES)
+                .build();
+        }
+        if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario)
             && caseData.getRespondentResponseIsSame().equals(NO)) {
             updatedData.sameSolicitorSameResponse(NO);
             if (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                 || FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
                 updatedData.respondentClaimResponseTypeForSpecGeneric(FULL_DEFENCE);
             }
-        } else if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+        } else if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario)
             && caseData.getRespondentResponseIsSame().equals(YES)) {
             updatedData.sameSolicitorSameResponse(YES);
             updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
@@ -523,7 +535,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         }
 
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
+        if (ONE_V_TWO_TWO_LEGAL_REP.equals(multiPartyScenario)) {
             if (coreCaseUserService.userHasCaseRole(
                 caseData.getCcdCaseReference().toString(),
                 userInfo.getUid(),
@@ -538,7 +550,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
         }
 
-        if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
+        if (ONE_V_TWO_TWO_LEGAL_REP.equals(multiPartyScenario)) {
             if (YES.equals(caseData.getIsRespondent1())
                 && RespondentResponseTypeSpec.PART_ADMISSION.equals(
                 caseData.getRespondent1ClaimResponseTypeForSpec())) {
@@ -780,9 +792,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 || caseData.getClaimant2ClaimResponseTypeForSpec() == FULL_DEFENCE);
         } else {
             return someoneDisputes(caseData, CAN_ANSWER_RESPONDENT_1,
-                                   caseData.getRespondent1ClaimResponseTypeForSpec())
+                                   caseData.getRespondent1ClaimResponseTypeForSpec()
+            )
                 || someoneDisputes(caseData, CAN_ANSWER_RESPONDENT_2,
-                                   caseData.getRespondent2ClaimResponseTypeForSpec());
+                                   caseData.getRespondent2ClaimResponseTypeForSpec()
+            );
         }
     }
 

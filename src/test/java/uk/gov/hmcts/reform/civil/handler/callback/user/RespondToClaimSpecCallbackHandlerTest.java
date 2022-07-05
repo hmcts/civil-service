@@ -540,6 +540,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
         }
 
+        /**
+         * if solicitor says that each defendant gets their response but then chooses the same
+         * option from full defence/part admit/full admit/counterclaim, then it is not different response
+         */
         @Test
         void shouldSetMultiPartyResponseTypeFlags_1v2_sameSolicitor_DifferentResponse() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -557,7 +561,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
                 .isEqualTo("FULL_DEFENCE");
             assertThat(response.getData()).extracting("sameSolicitorSameResponse")
-                .isEqualTo("No");
+                .isEqualTo("Yes");
         }
 
         @Test
