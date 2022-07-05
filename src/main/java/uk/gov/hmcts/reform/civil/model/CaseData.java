@@ -411,6 +411,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String detailsOfDirection;
 
     private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
+    private final String hearingPreferredRegionId;
+    private final String hearingBaseLocation;
     private final DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;
     private final String bothDefendants;
@@ -456,7 +458,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DisposalHearingBundle disposalHearingBundleDJ;
     private DisposalHearingNotes disposalHearingNotesDJ;
 
-    //default judgement SDO fields for trial screen
+    //default judgement SDO fields for trial
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
     private TrialHearingDisclosureOfDocuments trialHearingDisclosureOfDocumentsDJ;
     private TrialHearingWitnessOfFact trialHearingWitnessOfFactDJ;
