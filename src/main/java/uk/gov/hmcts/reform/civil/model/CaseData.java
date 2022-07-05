@@ -469,4 +469,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private TrialPersonalInjury trialPersonalInjury;
     private TrialRoadTrafficAccident trialRoadTrafficAccident;
 
+    //general application order documents
+    private final List<Element<Document>> generalAppWrittenRepUpload;
+    private final List<Element<Document>> gaWrittenRepDocList;
+    private final List<Element<Document>> generalAppDirOrderUpload;
+    private final List<Element<Document>> gaDirectionDocList;
+    private final List<Element<Document>> generalAppAddlnInfoUpload;
+    private final List<Element<Document>> gaAddlnInfoList;
 }
