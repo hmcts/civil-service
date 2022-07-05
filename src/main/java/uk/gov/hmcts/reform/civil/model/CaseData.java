@@ -46,6 +46,7 @@ import uk.gov.hmcts.reform.civil.model.dq.ExpertRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -83,7 +84,6 @@ import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 @Jacksonized
 @EqualsAndHashCode(callSuper = true)
 @Data
-@SuppressWarnings("unchecked")
 public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -111,6 +111,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<GeneralApplication>> generalApplications = new ArrayList<>();
 
     private final List<Element<GeneralApplicationsDetails>> generalApplicationsDetails;
+    private final List<Element<GADetailsRespondentSol>> gaDetailsRespondentSol;
+    private final List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolTwo;
     private final SolicitorReferences solicitorReferences;
     private final SolicitorReferences solicitorReferencesCopy;
     private final String respondentSolicitor2Reference;
@@ -244,6 +246,24 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final ResponseDocument respondent1SpecDefenceResponseDocument;
 
+    public RespondentResponseTypeSpec getRespondent1ClaimResponseTypeForSpec() {
+
+        if (respondent1ClaimResponseTypeForSpec == null) {
+            return getRespondent1ClaimResponseTestForSpec();
+        } else {
+            return respondent1ClaimResponseTypeForSpec;
+        }
+    }
+
+    public RespondentResponseTypeSpec getRespondent2ClaimResponseTypeForSpec() {
+
+        if (respondent2ClaimResponseTypeForSpec == null) {
+            return getRespondent2ClaimResponseTestForSpec();
+        } else {
+            return respondent2ClaimResponseTypeForSpec;
+        }
+    }
+
     private final RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
     private final RespondentResponseTypeSpec respondent2ClaimResponseTypeForSpec;
     private final RespondentResponseTypeSpec claimant1ClaimResponseTypeForSpec;
@@ -343,6 +363,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo claimantResponseDocumentToDefendant2Flag;
     private YesOrNo claimant2ResponseFlag;
     private RespondentResponseTypeSpec atLeastOneClaimResponseTypeForSpecIsFullDefence;
+    // used only in 2v1
     private YesOrNo specFullAdmissionOrPartAdmission;
     private YesOrNo sameSolicitorSameResponse;
     private YesOrNo specPaidLessAmountOrDisputesOrPartAdmission;
@@ -387,12 +408,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final Respondent1DebtLRspec specDefendant1Debts;
     private final Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails;
-    private final String detailsOfDirectionDisposal;
-    private final String detailsOfDirectionTrial;
+    private final String detailsOfDirection;
+
     private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
     private final DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;
     private final String bothDefendants;
+    private final String bothDefendantsSpec;
     private final String partialPaymentAmount;
     private final YesOrNo partialPayment;
     private final LocalDate paymentSetDate;
@@ -414,7 +436,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo disabilityPremiumPayments;
     private final YesOrNo severeDisabilityPremiumPayments;
 
+    private final String currentDefendant;
     private final YesOrNo claimStarted;
+    private final String currentDefendantName;
 
     @JsonUnwrapped(suffix = "Breathing")
     private final BreathingSpaceInfo breathing;
