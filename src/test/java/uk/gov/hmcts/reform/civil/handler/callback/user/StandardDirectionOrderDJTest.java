@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -17,10 +18,14 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(SpringExtension.class)
@@ -167,4 +172,36 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         }
     }
 
+    @Nested
+    class AboutToSubmitCallback {
+        @Test
+        void shouldFinishBusinessProcess() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("businessProcess").isNotNull();
+        }
+    }
+
+    @Nested
+    class SubmittedCallback {
+        @Test
+        void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked1v1() {
+            String body = "The directions order has been sent to: %n%n ## Claimant 1 %n%n Mr. John Rambo%n%n "
+                + "## Defendant 1 %n%n Mr. Sole Trader";
+            String header = "# Your order has been issued %n%n ## Claim number %n%n # 000DC001";
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment().build().toBuilder()
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format(header))
+                    .confirmationBody(format(body))
+                    .build());
+        }
+    }
 }
