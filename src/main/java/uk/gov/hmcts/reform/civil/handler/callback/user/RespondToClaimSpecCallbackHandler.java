@@ -788,8 +788,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     private boolean someoneDisputes(CaseData caseData) {
         if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
-            return (caseData.getClaimant1ClaimResponseTypeForSpec() == FULL_DEFENCE
-                || caseData.getClaimant2ClaimResponseTypeForSpec() == FULL_DEFENCE);
+            return ((caseData.getClaimant1ClaimResponseTypeForSpec() == FULL_DEFENCE
+                || caseData.getClaimant2ClaimResponseTypeForSpec() == FULL_DEFENCE)
+                || caseData.getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE
+                || caseData.getRespondent1ClaimResponseTypeForSpec() == PART_ADMISSION);
         } else {
             return someoneDisputes(caseData, CAN_ANSWER_RESPONDENT_1,
                                    caseData.getRespondent1ClaimResponseTypeForSpec()
