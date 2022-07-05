@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
 
-
 @Service
 @AllArgsConstructor
 public class CaseEventService {
