@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,6 +42,13 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -77,6 +85,10 @@ public class InitiateGeneralApplicationService {
         + "you must provide at least one valid Date from";
     public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after "
         + "Unavailability Date to. Please enter valid range.";
+
+    private static final List<CaseState> statesBeforeSDO = Arrays.asList(PENDING_CASE_ISSUED, CASE_ISSUED,
+            AWAITING_CASE_DETAILS_NOTIFICATION, AWAITING_RESPONDENT_ACKNOWLEDGEMENT, CASE_DISMISSED,
+            AWAITING_APPLICANT_INTENTION, PROCEEDS_IN_HERITAGE_SYSTEM);
 
     public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData, UserDetails userDetails,
                                   String authToken) {
@@ -303,7 +315,6 @@ public class InitiateGeneralApplicationService {
                 } else {
                     return Pair.of("defendant's preferred court location as specified in the DQs", "");
                 }
-
             } else {
                 //TODO: Adding dummy value until location PR-1113 is merged
                 return Pair.of("claimant's preferred court location as specified in the DQs", "");
@@ -312,18 +323,6 @@ public class InitiateGeneralApplicationService {
     }
 
     private boolean hasSDOBeenMade(CaseState state) {
-        switch (state) {
-            case PENDING_CASE_ISSUED :
-            case CASE_ISSUED :
-            case AWAITING_CASE_DETAILS_NOTIFICATION :
-            case AWAITING_RESPONDENT_ACKNOWLEDGEMENT :
-            case CASE_DISMISSED :
-            case AWAITING_APPLICANT_INTENTION :
-            case PROCEEDS_IN_HERITAGE_SYSTEM :
-                return false;
-            default:
-                return true;
-        }
-
+        return !statesBeforeSDO.contains(state);
     }
 }
