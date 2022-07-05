@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
@@ -117,7 +118,6 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                     templateId = N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
                 }
                 break;
-                //FALL-THROUGH
             case ONE_V_TWO_ONE_LEGAL_REP:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
@@ -211,7 +211,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     private DQ getDQAndSetSubmittedOn(DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder,
-                                     CaseData caseData) {
+                                      CaseData caseData) {
         if (isClaimantResponse(caseData)) {
             if (onlyApplicant2IsProceeding(caseData)) {
                 builder.submittedOn(caseData.getApplicant2ResponseDate().toLocalDate());
@@ -246,6 +246,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .applicants(claimantResponseLRspec ? getApplicants(caseData) : null)
             .allocatedTrack(caseData.getAllocatedTrack());
 
+        if (!SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            builder.statementOfTruthText(createStatementOfTruthText(isRespondentState(caseData)));
+        }
         DQ dq = getDQAndSetSubmittedOn(builder, caseData);
 
         if (!claimantResponseLRspec) {
@@ -873,4 +876,19 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""))
             .build();
     }
+
+    private String createStatementOfTruthText(Boolean respondentState) {
+        String role = respondentState ? "defendant" : "claimant";
+        String statementOfTruth = role.equals("defendant")
+            ? "The defendant believes that the facts stated in the response are true."
+            : "The claimant believes that the facts in this claim are true.";
+        statementOfTruth += String.format("\n\n\nI am duly authorised by the %s to sign this statement.\n\n"
+                                              + "The %s understands that the proceedings for contempt of court "
+                                              + "may be brought against anyone who makes, or causes to be made, "
+                                              + "a false statement in a document verified by a statement of truth "
+                                              + "without an honest belief in its truth.",
+                                          IntStream.range(0, 2).mapToObj(i -> role).toArray());
+        return statementOfTruth;
+    }
+
 }
