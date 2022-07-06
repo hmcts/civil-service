@@ -542,7 +542,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         /**
          * if solicitor says that each defendant gets their response but then chooses the same
-         * option from full defence/part admit/full admit/counterclaim, then it is not different response
+         * option from full defence/part admit/full admit/counterclaim, then it is not different response.
          */
         @Test
         void shouldSetMultiPartyResponseTypeFlags_1v2_sameSolicitor_DifferentResponse() {
