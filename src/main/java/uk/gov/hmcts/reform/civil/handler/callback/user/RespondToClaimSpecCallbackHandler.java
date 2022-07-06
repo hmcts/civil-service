@@ -830,7 +830,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 break;
             case TWO_V_ONE:
                 if (!bcoPartAdmission.contains(ONLY_RESPONDENT_1_DISPUTES)) {
-                    if (caseData.getDefendantSingleResponseToBothClaimants() == YES ) {
+                    if (caseData.getDefendantSingleResponseToBothClaimants() == YES) {
                         fullDefenceAndPaidLess(
                             caseData.getRespondent1ClaimResponseTypeForSpec(),
                             caseData.getDefenceRouteRequired(),
