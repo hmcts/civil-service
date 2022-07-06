@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
@@ -10,11 +10,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,9 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.*;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -130,19 +130,36 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
     private void sendNotificationToSolicitorSpec(CaseData caseData, String recipient, CaseEvent caseEvent) {
         String emailTemplate;
-        //if template has to be changed for def1, this is the place to change it
         if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE)) {
             emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
+            notificationService.sendMail(
+                recipient,
+                emailTemplate,
+                addPropertiesSpec(caseData, caseEvent),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        } else if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC)) {
+            emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+            if (caseData.getRespondent1ResponseDate() == null || !MultiPartyScenario.getMultiPartyScenario(caseData)
+                .equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+                notificationService.sendMail(
+                    recipient,
+                    emailTemplate,
+                    addPropertiesSpec(caseData, caseEvent),
+                    String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+                );
+            }
+
         } else {
             emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+            notificationService.sendMail(
+                recipient,
+                emailTemplate,
+                addPropertiesSpec(caseData, caseEvent),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
         }
-        notificationService.sendMail(
-            recipient,
-            emailTemplate,
-            addPropertiesSpec(caseData, caseEvent),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
-    }
+   }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
