@@ -260,15 +260,23 @@ public class EventHistoryMapper {
                     eventDetails = eventDetails + BS_START_DT + " "
                         + caseData.getBreathing().getEnter().getStart();
                 }
+            } else {
+                if (eventDetails == null) {
+                    eventDetails = StringUtils.capitalize(BS_START_DT) + " "
+                        + LocalDateTime.now();
+                } else {
+                    eventDetails = eventDetails + BS_START_DT + " "
+                        + LocalDateTime.now();
+                }
             }
         } else if (bsStatus.equals("Lifted")) {
-            if (caseData.getBreathing().getEnter().getStart() != null) {
+            if (caseData.getBreathing().getLift().getExpectedEnd() != null) {
                 if (eventDetails == null) {
                     eventDetails = StringUtils.capitalize(BS_END_DATE) + " "
-                        + caseData.getBreathing().getEnter().getStart();
+                        + caseData.getBreathing().getLift().getExpectedEnd();
                 } else {
                     eventDetails = eventDetails + BS_END_DATE + " "
-                        + caseData.getBreathing().getEnter().getStart();
+                        + caseData.getBreathing().getLift().getExpectedEnd();
                 }
             }
         }
@@ -279,7 +287,8 @@ public class EventHistoryMapper {
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(eventType.getCode())
                     .dateReceived(caseData.getBreathing().getEnter().getStart() != null
-                                      ? caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now()) : null)
+                                      ? caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now())
+                                      : LocalDateTime.now())
                     .litigiousPartyID("001")
                     .eventDetailsText(eventDetails)
                     .eventDetails(EventDetails.builder().miscText(eventDetails)
@@ -291,7 +300,8 @@ public class EventHistoryMapper {
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(eventType.getCode())
                     .dateReceived(caseData.getBreathing().getLift().getExpectedEnd() != null
-                                    ? caseData.getBreathing().getLift().getExpectedEnd().atTime(LocalTime.now()) : null)
+                                      ? caseData.getBreathing().getLift().getExpectedEnd().atTime(LocalTime.now())
+                                      : LocalDateTime.now())
                     .eventDetailsText(eventDetails)
                     .litigiousPartyID("001")
                     .eventDetails(EventDetails.builder().miscText(eventDetails)
@@ -303,7 +313,8 @@ public class EventHistoryMapper {
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(eventType.getCode())
                     .dateReceived(caseData.getBreathing().getEnter().getStart() != null
-                                      ? caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now()) : null)
+                                      ? caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now())
+                                      : LocalDateTime.now())
                     .eventDetailsText(eventDetails)
                     .litigiousPartyID("001")
                     .eventDetails(EventDetails.builder().miscText(eventDetails)
@@ -315,7 +326,8 @@ public class EventHistoryMapper {
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(eventType.getCode())
                     .dateReceived(caseData.getBreathing().getLift().getExpectedEnd() != null
-                                    ? caseData.getBreathing().getLift().getExpectedEnd().atTime(LocalTime.now()) : null)
+                                      ? caseData.getBreathing().getLift().getExpectedEnd().atTime(LocalTime.now())
+                                      : LocalDateTime.now())
                     .eventDetailsText(eventDetails)
                     .litigiousPartyID("001")
                     .eventDetails(EventDetails.builder().miscText(eventDetails)
