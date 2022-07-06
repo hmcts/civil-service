@@ -164,9 +164,11 @@ public class EventHistoryMapper {
                     // DIVERGENT_RESPOND states would only happen in 1v2 diff sol after both defendant responds.
                     case AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED:
                     case AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED:
+                        buildRespondentDivergentResponse(builder, caseData, false);
+                        break;
                     case DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE:
                     case DIVERGENT_RESPOND_GO_OFFLINE:
-                        buildRespondentDivergentResponse(builder, caseData);
+                        buildRespondentDivergentResponse(builder, caseData, true);
                         break;
                     case FULL_DEFENCE_NOT_PROCEED:
                         buildFullDefenceNotProceed(builder, caseData);
@@ -321,7 +323,8 @@ public class EventHistoryMapper {
         }
     }
 
-    private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+    private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData,
+                                                  boolean goingOffline) {
         LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
         LocalDateTime respondent2ResponseDate;
         if (ONE_V_TWO_ONE_LEGAL_REP == MultiPartyScenario.getMultiPartyScenario(caseData)) {
@@ -348,7 +351,14 @@ public class EventHistoryMapper {
                 );
             }
 
-            if (!FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())) {
+            boolean addMiscEvent;
+            if (caseData.getSuperClaimType() == SPEC_CLAIM) {
+                addMiscEvent = goingOffline && !RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent1ClaimResponseTypeForSpec());
+            } else {
+                addMiscEvent = !FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType());
+            }
+            if (addMiscEvent) {
                 miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
                 builder.miscellaneous((Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
@@ -374,7 +384,14 @@ public class EventHistoryMapper {
                 );
             }
 
-            if (!FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType())) {
+            boolean addMiscEvent;
+            if (caseData.getSuperClaimType() == SPEC_CLAIM) {
+                addMiscEvent = goingOffline && !RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec());
+            } else {
+                addMiscEvent = !FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType());
+            }
+            if (addMiscEvent) {
                 miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
                 builder.miscellaneous((Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))

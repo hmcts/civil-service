@@ -474,7 +474,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private TrialPersonalInjury trialPersonalInjury;
     private TrialRoadTrafficAccident trialRoadTrafficAccident;
 
-
     /**
      * There are several fields that can hold the I2P of applicant1 depending
      * on multiparty scenario, which complicates all conditions depending on it.
@@ -489,6 +488,20 @@ public class CaseData extends CaseDataParent implements MappableObject {
                 applicant1ProceedWithClaim,
                 getApplicant1ProceedWithClaimSpec2v1()
             )
+            .filter(Objects::nonNull)
+            .findFirst().orElse(null);
+    }
+
+    public YesOrNo getRespondent1Represented() {
+        return Stream.of(respondent1Represented,
+                         specRespondent1Represented)
+            .filter(Objects::nonNull)
+            .findFirst().orElse(null);
+    }
+
+    public YesOrNo getRespondent2Represented() {
+        return Stream.of(respondent2Represented,
+                         specRespondent2Represented)
             .filter(Objects::nonNull)
             .findFirst().orElse(null);
     }
