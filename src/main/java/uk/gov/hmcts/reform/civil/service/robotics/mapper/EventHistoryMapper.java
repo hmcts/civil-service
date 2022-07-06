@@ -1018,18 +1018,23 @@ public class EventHistoryMapper {
     private List<ClaimantResponseDetails> prepareApplicantsDetails(CaseData caseData) {
         List<ClaimantResponseDetails> applicantsDetails = new ArrayList<>();
         if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
-            if (YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())) {
+            if (YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
+                || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
                 applicantsDetails.add(ClaimantResponseDetails.builder()
                                           .dq(caseData.getApplicant1DQ())
                                           .litigiousPartyID(APPLICANT_ID)
                                           .responseDate(caseData.getApplicant1ResponseDate())
                                           .build());
             }
-            if (YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())) {
+            if (YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
+                || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
                 applicantsDetails.add(ClaimantResponseDetails.builder()
                                           .dq(caseData.getApplicant2DQ())
                                           .litigiousPartyID(APPLICANT2_ID)
-                                          .responseDate(caseData.getApplicant2ResponseDate())
+                                          .responseDate(
+                                              SPEC_CLAIM.equals(caseData.getSuperClaimType())
+                                                  ? caseData.getApplicant1ResponseDate()
+                                                  : caseData.getApplicant2ResponseDate())
                                           .build());
             }
         } else {
