@@ -65,6 +65,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -363,6 +364,31 @@ class DirectionsQuestionnaireGeneratorTest {
                     .superClaimType(SuperClaimType.SPEC_CLAIM)
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YES)
+                    .build();
+
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                assertEquals(
+                    templateData.getFileDirectionsQuestionnaire(),
+                    caseData.getApplicant1DQ().getFileDirectionQuestionnaire()
+                );
+            }
+
+            @Test
+            void whenCaseStateIsFullDefence1v2_TWO_LR_Applicant1ProceedsLRSpec_shouldGetRespondentDQData() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimOneDefendantSolicitor()
+                    .atStateApplicantRespondToDefenceAndNotProceed_1v2_DiffSol()
+                    .applicant1DQ()
+                    .build()
+                    .toBuilder()
+                    .businessProcess(BusinessProcess.builder()
+                                         .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .applicant1ProceedWithClaim(YES)
+                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .respondent2SameLegalRepresentative(NO)
                     .build();
 
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
@@ -1568,4 +1594,50 @@ class DirectionsQuestionnaireGeneratorTest {
         }
     }
 
+    @Nested
+    class StatementOfTruthText {
+        @Test
+        void checkStatementOfTruthTextForClaimant() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build()
+                .toBuilder()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE").build())
+                .build();
+
+            String statementOfTruth = "The claimant believes that the facts in this claim are true."
+                + "\n\n\nI am duly authorised by the claimant to sign this statement.\n\n"
+                + "The claimant understands that the proceedings for contempt of court "
+                + "may be brought against anyone who makes, or causes to be made, "
+                + "a false statement in a document verified by a statement of truth "
+                + "without an honest belief in its truth.";
+
+            DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+            assertNotEquals(caseData.getSuperClaimType(), SuperClaimType.SPEC_CLAIM);
+            assertEquals(templateData.getStatementOfTruthText(), statementOfTruth);
+        }
+
+        @Test
+        void checkStatementOfTruthTextForDefendent() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence()
+                .build()
+                .toBuilder()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("DEFENDANT_RESPONSE").build())
+                .build();
+
+            String statementOfTruth = "The defendant believes that the facts stated in the response are true."
+                + "\n\n\nI am duly authorised by the defendant to sign this statement.\n\n"
+                + "The defendant understands that the proceedings for contempt of court "
+                + "may be brought against anyone who makes, or causes to be made, "
+                + "a false statement in a document verified by a statement of truth "
+                + "without an honest belief in its truth.";
+
+            DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+            assertNotEquals(caseData.getSuperClaimType(), SuperClaimType.SPEC_CLAIM);
+            assertEquals(templateData.getStatementOfTruthText(), statementOfTruth);
+        }
+    }
 }

@@ -33,6 +33,7 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> claimSubmittedOneRespondentRepresentative = caseData ->
         caseData.getSubmittedDate() != null
+            && caseData.getRespondent1Represented() != NO
             && (caseData.getAddRespondent2() == null
             || caseData.getAddRespondent2() == NO
             || (caseData.getAddRespondent2() == YES && caseData.getRespondent2SameLegalRepresentative() == YES));
@@ -44,7 +45,11 @@ public class FlowPredicate {
             && caseData.getRespondent1Represented() != NO
             && caseData.getRespondent2Represented() != NO;
 
-    public static final Predicate<CaseData> claimSubmittedNoRespondentRepresented = caseData ->
+    // have to use this for now because cannot use featureToggleService.isNoticeOfChangeEnabled() as predicate
+    public static final Predicate<CaseData> noticeOfChangeEnabledAndLiP = caseData ->
+        caseData.getAddLegalRepDeadline() != null;
+
+    public static final Predicate<CaseData> claimSubmittedBothRespondentUnrepresented = caseData ->
         caseData.getSubmittedDate() != null
             && caseData.getAddRespondent2() == YES
             && caseData.getRespondent1Represented() == NO
@@ -61,6 +66,25 @@ public class FlowPredicate {
                     && caseData.getAddRespondent2() == YES
                     && caseData.getRespondent2Represented() == YES)
         );
+
+    public static final Predicate<CaseData> claimSubmittedOneUnrepresentedDefendantOnly = caseData ->
+        caseData.getSubmittedDate() != null
+            && caseData.getRespondent1Represented() == NO
+            && caseData.getAddRespondent2() == NO;
+
+    public static final Predicate<CaseData> claimSubmittedRespondent1Unrepresented = caseData ->
+        caseData.getSubmittedDate() != null
+            && caseData.getRespondent1Represented() == NO;
+
+    public static final Predicate<CaseData> claimSubmittedRespondent2Unrepresented = caseData ->
+        caseData.getSubmittedDate() != null
+            && caseData.getAddRespondent2() == YES
+            && caseData.getRespondent2Represented() == NO;
+
+    public static final Predicate<CaseData> claimSubmittedBothUnregisteredSolicitors = caseData ->
+        caseData.getSubmittedDate() != null
+            && caseData.getRespondent1OrgRegistered() == NO
+            && (caseData.getAddRespondent2() == YES && caseData.getRespondent2OrgRegistered() == NO);
 
     public static final Predicate<CaseData> respondent1NotRepresented = caseData ->
         caseData.getIssueDate() != null && caseData.getRespondent1Represented() == NO;
@@ -499,6 +523,7 @@ public class FlowPredicate {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 predicate = basePredicate
                     && caseData.getRespondent2ClaimResponseTypeForSpec() == responseType
+                    // for the time being, even if the response is the same, 1v2ds only deals with full defence
                     && responseType == RespondentResponseTypeSpec.FULL_DEFENCE;
                 break;
             case ONE_V_ONE:
@@ -544,14 +569,10 @@ public class FlowPredicate {
                     && caseData.getRespondent2ClaimResponseTypeForSpec() != null
                     && caseData.getRespondent1ResponseDate() != null
                     && caseData.getRespondent2ResponseDate() != null
-                    && !caseData.getRespondent1ClaimResponseTypeForSpec()
+                    && (!caseData.getRespondent1ClaimResponseTypeForSpec()
                     .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-                    && ((RespondentResponseTypeSpec.FULL_DEFENCE
-                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-                    && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()))
-                    || (RespondentResponseTypeSpec.FULL_DEFENCE
-                    .equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                    && caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate())));
+                    // for the time being, 1v2ds not full defence goes offline
+                    || caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_DEFENCE);
             case TWO_V_ONE:
                 return (RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
                     || RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec()))
@@ -577,11 +598,20 @@ public class FlowPredicate {
                     && caseData.getRespondent2ClaimResponseTypeForSpec() != null
                     && caseData.getRespondent1ResponseDate() != null
                     && caseData.getRespondent2ResponseDate() != null
-                    && (!caseData.getRespondent1ClaimResponseTypeForSpec()
+                    && !caseData.getRespondent1ClaimResponseTypeForSpec()
                     .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
                     //scenario: latest response is not full defence
-                    || caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_DEFENCE
-                    || caseData.getRespondent2ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_DEFENCE);
+                    && (((!RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+                    && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate())
+                    || !RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                    && caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate())))
+                    //scenario: neither responses are full defence
+                    || (!RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                    && !RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec())));
             case ONE_V_TWO_ONE_LEGAL_REP:
                 return caseData.getRespondent1ClaimResponseTypeForSpec() != null
                     && !caseData.getRespondent1ClaimResponseTypeForSpec()
