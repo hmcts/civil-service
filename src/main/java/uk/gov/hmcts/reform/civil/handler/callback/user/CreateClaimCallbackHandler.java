@@ -54,8 +54,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
@@ -325,7 +323,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         dataBuilder.claimStarted(null);
 
         if (toggleService.isNoticeOfChangeEnabled()) {
-            if (areRespondentsRepresented(caseData) == false && getMultiPartyScenario(caseData) == ONE_V_ONE)  {
+            // LiP are not represented or registered
+            if (areAnyRespondentsLitigantInPerson(caseData) == true)  {
                 dataBuilder.addLegalRepDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(time.now()));
             }
         }
@@ -407,9 +406,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             || caseData.getRespondent2OrgRegistered() == NO);
     }
 
-    private boolean areRespondentsRepresented(CaseData caseData) {
-        return caseData.getRespondent1Represented() == YES
-            && caseData.getRespondent1OrgRegistered() == YES;
+    private boolean areAnyRespondentsLitigantInPerson(CaseData caseData) {
+        return caseData.getRespondent1Represented() == NO
+            || (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
     }
 
     private String getBody(CaseData caseData) {
