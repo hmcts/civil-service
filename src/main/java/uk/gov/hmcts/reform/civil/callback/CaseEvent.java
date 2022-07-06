@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.civil.callback.UserType.USER;
 @Getter
 @RequiredArgsConstructor
 public enum CaseEvent {
+    applyNocDecision(USER),
     CREATE_CLAIM(USER),
     CREATE_CLAIM_SPEC(USER),
     ENTER_BREATHING_SPACE_SPEC(USER),
