@@ -869,8 +869,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     } else {
                         fullDefenceAndPaidLess(
                             caseData.getRespondent2ClaimResponseTypeForSpec(),
-                            caseData.getDefenceRouteRequired2(),
-                            caseData.getRespondToClaim2(),
+                            // if only 2nd defends, defenceRouteRequired2 field is not used
+                            caseData.getDefenceRouteRequired(),
+                            caseData.getRespondToClaim(),
                             caseData.getTotalClaimAmount(),
                             DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES,
                             DefendantResponseShowTag.RESPONDENT_2_PAID_LESS
