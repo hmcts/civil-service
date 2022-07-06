@@ -468,8 +468,8 @@ public class GeneralApplicationDetailsBuilder {
     public CaseData getCaseDataForWorkAllocation(CaseState state,
                                                  SuperClaimType claimType,
                                                  Party.Type claimant1Type,
-                                                 String applicant1DQRequestedCourt,
-                                                 String respondent1DQRequestedCourt) {
+                                                 Applicant1DQ applicant1DQ,
+                                                 Respondent1DQ respondent1DQ) {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
                 .ccdCaseReference(1234L)
                 .respondent2OrganisationPolicy(OrganisationPolicy.builder()
@@ -553,23 +553,11 @@ public class GeneralApplicationDetailsBuilder {
                         .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
                         .orgPolicyReference(STRING_CONSTANT).build())
                 .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
+                .applicant1DQ(applicant1DQ)
+                .respondent1DQ(respondent1DQ)
                 .ccdState(state);
         if (claimType != null) {
             builder.superClaimType(SuperClaimType.SPEC_CLAIM);
-        }
-        if (applicant1DQRequestedCourt != null) {
-            builder.applicant1DQ(Applicant1DQ.builder()
-                    .applicant1DQRequestedCourt(RequestedCourt.builder()
-                            .responseCourtCode(applicant1DQRequestedCourt)
-                            .build())
-                    .build());
-        }
-        if (respondent1DQRequestedCourt != null) {
-            builder.respondent1DQ(Respondent1DQ.builder()
-                    .respondent1DQRequestedCourt(RequestedCourt.builder()
-                            .responseCourtCode(respondent1DQRequestedCourt)
-                            .build())
-                    .build());
         }
         return builder.build();
     }
