@@ -278,7 +278,8 @@ public class EventHistoryMapper {
                 builder.breathingSpaceEntered((Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(eventType.getCode())
-                    .dateReceived(caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now()))
+                    .dateReceived(caseData.getBreathing().getEnter().getStart() != null
+                                      ? caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now()) : null)
                     .litigiousPartyID("001")
                     .eventDetailsText(eventDetails)
                     .eventDetails(EventDetails.builder().miscText(eventDetails)
@@ -289,7 +290,8 @@ public class EventHistoryMapper {
                 builder.breathingSpaceLifted((Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(eventType.getCode())
-                    .dateReceived(caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now()))
+                    .dateReceived(caseData.getBreathing().getLift().getExpectedEnd() != null
+                                    ? caseData.getBreathing().getLift().getExpectedEnd().atTime(LocalTime.now()) : null)
                     .eventDetailsText(eventDetails)
                     .litigiousPartyID("001")
                     .eventDetails(EventDetails.builder().miscText(eventDetails)
@@ -300,7 +302,8 @@ public class EventHistoryMapper {
                 builder.breathingSpaceMentalHealthEntered((Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(eventType.getCode())
-                    .dateReceived(caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now()))
+                    .dateReceived(caseData.getBreathing().getEnter().getStart() != null
+                                      ? caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now()) : null)
                     .eventDetailsText(eventDetails)
                     .litigiousPartyID("001")
                     .eventDetails(EventDetails.builder().miscText(eventDetails)
@@ -311,7 +314,8 @@ public class EventHistoryMapper {
                 builder.breathingSpaceMentalHealthLifted((Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(eventType.getCode())
-                    .dateReceived(caseData.getBreathing().getEnter().getStart().atTime(LocalTime.now()))
+                    .dateReceived(caseData.getBreathing().getLift().getExpectedEnd() != null
+                                    ? caseData.getBreathing().getLift().getExpectedEnd().atTime(LocalTime.now()) : null)
                     .eventDetailsText(eventDetails)
                     .litigiousPartyID("001")
                     .eventDetails(EventDetails.builder().miscText(eventDetails)
