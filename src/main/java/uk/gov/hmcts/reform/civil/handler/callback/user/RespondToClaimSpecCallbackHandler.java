@@ -752,7 +752,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 }
                 break;
             case TWO_V_ONE:
-                if (caseData.getClaimant1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+                if ((caseData.getDefendantSingleResponseToBothClaimants() == YES
+                    && caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION)
+                    || caseData.getClaimant1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
                     || caseData.getClaimant2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
                     tags.add(ONLY_RESPONDENT_1_DISPUTES);
                 }
@@ -828,14 +830,34 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 break;
             case TWO_V_ONE:
                 if (!bcoPartAdmission.contains(ONLY_RESPONDENT_1_DISPUTES)) {
-                    fullDefenceAndPaidLess(
-                        caseData.getClaimant1ClaimResponseTypeForSpec(),
-                        caseData.getDefenceRouteRequired(),
-                        caseData.getRespondToClaim(),
-                        caseData.getTotalClaimAmount(),
-                        ONLY_RESPONDENT_1_DISPUTES,
-                        DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
-                    ).ifPresent(bcoPartAdmission::add);
+                    if (caseData.getDefendantSingleResponseToBothClaimants() == YES ) {
+                        fullDefenceAndPaidLess(
+                            caseData.getRespondent1ClaimResponseTypeForSpec(),
+                            caseData.getDefenceRouteRequired(),
+                            caseData.getRespondToClaim(),
+                            caseData.getTotalClaimAmount(),
+                            ONLY_RESPONDENT_1_DISPUTES,
+                            DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
+                        ).ifPresent(bcoPartAdmission::add);
+                    } else {
+                        fullDefenceAndPaidLess(
+                            caseData.getClaimant1ClaimResponseTypeForSpec(),
+                            caseData.getDefenceRouteRequired(),
+                            caseData.getRespondToClaim(),
+                            caseData.getTotalClaimAmount(),
+                            ONLY_RESPONDENT_1_DISPUTES,
+                            DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
+                        ).ifPresent(bcoPartAdmission::add);
+
+                        fullDefenceAndPaidLess(
+                            caseData.getClaimant2ClaimResponseTypeForSpec(),
+                            caseData.getDefenceRouteRequired(),
+                            caseData.getRespondToClaim(),
+                            caseData.getTotalClaimAmount(),
+                            ONLY_RESPONDENT_1_DISPUTES,
+                            DefendantResponseShowTag.RESPONDENT_1_PAID_LESS
+                        ).ifPresent(bcoPartAdmission::add);
+                    }
                 }
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
