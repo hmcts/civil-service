@@ -61,6 +61,11 @@ public class CasesController {
         var caseDataResponse = caseDetailsConverter
             .toCaseData(coreCaseDataService.getCase(caseId, authorisation));
 
+        log.info(
+            "Returning response CaseId: {}",
+            caseDataResponse
+        );
+
         return new ResponseEntity<>(caseDataResponse, HttpStatus.OK);
     }
 
