@@ -19,8 +19,8 @@ import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 import java.util.HashMap;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
-import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
+import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.*;
+import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERAL_APPLICATION_CASE_TYPE;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +55,7 @@ public class CoreCaseDataService {
         );
     }
 
-    public CaseData submitUpdate(String caseId, CaseDataContent caseDataContent) {
+    public CaseData  submitUpdate(String caseId, CaseDataContent caseDataContent) {
         UserAuthContent systemUpdateUser = getSystemUpdateUser();
 
         CaseDetails caseDetails = coreCaseDataApi.submitEventForCaseWorker(
@@ -64,6 +64,36 @@ public class CoreCaseDataService {
             systemUpdateUser.getUserId(),
             JURISDICTION,
             CASE_TYPE,
+            caseId,
+            true,
+            caseDataContent
+        );
+        return caseDetailsConverter.toCaseData(caseDetails);
+    }
+
+    public StartEventResponse startGaUpdate(String caseId, CaseEvent eventName) {
+        UserAuthContent systemUpdateUser = getSystemUpdateUser();
+
+        return coreCaseDataApi.startEventForCaseWorker(
+            systemUpdateUser.getUserToken(),
+            authTokenGenerator.generate(),
+            systemUpdateUser.getUserId(),
+            JURISDICTION,
+            GENERAL_APPLICATION_CASE_TYPE,
+            caseId,
+            eventName.name()
+        );
+    }
+
+    public CaseData submitGaUpdate(String caseId, CaseDataContent caseDataContent) {
+        UserAuthContent systemUpdateUser = getSystemUpdateUser();
+
+        CaseDetails caseDetails = coreCaseDataApi.submitEventForCaseWorker(
+            systemUpdateUser.getUserToken(),
+            authTokenGenerator.generate(),
+            systemUpdateUser.getUserId(),
+            JURISDICTION,
+            GENERAL_APPLICATION_CASE_TYPE,
             caseId,
             true,
             caseDataContent
@@ -95,7 +125,7 @@ public class CoreCaseDataService {
         return UserAuthContent.builder().userToken(userToken).userId(userId).build();
     }
 
-    private CaseDataContent caseDataContentFromStartEventResponse(
+    public CaseDataContent caseDataContentFromStartEventResponse(
         StartEventResponse startEventResponse, Map<String, Object> contentModified) {
         var payload = new HashMap<>(startEventResponse.getCaseDetails().getData());
         payload.putAll(contentModified);

@@ -15,11 +15,16 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -40,12 +45,26 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
     private final StateFlowEngine stateFlowEngine;
 
     private CaseData data;
+    private CaseData generalAppCaseData;
+    private CaseData civilCaseData;
 
     @Override
     public void handleTask(ExternalTask externalTask) {
         ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
-        String caseId = variables.getCaseId();
-        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, variables.getCaseEvent());
-        CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+        String generalAppCaseId = variables.getCaseId();
+        String civilCaseId = variables.getGeneralAppParentCaseLink();
+        StartEventResponse startGaEventResponse = coreCaseDataService.startGaUpdate(generalAppCaseId, variables.getCaseEvent());
+        generalAppCaseData = caseDetailsConverter.toCaseData(startGaEventResponse.getCaseDetails());
+        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(civilCaseId, variables.getCaseEvent());
+        civilCaseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+
+        data = coreCaseDataService.submitGaUpdate(civilCaseId, coreCaseDataService.caseDataContentFromStartEventResponse(
+            startEventResponse, getUpdatedCaseData(civilCaseData, generalAppCaseData)));
+    }
+
+    private Map<String, Object> getUpdatedCaseData(CaseData civilCaseData, CaseData generalAppCaseData) {
+        Map<String, Object> output = civilCaseData.toMap(mapper);
+        output.put("directionOrderDocument", generalAppCaseData.getDirectionOrderDocument());
+        return output;
     }
 }
