@@ -125,10 +125,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
             caseDataBuilder.hearingSupportRequirementsDJ(caseData.getHearingSupportRequirementsDJ().toBuilder()
                         .hearingPreferredLocation(caseData.getHearingSupportRequirementsDJ()
                                 .getHearingTemporaryLocation().getValue().getLabel()).build())
-                .caseManagementLocation(
-                    CaseLocation.builder()
-                        .region(location.getRegionId())
-                        .baseLocation(location.getEpimmsId()).build());
+                .caseManagementLocation(CaseLocation.builder().region(location.getRegionId()).baseLocation(
+                    location.getEpimmsId()).build());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
