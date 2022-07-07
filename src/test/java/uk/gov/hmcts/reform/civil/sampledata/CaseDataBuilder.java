@@ -2018,6 +2018,18 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addEnterMentalHealthBreathingSpaceNoOptionalData() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+            .type(BreathingSpaceType.MENTAL_HEALTH)
+            .reference(null)
+            .start(null)
+            .build();
+
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
+
+        return this;
+    }
+
     public CaseDataBuilder addLiftBreathingSpace() {
         this.enter = BreathingSpaceEnterInfo.builder()
             .type(BreathingSpaceType.STANDARD)
@@ -2031,6 +2043,19 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addLiftBreathingSpaceWithoutOptionalData() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+            .type(BreathingSpaceType.STANDARD)
+            .reference(null)
+            .start(null)
+            .build();
+        this.lift = BreathingSpaceLiftInfo.builder().expectedEnd(null).build();
+
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).lift(this.lift).build();
+
+        return this;
+    }
+
     public CaseDataBuilder addLiftMentalBreathingSpace() {
         this.enter = BreathingSpaceEnterInfo.builder()
             .type(BreathingSpaceType.MENTAL_HEALTH)
@@ -2038,6 +2063,19 @@ public class CaseDataBuilder {
             .start(LocalDate.now())
             .build();
         this.lift = BreathingSpaceLiftInfo.builder().expectedEnd(LocalDate.now()).build();
+
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).lift(this.lift).build();
+
+        return this;
+    }
+
+    public CaseDataBuilder addLiftMentalBreathingSpaceNoOptionalData() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+            .type(BreathingSpaceType.MENTAL_HEALTH)
+            .reference(null)
+            .start(null)
+            .build();
+        this.lift = BreathingSpaceLiftInfo.builder().expectedEnd(null).build();
 
         this.breathing = BreathingSpaceInfo.builder().enter(this.enter).lift(this.lift).build();
 
@@ -2063,6 +2101,18 @@ public class CaseDataBuilder {
         ccdState = AWAITING_APPLICANT_INTENTION;
         respondent1ResponseDate = claimDetailsNotificationDate.plusDays(1);
         takenOfflineDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder addEnterBreathingSpaceWithOnlyReferenceInfo() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+            .type(BreathingSpaceType.STANDARD)
+            .reference("12345")
+            .start(null)
+            .build();
+
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
+
         return this;
     }
 
