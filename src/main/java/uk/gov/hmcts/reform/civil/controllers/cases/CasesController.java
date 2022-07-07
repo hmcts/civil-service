@@ -111,7 +111,7 @@ public class CasesController {
         return new ResponseEntity<>(ocmcClaims, HttpStatus.OK);
     }
 
-    @GetMapping(path = "/defendant/{submitterId}/response/submit/{caseId}/token")
+    @GetMapping(path = "/defendant/{submitterId}/response/{caseId}/event-token")
     @ApiOperation("Gets event token for defendant submit response event")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),

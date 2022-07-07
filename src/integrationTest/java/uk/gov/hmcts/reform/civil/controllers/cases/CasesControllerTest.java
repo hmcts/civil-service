@@ -42,7 +42,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
         + "}";
     private static final String CLAIMANT_CLAIMS_URL = "/cases/claimant/{submitterId}";
     private static final String DEFENDANT_CLAIMS_URL = "/cases/defendant/{submitterId}";
-    private static final String GET_EVENT_TOKEN_URL = "/cases/defendant/{submitterId}/response/submit/{caseId}/token";
+    private static final String GET_EVENT_TOKEN_URL = "/cases/defendant/{submitterId}/response/{caseId}/event-token";
     private static final List<DashboardClaimInfo> claimResults =
         Collections.singletonList(DashboardClaimInfo.builder()
                                       .claimAmount(new BigDecimal(
