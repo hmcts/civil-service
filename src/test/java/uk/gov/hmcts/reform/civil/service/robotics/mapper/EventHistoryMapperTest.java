@@ -5673,6 +5673,26 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("breathingSpaceMentalHealthLifted").asList()
                 .isNotNull();
         }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseEntersBreathingSpaceOptionalDataNull() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .addEnterBreathingSpaceWithoutOptionalData()
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("breathingSpaceEntered").asList()
+                .isNotNull();
+        }
     }
 
     @Nested

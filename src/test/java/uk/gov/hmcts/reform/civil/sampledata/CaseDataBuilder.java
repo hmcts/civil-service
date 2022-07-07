@@ -2044,6 +2044,18 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addEnterBreathingSpaceWithoutOptionalData() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+            .type(BreathingSpaceType.STANDARD)
+            .reference(null)
+            .start(null)
+            .build();
+
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
+
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondentFullAdmissionAfterNotifyDetails() {
         atStateClaimDetailsNotified();
         respondent1ClaimResponseType = RespondentResponseType.FULL_ADMISSION;
