@@ -23,13 +23,13 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.applyNocDecision;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.nocRequest;
 
 @Service
 @RequiredArgsConstructor
 public class NoticeOfChangeRequestCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(applyNocDecision);
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(nocRequest);
 
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseAssignmentApi caseAssignmentApi;
@@ -39,8 +39,8 @@ public class NoticeOfChangeRequestCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::something)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::applyDecision)
-            .put(callbackKey(SUBMITTED), this::something)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::something)
+            .put(callbackKey(SUBMITTED), this::applyDecision)
             .build();
     }
 
@@ -49,10 +49,10 @@ public class NoticeOfChangeRequestCallbackHandler extends CallbackHandler {
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
-        return caseAssignmentApi.applyDecision(
-            authToken, authTokenGenerator.generate(), DecisionRequest.decisionRequest(caseDetails));
-//        return caseAssignmentApi.checkNocApproval(
-//            authToken, authTokenGenerator.generate(), callbackParams.getRequest());
+//        return caseAssignmentApi.applyDecision(
+//            authToken, authTokenGenerator.generate(), DecisionRequest.decisionRequest(caseDetails));
+        return caseAssignmentApi.checkNocApproval(
+            authToken, authTokenGenerator.generate(), callbackParams.getRequest());
     }
 
     private CallbackResponse something(CallbackParams callbackParams) {
