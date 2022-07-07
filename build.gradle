@@ -274,7 +274,7 @@ def versions = [
   junitPlatform      : '1.8.1',
   reformLogging      : '5.1.5',
   springBoot         : springBoot.class.package.implementationVersion,
-  springStatemachine : '3.2.0',
+  springStatemachine : '3.0.0.M2',
   springfoxSwagger   : '2.9.2',
   lombok             : '1.18.24',
   pact               : '3.5.24',
