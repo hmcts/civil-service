@@ -81,6 +81,9 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
                 sendNotificationToSolicitorSpecCounterClaim(caseData, recipient);
             } else if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
                 sendNotificationToSolicitorSpec(caseData, recipient);
+            } else
+            {
+                sendNotificationToSolicitor(caseData, recipient, templateID);
             }
         } else {
             sendNotificationToSolicitor(caseData, recipient, templateID);
