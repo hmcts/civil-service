@@ -70,6 +70,8 @@ genApp:
       consentedOrWithoutNotice: GeneralAppWithoutNotice
   lrd:
     endpoint: /refdata/location/court-venues
+  jrd:
+    endpoint: /refdata/judicial/users/search
 
 
 payments:
@@ -128,21 +130,21 @@ notifications:
   breathingSpaceEnterDefendantEmailTemplate: "3988a0c6-5a4f-46d2-9a46-15f95f0ae4eb"
   breathingSpaceLiftedApplicantEmailTemplate: "bd717149-5cba-40e8-ba93-1257033e5e86"
   breathingSpaceLiftedRespondentEmailTemplate: "a9975259-be57-482f-8a31-0c5583ad0779"
-  respondentSolicitorClaimIssueMultipartyEmailTemplate: "275225da-c0a0-4a2d-87c2-349ef4bc43e2"
-  respondentSolicitorClaimDetailsEmailTemplate: "17151a5a-00b1-48b7-8e45-38a5f20b6ec0"
-  solicitorDefendantResponseCaseTakenOffline: "c865678e-66a5-4249-8ab6-65de962c5211"
-  claimantSolicitorDefendantResponseFullDefence: "64c1ce3c-1b2a-4959-914b-38cceb6ae195"
-  solicitorDefendantResponseCaseTakenOfflineMultiparty: "d6b33ddd-833e-46ed-9887-c86e929d140b"
-  respondentSolicitorAcknowledgeClaim: "3ae4b5d8-6e73-4d72-9ae6-ff25f4941cdb"
-  failedPayment: "d6a28ba8-7496-4b13-bf1b-b821c61fdae6"
-  solicitorClaimDismissed: "b5b38ee3-863b-428d-b893-a440c82b6212"
-  claimantSolicitorCaseWillProgressOffline: "f92cc2fa-ede1-40c4-99ff-22d912ab7fe7"
-  claimantSolicitorAgreedExtensionDate: "97421dfb-f2d7-43c0-8525-e0d045e17d10"
-  claimantSolicitorConfirmsToProceed: "cd08fe4c-24a2-4353-adb0-1aef8e41fbcf"
-  claimantSolicitorConfirmsNotToProceed: "2d09dbed-f0d1-4d81-b72a-22c3fbfc649e"
-  claimantSolicitorClaimContinuingOnline: "7b30d4cb-c930-4409-aba6-f6d6cf14e376"
-  solicitorCaseTakenOffline: "a2c8a2d4-da8c-4477-b1ed-4399dfbd2424"
-  solicitorLitigationFriendAdded: "9fbbd0fd-4d61-439b-9f08-2935687b2791"
+  respondentSolicitorClaimIssueMultipartyEmailTemplate: "6e63242f-a26a-442e-ad2c-f201072195e2"
+  respondentSolicitorClaimDetailsEmailTemplate: "a565e057-8ad0-413d-aa78-2c21705853fd"
+  solicitorDefendantResponseCaseTakenOffline: "e41ab7af-71ab-4e87-a636-25c134a2d11d"
+  claimantSolicitorDefendantResponseFullDefence: "27040d5f-8e43-4a00-b6dc-bcd3b21b66bc"
+  solicitorDefendantResponseCaseTakenOfflineMultiparty: "7e1e7b92-84aa-4231-92c1-a61516e93c31"
+  respondentSolicitorAcknowledgeClaim: "b06244fd-f24d-4181-8171-1e440fab447e"
+  failedPayment: "b7b98d09-6794-4d8d-8550-cc219c91ee8c"
+  solicitorClaimDismissed: "e2f1d745-979e-43e6-9f50-e35bb30c88c1"
+  claimantSolicitorCaseWillProgressOffline: "d004304d-a7f4-4440-a13b-753cb2d57a74"
+  claimantSolicitorAgreedExtensionDate: "e920bdf0-be34-4aa3-b7da-e9de1481cecb"
+  claimantSolicitorConfirmsToProceed: "bf16b060-17b6-4d06-8367-e26a538a4911"
+  claimantSolicitorConfirmsNotToProceed: "8d2b0c8c-7cb2-4559-ba2c-a2ed5f7982be"
+  claimantSolicitorClaimContinuingOnline: "d6c71e08-a9c3-405c-8873-4370d4bdcca3"
+  solicitorCaseTakenOffline: "5f1f497e-e1e0-40e0-8296-a0a1341f1e8c"
+  solicitorLitigationFriendAdded: "bad02653-df70-4a33-9b02-d42d30c5022c"
   claimantSolicitorClaimContinuingOnlineForSpec: "cbc491af-e194-4582-934e-329f815d897d"
   claimantSolicitorClaimContinuingOnline1v2ForSpec: "1d734510-6a06-4372-aff2-d5da8bf19f72"
   respondentSolicitorClaimContinuingOnlineForSpec: "4b072a91-ff2c-4d64-a744-103d0b69152f"
@@ -232,6 +234,8 @@ fees:
 genApp:
   lrd:
     url: http://localhost:8765
+  jrd:
+    url: http://localhost:8765
 
 payments:
   api:
@@ -297,6 +301,8 @@ fees:
 genApp:
   lrd:
     url: http://fake-rd-location-ref-api
+  jrd:
+    url: http://fake-rd-judicial-api
 
 payments:
   api:
