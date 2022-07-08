@@ -68,10 +68,12 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
         if (is1v1Or2v1Case(caseData)) {
             templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
         } else {
-            if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_ONE_LEGAL_REP)) {
-                templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
-            } else {
+            if(MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)
+            && SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 templateID = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
+            }
+            else {
+                templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
             }
         }
         if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
