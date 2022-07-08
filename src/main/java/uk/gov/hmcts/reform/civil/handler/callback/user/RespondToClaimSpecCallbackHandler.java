@@ -942,6 +942,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             ONLY_RESPONDENT_1_DISPUTES,
             DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES,
             DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE,
+            SOMEONE_DISPUTES,
+            CURRENT_ADMITS_PART_OR_FULL,
             DefendantResponseShowTag.RESPONDENT_1_PAID_LESS,
             DefendantResponseShowTag.RESPONDENT_2_PAID_LESS
         )::contains);
