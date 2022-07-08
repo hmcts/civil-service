@@ -28,7 +28,7 @@ public class DashboardClaimInfo {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private LocalDate responseDeadLine;
+    private LocalDate responseDeadline;
 
 }
 
