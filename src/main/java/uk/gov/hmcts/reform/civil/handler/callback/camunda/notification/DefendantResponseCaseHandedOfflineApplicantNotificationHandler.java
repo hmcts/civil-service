@@ -71,8 +71,7 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
             if(MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)
             && SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 templateID = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
-            }
-            else {
+            } else {
                 templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
             }
         }
