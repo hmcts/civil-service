@@ -50,11 +50,13 @@ import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenari
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CONSENT_EXTENSION_FILING_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_AND_COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.GENERAL_FORM_OF_APPLICATION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
@@ -156,6 +158,8 @@ public class EventHistoryMapper {
                         break;
                     case TAKEN_OFFLINE_BY_STAFF:
                         buildTakenOfflineByStaff(builder, caseData);
+                        buildGeneralApplicationDefendantStrikeOut(builder, caseData);
+                        //call
                         break;
                     case CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE:
                         buildClaimDismissedPastDeadline(builder, caseData,
@@ -631,6 +635,7 @@ public class EventHistoryMapper {
         currentSequence = getCurrentSequence(history.getReceiptOfAdmission(), currentSequence);
         currentSequence = getCurrentSequence(history.getReplyToDefence(), currentSequence);
         currentSequence = getCurrentSequence(history.getDirectionsQuestionnaireFiled(), currentSequence);
+        currentSequence = getCurrentSequence(history.getGeneralFormOfApplication(), currentSequence);
         return currentSequence + 1;
     }
 
@@ -1399,4 +1404,49 @@ public class EventHistoryMapper {
                 return format("agreed extension date: %s", extensionDate);
         }
     }
+
+    private void buildGeneralApplicationDefendantStrikeOut(EventHistory.EventHistoryBuilder builder,
+                                                           CaseData caseData) {
+        /*    if(caseData.getCcdState()==(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)) {*/
+        var generalApplications = caseData
+            .getGeneralApplications()
+            .stream()
+            .filter(application -> application.getValue()
+                .getGeneralAppType().getTypes()
+                .contains(STRIKE_OUT))
+            .collect(Collectors.toList());
+
+        List<Event> generalApplicationsEvents = IntStream.range(0, generalApplications.size())
+            .mapToObj(index -> {
+                String miscText = "APPLICATION TO " + caseData
+                    .getGeneralApplicationsDetails()
+                    .get(index)
+                    .getValue()
+                    .getGeneralApplicationType();
+                return Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(GENERAL_FORM_OF_APPLICATION.getCode())
+                    .dateReceived(caseData
+                                      .getGeneralApplications()
+                                      .get(index)
+                                      .getValue()
+                                      .getGeneralAppSubmittedDateGAspec())
+                    .litigiousPartyID(caseData
+                                          .getGeneralApplications()
+                                          .get(index)
+                                          .getValue()
+                                          .getLitigiousPartyID())
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build();
+            })
+
+            .collect(Collectors.toList());
+
+        builder.generalFormOfApplication(generalApplicationsEvents);
+    }
+    /* }*/
+
 }

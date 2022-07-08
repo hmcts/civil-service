@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
@@ -140,6 +141,15 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .caseRole(RESPONDENTSOLICITORONE.getFormattedName()).build(),
             CaseAssignedUserRole.builder().caseDataId("1").userId("2")
                 .caseRole(RESPONDENTSOLICITORTWO.getFormattedName()).build()
+        );
+    }
+
+    public List<CaseAssignedUserRole> getCaseUsersForApplicant2ToBeApplicant() {
+        return List.of(
+            CaseAssignedUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
+                .caseRole(APPLICANTSOLICITORTWO.getFormattedName()).build(),
+            CaseAssignedUserRole.builder().caseDataId("1").userId("2")
+                .caseRole(RESPONDENTSOLICITORONE.getFormattedName()).build()
         );
     }
 
@@ -280,7 +290,58 @@ public class InitiateGeneralApplicationServiceHelperTest {
         assertThat(result.getGeneralAppRespondentSolicitors().get(0).getValue()
                        .getOrganisationIdentifier()).isEqualTo("345");
         assertThat(result.getApplicantPartyName()).isEqualTo("Applicant1");
+        assertThat(result.getLitigiousPartyID()).isEqualTo("001");
+    }
 
+    @Test
+    void shouldNotExceptionClaimantDetialsSetToAppl2() {
+
+        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
+            .thenReturn(CaseAssignedUserRolesResource.builder()
+                            .caseAssignedUserRoles(getCaseUsersForApplicant2ToBeApplicant()).build());
+
+        GeneralApplication result = helper.setRespondentDetailsIfPresent(
+            GeneralApplication.builder().build(),
+            CaseData.builder().ccdCaseReference(1234L)
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .organisation(Organisation.builder().organisationID("345").build())
+                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
+                                                   .build())
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(APPLICANT_EMAIL_ID_CONSTANT).build())
+                .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
+                .applicant2(Party.builder().type(COMPANY).companyName("Applicant2").build())
+                .respondent1(Party.builder().type(COMPANY).companyName("Respondent1").build())
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                                  .organisation(Organisation.builder().organisationID("123").build())
+                                                  .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE
+                                                                                 .getFormattedName())
+                                                  .build())
+                .applicant2OrganisationPolicy(OrganisationPolicy.builder()
+                                                  .organisation(Organisation.builder().organisationID("234").build())
+                                                  .orgPolicyCaseAssignedRole(APPLICANTSOLICITORTWO.getFormattedName())
+                                                  .build()).build(),
+            getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
+        );
+
+        assertDoesNotThrow(() -> helper);
+        assertThat(result).isNotNull();
+        ArrayList<String> userID = new ArrayList<>(Collections.singletonList("2"));
+
+        userID.forEach(uid -> assertThat(result.getGeneralAppRespondentSolicitors()
+                                             .stream().filter(e -> uid.equals(e.getValue().getId()))
+                                             .count()).isEqualTo(1));
+
+        assertThat(result.getGeneralAppRespondentSolicitors()
+                       .stream().filter(e -> STRING_NUM_CONSTANT
+                .equals(e.getValue().getId())).count()).isEqualTo(0);
+
+        assertThat(result.getGeneralAppRespondentSolicitors().get(0).getValue()
+                       .getEmail()).isEqualTo(RESPONDENT_EMAIL_ID_CONSTANT);
+
+        assertThat(result.getGeneralAppRespondentSolicitors().get(0).getValue()
+                       .getOrganisationIdentifier()).isEqualTo("345");
+        assertThat(result.getApplicantPartyName()).isEqualTo("Applicant2");
+        assertThat(result.getLitigiousPartyID()).isEqualTo("004");
     }
 
     @Test
@@ -330,6 +391,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                        .getOrganisationIdentifier()).isEqualTo("123");
 
         assertThat(result.getApplicantPartyName()).isEqualTo("Respondent1");
+        assertThat(result.getLitigiousPartyID()).isEqualTo("002");
 
     }
 
@@ -390,6 +452,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .stream().filter(e -> org.equals(e.getValue().getOrganisationIdentifier()))
                 .count()).isEqualTo(1));
         assertThat(result.getApplicantPartyName()).isEqualTo("Respondent2");
+        assertThat(result.getLitigiousPartyID()).isEqualTo("003");
     }
 
     @Test

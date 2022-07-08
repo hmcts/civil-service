@@ -34,6 +34,10 @@ public class InitiateGeneralApplicationServiceHelper {
     private final AuthTokenGenerator authTokenGenerator;
     private final UserService userService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
+    public static final String APPLICANT_ID = "001";
+    public static final String RESPONDENT_ID = "002";
+    public static final String RESPONDENT2_ID = "003";
+    public static final String APPLICANT2_ID = "004";
 
     public boolean isPCClaimantEmailIDSameAsLoginUser(String email, UserDetails userDetails) {
 
@@ -120,7 +124,9 @@ public class InitiateGeneralApplicationServiceHelper {
                 GASolicitorDetailsGAspec gaSolicitorDetailsGAspec = specBuilder.build();
                 respondentSols.add(element(gaSolicitorDetailsGAspec));
             });
-            applicationBuilder.applicantPartyName(getApplicantPartyName(userRoles, userDetails, caseData));
+            String applicantPartyName = getApplicantPartyName(userRoles, userDetails, caseData);
+            applicationBuilder.applicantPartyName(applicantPartyName);
+            applicationBuilder.litigiousPartyID(getLitigiousId(caseData, applicantPartyName));
             applicationBuilder.generalAppRespondentSolicitors(respondentSols);
         }
 
@@ -159,6 +165,37 @@ public class InitiateGeneralApplicationServiceHelper {
                     return caseData.getRespondent2().getPartyName();
                 }
             }
+        }
+        return EMPTY;
+    }
+
+    private String getLitigiousId(CaseData caseData, String applicantPartyName) {
+        if (applicantPartyName == null || applicantPartyName.isEmpty()) {
+            return EMPTY;
+        }
+        if (caseData.getApplicant1() != null
+            && caseData.getApplicant1().getPartyName() != null
+            && !caseData.getApplicant1().getPartyName().isEmpty()
+            && caseData.getApplicant1().getPartyName().equals(applicantPartyName)) {
+            return APPLICANT_ID;
+        }
+        if (caseData.getApplicant2() != null
+            && caseData.getApplicant2().getPartyName() != null
+            && !caseData.getApplicant2().getPartyName().isEmpty()
+            && caseData.getApplicant2().getPartyName().equals(applicantPartyName)) {
+            return APPLICANT2_ID;
+        }
+        if (caseData.getRespondent1() != null
+            && caseData.getRespondent1().getPartyName() != null
+            && !caseData.getRespondent1().getPartyName().isEmpty()
+            && caseData.getRespondent1().getPartyName().equals(applicantPartyName)) {
+            return RESPONDENT_ID;
+        }
+        if (caseData.getRespondent2() != null
+            && caseData.getRespondent2().getPartyName() != null
+            && !caseData.getRespondent2().getPartyName().isEmpty()
+            && caseData.getRespondent2().getPartyName().equals(applicantPartyName)) {
+            return RESPONDENT2_ID;
         }
         return EMPTY;
     }

@@ -166,6 +166,7 @@ public class RoboticsNotificationService {
         triggerReason = updateTriggerReason(eventHistory.getReceiptOfAdmission(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getReplyToDefence(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getDirectionsQuestionnaireFiled(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getGeneralFormOfApplication(), triggerReason);
 
         return triggerReason;
     }

@@ -4114,6 +4114,46 @@ class EventHistoryMapperTest {
                 "consentExtensionFilingDefence"
             );
         }
+
+        @Test
+        void shouldPrepareMiscellaneousEvent_whenGeneralApplicationDecisionDefenseStruckOut() {
+            String eventDetailText = "APPLICATION TO Strike Out";
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineByStaff()
+                .getGeneralApplicationWithLitigiousPartyID001()
+                .getGeneralApplicationsDetails()
+                .build();
+
+            Event claimNotifiedEvent = Event.builder()
+                .eventSequence(2)
+                .eventCode("999")
+                .dateReceived(caseData.getTakenOfflineByStaffDate())
+                .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                .eventDetails(EventDetails.builder()
+                                  .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                  .build())
+                .build();
+            Event generalApplicationEvent = Event.builder()
+                .eventSequence(1)
+                .eventCode("136")
+                .litigiousPartyID("001")
+                .dateReceived(caseData.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
+                .eventDetailsText(eventDetailText)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(eventDetailText)
+                                  .build())
+                .build();
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory)
+                .extracting("miscellaneous")
+                .asList()
+                .containsExactly(claimNotifiedEvent);
+
+            assertThat(eventHistory.getGeneralFormOfApplication()).isEqualTo(List.of(generalApplicationEvent));
+        }
+
     }
 
     @Nested
