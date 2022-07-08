@@ -23,7 +23,6 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -68,8 +67,8 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
         if (is1v1Or2v1Case(caseData)) {
             templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
         } else {
-            if(MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)
-            && SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)
+                && SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 templateID = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
             } else {
                 templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
