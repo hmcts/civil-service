@@ -5673,6 +5673,108 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("breathingSpaceMentalHealthLifted").asList()
                 .isNotNull();
         }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseEntersBreathingSpaceOptionalDataNull() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .addEnterBreathingSpaceWithoutOptionalData()
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("breathingSpaceEntered").asList()
+                .isNotNull();
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseLiftsBreathingSpaceWithoutOptionalData() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .addEnterBreathingSpace()
+                .addLiftBreathingSpaceWithoutOptionalData()
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("breathingSpaceLifted").asList()
+                .isNotNull();
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseEntersMentalBreathingSpaceWithoutOptionalData() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .addEnterMentalHealthBreathingSpaceNoOptionalData()
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("breathingSpaceMentalHealthEntered").asList()
+                .isNotNull();
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseLiftsMentalHealthBreathingSpaceWithoutOptionalData() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .addLiftMentalBreathingSpace()
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("breathingSpaceMentalHealthLifted").asList()
+                .isNotNull();
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseEntersBreathingSpaceWithOnlyReferenceInfo() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .addEnterBreathingSpaceWithOnlyReferenceInfo()
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("breathingSpaceEntered").asList()
+                .isNotNull();
+        }
+
     }
 
     @Nested
