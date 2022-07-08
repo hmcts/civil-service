@@ -170,6 +170,17 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackCostsToggle").isNotNull();
             assertThat(response.getData()).extracting("fastTrackTrialToggle").isNotNull();
             assertThat(response.getData()).extracting("fastTrackMethodToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocumentsToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingWitnessOfFactToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingMedicalEvidenceToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingQuestionsToExpertsToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingMethodToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingBundleToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingClaimSettlingToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingCostsToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingApplicationsOrderToggle").isNotNull();
 
             assertThat(response.getData()).extracting("disposalHearingJudgesRecital").extracting("input")
                 .isEqualTo("Upon considering the claim Form and Particulars of Claim/statements of case "

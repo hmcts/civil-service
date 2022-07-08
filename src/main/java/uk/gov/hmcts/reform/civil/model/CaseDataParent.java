@@ -168,6 +168,17 @@ public class CaseDataParent implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> fastTrackCostsToggle;
     private List<OrderDetailsPagesSectionsToggle> fastTrackTrialToggle;
     private List<OrderDetailsPagesSectionsToggle> fastTrackMethodToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingDisclosureOfDocumentsToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingWitnessOfFactToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingMedicalEvidenceToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingQuestionsToExpertsToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingSchedulesOfLossToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingFinalDisposalHearingToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingMethodToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingBundleToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingClaimSettlingToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingCostsToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingApplicationsOrderToggle;
 
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
