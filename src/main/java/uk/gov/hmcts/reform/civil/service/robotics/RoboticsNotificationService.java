@@ -114,7 +114,7 @@ public class RoboticsNotificationService {
     private String getRoboticsEmailRecipient(boolean isMultiParty, SuperClaimType superClaimType) {
         if (SPEC_CLAIM.equals(superClaimType)) {
             return isMultiParty ? roboticsEmailConfiguration
-                .getRecipient() : roboticsEmailConfiguration.getRecipient();
+                .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
         }
         return isMultiParty ? roboticsEmailConfiguration
             .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
