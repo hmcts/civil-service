@@ -113,11 +113,12 @@ public class RoboticsNotificationService {
 
     private String getRoboticsEmailRecipient(boolean isMultiParty, SuperClaimType superClaimType) {
         if (SPEC_CLAIM.equals(superClaimType)) {
-            return isMultiParty && !toggleService.isSpecRpaContinuousFeedEnabled() ? roboticsEmailConfiguration
-                .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
+            return isMultiParty ? roboticsEmailConfiguration
+                .getRecipient() : roboticsEmailConfiguration.getRecipient();
         }
-        return isMultiParty && !toggleService.isRpaContinuousFeedEnabled() ? roboticsEmailConfiguration
+        return isMultiParty ? roboticsEmailConfiguration
             .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
+
     }
 
     public static String findLatestEventTriggerReason(EventHistory eventHistory) {
