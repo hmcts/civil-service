@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -497,5 +498,31 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
             "NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE").build()).build())).isEqualTo(TASK_ID_RESPONDENT2);
 
+    }
+
+    @Test
+    void shouldReturnPropertiesSpec1v2DiffSol2_whenInvoked() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged()
+            .build();
+
+        assertThat(handler.addPropertiesSpec1v2DiffSol(caseData,
+                                                      CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC))
+            .containsEntry("legalOrgName", "Signer Name")
+            .containsEntry("claimReferenceNumber", "000DC001");
+    }
+
+    @Test
+    void shouldReturnPropertiesSpec1v2DiffSol1_whenInvoked() {
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged()
+            .build();
+
+        assertThat(handler.addPropertiesSpec1v2DiffSol(caseData,
+                                                      CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC))
+            .containsEntry("legalOrgName", "Signer Name")
+            .containsEntry("claimReferenceNumber", "000DC001");
     }
 }
