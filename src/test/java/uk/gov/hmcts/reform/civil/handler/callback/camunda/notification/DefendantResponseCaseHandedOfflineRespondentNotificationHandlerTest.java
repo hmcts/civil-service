@@ -103,6 +103,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
             void shouldNotifyDefendantSolicitor1_when1v2Case() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                     .multiPartyClaimTwoDefendantSolicitors()
                     .build();
 
