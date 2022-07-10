@@ -103,8 +103,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
             void shouldNotifyDefendantSolicitor1_when1v2Case() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
-                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
-                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
                     .multiPartyClaimTwoDefendantSolicitors()
                     .build();
 
@@ -307,7 +307,6 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                 );
             }
 
-
             @Test
             void shouldNotifyDefendantSolicitor2FirstScenerio_when1v2DifferentSolicitorCase() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -359,7 +358,6 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     "defendant-response-case-handed-offline-respondent-notification-000DC001"
                 );
             }
-
 
         }
 
