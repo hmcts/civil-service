@@ -144,7 +144,7 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
     }
 
     private void sendNotificationToSolicitorSpec(CaseData caseData,
-                                                             String recipient, CaseEvent caseEvent) {
+                                                 String recipient, CaseEvent caseEvent) {
         String emailTemplate =  notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
         notificationService.sendMail(
             recipient,
