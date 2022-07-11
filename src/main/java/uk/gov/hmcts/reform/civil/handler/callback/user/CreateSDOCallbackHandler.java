@@ -48,7 +48,16 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsOrderAndHearingDetails;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredEmail;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredTelephone;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
@@ -117,8 +126,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     // FlowStateAllowedEventService.java.
     // This way pressing previous on the ccd page won't end up calling this method again and thus
     // repopulating the fields if they have been changed.
-    // There is no reason to add conditionals to avoid this here since having it as an about to start event will mean
-    // it is only ever called once.
+    // There is no reason to add conditionals to avoid this here since having it as an about to start event will
+    // mean it is only ever called once.
     // Then any changes to fields in ccd will persist in ccd regardless of backwards or forwards page navigation.
     private CallbackResponse prePopulateOrderDetailsPages(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
@@ -479,6 +488,109 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
 
         updatedData.smallClaimsRoadTrafficAccident(tempSmallClaimsRoadTrafficAccident).build();
+        SmallClaimsJudgesRecital tempSmallClaimsJudgesRecital = SmallClaimsJudgesRecital.builder()
+            .input("District Judge Perna has considered the statements of case and the information provided by the "
+                       + "parties,"
+                       + " \n\nIT IS ORDERED that:-")
+            .build();
+
+        updatedData.smallClaimsJudgesRecital(tempSmallClaimsJudgesRecital).build();
+
+        if (judgementSum != null) {
+            SmallClaimsJudgementDeductionValue tempSmallClaimsJudgementDeductionValue =
+                SmallClaimsJudgementDeductionValue.builder()
+                    .value(judgementSum.getJudgementSum().toString() + "%")
+                    .build();
+
+            updatedData.smallClaimsJudgementDeductionValue(tempSmallClaimsJudgementDeductionValue).build();
+        }
+
+        SmallClaimsOrderAndHearingDetails tempSmallClaimsOrderAndHearingDetails =
+            SmallClaimsOrderAndHearingDetails.builder()
+            .text("Warning: you must comply with the terms imposed upon you by this order otherwise "
+                      + "your claim or the defence of it is liable to be struck out or some "
+                      + "other sanction imposed. If you cannot comply you are expected to make "
+                      + "formal application to the court before any deadline imposed upon you expires."
+                      + "\n\nYou are encouraged to try to settle the case with the other side. You may also "
+                      + "contact the Small Claims Mediation Service to arrange a mediation appointment. "
+                      + "The service is free and it can be contacted on 01604795511.")
+            .build();
+
+        updatedData.smallClaimsOrderAndHearingDetails(tempSmallClaimsOrderAndHearingDetails).build();
+
+        SmallClaimsDocuments tempSmallClaimsDocuments = SmallClaimsDocuments.builder()
+            .input1("Each party must send to the other party(ies) and to the court office to be received not less "
+                    + "than 14 days before the hearing, copies of all documents which they wish the court to "
+                    + "consider when reaching its decision.")
+            .input2("The court may refuse to consider any document which has not been sent to the other "
+                    + "party/ies and the court as set out above.")
+            .build();
+
+        updatedData.smallClaimsDocuments(tempSmallClaimsDocuments).build();
+
+        SmallClaimsWitnessStatement tempSmallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
+            .input1("Each party must send to the other party(ies) and to the court office to be received not less "
+                        + "than 14 days before the hearing, copies of the statements of any witness (including "
+                        + "themselves) upon whose evidence they intend to rely at the hearing. This is limited to")
+            .input2("")
+            .input3("")
+            .input4("For this limitation, a party is counted as a witness.")
+            .text("A witness statement must: \na) Start with the name of the case and the claim number;"
+                      + "\nb) State the full name and address of the witness; "
+                      + "\nc) Set out the witness's evidence clearly in numbered paragraphs on numbered pages;"
+                      + "\nd) End with this paragraph: 'I believe that the facts stated in this witness "
+                      + "statement are true. I understand that proceedings for contempt of court may be "
+                      + "brought against anyone who makes, or causes to be made, a false statement in a "
+                      + "document verified by a statement of truth without an honest belief in its truth'."
+                      + "\ne) be signed by the witness and dated."
+                      + "\nf) if a witness is unable to read the statement there must be a certificate that "
+                      + "it has been read or interpreted to the witness by a suitably qualified person and "
+                      + "at the final hearing there must be an independent interpreter who will not be "
+                      + "provided by the Court."
+                      + "\n\nThe judge may refuse to allow a witness to give evidence or consider any "
+                      + "statement of any witness whose statement has not been sent to the court and the "
+                      + "other party/ies in accordance with the paragraphs above."
+                      + "\n\nA witness whose statement is sent in accordance with the above should attend "
+                      + "the hearing, If they do not attend, it will be for the court to decide how much "
+                      + "reliance, if any, to place on their evidence.")
+            .build();
+
+        updatedData.smallClaimsWitnessStatement(tempSmallClaimsWitnessStatement).build();
+
+        SmallClaimsHearing tempSmallClaimsHearing =
+            SmallClaimsHearing.builder()
+                .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
+                       + "The hearing will have a time estimate of")
+                .input2("The claimant must by no later than 14 days before the hearing date, pay the court the "
+                       + "required hearing fee or submit a fully completed application for Help with Fees. If the "
+                       + "claimant fails to pay the fee or obtain a fee exemption by that time the claim will be "
+                       + "struck without further order.")
+                .build();
+
+        updatedData.smallClaimsHearing(tempSmallClaimsHearing).build();
+
+        SmallClaimsNotes tempSmallClaimsNotes = SmallClaimsNotes.builder()
+            .input("This Order has been made without a hearing. Each party has the right to apply to have this Order "
+                       + "set aside or varied. Any such application must be received by the Court "
+                       + "(together with the appropriate fee) by 4pm on")
+            .date(LocalDate.now().plusWeeks(1))
+            .build();
+
+        updatedData.smallClaimsNotes(tempSmallClaimsNotes).build();
+
+        SmallClaimsPreferredTelephone tempSmallClaimsPreferredTelephone = SmallClaimsPreferredTelephone
+            .builder()
+            .telephone(preferredTelephone)
+            .build();
+
+        updatedData.smallClaimsPreferredTelephone(tempSmallClaimsPreferredTelephone).build();
+
+        SmallClaimsPreferredEmail tempSmallClaimsPreferredEmail = SmallClaimsPreferredEmail
+            .builder()
+            .email(preferredEmail)
+            .build();
+
+        updatedData.smallClaimsPreferredEmail(tempSmallClaimsPreferredEmail).build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
