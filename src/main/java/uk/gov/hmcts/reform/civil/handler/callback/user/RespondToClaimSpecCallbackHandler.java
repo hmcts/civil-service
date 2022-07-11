@@ -308,11 +308,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             && caseData.getSpecDefenceFullAdmittedRequired() == NO) {
             updatedCaseData.specFullAdmitPaid(NO);
         }
-        if (mustWhenWillClaimBePaidBeShown(caseData)) {
-            Set<DefendantResponseShowTag> flags = caseData.getShowConditionFlags();
-            flags.add(WHEN_WILL_CLAIM_BE_PAID);
-            updatedCaseData.showConditionFlags(flags);
-        }
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             AllocatedTrack allocatedTrack = getAllocatedTrack(caseData);
             updatedCaseData.responseClaimTrack(allocatedTrack.name());
@@ -322,9 +317,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             NEED_FINANCIAL_DETAILS_1,
             NEED_FINANCIAL_DETAILS_2,
             WHY_1_DOES_NOT_PAY_IMMEDIATELY,
-            WHY_2_DOES_NOT_PAY_IMMEDIATELY
+            WHY_2_DOES_NOT_PAY_IMMEDIATELY,
+            WHEN_WILL_CLAIM_BE_PAID
         ));
         currentShowFlags.addAll(checkNecessaryFinancialDetails(caseData));
+        if (mustWhenWillClaimBePaidBeShown(caseData)) {
+            currentShowFlags.add(WHEN_WILL_CLAIM_BE_PAID);
+        }
         updatedCaseData.showConditionFlags(currentShowFlags);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
