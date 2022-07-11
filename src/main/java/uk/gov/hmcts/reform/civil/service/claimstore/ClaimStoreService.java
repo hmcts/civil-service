@@ -25,11 +25,13 @@ public class ClaimStoreService {
 
     private List<DashboardClaimInfo> translateCmcClaimToClaimInfo(List<CmcClaim> cmcClaims) {
         return cmcClaims.stream().map(cmcClaim -> DashboardClaimInfo.builder()
+            .claimId(cmcClaim.getExternalId())
             .claimNumber(cmcClaim.getReferenceNumber())
             .claimantName(cmcClaim.getClaimantName())
             .defendantName(cmcClaim.getDefendantName())
             .responseDeadline(cmcClaim.getResponseDeadline())
             .claimAmount(cmcClaim.getTotalAmountTillToday())
+            .ocmc(true)
             .build()
         ).collect(Collectors.toList());
     }
