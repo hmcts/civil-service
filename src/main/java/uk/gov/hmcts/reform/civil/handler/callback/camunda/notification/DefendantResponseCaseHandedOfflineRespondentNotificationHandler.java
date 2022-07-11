@@ -78,13 +78,16 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
         if (is1v1Or2v1Case(caseData)) {
             recipient = caseData.getRespondentSolicitor1EmailAddress();
             templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
-
         } else {
             //Use Multiparty Template as there are 2 defendant responses
-            if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)) {
-                templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
-            } else {
+            if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
+                && !RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                && !RespondentResponseTypeSpec.COUNTER_CLAIM
+                .equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
                 templateID = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+
+            } else {
+                templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
             }
             if (isRespondent1(callbackParams, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE)) {
                 recipient = caseData.getRespondentSolicitor1EmailAddress();
@@ -141,7 +144,7 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
     }
 
     private void sendNotificationToSolicitorSpec(CaseData caseData,
-                                                             String recipient, CaseEvent caseEvent) {
+                                                 String recipient, CaseEvent caseEvent) {
         String emailTemplate =  notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
         notificationService.sendMail(
             recipient,
