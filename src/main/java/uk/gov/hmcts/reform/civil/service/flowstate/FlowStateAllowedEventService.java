@@ -180,11 +180,9 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 DEFAULT_JUDGEMENT,
                 CHANGE_SOLICITOR_EMAIL,
-
                 INITIATE_GENERAL_APPLICATION,
                 STANDARD_DIRECTION_ORDER_DJ,
                 CREATE_SDO
-
             )
         ),
         entry(

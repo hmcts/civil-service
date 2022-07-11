@@ -59,5 +59,6 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private final DisclosureReport disclosureReport;
     private final RequestedCourt requestedCourt;
     private final VulnerabilityQuestions vulnerabilityQuestions;
+    private final String statementOfTruthText;
 
 }
