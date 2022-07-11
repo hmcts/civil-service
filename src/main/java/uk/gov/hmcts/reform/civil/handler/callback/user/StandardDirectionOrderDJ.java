@@ -235,7 +235,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                             + " (together with the appropriate fee) by 4pm on")
                                                  .date(LocalDate.now().plusWeeks(1))
                                                  .build());
-                                                 
+
         // populates the trial screen
         caseDataBuilder
             .trialHearingJudgesRecitalDJ(TrialHearingJudgesRecital
@@ -443,7 +443,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
-    
+
     private CallbackResponse generateSDONotifications(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
@@ -461,6 +461,4 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .confirmationBody(getBody(caseData))
             .build();
     }
-
-
 }
