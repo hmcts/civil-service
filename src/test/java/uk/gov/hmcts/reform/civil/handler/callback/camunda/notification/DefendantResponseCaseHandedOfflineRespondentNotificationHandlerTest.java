@@ -104,6 +104,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
                     .multiPartyClaimTwoDefendantSolicitors()
                     .build();
+                when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
+                    .thenReturn("template-id-multiparty");
 
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
@@ -135,6 +137,9 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                                  .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE")
                                  .build())
                     .build();
+
+                when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
+                    .thenReturn("template-id-multiparty");
 
                 handler.handle(params);
 
@@ -204,7 +209,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .respondentSolicitor2EmailAddress(null)
                     .respondent2SameLegalRepresentative(YesOrNo.NO)
                     .build();
-
+                when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
+                    .thenReturn("template-id-multiparty");
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
