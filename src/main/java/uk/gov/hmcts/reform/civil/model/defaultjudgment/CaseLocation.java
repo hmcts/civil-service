@@ -11,9 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CaseLocation {
 
-    //RegionId
     private String region;
 
-    //EpimmsId
     private String baseLocation;
 }
