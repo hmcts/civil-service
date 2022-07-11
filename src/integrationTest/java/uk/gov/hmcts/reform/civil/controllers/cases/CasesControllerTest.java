@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.citizenui.CaseEventService;
-import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
+import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 
@@ -71,7 +71,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     private RoleAssignmentsService roleAssignmentsService;
 
     @MockBean
-    private ClaimStoreService claimStoreService;
+    private DashboardClaimInfoService dashboardClaimInfoService;
 
     @MockBean
     private CaseEventService caseEventService;
@@ -140,7 +140,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     void shouldReturnClaimsForClaimantSuccessfully() {
-        when(claimStoreService.getClaimsForClaimant(any(), any())).thenReturn(claimResults);
+        when(dashboardClaimInfoService.getClaimsForClaimant(any(), any())).thenReturn(claimResults);
         doGet(BEARER_TOKEN, CLAIMANT_CLAIMS_URL, "123")
             .andExpect(content().json(toJson(claimResults)))
             .andExpect(status().isOk());
@@ -149,7 +149,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     void shouldReturnClaimsForDefendantSuccessfully() {
-        when(claimStoreService.getClaimsForDefendant(any(), any())).thenReturn(claimResults);
+        when(dashboardClaimInfoService.getClaimsForDefendant(any(), any())).thenReturn(claimResults);
         doGet(BEARER_TOKEN, DEFENDANT_CLAIMS_URL, "123")
             .andExpect(content().json(toJson(claimResults)))
             .andExpect(status().isOk());

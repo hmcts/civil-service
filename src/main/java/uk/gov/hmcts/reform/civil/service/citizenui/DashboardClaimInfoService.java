@@ -57,7 +57,7 @@ public class DashboardClaimInfoService {
             .claimNumber(caseData.getLegacyCaseReference())
             .claimantName(caseData.getApplicant1().getPartyName())
             .defendantName(caseData.getRespondent1().getPartyName())
-            .claimAmount(caseData.getTotalClaimAmount())
+            .claimAmount(caseData.getClaimValue().toPounds())
             .build();
         if (caseData.getRespondent1ResponseDeadline() != null) {
             item.setResponseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate());
