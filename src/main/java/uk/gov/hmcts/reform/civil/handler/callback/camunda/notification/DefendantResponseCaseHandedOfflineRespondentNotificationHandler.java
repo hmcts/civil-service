@@ -166,13 +166,11 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
     }
 
     private String getLegalOrganisationName(CaseData caseData,  CaseEvent caseEvent) {
-        System.out.println(" inside getLegalOrganisationName");
         String organisationID;
         organisationID = caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE)
             ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
             : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
         Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
-        System.out.println(" Orgisation name " + organisation.get().getName());
         return organisation.isPresent() ? organisation.get().getName() :
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }

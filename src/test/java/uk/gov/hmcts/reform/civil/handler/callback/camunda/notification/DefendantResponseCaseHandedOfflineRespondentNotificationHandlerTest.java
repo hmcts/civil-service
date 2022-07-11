@@ -20,7 +20,9 @@ import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
+import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -287,6 +289,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
             void shouldNotifyDefendantSolicitor2_when1v2CounterClaimCase() {
                 when(notificationsProperties.getRespondentSolicitorCounterClaimForSpec())
                     .thenReturn("template-id");
+                when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.empty());
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged()
@@ -299,6 +302,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                         CallbackRequest.builder().eventId(
                             "NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE").build())
                     .build();
+
+                when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.empty());
 
                 handler.handle(params);
 
