@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.util.Map;
 import java.util.Optional;
@@ -338,6 +339,41 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     "respondentsolicitor2@example.com",
                     "template-id-multiparty",
                     getNotificationDataMap(caseData),
+                    "defendant-response-case-handed-offline-respondent-notification-000DC001"
+                );
+            }
+
+            @Test
+            void shouldNotifyDefendantSolicitor2FirstScenerio_when1v2DifferentSolicitorCaseNoCounter() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .setSuperClaimTypeToSpecClaim()
+                    .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
+                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                    .multiPartyClaimOneDefendantSolicitor()
+                    .respondent2SameLegalRepresentative(YesOrNo.NO)
+                    .build();
+                when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
+                    .thenReturn("template-id-multiparty");
+                Organisation r2Org = Organisation.builder()
+                    .name("org name")
+                    .build();
+                when(organisationService.findOrganisationById(
+                    caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID()
+                )).thenReturn(Optional.of(r2Org));
+                CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                                 .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE")
+                                 .build())
+                    .build();
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor2@example.com",
+                    "template-id-multiparty",
+                    Map.of("legalOrgName", r2Org.getName(),
+                           "claimReferenceNumber", caseData.getLegacyCaseReference()),
                     "defendant-response-case-handed-offline-respondent-notification-000DC001"
                 );
             }

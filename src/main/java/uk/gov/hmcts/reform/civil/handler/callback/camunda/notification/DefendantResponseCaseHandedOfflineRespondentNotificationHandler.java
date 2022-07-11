@@ -57,8 +57,10 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return isRespondent1(callbackParams,
-                             NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE) ? TASK_ID_RESPONDENT1
+        return isRespondent1(
+            callbackParams,
+            NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE
+        ) ? TASK_ID_RESPONDENT1
             : TASK_ID_RESPONDENT2;
     }
 
@@ -85,7 +87,6 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
                 && !RespondentResponseTypeSpec.COUNTER_CLAIM
                 .equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
                 templateID = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
-
             } else {
                 templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
             }
@@ -105,11 +106,10 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
                 && (caseData.getRespondent2() == null || YES.equals(caseData.getRespondentResponseIsSame()))) {
                 sendNotificationToSolicitorSpecCounterClaim(caseData, recipient, caseEvent);
             } else if (MultiPartyScenario.getMultiPartyScenario(caseData)
-                .equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)) {
-                if (caseData.getRespondent1ResponseDate() == null || caseData.getRespondent2ResponseDate() == null
-                    || caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE)) {
-                    sendNotificationToSolicitorSpec(caseData, recipient, caseEvent);
-                }
+                .equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
+                && (caseData.getRespondent1ResponseDate() == null || caseData.getRespondent2ResponseDate() == null
+                || caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE))) {
+                sendNotificationToSolicitorSpec(caseData, recipient, caseEvent);
             }
         } else {
             sendNotificationToSolicitor(caseData, recipient, templateID);
@@ -145,7 +145,7 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
 
     private void sendNotificationToSolicitorSpec(CaseData caseData,
                                                  String recipient, CaseEvent caseEvent) {
-        String emailTemplate =  notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+        String emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
         notificationService.sendMail(
             recipient,
             emailTemplate,
@@ -168,7 +168,7 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
         );
     }
 
-    private String getLegalOrganisationName(CaseData caseData,  CaseEvent caseEvent) {
+    private String getLegalOrganisationName(CaseData caseData, CaseEvent caseEvent) {
         String organisationID;
         organisationID = caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE)
             ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
