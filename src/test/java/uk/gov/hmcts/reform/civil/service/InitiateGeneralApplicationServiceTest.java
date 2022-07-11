@@ -25,9 +25,11 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 
@@ -102,6 +104,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @MockBean
     private CrossAccessUserConfiguration crossAccessUserConfiguration;
+
+    @MockBean
+    private LocationRefDataService locationRefDataService;
 
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
@@ -767,12 +772,15 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @Test
     void shouldPopulateWorkAllocationLocationOnAboutToSubmit_beforeSDOHasBeenMade() {
+        when(locationRefDataService.getCCMCCLocation(any()))
+                .thenReturn(LocationRefData.builder().region("9").epimmsId("574546").build());
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getCaseDataForWorkAllocation(CASE_ISSUED, null, INDIVIDUAL, applicant1DQ, respondent1DQ);
+
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
-        assertThat(result.getGeneralApplications().get(0).getValue().getWorkAllocationLocation()).isEqualTo("CCMCC");
-        assertThat(result.getGeneralApplications().get(0).getValue().getWorkAllocationLocationName()).isEqualTo("");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+                .isEqualTo("574546");
     }
 
     @Test
@@ -781,9 +789,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .getCaseDataForWorkAllocation(null, null, INDIVIDUAL, applicant1DQ, respondent1DQ);
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
-        assertThat(result.getGeneralApplications().get(0).getValue().getWorkAllocationLocation())
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
                 .isEqualTo("applicant1DQRequestedCourt");
-        assertThat(result.getGeneralApplications().get(0).getValue().getWorkAllocationLocationName()).isEqualTo("");
     }
 
     @Test
@@ -792,9 +799,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .getCaseDataForWorkAllocation(null, SPEC_CLAIM, INDIVIDUAL, applicant1DQ, respondent1DQ);
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
-        assertThat(result.getGeneralApplications().get(0).getValue().getWorkAllocationLocation())
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
                 .isEqualTo("applicant1DQRequestedCourt");
-        assertThat(result.getGeneralApplications().get(0).getValue().getWorkAllocationLocationName()).isEqualTo("");
     }
 
     @Test
@@ -803,10 +809,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .getCaseDataForWorkAllocation(null, SPEC_CLAIM, SOLE_TRADER, applicant1DQ, respondent1DQ);
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
-        assertThat(result.getGeneralApplications().get(0).getValue().getWorkAllocationLocation())
-                .isEqualTo("applicant1DQRequestedCourt");
-        assertThat(result.getGeneralApplications().get(0).getValue().getWorkAllocationLocationName()).isEqualTo("");
-    }
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+                .isEqualTo("applicant1DQRequestedCourt");}
 
     @Test
     void shouldPopulateWorkAllocationLocationOnAboutToSubmit_afterSDOHasBeenMadeForSpecCompanyClaimant() {
@@ -814,9 +818,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .getCaseDataForWorkAllocation(null, SPEC_CLAIM, COMPANY, applicant1DQ, respondent1DQ);
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
-        assertThat(result.getGeneralApplications().get(0).getValue().getWorkAllocationLocation())
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
                 .isEqualTo("respondent1DQRequestedCourt");
-        assertThat(result.getGeneralApplications().get(0).getValue().getWorkAllocationLocationName()).isEqualTo("");
     }
 
     @Test
@@ -825,9 +828,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .getCaseDataForWorkAllocation(null, SPEC_CLAIM, ORGANISATION, applicant1DQ, respondent1DQ);
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
-        assertThat(result.getGeneralApplications().get(0).getValue().getWorkAllocationLocation())
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
                 .isEqualTo("respondent1DQRequestedCourt");
-        assertThat(result.getGeneralApplications().get(0).getValue().getWorkAllocationLocationName()).isEqualTo("");
     }
 
     @Test
@@ -837,8 +839,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
-        assertThat(result.getGeneralApplications().get(0).getValue().getWorkAllocationLocation())
-                .isEqualTo("null");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+                .isNull();
     }
 
     @Test
@@ -849,8 +851,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
-        assertThat(result.getGeneralApplications().get(0).getValue().getWorkAllocationLocation())
-                .isEqualTo("null");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+                .isNull();
     }
 
     @Test
@@ -861,8 +863,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
-        assertThat(result.getGeneralApplications().get(0).getValue().getWorkAllocationLocation())
-                .isEqualTo("null");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+                .isNull();
     }
 
     @Test
@@ -872,8 +874,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
-        assertThat(result.getGeneralApplications().get(0).getValue().getWorkAllocationLocation())
-                .isEqualTo("null");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+                .isNull();
     }
 
     @Test
@@ -884,8 +886,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
-        assertThat(result.getGeneralApplications().get(0).getValue().getWorkAllocationLocation())
-                .isEqualTo("null");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+                .isNull();
     }
 
     @Test
@@ -896,8 +898,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
-        assertThat(result.getGeneralApplications().get(0).getValue().getWorkAllocationLocation())
-                .isEqualTo("null");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+                .isNull();
     }
 
     private void assertCaseDateEntries(CaseData caseData) {

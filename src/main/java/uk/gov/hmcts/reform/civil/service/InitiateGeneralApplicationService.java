@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
@@ -26,6 +27,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.prd.model.Organisation;
@@ -70,6 +73,7 @@ public class InitiateGeneralApplicationService {
 
     private final OrganisationApi organisationApi;
     private final AuthTokenGenerator authTokenGenerator;
+    private final LocationRefDataService locationRefDataService;
 
     private static final int NUMBER_OF_DEADLINE_DAYS = 5;
     public static final String URGENCY_DATE_REQUIRED = "Details of urgency consideration date required.";
@@ -123,10 +127,10 @@ public class InitiateGeneralApplicationService {
             applicationBuilder.isMultiParty(NO);
         }
 
-        Pair<String, String> workAllocationLocation = getWorkAllocationLocation(caseData);
+        Pair<CaseLocation, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
         //Setting Work Allocation location and location name
-        applicationBuilder.workAllocationLocation(workAllocationLocation.getKey());
-        applicationBuilder.workAllocationLocationName(workAllocationLocation.getValue());
+        applicationBuilder.caseManagementLocation(caseLocation.getLeft());
+        applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
 
         applicationBuilder.claimant1PartyName(caseData.getApplicant1().getPartyName());
         applicationBuilder.defendant1PartyName(caseData.getRespondent1().getPartyName());
@@ -299,26 +303,27 @@ public class InitiateGeneralApplicationService {
             respondentCaseRoles.add(caseData.getRespondent2OrganisationPolicy().getOrgPolicyCaseAssignedRole());
         }
         return respondentCaseRoles;
-
     }
 
-    private Pair<String, String> getWorkAllocationLocation(CaseData caseData) {
+    private Pair<CaseLocation, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
         if (hasSDOBeenMade(caseData.getCcdState())) {
             if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-                //TODO : Adding dummy value until there is no location in Applicant1DQ
                 if (INDIVIDUAL.equals(caseData.getApplicant1().getType())
                         || SOLE_TRADER.equals(caseData.getApplicant1().getType())) {
-                    return Pair.of(getClaimant1PreferredLocation(caseData), "");
+                    return Pair.of(getClaimant1PreferredLocation(caseData), false);
                 } else {
-                    //TODO : Adding dummy value until there is no location in Respondent1DQ
-                    return Pair.of(getDefendant1PreferredLocation(caseData), "");
+                    return Pair.of(getDefendant1PreferredLocation(caseData), false);
                 }
             } else {
-                //TODO : Adding dummy value until there is no location in Applicant1DQ
-                return Pair.of(getClaimant1PreferredLocation(caseData), "");
+                return Pair.of(getClaimant1PreferredLocation(caseData), false);
             }
         } else {
-            return Pair.of("CCMCC", "");
+            LocationRefData ccmccLocation = locationRefDataService.getCCMCCLocation(authToken);
+            CaseLocation courtLocation = CaseLocation.builder()
+                    .region(ccmccLocation.getRegion())
+                    .baseLocation(ccmccLocation.getEpimmsId())
+                    .build();
+            return Pair.of(courtLocation, true);
         }
     }
 
@@ -326,21 +331,34 @@ public class InitiateGeneralApplicationService {
         return !statesBeforeSDO.contains(state);
     }
 
-    private String getClaimant1PreferredLocation(CaseData caseData) {
+    private CaseLocation getClaimant1PreferredLocation(CaseData caseData) {
         if (caseData.getApplicant1DQ() == null
                 || caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() == null
                 || caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode() == null) {
-            return "null";
+            return CaseLocation.builder().build();
         }
-        return caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode();
+        return CaseLocation.builder()
+                //.region(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getHearingPreferredRegionId())
+                .region(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode())
+                //.baseLocation(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt()
+                //.getHearingPreferredCourtVenueId())
+                .baseLocation(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode())
+                .build();
     }
 
-    private String getDefendant1PreferredLocation(CaseData caseData) {
+    private CaseLocation getDefendant1PreferredLocation(CaseData caseData) {
         if (caseData.getRespondent1DQ() == null
                 || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() == null
                 || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode() == null) {
-            return "null";
+            return CaseLocation.builder().build();
         }
-        return caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode();
+        //return caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode();
+        return CaseLocation.builder()
+                //.region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getHearingPreferredRegionId())
+                .region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode())
+                //.baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
+                //.getHearingPreferredCourtVenueId())
+                .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode())
+                .build();
     }
 }

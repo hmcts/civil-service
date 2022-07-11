@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.referencedata;
 
+import io.jsonwebtoken.lang.Collections;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -45,6 +46,23 @@ public class LocationRefDataService {
         return new ArrayList<>();
     }
 
+    public LocationRefData getCCMCCLocation(String authToken) {
+        try {
+            ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
+                    buildURIforCCMCC(),
+                    HttpMethod.GET,
+                    getHeaders(authToken),
+                    new ParameterizedTypeReference<List<LocationRefData>>() {});
+            List<LocationRefData> ccmccLocations = responseEntity.getBody();
+            return !Collections.isEmpty(ccmccLocations)
+                    ? ccmccLocations.get(0)
+                    : LocationRefData.builder().build();
+        } catch (Exception e) {
+            log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
+        }
+        return LocationRefData.builder().build();
+    }
+
     public List<LocationRefData> getCourtLocationsForDefaultJudgments(String authToken) {
         try {
             ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
@@ -64,6 +82,13 @@ public class LocationRefDataService {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
                 .queryParam("is_hearing_location", "Y")
                 .queryParam("location_type", "Court");
+        return builder.buildAndExpand(new HashMap<>()).toUri();
+    }
+
+    private URI buildURIforCCMCC() {
+        String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
+                .queryParam("court_venue_name", "County Court Money Claims Centre");
         return builder.buildAndExpand(new HashMap<>()).toUri();
     }
 
