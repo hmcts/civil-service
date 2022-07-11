@@ -36,6 +36,12 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -43,13 +49,6 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
-
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 
 @Service
 @RequiredArgsConstructor
