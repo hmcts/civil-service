@@ -153,6 +153,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private CallbackResponse submitApplication(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
@@ -164,7 +165,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             CaseData newCaseData = caseData.toBuilder().generalAppPBADetails(generalAppPBADetails).build();
             caseData = newCaseData;
         }
-        if (caseData.getGeneralAppHearingDetails().getHearingPreferredLocation().getValue().getLabel() != null) {
+        String preferredType = caseData.getGeneralAppHearingDetails().getHearingPreferencesPreferredType().name();
+        if (preferredType.equals("IN_PERSON")) {
             List<String> applicationLocationList = List.of(caseData.getGeneralAppHearingDetails()
                                                                .getHearingPreferredLocation()
                                                                .getValue().getLabel());
@@ -173,7 +175,13 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .filter(l -> l.getLabel().equals(applicationLocationList.get(0))).findFirst();
             first.ifPresent(dynamicLocationList::setValue);
             GAHearingDetails generalAppHearingDetails = caseData.getGeneralAppHearingDetails().toBuilder()
-                                                                .hearingPreferredLocation(dynamicLocationList).build();
+                .hearingPreferredLocation(dynamicLocationList).build();
+            CaseData updatedCaseData = caseData.toBuilder().generalAppHearingDetails(generalAppHearingDetails).build();
+            caseData = updatedCaseData;
+        }
+        else {
+            GAHearingDetails generalAppHearingDetails = caseData.getGeneralAppHearingDetails().toBuilder()
+                .hearingPreferredLocation(DynamicList.builder().build()).build();
             CaseData updatedCaseData = caseData.toBuilder().generalAppHearingDetails(generalAppHearingDetails).build();
             caseData = updatedCaseData;
         }
