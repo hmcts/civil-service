@@ -19,16 +19,18 @@ import java.time.LocalDate;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DashboardClaimInfo {
 
+    private String claimId;
     private String claimNumber;
     private String claimantName;
     private String defendantName;
+    private boolean ocmc;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal claimAmount;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private LocalDate responseDeadLine;
+    private LocalDate responseDeadline;
 
 }
 
