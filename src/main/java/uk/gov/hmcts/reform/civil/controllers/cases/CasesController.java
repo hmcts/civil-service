@@ -17,10 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
@@ -30,11 +28,10 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
-import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
+import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 
 import java.util.List;
-import java.util.Map;
 
 import static java.util.Collections.emptyList;
 
@@ -51,7 +48,7 @@ public class CasesController {
     private final RoleAssignmentsService roleAssignmentsService;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final ClaimStoreService claimStoreService;
+    private final DashboardClaimInfoService dashboardClaimInfoService;
     private final CaseEventService caseEventService;
 
     @GetMapping(path = {
@@ -102,8 +99,11 @@ public class CasesController {
     @ApiOperation("Gets basic claim information for claimant")
     public ResponseEntity<List<DashboardClaimInfo>>
         getClaimsForClaimant(@PathVariable("submitterId") String submitterId,
-                            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-        List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForClaimant(authorization, submitterId);
+                         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        List<DashboardClaimInfo> ocmcClaims = dashboardClaimInfoService.getClaimsForClaimant(
+            authorization,
+            submitterId
+        );
         return new ResponseEntity<>(ocmcClaims, HttpStatus.OK);
     }
 
@@ -111,9 +111,12 @@ public class CasesController {
     @ApiOperation("Gets basic claim information for defendant")
     public ResponseEntity<List<DashboardClaimInfo>>
         getClaimsForDefendant(@PathVariable("submitterId") String submitterId,
-                              @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-        List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForDefendant(authorization, submitterId);
-        return new ResponseEntity<>(ocmcClaims, HttpStatus.OK);
+                          @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        List<DashboardClaimInfo> defendantClaims = dashboardClaimInfoService.getClaimsForDefendant(
+            authorization,
+            submitterId
+        );
+        return new ResponseEntity<>(defendantClaims, HttpStatus.OK);
     }
 
     @PostMapping(path = "/{caseId}/citizen/{submitterId}/event")

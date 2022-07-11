@@ -19,9 +19,11 @@ import java.time.LocalDate;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DashboardClaimInfo {
 
+    private String claimId;
     private String claimNumber;
     private String claimantName;
     private String defendantName;
+    private boolean ocmc;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal claimAmount;

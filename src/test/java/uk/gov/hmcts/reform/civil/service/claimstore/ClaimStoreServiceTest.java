@@ -46,6 +46,7 @@ public class ClaimStoreServiceTest {
                                                                                                 DEFENDANT_NAME)
                                                                                             .responseDeadline(
                                                                                                 RESPONSE_DEADLINE)
+                                                                                            .ocmc(true)
                                                                                             .build());
 
     @BeforeEach
