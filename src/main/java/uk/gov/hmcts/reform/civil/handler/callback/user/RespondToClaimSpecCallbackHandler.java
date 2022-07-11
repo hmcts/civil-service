@@ -945,7 +945,16 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             SOMEONE_DISPUTES,
             CURRENT_ADMITS_PART_OR_FULL,
             DefendantResponseShowTag.RESPONDENT_1_PAID_LESS,
-            DefendantResponseShowTag.RESPONDENT_2_PAID_LESS
+            DefendantResponseShowTag.RESPONDENT_2_PAID_LESS,
+            WHEN_WILL_CLAIM_BE_PAID,
+            RESPONDENT_1_ADMITS_PART_OR_FULL,
+            RESPONDENT_2_ADMITS_PART_OR_FULL,
+            NEED_FINANCIAL_DETAILS_1,
+            NEED_FINANCIAL_DETAILS_2,
+            WHY_1_DOES_NOT_PAY_IMMEDIATELY,
+            WHY_2_DOES_NOT_PAY_IMMEDIATELY,
+            REPAYMENT_PLAN_2,
+            DefendantResponseShowTag.MEDIATION
         )::contains);
     }
 
