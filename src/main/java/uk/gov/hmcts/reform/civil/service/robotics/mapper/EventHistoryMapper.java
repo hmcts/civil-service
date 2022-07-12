@@ -1413,20 +1413,24 @@ public class EventHistoryMapper {
 
     private void buildGeneralFormApplicationEventsStrikeOutOrder(EventHistory.EventHistoryBuilder builder,
                                                            CaseData caseData) {
-        var generalApplications = caseData
-            .getGeneralApplications()
-            .stream()
-            .filter(application -> application.getValue().getGeneralAppType().getTypes().contains(STRIKE_OUT)
-                &&  getGeneralApplicationDetailsJudeDecisionWithStruckOutDefence(application.getValue()
-                                                                                     .getCaseLink()
-                                                                                     .getCaseReference(),
-                                                                                 caseData)
-                 != null)
-            .collect(Collectors.toList());
+        if (caseData.getGeneralApplications() != null) {
+            var generalApplications = caseData
+                .getGeneralApplications()
+                .stream()
+                .filter(application -> application.getValue().getGeneralAppType().getTypes().contains(STRIKE_OUT)
+                    && getGeneralApplicationDetailsJudeDecisionWithStruckOutDefence(
+                    application.getValue()
+                        .getCaseLink()
+                        .getCaseReference(),
+                    caseData
+                )
+                    != null)
+                .collect(Collectors.toList());
 
-        if (!generalApplications.isEmpty()) {
-            buildGeneralFormOfApplicationStrikeOut(builder, generalApplications);
-            buildDefenceStruckOutJudgmentEvent(builder, generalApplications);
+            if (!generalApplications.isEmpty()) {
+                buildGeneralFormOfApplicationStrikeOut(builder, generalApplications);
+                buildDefenceStruckOutJudgmentEvent(builder, generalApplications);
+            }
         }
 
     }
