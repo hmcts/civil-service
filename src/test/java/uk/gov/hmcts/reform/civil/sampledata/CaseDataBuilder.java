@@ -2484,6 +2484,7 @@ public class CaseDataBuilder {
             .build();
         return this;
     }
+
     public CaseDataBuilder getGeneralApplicationWithLitigiousPartyID001() {
         List<GeneralApplicationTypes> types = Arrays.asList(STRIKE_OUT);
         List<Element<GeneralApplication>> generalApplicationValues = wrapElements(
@@ -2519,6 +2520,7 @@ public class CaseDataBuilder {
         this.generalApplicationsDetails = generalApplicationsDetails;
         return this;
     }
+
     public CaseDataBuilder multiPartyClaimTwoDefendantSolicitors() {
         this.addRespondent2 = YES;
         this.respondent2 = PartyBuilder.builder().individual().build();
