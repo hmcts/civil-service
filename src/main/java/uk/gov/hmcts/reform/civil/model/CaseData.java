@@ -22,11 +22,24 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingSchedulesOfLoss;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -49,6 +62,16 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -217,7 +240,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo specRespondent1Represented;
     private final YesOrNo specRespondent2Represented;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents;
-    private final String specClaimResponseTimelineList;
+    private final TimelineUploadTypeSpec specClaimResponseTimelineList;
     private final ResponseDocument specResponseTimelineDocumentFiles;
     private final List<Evidence> specResponselistYourEvidenceList;
 
@@ -390,6 +413,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String detailsOfDirection;
 
     private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
+    private final CaseLocation caseManagementLocation;
     private final DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;
     private final String bothDefendants;
@@ -421,6 +445,33 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonUnwrapped(suffix = "Breathing")
     private final BreathingSpaceInfo breathing;
+    private final String applicantVRespondentText;
 
+    //default judgement SDO fields for disposal
+    private DisposalHearingJudgesRecital disposalHearingJudgesRecitalDJ;
+    private DisposalHearingDisclosureOfDocuments disposalHearingDisclosureOfDocumentsDJ;
+    private DisposalHearingWitnessOfFact disposalHearingWitnessOfFactDJ;
+    private DisposalHearingMedicalEvidence disposalHearingMedicalEvidenceDJ;
+    private DisposalHearingQuestionsToExperts disposalHearingQuestionsToExpertsDJ;
+    private DisposalHearingSchedulesOfLoss disposalHearingSchedulesOfLossDJ;
+    private DisposalHearingStandardDisposalOrder disposalHearingStandardDisposalOrderDJ;
+    private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearingDJ;
+    private DisposalHearingBundle disposalHearingBundleDJ;
+    private DisposalHearingNotes disposalHearingNotesDJ;
 
+    //default judgement SDO fields for trial
+    private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
+    private TrialHearingDisclosureOfDocuments trialHearingDisclosureOfDocumentsDJ;
+    private TrialHearingWitnessOfFact trialHearingWitnessOfFactDJ;
+    private TrialHearingSchedulesOfLoss trialHearingSchedulesOfLossDJ;
+    private TrialHearingTrial trialHearingTrialDJ;
+    private TrialHearingNotes trialHearingNotesDJ;
+    private TrialBuildingDispute trialBuildingDispute;
+    private TrialClinicalNegligence trialClinicalNegligence;
+    private TrialCreditHire trialCreditHire;
+    private TrialPersonalInjury trialPersonalInjury;
+    private TrialRoadTrafficAccident trialRoadTrafficAccident;
+
+    private String caseManagementOrderSelection;
+    private Document orderSDODocumentDJ;
 }
