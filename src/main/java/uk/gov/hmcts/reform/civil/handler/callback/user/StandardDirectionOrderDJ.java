@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
@@ -36,6 +37,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -43,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -56,6 +59,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(STANDARD_DIRECTION_ORDER_DJ);
     private final ObjectMapper objectMapper;
+    private final DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     String participantString;
 
     public static final String ORDER_1_CLAI = "The directions order has been sent to: "
@@ -69,6 +73,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::initiateSDO)
             .put(callbackKey(MID, "trial-disposal-screen"), this::populateDisposalTrialScreen)
+            .put(callbackKey(MID, "create-order"), this::createOrderScreen)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::generateSDONotifications)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -459,6 +464,17 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(getHeader(caseData))
             .confirmationBody(getBody(caseData))
+            .build();
+    }
+    private CallbackResponse createOrderScreen(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        CaseDocument document = defaultJudgmentOrderFormGenerator.generate(
+            caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        caseDataBuilder.orderSDODocumentDJ(document.getDocumentLink());
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 }
