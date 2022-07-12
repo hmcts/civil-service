@@ -23,6 +23,8 @@ import uk.gov.hmcts.reform.civil.service.bankholidays.PublicHolidaysCollection;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static java.time.LocalTime.MIDNIGHT;
@@ -263,6 +265,43 @@ public class DeadlinesCalculatorTest {
             assertThat(responseDeadline)
                 .isWeekday()
                 .isTheSame(expectedDeadline);
+        }
+    }
+
+    @Nested
+    class NextDeadline {
+        @Test
+        void shouldReturnEarliestDate() {
+            List<LocalDateTime> datelines = new ArrayList<>();
+            LocalDateTime earliestDeadline = LocalDateTime.of(2019, 03, 28, 14, 33, 48);
+            datelines.add(earliestDeadline);
+            datelines.add(LocalDateTime.of(2019, 03, 28, 14, 50, 48));
+            datelines.add(LocalDateTime.of(2019, 05, 28, 14, 33, 48));
+
+            assertThat(calculator.nextDeadline(datelines)).isTheSame(earliestDeadline);
+        }
+
+        @Test
+        void shouldReturnEarliestDate_whenOneOfDatesIsNull() {
+            List<LocalDateTime> datelines = new ArrayList<>();
+            LocalDateTime earliestDeadline = LocalDateTime.of(2019, 03, 28, 14, 33, 48);
+            datelines.add(earliestDeadline);
+            datelines.add(LocalDateTime.of(2019, 03, 28, 14, 50, 48));
+            datelines.add(null);
+            datelines.add(LocalDateTime.of(2019, 05, 28, 14, 33, 48));
+
+            assertThat(calculator.nextDeadline(datelines)).isTheSame(earliestDeadline);
+        }
+
+        @Test
+        void shouldReturnEarliestDate_AllDatesAreSame() {
+            List<LocalDateTime> datelines = new ArrayList<>();
+            LocalDateTime earliestDeadline = LocalDateTime.of(2019, 03, 28, 14, 33, 48);
+            datelines.add(earliestDeadline);
+            datelines.add(earliestDeadline);
+            datelines.add(earliestDeadline);
+
+            assertThat(calculator.nextDeadline(datelines)).isTheSame(earliestDeadline);
         }
     }
 

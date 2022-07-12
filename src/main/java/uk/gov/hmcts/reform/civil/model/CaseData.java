@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
@@ -85,7 +86,6 @@ import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 @Jacksonized
 @EqualsAndHashCode(callSuper = true)
 @Data
-@SuppressWarnings("unchecked")
 public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -248,6 +248,24 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final ResponseDocument respondent1SpecDefenceResponseDocument;
 
+    public RespondentResponseTypeSpec getRespondent1ClaimResponseTypeForSpec() {
+
+        if (respondent1ClaimResponseTypeForSpec == null) {
+            return getRespondent1ClaimResponseTestForSpec();
+        } else {
+            return respondent1ClaimResponseTypeForSpec;
+        }
+    }
+
+    public RespondentResponseTypeSpec getRespondent2ClaimResponseTypeForSpec() {
+
+        if (respondent2ClaimResponseTypeForSpec == null) {
+            return getRespondent2ClaimResponseTestForSpec();
+        } else {
+            return respondent2ClaimResponseTypeForSpec;
+        }
+    }
+
     private final RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
     private final RespondentResponseTypeSpec respondent2ClaimResponseTypeForSpec;
     private final RespondentResponseTypeSpec claimant1ClaimResponseTypeForSpec;
@@ -347,6 +365,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo claimantResponseDocumentToDefendant2Flag;
     private YesOrNo claimant2ResponseFlag;
     private RespondentResponseTypeSpec atLeastOneClaimResponseTypeForSpecIsFullDefence;
+    // used only in 2v1
     private YesOrNo specFullAdmissionOrPartAdmission;
     private YesOrNo sameSolicitorSameResponse;
     private YesOrNo specPaidLessAmountOrDisputesOrPartAdmission;
@@ -394,6 +413,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String detailsOfDirection;
 
     private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
+    private final CaseLocation caseManagementLocation;
     private final DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;
     private final String bothDefendants;
@@ -454,6 +474,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
+
     private List<DisposalAndTrialHearingDJToggle> disposalHearingDisclosureOfDocumentsDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingWitnessOfFactDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingMedicalEvidenceDJToggle;
@@ -474,5 +495,4 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private List<DisposalAndTrialHearingDJToggle> trialHearingSchedulesOfLossDJToggle;
     private List<DisposalAndTrialHearingDJToggle> trialHearingCostsToggle;
     private List<DisposalAndTrialHearingDJToggle> trialHearingTrialDJToggle;
-
 }

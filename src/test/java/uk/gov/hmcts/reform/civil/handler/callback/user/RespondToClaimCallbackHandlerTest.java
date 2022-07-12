@@ -76,6 +76,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.APPLICANT_RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.RESPONSE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
@@ -780,6 +781,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .containsEntry("applicant1ResponseDeadline", deadline.format(ISO_DATE_TIME))
+                .containsEntry("nextDeadline", deadline.toLocalDate().toString())
                 .containsEntry("respondent1ResponseDate", responseDate.format(ISO_DATE_TIME))
                 .containsEntry("respondent2ResponseDate", responseDate.format(ISO_DATE_TIME));
 
@@ -808,6 +810,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .containsEntry("applicant1ResponseDeadline", deadline.format(ISO_DATE_TIME))
+                .containsEntry("nextDeadline", deadline.toLocalDate().toString())
                 .containsEntry("respondent1ResponseDate", responseDate.format(ISO_DATE_TIME))
                 .containsEntry("respondent2ResponseDate", responseDate.format(ISO_DATE_TIME));
 
@@ -834,6 +837,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .containsEntry("applicant1ResponseDeadline", deadline.format(ISO_DATE_TIME))
+                .containsEntry("nextDeadline", deadline.toLocalDate().toString())
                 .containsEntry("respondent1ResponseDate", caseData.getRespondent1ResponseDate().format(ISO_DATE_TIME))
                 .containsEntry("respondent2ResponseDate", responseDate.format(ISO_DATE_TIME));
 
@@ -859,6 +863,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .containsEntry("applicant1ResponseDeadline", deadline.format(ISO_DATE_TIME))
+                .containsEntry("nextDeadline", deadline.toLocalDate().toString())
                 .containsEntry("respondent1ResponseDate", responseDate.format(ISO_DATE_TIME))
                 .containsEntry("respondent2ResponseDate", caseData.getRespondent2ResponseDate().format(ISO_DATE_TIME));
 
@@ -910,6 +915,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
+                .removeSolicitorReferences()
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, Map.of());
@@ -920,6 +926,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isNull();
             assertThat(response.getData())
                 .extracting("respondentSolicitor2Reference")
+                .isNull();
+            assertThat(response.getData())
+                .extracting("caseListDisplayDefendantSolicitorReferences")
                 .isNull();
         }
 
@@ -951,6 +960,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("respondentSolicitor2Reference")
                 .asString()
                 .contains("01234");
+            assertThat(response.getData())
+                .extracting("caseListDisplayDefendantSolicitorReferences")
+                .asString()
+                .contains("6789, 01234");
         }
 
         @Test
@@ -968,6 +981,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("applicant1ResponseDeadline").isNull();
+            assertThat(response.getData())
+                .containsEntry("nextDeadline", caseData.getRespondent2ResponseDeadline().toLocalDate().toString());
             assertThat(response.getData()).extracting("respondent1ResponseDate")
                 .isEqualTo(responseDate.format(ISO_DATE_TIME));
             assertThat(response.getData()).extracting("respondent2ResponseDate").isNull();
@@ -989,6 +1004,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("applicant1ResponseDeadline").isNull();
+            assertThat(response.getData())
+                .containsEntry("nextDeadline", caseData.getRespondent1ResponseDeadline().toLocalDate().toString());
             assertThat(response.getData()).extracting("respondent2ResponseDate")
                 .isEqualTo(responseDate.format(ISO_DATE_TIME));
             assertThat(response.getData()).extracting("respondent1ResponseDate").isNull();
@@ -999,6 +1016,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldCopyRespondentPrimaryAddresses_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                .respondent2ResponseDeadline(RESPONSE_DEADLINE)
                 .respondent2(PartyBuilder.builder().individual().build())
                 .build();
             String address = "test address";
@@ -1038,6 +1056,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("respondent1ResponseDate", responseDate.format(ISO_DATE_TIME));
 
             assertThat(response.getData()).extracting("respondent2ResponseDate").isNull();
+            assertThat(response.getData())
+                .containsEntry("nextDeadline", deadline.toLocalDate().toString());
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent", "status")
