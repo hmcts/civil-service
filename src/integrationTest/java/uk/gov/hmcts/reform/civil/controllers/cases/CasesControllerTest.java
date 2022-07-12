@@ -166,7 +166,13 @@ public class CasesControllerTest extends BaseIntegrationTest {
         when(caseEventService.submitEvent(any())).thenReturn(expectedCaseDetails);
         when(caseDetailsConverter.toCaseData(expectedCaseDetails))
             .thenReturn(expectedCaseData);
-        doPost(BEARER_TOKEN, EventDto.builder().event(CaseEvent.DEFENDANT_RESPONSE_SPEC).caseDataUpdate(Map.of()).build(), SUBMIT_EVENT_URL, "123", "123")
+        doPost(
+            BEARER_TOKEN,
+            EventDto.builder().event(CaseEvent.DEFENDANT_RESPONSE_SPEC).caseDataUpdate(Map.of()).build(),
+            SUBMIT_EVENT_URL,
+            "123",
+            "123"
+        )
             .andExpect(content().json(toJson(expectedCaseData)))
             .andExpect(status().isOk());
     }
