@@ -50,7 +50,15 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredEmail;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredTelephone;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -143,6 +151,14 @@ public class CaseDataParent implements MappableObject {
     private FastTrackPreferredEmail fastTrackPreferredEmail;
     private SmallClaimsCreditHire smallClaimsCreditHire;
     private SmallClaimsRoadTrafficAccident smallClaimsRoadTrafficAccident;
+    private SmallClaimsDocuments smallClaimsDocuments;
+    private SmallClaimsHearing smallClaimsHearing;
+    private SmallClaimsJudgementDeductionValue smallClaimsJudgementDeductionValue;
+    private SmallClaimsJudgesRecital smallClaimsJudgesRecital;
+    private SmallClaimsNotes smallClaimsNotes;
+    private SmallClaimsPreferredEmail smallClaimsPreferredEmail;
+    private SmallClaimsPreferredTelephone smallClaimsPreferredTelephone;
+    private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
 
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
