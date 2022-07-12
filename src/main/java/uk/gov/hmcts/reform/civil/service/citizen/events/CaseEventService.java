@@ -33,7 +33,12 @@ public class CaseEventService {
     }
 
     public CaseDetails submitEvent(EventSubmissionParams params) {
-        StartEventResponse eventResponse = startEvent(params.getAuthorisation(), params.getUserId(), params.getCaseId(), params.getEvent());
+        StartEventResponse eventResponse = startEvent(
+            params.getAuthorisation(),
+            params.getUserId(),
+            params.getCaseId(),
+            params.getEvent()
+        );
         CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(eventResponse, params.getUpdates());
         return coreCaseDataApi.submitEventForCitizen(
             params.getAuthorisation(),
@@ -46,7 +51,4 @@ public class CaseEventService {
             caseDataContent
         );
     }
-
-
-
 }
