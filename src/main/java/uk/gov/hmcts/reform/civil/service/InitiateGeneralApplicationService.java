@@ -318,7 +318,7 @@ public class InitiateGeneralApplicationService {
                 return Pair.of(getClaimant1PreferredLocation(caseData), false);
             }
         } else {
-            LocationRefData ccmccLocation = locationRefDataService.getCCMCCLocation(authToken);
+            LocationRefData ccmccLocation = locationRefDataService.getCcmccLocation(authToken);
             CaseLocation courtLocation = CaseLocation.builder()
                     .region(ccmccLocation.getRegion())
                     .baseLocation(ccmccLocation.getEpimmsId())

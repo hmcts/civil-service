@@ -46,17 +46,22 @@ public class LocationRefDataService {
         return new ArrayList<>();
     }
 
-    public LocationRefData getCCMCCLocation(String authToken) {
+    public LocationRefData getCcmccLocation(String authToken) {
         try {
             ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
-                    buildURIforCCMCC(),
+                    buildURIforCcmcc(),
                     HttpMethod.GET,
                     getHeaders(authToken),
                     new ParameterizedTypeReference<List<LocationRefData>>() {});
             List<LocationRefData> ccmccLocations = responseEntity.getBody();
-            return !Collections.isEmpty(ccmccLocations)
-                    ? ccmccLocations.get(0)
-                    : LocationRefData.builder().build();
+            if (Collections.isEmpty(ccmccLocations)) {
+                log.warn("Location Reference Data Lookup did not return any CCMCC location");
+                return LocationRefData.builder().build();
+            }
+            if (!Collections.isEmpty(ccmccLocations) && ccmccLocations.size() > 1) {
+                log.warn("Location Reference Data Lookup returned more than one CCMCC location");
+            }
+            return ccmccLocations.get(0);
         } catch (Exception e) {
             log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
         }
@@ -85,7 +90,7 @@ public class LocationRefDataService {
         return builder.buildAndExpand(new HashMap<>()).toUri();
     }
 
-    private URI buildURIforCCMCC() {
+    private URI buildURIforCcmcc() {
         String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
                 .queryParam("court_venue_name", "County Court Money Claims Centre");
