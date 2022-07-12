@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.controllers.cases;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -23,7 +25,8 @@ import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
-import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
+import uk.gov.hmcts.reform.civil.service.citizenui.CaseEventService;
+import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 
 import java.util.List;
@@ -43,7 +46,8 @@ public class CasesController {
     private final RoleAssignmentsService roleAssignmentsService;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final ClaimStoreService claimStoreService;
+    private final DashboardClaimInfoService dashboardClaimInfoService;
+    private final CaseEventService caseEventService;
 
     @GetMapping(path = {
         "/{caseId}",
@@ -93,8 +97,11 @@ public class CasesController {
     @ApiOperation("Gets basic claim information for claimant")
     public ResponseEntity<List<DashboardClaimInfo>>
         getClaimsForClaimant(@PathVariable("submitterId") String submitterId,
-                            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-        List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForClaimant(authorization, submitterId);
+                         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        List<DashboardClaimInfo> ocmcClaims = dashboardClaimInfoService.getClaimsForClaimant(
+            authorization,
+            submitterId
+        );
         return new ResponseEntity<>(ocmcClaims, HttpStatus.OK);
     }
 
@@ -102,8 +109,24 @@ public class CasesController {
     @ApiOperation("Gets basic claim information for defendant")
     public ResponseEntity<List<DashboardClaimInfo>>
         getClaimsForDefendant(@PathVariable("submitterId") String submitterId,
-                              @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-        List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForDefendant(authorization, submitterId);
-        return new ResponseEntity<>(ocmcClaims, HttpStatus.OK);
+                          @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        List<DashboardClaimInfo> defendantClaims = dashboardClaimInfoService.getClaimsForDefendant(
+            authorization,
+            submitterId
+        );
+        return new ResponseEntity<>(defendantClaims, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/defendant/{submitterId}/response/{caseId}/event-token")
+    @ApiOperation("Gets event token for defendant submit response event")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 401, message = "Not Authorized")})
+    public ResponseEntity<String>
+        getSubmitResponseToken(@PathVariable("submitterId") String submitterId,
+                           @PathVariable("caseId") String caseId,
+                           @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        String eventToken = caseEventService.getDefendantResponseSpecEventToken(authorization, submitterId, caseId);
+        return new ResponseEntity<>(eventToken, HttpStatus.OK);
     }
 }
