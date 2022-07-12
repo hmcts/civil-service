@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -61,6 +62,10 @@ import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
@@ -72,6 +77,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static java.time.LocalDate.now;
@@ -92,8 +98,10 @@ import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
 import static uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator.DISPOSAL_HEARING;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class CaseDataBuilder {
 
@@ -263,6 +271,8 @@ public class CaseDataBuilder {
     private String respondent2OrganisationIDCopy;
     private String caseManagementOrderSelection;
     private LocalDateTime addLegalRepDeadline;
+    private List<Element<GeneralApplication>> generalApplications;
+    private List<Element<GeneralApplicationsDetails>> generalApplicationsDetails;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -2474,7 +2484,41 @@ public class CaseDataBuilder {
             .build();
         return this;
     }
+    public CaseDataBuilder getGeneralApplicationWithLitigiousPartyID001() {
+        List<GeneralApplicationTypes> types = Arrays.asList(STRIKE_OUT);
+        List<Element<GeneralApplication>> generalApplicationValues = wrapElements(
+            GeneralApplication.builder()
+                .applicantPartyName("partyName")
+                .litigiousPartyID("001")
+                .applicantPartyName("partyName")
+                .generalAppDateDeadline(DEADLINE)
+                .generalAppSubmittedDateGAspec(SUBMITTED_DATE_TIME)
+                .generalAppType(GAApplicationType.builder()
+                                    .types(types)
+                                    .build())
+                .caseLink(CaseLink.builder().caseReference("12345678").build())
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("NotifyRoboticsOnCaseHandedOffline")
+                                     .build())
+                .build());
 
+        this.generalApplications = generalApplicationValues;
+        return this;
+    }
+
+    public CaseDataBuilder getGeneralApplicationsDetails() {
+        List<Element<GeneralApplicationsDetails>> generalApplicationsDetails = wrapElements(
+            GeneralApplicationsDetails.builder()
+                .generalApplicationType(STRIKE_OUT.getDisplayedValue())
+                .caseState(PROCEEDS_IN_HERITAGE_SYSTEM.name())
+                .generalAppSubmittedDateGAspec(SUBMITTED_DATE_TIME)
+                .caseLink(CaseLink.builder().caseReference("12345678").build())
+                .build()
+        );
+
+        this.generalApplicationsDetails = generalApplicationsDetails;
+        return this;
+    }
     public CaseDataBuilder multiPartyClaimTwoDefendantSolicitors() {
         this.addRespondent2 = YES;
         this.respondent2 = PartyBuilder.builder().individual().build();
@@ -2845,6 +2889,8 @@ public class CaseDataBuilder {
             .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
             .caseManagementOrderSelection(caseManagementOrderSelection)
+            .generalApplications(generalApplications)
+            .generalApplicationsDetails(generalApplicationsDetails)
             .build();
     }
 }
