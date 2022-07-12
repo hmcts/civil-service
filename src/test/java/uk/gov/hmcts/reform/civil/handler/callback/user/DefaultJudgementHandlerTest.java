@@ -290,7 +290,8 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ
                 .builder().hearingDates(
                     wrapElements(hearingDates)).build();
-            List<String> temporaryLocationList = List.of("Loc 1", "Loc 2");
+            List<DynamicListElement> temporaryLocationList = List.of(
+                DynamicListElement.builder().label("Loc 1").build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
@@ -300,10 +301,13 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ
                                                   .builder()
                                                   .hearingTemporaryLocation(
-                                                      DynamicList.fromList(temporaryLocationList)).build())
+                                                      DynamicList.builder().listItems(temporaryLocationList)
+                                                          .value(DynamicListElement.builder().label("Loc - 1 - 1")
+                                                                     .build())
+                                                          .build()).build())
                 .build();
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder()
+            locations.add(LocationRefData.builder().siteName("Loc").courtAddress("1").postcode("1")
                               .courtName("Court Name").region("Region").regionId("1").courtVenueId("000").build());
             when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
