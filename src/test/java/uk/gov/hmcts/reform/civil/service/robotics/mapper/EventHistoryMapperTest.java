@@ -4125,7 +4125,7 @@ class EventHistoryMapperTest {
                 .build();
 
             Event claimNotifiedEvent = Event.builder()
-                .eventSequence(2)
+                .eventSequence(3)
                 .eventCode("999")
                 .dateReceived(caseData.getTakenOfflineByStaffDate())
                 .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
@@ -4143,6 +4143,12 @@ class EventHistoryMapperTest {
                                   .miscText(eventDetailText)
                                   .build())
                 .build();
+            Event defenceStruckOutJudgment = Event.builder()
+                .eventSequence(2)
+                .eventCode("57")
+                .litigiousPartyID("001")
+                .dateReceived(caseData.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
+                .build();
             var eventHistory = mapper.buildEvents(caseData);
 
             assertThat(eventHistory).isNotNull();
@@ -4152,6 +4158,7 @@ class EventHistoryMapperTest {
                 .containsExactly(claimNotifiedEvent);
 
             assertThat(eventHistory.getGeneralFormOfApplication()).isEqualTo(List.of(generalApplicationEvent));
+            assertThat(eventHistory.getDefenceStruckOutJudgment()).isEqualTo(List.of(defenceStruckOutJudgment));
         }
 
     }

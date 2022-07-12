@@ -62,6 +62,7 @@ import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
@@ -1365,6 +1366,7 @@ public class CaseDataBuilder {
                 .businessProcess(BusinessProcess.builder()
                                      .camundaEvent("NotifyRoboticsOnCaseHandedOffline")
                                      .build())
+                .caseLink(CaseLink.builder().caseReference("12345678").build())
                 .build());
 
         this.generalApplications = generalApplicationValues;
@@ -1376,7 +1378,9 @@ public class CaseDataBuilder {
         List<Element<GeneralApplicationsDetails>> generalApplicationsDetails = wrapElements(
             GeneralApplicationsDetails.builder()
                 .generalApplicationType(STRIKE_OUT.getDisplayedValue())
+                .caseState(PROCEEDS_IN_HERITAGE_SYSTEM.name())
                 .generalAppSubmittedDateGAspec(SUBMITTED_DATE_TIME)
+                .caseLink(CaseLink.builder().caseReference("12345678").build())
                 .build()
         );
 

@@ -76,6 +76,9 @@ public class EventHistorySequencer {
                 case GENERAL_FORM_OF_APPLICATION:
                     builder.generalFormOfApplication(event);
                     break;
+                case DEFENCE_STRUCK_OUT:
+                    builder.defenceStruckOutJudgment(event);
+                    break;
                 default:
                     throw new IllegalStateException("Unexpected event type: " + eventType);
             }
@@ -104,6 +107,12 @@ public class EventHistorySequencer {
         if (isEmpty(builder.build().getReplyToDefence())) {
             builder.replyToDefence(List.of(Event.builder().build()));
         }
+        if (isEmpty(builder.build().getGeneralFormOfApplication())) {
+            builder.generalFormOfApplication(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getDefenceStruckOutJudgment())) {
+            builder.defenceStruckOutJudgment(List.of(Event.builder().build()));
+        }
         return builder
             .build();
     }
@@ -130,7 +139,8 @@ public class EventHistorySequencer {
             eventHistory.getReceiptOfAdmission(),
             eventHistory.getReplyToDefence(),
             eventHistory.getDirectionsQuestionnaireFiled(),
-            eventHistory.getGeneralFormOfApplication()
+            eventHistory.getGeneralFormOfApplication(),
+            eventHistory.getDefenceStruckOutJudgment()
         );
         return eventsList.stream()
             .filter(Objects::nonNull)

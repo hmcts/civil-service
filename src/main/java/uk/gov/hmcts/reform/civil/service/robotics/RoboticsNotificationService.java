@@ -144,7 +144,9 @@ public class RoboticsNotificationService {
             eventHistory.getReceiptOfPartAdmission(),
             eventHistory.getReceiptOfAdmission(),
             eventHistory.getReplyToDefence(),
-            eventHistory.getDirectionsQuestionnaireFiled()
+            eventHistory.getDirectionsQuestionnaireFiled(),
+            eventHistory.getGeneralFormOfApplication(),
+            eventHistory.getDefenceStruckOutJudgment()
         );
         return eventsList.stream()
             .filter(Objects::nonNull)
@@ -167,6 +169,7 @@ public class RoboticsNotificationService {
         triggerReason = updateTriggerReason(eventHistory.getReplyToDefence(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getDirectionsQuestionnaireFiled(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getGeneralFormOfApplication(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getDefenceStruckOutJudgment(), triggerReason);
 
         return triggerReason;
     }

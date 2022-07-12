@@ -12,11 +12,14 @@ import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.model.ClaimantResponseDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -38,6 +41,7 @@ import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.left;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -55,6 +59,7 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CONSENT_EXTENSION_FILING_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_AND_COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_STRUCK_OUT;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.GENERAL_FORM_OF_APPLICATION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
@@ -158,7 +163,7 @@ public class EventHistoryMapper {
                         break;
                     case TAKEN_OFFLINE_BY_STAFF:
                         buildTakenOfflineByStaff(builder, caseData);
-                        buildGeneralApplicationDefendantStrikeOut(builder, caseData);
+                        buildGeneralFormApplicationEventsStrikeOutOrder(builder, caseData);
                         //call
                         break;
                     case CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE:
@@ -636,6 +641,7 @@ public class EventHistoryMapper {
         currentSequence = getCurrentSequence(history.getReplyToDefence(), currentSequence);
         currentSequence = getCurrentSequence(history.getDirectionsQuestionnaireFiled(), currentSequence);
         currentSequence = getCurrentSequence(history.getGeneralFormOfApplication(), currentSequence);
+        currentSequence = getCurrentSequence(history.getDefenceStruckOutJudgment(), currentSequence);
         return currentSequence + 1;
     }
 
@@ -1405,34 +1411,40 @@ public class EventHistoryMapper {
         }
     }
 
-    private void buildGeneralApplicationDefendantStrikeOut(EventHistory.EventHistoryBuilder builder,
+    private void buildGeneralFormApplicationEventsStrikeOutOrder(EventHistory.EventHistoryBuilder builder,
                                                            CaseData caseData) {
-        /*    if(caseData.getCcdState()==(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)) {*/
         var generalApplications = caseData
             .getGeneralApplications()
             .stream()
-            .filter(application -> application.getValue()
-                .getGeneralAppType().getTypes()
-                .contains(STRIKE_OUT))
+            .filter(application -> application.getValue().getGeneralAppType().getTypes().contains(STRIKE_OUT)
+                &&  getGeneralApplicationDetailsJudeDecisionWithStruckOutDefence(application.getValue()
+                                                                                     .getCaseLink()
+                                                                                     .getCaseReference(),
+                                                                                 caseData)
+                 != null)
             .collect(Collectors.toList());
 
-        List<Event> generalApplicationsEvents = IntStream.range(0, generalApplications.size())
+        if (!generalApplications.isEmpty()) {
+            buildGeneralFormOfApplicationStrikeOut(builder, generalApplications);
+            buildDefenceStruckOutJudgmentEvent(builder, generalApplications);
+        }
+
+    }
+
+    private void buildGeneralFormOfApplicationStrikeOut(EventHistory.EventHistoryBuilder builder,
+                                                    List<Element<GeneralApplication>> generalApplicationsStrikeOut) {
+
+        List<Event> generalApplicationsEvents = IntStream.range(0, generalApplicationsStrikeOut.size())
             .mapToObj(index -> {
-                String miscText = "APPLICATION TO " + caseData
-                    .getGeneralApplicationsDetails()
-                    .get(index)
-                    .getValue()
-                    .getGeneralApplicationType();
+                String miscText = "APPLICATION TO Strike Out";
                 return Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(GENERAL_FORM_OF_APPLICATION.getCode())
-                    .dateReceived(caseData
-                                      .getGeneralApplications()
+                    .dateReceived(generalApplicationsStrikeOut
                                       .get(index)
                                       .getValue()
                                       .getGeneralAppSubmittedDateGAspec())
-                    .litigiousPartyID(caseData
-                                          .getGeneralApplications()
+                    .litigiousPartyID(generalApplicationsStrikeOut
                                           .get(index)
                                           .getValue()
                                           .getLitigiousPartyID())
@@ -1442,11 +1454,47 @@ public class EventHistoryMapper {
                                       .build())
                     .build();
             })
-
             .collect(Collectors.toList());
 
         builder.generalFormOfApplication(generalApplicationsEvents);
     }
-    /* }*/
+
+    private void buildDefenceStruckOutJudgmentEvent(EventHistory.EventHistoryBuilder builder,
+                                                    List<Element<GeneralApplication>> generalApplicationsStrikeOut) {
+
+        List<Event> generalApplicationsEvents = IntStream.range(0, generalApplicationsStrikeOut.size())
+            .mapToObj(index -> {
+                return Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(DEFENCE_STRUCK_OUT.getCode())
+                    .dateReceived(generalApplicationsStrikeOut
+                                      .get(index)
+                                      .getValue()
+                                      .getGeneralAppSubmittedDateGAspec())
+                    .litigiousPartyID(generalApplicationsStrikeOut
+                                          .get(index)
+                                          .getValue()
+                                          .getLitigiousPartyID())
+                    .build();
+            })
+            .collect(Collectors.toList());
+
+        builder.generalFormOfApplication(generalApplicationsEvents);
+    }
+
+    private Element<GeneralApplicationsDetails> getGeneralApplicationDetailsJudeDecisionWithStruckOutDefence(
+        String caseLinkId, CaseData caseData) {
+        return caseData.getGeneralApplicationsDetails().stream()
+                .filter(generalApplicationsDetailsElement ->
+                       generalApplicationsDetailsElement
+                           .getValue()
+                           .getCaseLink()
+                           .getCaseReference()
+                           .equals(caseLinkId)
+                       && generalApplicationsDetailsElement.getValue().getCaseState()
+                           .equals(PROCEEDS_IN_HERITAGE_SYSTEM.name()))
+            .findFirst()
+            .orElse(null);
+    }
 
 }

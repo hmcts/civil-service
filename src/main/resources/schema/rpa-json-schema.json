@@ -346,7 +346,8 @@
         "receiptOfAdmission",
         "replyToDefence",
         "directionsQuestionnaireFiled",
-        "generalFormOfApplication"
+        "generalFormOfApplication",
+        "defenceStruckOutJudgment"
       ],
       "properties": {
         "miscellaneous": {
@@ -462,6 +463,18 @@
         "anyOf": [
           {
             "$ref": "#/definitions/generalFormOfApplicationEventType"
+          },
+          {
+            "$ref": "#/definitions/nullEventType"
+          }
+        ],
+        "description": ""
+      },
+      "defenceStruckOutJudgment": {
+        "$id": "#/properties/events/properties/defenceStruckOutJudgment",
+        "anyOf": [
+          {
+            "$ref": "#/definitions/defenceStruckOutJudgmentEventType"
           },
           {
             "$ref": "#/definitions/nullEventType"
@@ -1374,6 +1387,52 @@
             ],
             "maxLength": 250,
             "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "defenceStruckOutJudgmentEventType": {
+      "$id": "#/definitions/defenceStruckOutJudgmentEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/defenceStruckOutJudgmentEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/defenceStruckOutJudgmentEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/defenceStruckOutJudgmentEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "57",
+            "description": "The CASEMAN code for the Judge decision of Struck out Defense."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/defenceStruckOutJudgmentEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/defenceStruckOutJudgmentEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/defenceStruckOutJudgmentEventType/items/properties/eventDetails",
+            "type": "null"
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/defenceStruckOutJudgmentEventType/items/properties/eventDetailsText",
+            "type": "null"
           }
         },
         "additionalProperties": false
