@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static java.lang.Long.parseLong;
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.*;
@@ -53,12 +54,13 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
         String generalAppCaseId = variables.getCaseId();
         String civilCaseId = variables.getGeneralAppParentCaseLink();
-        StartEventResponse startGaEventResponse = coreCaseDataService.startGaUpdate(generalAppCaseId, variables.getCaseEvent());
-        generalAppCaseData = caseDetailsConverter.toCaseData(startGaEventResponse.getCaseDetails());
+
+        generalAppCaseData = caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(generalAppCaseId)));
+
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(civilCaseId, variables.getCaseEvent());
         civilCaseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
 
-        data = coreCaseDataService.submitGaUpdate(civilCaseId, coreCaseDataService.caseDataContentFromStartEventResponse(
+        data = coreCaseDataService.submitUpdate(civilCaseId, coreCaseDataService.caseDataContentFromStartEventResponse(
             startEventResponse, getUpdatedCaseData(civilCaseData, generalAppCaseData)));
     }
 
