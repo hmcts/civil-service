@@ -569,7 +569,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPrePopulateDisposalHearingJudgementDeductionValueWhenDrawDirectionsOrderIsNotNull() {
             JudgementSum tempJudgementSum = JudgementSum.builder()
-                .judgementSum(12)
+                .judgementSum(12.0)
                 .build();
 
             CaseData caseData = CaseDataBuilder.builder()
@@ -584,11 +584,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("disposalHearingJudgementDeductionValue").extracting("value")
-                .isEqualTo("12%");
+                .isEqualTo("12.0%");
             assertThat(response.getData()).extracting("fastTrackJudgementDeductionValue").extracting("value")
-                .isEqualTo("12%");
+                .isEqualTo("12.0%");
             assertThat(response.getData()).extracting("smallClaimsJudgementDeductionValue").extracting("value")
-                .isEqualTo("12%");
+                .isEqualTo("12.0%");
         }
 
         @Test
