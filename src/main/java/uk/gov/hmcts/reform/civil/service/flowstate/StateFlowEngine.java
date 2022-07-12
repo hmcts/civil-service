@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -162,6 +163,14 @@ public class StateFlowEngine {
                                 .or(claimSubmittedBothUnregisteredSolicitors)
                                 // this line MUST be removed when NOC toggle(noticeOfChangeEnabledAndLiP) is removed
                                 .or(claimSubmittedOneUnrepresentedDefendantOnly))))
+                .set(flags -> flags.putAll(
+                    // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
+                    // camunda diagram for TAKE_CASE_OFFLINE is changed
+                    Map.of(
+                        FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
+                        FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
+                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
+                    )))
             // Only one unrepresented defendant
             .transitionTo(CLAIM_SUBMITTED)
                 .onlyIf(noticeOfChangeEnabledAndLiP.and(claimSubmittedOneUnrepresentedDefendantOnly))
@@ -236,7 +245,9 @@ public class StateFlowEngine {
                     .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
                             .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
                     .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
-                            .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))))
+                            .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))
+                            .and(caseData -> MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP
+                                != MultiPartyScenario.getMultiPartyScenario(caseData))))
             // Unrepresented and Unregistered
             // 1. Def1 unrepresented, Def2 unregistered
             // 2. Def1 unregistered, Def 2 unrepresented

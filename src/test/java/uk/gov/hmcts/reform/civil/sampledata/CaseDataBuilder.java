@@ -93,6 +93,7 @@ import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
+import static uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator.DISPOSAL_HEARING;
 
 public class CaseDataBuilder {
 
@@ -260,6 +261,7 @@ public class CaseDataBuilder {
 
     private String respondent1OrganisationIDCopy;
     private String respondent2OrganisationIDCopy;
+    private String caseManagementOrderSelection;
     private LocalDateTime addLegalRepDeadline;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
@@ -1047,6 +1049,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendant1UnrepresentedDefendant2() {
         respondent2 = PartyBuilder.builder().individual().build();
         atStatePendingClaimIssuedUnrepresentedDefendant();
+        addRespondent2 = YES;
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1Represented = YES;
@@ -1257,6 +1260,23 @@ public class CaseDataBuilder {
         defendantDetails = DynamicList.builder()
             .value(DynamicListElement.builder().label("Both Defendants").build())
             .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssued1v2AndOneDefendantDefaultJudgment() {
+        defendantDetails = DynamicList.builder()
+            .value(DynamicListElement.builder().label("Mr. Sole Trader").build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedDisposalHearing() {
+        caseManagementOrderSelection = DISPOSAL_HEARING;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedTrialHearing() {
+        caseManagementOrderSelection = "TRIAL_HEARING";
         return this;
     }
 
@@ -1793,6 +1813,13 @@ public class CaseDataBuilder {
         respondent2ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateApplicantRespondToDefenceAndNotProceed_1v2_DiffSol() {
+        atStateApplicantRespondToDefenceAndNotProceed_1v2();
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
         return this;
     }
 
@@ -2859,6 +2886,7 @@ public class CaseDataBuilder {
             .applicant1ProceedWithClaimSpec2v1(applicant1ProceedWithClaimSpec2v1)
             .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
+            .caseManagementOrderSelection(caseManagementOrderSelection)
             .build();
     }
 }

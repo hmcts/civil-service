@@ -86,6 +86,15 @@ public class DocmosisTemplateDataUtils {
             .build();
     }
 
+    public static String fetchSoleTraderCompany(Party party) {
+        StringBuilder soleTraderCompanyBuilder = new StringBuilder();
+        if (party.getType() == uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER
+            && StringUtils.isNotBlank(party.getSoleTraderTradingAs())) {
+            soleTraderCompanyBuilder.append(" T/A ").append(party.getSoleTraderTradingAs());
+        }
+        return soleTraderCompanyBuilder.toString();
+    }
+
     private static void soleTraderCompany(Party party, StringBuilder stringBuilder) {
         if (party.getType() == Party.Type.SOLE_TRADER && StringUtils.isNotBlank(party.getSoleTraderTradingAs())) {
             stringBuilder.append(" T/A ").append(party.getSoleTraderTradingAs());

@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -75,31 +75,31 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        LocalDate extensionDate = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
+        LocalDateTime extensionDate = caseData.getRespondent1ResponseDeadline();
 
         //finding extension date for the correct respondent in a 1v2 different solicitor scenario
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            if ((caseData.getRespondent1TimeExtensionDate() == null)
-                && (caseData.getRespondent2TimeExtensionDate() != null)) {
-                extensionDate = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
-            } else if ((caseData.getRespondent1TimeExtensionDate() != null)
-                && (caseData.getRespondent2TimeExtensionDate() == null)) {
-                extensionDate = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
-            } else if ((caseData.getRespondent1TimeExtensionDate() != null)
-                && (caseData.getRespondent2TimeExtensionDate() != null)) {
-                if (caseData.getRespondent2TimeExtensionDate()
-                    .isAfter(caseData.getRespondent1TimeExtensionDate())) {
-                    extensionDate = caseData.getRespondentSolicitor2AgreedDeadlineExtension();
+            if ((caseData.getRespondent1ResponseDeadline() == null)
+                && (caseData.getRespondent2ResponseDeadline() != null)) {
+                extensionDate = caseData.getRespondent2ResponseDeadline();
+            } else if ((caseData.getRespondent1ResponseDeadline() != null)
+                && (caseData.getRespondent2ResponseDeadline() == null)) {
+                extensionDate = caseData.getRespondent1ResponseDeadline();
+            } else if ((caseData.getRespondent1ResponseDeadline() != null)
+                && (caseData.getRespondent2ResponseDeadline() != null)) {
+                if (caseData.getRespondent2ResponseDeadline()
+                    .isAfter(caseData.getRespondent1ResponseDeadline())) {
+                    extensionDate = caseData.getRespondent2ResponseDeadline();
                 } else {
-                    extensionDate = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
+                    extensionDate = caseData.getRespondent1ResponseDeadline();
                 }
             }
         }
 
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE),
+            AGREED_EXTENSION_DATE, formatLocalDate(extensionDate.toLocalDate(), DATE),
             PARTY_REFERENCES, buildPartiesReferences(caseData)
         );
     }
