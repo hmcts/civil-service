@@ -1250,13 +1250,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimIssued1v2AndOneDefendantDefaultJudgment() {
-        defendantDetails = DynamicList.builder()
-            .value(DynamicListElement.builder().label("Mr. Sole Trader").build())
-            .build();
-        return this;
-    }
-
     public CaseDataBuilder atStateClaimSubmitted1v2Respondent2OrgNotRegistered() {
         atStateClaimIssued();
         respondent1Represented = YES;
