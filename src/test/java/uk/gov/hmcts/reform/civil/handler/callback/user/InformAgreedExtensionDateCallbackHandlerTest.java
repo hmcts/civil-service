@@ -34,7 +34,6 @@ import java.time.LocalDateTime;
 
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
-import static java.time.LocalTime.MIDNIGHT;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -337,52 +336,6 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
     @Nested
     class AboutToSubmitCallback {
         LocalDateTime timeExtensionDate;
-        LocalDate extensionDate;
-
-        @BeforeEach
-        void setup() {
-            timeExtensionDate = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
-            when(time.now()).thenReturn(timeExtensionDate);
-
-            extensionDate = now().plusDays(14);
-            when(deadlinesCalculator.calculateFirstWorkingDay(extensionDate)).thenReturn(extensionDate);
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
-        }
-
-        @Test
-        void shouldUpdateResponseDeadlineToExtensionDate_whenInvoked() {
-            LocalDateTime responseDeadline = now().atTime(MIDNIGHT);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .respondentSolicitor1AgreedDeadlineExtension(extensionDate)
-                .respondent1ResponseDeadline(responseDeadline)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            LocalDateTime newDeadline = extensionDate.atTime(END_OF_BUSINESS_DAY);
-
-            assertThat(response.getData())
-                .containsEntry("respondent1ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
-                .containsEntry("respondent1TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME));
-
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("camundaEvent")
-                .isEqualTo(INFORM_AGREED_EXTENSION_DATE.name());
-
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("status")
-                .isEqualTo("READY");
-        }
-    }
-
-    @Nested
-    class AboutToSubmitV1Callback {
-        LocalDateTime timeExtensionDate;
         LocalDate extensionDateRespondent1;
         LocalDate extensionDateRespondent2;
 
@@ -403,11 +356,14 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldUpdateRespondent1ResponseDeadlineToExtensionDate_whenRepresentingRespondent1() {
+            LocalDateTime nextDeadline = extensionDateRespondent1.atStartOfDay();
+            when(deadlinesCalculator.nextDeadline(any())).thenReturn(nextDeadline);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
                 .addRespondent2(NO)
                 .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)
                 .build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -426,16 +382,23 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
                 .extracting("businessProcess")
                 .extracting("status")
                 .isEqualTo("READY");
+
+            assertThat(response.getData())
+                .extracting("nextDeadline")
+                .isEqualTo(nextDeadline.toLocalDate().toString());
         }
 
         @Test
         void shouldUpdateRespondent2ResponseDeadlineToExtensionDate_whenRepresentingRespondent2() {
+            LocalDateTime nextDeadline = LocalDateTime.now().plusDays(7);
+            when(deadlinesCalculator.nextDeadline(any())).thenReturn(nextDeadline);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
                 .respondentSolicitor2AgreedDeadlineExtension(extensionDateRespondent2)
                 .build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -444,16 +407,22 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getData())
                 .containsEntry("respondent2ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
                 .containsEntry("respondent2TimeExtensionDate", timeExtensionDate.format(ISO_DATE_TIME));
+
+            assertThat(response.getData())
+                .extracting("nextDeadline")
+                .isEqualTo(nextDeadline.toLocalDate().toString());
         }
 
         @Test
         void shouldUpdateBothRespondentResponseDeadlinesToExtensionDate_whenSolicitorRepresentingBothRespondents() {
+            LocalDateTime nextDeadline = extensionDateRespondent1.atStartOfDay();
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(YES)
                 .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)
                 .build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -467,6 +436,72 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
                 .extracting("businessProcess")
                 .extracting("status")
                 .isEqualTo("READY");
+
+            assertThat(response.getData())
+                .extracting("nextDeadline")
+                .isEqualTo(nextDeadline.toLocalDate().toString());
+        }
+
+        @Nested
+        class NextDeadline {
+            @Test
+            void oneVOne_TwoVOne_shouldReturnCorrectNextDeadline() {
+                LocalDateTime nextDeadline = extensionDateRespondent1.atStartOfDay();
+                when(deadlinesCalculator.nextDeadline(any())).thenReturn(nextDeadline);
+
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
+                    .addRespondent2(NO)
+                    .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData())
+                    .extracting("nextDeadline")
+                    .isEqualTo(nextDeadline.toLocalDate().toString());
+            }
+
+            @Test
+            void oneVTwoSameSolicitor_shouldReturnCorrectNextDeadline() {
+                LocalDateTime nextDeadline = extensionDateRespondent1.atStartOfDay();
+
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
+                    .addRespondent2(YES)
+                    .respondent2SameLegalRepresentative(YES)
+                    .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData())
+                    .extracting("nextDeadline")
+                    .isEqualTo(nextDeadline.toLocalDate().toString());
+            }
+
+            @Test
+            void oneVTwoDifferentSolicitor_shouldReturnCorrectNextDeadline() {
+                LocalDateTime nextDeadline = LocalDateTime.now().plusDays(7);
+                when(deadlinesCalculator.nextDeadline(any())).thenReturn(nextDeadline);
+
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
+                    .addRespondent2(YES)
+                    .respondent2SameLegalRepresentative(NO)
+                    .respondentSolicitor2AgreedDeadlineExtension(extensionDateRespondent2)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                LocalDateTime newDeadline = extensionDateRespondent2.atTime(END_OF_BUSINESS_DAY);
+
+                assertThat(response.getData())
+                    .extracting("nextDeadline")
+                    .isEqualTo(nextDeadline.toLocalDate().toString());
+            }
         }
     }
 

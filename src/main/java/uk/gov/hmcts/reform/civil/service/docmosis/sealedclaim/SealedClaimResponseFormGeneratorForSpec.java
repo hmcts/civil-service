@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -50,17 +51,21 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             .whyDisputeTheClaim(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
             .statementOfTruth(caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth());
 
-        builder.respondent1(getSpecifiedParty(
-            caseData.getRespondent1(),
-            representativeService.getRespondent1Representative(caseData)
-        ));
-        Optional.ofNullable(caseData.getRespondent2()).ifPresent(
-            respondent2 ->
-                builder.respondent2(getSpecifiedParty(
-                    respondent2,
-                    representativeService.getRespondent2Representative(
-                        caseData)
-                )));
+        if (MultiPartyScenario.getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
+            builder.respondent1(getDefendant1v2ds(caseData));
+        } else {
+            builder.respondent1(getSpecifiedParty(
+                caseData.getRespondent1(),
+                representativeService.getRespondent1Representative(caseData)
+            ));
+            Optional.ofNullable(caseData.getRespondent2()).ifPresent(
+                respondent2 ->
+                    builder.respondent2(getSpecifiedParty(
+                        respondent2,
+                        representativeService.getRespondent2Representative(
+                            caseData)
+                    )));
+        }
 
         Optional.ofNullable(caseData.getSolicitorReferences())
             .ifPresent(builder::solicitorReferences);
@@ -100,6 +105,32 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
                 .paymentMethod(getPaymentMethod(response)));
 
         return builder.build();
+    }
+
+    /**
+     * We pass through this method twice, once for each defendant. Each time
+     * we have to set the defendant who just answered.
+     *
+     * @param caseData a case data 1v2 with different solicitors and at least one of the defendants
+     *                 has responded
+     * @return which should be the defendant in the sealed claim form
+     */
+    private SpecifiedParty getDefendant1v2ds(CaseData caseData) {
+        if (caseData.getRespondent1ResponseDate() == null
+            || (caseData.getRespondent2ResponseDate() != null
+            && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()))) {
+            return getSpecifiedParty(
+                caseData.getRespondent2(),
+                representativeService.getRespondent2Representative(
+                    caseData)
+            );
+        } else {
+            return getSpecifiedParty(
+                caseData.getRespondent1(),
+                representativeService.getRespondent1Representative(
+                    caseData)
+            );
+        }
     }
 
     private String getPaymentMethod(RespondToClaim response) {
