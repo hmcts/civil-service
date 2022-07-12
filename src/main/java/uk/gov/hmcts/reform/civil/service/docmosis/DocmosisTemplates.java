@@ -27,6 +27,8 @@ public enum DocmosisTemplates {
     DEFENDANT_RESPONSE_SPEC_SEALED_1v2(
         "CV-SPC-HRN-ENG-01064.docx", "%s_response_sealed_form.pdf"
     ),
+    DJ_SDO_DISPOSAL("CV-UNS-DEC-ENG-09999.docx", "Order_disposal_pdf_%s.pdf"),
+    DJ_SDO_TRIAL("CV-UNS-DEC-ENG-09998.docx", "Order_trial_pdf_%s.pdf"),
     CLAIMANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01062.docx", "%s_directions_questionnaire_form_%s.pdf");
 
     private final String template;
