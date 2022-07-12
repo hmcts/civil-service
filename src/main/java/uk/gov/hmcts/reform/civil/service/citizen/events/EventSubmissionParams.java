@@ -13,10 +13,10 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventSubmissionParams {
+
     private String authorisation;
     private String userId;
     private String caseId;
     private CaseEvent event;
     private Map<String, Object> updates;
-
 }
