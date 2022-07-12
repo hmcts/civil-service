@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -7,11 +9,8 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import java.util.HashMap;
 import java.util.Map;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CaseDataContentConverter {
-
-    private CaseDataContentConverter(){
-
-    }
 
     public static CaseDataContent caseDataContentFromStartEventResponse(
         StartEventResponse startEventResponse, Map<String, Object> contentModified) {
