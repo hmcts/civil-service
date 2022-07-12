@@ -8,5 +8,4 @@ public class CaseDefinitionConstants {
 
     public static final String JURISDICTION = "CIVIL";
     public static final String CASE_TYPE = "CIVIL";
-    public static final String GENERAL_APPLICATION_CASE_TYPE = "GENERALAPPLICATION";
 }
