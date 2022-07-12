@@ -178,8 +178,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .hearingPreferredLocation(dynamicLocationList).build();
             CaseData updatedCaseData = caseData.toBuilder().generalAppHearingDetails(generalAppHearingDetails).build();
             caseData = updatedCaseData;
-        }
-        else {
+        } else {
             GAHearingDetails generalAppHearingDetails = caseData.getGeneralAppHearingDetails().toBuilder()
                 .hearingPreferredLocation(DynamicList.builder().build()).build();
             CaseData updatedCaseData = caseData.toBuilder().generalAppHearingDetails(generalAppHearingDetails).build();
