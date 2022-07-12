@@ -456,61 +456,61 @@
             }
           ],
           "description": ""
+        },
+        "generalFormOfApplication": {
+          "$id": "#/properties/events/properties/generalFormOfApplication",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/generalFormOfApplicationEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
+        },
+        "defenceStruckOutJudgment": {
+          "$id": "#/properties/events/properties/defenceStruckOutJudgment",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/defenceStruckOutJudgmentEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
         }
       },
-      "generalFormOfApplication": {
-        "$id": "#/properties/events/properties/generalFormOfApplication",
-        "anyOf": [
-          {
-            "$ref": "#/definitions/generalFormOfApplicationEventType"
-          },
-          {
-            "$ref": "#/definitions/nullEventType"
-          }
-        ],
-        "description": ""
-      },
-      "defenceStruckOutJudgment": {
-        "$id": "#/properties/events/properties/defenceStruckOutJudgment",
-        "anyOf": [
-          {
-            "$ref": "#/definitions/defenceStruckOutJudgmentEventType"
-          },
-          {
-            "$ref": "#/definitions/nullEventType"
-          }
-        ],
-        "description": ""
-      }
+      "additionalProperties": false
     },
-    "additionalProperties": false
-  },
-  "breathingSpace": {
-    "$id": "#/properties/breathing",
-    "type": [
-      "null",
-      "object"
-    ],
-    "description": "This section contains the information about Breathing Space",
-    "required": [
-      "type"
-    ],
-    "properties": {
-      "type": {
-        "$id": "#/properties/breathing/type",
-        "type": "string",
-        "enum": [
-          "STANDARD",
-          "MENTAL_HEALTH"
-        ]
+    "breathingSpace": {
+      "$id": "#/properties/breathing",
+      "type": [
+        "null",
+        "object"
+      ],
+      "description": "This section contains the information about Breathing Space",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "$id": "#/properties/breathing/type",
+          "type": "string",
+          "enum": [
+            "STANDARD",
+            "MENTAL_HEALTH"
+          ]
+        },
+        "endDate": {
+          "$id": "#/properties/breathing/endDate",
+          "$ref": "#/definitions/formatDateOrNull",
+          "description": ""
+        }
       },
-      "endDate": {
-        "$id": "#/properties/breathing/endDate",
-        "$ref": "#/definitions/formatDateOrNull",
-        "description": ""
-      }
-    },
-    "additionalProperties": false
+      "additionalProperties": false
+    }
   },
   "additionalProperties": false,
   "definitions": {
