@@ -6,12 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
@@ -24,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
@@ -34,12 +37,15 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -53,21 +59,47 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(STANDARD_DIRECTION_ORDER_DJ);
     private final ObjectMapper objectMapper;
+    private final DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     String participantString;
+
+    public static final String ORDER_1_CLAI = "The directions order has been sent to: "
+        + "%n%n ## Claimant 1 %n%n %s";
+    public static final String ORDER_1_DEF = "%n%n ## Defendant 1 %n%n %s";
+    public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
+    public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
 
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::initiateSDO)
             .put(callbackKey(MID, "trial-disposal-screen"), this::populateDisposalTrialScreen)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::emptySubmittedCallbackResponse)
-            .put(callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse)
+            .put(callbackKey(MID, "create-order"), this::createOrderScreen)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::generateSDONotifications)
+            .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
 
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private String getBody(CaseData caseData) {
+        if (caseData.getRespondent2() != null
+            && caseData.getDefendantDetails().getValue()
+            .getLabel().startsWith("Both")) {
+            return format(ORDER_1_CLAI, caseData.getApplicant1().getPartyName())
+                + format(ORDER_1_DEF, caseData.getRespondent1().getPartyName())
+                + format(ORDER_2_DEF, caseData.getRespondent2().getPartyName());
+
+        } else {
+            return format(ORDER_1_CLAI, caseData.getApplicant1().getPartyName())
+                + format(ORDER_1_DEF, caseData.getRespondent1().getPartyName());
+        }
+    }
+
+    private String getHeader(CaseData caseData) {
+        return format(ORDER_ISSUED, caseData.getLegacyCaseReference());
     }
 
     private CallbackResponse initiateSDO(CallbackParams callbackParams) {
@@ -417,4 +449,33 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .build();
     }
 
+    private CallbackResponse generateSDONotifications(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        return SubmittedCallbackResponse.builder()
+            .confirmationHeader(getHeader(caseData))
+            .confirmationBody(getBody(caseData))
+            .build();
+    }
+
+    private CallbackResponse createOrderScreen(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        CaseDocument document = defaultJudgmentOrderFormGenerator.generate(
+            caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        caseDataBuilder.orderSDODocumentDJ(document.getDocumentLink());
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
 }
