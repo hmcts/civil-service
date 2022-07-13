@@ -300,7 +300,7 @@ public class RoboticsDataMapper {
         var organisationDetails = ofNullable(
             caseData.getRespondentSolicitor2OrganisationDetails()
         );
-        if ((organisationId.isEmpty() || organisationId == null) && organisationDetails.isEmpty()) {
+        if (organisationId == null && organisationDetails.isEmpty()) {
             return null;
         }
         solicitorBuilder
