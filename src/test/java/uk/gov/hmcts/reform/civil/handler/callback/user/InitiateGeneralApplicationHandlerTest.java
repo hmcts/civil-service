@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
@@ -623,6 +624,28 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             assertThat(application.getGeneralAppHearingDetails().getHearingPreferencesPreferredType())
                 .isEqualTo(IN_PERSON);
             assertThat(application.getIsMultiParty()).isEqualTo(NO);
+        }
+
+        @Test
+        void shouldSetDynamicListWhenPreferredTypeNotInPerson() {
+
+            CaseData caseData = CaseData.builder()
+                .generalAppHearingDetails(GAHearingDetails.builder()
+                                              .hearingPreferencesPreferredType(IN_PERSON)
+                                              .build())
+                .generalAppPBADetails(GAPbaDetails.builder().fee(feeFromFeeService).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            DynamicList dynamicList = getLocationDynamicList(data);
+
+            assertThat(response.getErrors()).isEmpty();
+            assertThat(data.getGeneralAppHearingDetails()).isNotNull();
+            assertThat(dynamicList).isNull();
         }
     }
 
