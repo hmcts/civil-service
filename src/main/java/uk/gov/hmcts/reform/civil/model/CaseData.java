@@ -422,5 +422,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonUnwrapped(suffix = "Breathing")
     private final BreathingSpaceInfo breathing;
 
+    private final RepresentationUpdateHistory representationUpdateHistory;
+
 
 }

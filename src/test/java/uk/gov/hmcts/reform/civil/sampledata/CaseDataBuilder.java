@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.sampledata;
 
+import org.apache.tomcat.jni.Local;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
+import uk.gov.hmcts.reform.civil.model.ChangedRepresentative;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CloseClaim;
@@ -33,6 +35,8 @@ import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
+import uk.gov.hmcts.reform.civil.model.RepresentationUpdate;
+import uk.gov.hmcts.reform.civil.model.RepresentationUpdateHistory;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
@@ -261,6 +265,7 @@ public class CaseDataBuilder {
     private String respondent1OrganisationIDCopy;
     private String respondent2OrganisationIDCopy;
     private LocalDateTime addLegalRepDeadline;
+    private RepresentationUpdateHistory representationUpdateHistory;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1319,6 +1324,23 @@ public class CaseDataBuilder {
         claimNotificationDate = issueDate.plusDays(1).atStartOfDay();
         claimDetailsNotificationDeadline = DEADLINE;
         ccdState = AWAITING_CASE_DETAILS_NOTIFICATION;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1() {
+        atStateClaimDetailsNotified();
+        representationUpdateHistory = RepresentationUpdateHistory.builder().representationUpdateHistory(
+            List.of(
+                RepresentationUpdate.builder()
+                    .added(ChangedRepresentative.builder().name("Previous Solicitor")
+                               .email(respondentSolicitor1EmailAddress).build())
+                    .removed(ChangedRepresentative.builder().name("New Solicitor")
+                                 .email("new-solicitor@example.com").build()
+                    )
+                    .date(LocalDateTime.now())
+                    .build()
+            )
+        ).build();
         return this;
     }
 
@@ -2825,6 +2847,7 @@ public class CaseDataBuilder {
             .applicant1ProceedWithClaimSpec2v1(applicant1ProceedWithClaimSpec2v1)
             .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
+            .representationUpdateHistory(representationUpdateHistory)
             .build();
     }
 }

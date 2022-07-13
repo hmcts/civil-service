@@ -9,8 +9,11 @@ import uk.gov.hmcts.reform.civil.model.PartyData;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
@@ -153,5 +156,16 @@ public class PartyUtils {
         } else {
             return caseData.getRespondent2ClaimResponseType();
         }
+    }
+
+    public static List<String> getAllPartyEmails(CaseData caseData) {
+        List<String> partyEmails = new ArrayList<>();
+        if(caseData.getApplicantSolicitor1UserDetails() != null) {
+            partyEmails.add(caseData.getApplicantSolicitor1UserDetails().getEmail());
+        }
+        partyEmails.add(caseData.getRespondentSolicitor1EmailAddress());
+        partyEmails.add(caseData.getRespondentSolicitor2EmailAddress());
+        partyEmails.add(caseData.getSpecRespondentSolicitor1EmailAddress());
+        return partyEmails.stream().filter(email -> email != null).collect(Collectors.toList());
     }
 }

@@ -41,7 +41,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.nocRequest;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_REPRESENTATION_CHANGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_NOC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
@@ -100,6 +103,8 @@ public class FlowStateAllowedEventService {
         entry(
             CLAIM_SUBMITTED.fullName(),
             List.of(
+                nocRequest,
+                NOTIFY_REPRESENTATION_CHANGE,
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO
@@ -109,6 +114,7 @@ public class FlowStateAllowedEventService {
         entry(
             CLAIM_ISSUED_PAYMENT_FAILED.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 RESUBMIT_CLAIM,
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
@@ -121,12 +127,14 @@ public class FlowStateAllowedEventService {
 
         entry(
             CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-            List.of(ADD_CASE_NOTE, INITIATE_GENERAL_APPLICATION, CREATE_SDO)
+            List.of(
+                NOTIFY_REPRESENTATION_CHANGE,ADD_CASE_NOTE, INITIATE_GENERAL_APPLICATION, CREATE_SDO)
         ),
 
         entry(
             CLAIM_ISSUED.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 NOTIFY_DEFENDANT_OF_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,
@@ -145,6 +153,7 @@ public class FlowStateAllowedEventService {
         entry(
             CLAIM_NOTIFIED.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 NOTIFY_DEFENDANT_OF_CLAIM_DETAILS,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,
@@ -167,6 +176,8 @@ public class FlowStateAllowedEventService {
         entry(
             CLAIM_DETAILS_NOTIFIED.fullName(),
             List.of(
+                nocRequest,
+                NOTIFY_REPRESENTATION_CHANGE,
                 ACKNOWLEDGE_CLAIM,
                 DEFENDANT_RESPONSE,
                 INFORM_AGREED_EXTENSION_DATE,
@@ -188,6 +199,7 @@ public class FlowStateAllowedEventService {
         entry(
             CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 ACKNOWLEDGE_CLAIM,
                 DEFENDANT_RESPONSE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -208,6 +220,7 @@ public class FlowStateAllowedEventService {
         entry(
             NOTIFICATION_ACKNOWLEDGED.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 ACKNOWLEDGE_CLAIM,
                 DEFENDANT_RESPONSE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -228,6 +241,8 @@ public class FlowStateAllowedEventService {
         entry(
             NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
             List.of(
+                nocRequest,
+                NOTIFY_REPRESENTATION_CHANGE,
                 ACKNOWLEDGE_CLAIM,
                 DEFENDANT_RESPONSE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -241,13 +256,15 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 DEFAULT_JUDGEMENT,
-                CREATE_SDO
+                CREATE_SDO,
+                NOTIFY_REPRESENTATION_CHANGE
             )
         ),
 
         entry(
             AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 DEFENDANT_RESPONSE,
                 ACKNOWLEDGE_CLAIM,
                 INFORM_AGREED_EXTENSION_DATE,
@@ -267,6 +284,7 @@ public class FlowStateAllowedEventService {
         entry(
             AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 DEFENDANT_RESPONSE,
                 ACKNOWLEDGE_CLAIM,
                 INFORM_AGREED_EXTENSION_DATE,
@@ -286,6 +304,7 @@ public class FlowStateAllowedEventService {
         entry(
             FULL_DEFENCE.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 CLAIMANT_RESPONSE,
                 WITHDRAW_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -303,6 +322,7 @@ public class FlowStateAllowedEventService {
         entry(
             FULL_ADMISSION.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 WITHDRAW_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 DISCONTINUE_CLAIM,
@@ -318,6 +338,7 @@ public class FlowStateAllowedEventService {
         entry(
             PART_ADMISSION.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 WITHDRAW_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 DISCONTINUE_CLAIM,
@@ -333,6 +354,7 @@ public class FlowStateAllowedEventService {
         entry(
             COUNTER_CLAIM.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 WITHDRAW_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 DISCONTINUE_CLAIM,
@@ -348,6 +370,9 @@ public class FlowStateAllowedEventService {
         entry(
             FULL_DEFENCE_PROCEED.fullName(),
             List.of(
+                NOTIFY_RESPONDENT1_NOC,
+                nocRequest,
+                NOTIFY_REPRESENTATION_CHANGE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
@@ -363,6 +388,7 @@ public class FlowStateAllowedEventService {
         entry(
             FULL_DEFENCE_NOT_PROCEED.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
@@ -377,6 +403,7 @@ public class FlowStateAllowedEventService {
         entry(
             CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 CASE_PROCEEDS_IN_CASEMAN,
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
@@ -386,6 +413,7 @@ public class FlowStateAllowedEventService {
         entry(
             CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 CASE_PROCEEDS_IN_CASEMAN,
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
@@ -394,15 +422,18 @@ public class FlowStateAllowedEventService {
         ),
         entry(
             PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
-            List.of(TAKE_CASE_OFFLINE)
+            List.of(
+                NOTIFY_REPRESENTATION_CHANGE,TAKE_CASE_OFFLINE)
         ),
         entry(
             PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA.fullName(),
-            List.of(TAKE_CASE_OFFLINE)
+            List.of(
+                NOTIFY_REPRESENTATION_CHANGE,TAKE_CASE_OFFLINE)
         ),
         entry(
             PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
@@ -412,6 +443,7 @@ public class FlowStateAllowedEventService {
         entry(
             PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
@@ -421,6 +453,7 @@ public class FlowStateAllowedEventService {
         entry(
             PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 DISMISS_CLAIM
             )
         ),
@@ -549,6 +582,7 @@ public class FlowStateAllowedEventService {
         entry(
             NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 DEFENDANT_RESPONSE,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
@@ -567,6 +601,7 @@ public class FlowStateAllowedEventService {
         entry(
             FULL_DEFENCE.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 CLAIMANT_RESPONSE,
                 CLAIMANT_RESPONSE_SPEC,
                 ENTER_BREATHING_SPACE_SPEC,
@@ -585,6 +620,7 @@ public class FlowStateAllowedEventService {
         entry(
             FULL_ADMISSION.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 CLAIMANT_RESPONSE_SPEC,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
@@ -601,6 +637,7 @@ public class FlowStateAllowedEventService {
         entry(
             PART_ADMISSION.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 CLAIMANT_RESPONSE_SPEC,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
@@ -617,6 +654,7 @@ public class FlowStateAllowedEventService {
         entry(
             COUNTER_CLAIM.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
@@ -632,6 +670,7 @@ public class FlowStateAllowedEventService {
         entry(
             FULL_DEFENCE_PROCEED.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
@@ -647,6 +686,7 @@ public class FlowStateAllowedEventService {
         entry(
             FULL_DEFENCE_NOT_PROCEED.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
@@ -685,6 +725,7 @@ public class FlowStateAllowedEventService {
         entry(
             AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
             List.of(
+                NOTIFY_REPRESENTATION_CHANGE,
                 DEFENDANT_RESPONSE_SPEC,
                 ACKNOWLEDGE_CLAIM,
                 INFORM_AGREED_EXTENSION_DATE,

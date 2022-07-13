@@ -134,7 +134,7 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String applicantSolicitor1DefaultJudgmentRequested;
-    
+
     @NotEmpty
     private String interimJudgmentRequestedClaimant;
 
@@ -146,5 +146,15 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String interimJudgmentApprovalDefendant;
+
+    @NotEmpty
+    private String noticeOfChangeFormerSolicitor;
+
+    @NotEmpty
+    private String noticeOfChangeNewSolicitor;
+
+    @NotEmpty
+    private String noticeOfChangeOtherParties;
+
 
 }
