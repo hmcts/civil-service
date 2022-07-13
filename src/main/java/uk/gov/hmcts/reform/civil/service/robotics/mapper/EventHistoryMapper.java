@@ -82,6 +82,7 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseE
 @RequiredArgsConstructor
 public class EventHistoryMapper {
 
+    public static final String PROCEEDS_IN_HERITAGE = "Proceeds in Heritage";
     private final StateFlowEngine stateFlowEngine;
     private final FeatureToggleService featureToggleService;
     private final EventHistorySequencer eventHistorySequencer;
@@ -163,7 +164,6 @@ public class EventHistoryMapper {
                     case TAKEN_OFFLINE_BY_STAFF:
                         buildTakenOfflineByStaff(builder, caseData);
                         buildGeneralFormApplicationEventsStrikeOutOrder(builder, caseData);
-                        //call
                         break;
                     case CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE:
                         buildClaimDismissedPastDeadline(builder, caseData,
@@ -640,7 +640,7 @@ public class EventHistoryMapper {
         currentSequence = getCurrentSequence(history.getReplyToDefence(), currentSequence);
         currentSequence = getCurrentSequence(history.getDirectionsQuestionnaireFiled(), currentSequence);
         currentSequence = getCurrentSequence(history.getGeneralFormOfApplication(), currentSequence);
-        currentSequence = getCurrentSequence(history.getDefenceStruckOutJudgment(), currentSequence);
+        currentSequence = getCurrentSequence(history.getDefenceStruckOut(), currentSequence);
         return currentSequence + 1;
     }
 
@@ -1482,7 +1482,7 @@ public class EventHistoryMapper {
             })
             .collect(Collectors.toList());
 
-        builder.generalFormOfApplication(generalApplicationsEvents);
+        builder.defenceStruckOut(generalApplicationsEvents);
     }
 
     private Element<GeneralApplicationsDetails> getGeneralApplicationDetailsJudeDecisionWithStruckOutDefence(
@@ -1495,7 +1495,7 @@ public class EventHistoryMapper {
                            .getCaseReference()
                            .equals(caseLinkId)
                        && generalApplicationsDetailsElement.getValue().getCaseState()
-                           .equals("Proceeds in Heritage"))
+                           .equals(PROCEEDS_IN_HERITAGE))
             .findFirst()
             .orElse(null);
     }

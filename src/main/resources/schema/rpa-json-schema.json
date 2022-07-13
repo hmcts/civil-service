@@ -347,7 +347,7 @@
         "replyToDefence",
         "directionsQuestionnaireFiled",
         "generalFormOfApplication",
-        "defenceStruckOutJudgment"
+        "defenceStruckOut"
       ],
       "properties": {
         "miscellaneous": {
@@ -469,11 +469,11 @@
           ],
           "description": ""
         },
-        "defenceStruckOutJudgment": {
-          "$id": "#/properties/events/properties/defenceStruckOutJudgment",
+        "defenceStruckOut": {
+          "$id": "#/properties/events/properties/defenceStruckOut",
           "anyOf": [
             {
-              "$ref": "#/definitions/defenceStruckOutJudgmentEventType"
+              "$ref": "#/definitions/defenceStruckOutEventType"
             },
             {
               "$ref": "#/definitions/nullEventType"
@@ -1392,12 +1392,12 @@
         "additionalProperties": false
       }
     },
-    "defenceStruckOutJudgmentEventType": {
-      "$id": "#/definitions/defenceStruckOutJudgmentEventType",
+    "defenceStruckOutEventType": {
+      "$id": "#/definitions/defenceStruckOutEventType",
       "type": "array",
       "additionalItems": false,
       "items": {
-        "$id": "#/definitions/defenceStruckOutJudgmentEventType/items",
+        "$id": "#/definitions/defenceStruckOutEventType/items",
         "type": "object",
         "required": [
           "eventSequence",
@@ -1407,31 +1407,31 @@
         ],
         "properties": {
           "eventSequence": {
-            "$id": "#/definitions/defenceStruckOutJudgmentEventType/items/properties/eventSequence",
+            "$id": "#/definitions/defenceStruckOutEventType/items/properties/eventSequence",
             "$ref": "#/definitions/eventSequenceType"
           },
           "eventCode": {
-            "$id": "#/definitions/defenceStruckOutJudgmentEventType/items/properties/eventCode",
+            "$id": "#/definitions/defenceStruckOutEventType/items/properties/eventCode",
             "type": "string",
             "const": "57",
             "description": "The CASEMAN code for the Judge decision of Struck out Defense."
           },
           "dateReceived": {
-            "$id": "#/definitions/defenceStruckOutJudgmentEventType/items/properties/dateReceived",
+            "$id": "#/definitions/defenceStruckOutEventType/items/properties/dateReceived",
             "$ref": "#/definitions/formatDate",
             "description": ""
           },
           "litigiousPartyID": {
-            "$id": "#/definitions/defenceStruckOutJudgmentEventType/items/properties/litigiousPartyID",
+            "$id": "#/definitions/defenceStruckOutEventType/items/properties/litigiousPartyID",
             "$ref": "#/definitions/litigiousPartyIDType",
             "description": ""
           },
           "eventDetails": {
-            "$id": "#/definitions/defenceStruckOutJudgmentEventType/items/properties/eventDetails",
+            "$id": "#/definitions/defenceStruckOutEventType/items/properties/eventDetails",
             "type": "null"
           },
           "eventDetailsText": {
-            "$id": "#/definitions/defenceStruckOutJudgmentEventType/items/properties/eventDetailsText",
+            "$id": "#/definitions/defenceStruckOutEventType/items/properties/eventDetailsText",
             "type": "null"
           }
         },

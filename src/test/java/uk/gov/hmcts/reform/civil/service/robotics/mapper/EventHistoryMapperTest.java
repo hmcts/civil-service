@@ -4158,7 +4158,7 @@ class EventHistoryMapperTest {
                 .containsExactly(claimNotifiedEvent);
 
             assertThat(eventHistory.getGeneralFormOfApplication()).isEqualTo(List.of(generalApplicationEvent));
-            assertThat(eventHistory.getDefenceStruckOutJudgment()).isEqualTo(List.of(defenceStruckOutJudgment));
+            assertThat(eventHistory.getDefenceStruckOut()).isEqualTo(List.of(defenceStruckOutJudgment));
         }
 
         @Test
@@ -4192,7 +4192,7 @@ class EventHistoryMapperTest {
                 .containsExactly(claimNotifiedEvent);
 
             assertThat(eventHistory.getGeneralFormOfApplication()).isEqualTo(List.of(generalApplicationEvent));
-            assertThat(eventHistory.getDefenceStruckOutJudgment()).isEqualTo(List.of(defenceStruckOutJudgment));
+            assertThat(eventHistory.getDefenceStruckOut()).isEqualTo(List.of(defenceStruckOutJudgment));
         }
     }
 

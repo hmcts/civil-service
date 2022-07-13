@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAParties;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -124,9 +125,9 @@ public class InitiateGeneralApplicationServiceHelper {
                 GASolicitorDetailsGAspec gaSolicitorDetailsGAspec = specBuilder.build();
                 respondentSols.add(element(gaSolicitorDetailsGAspec));
             });
-            String applicantPartyName = getApplicantPartyName(userRoles, userDetails, caseData);
-            applicationBuilder.applicantPartyName(applicantPartyName);
-            applicationBuilder.litigiousPartyID(getLitigiousId(caseData, applicantPartyName));
+            GAParties applicantPartyData = getApplicantPartyData(userRoles, userDetails, caseData);
+            applicationBuilder.applicantPartyName(applicantPartyData.getApplicantPartyName());
+            applicationBuilder.litigiousPartyID(applicantPartyData.getLitigiousPartyID());
             applicationBuilder.generalAppRespondentSolicitors(respondentSols);
         }
 
@@ -136,68 +137,50 @@ public class InitiateGeneralApplicationServiceHelper {
                                            : YesOrNo.NO).build();
     }
 
-    private String getApplicantPartyName(CaseAssignedUserRolesResource userRoles, UserDetails userDetails,
-                                         CaseData caseData) {
+    private GAParties getApplicantPartyData(CaseAssignedUserRolesResource userRoles, UserDetails userDetails,
+                                                     CaseData caseData) {
         String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
         String respondent1OrgCaseRole = caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
         String applicant2OrgCaseRole = caseData.getApplicant2OrganisationPolicy() != null
-                ? caseData.getApplicant2OrganisationPolicy().getOrgPolicyCaseAssignedRole() : EMPTY;
+            ? caseData.getApplicant2OrganisationPolicy().getOrgPolicyCaseAssignedRole() : EMPTY;
         String respondent2OrgCaseRole = caseData.getRespondent2OrganisationPolicy() != null
-                ? caseData.getRespondent2OrganisationPolicy().getOrgPolicyCaseAssignedRole() : EMPTY;
+            ? caseData.getRespondent2OrganisationPolicy().getOrgPolicyCaseAssignedRole() : EMPTY;
 
         Optional<CaseAssignedUserRole> applicantSol = userRoles.getCaseAssignedUserRoles().stream()
-                .filter(CA -> CA.getUserId().equals(userDetails.getId())).findFirst();
+            .filter(CA -> CA.getUserId().equals(userDetails.getId())).findFirst();
+
         if (applicantSol.isPresent()) {
             CaseAssignedUserRole applicantSolicitor = applicantSol.get();
             if (applicant1OrgCaseRole.equals(applicantSolicitor.getCaseRole())) {
-                return caseData.getApplicant1().getPartyName();
+                return GAParties.builder()
+                    .applicantPartyName(caseData.getApplicant1().getPartyName())
+                    .litigiousPartyID(APPLICANT_ID)
+                    .build();
             }
             if (applicant2OrgCaseRole.equals(applicantSolicitor.getCaseRole())) {
                 if (caseData.getApplicant2() != null) {
-                    return caseData.getApplicant2().getPartyName();
+                    return GAParties.builder()
+                        .applicantPartyName(caseData.getApplicant2().getPartyName())
+                        .litigiousPartyID(APPLICANT2_ID)
+                        .build();
                 }
             }
             if (respondent1OrgCaseRole.equals(applicantSolicitor.getCaseRole())) {
-                return caseData.getRespondent1().getPartyName();
+                return GAParties.builder()
+                    .applicantPartyName(caseData.getRespondent1().getPartyName())
+                    .litigiousPartyID(RESPONDENT_ID)
+                    .build();
             }
             if (respondent2OrgCaseRole.equals(applicantSolicitor.getCaseRole())) {
                 if (caseData.getRespondent2() != null) {
-                    return caseData.getRespondent2().getPartyName();
+                    return GAParties.builder()
+                        .applicantPartyName(caseData.getRespondent2().getPartyName())
+                        .litigiousPartyID(RESPONDENT2_ID)
+                        .build();
                 }
             }
         }
-        return EMPTY;
-    }
-
-    private String getLitigiousId(CaseData caseData, String applicantPartyName) {
-        if (applicantPartyName == null || applicantPartyName.isEmpty()) {
-            return EMPTY;
-        }
-        if (caseData.getApplicant1() != null
-            && caseData.getApplicant1().getPartyName() != null
-            && !caseData.getApplicant1().getPartyName().isEmpty()
-            && caseData.getApplicant1().getPartyName().equals(applicantPartyName)) {
-            return APPLICANT_ID;
-        }
-        if (caseData.getApplicant2() != null
-            && caseData.getApplicant2().getPartyName() != null
-            && !caseData.getApplicant2().getPartyName().isEmpty()
-            && caseData.getApplicant2().getPartyName().equals(applicantPartyName)) {
-            return APPLICANT2_ID;
-        }
-        if (caseData.getRespondent1() != null
-            && caseData.getRespondent1().getPartyName() != null
-            && !caseData.getRespondent1().getPartyName().isEmpty()
-            && caseData.getRespondent1().getPartyName().equals(applicantPartyName)) {
-            return RESPONDENT_ID;
-        }
-        if (caseData.getRespondent2() != null
-            && caseData.getRespondent2().getPartyName() != null
-            && !caseData.getRespondent2().getPartyName().isEmpty()
-            && caseData.getRespondent2().getPartyName().equals(applicantPartyName)) {
-            return RESPONDENT2_ID;
-        }
-        return EMPTY;
+        return GAParties.builder().build();
     }
 
     public String getCaaAccessToken() {
