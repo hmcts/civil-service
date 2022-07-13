@@ -6,12 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
@@ -42,6 +44,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -59,20 +62,44 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     private final DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     String participantString;
 
+    public static final String ORDER_1_CLAI = "The directions order has been sent to: "
+        + "%n%n ## Claimant 1 %n%n %s";
+    public static final String ORDER_1_DEF = "%n%n ## Defendant 1 %n%n %s";
+    public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
+    public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
+
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::initiateSDO)
             .put(callbackKey(MID, "trial-disposal-screen"), this::populateDisposalTrialScreen)
             .put(callbackKey(MID, "create-order"), this::createOrderScreen)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse)
-            .put(callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::generateSDONotifications)
+            .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
 
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private String getBody(CaseData caseData) {
+        if (caseData.getRespondent2() != null
+            && caseData.getDefendantDetails().getValue()
+            .getLabel().startsWith("Both")) {
+            return format(ORDER_1_CLAI, caseData.getApplicant1().getPartyName())
+                + format(ORDER_1_DEF, caseData.getRespondent1().getPartyName())
+                + format(ORDER_2_DEF, caseData.getRespondent2().getPartyName());
+
+        } else {
+            return format(ORDER_1_CLAI, caseData.getApplicant1().getPartyName())
+                + format(ORDER_1_DEF, caseData.getRespondent1().getPartyName());
+        }
+    }
+
+    private String getHeader(CaseData caseData) {
+        return format(ORDER_ISSUED, caseData.getLegacyCaseReference());
     }
 
     private CallbackResponse initiateSDO(CallbackParams callbackParams) {
@@ -419,6 +446,24 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse generateSDONotifications(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        return SubmittedCallbackResponse.builder()
+            .confirmationHeader(getHeader(caseData))
+            .confirmationBody(getBody(caseData))
             .build();
     }
 
