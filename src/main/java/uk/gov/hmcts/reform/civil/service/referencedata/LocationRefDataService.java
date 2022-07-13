@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.referencedata;
 
-import io.jsonwebtoken.lang.Collections;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -54,14 +53,15 @@ public class LocationRefDataService {
                     getHeaders(authToken),
                     new ParameterizedTypeReference<List<LocationRefData>>() {});
             List<LocationRefData> ccmccLocations = responseEntity.getBody();
-            if (Collections.isEmpty(ccmccLocations)) {
+            if (ccmccLocations == null || ccmccLocations.isEmpty()) {
                 log.warn("Location Reference Data Lookup did not return any CCMCC location");
                 return LocationRefData.builder().build();
+            } else {
+                if (ccmccLocations.size() > 1) {
+                    log.warn("Location Reference Data Lookup returned more than one CCMCC location");
+                }
+                return ccmccLocations.get(0);
             }
-            if (!Collections.isEmpty(ccmccLocations) && ccmccLocations.size() > 1) {
-                log.warn("Location Reference Data Lookup returned more than one CCMCC location");
-            }
-            return ccmccLocations.get(0);
         } catch (Exception e) {
             log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
         }
