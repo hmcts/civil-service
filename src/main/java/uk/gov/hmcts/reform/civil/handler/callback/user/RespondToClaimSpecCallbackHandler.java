@@ -98,6 +98,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.Defendan
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.NEED_FINANCIAL_DETAILS_1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.NEED_FINANCIAL_DETAILS_2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.ONLY_RESPONDENT_1_DISPUTES;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.REPAYMENT_PLAN_2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_1_ADMITS_PART_OR_FULL;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.RESPONDENT_1_PAID_LESS;
@@ -307,11 +308,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             && caseData.getSpecDefenceFullAdmittedRequired() == NO) {
             updatedCaseData.specFullAdmitPaid(NO);
         }
-        if (mustWhenWillClaimBePaidBeShown(caseData)) {
-            Set<DefendantResponseShowTag> flags = caseData.getShowConditionFlags();
-            flags.add(WHEN_WILL_CLAIM_BE_PAID);
-            updatedCaseData.showConditionFlags(flags);
-        }
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
             AllocatedTrack allocatedTrack = getAllocatedTrack(caseData);
             updatedCaseData.responseClaimTrack(allocatedTrack.name());
@@ -321,9 +317,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             NEED_FINANCIAL_DETAILS_1,
             NEED_FINANCIAL_DETAILS_2,
             WHY_1_DOES_NOT_PAY_IMMEDIATELY,
-            WHY_2_DOES_NOT_PAY_IMMEDIATELY
+            WHY_2_DOES_NOT_PAY_IMMEDIATELY,
+            WHEN_WILL_CLAIM_BE_PAID
         ));
         currentShowFlags.addAll(checkNecessaryFinancialDetails(caseData));
+        if (mustWhenWillClaimBePaidBeShown(caseData)) {
+            currentShowFlags.add(WHEN_WILL_CLAIM_BE_PAID);
+        }
         updatedCaseData.showConditionFlags(currentShowFlags);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -665,7 +665,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             RespondentResponseTypeSpec.PART_ADMISSION,
             RespondentResponseTypeSpec.FULL_ADMISSION
         );
-        if (anyAdmission.contains(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+        if (updatedShowConditions.contains(CAN_ANSWER_RESPONDENT_1)
+            && anyAdmission.contains(caseData.getRespondent1ClaimResponseTypeForSpec())) {
             updatedShowConditions.add(RESPONDENT_1_ADMITS_PART_OR_FULL);
             if (caseData.getRespondentResponseIsSame() == YES) {
                 updatedShowConditions.add(RESPONDENT_2_ADMITS_PART_OR_FULL);
@@ -934,6 +935,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 throw new UnsupportedOperationException("Unknown mp scenario");
         }
         tags.addAll(bcoPartAdmission);
+        if (tags.contains(ONLY_RESPONDENT_1_DISPUTES)
+            || tags.contains(ONLY_RESPONDENT_2_DISPUTES)
+            || tags.contains(BOTH_RESPONDENTS_DISPUTE)) {
+            tags.add(SOMEONE_DISPUTES);
+        }
         return tags;
     }
 
@@ -942,8 +948,19 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             ONLY_RESPONDENT_1_DISPUTES,
             DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES,
             DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE,
+            SOMEONE_DISPUTES,
+            CURRENT_ADMITS_PART_OR_FULL,
             DefendantResponseShowTag.RESPONDENT_1_PAID_LESS,
-            DefendantResponseShowTag.RESPONDENT_2_PAID_LESS
+            DefendantResponseShowTag.RESPONDENT_2_PAID_LESS,
+            WHEN_WILL_CLAIM_BE_PAID,
+            RESPONDENT_1_ADMITS_PART_OR_FULL,
+            RESPONDENT_2_ADMITS_PART_OR_FULL,
+            NEED_FINANCIAL_DETAILS_1,
+            NEED_FINANCIAL_DETAILS_2,
+            WHY_1_DOES_NOT_PAY_IMMEDIATELY,
+            WHY_2_DOES_NOT_PAY_IMMEDIATELY,
+            REPAYMENT_PLAN_2,
+            DefendantResponseShowTag.MEDIATION
         )::contains);
     }
 
