@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
@@ -51,6 +52,7 @@ public class RoboticsDataMapperForSpecTest {
                              .type(Party.Type.COMPANY)
                              .companyName("company 2")
                              .build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
             .breathing(BreathingSpaceInfo.builder()
                            .enter(BreathingSpaceEnterInfo.builder()
                                       .type(BreathingSpaceType.STANDARD)
@@ -70,8 +72,5 @@ public class RoboticsDataMapperForSpecTest {
                               .anyMatch(p -> p.getName().equals(caseData.getApplicant1().getPartyName())));
         Assert.assertTrue(mapped.getLitigiousParties().stream()
                               .anyMatch(p -> p.getName().equals(caseData.getRespondent1().getPartyName())));
-        Assert.assertEquals(caseData.getBreathing().getEnter().getType(), mapped.getBreathingSpace().getType());
-        Assert.assertEquals(caseData.getBreathing().getLift().getExpectedEnd(),
-                            mapped.getBreathingSpace().getEndDate());
     }
 }

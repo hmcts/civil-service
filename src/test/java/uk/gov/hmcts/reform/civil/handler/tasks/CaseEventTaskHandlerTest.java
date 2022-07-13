@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -250,6 +251,11 @@ class CaseEventTaskHandlerTest {
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
 
             CaseData caseData = getCaseData(state);
+            if (caseData.getRespondent2Represented() == null && caseData.getRespondent2OrgRegistered() != null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YesOrNo.YES)
+                    .build();
+            }
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
