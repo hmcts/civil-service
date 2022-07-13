@@ -41,6 +41,10 @@ import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnemployedComplexTypeLRspec;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
+import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -192,6 +196,9 @@ public class CaseDataBuilder {
     protected LitigationFriend respondent1LitigationFriend;
     protected LitigationFriend respondent2LitigationFriend;
     protected LitigationFriend genericLitigationFriend;
+    protected BreathingSpaceInfo breathing;
+    protected BreathingSpaceEnterInfo enter;
+    protected BreathingSpaceLiftInfo lift;
 
     protected List<Element<CaseNote>> caseNotes;
 
@@ -1670,6 +1677,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateRespondent1v2FullDefence_AdmitFull() {
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondent1v2AdmintPart_FullDefence() {
         respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
         respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
@@ -1928,6 +1941,13 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateRespondentFullAdmissionSpec() {
+        atStateRespondentRespondToClaimSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
+        takenOfflineDate = LocalDateTime.now();
+        respondent1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
     public CaseDataBuilder atStateBothRespondentsSameResponse(RespondentResponseType respondentResponseType) {
         atStateClaimDetailsNotified();
         respondent1ClaimResponseType = respondentResponseType;
@@ -1955,7 +1975,15 @@ public class CaseDataBuilder {
         respondent2Responds(respondent2Response);
         respondent1ResponseDate = LocalDateTime.now().plusDays(1);
         respondentResponseIsSame(NO);
-        respondent2ResponseDate = respondent1ResponseDate;
+        if (superClaimType != SPEC_CLAIM) {
+            // at least in spec claims, respondent2 response date is null by front-end
+            respondent2ResponseDate = respondent1ResponseDate;
+        } else {
+            respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec
+                .valueOf(respondent1Response.name());
+            respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec
+                .valueOf(respondent2ClaimResponseType.name());
+        }
         return this;
     }
 
@@ -1985,6 +2013,106 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addEnterBreathingSpace() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+                    .type(BreathingSpaceType.STANDARD)
+                    .reference("12345")
+                    .start(LocalDate.now())
+                    .build();
+
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
+
+        return this;
+    }
+
+    public CaseDataBuilder addEnterMentalHealthBreathingSpace() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+                    .type(BreathingSpaceType.MENTAL_HEALTH)
+                    .reference("12345")
+                    .start(LocalDate.now())
+                    .build();
+
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
+
+        return this;
+    }
+
+    public CaseDataBuilder addEnterMentalHealthBreathingSpaceNoOptionalData() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+            .type(BreathingSpaceType.MENTAL_HEALTH)
+            .reference(null)
+            .start(null)
+            .build();
+
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
+
+        return this;
+    }
+
+    public CaseDataBuilder addLiftBreathingSpace() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+            .type(BreathingSpaceType.STANDARD)
+            .reference("12345")
+            .start(LocalDate.now())
+            .build();
+        this.lift = BreathingSpaceLiftInfo.builder().expectedEnd(LocalDate.now()).build();
+
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).lift(this.lift).build();
+
+        return this;
+    }
+
+    public CaseDataBuilder addLiftBreathingSpaceWithoutOptionalData() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+            .type(BreathingSpaceType.STANDARD)
+            .reference(null)
+            .start(null)
+            .build();
+        this.lift = BreathingSpaceLiftInfo.builder().expectedEnd(null).build();
+
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).lift(this.lift).build();
+
+        return this;
+    }
+
+    public CaseDataBuilder addLiftMentalBreathingSpace() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+            .type(BreathingSpaceType.MENTAL_HEALTH)
+            .reference("12345")
+            .start(LocalDate.now())
+            .build();
+        this.lift = BreathingSpaceLiftInfo.builder().expectedEnd(LocalDate.now()).build();
+
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).lift(this.lift).build();
+
+        return this;
+    }
+
+    public CaseDataBuilder addLiftMentalBreathingSpaceNoOptionalData() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+            .type(BreathingSpaceType.MENTAL_HEALTH)
+            .reference(null)
+            .start(null)
+            .build();
+        this.lift = BreathingSpaceLiftInfo.builder().expectedEnd(null).build();
+
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).lift(this.lift).build();
+
+        return this;
+    }
+
+    public CaseDataBuilder addEnterBreathingSpaceWithoutOptionalData() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+            .type(BreathingSpaceType.STANDARD)
+            .reference(null)
+            .start(null)
+            .build();
+
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
+
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondentFullAdmissionAfterNotifyDetails() {
         atStateClaimDetailsNotified();
         respondent1ClaimResponseType = RespondentResponseType.FULL_ADMISSION;
@@ -1995,8 +2123,27 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addEnterBreathingSpaceWithOnlyReferenceInfo() {
+        this.enter = BreathingSpaceEnterInfo.builder()
+            .type(BreathingSpaceType.STANDARD)
+            .reference("12345")
+            .start(null)
+            .build();
+
+        this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
+
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondentPartAdmission() {
         atStateRespondentRespondToClaim(RespondentResponseType.PART_ADMISSION);
+        takenOfflineDate = LocalDateTime.now();
+        respondent1ResponseDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentPartAdmissionSpec() {
+        atStateRespondentRespondToClaimSpec(RespondentResponseTypeSpec.PART_ADMISSION);
         takenOfflineDate = LocalDateTime.now();
         respondent1ResponseDate = LocalDateTime.now();
         return this;
@@ -2045,6 +2192,13 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateRespondentCounterClaim() {
         atStateRespondentRespondToClaim(RespondentResponseType.COUNTER_CLAIM);
+        takenOfflineDate = LocalDateTime.now();
+        respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentCounterClaimSpec() {
+        atStateRespondentRespondToClaimSpec(RespondentResponseTypeSpec.COUNTER_CLAIM);
         takenOfflineDate = LocalDateTime.now();
         respondent1ResponseDate = respondent1AcknowledgeNotificationDate.plusDays(1);
         return this;
@@ -2442,6 +2596,7 @@ public class CaseDataBuilder {
         LocalDateTime tomrrowsDateTime = LocalDateTime.now().plusDays(1);
         this.respondent1LitigationFriendDate = tomrrowsDateTime;
         this.respondent1LitigationFriendCreatedDate = tomrrowsDateTime;
+
         return this;
     }
 
@@ -2844,6 +2999,7 @@ public class CaseDataBuilder {
             .applicant1ProceedWithClaimSpec2v1(applicant1ProceedWithClaimSpec2v1)
             .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
+            .breathing(breathing)
             .caseManagementOrderSelection(caseManagementOrderSelection)
             .build();
     }

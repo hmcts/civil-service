@@ -12,12 +12,14 @@ import uk.gov.hmcts.reform.civil.enums.PartyRole;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
@@ -29,6 +31,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -37,6 +40,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
+import static java.time.LocalDate.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -173,6 +177,12 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareMiscellaneousEvent_whenClaimWith1v1UnregisteredDefendant() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOffline1v1UnregisteredDefendant().build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event expectedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")
@@ -258,6 +268,12 @@ class EventHistoryMapperTest {
         void shouldPrepareMiscellaneousEvent_whenClaimWithUnrepresentedDefendant1UnregisteredDefendant2() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2().build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event expectedEvent1 = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")
@@ -310,6 +326,12 @@ class EventHistoryMapperTest {
         void shouldPrepareMiscellaneousEvent_whenClaimWithUnregisteredDefendant1UnrepresentedDefendant2() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateProceedsOfflineUnregisteredDefendant1UnrepresentedDefendant2().build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event expectedEvent1 = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")
@@ -370,6 +392,12 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareMiscellaneousEvent_whenClaimIssued() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event expectedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")
@@ -407,6 +435,12 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareMiscellaneousEvent_whenNotifyClaimRpaHandedOffline() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAfterClaimNotified().build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event expectedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")
@@ -444,6 +478,12 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenPastApplicantResponseDeadline() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAfterClaimDetailsNotified().build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             List<Event> expectedEvent = List.of(
                 Event.builder()
                     .eventSequence(1)
@@ -497,6 +537,12 @@ class EventHistoryMapperTest {
         @Test
         void shouldReturnLatestTriggerEvent() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event claimIssuedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")
@@ -599,7 +645,12 @@ class EventHistoryMapperTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged()
                     .build();
-
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 Event expectedAcknowledgementOfServiceReceived = Event.builder()
                     .eventSequence(2)
                     .eventCode("38")
@@ -635,7 +686,12 @@ class EventHistoryMapperTest {
                     .atStateNotificationAcknowledged1v2SameSolicitor()
                     .multiPartyClaimOneDefendantSolicitor()
                     .build();
-
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 List<Event> expectedAcknowledgementOfServiceReceived = List.of(
                     Event.builder()
                         .eventSequence(2)
@@ -685,7 +741,12 @@ class EventHistoryMapperTest {
                     .atStateNotificationAcknowledged1v2SameSolicitor()
                     .multiPartyClaimTwoDefendantSolicitors()
                     .build();
-
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 List<Event> expectedAcknowledgementOfServiceReceived = List.of(
                     Event.builder()
                         .eventSequence(2)
@@ -730,7 +791,12 @@ class EventHistoryMapperTest {
                     .multiPartyClaimTwoDefendantSolicitors()
                     .respondent2AcknowledgeNotificationDate(null)
                     .build();
-
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 Event expectedAcknowledgementOfServiceReceivedEvent =
                     Event.builder()
                         .eventSequence(2)
@@ -762,7 +828,12 @@ class EventHistoryMapperTest {
                     .multiPartyClaimTwoDefendantSolicitors()
                     .respondent1AcknowledgeNotificationDate(null)
                     .build();
-
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 Event expectedAcknowledgementOfServiceReceivedEvent =
                     Event.builder()
                         .eventSequence(2)
@@ -793,7 +864,12 @@ class EventHistoryMapperTest {
                     .atStateNotificationAcknowledged()
                     .multiPartyClaimTwoApplicants()
                     .build();
-
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 Event expectedAcknowledgementOfServiceReceived = Event.builder()
                     .eventSequence(2)
                     .eventCode("38")
@@ -836,6 +912,12 @@ class EventHistoryMapperTest {
             @Test
             void shouldPrepareExpectedEvents() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension().build();
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
                     PartyUtils.respondent1Data(caseData),
                     format("agreed extension date: %s", caseData.getRespondentSolicitor1AgreedDeadlineExtension()
@@ -856,7 +938,12 @@ class EventHistoryMapperTest {
             void shouldPrepareExpectedEvents_Respondent1RequestsTimeExtensionDifferentSolicitorScenario() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atState1v2DifferentSolicitorClaimDetailsRespondent1NotifiedTimeExtension().build();
-
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
                     PartyUtils.respondent1Data(caseData),
                     format("Defendant: Mr. Sole Trader has agreed extension: %s",
@@ -876,7 +963,12 @@ class EventHistoryMapperTest {
             void shouldPrepareExpectedEvents_Respondent2RequestsTimeExtensionDifferentSolicitorScenario() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atState1v2DifferentSolicitorClaimDetailsRespondent2NotifiedTimeExtension().build();
-
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
                     PartyUtils.respondent2Data(caseData),
                     format("Defendant: Mr. John Rambo has agreed extension: %s",
@@ -896,7 +988,12 @@ class EventHistoryMapperTest {
             void shouldPrepareExpectedEvents_SameSolicitorScenario() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atState1v2SameSolicitorClaimDetailsRespondentNotifiedTimeExtension().build();
-
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 Event deadlineExtendedEvent = expectedDeadLineExtendedEvent(
                     PartyUtils.respondent1Data(caseData),
                     format("Defendant(s) have agreed extension: %s",
@@ -937,6 +1034,12 @@ class EventHistoryMapperTest {
                 .atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
                 .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event expectedReceiptOfAdmission = Event.builder()
                 .eventSequence(4)
                 .eventCode("40")
@@ -1020,6 +1123,12 @@ class EventHistoryMapperTest {
                 .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
                 .respondent1AcknowledgeNotificationDate(null)
                 .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event expectedReceiptOfAdmission = Event.builder()
                 .eventSequence(2)
                 .eventCode("40")
@@ -1073,7 +1182,12 @@ class EventHistoryMapperTest {
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateBothRespondentsSameResponse(FULL_ADMISSION)
                 .build();
-
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             List<Event> expectedReceiptOfAdmission = List.of(
                 Event.builder()
                     .eventSequence(2)
@@ -1151,7 +1265,12 @@ class EventHistoryMapperTest {
                 .atStateBothRespondentsSameResponse1v2SameSolicitor(FULL_ADMISSION)
                 .respondentResponseIsSame(YES)
                 .build();
-
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             List<Event> expectedReceiptOfAdmission = List.of(
                 Event.builder()
                     .eventSequence(2)
@@ -1236,6 +1355,12 @@ class EventHistoryMapperTest {
                 .applicant1ProceedWithClaim(YES)
                 .respondent1AcknowledgeNotificationDate(null)
                 .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event expectedDefenceFiled = Event.builder()
                 .eventSequence(1)
                 .eventCode("50")
@@ -1310,6 +1435,83 @@ class EventHistoryMapperTest {
                 "consentExtensionFilingDefence"
             );
         }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenClaimWithFullDefence1v1AllPaid() {
+            BigDecimal claimValue = BigDecimal.valueOf(1000);
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.FULL_DEFENCE)
+                .atStateRespondent1v1FullDefenceSpec()
+                .respondent1AcknowledgeNotificationDate(null)
+                .totalClaimAmount(claimValue)
+                .build().toBuilder()
+                .respondToClaim(RespondToClaim.builder()
+                                    .howMuchWasPaid(BigDecimal.valueOf(100000))
+                                    .build())
+                .build();
+            Event expectedDefenceFiled = Event.builder()
+                .eventSequence(1)
+                .eventCode("49")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID("002")
+                .build();
+            List<Event> expectedDirectionsQuestionnaireFiled =
+                List.of(Event.builder()
+                            .eventSequence(2)
+                            .eventCode("197")
+                            .dateReceived(caseData.getRespondent1ResponseDate())
+                            .litigiousPartyID("002")
+                            .eventDetailsText(mapper.prepareFullDefenceEventText(
+                                caseData.getRespondent1DQ(),
+                                caseData,
+                                true,
+                                caseData.getRespondent1()
+                            ))
+                            .eventDetails(EventDetails.builder()
+                                              .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                              .preferredCourtCode(mapper.getPreferredCourtCode(
+                                                  caseData.getRespondent1DQ()))
+                                              .preferredCourtName("")
+                                              .build())
+                            .build(),
+                        Event.builder()
+                            .eventSequence(4)
+                            .eventCode("197")
+                            .dateReceived(caseData.getRespondent1ResponseDate())
+                            .litigiousPartyID("002")
+                            .eventDetailsText(mapper.prepareFullDefenceEventText(
+                                caseData.getRespondent1DQ(),
+                                caseData,
+                                true,
+                                caseData.getRespondent1()
+                            ))
+                            .eventDetails(EventDetails.builder()
+                                              .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                              .preferredCourtCode(
+                                                  mapper.getPreferredCourtCode(caseData.getRespondent1DQ()))
+                                              .preferredCourtName("")
+                                              .build())
+                            .build()
+                );
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("statesPaid").asList()
+                .containsExactly(expectedDefenceFiled);
+            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
+                .contains(expectedDirectionsQuestionnaireFiled.get(0));
+
+            assertEmptyEvents(
+                eventHistory,
+                "receiptOfAdmission",
+                "receiptOfPartAdmission",
+                "acknowledgementOfServiceReceived",
+                "consentExtensionFilingDefence"
+            );
+        }
     }
 
     @Nested
@@ -1321,7 +1523,12 @@ class EventHistoryMapperTest {
                 .atStateSpec1v1ClaimSubmitted()
                 .atStateRespondent1v1FullAdmissionSpec()
                 .build();
-
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event expectedReceiptOfAdmission = Event.builder()
                 .eventSequence(1)
                 .eventCode("40")
@@ -1365,7 +1572,12 @@ class EventHistoryMapperTest {
                 .atStateSpec2v1ClaimSubmitted()
                 .atStateRespondent2v1FullAdmission()
                 .build();
-
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event expectedReceiptOfAdmission = Event.builder()
                 .eventSequence(1)
                 .eventCode("40")
@@ -1409,7 +1621,12 @@ class EventHistoryMapperTest {
                 .atStateSpec1v2ClaimSubmitted()
                 .atStateRespondent1v2FullAdmission()
                 .build();
-
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event expectedReceiptOfAdmission = Event.builder()
                 .eventSequence(1)
                 .eventCode("40")
@@ -1421,10 +1638,11 @@ class EventHistoryMapperTest {
                 .eventSequence(2)
                 .eventCode("999")
                 .dateReceived(caseData.getRespondent1ResponseDate())
-                .eventDetailsText("RPA Reason: [1 of 2 - 2020-08-01] Defendant: Mr. Sole Trader has responded: null")
+                .eventDetailsText(
+                    "RPA Reason: [1 of 2 - 2020-08-01] Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
                 .eventDetails(EventDetails.builder()
                                   .miscText("RPA Reason: [1 of 2 - 2020-08-01] "
-                                                + "Defendant: Mr. Sole Trader has responded: null")
+                                                + "Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
                                   .build())
                 .build();
 
@@ -1459,7 +1677,12 @@ class EventHistoryMapperTest {
                 .atStateSpec2v1ClaimSubmitted()
                 .atStateRespondent2v1PartAdmission()
                 .build();
-
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event expectedReceiptOfPartAdmission = Event.builder()
                 .eventSequence(1)
                 .eventCode("60")
@@ -1507,7 +1730,12 @@ class EventHistoryMapperTest {
                 .atStateSpec2v1ClaimSubmitted()
                 .atStateRespondent2v1CounterClaim()
                 .build();
-
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event expectedDefenceAndCounterClaim = Event.builder()
                 .eventSequence(1)
                 .eventCode("52")
@@ -1554,6 +1782,12 @@ class EventHistoryMapperTest {
                 .atStateRespondentPartAdmissionAfterNotificationAcknowledgement()
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event expectedReceiptOfPartAdmission = Event.builder()
                 .eventSequence(3)
                 .eventCode("60")
@@ -1676,7 +1910,12 @@ class EventHistoryMapperTest {
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateBothRespondentsSameResponse(PART_ADMISSION)
                 .build();
-
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             List<Event> expectedReceiptOfPartAdmission = List.of(
                 Event.builder()
                     .eventSequence(2)
@@ -1754,7 +1993,12 @@ class EventHistoryMapperTest {
                 .atStateBothRespondentsSameResponse1v2SameSolicitor(PART_ADMISSION)
                 .respondentResponseIsSame(YES)
                 .build();
-
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             List<Event> expectedReceiptOfPartAdmission = List.of(
                 Event.builder()
                     .eventSequence(2)
@@ -1835,6 +2079,12 @@ class EventHistoryMapperTest {
                 .atStateRespondentCounterClaim()
                 .respondent1ClaimResponseIntentionType(CONTEST_JURISDICTION)
                 .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event expectedDefenceAndCounterClaim = Event.builder()
                 .eventSequence(3)
                 .eventCode("52")
@@ -1904,6 +2154,12 @@ class EventHistoryMapperTest {
                 .respondent1ClaimResponseIntentionType(CONTEST_JURISDICTION)
                 .respondent1AcknowledgeNotificationDate(null)
                 .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event expectedDefenceAndCounterClaim = Event.builder()
                 .eventSequence(2)
                 .eventCode("52")
@@ -1957,7 +2213,12 @@ class EventHistoryMapperTest {
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateBothRespondentsSameResponse(COUNTER_CLAIM)
                 .build();
-
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             List<Event> expectedDefenceAndCounterClaim = List.of(
                 Event.builder()
                     .eventSequence(2)
@@ -2035,7 +2296,12 @@ class EventHistoryMapperTest {
                 .atStateBothRespondentsSameResponse1v2SameSolicitor(COUNTER_CLAIM)
                 .respondentResponseIsSame(YES)
                 .build();
-
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             List<Event> expectedDefenceAndCounterClaim = List.of(
                 Event.builder()
                     .eventSequence(2)
@@ -2116,6 +2382,12 @@ class EventHistoryMapperTest {
                 .atState(FlowState.Main.FULL_DEFENCE)
                 .respondent1AcknowledgeNotificationDate(null)
                 .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event expectedDefenceFiled = Event.builder()
                 .eventSequence(2)
                 .eventCode("50")
@@ -2172,6 +2444,78 @@ class EventHistoryMapperTest {
         }
 
         @Test
+        void shouldPrepareExpectedEvents_whenClaimWithFullDefence1v1WithoutOptionalEventsFullyPaid() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.FULL_DEFENCE)
+                .respondent1AcknowledgeNotificationDate(null)
+                .totalClaimAmount(BigDecimal.valueOf(1200))
+                .build().toBuilder()
+                .respondToClaim(RespondToClaim.builder()
+                                    .howMuchWasPaid(BigDecimal.valueOf(120000))
+                                    .build())
+                .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
+            Event expectedDefenceFiled = Event.builder()
+                .eventSequence(2)
+                .eventCode("49")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID("002")
+                .build();
+            Event expectedDirectionsQuestionnaireFiled = Event.builder()
+                .eventSequence(3)
+                .eventCode("197")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID("002")
+                .eventDetailsText(mapper.prepareFullDefenceEventText(
+                    caseData.getRespondent1DQ(),
+                    caseData,
+                    true,
+                    caseData.getRespondent1()
+                ))
+                .eventDetails(EventDetails.builder()
+                                  .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                  .preferredCourtCode(mapper.getPreferredCourtCode(caseData.getRespondent1DQ()))
+                                  .preferredCourtName("")
+                                  .build())
+                .build();
+            List<Event> expectedMiscellaneousEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimNotificationDate())
+                    .eventDetailsText("Claimant has notified defendant.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant has notified defendant.")
+                                      .build())
+                    .build()
+            );
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("statesPaid").asList()
+                .containsExactly(expectedDefenceFiled);
+            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
+                .containsExactly(expectedDirectionsQuestionnaireFiled);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents.get(0));
+
+            assertEmptyEvents(
+                eventHistory,
+                "receiptOfAdmission",
+                "receiptOfPartAdmission",
+                "replyToDefence",
+                "acknowledgementOfServiceReceived",
+                "consentExtensionFilingDefence"
+            );
+        }
+
+        @Test
         void shouldPrepareExpectedEvents_whenClaimWithFullDefence1v2SameSolicitorWithoutOptionalEvents() {
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimOneDefendantSolicitor()
@@ -2181,6 +2525,12 @@ class EventHistoryMapperTest {
                 .respondent2DQ(Respondent2DQ.builder().build())
                 .respondent2ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
                 .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             List<Event> expectedDefenceFiled = List.of(
                 Event.builder()
                     .eventSequence(3)
@@ -2220,7 +2570,7 @@ class EventHistoryMapperTest {
                     .eventDetailsText(mapper.prepareFullDefenceEventText(
                         caseData.getRespondent2DQ(),
                         caseData,
-                        false,
+                        true,
                         caseData.getRespondent2()
                     ))
                     .eventDetails(EventDetails.builder()
@@ -2271,6 +2621,12 @@ class EventHistoryMapperTest {
                 .respondent2Responds1v2DiffSol(FULL_DEFENCE)
                 .respondent2DQ()
                 .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             List<Event> expectedDefenceFiled = List.of(
                 Event.builder()
                     .eventSequence(3)
@@ -2357,7 +2713,7 @@ class EventHistoryMapperTest {
     class RespondentDivergentResponseSpec {
 
         @Test
-        void shouldPrepareExpectedEvents_whenClaimWith1v2DiffSolicitorResp1FullyAdmitsResp2FullDef() {
+        void shouldPrepareExpectedEvents_whenClaimWith1v2DiffSolicitorResp1PartAdmitsResp2FullDef() {
             CaseData caseData = CaseDataBuilder.builder()
                 .setSuperClaimTypeToSpecClaim()
                 .atState(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
@@ -2371,7 +2727,77 @@ class EventHistoryMapperTest {
                                  .individualDateOfBirth(LocalDate.now().plusDays(1))
                                  .build())
                 .build();
+            if (caseData.getRespondent2Represented() == null && caseData.getRespondent2OrgRegistered() != null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YesOrNo.YES)
+                    .build();
+            }
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
+            String respondent1MiscText =
+                mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
+            String respondent2MiscText =
+                mapper.prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
 
+            Event expectedDefenceFiled = Event.builder()
+                .eventSequence(1)
+                .eventCode("50")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID("002")
+                .build();
+            List<Event> expectedMiscellaneousEvents = List.of(
+                Event.builder()
+                    .eventSequence(4)
+                    .eventCode("999")
+                    .dateReceived(caseData.getRespondent2ResponseDate())
+                    .eventDetailsText(respondent2MiscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(respondent2MiscText)
+                                      .build())
+                    .build()
+            );
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("defenceFiled").asList()
+                .containsExactly(expectedDefenceFiled);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents.get(0));
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceAndCounterClaim",
+                "replyToDefence",
+                "consentExtensionFilingDefence",
+                "acknowledgementOfServiceReceived"
+            );
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenClaimWith1v2DiffSolicitorResp1FullyAdmitsResp2FullDef() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atState(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondent1v2FullDefence_AdmitFull()
+                .atState1v2DivergentResponseSpec(RespondentResponseTypeSpec.FULL_DEFENCE,
+                                                 RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent2DQ()
+                .respondent1DQ()
+                .respondent1(PartyBuilder.builder().individual()
+                                 .individualDateOfBirth(LocalDate.now().plusDays(1))
+                                 .build())
+                .build();
+            if (caseData.getRespondent2Represented() == null && caseData.getRespondent2OrgRegistered() != null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YesOrNo.YES)
+                    .build();
+            }
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             String respondent2MiscText =
@@ -2422,7 +2848,12 @@ class EventHistoryMapperTest {
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atState1v2DivergentResponse(FULL_ADMISSION, PART_ADMISSION)
                 .build();
-
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             String respondent2MiscText =
@@ -2499,7 +2930,12 @@ class EventHistoryMapperTest {
                 .atState1v2DivergentResponse(FULL_ADMISSION, FULL_DEFENCE)
                 .respondent2DQ()
                 .build();
-
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             String respondent2MiscText =
@@ -2585,7 +3021,12 @@ class EventHistoryMapperTest {
                 .atState1v2SameSolicitorDivergentResponse(FULL_ADMISSION, PART_ADMISSION)
                 .respondentResponseIsSame(NO)
                 .build();
-
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             String respondent2MiscText =
@@ -2662,7 +3103,12 @@ class EventHistoryMapperTest {
                 .respondentResponseIsSame(NO)
                 .respondent2DQ()
                 .build();
-
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             String respondent2MiscText =
@@ -2740,6 +3186,96 @@ class EventHistoryMapperTest {
                 "acknowledgementOfServiceReceived"
             );
         }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenClaimWith1v2ssR1FullAdmissionR2FullDefenceNoOptionalEventsSpec() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .multiPartyClaimOneDefendantSolicitor()
+                .atState1v2SameSolicitorDivergentResponse(FULL_ADMISSION, FULL_DEFENCE)
+                .respondentResponseIsSame(NO)
+                .respondent2DQ()
+                .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
+            String respondent1MiscText =
+                mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
+            String respondent2MiscText =
+                mapper.prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
+
+            Event expectedReceiptOfAdmission = Event.builder()
+                .eventSequence(2)
+                .eventCode("40")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID("002")
+                .build();
+            Event expectedDefenceFiled = Event.builder()
+                .eventSequence(1)
+                .eventCode("50")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID("003")
+                .build();
+            Event expectedDirectionsQuestionnaireFiled = Event.builder()
+                .eventSequence(3)
+                .eventCode("197")
+                .dateReceived(caseData.getRespondent1ResponseDate())
+                .litigiousPartyID("003")
+                .eventDetailsText(mapper.prepareFullDefenceEventText(
+                    caseData.getRespondent2DQ(),
+                    caseData,
+                    false,
+                    caseData.getRespondent2()
+                ))
+                .eventDetails(EventDetails.builder()
+                                  .stayClaim(mapper.isStayClaim(caseData.getRespondent2DQ()))
+                                  .preferredCourtCode(mapper.getPreferredCourtCode(caseData.getRespondent2DQ()))
+                                  .preferredCourtName("")
+                                  .build())
+                .build();
+            List<Event> expectedMiscellaneousEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimNotificationDate())
+                    .eventDetailsText("Claimant has notified defendant.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant has notified defendant.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(5)
+                    .eventCode("999")
+                    .dateReceived(caseData.getRespondent1ResponseDate())
+                    .eventDetailsText(respondent1MiscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(respondent1MiscText)
+                                      .build())
+                    .build()
+            );
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("receiptOfAdmission").asList()
+                .containsExactly(expectedReceiptOfAdmission);
+            assertThat(eventHistory).extracting("defenceFiled").asList()
+                .containsExactly(expectedDefenceFiled);
+            assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
+                .containsExactly(expectedDirectionsQuestionnaireFiled);
+
+            assertEmptyEvents(
+                eventHistory,
+                "defenceAndCounterClaim",
+                "receiptOfPartAdmission",
+                "replyToDefence",
+                "consentExtensionFilingDefence",
+                "acknowledgementOfServiceReceived"
+            );
+        }
     }
 
     @Nested
@@ -2754,6 +3290,12 @@ class EventHistoryMapperTest {
                     .multiPartyClaimTwoDefendantSolicitors()
                     .atState(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
                     .build();
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 List<Event> expectedDefenceFiled =
                     List.of(Event.builder()
                                 .eventSequence(2)
@@ -2804,7 +3346,12 @@ class EventHistoryMapperTest {
                     .multiPartyClaimTwoDefendantSolicitors()
                     .atState(FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
                     .build();
-
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 Event expectedReceiptOfAdmission = Event.builder()
                     .eventSequence(2)
                     .eventCode("40")
@@ -2855,7 +3402,12 @@ class EventHistoryMapperTest {
                     .multiPartyClaimTwoDefendantSolicitors()
                     .atStateAwaitingResponseNotFullDefenceReceived(PART_ADMISSION)
                     .build();
-
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 Event expectedReceiptOfPartAdmission = Event.builder()
                     .eventSequence(2)
                     .eventCode("60")
@@ -2906,7 +3458,12 @@ class EventHistoryMapperTest {
                     .multiPartyClaimTwoDefendantSolicitors()
                     .atStateAwaitingResponseNotFullDefenceReceived(COUNTER_CLAIM)
                     .build();
-
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 Event expectedDefenceAndCounterClaim = Event.builder()
                     .eventSequence(2)
                     .eventCode("52")
@@ -2942,6 +3499,12 @@ class EventHistoryMapperTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atState(FlowState.Main.FULL_DEFENCE_NOT_PROCEED)
                     .build();
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 Event expectedDefenceFiled = Event.builder()
                     .eventSequence(3)
                     .eventCode("50")
@@ -3010,6 +3573,12 @@ class EventHistoryMapperTest {
                     .atState(FlowState.Main.FULL_DEFENCE_NOT_PROCEED)
                     .atStateApplicantRespondToDefenceAndNotProceed_1v2()
                     .build();
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 Event expectedDefenceFiled = Event.builder()
                     .eventSequence(3)
                     .eventCode("50")
@@ -3079,7 +3648,12 @@ class EventHistoryMapperTest {
                     .multiPartyClaimTwoApplicants()
                     .atStateApplicantRespondToDefenceAndNotProceed_2v1()
                     .build();
-
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 Event expectedDefenceFiled = Event.builder()
                     .eventSequence(3)
                     .eventCode("50")
@@ -3152,6 +3726,12 @@ class EventHistoryMapperTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
                     .build();
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 Event expectedDirectionsQuestionnaireRespondent = Event.builder()
                     .eventSequence(4)
                     .eventCode("197")
@@ -3235,6 +3815,25 @@ class EventHistoryMapperTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                     .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
+                    .respondentResponseIsSame(YES)
+                    .build();
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
+                Event expectedDefence1 = Event.builder()
+                    .eventSequence(3)
+                    .eventCode("50")
+                    .dateReceived(caseData.getRespondent1ResponseDate())
+                    .litigiousPartyID("002")
+                    .build();
+                Event expectedDefence2 = Event.builder()
+                    .eventSequence(5)
+                    .eventCode("50")
+                    .dateReceived(caseData.getRespondent2ResponseDate())
+                    .litigiousPartyID("003")
                     .build();
                 Event expectedReplyToDefence = Event.builder()
                     .eventSequence(6)
@@ -3263,7 +3862,7 @@ class EventHistoryMapperTest {
                     .litigiousPartyID("003")
                     .eventDetailsText(mapper.prepareFullDefenceEventText(
                         caseData.getRespondent2DQ(), caseData,
-                        false, caseData.getRespondent2()))
+                        true, caseData.getRespondent2()))
                     .eventDetails(EventDetails.builder()
                                       .stayClaim(mapper.isStayClaim(caseData.getRespondent2DQ()))
                                       .preferredCourtCode(mapper.getPreferredCourtCode(caseData.getRespondent2DQ()))
@@ -3318,6 +3917,8 @@ class EventHistoryMapperTest {
                 var eventHistory = mapper.buildEvents(caseData);
 
                 assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory).extracting("defenceFiled").asList()
+                        .containsExactly(expectedDefence1, expectedDefence2);
                 assertThat(eventHistory).extracting("replyToDefence").asList()
                     .containsExactly(expectedReplyToDefence);
                 assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
@@ -3345,9 +3946,15 @@ class EventHistoryMapperTest {
                     .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                     .atStateApplicantRespondToDefenceAndProceedVsDefendant1Only_1v2()
                     .build();
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 List<Event> expectedMiscEvents = List.of(
                     Event.builder()
-                        .eventSequence(3)
+                        .eventSequence(1)
                         .eventCode("999")
                         .dateReceived(caseData.getClaimNotificationDate())
                         .eventDetailsText("Claimant has notified defendant.")
@@ -3356,7 +3963,7 @@ class EventHistoryMapperTest {
                                           .build())
                         .build(),
                     Event.builder()
-                        .eventSequence(9)
+                        .eventSequence(7)
                         .eventCode("999")
                         .dateReceived(caseData.getApplicant1ResponseDate())
                         .eventDetailsText(expectedMiscText1)
@@ -3365,7 +3972,7 @@ class EventHistoryMapperTest {
                                           .build())
                         .build(),
                     Event.builder()
-                        .eventSequence(10)
+                        .eventSequence(8)
                         .eventCode("999")
                         .dateReceived(caseData.getApplicant1ResponseDate())
                         .eventDetailsText(expectedMiscText2)
@@ -3389,7 +3996,14 @@ class EventHistoryMapperTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                     .atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2()
+                    .respondentResponseIsSame(YES)
                     .build();
+                if (caseData.getRespondent2OrgRegistered() != null
+                    && caseData.getRespondent2Represented() == null) {
+                    caseData = caseData.toBuilder()
+                        .respondent2Represented(YES)
+                        .build();
+                }
                 List<Event> expectedMiscEvents = List.of(
                     Event.builder()
                         .eventSequence(3)
@@ -4211,7 +4825,12 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atDeadlinePassedAfterStateClaimDetailsNotifiedExtension()
                 .build();
-
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
                     .eventSequence(1)
@@ -4419,6 +5038,12 @@ class EventHistoryMapperTest {
                 .atStateNotificationAcknowledgedRespondent1TimeExtension()
                 .atState(FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE)
                 .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event expectedDefenceFiled = Event.builder()
                 .eventSequence(4)
                 .eventCode("50")
@@ -4526,6 +5151,12 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareMiscellaneousEvent_whenClaimNotified() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event claimIssuedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")
@@ -4580,6 +5211,12 @@ class EventHistoryMapperTest {
                 .atStateClaimNotified_1v1()
                 .addRespondent1LitigationFriend()
                 .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event claimIssuedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")
@@ -4635,6 +5272,12 @@ class EventHistoryMapperTest {
                 .atStateClaimNotified_1v2_andNotifyBothSolicitors()
                 .addRespondent2LitigationFriend()
                 .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event claimIssuedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")
@@ -4704,7 +5347,12 @@ class EventHistoryMapperTest {
                                .note("my note")
                                .build())
                 .build();
-
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             Event claimIssuedEvent = Event.builder()
                 .eventSequence(1)
                 .eventCode("999")
@@ -4883,6 +5531,12 @@ class EventHistoryMapperTest {
                              .build())
             .respondent2LitigationFriendCreatedDate(LocalDateTime.now())
             .build();
+        if (caseData.getRespondent2OrgRegistered() != null
+            && caseData.getRespondent2Represented() == null) {
+            caseData = caseData.toBuilder()
+                .respondent2Represented(YES)
+                .build();
+        }
         when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
 
         Event claimIssuedEvent = Event.builder()
@@ -4935,4 +5589,219 @@ class EventHistoryMapperTest {
             "directionsQuestionnaireFiled"
         );
     }
+
+    @Nested
+    class BreathingSpaceEvents {
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseEntersBreathingSpace() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .addEnterBreathingSpace()
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("breathingSpaceEntered").asList()
+                .isNotNull();
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseLiftsBreathingSpace() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .addEnterBreathingSpace()
+                .addLiftBreathingSpace()
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("breathingSpaceLifted").asList()
+                .isNotNull();
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseEntersMentalBreathingSpace() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .addEnterMentalHealthBreathingSpace()
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("breathingSpaceMentalHealthEntered").asList()
+                .isNotNull();
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseLiftsMentalHealthBreathingSpace() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .addLiftMentalBreathingSpace()
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("breathingSpaceMentalHealthLifted").asList()
+                .isNotNull();
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseEntersBreathingSpaceOptionalDataNull() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .addEnterBreathingSpaceWithoutOptionalData()
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("breathingSpaceEntered").asList()
+                .isNotNull();
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseLiftsBreathingSpaceWithoutOptionalData() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .addEnterBreathingSpace()
+                .addLiftBreathingSpaceWithoutOptionalData()
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("breathingSpaceLifted").asList()
+                .isNotNull();
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseEntersMentalBreathingSpaceWithoutOptionalData() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .addEnterMentalHealthBreathingSpaceNoOptionalData()
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("breathingSpaceMentalHealthEntered").asList()
+                .isNotNull();
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseLiftsMentalHealthBreathingSpaceWithoutOptionalData() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .addLiftMentalBreathingSpace()
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("breathingSpaceMentalHealthLifted").asList()
+                .isNotNull();
+        }
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseEntersBreathingSpaceWithOnlyReferenceInfo() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .addEnterBreathingSpaceWithOnlyReferenceInfo()
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("breathingSpaceEntered").asList()
+                .isNotNull();
+        }
+
+    }
+
+    @Nested
+    class InformAgreedExtensionDateForSpecEvents {
+
+        @Test
+        void shouldPrepareExpectedEvents_whenCaseInformAgreedExtensionDate() {
+            LocalDate extensionDateRespondent1 = now().plusDays(14);
+            LocalDateTime datetime = LocalDateTime.now();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
+                .atState(FlowState.Main.CLAIM_ISSUED)
+                .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)
+                .respondent1TimeExtensionDate(datetime)
+                .build();
+
+            LocalDateTime currentTime = LocalDateTime.now();
+            when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
+                .extracting("eventCode").asString().contains("45");
+        }
+    }
+
 }
