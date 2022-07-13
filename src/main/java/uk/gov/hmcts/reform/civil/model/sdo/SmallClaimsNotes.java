@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
 
 import java.time.LocalDate;
 import javax.validation.constraints.Future;
@@ -13,11 +12,9 @@ import javax.validation.constraints.Future;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class DisposalHearingFinalDisposalHearing {
+public class SmallClaimsNotes {
 
     private String input;
     @Future(message = "The date entered must be in the future")
     private LocalDate date;
-    private DisposalHearingFinalDisposalHearingTimeEstimate time;
-
 }

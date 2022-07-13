@@ -9,8 +9,11 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 @Builder(toBuilder = true)
 public class Party {
 
+    private final String type;
     private final String name;
     private final Address primaryAddress;
     private final Representative representative;
     private final String litigationFriendName;
+    private final String soleTraderTradingAs;
+
 }

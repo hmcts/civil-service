@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -242,7 +243,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo specRespondent1Represented;
     private final YesOrNo specRespondent2Represented;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents;
-    private final String specClaimResponseTimelineList;
+    private final TimelineUploadTypeSpec specClaimResponseTimelineList;
     private final ResponseDocument specResponseTimelineDocumentFiles;
     private final List<Evidence> specResponselistYourEvidenceList;
 
@@ -460,7 +461,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearingDJ;
     private DisposalHearingBundle disposalHearingBundleDJ;
     private DisposalHearingNotes disposalHearingNotesDJ;
-
     //default judgement SDO fields for trial
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
     private TrialHearingDisclosureOfDocuments trialHearingDisclosureOfDocumentsDJ;
@@ -476,6 +476,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
+
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
