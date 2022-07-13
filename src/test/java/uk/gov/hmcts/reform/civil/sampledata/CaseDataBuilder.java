@@ -2485,7 +2485,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder getGeneralApplicationWithLitigiousPartyID001() {
+    public CaseDataBuilder getGeneralApplicationWithStrikeOut() {
         List<GeneralApplicationTypes> types = Arrays.asList(STRIKE_OUT);
         List<Element<GeneralApplication>> generalApplicationValues = wrapElements(
             GeneralApplication.builder()
@@ -2497,6 +2497,7 @@ public class CaseDataBuilder {
                 .generalAppType(GAApplicationType.builder()
                                     .types(types)
                                     .build())
+
                 .caseLink(CaseLink.builder().caseReference("12345678").build())
                 .businessProcess(BusinessProcess.builder()
                                      .camundaEvent("NotifyRoboticsOnCaseHandedOffline")
@@ -2507,11 +2508,11 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder getGeneralApplicationsDetails() {
+    public CaseDataBuilder getGeneralApplicationsDetailsWithCaseState(final String caseState) {
         List<Element<GeneralApplicationsDetails>> generalApplicationsDetails = wrapElements(
             GeneralApplicationsDetails.builder()
                 .generalApplicationType(STRIKE_OUT.getDisplayedValue())
-                .caseState(PROCEEDS_IN_HERITAGE_SYSTEM.name())
+                .caseState(caseState)
                 .generalAppSubmittedDateGAspec(SUBMITTED_DATE_TIME)
                 .caseLink(CaseLink.builder().caseReference("12345678").build())
                 .build()

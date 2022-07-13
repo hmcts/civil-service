@@ -4116,12 +4116,12 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        void shouldPrepareMiscellaneousEvent_whenGeneralApplicationDecisionDefenseStruckOut() {
+        void shouldPrepareGeneralApplicationEvents_whenGeneralApplicationDecisionDefenseStruckOut() {
             String eventDetailText = "APPLICATION TO Strike Out";
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineByStaff()
-                .getGeneralApplicationWithLitigiousPartyID001()
-                .getGeneralApplicationsDetails()
+                .getGeneralApplicationWithStrikeOut()
+                .getGeneralApplicationsDetailsWithCaseState("Proceeds in Heritage")
                 .build();
 
             Event claimNotifiedEvent = Event.builder()
@@ -4160,7 +4160,39 @@ class EventHistoryMapperTest {
             assertThat(eventHistory.getGeneralFormOfApplication()).isEqualTo(List.of(generalApplicationEvent));
             assertThat(eventHistory.getDefenceStruckOutJudgment()).isEqualTo(List.of(defenceStruckOutJudgment));
         }
+        @Test
+        void shouldNotPrepareGeneralApplicationEvents_whenGeneralApplicationDecisionOrderMade() {
 
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineByStaff()
+                .getGeneralApplicationWithStrikeOut()
+                .getGeneralApplicationsDetailsWithCaseState("Order Made")
+                .build();
+
+            Event claimNotifiedEvent = Event.builder()
+                .eventSequence(1)
+                .eventCode("999")
+                .dateReceived(caseData.getTakenOfflineByStaffDate())
+                .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                .eventDetails(EventDetails.builder()
+                                  .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                  .build())
+                .build();
+            Event generalApplicationEvent = Event.builder().build();
+
+            Event defenceStruckOutJudgment = Event.builder().build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory)
+                .extracting("miscellaneous")
+                .asList()
+                .containsExactly(claimNotifiedEvent);
+
+            assertThat(eventHistory.getGeneralFormOfApplication()).isEqualTo(List.of(generalApplicationEvent));
+            assertThat(eventHistory.getDefenceStruckOutJudgment()).isEqualTo(List.of(defenceStruckOutJudgment));
+        }
     }
 
     @Nested

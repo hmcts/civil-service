@@ -1496,7 +1496,7 @@ public class EventHistoryMapper {
                            .getCaseReference()
                            .equals(caseLinkId)
                        && generalApplicationsDetailsElement.getValue().getCaseState()
-                           .equals(PROCEEDS_IN_HERITAGE_SYSTEM.name()))
+                           .equals("Proceeds in Heritage"))
             .findFirst()
             .orElse(null);
     }
