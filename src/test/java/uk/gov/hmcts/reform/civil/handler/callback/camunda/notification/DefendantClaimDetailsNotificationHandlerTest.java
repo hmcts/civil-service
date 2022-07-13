@@ -100,7 +100,7 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONSE_DEADLINE, formatLocalDate(caseData.getClaimDetailsNotificationDeadline().toLocalDate(), DATE),
-                RESPONSE_DEADLINE_PLUS_28, formatLocalDate(caseData.getRespondent1ResponseDeadline().plusDays(28)
+                RESPONSE_DEADLINE_PLUS_28, formatLocalDate(caseData.getRespondent1ResponseDeadline().plusDays(14)
                                                                                  .toLocalDate(), DATE),
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
