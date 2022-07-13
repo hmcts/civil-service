@@ -4160,6 +4160,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory.getGeneralFormOfApplication()).isEqualTo(List.of(generalApplicationEvent));
             assertThat(eventHistory.getDefenceStruckOutJudgment()).isEqualTo(List.of(defenceStruckOutJudgment));
         }
+
         @Test
         void shouldNotPrepareGeneralApplicationEvents_whenGeneralApplicationDecisionOrderMade() {
 
