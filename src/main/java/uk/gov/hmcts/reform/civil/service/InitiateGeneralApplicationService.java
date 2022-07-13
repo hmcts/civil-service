@@ -320,7 +320,7 @@ public class InitiateGeneralApplicationService {
         } else {
             LocationRefData ccmccLocation = locationRefDataService.getCcmccLocation(authToken);
             CaseLocation courtLocation = CaseLocation.builder()
-                    .region(ccmccLocation.getRegion())
+                    .region(ccmccLocation.getRegionId())
                     .baseLocation(ccmccLocation.getEpimmsId())
                     .build();
             return Pair.of(courtLocation, true);
