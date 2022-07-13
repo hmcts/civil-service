@@ -128,7 +128,7 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
             RESPONSE_DEADLINE_PLUS_28, formatLocalDate(caseData
                                                                              .getRespondent1ResponseDeadline()
                                                                              .toLocalDate()
-                                                                             .plusDays(28)
+                                                                             .plusDays(14)
                                                                              .atTime(23, 59)
                                                                              .toLocalDate(), DATE),
             PARTY_REFERENCES, buildPartiesReferences(caseData)
