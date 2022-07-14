@@ -116,27 +116,27 @@ public class RoboticsDataMapper {
 
     private Solicitor buildRespondentSolicitor(CaseData caseData, String id) {
         Solicitor.SolicitorBuilder solicitorBuilder = Solicitor.builder();
-        Optional<String> organisationId = getOrganisationId(caseData.getRespondent1OrganisationPolicy());
+        String organisationId = caseData.getRespondent1OrganisationIDCopy();
 
         var organisationDetails = ofNullable(
             caseData.getRespondentSolicitor1OrganisationDetails()
         );
-        if (organisationId.isEmpty() && organisationDetails.isEmpty()) {
+        if (organisationId == null && organisationDetails.isEmpty()) {
             return null;
         }
         solicitorBuilder
             .id(id)
             .isPayee(false)
-            .organisationId(organisationId.orElse(null))
+            .organisationId(organisationId)
             .reference(ofNullable(caseData.getSolicitorReferences())
                            .map(SolicitorReferences::getRespondentSolicitor1Reference)
                            .orElse(null)
             );
 
-        organisationId
-            .flatMap(organisationService::findOrganisationById)
-            .ifPresent(buildOrganisation(solicitorBuilder, caseData.getRespondentSolicitor1ServiceAddress()));
-
+        if (organisationId != null) {
+            organisationService.findOrganisationById(organisationId)
+                .ifPresent(buildOrganisation(solicitorBuilder, caseData.getRespondentSolicitor1ServiceAddress()));
+        }
         organisationDetails.ifPresent(buildOrganisationDetails(solicitorBuilder));
 
         return solicitorBuilder.build();
@@ -213,6 +213,13 @@ public class RoboticsDataMapper {
     private List<LitigiousParty> buildLitigiousParties(CaseData caseData) {
         String respondent1SolicitorId = caseData.getRespondent1Represented() == YES
             ? RESPONDENT_SOLICITOR_ID : null;
+
+        /*LocalDateTime dateOfService = null;
+        if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+            dateOfService = caseData.getIssueDate().atStartOfDay();
+        } else {
+            dateOfService = caseData.getClaimDetailsNotificationDate();
+        }*/
 
         var respondentParties = new ArrayList<>(List.of(
             buildLitigiousParty(
@@ -295,23 +302,24 @@ public class RoboticsDataMapper {
 
     private Solicitor buildRespondent2Solicitor(CaseData caseData, String id) {
         Solicitor.SolicitorBuilder solicitorBuilder = Solicitor.builder();
-        Optional<String> organisationId = getOrganisationId(caseData.getRespondent2OrganisationPolicy());
+        String organisationId = caseData.getRespondent2OrganisationIDCopy();
 
         var organisationDetails = ofNullable(
             caseData.getRespondentSolicitor2OrganisationDetails()
         );
-        if (organisationId.isEmpty() && organisationDetails.isEmpty()) {
+        if (organisationId == null && organisationDetails.isEmpty()) {
             return null;
         }
         solicitorBuilder
             .id(id)
             .isPayee(false)
-            .organisationId(organisationId.orElse(null))
+            .organisationId(organisationId)
             .reference(caseData.getRespondentSolicitor2Reference());
 
-        organisationId
-            .flatMap(organisationService::findOrganisationById)
-            .ifPresent(buildOrganisation(solicitorBuilder, caseData.getRespondentSolicitor2ServiceAddress()));
+        if (organisationId != null) {
+            organisationService.findOrganisationById(organisationId)
+                .ifPresent(buildOrganisation(solicitorBuilder, caseData.getRespondentSolicitor2ServiceAddress()));
+        }
 
         organisationDetails.ifPresent(buildOrganisationDetails(solicitorBuilder));
 

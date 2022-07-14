@@ -146,6 +146,10 @@ public class RoboticsNotificationService {
             eventHistory.getReceiptOfAdmission(),
             eventHistory.getReplyToDefence(),
             eventHistory.getDirectionsQuestionnaireFiled(),
+            eventHistory.getBreathingSpaceEntered(),
+            eventHistory.getBreathingSpaceLifted(),
+            eventHistory.getBreathingSpaceMentalHealthEntered(),
+            eventHistory.getBreathingSpaceMentalHealthLifted(),
             eventHistory.getGeneralFormOfApplication(),
             eventHistory.getDefenceStruckOut()
         );
@@ -168,6 +172,10 @@ public class RoboticsNotificationService {
         triggerReason = updateTriggerReason(eventHistory.getReceiptOfPartAdmission(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getReceiptOfAdmission(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getReplyToDefence(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getBreathingSpaceEntered(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getBreathingSpaceLifted(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getBreathingSpaceMentalHealthEntered(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getBreathingSpaceMentalHealthLifted(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getDirectionsQuestionnaireFiled(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getGeneralFormOfApplication(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getDefenceStruckOut(), triggerReason);

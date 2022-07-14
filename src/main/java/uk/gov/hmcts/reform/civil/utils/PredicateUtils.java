@@ -1,8 +1,12 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.function.Predicate;
+
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public class PredicateUtils {
 
@@ -19,7 +23,7 @@ public class PredicateUtils {
             && caseData.getRespondentSolicitor2AgreedDeadlineExtension() != null;
 
     public static final Predicate<CaseData> defendant1AckExists = caseData ->
-        caseData.getRespondent1AcknowledgeNotificationDate()  != null;
+        caseData.getRespondent1AcknowledgeNotificationDate() != null;
 
     public static final Predicate<CaseData> defendant2AckExists = caseData ->
         caseData.getRespondent2AcknowledgeNotificationDate() != null;
@@ -28,5 +32,15 @@ public class PredicateUtils {
         caseData.getRespondent1ResponseDate() != null;
 
     public static final Predicate<CaseData> defendant2ResponseExists = caseData ->
-        caseData.getRespondent2() != null && caseData.getRespondent2ResponseDate() != null;
+        caseData.getRespondent2() != null && caseData.getRespondent2ResponseDate() != null
+        && caseData.getRespondent2SameLegalRepresentative() != YesOrNo.YES;
+
+    public static final Predicate<CaseData> defendant2DivergentResponseExists = caseData ->
+        caseData.getRespondent2() != null && (caseData.getRespondent2ResponseDate() != null
+            || (caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES
+            && caseData.getRespondent1ResponseDate() != null && caseData.getRespondentResponseIsSame()  == NO));
+
+    public static final Predicate<CaseData> defendant1v2SameSolicitorSameResponse =  caseData ->
+        caseData.getRespondent1ResponseDate() != null && caseData.getRespondent2() != null
+            && caseData.getRespondentResponseIsSame()  == YES;
 }
