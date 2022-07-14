@@ -279,6 +279,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedCaseData.respondToClaimAdmitPartEmploymentTypeLRspecGeneric(
                 caseData.getRespondToClaimAdmitPartEmploymentTypeLRspec2());
         }
+        if (caseData.getRespondToAdmittedClaimOwingAmount() != null) {
+            BigDecimal valuePounds = MonetaryConversions
+                .penniesToPounds(caseData.getRespondToAdmittedClaimOwingAmount());
+            updatedCaseData.respondToAdmittedClaimOwingAmountPounds(valuePounds);
+        }
+        if (YES.equals(caseData.getDefenceAdmitPartEmploymentType2Required())) {
+            updatedCaseData.respondToClaimAdmitPartEmploymentTypeLRspecGeneric(
+                caseData.getRespondToClaimAdmitPartEmploymentTypeLRspec2());
+        }
         Optional.ofNullable(caseData.getRespondToAdmittedClaimOwingAmount())
             .map(MonetaryConversions::penniesToPounds)
             .ifPresent(updatedCaseData::respondToAdmittedClaimOwingAmountPounds);
@@ -358,6 +367,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     && ((caseData.getRespondentResponseIsSame() != YES && needFinancialInfo21v2ds(caseData))
                     || (needFinancialInfo1(caseData) && caseData.getRespondentResponseIsSame() == YES))) {
                     necessary.add(NEED_FINANCIAL_DETAILS_2);
+                }
+
+                if (respondent2doesNotPayImmediately(caseData, scenario)) {
+                    necessary.add(WHY_2_DOES_NOT_PAY_IMMEDIATELY);
                 }
             }
 
@@ -949,7 +962,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             DefendantResponseShowTag.ONLY_RESPONDENT_2_DISPUTES,
             DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE,
             SOMEONE_DISPUTES,
-            CURRENT_ADMITS_PART_OR_FULL,
+            DefendantResponseShowTag.CURRENT_ADMITS_PART_OR_FULL,
             DefendantResponseShowTag.RESPONDENT_1_PAID_LESS,
             DefendantResponseShowTag.RESPONDENT_2_PAID_LESS,
             WHEN_WILL_CLAIM_BE_PAID,
@@ -957,7 +970,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             RESPONDENT_2_ADMITS_PART_OR_FULL,
             NEED_FINANCIAL_DETAILS_1,
             NEED_FINANCIAL_DETAILS_2,
-            WHY_1_DOES_NOT_PAY_IMMEDIATELY,
+            DefendantResponseShowTag.WHY_1_DOES_NOT_PAY_IMMEDIATELY,
             WHY_2_DOES_NOT_PAY_IMMEDIATELY,
             REPAYMENT_PLAN_2,
             DefendantResponseShowTag.MEDIATION

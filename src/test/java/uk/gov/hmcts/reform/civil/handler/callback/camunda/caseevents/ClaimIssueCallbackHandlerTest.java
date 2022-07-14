@@ -78,7 +78,7 @@ class ClaimIssueCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(updatedData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
             .isEqualTo(null);
         assertThat(updatedData.getRespondent1OrganisationIDCopy()).isEqualTo("QWERTY R");
-        assertThat(updatedData.getRespondent2OrganisationIDCopy()).isEqualTo(null);
+        assertThat(updatedData.getRespondent2OrganisationIDCopy()).isEqualTo("QWERTY R2");
 
     }
 
