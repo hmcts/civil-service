@@ -10,7 +10,7 @@ public enum DocumentType {
     DEFAULT_JUDGMENT,
     CLAIMANT_DEFENCE,
     CLAIMANT_DRAFT_DIRECTIONS,
-    DEFAULT_JUDGMENT_SDO_ORDER
+    DEFAULT_JUDGMENT_SDO_ORDER,
 
     //General Application Document Type
     GENERAL_ORDER,

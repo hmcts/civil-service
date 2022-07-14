@@ -59,7 +59,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
-import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDocuments;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
@@ -478,6 +477,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
 
+    //general application order documents
+    private final List<Element<CaseDocument>> generalOrderDocument;
+    private final List<Element<CaseDocument>> dismissalOrderDocument;
+    private final List<Element<CaseDocument>> directionOrderDocument;
+
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -510,14 +514,4 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .filter(Objects::nonNull)
             .findFirst().orElse(null);
     }
-
-    //general application order documents
-    private final List<Element<GeneralApplicationsDocuments>> generalApplicationsDocuments;
-    private final List<Element<CaseDocument>> generalOrderDocument;
-    private final List<Element<CaseDocument>> dismissalOrderDocument;
-    private final List<Element<CaseDocument>> directionOrderDocument;
-    private final List<Element<CaseDocument>> requestForInformationDocument;
-    private final List<Element<CaseDocument>> hearingOrderDocument;
-    private final List<Element<CaseDocument>> writtenRepSequentialDocument;
-    private final List<Element<CaseDocument>> writtenRepConcurrentDocument;
 }
