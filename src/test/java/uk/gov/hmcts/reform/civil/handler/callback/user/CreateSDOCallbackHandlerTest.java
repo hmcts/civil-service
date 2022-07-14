@@ -181,6 +181,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingClaimSettlingToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingCostsToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingApplicationsOrderToggle").isNotNull();
+            assertThat(response.getData()).extracting("smallClaimsHearingToggle").isNotNull();
+            assertThat(response.getData()).extracting("smallClaimsMethodToggle").isNotNull();
+            assertThat(response.getData()).extracting("smallClaimsDocumentsToggle").isNotNull();
+            assertThat(response.getData()).extracting("smallClaimsWitnessStatementToggle").isNotNull();
 
             assertThat(response.getData()).extracting("disposalHearingJudgesRecital").extracting("input")
                 .isEqualTo("Upon considering the claim Form and Particulars of Claim/statements of case "
