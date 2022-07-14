@@ -213,4 +213,5 @@ public class CaseDataParent implements MappableObject {
     private final BigDecimal respondToAdmittedClaimOwingAmountPounds2;
 
     private final ChangeOrganisationRequest changeOrganisationRequestField;
+    private final ChangeOfRepresentation changeOfRepresentation;
 }
