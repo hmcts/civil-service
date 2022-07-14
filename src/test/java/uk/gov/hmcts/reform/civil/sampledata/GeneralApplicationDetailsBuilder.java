@@ -339,7 +339,6 @@ public class GeneralApplicationDetailsBuilder {
                                                   .unavailableTrialDateFrom(APP_DATE_EPOCH)
                                                   .build()))
                                           .supportRequirementOther(STRING_CONSTANT)
-                                          .hearingPreferredLocation(DynamicList.builder().build())
                                           .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
                                           .reasonForPreferredHearingType(STRING_CONSTANT)
                                           .telephoneHearingPreferredType(STRING_CONSTANT)

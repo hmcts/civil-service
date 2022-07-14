@@ -643,7 +643,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
             DynamicList dynamicList = getLocationDynamicList(data);
             assertThat(data.getGeneralAppHearingDetails()).isNotNull();
-            assertThat(dynamicList.getValue()).isNull();
+            assertThat(dynamicList).isNull();
         }
     }
 
