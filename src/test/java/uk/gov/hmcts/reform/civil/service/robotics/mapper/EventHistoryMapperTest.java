@@ -41,6 +41,7 @@ import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.PROCEEDS_IN_HERITAGE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
@@ -4116,12 +4117,12 @@ class EventHistoryMapperTest {
         }
 
         @Test
-        void shouldPrepareGeneralApplicationEvents_whenGeneralApplicationDecisionDefenseStruckOut() {
-            String eventDetailText = "APPLICATION TO Strike Out";
+        void shouldPrepareGeneralApplicationEvents_whenGeneralApplicationApplicant1DecisionDefenseStruckOut() {
+            final String eventDetailText = "APPLICATION TO Strike Out";
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineByStaff()
-                .getGeneralApplicationWithStrikeOut()
-                .getGeneralApplicationsDetailsWithCaseState("Proceeds in Heritage")
+                .getGeneralApplicationWithStrikeOut("001")
+                .getGeneralStrikeOutApplicationsDetailsWithCaseState(PROCEEDS_IN_HERITAGE.getDisplayedValue())
                 .build();
 
             Event claimNotifiedEvent = Event.builder()
@@ -4160,14 +4161,59 @@ class EventHistoryMapperTest {
             assertThat(eventHistory.getGeneralFormOfApplication()).isEqualTo(List.of(generalApplicationEvent));
             assertThat(eventHistory.getDefenceStruckOut()).isEqualTo(List.of(defenceStruckOutJudgment));
         }
+        @Test
+        void shouldPrepareGeneralApplicationEvents_whenGeneralApplicationApplicant2DecisionDefenseStruckOut() {
+            String eventDetailText = "APPLICATION TO Strike Out";
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineByStaff()
+                .getGeneralApplicationWithStrikeOut("004")
+                .getGeneralStrikeOutApplicationsDetailsWithCaseState(PROCEEDS_IN_HERITAGE.getDisplayedValue())
+                .build();
+
+            Event claimNotifiedEvent = Event.builder()
+                .eventSequence(3)
+                .eventCode("999")
+                .dateReceived(caseData.getTakenOfflineByStaffDate())
+                .eventDetailsText(mapper.prepareTakenOfflineEventDetails(caseData))
+                .eventDetails(EventDetails.builder()
+                                  .miscText(mapper.prepareTakenOfflineEventDetails(caseData))
+                                  .build())
+                .build();
+            Event generalApplicationEvent = Event.builder()
+                .eventSequence(1)
+                .eventCode("136")
+                .litigiousPartyID("004")
+                .dateReceived(caseData.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
+                .eventDetailsText(eventDetailText)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(eventDetailText)
+                                  .build())
+                .build();
+            Event defenceStruckOutJudgment = Event.builder()
+                .eventSequence(2)
+                .eventCode("57")
+                .litigiousPartyID("004")
+                .dateReceived(caseData.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
+                .build();
+            var eventHistory = mapper.buildEvents(caseData);
+
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory)
+                .extracting("miscellaneous")
+                .asList()
+                .containsExactly(claimNotifiedEvent);
+
+            assertThat(eventHistory.getGeneralFormOfApplication()).isEqualTo(List.of(generalApplicationEvent));
+            assertThat(eventHistory.getDefenceStruckOut()).isEqualTo(List.of(defenceStruckOutJudgment));
+        }
 
         @Test
         void shouldNotPrepareGeneralApplicationEvents_whenGeneralApplicationDecisionOrderMade() {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineByStaff()
-                .getGeneralApplicationWithStrikeOut()
-                .getGeneralApplicationsDetailsWithCaseState("Order Made")
+                .getGeneralApplicationWithStrikeOut("001")
+                .getGeneralStrikeOutApplicationsDetailsWithCaseState("Order Made")
                 .build();
 
             Event claimNotifiedEvent = Event.builder()

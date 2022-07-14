@@ -2485,13 +2485,12 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder getGeneralApplicationWithStrikeOut() {
+    public CaseDataBuilder getGeneralApplicationWithStrikeOut(final String litigiousPartyID) {
         List<GeneralApplicationTypes> types = Arrays.asList(STRIKE_OUT);
         List<Element<GeneralApplication>> generalApplicationValues = wrapElements(
             GeneralApplication.builder()
                 .applicantPartyName("partyName")
-                .litigiousPartyID("001")
-                .applicantPartyName("partyName")
+                .litigiousPartyID(litigiousPartyID)
                 .generalAppDateDeadline(DEADLINE)
                 .generalAppSubmittedDateGAspec(SUBMITTED_DATE_TIME)
                 .generalAppType(GAApplicationType.builder()
@@ -2508,7 +2507,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder getGeneralApplicationsDetailsWithCaseState(final String caseState) {
+    public CaseDataBuilder getGeneralStrikeOutApplicationsDetailsWithCaseState(final String caseState) {
         List<Element<GeneralApplicationsDetails>> generalApplicationsDetails = wrapElements(
             GeneralApplicationsDetails.builder()
                 .generalApplicationType(STRIKE_OUT.getDisplayedValue())

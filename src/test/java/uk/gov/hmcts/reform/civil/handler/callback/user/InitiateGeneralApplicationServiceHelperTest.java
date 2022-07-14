@@ -309,6 +309,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                                                    .build())
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(APPLICANT_EMAIL_ID_CONSTANT).build())
                 .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
+                .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
                 .applicant2(Party.builder().type(COMPANY).companyName("Applicant2").build())
                 .respondent1(Party.builder().type(COMPANY).companyName("Respondent1").build())
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
