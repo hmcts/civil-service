@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
@@ -627,25 +626,24 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldSetDynamicListWhenPreferredTypeNotInPerson() {
+        void shouldSetDynamicListWhenPreferredLocationValueIsNull() {
 
-            CaseData caseData = CaseData.builder()
-                .generalAppHearingDetails(GAHearingDetails.builder()
-                                              .hearingPreferencesPreferredType(IN_PERSON)
-                                              .build())
-                .generalAppPBADetails(GAPbaDetails.builder().fee(feeFromFeeService).build()).build();
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithEmptyPreferredLocation(CaseData.builder().build());
+            when(feesService.getFeeForGA(any())).thenReturn(feeFromFeeService);
+            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+                                                                        .email(APPLICANT_EMAIL_ID_CONSTANT)
+                                                                        .build());
+            when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
+                                                         any(CaseData.class), any(UserDetails.class), anyString()))
+                .thenReturn(getMockServiceData(caseData));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
-
             DynamicList dynamicList = getLocationDynamicList(data);
-
-            assertThat(response.getErrors()).isEmpty();
             assertThat(data.getGeneralAppHearingDetails()).isNotNull();
-            assertThat(dynamicList).isNull();
+            assertThat(dynamicList.getValue()).isNull();
         }
     }
 

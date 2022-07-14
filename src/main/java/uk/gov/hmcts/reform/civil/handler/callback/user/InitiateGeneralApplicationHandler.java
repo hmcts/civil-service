@@ -165,10 +165,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             CaseData newCaseData = caseData.toBuilder().generalAppPBADetails(generalAppPBADetails).build();
             caseData = newCaseData;
         }
-        String preferredType = caseData.getGeneralAppHearingDetails().getHearingPreferencesPreferredType().name();
 
-        if (preferredType.equals(PREFERRED_TYPE_IN_PERSON)
-                && (caseData.getGeneralAppHearingDetails().getHearingPreferredLocation() != null)) {
+        if ((caseData.getGeneralAppHearingDetails().getHearingPreferredLocation().getValue() != null)) {
             List<String> applicationLocationList = List.of(caseData.getGeneralAppHearingDetails()
                                                                .getHearingPreferredLocation()
                                                                .getValue().getLabel());
