@@ -137,15 +137,31 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToStartCallback {
 
+        private static final String SUPER_CLAIM_KEY = "superClaimType";
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStatePendingClaimIssued().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseDetails).build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssued()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldSetSuperClaimType_WhenAboutToStartIsInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssued()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData().get(SUPER_CLAIM_KEY)).isEqualTo("UNSPEC_CLAIM");
         }
     }
 
