@@ -66,6 +66,7 @@ public class CasesController {
         return new ResponseEntity<>(caseDetailsResponse, HttpStatus.OK);
     }
 
+
     @PostMapping(path = "/")
     @ApiOperation("get list of the cases from CCD")
     public ResponseEntity<SearchResult> getCaseList(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
