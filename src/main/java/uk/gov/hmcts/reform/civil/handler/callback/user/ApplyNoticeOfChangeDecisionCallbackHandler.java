@@ -43,11 +43,8 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseAssignmentApi caseAssignmentApi;
     private final ObjectMapper objectMapper;
-    private final IdamClient idamClient;
-    private final UserService userService;
 
     private static final String CHANGE_ORGANISATION_REQUEST = "changeOrganisationRequestField";
-
     private static final String ORD_ID_FOR_AUTO_APPROVAL = "org id to persist updated change organisation request field";
 
     @Override
@@ -62,13 +59,6 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         ChangeOrganisationRequest corFieldBeforeNoC = callbackParams.getCaseData().getChangeOrganisationRequestField();
-
-        UserDetails userDetails = idamClient.getUserDetails(authToken);
-        System.out.println("apply_noc_decision email " + userDetails.getEmail());
-
-        UserInfo userInfo = userService.getUserInfo(authToken);
-        System.out.println("apply_noc_decision ID " + userInfo.getUid());
-        System.out.println("apply_noc_decision name " + userInfo.getName() + userInfo.getGivenName() + userInfo.getFamilyName());
 
         updateOrgPoliciesForLiP(callbackParams.getRequest().getCaseDetails());
 

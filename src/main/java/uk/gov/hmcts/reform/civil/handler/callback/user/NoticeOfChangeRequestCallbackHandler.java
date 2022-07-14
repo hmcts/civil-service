@@ -35,35 +35,12 @@ public class NoticeOfChangeRequestCallbackHandler extends CallbackHandler {
 
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseAssignmentApi caseAssignmentApi;
-    private final IdamClient idamClient;
-    private final UserService userService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(SUBMITTED), this::checkNoticeOfChangeApproval)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::validateCaseState)
             .build();
-    }
-
-    private CallbackResponse validateCaseState(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseState ccdState = caseData.getCcdState();
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-
-        UserDetails userDetails = idamClient.getUserDetails(authToken);
-        System.out.println("noc_request email " + userDetails.getEmail());
-        UserInfo userInfo = userService.getUserInfo(authToken);
-        System.out.println("noc_request ID " + userInfo.getUid());
-        System.out.println("noc_request name " + userInfo.getName() + userInfo.getGivenName() + userInfo.getFamilyName());
-
-        List<String> errors = Collections.singletonList("Case state invalid");
-        if (ccdState == CaseState.CASE_DISMISSED || ccdState == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(errors)
-                .build();
-        } else
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     private CallbackResponse checkNoticeOfChangeApproval(CallbackParams callbackParams) {
