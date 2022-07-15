@@ -271,6 +271,9 @@ public class CaseDataBuilder {
     private String caseManagementOrderSelection;
     private LocalDateTime addLegalRepDeadline;
 
+    //update pdf document from general applications
+    private List<Element<CaseDocument>> generalOrderDocument;
+
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
         return this;

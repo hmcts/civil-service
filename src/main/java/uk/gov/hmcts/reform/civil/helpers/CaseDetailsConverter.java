@@ -30,14 +30,14 @@ public class CaseDetailsConverter {
         return objectMapper.convertValue(data, CaseData.class);
     }
 
+    public CaseData toCaseData(Map<String, Object> caseDataMap) {
+        return objectMapper.convertValue(caseDataMap, CaseData.class);
+    }
+
     public CaseData toGACaseData(CaseDetails caseDetails) {
         Map<String, Object> data = new HashMap<>(caseDetails.getData());
         data.put("ccdCaseReference", caseDetails.getId());
 
         return objectMapper.convertValue(data, CaseData.class);
-    }
-
-    public CaseData toCaseData(Map<String, Object> caseDataMap) {
-        return objectMapper.convertValue(caseDataMap, CaseData.class);
     }
 }

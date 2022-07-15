@@ -13,14 +13,11 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Long.parseLong;
-import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
 @Component
@@ -40,7 +37,8 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         String generalAppCaseId = variables.getCaseId();
         String civilCaseId = variables.getGeneralAppParentCaseLink();
 
-        generalAppCaseData = caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(generalAppCaseId)));
+        generalAppCaseData = caseDetailsConverter.toGACaseData(coreCaseDataService
+                                                                   .getCase(parseLong(generalAppCaseId)));
 
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(civilCaseId, variables.getCaseEvent());
         civilCaseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
@@ -55,25 +53,25 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
     }
 
     private Map<String, Object> getUpdatedCaseData(CaseData civilCaseData, CaseData generalAppCaseData) {
-        List<Element<CaseDocument>> generalOrderDocument =
-            ofNullable(civilCaseData.getGeneralOrderDocument()).orElse(newArrayList());
-        generalOrderDocument.add(generalAppCaseData.getGeneralOrderDocument() != null ? generalAppCaseData
-            .getGeneralOrderDocument().get(0) : null);
+        List<Element<CaseDocument>> generalOrderDocument = newArrayList();
+        if (generalAppCaseData.getGeneralOrderDocument() != null) {
+            generalOrderDocument.add(generalAppCaseData.getGeneralOrderDocument().get(0));
+        }
 
-        List<Element<CaseDocument>> dismissalOrderDocument =
-            ofNullable(civilCaseData.getDismissalOrderDocument()).orElse(newArrayList());
-        dismissalOrderDocument.add(generalAppCaseData.getDismissalOrderDocument() != null ? generalAppCaseData
-            .getDismissalOrderDocument().get(0) : null);
+        List<Element<CaseDocument>> dismissalOrderDocument = newArrayList();
+        if (generalAppCaseData.getDismissalOrderDocument() != null) {
+            dismissalOrderDocument.add(generalAppCaseData.getDismissalOrderDocument().get(0));
+        }
 
-        List<Element<CaseDocument>> directionOrderDocumnet =
-            ofNullable(civilCaseData.getDirectionOrderDocument()).orElse(newArrayList());
-        directionOrderDocumnet.add(generalAppCaseData.getDirectionOrderDocument() != null ? generalAppCaseData
-            .getDirectionOrderDocument().get(0) : null);
+        List<Element<CaseDocument>> directionOrderDocumnet = newArrayList();
+        if (generalAppCaseData.getDirectionOrderDocument() != null) {
+            directionOrderDocumnet.add(generalAppCaseData.getDirectionOrderDocument().get(0));
+        }
 
         Map<String, Object> output = civilCaseData.toMap(mapper);
-        output.put("generalOrderDocument", generalOrderDocument);
-        output.put("dismissalOrderDocument", dismissalOrderDocument);
-        output.put("directionOrderDocument", directionOrderDocumnet);
+        output.put("generalOrderDocument", generalOrderDocument.isEmpty() ? null : generalOrderDocument);
+        output.put("dismissalOrderDocument", dismissalOrderDocument.isEmpty() ? null : dismissalOrderDocument);
+        output.put("directionOrderDocument", directionOrderDocumnet.isEmpty() ? null : directionOrderDocumnet);
 
         return output;
     }
