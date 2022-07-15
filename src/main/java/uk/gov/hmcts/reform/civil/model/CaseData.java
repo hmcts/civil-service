@@ -23,7 +23,9 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -32,6 +34,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialEmployersLiability;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
@@ -458,6 +461,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearingDJ;
     private DisposalHearingBundle disposalHearingBundleDJ;
     private DisposalHearingNotes disposalHearingNotesDJ;
+    private DisposalHearingMethodDJ disposalHearingMethodDJ;
 
     //default judgement SDO fields for trial
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
@@ -471,6 +475,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private TrialCreditHire trialCreditHire;
     private TrialPersonalInjury trialPersonalInjury;
     private TrialRoadTrafficAccident trialRoadTrafficAccident;
+    private TrialEmployersLiability trialEmployersLiability;
+    private DisposalHearingMethodDJ trialHearingMethodDJ;
 
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
@@ -495,4 +501,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private List<DisposalAndTrialHearingDJToggle> trialHearingSchedulesOfLossDJToggle;
     private List<DisposalAndTrialHearingDJToggle> trialHearingCostsToggle;
     private List<DisposalAndTrialHearingDJToggle> trialHearingTrialDJToggle;
+
+    private List<CaseManagementOrderAdditional> caseManagementOrderAdditional;
 }
