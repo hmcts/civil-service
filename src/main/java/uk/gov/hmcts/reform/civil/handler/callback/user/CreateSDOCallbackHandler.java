@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -130,10 +131,33 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     // Then any changes to fields in ccd will persist in ccd regardless of backwards or forwards page navigation.
     private CallbackResponse prePopulateOrderDetailsPages(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
         updatedData.disposalHearingMethodInPerson(fromList(fetchLocationData(callbackParams)));
         updatedData.fastTrackMethodInPerson(fromList(fetchLocationData(callbackParams)));
+
+        List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
+
+        updatedData.fastTrackAltDisputeResolutionToggle(checkList);
+        updatedData.fastTrackVariationOfDirectionsToggle(checkList);
+        updatedData.fastTrackSettlementToggle(checkList);
+        updatedData.fastTrackDisclosureOfDocumentsToggle(checkList);
+        updatedData.fastTrackWitnessOfFactToggle(checkList);
+        updatedData.fastTrackSchedulesOfLossToggle(checkList);
+        updatedData.fastTrackCostsToggle(checkList);
+        updatedData.fastTrackTrialToggle(checkList);
+        updatedData.fastTrackMethodToggle(checkList);
+        updatedData.disposalHearingDisclosureOfDocumentsToggle(checkList);
+        updatedData.disposalHearingWitnessOfFactToggle(checkList);
+        updatedData.disposalHearingMedicalEvidenceToggle(checkList);
+        updatedData.disposalHearingQuestionsToExpertsToggle(checkList);
+        updatedData.disposalHearingSchedulesOfLossToggle(checkList);
+        updatedData.disposalHearingFinalDisposalHearingToggle(checkList);
+        updatedData.disposalHearingMethodToggle(checkList);
+        updatedData.disposalHearingBundleToggle(checkList);
+        updatedData.disposalHearingClaimSettlingToggle(checkList);
+        updatedData.disposalHearingCostsToggle(checkList);
+        updatedData.disposalHearingApplicationsOrderToggle(checkList);
 
         DisposalHearingJudgesRecital tempDisposalHearingJudgesRecital = DisposalHearingJudgesRecital.builder()
             .input("Upon considering the claim Form and Particulars of Claim/statements of case"
