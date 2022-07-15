@@ -225,7 +225,7 @@ public class RoboticsDataMapper {
             buildLitigiousParty(
                 caseData.getApplicant1(),
                 caseData.getApplicant1LitigationFriend(),
-                caseData.getApplicant1OrganisationPolicy(),
+                caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID(),
                 "Claimant",
                 APPLICANT_ID,
                 APPLICANT_SOLICITOR_ID,
@@ -234,7 +234,11 @@ public class RoboticsDataMapper {
             buildLitigiousParty(
                 caseData.getRespondent1(),
                 caseData.getRespondent1LitigationFriend(),
-                caseData.getRespondent1OrganisationPolicy(),
+                caseData.getRespondent1OrganisationIDCopy() != null
+                    ? caseData.getRespondent1OrganisationIDCopy()
+                    : (caseData.getRespondent1OrganisationPolicy() != null
+                    ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
+                    : null),
                 "Defendant",
                 RESPONDENT_ID,
                 respondent1SolicitorId,
@@ -246,7 +250,9 @@ public class RoboticsDataMapper {
             respondentParties.add(buildLitigiousParty(
                 caseData.getApplicant2(),
                 caseData.getApplicant2LitigationFriend(),
-                caseData.getApplicant2OrganisationPolicy(),
+                caseData.getApplicant2OrganisationPolicy() != null
+                    ? caseData.getApplicant2OrganisationPolicy().getOrganisation().getOrganisationID()
+                    : null,
                 "Claimant",
                 APPLICANT2_ID,
                 APPLICANT_SOLICITOR_ID,
@@ -266,7 +272,11 @@ public class RoboticsDataMapper {
             respondentParties.add(buildLitigiousParty(
                 caseData.getRespondent2(),
                 caseData.getRespondent2LitigationFriend(),
-                caseData.getRespondent2OrganisationPolicy(),
+                caseData.getRespondent2OrganisationIDCopy() != null
+                    ? caseData.getRespondent2OrganisationIDCopy()
+                    : (caseData.getRespondent2OrganisationPolicy() != null
+                    ? caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID()
+                    : null),
                 "Defendant",
                 RESPONDENT2_ID,
                 respondent2SolicitorId,
@@ -279,7 +289,7 @@ public class RoboticsDataMapper {
     private LitigiousParty buildLitigiousParty(
         Party party,
         LitigationFriend litigationFriend,
-        OrganisationPolicy organisationPolicy,
+        String organisationId,
         String type,
         String id,
         String solicitorId,
@@ -296,7 +306,7 @@ public class RoboticsDataMapper {
                                .map(LocalDateTime::toLocalDate)
                                .map(d -> d.format(ISO_DATE))
                                .orElse(null))
-            .solicitorOrganisationID(getOrganisationId(organisationPolicy).orElse(null))
+            .solicitorOrganisationID(organisationId != null ? organisationId : null)
             .build();
     }
 
