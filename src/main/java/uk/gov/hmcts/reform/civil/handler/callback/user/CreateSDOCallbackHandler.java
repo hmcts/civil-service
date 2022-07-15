@@ -30,7 +30,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingPreferredEmail;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingPreferredTelephone;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
@@ -228,13 +227,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.disposalHearingSchedulesOfLoss(tempDisposalHearingSchedulesOfLoss).build();
 
-        DisposalHearingStandardDisposalOrder tempDisposalHearingStandardDisposalOrder =
-            DisposalHearingStandardDisposalOrder.builder()
-            .input("input")
-            .build();
-
-        updatedData.disposalHearingStandardDisposalOrder(tempDisposalHearingStandardDisposalOrder).build();
-
         DisposalHearingFinalDisposalHearing tempDisposalHearingFinalDisposalHearing =
             DisposalHearingFinalDisposalHearing.builder()
             .input("This claim be listed for final disposal before a Judge on the first available date after.")
@@ -313,14 +305,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments).build();
 
         FastTrackWitnessOfFact tempFastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
-            .input1("Each party shall serve on every other party the witness statements of all "
-                        + "witnesses of fact on whom he intends to rely")
-            .input2("All statements to be no more than")
+            .input1("Each party must upload to the Digital Portal copies of the statements of all witnesses of fact on"
+                        + " whom they intend to rely.")
+            .input2("")
             .input3("")
-            .input4("pages long, A4, double spaced and in font size 12.")
-            .input5("There shall be simultaneous exchange of such statements by 4pm on")
+            .input4("For this limitation, a party is counted as a witness.")
+            .input5("Each party shall serve on every other party the witness statements of all "
+                        + "witnesses of fact on whom he intends to rely")
+            .input6("All statements to be no more than")
+            .input7("")
+            .input8("pages long, A4, double spaced and in font size 12.")
+            .input9("There shall be simultaneous exchange of such statements by 4pm on")
             .date(LocalDate.now().plusWeeks(8))
-            .input6("Oral evidence will not be permitted at trail from a witness whose statement has not been served "
+            .input10("Oral evidence will not be permitted at trail from a witness whose statement has not been served "
                         + "in accordance with this order or has been served late, except with "
                         + "permission from the Court.")
             .build();

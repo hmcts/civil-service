@@ -32,7 +32,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingPreferredEmail;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingPreferredTelephone;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
@@ -123,7 +122,6 @@ public class CaseDataParent implements MappableObject {
     private DisposalHearingMedicalEvidence disposalHearingMedicalEvidence;
     private DisposalHearingQuestionsToExperts disposalHearingQuestionsToExperts;
     private DisposalHearingSchedulesOfLoss disposalHearingSchedulesOfLoss;
-    private DisposalHearingStandardDisposalOrder disposalHearingStandardDisposalOrder;
     private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearing;
     private DisposalHearingPreferredTelephone disposalHearingPreferredTelephone;
     private DisposalHearingPreferredEmail disposalHearingPreferredEmail;

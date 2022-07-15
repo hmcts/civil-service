@@ -234,9 +234,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingSchedulesOfLoss").extracting("date2")
                 .isEqualTo(LocalDate.now().plusWeeks(12).toString());
 
-            assertThat(response.getData()).extracting("disposalHearingStandardDisposalOrder").extracting("input")
-                .isEqualTo("input");
-
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearing").extracting("input")
                 .isEqualTo("This claim be listed for final disposal before a Judge on the first available date after.");
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearing").extracting("date")
@@ -284,19 +281,28 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(LocalDate.now().plusWeeks(4).toString());
 
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input1")
-                .isEqualTo("Each party shall serve on every other party the witness statements of all "
-                               + "witnesses of fact on whom he intends to rely");
+                .isEqualTo("Each party must upload to the Digital Portal copies of the statements of all witnesses of"
+                               + " fact on whom they intend to rely.");
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input2")
-                .isEqualTo("All statements to be no more than");
+                .isEqualTo(null);
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input3")
                 .isEqualTo(null);
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input4")
-                .isEqualTo("pages long, A4, double spaced and in font size 12.");
+                .isEqualTo("For this limitation, a party is counted as a witness.");
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input5")
+                .isEqualTo("Each party shall serve on every other party the witness statements of all "
+                               + "witnesses of fact on whom he intends to rely");
+            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input6")
+                .isEqualTo("All statements to be no more than");
+            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input7")
+                .isEqualTo(null);
+            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input8")
+                .isEqualTo("pages long, A4, double spaced and in font size 12.");
+            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input9")
                 .isEqualTo("There shall be simultaneous exchange of such statements by 4pm on");
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("date")
                 .isEqualTo(LocalDate.now().plusWeeks(8).toString());
-            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input6")
+            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input10")
                 .isEqualTo("Oral evidence will not be permitted at trail from a witness whose statement has not been "
                                + "served in accordance with this order or has been served late, except with "
                                + "permission from the Court.");
