@@ -621,7 +621,7 @@ public class GeneralApplicationDetailsBuilder {
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
             .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
-            .generalOrderDocument(singletonList(Element.<CaseDocument>builder().value(pdfDocument).build()))
+            .directionOrderDocument(singletonList(Element.<CaseDocument>builder().value(pdfDocument).build()))
             .build();
     }
 
