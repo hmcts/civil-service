@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -20,14 +21,20 @@ import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -49,6 +56,8 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
     private DefaultJudgementHandler handler;
+    @MockBean
+    private LocationRefDataService locationRefDataService;
 
     @Nested
     class AboutToStartCallback {
@@ -133,6 +142,23 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("bothDefendants")).isEqualTo("One");
+        }
+    }
+
+    @Nested
+    class MidEventCheckLocationsCallback {
+
+        private static final String PAGE_ID = "checkPreferredLocations";
+
+        @Test
+        void shouldReturnLocationList_whenLocationsAreQueried() {
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().courtName("Court Name").region("Region").build());
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData().get("hearingSupportRequirementsDJ")).isNotNull();
         }
     }
 
@@ -255,17 +281,64 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
         }
+
+        @Test
+        void shouldNotReturnError_whenLocationsProvided() {
+            HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
+                LocalDate.now().plusMonths(1)).hearingUnavailableUntil(
+                LocalDate.now().plusMonths(2)).build();
+            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ
+                .builder().hearingDates(
+                    wrapElements(hearingDates)).build();
+            List<DynamicListElement> temporaryLocationList = List.of(
+                DynamicListElement.builder().label("Loc 1").build());
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ
+                                                  .builder()
+                                                  .hearingTemporaryLocation(
+                                                      DynamicList.builder().listItems(temporaryLocationList)
+                                                          .value(DynamicListElement.builder().label("Loc - 1 - 1")
+                                                                     .build())
+                                                          .build()).build())
+                .build();
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().siteName("Loc").courtAddress("1").postcode("1")
+                              .courtName("Court Name").region("Region").regionId("1").courtVenueId("000").build());
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isNull();
+        }
     }
 
     @Nested
     class AboutToSubmitCallback {
 
         @Test
-        public void shouldCallExternalTask_whenAboutToSubmit() {
+        void shouldCallExternalTask_whenAboutToSubmit() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .addRespondent2(NO)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                           .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo("DEFAULT_JUDGEMENT");
+        }
+
+        @Test
+        void shouldCallExternalTaskAndDeleteLocationList_whenAboutToSubmit() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .addRespondent2(NO)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

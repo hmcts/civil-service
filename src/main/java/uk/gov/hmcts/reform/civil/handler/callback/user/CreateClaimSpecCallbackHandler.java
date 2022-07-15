@@ -32,6 +32,9 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -117,6 +120,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final PostcodeValidator postcodeValidator;
     private final InterestCalculator interestCalculator;
     private final FeatureToggleService toggleService;
+    private final StateFlowEngine stateFlowEngine;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -333,6 +337,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        StateFlow evaluation = stateFlowEngine.evaluate(caseData);
+        State state = evaluation.getState();
+        Map<String, Boolean> flags = evaluation.getFlags();
+
         // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
         // must be to do with the way XUI cache data entered through the lifecycle of an event.
         CaseData updatedCaseData = caseData.toBuilder()
@@ -357,6 +365,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         if (callbackParams.getRequest().getEventId() != null) {
             var respondent1Represented = caseData.getSpecRespondent1Represented();
             dataBuilder.respondent1Represented(respondent1Represented);
+            var respondent2Represented = caseData.getSpecRespondent2Represented();
+            dataBuilder.respondent2Represented(respondent2Represented);
         }
 
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
