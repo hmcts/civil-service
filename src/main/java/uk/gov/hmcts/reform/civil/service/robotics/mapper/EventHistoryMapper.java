@@ -1887,10 +1887,6 @@ public class EventHistoryMapper {
                                       .get(index)
                                       .getValue()
                                       .getGeneralAppSubmittedDateGAspec())
-                    .litigiousPartyID(generalApplicationsStrikeOut
-                                          .get(index)
-                                          .getValue()
-                                          .getLitigiousPartyID())
                     .build();
             })
             .collect(Collectors.toList());

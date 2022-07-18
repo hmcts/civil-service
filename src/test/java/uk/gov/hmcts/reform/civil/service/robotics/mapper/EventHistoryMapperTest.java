@@ -4761,7 +4761,6 @@ class EventHistoryMapperTest {
             Event defenceStruckOutJudgment = Event.builder()
                 .eventSequence(2)
                 .eventCode("57")
-                .litigiousPartyID("001")
                 .dateReceived(caseData.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
                 .build();
             var eventHistory = mapper.buildEvents(caseData);
@@ -4807,7 +4806,6 @@ class EventHistoryMapperTest {
             Event defenceStruckOutJudgment = Event.builder()
                 .eventSequence(2)
                 .eventCode("57")
-                .litigiousPartyID("004")
                 .dateReceived(caseData.getGeneralApplications().get(0).getValue().getGeneralAppSubmittedDateGAspec())
                 .build();
             var eventHistory = mapper.buildEvents(caseData);
