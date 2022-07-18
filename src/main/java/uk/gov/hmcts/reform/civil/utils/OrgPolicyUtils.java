@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 public class OrgPolicyUtils {
@@ -9,18 +10,19 @@ public class OrgPolicyUtils {
     }
 
     public static String getRespondent1SolicitorOrgId(CaseData caseData) {
-        return caseData.getRespondent1OrganisationIDCopy() != null
-            ? caseData.getRespondent1OrganisationIDCopy()
-            : caseData.getRespondent1OrganisationPolicy() != null
-            ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
-            : null;
+        String orgId = getOrgId(caseData.getRespondent1OrganisationPolicy());
+        return orgId != null ? orgId : caseData.getRespondent1OrganisationIDCopy();
     }
 
     public static String getRespondent2SolicitorOrgId(CaseData caseData) {
-        return caseData.getRespondent2OrganisationIDCopy() != null
-            ? caseData.getRespondent2OrganisationIDCopy()
-            : caseData.getRespondent2OrganisationPolicy() != null
-            ? caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID()
-            : null;
+        String orgId = getOrgId(caseData.getRespondent2OrganisationPolicy());
+        return orgId != null ? orgId : caseData.getRespondent2OrganisationIDCopy();
+    }
+
+    private static String getOrgId(OrganisationPolicy orgPolicy) {
+        return orgPolicy != null
+            && orgPolicy.getOrganisation() != null
+            && orgPolicy.getOrganisation().getOrganisationID() != null
+            ? orgPolicy.getOrganisation().getOrganisationID() : null;
     }
 }

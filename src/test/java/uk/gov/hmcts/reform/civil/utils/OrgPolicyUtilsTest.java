@@ -21,6 +21,15 @@ class OrgPolicyUtilsTest {
         }
 
         @Test
+        void shouldReturnNull_whenRespondent1OrganisationPolicyOrganisationDoesNotExist() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
+                .build();
+
+            assertNull(OrgPolicyUtils.getRespondent1SolicitorOrgId(caseData));
+        }
+
+        @Test
         void shouldReturnOrganisationId_whenRespondent1OrganisationPolicyOrganisationExist() {
             String expected = "original-id";
             CaseData caseData = CaseDataBuilder.builder().respondent1OrganisationPolicy(
@@ -56,6 +65,15 @@ class OrgPolicyUtilsTest {
         @Test
         void shouldReturnNull_whenRespondent2OrganisationPolicyDoesNotExist() {
             CaseData caseData = CaseDataBuilder.builder().build();
+            assertNull(OrgPolicyUtils.getRespondent2SolicitorOrgId(caseData));
+        }
+
+        @Test
+        void shouldReturnNull_whenRespondent2OrganisationPolicyOrganisationDoesNotExist() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder().build())
+                .build();
+
             assertNull(OrgPolicyUtils.getRespondent2SolicitorOrgId(caseData));
         }
 
