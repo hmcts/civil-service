@@ -51,7 +51,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(INITIATE_GENERAL_APPLICATION);
     private static final String RESP_NOT_ASSIGNED_ERROR = "Application cannot be created until all the required "
             + "respondent solicitor are assigned to the case.";
-    public static final String PREFERRED_TYPE_IN_PERSON = "IN_PERSON";
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
     private final ObjectMapper objectMapper;
     private final OrganisationService organisationService;
