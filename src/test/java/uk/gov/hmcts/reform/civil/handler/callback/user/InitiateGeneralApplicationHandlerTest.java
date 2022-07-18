@@ -624,6 +624,27 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(IN_PERSON);
             assertThat(application.getIsMultiParty()).isEqualTo(NO);
         }
+
+        @Test
+        void shouldSetDynamicListWhenPreferredLocationValueIsNull() {
+
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithEmptyPreferredLocation(CaseData.builder().build());
+            when(feesService.getFeeForGA(any())).thenReturn(feeFromFeeService);
+            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+                                                                        .email(APPLICANT_EMAIL_ID_CONSTANT)
+                                                                        .build());
+            when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
+                                                         any(CaseData.class), any(UserDetails.class), anyString()))
+                .thenReturn(getMockServiceData(caseData));
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+            DynamicList dynamicList = getLocationDynamicList(data);
+            assertThat(data.getGeneralAppHearingDetails()).isNotNull();
+            assertThat(dynamicList).isNull();
+        }
     }
 
     @Nested
