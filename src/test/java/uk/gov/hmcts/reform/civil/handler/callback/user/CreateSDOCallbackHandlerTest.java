@@ -303,7 +303,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("N/A");
 
             assertThat(response.getData()).extracting("fastTrackJudgesRecital").extracting("input")
-                .isEqualTo("District Judge Bobby Knuckles has considered the statements of case and the information provided "
+                .isEqualTo("District Judge Bobby Knuckles "
+                               + "has considered the statements of case and the information provided "
                                + "by the parties, \n\nIT IS ORDERED that:-");
 
             assertThat(response.getData()).extracting("fastTrackJudgementDeductionValue").isEqualTo(null);
