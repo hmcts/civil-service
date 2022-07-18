@@ -141,9 +141,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.disposalHearingMethodInPerson(fromList(locationRefData));
         updatedData.fastTrackMethodInPerson(fromList(locationRefData));
 
-        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        String judgeName = userDetails.getFullName();
-
         List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
 
         updatedData.fastTrackAltDisputeResolutionToggle(checkList);
@@ -288,8 +285,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.disposalHearingNotes(tempDisposalHearingNotes).build();
 
+        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        String judgeName = userDetails.getFullName();
+
         FastTrackJudgesRecital tempFastTrackJudgesRecital = FastTrackJudgesRecital.builder()
-            .input("District Judge " + judgeName + " has considered the statements of case and the information provided by the "
+            .input("District Judge " + judgeName +
+                       " has considered the statements of case and the information provided by the "
                        + "parties,"
                        + " \n\nIT IS ORDERED that:-")
             .build();
@@ -482,7 +483,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackPreferredEmail(tempFastTrackPreferredEmail).build();
 
         SmallClaimsJudgesRecital tempSmallClaimsJudgesRecital = SmallClaimsJudgesRecital.builder()
-            .input("District Judge " + judgeName + " has considered the statements of case and the information provided by the "
+            .input("District Judge " + judgeName +
+                       " has considered the statements of case and the information provided by the "
                        + "parties,"
                        + " \n\nIT IS ORDERED that:-")
             .build();
