@@ -19,4 +19,5 @@ public class DisposalHearingFinalDisposalHearing {
     @Future(message = "The date entered must be in the future")
     private LocalDate date;
     private DisposalHearingFinalDisposalHearingTimeEstimate time;
+
 }

@@ -10,8 +10,10 @@ import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -158,6 +160,26 @@ public class CaseDataParent implements MappableObject {
     private SmallClaimsPreferredEmail smallClaimsPreferredEmail;
     private SmallClaimsPreferredTelephone smallClaimsPreferredTelephone;
     private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackAltDisputeResolutionToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackVariationOfDirectionsToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackSettlementToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackDisclosureOfDocumentsToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackWitnessOfFactToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackSchedulesOfLossToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackCostsToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackTrialToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackMethodToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingDisclosureOfDocumentsToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingWitnessOfFactToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingMedicalEvidenceToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingQuestionsToExpertsToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingSchedulesOfLossToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingFinalDisposalHearingToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingMethodToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingBundleToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingClaimSettlingToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingCostsToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingApplicationsOrderToggle;
 
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
@@ -188,7 +210,7 @@ public class CaseDataParent implements MappableObject {
     private final String detailsOfWhyDoesYouDisputeTheClaim2;
     private final String specDefenceRouteUploadDocumentLabel3;
     private final ResponseSpecDocument respondent2SpecDefenceResponseDocument;
-    private final String specClaimResponseTimelineList2;
+    private final TimelineUploadTypeSpec specClaimResponseTimelineList2;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents2;
     private final String responseClaimMediationSpecLabelRes2;
     private final YesOrNo responseClaimMediationSpec2Required;

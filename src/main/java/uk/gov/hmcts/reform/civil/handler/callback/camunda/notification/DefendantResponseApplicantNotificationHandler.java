@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -22,8 +23,10 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
@@ -37,11 +40,13 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE,
         NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC,
+        NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC,
         NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC
     );
 
     public static final String TASK_ID = "DefendantResponseFullDefenceNotifyApplicantSolicitor1";
     public static final String TASK_ID_CC = "DefendantResponseFullDefenceNotifyRespondentSolicitor1CC";
+    public static final String TASK_ID_CC_RESP1 = "DefendantResponseFullDefenceNotifyRespondentSolicitor1";
     public static final String TASK_ID_CC_RESP2 = "DefendantResponseFullDefenceNotifyRespondentSolicitor2CC";
     private static final String REFERENCE_TEMPLATE = "defendant-response-applicant-notification-%s";
 
@@ -64,6 +69,8 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
                 return TASK_ID;
             case NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC:
                 return TASK_ID_CC;
+            case NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC:
+                return TASK_ID_CC_RESP1;
             case NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC:
                 return TASK_ID_CC_RESP2;
             default:
@@ -79,7 +86,6 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     private CallbackResponse notifySolicitorsForDefendantResponse(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String recipient;
-
         //determine recipient for notification, based on Camunda Event ID
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         switch (caseEvent) {
@@ -88,6 +94,16 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
                 break;
             case NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC:
                 recipient = caseData.getRespondentSolicitor1EmailAddress();
+                break;
+            case NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC:
+                if (caseData.getRespondent1DQ() != null
+                    && caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
+                    var emailAddress = Optional.ofNullable(caseData.getRespondentSolicitor1EmailAddress());
+                    recipient = emailAddress.orElse(null);
+                } else {
+                    var emailAddress = Optional.ofNullable(caseData.getRespondentSolicitor2EmailAddress());
+                    recipient = emailAddress.orElse(null);
+                }
                 break;
             case NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC:
                 recipient = caseData.getRespondentSolicitor2EmailAddress();
@@ -116,15 +132,35 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
     private void sendNotificationToSolicitorSpec(CaseData caseData, String recipient, CaseEvent caseEvent) {
         String emailTemplate;
-        emailTemplate = caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC)
-            ? notificationsProperties.getRespondentSolicitorDefendantResponseForSpec()
-            : notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
-        notificationService.sendMail(
-            recipient,
-            emailTemplate,
-            addPropertiesSpec(caseData, caseEvent),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE)) {
+            emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
+            notificationService.sendMail(
+                recipient,
+                emailTemplate,
+                addPropertiesSpec(caseData, caseEvent),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        } else if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC)) {
+            emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+            if (caseData.getRespondent1ResponseDate() == null || !MultiPartyScenario.getMultiPartyScenario(caseData)
+                .equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+                notificationService.sendMail(
+                    recipient,
+                    emailTemplate,
+                    addPropertiesSpec(caseData, caseEvent),
+                    String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+                );
+            }
+
+        } else {
+            emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+            notificationService.sendMail(
+                recipient,
+                emailTemplate,
+                addPropertiesSpec(caseData, caseEvent),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
     }
 
     @Override
@@ -149,19 +185,51 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     }
 
     public Map<String, String> addPropertiesSpec(CaseData caseData, CaseEvent caseEvent) {
-        return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
-        );
+        if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE)) {
+            return Map.of(
+                CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+            );
+        } else if (caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC)) {
+            return Map.of(
+                CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent2())
+            );
+        } else {
+            if (caseData.getRespondent1DQ() != null
+                && caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
+                return Map.of(
+                    CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
+                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                    RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+                );
+            } else {
+                return Map.of(
+                    CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
+                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                    RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent2())
+                );
+            }
+        }
     }
 
     //finding legal org name
     private String getLegalOrganisationName(CaseData caseData,  CaseEvent caseEvent) {
         String organisationID;
-        organisationID = caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC)
-            ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
-            : caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+        if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE)) {
+            organisationID = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+        } else if (caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC)) {
+            organisationID = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+        } else {
+            if (caseData.getRespondent1DQ() != null
+                && caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
+                organisationID = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+            } else {
+                organisationID = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+            }
+        }
         Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
         return organisation.isPresent() ? organisation.get().getName() :
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
