@@ -80,4 +80,7 @@
   <suppress until="2022-08-01">
     <cve>CVE-2022-33915</cve>
   </suppress>
+  <suppress until="2022-08-01">
+    <cve>CVE-2022-31569</cve>
+  </suppress>
 </suppressions>
