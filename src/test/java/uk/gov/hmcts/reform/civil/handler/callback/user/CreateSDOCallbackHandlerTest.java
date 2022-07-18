@@ -109,8 +109,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
 
+            String forename = "Bobby";
+            String surname = "Knuckles";
             given(idamClient.getUserDetails(any()))
-                .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
+                .willReturn(UserDetails.builder().email(EMAIL).id(userId).forename(forename).surname(surname).build());
 
             given(time.now()).willReturn(submittedDate);
         }
@@ -129,6 +131,27 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MidEventDisposalHearingLocationRefDataCallback extends LocationRefSampleDataBuilder {
         private static final String PAGE_ID = "order-details";
+
+        private CallbackParams params;
+        private CaseData caseData;
+        private String userId;
+
+        private static final String EMAIL = "example@email.com";
+        private final LocalDateTime submittedDate = LocalDateTime.now();
+
+        @BeforeEach
+        void setup() {
+            caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            userId = UUID.randomUUID().toString();
+
+            String forename = "Bobby";
+            String surname = "Knuckles";
+            given(idamClient.getUserDetails(any()))
+                .willReturn(UserDetails.builder().email(EMAIL).id(userId).forename(forename).surname(surname).build());
+
+            given(time.now()).willReturn(submittedDate);
+        }
 
         @Test
         void shouldPrePopulateDisposalHearingPage() {
@@ -152,6 +175,27 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MidEventPrePopulateOrderDetailsPagesCallback {
         private static final String PAGE_ID = "order-details";
+
+        private CallbackParams params;
+        private CaseData caseData;
+        private String userId;
+
+        private static final String EMAIL = "example@email.com";
+        private final LocalDateTime submittedDate = LocalDateTime.now();
+
+        @BeforeEach
+        void setup() {
+            caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            userId = UUID.randomUUID().toString();
+
+            String forename = "Bobby";
+            String surname = "Knuckles";
+            given(idamClient.getUserDetails(any()))
+                .willReturn(UserDetails.builder().email(EMAIL).id(userId).forename(forename).surname(surname).build());
+
+            given(time.now()).willReturn(submittedDate);
+        }
 
         @Test
         void shouldPrePopulateOrderDetailsPages() {
@@ -259,7 +303,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("N/A");
 
             assertThat(response.getData()).extracting("fastTrackJudgesRecital").extracting("input")
-                .isEqualTo("District Judge Perna has considered the statements of case and the information provided "
+                .isEqualTo("District Judge Bobby Knuckles has considered the statements of case and the information provided "
                                + "by the parties, \n\nIT IS ORDERED that:-");
 
             assertThat(response.getData()).extracting("fastTrackJudgementDeductionValue").isEqualTo(null);
@@ -452,7 +496,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "agreed by the parties.");
 
             assertThat(response.getData()).extracting("smallClaimsJudgesRecital").extracting("input")
-                .isEqualTo("District Judge Perna has considered the statements of case and the information "
+                .isEqualTo("District Judge Bobby Knuckles has considered the statements of case and the information "
                                + "provided by the parties,"
                                + " \n\nIT IS ORDERED that:-");
 

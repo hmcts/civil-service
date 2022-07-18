@@ -59,6 +59,8 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredTelephone;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -104,6 +106,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
+    private final IdamClient idamClient;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -133,8 +136,13 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
-        updatedData.disposalHearingMethodInPerson(fromList(fetchLocationData(callbackParams)));
-        updatedData.fastTrackMethodInPerson(fromList(fetchLocationData(callbackParams)));
+        List<String> locationRefData = fetchLocationData(callbackParams);
+
+        updatedData.disposalHearingMethodInPerson(fromList(locationRefData));
+        updatedData.fastTrackMethodInPerson(fromList(locationRefData));
+
+        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        String judgeName = userDetails.getFullName();
 
         List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
 
@@ -281,7 +289,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.disposalHearingNotes(tempDisposalHearingNotes).build();
 
         FastTrackJudgesRecital tempFastTrackJudgesRecital = FastTrackJudgesRecital.builder()
-            .input("District Judge Perna has considered the statements of case and the information provided by the "
+            .input("District Judge " + judgeName + " has considered the statements of case and the information provided by the "
                        + "parties,"
                        + " \n\nIT IS ORDERED that:-")
             .build();
@@ -474,7 +482,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackPreferredEmail(tempFastTrackPreferredEmail).build();
 
         SmallClaimsJudgesRecital tempSmallClaimsJudgesRecital = SmallClaimsJudgesRecital.builder()
-            .input("District Judge Perna has considered the statements of case and the information provided by the "
+            .input("District Judge " + judgeName + " has considered the statements of case and the information provided by the "
                        + "parties,"
                        + " \n\nIT IS ORDERED that:-")
             .build();
