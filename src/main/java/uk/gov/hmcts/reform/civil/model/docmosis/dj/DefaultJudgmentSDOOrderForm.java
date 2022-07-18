@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
@@ -61,37 +62,39 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private final TrialCreditHire trialCreditHire;
     private final TrialPersonalInjury trialPersonalInjury;
     private final TrialRoadTrafficAccident trialRoadTrafficAccident;
+    private final TrialHousingDisrepair trialHousingDisrepair;
 
     //additional data for hearings
-    private final String disposalHearingDisclosureOfDocumentsDJAddSection;
-    private final String disposalHearingWitnessOfFactDJAddSection;
-    private final String disposalHearingMedicalEvidenceDJAddSection;
-    private final String disposalHearingQuestionsToExpertsDJAddSection;
-    private final String disposalHearingSchedulesOfLossDJAddSection;
-    private final String disposalHearingFinalDisposalHearingDJAddSection;
-    private final String disposalHearingBundleDJAddSection;
-    private final String disposalHearingClaimSettlingAddSection;
-    private final String disposalHearingCostsAddSection;
+    private final boolean disposalHearingDisclosureOfDocumentsDJAddSection;
+    private final boolean disposalHearingWitnessOfFactDJAddSection;
+    private final boolean disposalHearingMedicalEvidenceDJAddSection;
+    private final boolean disposalHearingQuestionsToExpertsDJAddSection;
+    private final boolean disposalHearingSchedulesOfLossDJAddSection;
+    private final boolean disposalHearingFinalDisposalHearingDJAddSection;
+    private final boolean disposalHearingBundleDJAddSection;
+    private final boolean disposalHearingClaimSettlingAddSection;
+    private final boolean disposalHearingCostsAddSection;
 
     private final String typeBundleInfo;
     private final String disposalHearingTime;
     private final String disposalHearingMethod;
 
     //additional data for trial
-    private final String trialHearingDisputeAddSection;
-    private final String trialHearingVariationsAddSection;
-    private final String trialHearingSettlementAddSection;
-    private final String trialHearingDisclosureOfDocumentsDJAddSection;
-    private final String trialHearingWitnessOfFactDJAddSection;
-    private final String trialHearingSchedulesOfLossDJAddSection;
-    private final String trialHearingCostsAddSection;
-    private final String trialHearingTrialDJAddSection;
-    private final String trialBuildingDisputeAddSection;
-    private final String trialClinicalNegligenceAddSection;
-    private final String trialCreditHireAddSection;
-    private final String trialEmployerLiabilityAddSection;
-    private final String trialPersonalInjuryAddSection;
-    private final String trialRoadTrafficAccidentAddSection;
+    private final boolean trialHearingDisputeAddSection;
+    private final boolean trialHearingVariationsAddSection;
+    private final boolean trialHearingSettlementAddSection;
+    private final boolean trialHearingDisclosureOfDocumentsDJAddSection;
+    private final boolean trialHearingWitnessOfFactDJAddSection;
+    private final boolean trialHearingSchedulesOfLossDJAddSection;
+    private final boolean trialHearingCostsAddSection;
+    private final boolean trialHearingTrialDJAddSection;
+    private final boolean trialBuildingDisputeAddSection;
+    private final boolean trialClinicalNegligenceAddSection;
+    private final boolean trialCreditHireAddSection;
+    private final boolean trialEmployerLiabilityAddSection;
+    private final boolean trialPersonalInjuryAddSection;
+    private final boolean trialRoadTrafficAccidentAddSection;
+    private final boolean trialHousingDisrepairAddSection;
 
     private final String trialDays;
     private final String trialHearingMethod;

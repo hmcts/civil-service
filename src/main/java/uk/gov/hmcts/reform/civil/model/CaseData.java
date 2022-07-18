@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
@@ -476,6 +477,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private TrialPersonalInjury trialPersonalInjury;
     private TrialRoadTrafficAccident trialRoadTrafficAccident;
     private TrialEmployersLiability trialEmployersLiability;
+    private TrialHousingDisrepair trialHousingDisrepair;
     private DisposalHearingMethodDJ trialHearingMethodDJ;
 
     private String caseManagementOrderSelection;

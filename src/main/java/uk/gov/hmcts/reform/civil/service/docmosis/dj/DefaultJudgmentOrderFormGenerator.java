@@ -74,52 +74,44 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         return DefaultJudgmentSDOOrderForm.builder()
             .caseNumber(caseData.getLegacyCaseReference())
             .disposalHearingBundleDJ(caseData.getDisposalHearingBundleDJ())
-            .disposalHearingBundleDJAddSection(nonNull(caseData.getDisposalHearingBundleDJ())
-                                                   ? "true" : "false" )
+            .disposalHearingBundleDJAddSection(nonNull(caseData.getDisposalHearingBundleDJ()))
             .typeBundleInfo(nonNull(caseData.getDisposalHearingBundleDJ())
-                                ? fillTypeBundleInfo(caseData.getDisposalHearingBundleDJ().getType()) : null )
+                                ? fillTypeBundleInfo(caseData.getDisposalHearingBundleDJ().getType()) : null)
             .disposalHearingDisclosureOfDocumentsDJ(caseData.getDisposalHearingDisclosureOfDocumentsDJ())
             .disposalHearingDisclosureOfDocumentsDJAddSection(nonNull(
-                caseData.getDisposalHearingDisclosureOfDocumentsDJ()) ? "true" : "false" )
+                caseData.getDisposalHearingDisclosureOfDocumentsDJ()))
             .disposalHearingWitnessOfFactDJ(caseData.getDisposalHearingWitnessOfFactDJ())
-            .disposalHearingWitnessOfFactDJAddSection(nonNull(caseData.getDisposalHearingWitnessOfFactDJ())
-                                     ? "true" : "false" )
+            .disposalHearingWitnessOfFactDJAddSection(nonNull(caseData.getDisposalHearingWitnessOfFactDJ()))
             .disposalHearingFinalDisposalHearingDJ(caseData.getDisposalHearingFinalDisposalHearingDJ())
             .disposalHearingFinalDisposalHearingDJAddSection(nonNull(
-                caseData.getDisposalHearingFinalDisposalHearingDJ()) ? "true" : "false" )
+                caseData.getDisposalHearingFinalDisposalHearingDJ()))
             .disposalHearingTime(nonNull(caseData.getDisposalHearingFinalDisposalHearingDJ())
                                      ? fillDisposalHearingTime(
-                                         caseData.getDisposalHearingFinalDisposalHearingDJ().getTime()) : "false" )
+                                         caseData.getDisposalHearingFinalDisposalHearingDJ().getTime()) : null)
             .disposalHearingJudgesRecitalDJ(caseData.getDisposalHearingJudgesRecitalDJ())
             .disposalHearingMedicalEvidenceDJ(caseData.getDisposalHearingMedicalEvidenceDJ())
-            .disposalHearingMedicalEvidenceDJAddSection(nonNull(caseData.getDisposalHearingMedicalEvidenceDJ())
-                                                            ? "true" : "false" )
+            .disposalHearingMedicalEvidenceDJAddSection(nonNull(caseData.getDisposalHearingMedicalEvidenceDJ()))
             .disposalHearingNotesDJ(caseData.getDisposalHearingNotesDJ())
             .disposalHearingQuestionsToExpertsDJ(caseData.getDisposalHearingQuestionsToExpertsDJ())
-            .disposalHearingQuestionsToExpertsDJAddSection(nonNull(caseData.getDisposalHearingQuestionsToExpertsDJ())
-                                                               ? "true" : "false" )
+            .disposalHearingQuestionsToExpertsDJAddSection(nonNull(caseData.getDisposalHearingQuestionsToExpertsDJ()))
             .disposalHearingSchedulesOfLossDJ(caseData.getDisposalHearingSchedulesOfLossDJ())
-            .disposalHearingSchedulesOfLossDJAddSection(nonNull(caseData.getDisposalHearingSchedulesOfLossDJ())
-                                                            ? "true" : "false" )
+            .disposalHearingSchedulesOfLossDJAddSection(nonNull(caseData.getDisposalHearingSchedulesOfLossDJ()))
             .disposalHearingClaimSettlingAddSection(getToggleValue(caseData.getDisposalHearingClaimSettlingDJToggle()))
             .disposalHearingCostsAddSection(getToggleValue(caseData.getDisposalHearingCostsDJToggle()))
             .disposalHearingMethod(fillDisposalHearingMethod(caseData.getDisposalHearingMethodDJ()))
-            .applicant(caseData.getApplicant1().getPartyName())
-            .respondent(checkDefendantRequested(caseData)).build();
+            .applicant(caseData.getApplicant1().getPartyName().toUpperCase())
+            .respondent(checkDefendantRequested(caseData).toUpperCase()).build();
     }
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormTrial(CaseData caseData) {
         return DefaultJudgmentSDOOrderForm.builder()
             .caseNumber(caseData.getLegacyCaseReference())
             .trialBuildingDispute(caseData.getTrialBuildingDispute())
-            .trialBuildingDisputeAddSection(nonNull(caseData.getTrialBuildingDispute())
-                                                ? "true" : "false" )
+            .trialBuildingDisputeAddSection(nonNull(caseData.getTrialBuildingDispute()))
             .trialClinicalNegligence(caseData.getTrialClinicalNegligence())
-            .trialClinicalNegligenceAddSection(nonNull(caseData.getTrialClinicalNegligence())
-                                                   ? "true" : "false" )
+            .trialClinicalNegligenceAddSection(nonNull(caseData.getTrialClinicalNegligence()))
             .trialCreditHire(caseData.getTrialCreditHire())
-            .trialCreditHireAddSection(nonNull(caseData.getTrialCreditHire())
-                                           ? "true" : "false" )
+            .trialCreditHireAddSection(nonNull(caseData.getTrialCreditHire()))
             .trialHearingJudgesRecitalDJ(caseData.getTrialHearingJudgesRecitalDJ())
             .trialHearingTrialDJ(caseData.getTrialHearingTrialDJ())
             .trialHearingTrialDJAddSection(
@@ -130,14 +122,12 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialHearingDisclosureOfDocumentsDJAddSection(
                 getToggleValue(caseData.getTrialHearingDisclosureOfDocumentsDJToggle()))
             .trialPersonalInjury(caseData.getTrialPersonalInjury())
-            .trialPersonalInjuryAddSection(nonNull(caseData.getTrialPersonalInjury())
-                                               ? "true" : "false" )
+            .trialPersonalInjuryAddSection(nonNull(caseData.getTrialPersonalInjury()))
             .trialHearingSchedulesOfLossDJ(caseData.getTrialHearingSchedulesOfLossDJ())
             .trialHearingSchedulesOfLossDJAddSection(
                 getToggleValue(caseData.getTrialHearingSchedulesOfLossDJToggle()))
             .trialRoadTrafficAccident(caseData.getTrialRoadTrafficAccident())
-            .trialRoadTrafficAccidentAddSection(nonNull(caseData.getTrialRoadTrafficAccident())
-                                                    ? "true" : "false" )
+            .trialRoadTrafficAccidentAddSection(nonNull(caseData.getTrialRoadTrafficAccident()))
             .trialHearingWitnessOfFactDJ(caseData.getTrialHearingWitnessOfFactDJ())
             .trialHearingWitnessOfFactDJAddSection(
                 getToggleValue(caseData.getTrialHearingWitnessOfFactDJToggle()))
@@ -147,8 +137,10 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialHearingCostsAddSection(getToggleValue(caseData.getTrialHearingCostsToggle()))
             .trialEmployerLiabilityAddSection(getLiabilityValue(caseData.getCaseManagementOrderAdditional()))
             .trialHearingMethod(fillDisposalHearingMethod(caseData.getTrialHearingMethodDJ()))
-            .applicant(caseData.getApplicant1().getPartyName())
-            .respondent(checkDefendantRequested(caseData)).build();
+            .trialHousingDisrepair(caseData.getTrialHousingDisrepair())
+            .trialHousingDisrepairAddSection(nonNull(caseData.getTrialHousingDisrepair()))
+            .applicant(caseData.getApplicant1().getPartyName().toUpperCase())
+            .respondent(checkDefendantRequested(caseData).toUpperCase()).build();
     }
 
     private DocmosisTemplates getDocmosisTemplate() {
@@ -194,11 +186,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         }
     }
 
-    private String getToggleValue(List<DisposalAndTrialHearingDJToggle> toggle) {
-        if (nonNull(toggle) && toggle.get(0).equals(SHOW)) {
-            return "true";
-        }
-        return "false";
+    private boolean getToggleValue(List<DisposalAndTrialHearingDJToggle> toggle) {
+        return nonNull(toggle) && toggle.get(0).equals(SHOW);
     }
 
     private String fillDisposalHearingMethod(DisposalHearingMethodDJ method) {
@@ -215,18 +204,15 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     private String getTrialDays(TrialHearingTrial trial) {
-        if(nonNull(trial)) {
+        if (nonNull(trial)) {
             long daysBetween = DAYS.between(trial.getDate1(), trial.getDate2());
             return String.valueOf(daysBetween);
         }
         return null;
     }
 
-    private String getLiabilityValue(List<CaseManagementOrderAdditional> list) {
-        if (nonNull(list) && list.contains(OrderTypeTrialAdditionalDirectionsEmployersLiability)) {
-            return "true";
-        }
-        return "false";
+    private boolean getLiabilityValue(List<CaseManagementOrderAdditional> list) {
+        return nonNull(list) && list.contains(OrderTypeTrialAdditionalDirectionsEmployersLiability);
     }
 
 }

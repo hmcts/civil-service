@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
@@ -450,6 +451,19 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                 + " accident shall be prepared and "
                                                                 + "agreed by the parties.")
                                                      .build());
+        caseDataBuilder.trialHousingDisrepair(TrialHousingDisrepair.builder()
+                                                  .input1("The claimant must prepare a Scott Schedule of the items "
+                                                              + "of disrepair")
+                                                  .input2("The column headings will be as follows: Item; Alleged "
+                                                    + "disrepair; Defendant's Response; Reserved for Judge's Use")
+                                                  .input3("The claimant must serve the Scott Schedule with the "
+                                                              + "relevant columns completed by 4pm on")
+                                                  .date1(LocalDate.now().plusWeeks(10))
+                                                  .input4("The Defendant must file and serve the Scott Schedule "
+                                                              + "with the relevant column "
+                                                              + "in response completed by 4pm on")
+                                                  .date2(LocalDate.now().plusWeeks(12))
+                                        .build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

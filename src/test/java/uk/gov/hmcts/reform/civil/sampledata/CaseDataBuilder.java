@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -263,6 +264,8 @@ public class CaseDataBuilder {
     private String respondent2OrganisationIDCopy;
     private String caseManagementOrderSelection;
     private LocalDateTime addLegalRepDeadline;
+    private DisposalHearingMethodDJ trialHearingMethodDJ;
+    private DisposalHearingMethodDJ disposalHearingMethodDJ;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1247,6 +1250,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimIssuedTrialHearing() {
         caseManagementOrderSelection = "TRIAL_HEARING";
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedTrialSDOInPersonHearing() {
+        trialHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodInPerson;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedDisposalSDOVideoCall() {
+        disposalHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing;
         return this;
     }
 
@@ -2845,6 +2858,8 @@ public class CaseDataBuilder {
             .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
             .caseManagementOrderSelection(caseManagementOrderSelection)
+            .trialHearingMethodDJ(trialHearingMethodDJ)
+            .disposalHearingMethodDJ(disposalHearingMethodDJ)
             .build();
     }
 }
