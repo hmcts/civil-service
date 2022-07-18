@@ -7,6 +7,7 @@ import lombok.Data;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
@@ -44,6 +45,7 @@ public class GeneralApplication implements MappableObject {
     private final String defendant2PartyName;
     private final CaseLocation caseManagementLocation;
     private final YesOrNo isCcmccLocation;
+    private final DynamicList caseManagementCategory;
 
     @JsonCreator
     GeneralApplication(@JsonProperty("generalAppType") GAApplicationType generalAppType,
@@ -73,7 +75,8 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("defendant1PartyName") String defendant1PartyName,
                        @JsonProperty("defendant2PartyName") String defendant2PartyName,
                        @JsonProperty("caseManagementLocation") CaseLocation caseManagementLocation,
-                       @JsonProperty("isCcmccLocation") YesOrNo isCcmccLocation
+                       @JsonProperty("isCcmccLocation") YesOrNo isCcmccLocation,
+                       @JsonProperty("caseManagementCategory") DynamicList caseManagementCategory
                        ) {
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
@@ -101,5 +104,6 @@ public class GeneralApplication implements MappableObject {
         this.defendant2PartyName = defendant2PartyName;
         this.caseManagementLocation = caseManagementLocation;
         this.isCcmccLocation = isCcmccLocation;
+        this.caseManagementCategory = caseManagementCategory;
     }
 }

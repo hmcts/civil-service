@@ -783,6 +783,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .isEqualTo("574546");
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getRegion())
                 .isEqualTo("9");
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsCcmccLocation()).isEqualTo(YES);
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementCategory().getValue().getLabel())
+                .isEqualTo("Civil");
     }
 
     @Test
