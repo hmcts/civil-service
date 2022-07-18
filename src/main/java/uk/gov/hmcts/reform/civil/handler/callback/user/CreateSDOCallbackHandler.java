@@ -289,8 +289,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         String judgeName = userDetails.getFullName();
 
         FastTrackJudgesRecital tempFastTrackJudgesRecital = FastTrackJudgesRecital.builder()
-            .input("District Judge " + judgeName +
-                       " has considered the statements of case and the information provided by the "
+            .input("District Judge " + judgeName
+                       + " has considered the statements of case and the information provided by the "
                        + "parties,"
                        + " \n\nIT IS ORDERED that:-")
             .build();
@@ -483,8 +483,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackPreferredEmail(tempFastTrackPreferredEmail).build();
 
         SmallClaimsJudgesRecital tempSmallClaimsJudgesRecital = SmallClaimsJudgesRecital.builder()
-            .input("District Judge " + judgeName +
-                       " has considered the statements of case and the information provided by the "
+            .input("District Judge " + judgeName
+                       + " has considered the statements of case and the information provided by the "
                        + "parties,"
                        + " \n\nIT IS ORDERED that:-")
             .build();
