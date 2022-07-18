@@ -1292,6 +1292,20 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStatePaymentSuccessfulWithCopyOrganisationOnly() {
+        atStateClaimSubmitted();
+        claimIssuedPaymentDetails = PaymentDetails.builder()
+            .status(SUCCESS)
+            .reference("RC-1604-0739-2145-4711")
+            .build();
+        paymentReference = "12345";
+        paymentSuccessfulDate = LocalDateTime.now();
+        respondent1OrganisationIDCopy = respondent1OrganisationPolicy.getOrganisation().getOrganisationID();
+        respondent1OrganisationPolicy = respondent1OrganisationPolicy.toBuilder()
+            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build()).build();
+        return this;
+    }
+
     public CaseDataBuilder atStatePendingClaimIssued() {
         atStatePaymentSuccessful();
         issueDate = CLAIM_ISSUED_DATE;
