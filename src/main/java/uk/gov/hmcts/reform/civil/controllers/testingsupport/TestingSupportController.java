@@ -70,14 +70,6 @@ public class TestingSupportController {
         return new ResponseEntity<>(featureToggleInfo, HttpStatus.OK);
     }
 
-    @GetMapping("/testing-support/feature-toggle/court-locations")
-    @ApiOperation("Check if court location dynamic list feature toggle is enabled")
-    public ResponseEntity<FeatureToggleInfo> checkCourtLocationsDynamicListEnabled() {
-        boolean featureEnabled = featureToggleService.isCourtLocationDynamicListEnabled();
-        FeatureToggleInfo featureToggleInfo = new FeatureToggleInfo(featureEnabled);
-        return new ResponseEntity<>(featureToggleInfo, HttpStatus.OK);
-    }
-
     @Data
     private static class BusinessProcessInfo {
         private BusinessProcess businessProcess;
