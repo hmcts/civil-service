@@ -95,7 +95,7 @@ class RoboticsDataMapperTest {
 
     @Test
     void shouldMapToRoboticsCaseData_whenHandOffPointIsUnrepresentedDefendant() {
-        CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendants().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
 
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
 
@@ -183,8 +183,10 @@ class RoboticsDataMapperTest {
 
     @Test
     void shouldMapToRoboticsCaseData_whenOrganisationPolicyIsNotPresent() {
-        CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendants()
-            .respondent1OrganisationPolicy(null).respondentSolicitor1OrganisationDetails(null).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants()
+            .respondent1OrganisationPolicy(null)
+            .respondentSolicitor1OrganisationDetails(null)
+            .respondent1OrganisationIDCopy(null).build();
 
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
 
@@ -238,6 +240,19 @@ class RoboticsDataMapperTest {
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(3);
+    }
+
+    @Test
+    void shouldMapToRoboticsCaseDataWhen2ndDefendantIsRepresentedSameSolicitor() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .respondent2(PartyBuilder.builder().company().build())
+            .addRespondent2(YES)
+            .respondent2Represented(YES)
+            .respondent2SameLegalRepresentative(YES)
+            .build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
     }
 
     @Test

@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class GenerateDJFormHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(
@@ -55,8 +56,14 @@ public class GenerateDJFormHandler extends CallbackHandler {
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
         if (ofNullable(caseData.getRespondent2()).isPresent()
-            && caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
+            && ((ofNullable(caseData.getDefendantDetails()).isPresent()
+            && caseData.getDefendantDetails().getValue().getLabel().startsWith(
+                "Both")) || (ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+            && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
+                    "Both")))) {
+
             buildDocument(callbackParams, caseDataBuilder);
         } else if (ofNullable(caseData.getRespondent2()).isEmpty()) {
             buildDocument(callbackParams, caseDataBuilder);

@@ -68,10 +68,12 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class RespondToClaimCallbackHandler extends CallbackHandler implements ExpertsValidator, WitnessesValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE);
@@ -251,7 +253,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private CallbackResponse setGenericResponseTypeFlag(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder updatedData =
+        CaseData.CaseDataBuilder<?, ?> updatedData =
             caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
 
         var isRespondent1 = YES;
@@ -305,7 +307,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
             .build();
 
-        CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
 
@@ -324,6 +326,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
+        LocalDateTime applicant1Deadline = getApplicant1ResponseDeadline(responseDate, allocatedTrack);
 
         // 1v2 same legal rep - will respond for both and set applicant 1 response deadline
         if (respondent2HasSameLegalRep(caseData)) {
@@ -334,7 +337,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                     .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE))
                     .respondent1ResponseDate(responseDate)
                     .respondent2ResponseDate(responseDate)
-                    .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
+                    .nextDeadline(applicant1Deadline.toLocalDate())
+                    .applicant1ResponseDeadline(applicant1Deadline);
 
                 // moving statement of truth value to correct field, this was not possible in mid event.
                 StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
@@ -352,7 +356,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                     .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE))
                     .respondent1ResponseDate(responseDate)
                     .respondent2ResponseDate(responseDate)
-                    .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
+                    .nextDeadline(applicant1Deadline.toLocalDate())
+                    .applicant1ResponseDeadline(applicant1Deadline);
 
                 StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
                 if (caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
@@ -390,7 +395,10 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
             if (caseData.getRespondent1ResponseDate() != null) {
                 updatedData
-                    .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
+                    .nextDeadline(applicant1Deadline.toLocalDate())
+                    .applicant1ResponseDeadline(applicant1Deadline);
+            } else {
+                updatedData.nextDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate());
             }
 
             // 1v1, 2v1
@@ -412,7 +420,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             if (respondent2NotPresent(caseData)
                 || applicant2Present(caseData)
                 || caseData.getRespondent2ResponseDate() != null) {
-                updatedData.applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
+                updatedData
+                    .applicant1ResponseDeadline(applicant1Deadline)
+                    .nextDeadline(applicant1Deadline.toLocalDate());
             }
             // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
             if (ofNullable(caseData.getRespondent2()).isPresent()
@@ -423,8 +433,12 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
                 updatedData
                     .respondent2(updatedRespondent2)
-                    .respondent2Copy(null);
-                updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
+                    .respondent2Copy(null)
+                    .respondent2DetailsForClaimDetailsTab(updatedRespondent2);
+
+                if (caseData.getRespondent2ResponseDate() == null) {
+                    updatedData.nextDeadline(caseData.getRespondent2ResponseDeadline().toLocalDate());
+                }
             }
 
             // same legal rep - will respond for both and set applicant 1 response deadline
@@ -449,7 +463,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
         updatedData.isRespondent1(null);
         assembleResponseDocuments(caseData, updatedData);
-        retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), updatedData);
+        retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), updatedData, caseData);
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
 
@@ -464,24 +478,54 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .build();
     }
 
-    private void retainSolicitorReferences(Map<String, Object> beforeCaseData, CaseData.CaseDataBuilder updatedData) {
+    private void retainSolicitorReferences(Map<String, Object> beforeCaseData,
+                                           CaseData.CaseDataBuilder<?, ?> updatedData,
+                                           CaseData caseData) {
+
         @SuppressWarnings("unchecked")
         Map<String, String> solicitorRefs = ofNullable(beforeCaseData.get("solicitorReferences"))
             .map(refs -> objectMapper.convertValue(refs, HashMap.class))
                 .orElse(null);
         SolicitorReferences solicitorReferences = ofNullable(solicitorRefs)
-            .map(refMap -> SolicitorReferences.builder()
-                    .applicantSolicitor1Reference(refMap.getOrDefault("applicantSolicitor1Reference", null))
-                    .respondentSolicitor1Reference(refMap.getOrDefault("respondentSolicitor1Reference", null))
-                    .respondentSolicitor2Reference(refMap.getOrDefault("respondentSolicitor2Reference", null))
-                    .build())
-                .orElse(null);
+            .map(refMap -> {
+
+                // collect data from recent form - defendantSolicitorRef1
+                String defendantSolicitorRef1 = null;
+                if (caseData.getSolicitorReferences() != null
+                    && caseData.getSolicitorReferences().getRespondentSolicitor1Reference() != null) {
+                    defendantSolicitorRef1 = caseData.getSolicitorReferences().getRespondentSolicitor1Reference();
+                }
+
+                return SolicitorReferences.builder()
+                    .applicantSolicitor1Reference(
+                        refMap.getOrDefault("applicantSolicitor1Reference", null))
+                    // if solicitor reference recently changed in defendant response then use defendantSolicitorRef1
+                    // else use data before it's updated
+                    .respondentSolicitor1Reference(
+                        ofNullable(defendantSolicitorRef1)
+                            .orElse(refMap.getOrDefault("respondentSolicitor1Reference", null)))
+                    .respondentSolicitor2Reference(
+                        refMap.getOrDefault("respondentSolicitor2Reference", null))
+                    .build();
+            })
+            .orElse(null);
+
         updatedData.solicitorReferences(solicitorReferences);
-        updatedData.respondentSolicitor2Reference(ofNullable(beforeCaseData.get("respondentSolicitor2Reference"))
-            .map(Object::toString).orElse(null));
+
+        String respondentSolicitor2Reference = ofNullable(caseData.getRespondentSolicitor2Reference())
+            .orElse(ofNullable(beforeCaseData.get("respondentSolicitor2Reference"))
+                        .map(Object::toString).orElse(null));
+
+        updatedData
+            .solicitorReferences(solicitorReferences)
+            .respondentSolicitor2Reference(respondentSolicitor2Reference)
+            .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(
+                solicitorReferences != null ? ofNullable(solicitorReferences.getRespondentSolicitor1Reference())
+                    .map(Object::toString).orElse(null) : null,
+                respondentSolicitor2Reference));
     }
 
-    private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder updatedCaseData) {
+    private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         List<Element<CaseDocument>> defendantUploads = new ArrayList<>();
         Optional.ofNullable(caseData.getRespondent1ClaimResponseDocument())
             .map(ResponseDocument::getFile).ifPresent(respondent1ClaimDocument -> defendantUploads.add(

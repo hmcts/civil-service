@@ -3,10 +3,12 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
@@ -43,18 +45,23 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.text.NumberFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
@@ -63,7 +70,9 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_MULTIPARTY_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
@@ -81,7 +90,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         DocmosisDocument docmosisDocument;
         DirectionsQuestionnaireForm templateData;
         if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-            templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
+            if (isClaimantResponse(caseData)) {
+                templateId = DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
+            } else {
+                templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
+            }
         } else {
             templateId = getDocmosisTemplate(caseData);
         }
@@ -105,7 +118,6 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                     templateId = N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
                 }
                 break;
-                //FALL-THROUGH
             case ONE_V_TWO_ONE_LEGAL_REP:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
@@ -147,13 +159,59 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         );
     }
 
+    // return optional, if you get an empty optional, you didn't need to generate the doc
+    public Optional<CaseDocument> generateDQFor1v2DiffSol(CaseData caseData,
+                                                          String authorisation,
+                                                          String respondent) {
+        // TODO check if this is the correct template, I just copy-pasted from generateDQFor1v2SingleSolDiffResponse
+        DocmosisTemplates templateId = TWO_V_ONE.equals(MultiPartyScenario
+                                                            .getMultiPartyScenario(caseData)) ? N181_2V1 : N181;
+        String fileName = getFileName(caseData, templateId);
+        LocalDateTime responseDate;
+        if ("ONE".equals(respondent)) {
+            responseDate = caseData.getRespondent1ResponseDate();
+        } else if ("TWO".equals(respondent)) {
+            responseDate = caseData.getRespondent2ResponseDate();
+        } else {
+            throw new IllegalArgumentException("Respondent argument is expected to be one of ONE or TWO");
+        }
+        if (responseDate == null) {
+            throw new NullPointerException("Response date should not be null");
+        }
+        if (caseData.getSystemGeneratedCaseDocuments().stream()
+            .anyMatch(element ->
+                          Objects.equals(element.getValue().getCreatedDatetime(), responseDate)
+                              && fileName.equals(element.getValue().getDocumentName()))) {
+            // this DQ is already generated
+            return Optional.empty();
+        }
+
+        DirectionsQuestionnaireForm templateData;
+        if (respondent.equals("ONE")) {
+            templateData = getRespondent1TemplateData(caseData, "ONE");
+        } else {
+            // TWO
+            templateData = getRespondent2TemplateData(caseData, "TWO");
+        }
+
+        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N181);
+        CaseDocument document = documentManagementService.uploadDocument(
+            authorisation,
+            new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
+                    DocumentType.DIRECTIONS_QUESTIONNAIRE
+            )
+        );
+        // set the create date time equal to the response date time, so we can check it afterwards
+        return Optional.of(document.toBuilder().createdDatetime(responseDate).build());
+    }
+
     private String getFileName(CaseData caseData, DocmosisTemplates templateId) {
         String userPrefix = isRespondentState(caseData) ? "defendant" : "claimant";
         return String.format(templateId.getDocumentTitle(), userPrefix, caseData.getLegacyCaseReference());
     }
 
     private DQ getDQAndSetSubmittedOn(DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder,
-                                     CaseData caseData) {
+                                      CaseData caseData) {
         if (isClaimantResponse(caseData)) {
             if (onlyApplicant2IsProceeding(caseData)) {
                 builder.submittedOn(caseData.getApplicant2ResponseDate().toLocalDate());
@@ -176,36 +234,97 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
 
+        boolean claimantResponseLRspec = isClaimantResponse(caseData)
+            && SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType());
+
         DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = DirectionsQuestionnaireForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
             .solicitorReferences(DocmosisTemplateDataUtils
                                      .fetchSolicitorReferences(caseData))
             .respondents(getRespondents(caseData, null))
+            .applicants(claimantResponseLRspec ? getApplicants(caseData) : null)
             .allocatedTrack(caseData.getAllocatedTrack());
 
+        if (!SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            builder.statementOfTruthText(createStatementOfTruthText(isRespondentState(caseData)));
+        }
         DQ dq = getDQAndSetSubmittedOn(builder, caseData);
-        setApplicants(builder, caseData);
+
+        if (!claimantResponseLRspec) {
+            setApplicants(builder, caseData);
+        }
 
         Witnesses witnesses = getWitnesses(dq);
-        int witnessesIncludingDefendants = countWitnessesIncludingDefendant(witnesses, caseData);
+
+        Integer witnessesIncludingDefendants = null;
+        String state = stateFlowEngine.evaluate(caseData).getState().getName();
+        if (!(SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+            && state.equals(FULL_ADMISSION.fullName()))) {
+            witnessesIncludingDefendants = countWitnessesIncludingDefendant(witnesses, caseData);
+        }
+
+        boolean specAndSmallClaim = false;
+        if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+            && "SMALL_CLAIM".equals(caseData.getResponseClaimTrack())) {
+            witnesses = getWitnessesSmallClaim(witnessesIncludingDefendants);
+            specAndSmallClaim = true;
+        }
 
         builder.fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
-            .experts(getExperts(dq))
+            .experts(!specAndSmallClaim ? getExperts(dq) : getSmallClaimExperts(dq, caseData))
             .witnesses(witnesses)
             .witnessesIncludingDefendants(witnessesIncludingDefendants)
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
             .furtherInformation(getFurtherInformation(dq, caseData))
-            .welshLanguageRequirements(getWelshLanguageRequirements(dq, caseData))
+            .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
             .disclosureReport(getDisclosureReport(dq))
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .requestedCourt(getRequestedCourt(dq));
 
         return builder.build();
+    }
+
+    private List<Party> getApplicants(CaseData caseData) {
+        var applicant = caseData.getApplicant1();
+        var applicant2 = caseData.getApplicant2();
+        var respondentRepresentative = representativeService.getApplicantRepresentative(caseData);
+        var litigationFriend = caseData.getRespondent1LitigationFriend();
+        if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
+                return List.of(Party.builder()
+                                   .name(applicant.getPartyName())
+                                   .primaryAddress(applicant.getPrimaryAddress())
+                                   .representative(respondentRepresentative)
+                                   .litigationFriendName(
+                                       ofNullable(litigationFriend)
+                                           .map(LitigationFriend::getFullName)
+                                           .orElse(""))
+                                   .build(),
+                               Party.builder()
+                                   .name(applicant2.getPartyName())
+                                   .primaryAddress(applicant2.getPrimaryAddress())
+                                   .representative(respondentRepresentative)
+                                   .litigationFriendName(
+                                       ofNullable(litigationFriend)
+                                           .map(LitigationFriend::getFullName)
+                                           .orElse(""))
+                                   .build());
+            }
+        }
+        return List.of(Party.builder()
+                           .name(applicant.getPartyName())
+                           .primaryAddress(applicant.getPrimaryAddress())
+                           .representative(respondentRepresentative)
+                           .litigationFriendName(
+                               ofNullable(litigationFriend)
+                                   .map(LitigationFriend::getFullName)
+                                   .orElse(""))
+                           .build());
     }
 
     private Party getApplicant2DQParty(CaseData caseData) {
@@ -251,10 +370,15 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     private int countWitnessesIncludingDefendant(Witnesses witnesses, CaseData caseData) {
         int witnessesIncludingDefendants;
-        if (AllocatedTrack.SMALL_CLAIM.equals(caseData.getAllocatedTrack())) {
-            if (StringUtils.isNotBlank(caseData.getResponseClaimWitnesses())
-                && caseData.getResponseClaimWitnesses().matches("\\d+")) {
-                witnessesIncludingDefendants = Integer.parseInt(caseData.getResponseClaimWitnesses());
+        if (AllocatedTrack.SMALL_CLAIM.equals(caseData.getAllocatedTrack())
+            || SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
+            String smallClaimNumberOfWitnesses = caseData.getResponseClaimWitnesses();
+            if (isClaimantResponse(caseData)) {
+                smallClaimNumberOfWitnesses = caseData.getApplicant1ClaimWitnesses();
+            }
+            if (StringUtils.isNotBlank(smallClaimNumberOfWitnesses)
+                && smallClaimNumberOfWitnesses.matches("\\d+")) {
+                witnessesIncludingDefendants = Integer.parseInt(smallClaimNumberOfWitnesses);
             } else {
                 witnessesIncludingDefendants = 0;
             }
@@ -293,8 +417,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                     .map(FurtherInformation::getReasonForFutureApplications)
             ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
 
-        String furtherJudgeInfo = NO.equals(wantMore) ? null :
-            Stream.of(
+        String furtherJudgeInfo = Stream.of(
                 Optional.ofNullable(caseData.getAdditionalInformationForJudge()),
                 dqFurtherInformation
                     .map(FurtherInformation::getOtherInformationForJudge)
@@ -338,8 +461,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         }
     }
 
-    private boolean isClaimantResponse(CaseData caseData) {
+    public static boolean isClaimantResponse(CaseData caseData) {
         return "CLAIMANT_RESPONSE".equals(ofNullable(caseData.getBusinessProcess())
+                                              .map(BusinessProcess::getCamundaEvent)
+                                              .orElse(null))
+                || "CLAIMANT_RESPONSE_SPEC".equals(ofNullable(caseData.getBusinessProcess())
                                               .map(BusinessProcess::getCamundaEvent)
                                               .orElse(null));
     }
@@ -363,7 +489,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
             .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData))
-            .submittedOn(caseData.getRespondent2ResponseDate().toLocalDate())
+            .submittedOn(caseData.getRespondent2SameLegalRepresentative().equals(YES)
+                ? caseData.getRespondent1ResponseDate().toLocalDate()
+                             : caseData.getRespondent2ResponseDate().toLocalDate())
             .applicant(getApplicant1DQParty(caseData))
             .respondents(getRespondents(caseData, defendantIdentifier))
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
@@ -374,7 +502,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
             .furtherInformation(dq.getFurtherInformation())
-            .welshLanguageRequirements(getWelshLanguageRequirements(dq, caseData))
+            .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(caseData.getAllocatedTrack())
@@ -399,7 +527,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
             .furtherInformation(dq.getFurtherInformation())
-            .welshLanguageRequirements(getWelshLanguageRequirements(dq, caseData))
+            .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(caseData.getAllocatedTrack())
@@ -417,7 +545,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             || state.equals(FULL_DEFENCE.fullName())
             || state.equals(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
             || state.equals(ALL_RESPONSES_RECEIVED.fullName())
-            || state.equals(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName());
+            || state.equals(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName())
+            || state.equals(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName());
     }
 
     private boolean isRespondent2(CaseData caseData) {
@@ -444,6 +573,52 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         if (isClaimantResponse(caseData)) {
 
             List<Party> respondents = new ArrayList<>();
+
+            if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+                && !ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
+                if ((ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+                    && YES.equals(caseData.getRespondentResponseIsSame()))
+                    || (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+                    && RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                    && RespondentResponseTypeSpec.FULL_DEFENCE
+                    .equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
+                    ) {
+                    respondents.add(Party.builder()
+                                        .name(caseData.getRespondent1().getPartyName())
+                                        .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                                        .representative(representativeService
+                                                            .getRespondent1Representative(caseData))
+                                        .litigationFriendName(
+                                            ofNullable(caseData.getRespondent1LitigationFriend())
+                                                .map(LitigationFriend::getFullName)
+                                                .orElse(""))
+                                        .build());
+                    respondents.add(Party.builder()
+                                        .name(caseData.getRespondent2().getPartyName())
+                                        .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
+                                        .representative(representativeService
+                                                            .getRespondent2Representative(caseData))
+                                        .litigationFriendName(
+                                            ofNullable(caseData.getRespondent2LitigationFriend())
+                                                .map(LitigationFriend::getFullName)
+                                                .orElse(""))
+                                        .build());
+                } else if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
+                    respondents.add(Party.builder()
+                                        .name(caseData.getRespondent1().getPartyName())
+                                        .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                                        .representative(representativeService
+                                                            .getRespondent1Representative(caseData))
+                                        .litigationFriendName(
+                                            ofNullable(caseData.getRespondent1LitigationFriend())
+                                                .map(LitigationFriend::getFullName)
+                                                .orElse(""))
+                                        .build());
+                }
+                return respondents;
+            }
+
             if (isProceedingAgainstRespondent1(caseData)) {
                 respondents.add(Party.builder()
                                     .name(caseData.getRespondent1().getPartyName())
@@ -560,6 +735,31 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .build();
     }
 
+    private Experts getSmallClaimExperts(DQ dq, CaseData caseData) {
+        var experts = dq.getSmallClaimExperts();
+        YesOrNo expertRequired = caseData.getResponseClaimExpertSpecRequired();
+        if (isClaimantResponse(caseData)) {
+            expertRequired = caseData.getApplicant1ClaimExpertSpecRequired();
+        }
+        Expert expertDetails;
+        if (experts != null) {
+            expertDetails = Expert.builder()
+                .name(experts.getExpertName())
+                .formattedCost(MonetaryConversions.penniesToPounds(experts.getEstimatedCost()).toString())
+                .fieldOfExpertise(experts.getFieldofExpertise())
+                .build();
+        } else {
+            expertDetails = Expert.builder().build();
+        }
+
+        return Experts.builder()
+            .expertRequired(expertRequired)
+            .expertReportsSent(null)
+            .jointExpertSuitable(null)
+            .details(List.of(expertDetails))
+            .build();
+    }
+
     private List<Expert> getExpertsDetails(DQ dq) {
         if (dq.getExperts().getDetails() == null) {
             return Collections.emptyList();
@@ -589,6 +789,18 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         return Witnesses.builder()
             .witnessesToAppear(witnesses.getWitnessesToAppear())
             .details(witnessesList)
+            .build();
+    }
+
+    private Witnesses getWitnessesSmallClaim(Integer witnessesIncludingDefendants) {
+        if (witnessesIncludingDefendants != null
+            && witnessesIncludingDefendants > 0) {
+            return Witnesses.builder().witnessesToAppear(YES)
+                .details(Collections.emptyList())
+                .build();
+        }
+        return Witnesses.builder().witnessesToAppear(NO)
+            .details(Collections.emptyList())
             .build();
     }
 
@@ -646,9 +858,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         return stringBuilder.toString().trim();
     }
 
-    private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq, CaseData caseData) {
-        var welshLanguageRequirements = SPEC_CLAIM.equals(caseData.getSuperClaimType())
-            ? dq.getWelshLanguageRequirementsLRspec() : dq.getWelshLanguageRequirements();
+    private WelshLanguageRequirements getWelshLanguageRequirements(DQ dq) {
+        var welshLanguageRequirements = dq.getWelshLanguageRequirements();
         if (welshLanguageRequirements == null) {
             return WelshLanguageRequirements.builder()
                 .evidence("")
@@ -665,4 +876,19 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""))
             .build();
     }
+
+    private String createStatementOfTruthText(Boolean respondentState) {
+        String role = respondentState ? "defendant" : "claimant";
+        String statementOfTruth = role.equals("defendant")
+            ? "The defendant believes that the facts stated in the response are true."
+            : "The claimant believes that the facts in this claim are true.";
+        statementOfTruth += String.format("\n\n\nI am duly authorised by the %s to sign this statement.\n\n"
+                                              + "The %s understands that the proceedings for contempt of court "
+                                              + "may be brought against anyone who makes, or causes to be made, "
+                                              + "a false statement in a document verified by a statement of truth "
+                                              + "without an honest belief in its truth.",
+                                          IntStream.range(0, 2).mapToObj(i -> role).toArray());
+        return statementOfTruth;
+    }
+
 }

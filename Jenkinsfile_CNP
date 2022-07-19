@@ -61,6 +61,7 @@ withPipeline(type, product, component) {
   enableSlackNotifications('#civil_notifications')
 
   onPR {
+    env.ENVIRONMENT = "preview"
     loadVaultSecrets(secrets)
     enableCleanupOfHelmReleaseOnSuccess()
   }
@@ -97,7 +98,8 @@ withPipeline(type, product, component) {
       ./bin/add-roles.sh
       ./bin/pull-latest-release-asset.sh civil-ccd-definition civil-ccd-definition.zip
       ./bin/pull-latest-release-asset.sh civil-camunda-bpmn-definition civil-camunda-bpmn-definition.zip
-      ./bin/import-ccd-definition.sh "-e *-nonprod.json,*GAspec.json,*LRspec.json,*DJspec.json,*DJ.json"
+      ./bin/import-ccd-definition.sh "-e *DJspec.json,*DJ.json,*-prod.json,*DJ-SDO-nonprod.json,*DJ-nonprod.json,*GAspec.json"
+
       ./bin/import-bpmn-diagram.sh .
     """
 
@@ -106,7 +108,7 @@ withPipeline(type, product, component) {
   }
 
   after('smoketest:preview') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
   }
 
   before('functionalTest:preview') {
@@ -118,7 +120,7 @@ withPipeline(type, product, component) {
   }
 
   after('functionalTest:preview') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
   }
 
   before('smoketest:aat') {
@@ -128,7 +130,7 @@ withPipeline(type, product, component) {
       ./bin/add-roles.sh
       ./bin/pull-latest-release-asset.sh civil-ccd-definition civil-ccd-definition.zip
       ./bin/pull-latest-release-asset.sh civil-camunda-bpmn-definition civil-camunda-bpmn-definition.zip
-      ./bin/import-ccd-definition.sh "-e *-nonprod.json,*GAspec.json,*LRspec.json,*DJspec.json,*DJ.json"
+      ./bin/import-ccd-definition.sh "-e *GAspec.json,*DJspec.json,*-nonprod.json,*DJ.json,*DJ-SDO-nonprod.json,*DJ-nonprod.json"
       ./bin/import-bpmn-diagram.sh .
     """
     env.URL="https://civil-service-xui-staging.aat.platform.hmcts.net"
@@ -136,7 +138,7 @@ withPipeline(type, product, component) {
   }
 
   after('smoketest:aat') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
   }
 
   before('functionalTest:aat') {
@@ -148,7 +150,7 @@ withPipeline(type, product, component) {
   }
 
   after('functionalTest:aat') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
   }
 
   onMaster() {

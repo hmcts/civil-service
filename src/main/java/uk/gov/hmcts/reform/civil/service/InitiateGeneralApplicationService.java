@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
+import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
+import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -36,6 +39,7 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -43,10 +47,14 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@SuppressWarnings("unchecked")
 public class InitiateGeneralApplicationService {
 
     private final InitiateGeneralApplicationServiceHelper helper;
     private final GeneralAppsDeadlinesCalculator deadlinesCalculator;
+    private final CaseAccessDataStoreApi caseAccessDataStoreApi;
+    private final UserService userService;
+    private final CrossAccessUserConfiguration crossAccessUserConfiguration;
 
     private final OrganisationApi organisationApi;
     private final AuthTokenGenerator authTokenGenerator;
@@ -88,6 +96,7 @@ public class InitiateGeneralApplicationService {
     }
 
     private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails, String authToken) {
+        String caseType = "";
 
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
         if (caseData.getGeneralAppEvidenceDocument() != null) {
@@ -106,9 +115,14 @@ public class InitiateGeneralApplicationService {
         if (YES.equals(caseData.getAddRespondent2())) {
             applicationBuilder.defendant2PartyName(caseData.getRespondent2().getPartyName());
         }
-        String deadline = deadlinesCalculator
+        if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+            caseType = "SPEC_CLAIM";
+        } else {
+            caseType = "UNSPEC_CLAIM";
+        }
+        LocalDateTime deadline = deadlinesCalculator
             .calculateApplicantResponseDeadline(
-                LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS).toString();
+                LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS);
         if (caseData.getGeneralAppRespondentAgreement() != null
             && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())) {
             applicationBuilder
@@ -141,8 +155,9 @@ public class InitiateGeneralApplicationService {
             .generalAppReasonsOfOrder(caseData.getGeneralAppReasonsOfOrder())
             .generalAppHearingDetails(caseData.getGeneralAppHearingDetails())
             .generalAppPBADetails(caseData.getGeneralAppPBADetails())
-            .generalAppDeadlineNotification(deadline)
+            .generalAppDateDeadline(deadline)
             .generalAppSubmittedDateGAspec(LocalDateTime.now())
+            .generalAppSuperClaimType(caseType)
             .civilServiceUserRoles(IdamUserDetails.builder().id(userDetails.getId()).email(userDetails.getEmail())
                                        .build())
             .build();
@@ -232,5 +247,42 @@ public class InitiateGeneralApplicationService {
             log.error("User not registered in MO", ex);
             return Optional.empty();
         }
+    }
+
+    public boolean respondentAssigned(CaseData caseData) {
+        String caseId = caseData.getCcdCaseReference().toString();
+        CaseAssignedUserRolesResource userRoles = getUserRolesOnCase(caseId);
+        List<String> respondentCaseRoles = getRespondentCaseRoles(caseData);
+
+        for (String respondentCaseRole : respondentCaseRoles) {
+            if (userRoles.getCaseAssignedUserRoles() == null
+                    || userRoles.getCaseAssignedUserRoles().stream()
+                    .noneMatch(a -> a.getCaseRole() != null && respondentCaseRole.equals(a.getCaseRole()))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private CaseAssignedUserRolesResource getUserRolesOnCase(String caseId) {
+        String accessToken = userService.getAccessToken(
+                crossAccessUserConfiguration.getUserName(),
+                crossAccessUserConfiguration.getPassword()
+        );
+        return caseAccessDataStoreApi.getUserRoles(
+                accessToken,
+                authTokenGenerator.generate(),
+                List.of(caseId)
+        );
+    }
+
+    private List<String> getRespondentCaseRoles(CaseData caseData) {
+        List<String> respondentCaseRoles = new ArrayList<>();
+        respondentCaseRoles.add(caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole());
+        if (NO.equals(caseData.getRespondent2SameLegalRepresentative())
+                && caseData.getRespondent2OrganisationPolicy() != null) {
+            respondentCaseRoles.add(caseData.getRespondent2OrganisationPolicy().getOrgPolicyCaseAssignedRole());
+        }
+        return respondentCaseRoles;
     }
 }

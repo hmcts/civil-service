@@ -20,7 +20,6 @@ public class GeneralApplication implements MappableObject {
 
     private final GAApplicationType generalAppType;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
-    private final String respondentSolicitor1EmailAddress;
     private final BusinessProcess businessProcess;
     private final GAPbaDetails generalAppPBADetails;
     private final String generalAppDetailsOfOrder;
@@ -32,22 +31,23 @@ public class GeneralApplication implements MappableObject {
     private final GASolicitorDetailsGAspec generalAppApplnSolicitor;
     private final List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors;
     private final List<Element<Document>> generalAppEvidenceDocument;
-    private final String generalAppDeadlineNotification;
+    private final LocalDateTime generalAppDateDeadline;
     private final YesOrNo isMultiParty;
     private final YesOrNo parentClaimantIsApplicant;
     private final CaseLink caseLink;
     private final LocalDateTime generalAppSubmittedDateGAspec;
     private final IdamUserDetails civilServiceUserRoles;
+    private final String applicantPartyName;
     private final String claimant1PartyName;
     private final String claimant2PartyName;
     private final String defendant1PartyName;
     private final String defendant2PartyName;
+    private final String generalAppSuperClaimType;
 
     @JsonCreator
     GeneralApplication(@JsonProperty("generalAppType") GAApplicationType generalAppType,
                        @JsonProperty("generalAppRespondentAgreement")
                            GARespondentOrderAgreement generalAppRespondentAgreement,
-                       @JsonProperty("respondentSolicitor1EmailAddress") String respondentSolicitor1EmailAddress,
                        @JsonProperty("businessProcess") BusinessProcess businessProcess,
                        @JsonProperty("generalAppPBADetails") GAPbaDetails generalAppPBADetails,
                        @JsonProperty("generalAppDetailsOfOrder") String generalAppDetailsOfOrder,
@@ -60,19 +60,20 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("generalAppRespondentSolicitors") List<Element<GASolicitorDetailsGAspec>>
                            generalAppRespondentSolicitors,
                        @JsonProperty("generalAppEvidenceDocument") List<Element<Document>> generalAppEvidenceDocument,
-                       @JsonProperty("generalAppDeadlineNotification") String generalAppDeadlineNotification,
+                       @JsonProperty("generalAppDateDeadline") LocalDateTime generalAppDateDeadline,
                        @JsonProperty("isMultiParty") YesOrNo isMultiParty,
                        @JsonProperty("parentClaimantIsApplicant") YesOrNo parentClaimantIsApplicant,
                        @JsonProperty("caseLink") CaseLink caseLink,
                        @JsonProperty("generalAppSubmittedDateGAspec") LocalDateTime generalAppSubmittedDateGAspec,
                        @JsonProperty("civilServiceUserRoles") IdamUserDetails civilServiceUserRoles,
+                       @JsonProperty("applicantPartyName") String applicantPartyName,
                        @JsonProperty("claimant1PartyName") String claimant1PartyName,
                        @JsonProperty("claimant2PartyName") String claimant2PartyName,
                        @JsonProperty("defendant1PartyName") String defendant1PartyName,
-                       @JsonProperty("defendant2PartyName") String defendant2PartyName) {
+                       @JsonProperty("defendant2PartyName") String defendant2PartyName,
+                       @JsonProperty("generalAppSuperClaimType") String generalAppSuperClaimType) {
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
-        this.respondentSolicitor1EmailAddress = respondentSolicitor1EmailAddress;
         this.businessProcess = businessProcess;
         this.generalAppPBADetails = generalAppPBADetails;
         this.generalAppDetailsOfOrder = generalAppDetailsOfOrder;
@@ -84,15 +85,17 @@ public class GeneralApplication implements MappableObject {
         this.generalAppApplnSolicitor = generalAppApplnSolicitor;
         this.generalAppRespondentSolicitors = generalAppRespondentSolicitors;
         this.generalAppEvidenceDocument = generalAppEvidenceDocument;
-        this.generalAppDeadlineNotification = generalAppDeadlineNotification;
+        this.generalAppDateDeadline = generalAppDateDeadline;
         this.isMultiParty = isMultiParty;
         this.parentClaimantIsApplicant = parentClaimantIsApplicant;
         this.caseLink = caseLink;
         this.generalAppSubmittedDateGAspec = generalAppSubmittedDateGAspec;
         this.civilServiceUserRoles = civilServiceUserRoles;
+        this.applicantPartyName = applicantPartyName;
         this.claimant1PartyName = claimant1PartyName;
         this.claimant2PartyName = claimant2PartyName;
         this.defendant1PartyName = defendant1PartyName;
         this.defendant2PartyName = defendant2PartyName;
+        this.generalAppSuperClaimType = generalAppSuperClaimType;
     }
 }

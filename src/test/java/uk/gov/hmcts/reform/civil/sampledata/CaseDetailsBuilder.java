@@ -5,8 +5,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
@@ -101,8 +104,44 @@ public class CaseDetailsBuilder {
         return this;
     }
 
+    public CaseDetailsBuilder atStateFullDefenceSpec() {
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .ccdState(AWAITING_APPLICANT_INTENTION)
+            .build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = AWAITING_APPLICANT_INTENTION.name();
+        return this;
+    }
+
+    public CaseDetailsBuilder atStateFullAdmitSpec() {
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .ccdState(AWAITING_APPLICANT_INTENTION)
+            .build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = AWAITING_APPLICANT_INTENTION.name();
+        return this;
+    }
+
+    public CaseDetailsBuilder atStatePartAdmitSpec() {
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .ccdState(AWAITING_APPLICANT_INTENTION)
+            .build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = AWAITING_APPLICANT_INTENTION.name();
+        return this;
+    }
+
     public CaseDetailsBuilder atStateProceedsOffline() {
-        CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendants().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = PROCEEDS_IN_HERITAGE_SYSTEM.name();
         return this;

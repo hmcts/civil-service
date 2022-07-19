@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.ccd.model.Organisation;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
@@ -26,6 +29,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import java.time.LocalDateTime;
 
 import static java.lang.String.format;
+import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -59,6 +63,9 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private FeatureToggleService featureToggleService;
+
+    @Autowired
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     private NotifyClaimCallbackHandler handler;
@@ -150,7 +157,8 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .containsEntry("claimNotificationDate", notificationDate.format(ISO_DATE_TIME))
-                    .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME));
+                    .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME))
+                    .containsEntry("nextDeadline", deadline.format(ISO_DATE));
             }
 
             @Test
@@ -168,7 +176,8 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDateTime expectedTime = claimNotificationDeadline.toLocalDate().atTime(END_OF_BUSINESS_DAY);
 
                 assertThat(response.getData())
-                    .containsEntry("claimDetailsNotificationDeadline", expectedTime.format(ISO_DATE_TIME));
+                    .containsEntry("claimDetailsNotificationDeadline", expectedTime.format(ISO_DATE_TIME))
+                    .containsEntry("nextDeadline", expectedTime.format(ISO_DATE));
             }
 
             @Test
@@ -183,7 +192,8 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
-                    .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME));
+                    .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME))
+                    .containsEntry("nextDeadline", deadline.format(ISO_DATE));
             }
         }
 
@@ -234,6 +244,103 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .containsEntry("claimDetailsNotificationDeadline", expectedDeadline.format(ISO_DATE_TIME));
+            }
+        }
+
+        @Nested
+        class SetOrganisationPolicy {
+            OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
+                .organisation(Organisation.builder()
+                                  .organisationID(null)
+                                  .build())
+                .orgPolicyReference("orgreference")
+                .orgPolicyCaseAssignedRole("orgassignedrole")
+                .build();
+
+            @BeforeEach
+            void setup() {
+                when(time.now()).thenReturn(notificationDate);
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any(LocalDateTime.class))).thenReturn(deadline);
+            }
+
+            @Test
+            void shouldSetOrganisationPolicy_1v1() {
+                LocalDateTime claimNotificationDeadline = notificationDate.plusMonths(4);
+                OrganisationPolicy expectedOrganisationPolicy = OrganisationPolicy.builder()
+                    .organisation(Organisation.builder()
+                                      .organisationID("QWERTY R")
+                                      .build())
+                    .orgPolicyReference("orgreference")
+                    .orgPolicyCaseAssignedRole("orgassignedrole")
+                    .build();
+
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
+                    .respondent1OrganisationIDCopy("QWERTY R")
+                    .respondent1OrganisationPolicy(organisationPolicy)
+                    .claimNotificationDeadline(claimNotificationDeadline)
+                    .build();
+
+                CallbackParams params = CallbackParamsBuilder.builder().of(
+                    CallbackType.ABOUT_TO_SUBMIT,
+                    caseData
+                ).build();
+
+                assertThat(caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
+                    .isEqualTo(null);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(updatedData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
+                    .isEqualTo("QWERTY R");
+                assertThat(updatedData.getRespondent1OrganisationPolicy()).isEqualTo(expectedOrganisationPolicy);
+            }
+
+            @Test
+            void shouldSetOrganisationPolicy_1v2() {
+                OrganisationPolicy expectedOrganisationPolicy1 = OrganisationPolicy.builder()
+                    .organisation(Organisation.builder()
+                                      .organisationID("QWERTY R")
+                                      .build())
+                    .orgPolicyReference("orgreference")
+                    .orgPolicyCaseAssignedRole("orgassignedrole")
+                    .build();
+                OrganisationPolicy expectedOrganisationPolicy2 = OrganisationPolicy.builder()
+                    .organisation(Organisation.builder()
+                                      .organisationID("QWERTY R2")
+                                      .build())
+                    .orgPolicyReference("orgreference")
+                    .orgPolicyCaseAssignedRole("orgassignedrole")
+                    .build();
+                LocalDateTime claimNotificationDeadline = notificationDate.plusMonths(4);
+
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors()
+                    .respondent1OrganisationIDCopy("QWERTY R")
+                    .respondent1OrganisationPolicy(organisationPolicy)
+                    .respondent2OrganisationIDCopy("QWERTY R2")
+                    .respondent2OrganisationPolicy(organisationPolicy)
+                    .claimNotificationDeadline(claimNotificationDeadline)
+                    .build();
+
+                CallbackParams params = CallbackParamsBuilder.builder().of(
+                    CallbackType.ABOUT_TO_SUBMIT,
+                    caseData
+                ).build();
+
+                assertThat(caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
+                    .isEqualTo(null);
+                assertThat(caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID())
+                    .isEqualTo(null);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(updatedData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
+                    .isEqualTo("QWERTY R");
+                assertThat(updatedData.getRespondent1OrganisationPolicy()).isEqualTo(expectedOrganisationPolicy1);
+                assertThat(updatedData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID())
+                    .isEqualTo("QWERTY R2");
+                assertThat(updatedData.getRespondent2OrganisationPolicy()).isEqualTo(expectedOrganisationPolicy2);
             }
         }
     }

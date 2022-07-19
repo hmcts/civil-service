@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.model.Address.fromContactInformation;
 @Builder(toBuilder = true)
 public class Representative {
 
+    private final String contactName;
     private final String organisationName;
     private final String phoneNumber;
     private final String dxAddress;

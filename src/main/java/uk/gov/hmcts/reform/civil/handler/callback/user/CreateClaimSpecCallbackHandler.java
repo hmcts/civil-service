@@ -32,6 +32,9 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -92,10 +95,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     public static final String SPEC_CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
-        + "receive an email. The email will also include the date when you need to notify the defendant "
-        + "of the claim.%n%nYou must notify the defendant of the claim within 4 months of the claim being issued. "
-        + "The exact date when you must notify the claim details will be provided when you first notify "
-        + "the defendant of the claim.";
+        + "receive an email. The email will also include the date that the defendants have to respond.";
 
     public static final String SPEC_LIP_CONFIRMATION_BODY = "<br />When payment is confirmed your claim will be issued "
         + "and you'll be notified by email. The claim will then progress offline."
@@ -120,6 +120,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final PostcodeValidator postcodeValidator;
     private final InterestCalculator interestCalculator;
     private final FeatureToggleService toggleService;
+    private final StateFlowEngine stateFlowEngine;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -336,6 +337,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        StateFlow evaluation = stateFlowEngine.evaluate(caseData);
+        State state = evaluation.getState();
+        Map<String, Boolean> flags = evaluation.getFlags();
+
         // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
         // must be to do with the way XUI cache data entered through the lifecycle of an event.
         CaseData updatedCaseData = caseData.toBuilder()
@@ -360,7 +365,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         if (callbackParams.getRequest().getEventId() != null) {
             var respondent1Represented = caseData.getSpecRespondent1Represented();
             dataBuilder.respondent1Represented(respondent1Represented);
+            var respondent2Represented = caseData.getSpecRespondent2Represented();
+            dataBuilder.respondent2Represented(respondent2Represented);
         }
+
+        dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+        ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
@@ -382,11 +392,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1UserDetails.getEmail()).build());
         }
 
-        dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
         dataBuilder.submittedDate(time.now());
 
         if (null != callbackParams.getRequest().getEventId()) {
-            System.out.println(" inside if condition ");
             dataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
             dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
         }
