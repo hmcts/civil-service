@@ -147,7 +147,7 @@ public class CasesController {
         return new ResponseEntity<>(caseData, HttpStatus.OK);
     }
 
-    @PostMapping(path="response/deadline")
+    @PostMapping(path="/response/deadline")
     @ApiOperation("Calculates extended response deadline")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "Authorization", value = "Authorization token",
