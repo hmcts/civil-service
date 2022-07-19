@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -55,7 +56,7 @@ public class CasesController {
         "/{caseId}",
     })
     @ApiOperation("get case by id from CCD")
-    public ResponseEntity<CaseData> getCaseId(
+    public ResponseEntity<CaseDetails> getCaseId(
         @PathVariable("caseId") Long caseId,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
@@ -64,10 +65,10 @@ public class CasesController {
             caseId
         );
 
-        var caseDataResponse = caseDetailsConverter
-            .toCaseData(coreCaseDataService.getCase(caseId, authorisation).getData());
+        var caseDetailsResponse = coreCaseDataService.getCase(caseId, authorisation);
+        log.info("Returning case details: {}", caseDetailsResponse);
 
-        return new ResponseEntity<>(caseDataResponse, HttpStatus.OK);
+        return new ResponseEntity<>(caseDetailsResponse, HttpStatus.OK);
     }
 
     @PostMapping(path = "/")
