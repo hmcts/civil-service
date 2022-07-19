@@ -55,6 +55,7 @@ jobs:
               if (branch.startsWith('${{env.branchPrefix}}')
                   && !branch.startsWith('dependabot/gradle/org.flywaydb.flyway-9.0.1')
                   && !branch.startsWith('dependabot/gradle/au.com.dius.pact-4.3.11')
+                  && !branch.startsWith('dependabot/gradle/kotlin-stdlib-jdk7-1.7.10')
                   ) {
                 console.log('Branch matched: ' + branch);
                 statusOK = true;
