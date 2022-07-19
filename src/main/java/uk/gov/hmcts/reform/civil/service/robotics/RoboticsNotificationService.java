@@ -103,23 +103,23 @@ public class RoboticsNotificationService {
     }
 
     private String getSubject(CaseData caseData, String triggerEvent, boolean isMultiParty) {
-        if(SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-            return isMultiParty ? String.format("Multiparty LR v LR Case Data for %s - %s - %s", caseData.getLegacyCaseReference(),
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            return isMultiParty ? String.format("Multiparty LR v LR Case Data for %s - %s - %s",
+                                                caseData.getLegacyCaseReference(),
                                                 caseData.getCcdState(), triggerEvent
             ) : String.format(
                 "LR v LR Case Data for %s",
                 caseData.getLegacyCaseReference()
             );
         } else {
-            return isMultiParty ? String.format("Multiparty claim data for %s - %s - %s", caseData.getLegacyCaseReference(),
+            return isMultiParty ? String.format("Multiparty claim data for %s - %s - %s",
+                                                caseData.getLegacyCaseReference(),
                                                 caseData.getCcdState(), triggerEvent
             ) : String.format(
                 "Robotics case data for %s",
                 caseData.getLegacyCaseReference()
             );
         }
-
-
     }
 
     private String getRoboticsEmailRecipient(boolean isMultiParty, SuperClaimType superClaimType) {
