@@ -25,11 +25,12 @@ public class DeadlineExtensionCalculatorServiceTest {
     private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
 
     @Test
-    void shouldReturnTheSameGivenDateWhenDateIsWorkday(){
+    void shouldReturnTheSameGivenDateWhenDateIsWorkday() {
         given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
         LocalDate proposedExtensionDeadline = LocalDate.now();
 
-        LocalDate calculatedDeadline = deadlineExtensionCalculatorService.calculateExtendedDeadline(proposedExtensionDeadline);
+        LocalDate calculatedDeadline = deadlineExtensionCalculatorService.calculateExtendedDeadline(
+            proposedExtensionDeadline);
 
         assertThat(calculatedDeadline).isEqualTo(proposedExtensionDeadline);
         verify(workingDayIndicator).isWorkingDay(proposedExtensionDeadline);
@@ -37,13 +38,14 @@ public class DeadlineExtensionCalculatorServiceTest {
     }
 
     @Test
-    void shouldReturnNextWorkingDayWhenDateIsHoliday(){
+    void shouldReturnNextWorkingDayWhenDateIsHoliday() {
         given(workingDayIndicator.isWorkingDay(any())).willReturn(false);
-        LocalDate calculatedNextWorkingDay = LocalDate.of(2022, 6,4);
+        LocalDate calculatedNextWorkingDay = LocalDate.of(2022, 6, 4);
         given(workingDayIndicator.getNextWorkingDay(any())).willReturn(calculatedNextWorkingDay);
-        LocalDate proposedExtensionDeadline = LocalDate.of(2022, 6,3);
+        LocalDate proposedExtensionDeadline = LocalDate.of(2022, 6, 3);
 
-        LocalDate calculatedDeadline = deadlineExtensionCalculatorService.calculateExtendedDeadline(proposedExtensionDeadline);
+        LocalDate calculatedDeadline = deadlineExtensionCalculatorService.calculateExtendedDeadline(
+            proposedExtensionDeadline);
 
         assertThat(calculatedDeadline).isEqualTo(calculatedNextWorkingDay);
         verify(workingDayIndicator).isWorkingDay(proposedExtensionDeadline);
