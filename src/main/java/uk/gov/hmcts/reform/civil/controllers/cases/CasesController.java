@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.controllers.cases;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -29,8 +31,10 @@ import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
+import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
@@ -50,6 +54,7 @@ public class CasesController {
     private final CaseDetailsConverter caseDetailsConverter;
     private final DashboardClaimInfoService dashboardClaimInfoService;
     private final CaseEventService caseEventService;
+    private final DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
 
     @GetMapping(path = {
         "/{caseId}",
@@ -141,4 +146,18 @@ public class CasesController {
             .toCaseData(caseEventService.submitEvent(params));
         return new ResponseEntity<>(caseData, HttpStatus.OK);
     }
+
+    @PostMapping(path="response/deadline")
+    @ApiOperation("Calculates extended response deadline")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "Authorization", value = "Authorization token",
+            required = true, dataType = "string", paramType = "header") })
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 401, message = "Not Authorized")})
+    public ResponseEntity<LocalDate> calculateNewResponseDeadline(@RequestBody LocalDate extendedDeadline){
+        LocalDate calculatedDeadline = deadlineExtensionCalculatorService.calculateExtendedDeadline(extendedDeadline);
+        return new ResponseEntity<>(calculatedDeadline, HttpStatus.OK);
+    }
+
 }
