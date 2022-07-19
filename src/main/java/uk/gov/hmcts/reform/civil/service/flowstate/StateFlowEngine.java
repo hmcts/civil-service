@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -21,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaiting
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullDefenceReceivedSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceivedSpec;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.bothDefSameLegalRep;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledgedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
@@ -29,9 +31,13 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDet
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNotified;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedNoRespondentRepresented;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedBothRespondentUnrepresented;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedBothUnregisteredSolicitors;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneRespondentRepresentative;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneUnrepresentedDefendantOnly;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOnlyOneRespondentRepresented;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedRespondent1Unrepresented;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedRespondent2Unrepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentatives;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimSpec;
@@ -45,6 +51,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.noticeOfChangeEnabledAndLiP;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionSpec;
@@ -129,6 +136,8 @@ public class StateFlowEngine {
             .transitionTo(CLAIM_SUBMITTED)
                 .onlyIf(claimSubmittedOneRespondentRepresentative)
                 .set(flags -> flags.putAll(
+                    // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
+                    // camunda diagram for TAKE_CASE_OFFLINE is changed
                     Map.of(
                         FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
                         FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
@@ -138,6 +147,8 @@ public class StateFlowEngine {
             .transitionTo(CLAIM_SUBMITTED)
                 .onlyIf(claimSubmittedTwoRespondentRepresentatives)
                 .set(flags -> flags.putAll(
+                    // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
+                    // camunda diagram for TAKE_CASE_OFFLINE is changed
                     Map.of(
                         FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false,
                         FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
@@ -145,14 +156,67 @@ public class StateFlowEngine {
                         FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
                     )))
+            // To be removed when NOC is released. Needed for cases with unregistered and unrepresented defendants
             .transitionTo(CLAIM_SUBMITTED)
-                .onlyIf(claimSubmittedNoRespondentRepresented.or(claimSubmittedOnlyOneRespondentRepresented))
+                .onlyIf(noticeOfChangeEnabledAndLiP.negate()
+                            .and((claimSubmittedBothRespondentUnrepresented
+                                .or(claimSubmittedOnlyOneRespondentRepresented)
+                                .or(claimSubmittedBothUnregisteredSolicitors)
+                                // this line MUST be removed when NOC toggle(noticeOfChangeEnabledAndLiP) is removed
+                                .or(claimSubmittedOneUnrepresentedDefendantOnly))))
                 .set(flags -> flags.putAll(
-                    // flags for ONE_RESPONDENT_REPRESENTATIVE and TWO_RESPONDENT_REPRESENTATIVES
-                    // might have to change after NOC
+                    // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
+                    // camunda diagram for TAKE_CASE_OFFLINE is changed
                     Map.of(
-                        FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false,
-                        FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
+                        FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
+                        FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
+                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
+                    )))
+            // Only one unrepresented defendant
+            .transitionTo(CLAIM_SUBMITTED)
+                .onlyIf(noticeOfChangeEnabledAndLiP.and(claimSubmittedOneUnrepresentedDefendantOnly))
+                .set(flags -> flags.putAll(
+                    Map.of(
+                        FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
+                        FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
+                        FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
+                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
+                    )))
+            // Unrepresented defendant 1
+            .transitionTo(CLAIM_SUBMITTED)
+                .onlyIf(noticeOfChangeEnabledAndLiP
+                            .and(claimSubmittedRespondent1Unrepresented)
+                            .and(claimSubmittedOneUnrepresentedDefendantOnly.negate())
+                            .and(claimSubmittedRespondent2Unrepresented.negate()))
+                .set(flags -> flags.putAll(
+                    Map.of(
+                        FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
+                        FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false,
+                        FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
+                        FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
+                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
+                    )))
+            // Unrepresented defendant 2
+            .transitionTo(CLAIM_SUBMITTED)
+                .onlyIf(noticeOfChangeEnabledAndLiP
+                            .and(claimSubmittedRespondent2Unrepresented
+                                     .and(claimSubmittedRespondent1Unrepresented.negate())))
+                .set(flags -> flags.putAll(
+                    Map.of(
+                        FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false,
+                        FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
+                        FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
+                        FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
+                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
+                    )))
+            // Unrepresented defendants
+            .transitionTo(CLAIM_SUBMITTED)
+                .onlyIf(noticeOfChangeEnabledAndLiP.and(claimSubmittedRespondent1Unrepresented.and(
+                    claimSubmittedRespondent2Unrepresented)))
+                .set(flags -> flags.putAll(
+                    Map.of(
+                        FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
+                        FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
                         FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
                         FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
@@ -182,7 +246,10 @@ public class StateFlowEngine {
                     .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
                             .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
                     .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
-                            .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))))
+                            .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))
+                            .and(caseData -> MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP
+                                != MultiPartyScenario.getMultiPartyScenario(caseData)))
+                            .and(bothDefSameLegalRep.negate()))
             // Unrepresented and Unregistered
             // 1. Def1 unrepresented, Def2 unregistered
             // 2. Def1 unregistered, Def 2 unrepresented
