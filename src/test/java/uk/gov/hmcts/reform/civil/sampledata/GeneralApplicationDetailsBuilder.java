@@ -41,8 +41,8 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OT
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
-import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.GENERAL_ORDER;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.GENERAL_ORDER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SuppressWarnings("unchecked")
