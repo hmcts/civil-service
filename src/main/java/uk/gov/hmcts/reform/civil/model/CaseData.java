@@ -417,6 +417,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
     private final CaseLocation caseManagementLocation;
+    private final String locationName;
     private final DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;
     private final String bothDefendants;
