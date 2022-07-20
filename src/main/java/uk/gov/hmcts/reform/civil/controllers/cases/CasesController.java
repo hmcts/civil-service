@@ -147,15 +147,15 @@ public class CasesController {
         return new ResponseEntity<>(caseData, HttpStatus.OK);
     }
 
-    @PostMapping(path="/response/deadline")
+    @PostMapping(path = "/response/deadline")
     @ApiOperation("Calculates extended response deadline")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "Authorization", value = "Authorization token",
-            required = true, dataType = "string", paramType = "header") })
+            required = true, dataType = "string", paramType = "header")})
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 401, message = "Not Authorized")})
-    public ResponseEntity<LocalDate> calculateNewResponseDeadline(@RequestBody LocalDate extendedDeadline){
+    public ResponseEntity<LocalDate> calculateNewResponseDeadline(@RequestBody LocalDate extendedDeadline) {
         LocalDate calculatedDeadline = deadlineExtensionCalculatorService.calculateExtendedDeadline(extendedDeadline);
         return new ResponseEntity<>(calculatedDeadline, HttpStatus.OK);
     }
