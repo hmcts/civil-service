@@ -27,7 +27,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -117,6 +116,37 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondent1OrganisationIDCopy()).isEqualTo("1234");
             assertThat(updatedCaseData.getRespondent1Represented()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondent1OrgRegistered()).isEqualTo(YES);
+            //TODO update this after CCD-3538
+            assertThat(updatedCaseData.getRespondentSolicitor1EmailAddress()).isNull();
+        }
+
+        @Test
+        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor1v1LiP() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v1LiP()
+                .changeOfRepresentation(false, false, "1234", null)
+                .updateOrgPolicyAfterNoC(true, false)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            Organisation newOrg = getOrg(NEW_ORG_ID);
+
+            when(organisationService.findOrganisationById(NEW_ORG_ID)).thenReturn(Optional.of(newOrg));
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
+            assertThat(updatedCaseData.getRespondentSolicitor1OrganisationDetails()).isEqualTo(getNewOrgDetails());
+            assertThat(updatedCaseData.getRespondentSolicitor1ServiceAddress())
+                .isEqualTo(getNewOrgDetails().getAddress());
+            assertSolicitorReferences(false, false, caseData, updatedCaseData);
+            assertThat(updatedCaseData.getRespondent1OrganisationIDCopy()).isEqualTo("1234");
+            assertThat(updatedCaseData.getRespondent1Represented()).isEqualTo(YES);
+            assertThat(updatedCaseData.getRespondent1OrgRegistered()).isEqualTo(YES);
+            assertThat(updatedCaseData.getAddLegalRepDeadline()).isNull();
             //TODO update this after CCD-3538
             assertThat(updatedCaseData.getRespondentSolicitor1EmailAddress()).isNull();
         }
@@ -217,6 +247,73 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress()).isNull();
             //TODO uncomment after CIV-3227
             //assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
+        }
+
+        @Test
+        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor2LiP() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateClaimIssued1v2Respondent2LiP()
+                .changeOfRepresentation(false, true, "1234", null)
+                .updateOrgPolicyAfterNoC(false, true)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            Organisation newOrg = getOrg(NEW_ORG_ID);
+
+            when(organisationService.findOrganisationById(NEW_ORG_ID)).thenReturn(Optional.of(newOrg));
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
+            assertThat(updatedCaseData.getAddLegalRepDeadline()).isNull();
+            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isEqualTo(getNewOrgDetails());
+            assertThat(updatedCaseData.getRespondentSolicitor2ServiceAddress())
+                .isEqualTo(getNewOrgDetails().getAddress());
+            assertSolicitorReferences(false, true, caseData, updatedCaseData);
+            assertThat(updatedCaseData.getRespondent2OrganisationIDCopy()).isEqualTo("1234");
+            assertThat(updatedCaseData.getRespondent2Represented()).isEqualTo(YES);
+            assertThat(updatedCaseData.getRespondent2OrgRegistered()).isEqualTo(YES);
+            assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
+            //TODO update this after CCD-3538
+            assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress()).isNull();
+        }
+
+        @Test
+        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor2BothRespondentsLiP() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateClaimIssued1v2Respondent2LiP()
+                .atStateClaimIssued1v1LiP()
+                .changeOfRepresentation(false, true, "1234", null)
+                .updateOrgPolicyAfterNoC(false, true)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            Organisation newOrg = getOrg(NEW_ORG_ID);
+
+            when(organisationService.findOrganisationById(NEW_ORG_ID)).thenReturn(Optional.of(newOrg));
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
+            assertThat(updatedCaseData.getAddLegalRepDeadline()).isEqualTo(caseData.getAddLegalRepDeadline());
+            assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isEqualTo(getNewOrgDetails());
+            assertThat(updatedCaseData.getRespondentSolicitor2ServiceAddress())
+                .isEqualTo(getNewOrgDetails().getAddress());
+            assertSolicitorReferences(false, true, caseData, updatedCaseData);
+            assertThat(updatedCaseData.getRespondent2OrganisationIDCopy()).isEqualTo("1234");
+            assertThat(updatedCaseData.getRespondent2Represented()).isEqualTo(YES);
+            assertThat(updatedCaseData.getRespondent2OrgRegistered()).isEqualTo(YES);
+            assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
+            //TODO update this after CCD-3538
+            assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress()).isNull();
         }
 
         private void assertSolicitorReferences(boolean isApplicant, boolean respondent2Exists,

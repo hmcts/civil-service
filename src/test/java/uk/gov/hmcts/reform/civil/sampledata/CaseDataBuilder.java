@@ -1357,6 +1357,7 @@ public class CaseDataBuilder {
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
             .build();
+        addLegalRepDeadline = DEADLINE;
         return this;
     }
 
@@ -1367,6 +1368,7 @@ public class CaseDataBuilder {
         respondent2OrganisationPolicy = OrganisationPolicy.builder()
             .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
             .build();
+        addLegalRepDeadline = DEADLINE;
         return this;
     }
 
