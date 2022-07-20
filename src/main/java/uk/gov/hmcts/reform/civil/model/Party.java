@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.validation.groups.DateOfBirthGroup;
 
@@ -14,28 +16,30 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @Data
 @Builder(toBuilder = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@NoArgsConstructor
+@AllArgsConstructor
 public class Party {
 
-    private final Type type;
-    private final String individualTitle;
-    private final String individualFirstName;
-    private final String individualLastName;
+    private Type type;
+    private String individualTitle;
+    private String individualFirstName;
+    private String individualLastName;
 
     @PastOrPresent(message = "The date entered cannot be in the future", groups = DateOfBirthGroup.class)
-    private final LocalDate individualDateOfBirth;
-    private final String companyName;
-    private final String organisationName;
-    private final String soleTraderTitle;
-    private final String soleTraderFirstName;
-    private final String soleTraderLastName;
-    private final String soleTraderTradingAs;
+    private LocalDate individualDateOfBirth;
+    private String companyName;
+    private String organisationName;
+    private String soleTraderTitle;
+    private String soleTraderFirstName;
+    private String soleTraderLastName;
+    private String soleTraderTradingAs;
 
     @PastOrPresent(message = "The date entered cannot be in the future", groups = DateOfBirthGroup.class)
-    private final LocalDate soleTraderDateOfBirth;
-    private final Address primaryAddress;
+    private LocalDate soleTraderDateOfBirth;
+    private Address primaryAddress;
 
-    private final String partyName;
-    private final String partyTypeDisplayValue;
+    private String partyName;
+    private String partyTypeDisplayValue;
 
     public enum Type {
         INDIVIDUAL,

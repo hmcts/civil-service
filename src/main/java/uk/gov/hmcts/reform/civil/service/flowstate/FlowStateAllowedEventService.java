@@ -17,12 +17,12 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
@@ -41,8 +41,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
@@ -103,9 +103,7 @@ public class FlowStateAllowedEventService {
         entry(
             CLAIM_SUBMITTED.fullName(),
             List.of(
-                NOC_REQUEST,
                 ADD_CASE_NOTE,
-                APPLY_NOC_DECISION,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO
             )

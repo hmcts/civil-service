@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
 @Data

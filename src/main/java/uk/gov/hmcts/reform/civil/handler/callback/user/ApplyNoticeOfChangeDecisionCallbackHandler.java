@@ -40,7 +40,8 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     private final ObjectMapper objectMapper;
 
     private static final String CHANGE_ORGANISATION_REQUEST = "changeOrganisationRequestField";
-    private static final String ORD_ID_FOR_AUTO_APPROVAL = "org id to persist updated change organisation request field";
+    private static final String ORG_ID_FOR_AUTO_APPROVAL =
+        "org id to persist updated change organisation request field";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -64,15 +65,15 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         );
 
         CaseData updatedCaseData = objectMapper.convertValue(applyDecision.getData(), CaseData.class);
-        CaseData.CaseDataBuilder<?, ?> updatedcaseDataBuilder = updatedCaseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = updatedCaseData.toBuilder();
 
-        updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(updatedCaseData, updatedcaseDataBuilder);
+        updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(updatedCaseData, updatedCaseDataBuilder);
 
-        updatedcaseDataBuilder.businessProcess(BusinessProcess.ready(APPLY_NOC_DECISION))
+        updatedCaseDataBuilder.businessProcess(BusinessProcess.ready(APPLY_NOC_DECISION))
             .changeOfRepresentation(getChangeOfRepresentation(corFieldBeforeNoC));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedcaseDataBuilder.build().toMap(objectMapper)).build();
+            .data(updatedCaseDataBuilder.build().toMap(objectMapper)).build();
     }
 
     private ChangeOfRepresentation getChangeOfRepresentation(ChangeOrganisationRequest corFieldBeforeNoC) {
@@ -87,31 +88,43 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         return builder.build();
     }
 
-    /**todo java doc
+    /** After applying the NoC decision the ChangeOrganisationRequest field is nullified
+     * To auto assigned the case to the new user, Assign case access checks for:
+     * 1. ChangeOrganisationRequest field in case data, it does this by looking for the OrganisationToAdd node
+     * 2. checks if caseroleID field is null
      *
-     * @param updatedCaseData
-     * @param updatedcaseDataBuilder
+     * <p>If the two checks above return true, then the NoC request is auto approved and new user is auto assigned.
+     * However we cannot persist null values to the db since the objectMapper is
+     * initialized with setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
+     * To get around this, the field is forced to persist by setting a value for the OrganisationToAdd node</p>
+     *
+     * <p>This value will be deleted in the next callback UpdateCaseDetailsAfterNoCHandler</p>
+     *
+     * @param updatedCaseData updatedCaseData
+     * @param updatedcaseDataBuilder updatedcaseDataBuilder
      */
-    private void updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(CaseData updatedCaseData, CaseData.CaseDataBuilder<?, ?> updatedcaseDataBuilder) {
+    private void updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(
+        CaseData updatedCaseData,
+        CaseData.CaseDataBuilder<?, ?> updatedcaseDataBuilder) {
         ChangeOrganisationRequest updatedcor = updatedCaseData.getChangeOrganisationRequestField();
-
-        // aac checks for:
-        // 1. ChangeOrganisationRequest field in case data, it does this by looking for the orgtoadd node
-        // 2. checks if caseroleID field is null
-        // if those evaluate to true, then the noc request is auto approved
-        // since we can't persist null values in db, this is a workaround by forcing the field to exist with a fake org id
-        // the value will be removed on the next callback that updates case data after noc deicison has been applied.
         if (updatedcor == null) {
-            updatedcaseDataBuilder.changeOrganisationRequestField(ChangeOrganisationRequest.builder()
-                                                                      .organisationToAdd(Organisation.builder()
-                                                                                             .organisationID(ORD_ID_FOR_AUTO_APPROVAL).build())
+            updatedcaseDataBuilder
+                .changeOrganisationRequestField(ChangeOrganisationRequest.builder()
+                                                   .organisationToAdd(Organisation.builder()
+                                                                          .organisationID(
+                                                                              ORG_ID_FOR_AUTO_APPROVAL).build())
                                                                       .build());
         }
     }
 
-    /** todo java doc
+    /** The ChangeOrganisationRequest field has a node called OrganisationToRemove.
+     * If the litigant is a litigant in person, then the value for this node will be null.
+     * However we cannot persist null values to the db since the objectMapper is initialized
+     * with setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
+     * so it won't be available in the request and cause errors as the field doesn't exist
+     * The workaround is to add the field is added manually to the request in case of LiP scenario
      *
-     * @param caseDetails
+     * @param caseDetails caseDetails
      */
     private void updateOrgPoliciesForLiP(CaseDetails caseDetails) {
         ChangeOrganisationRequest changeOrganisationRequestField = objectMapper.convertValue(

@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.sampledata;
 
+import uk.gov.hmcts.reform.ccd.model.ChangeOrganisationApprovalStatus;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -19,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
+import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CloseClaim;
@@ -65,6 +68,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
@@ -72,6 +76,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static java.time.LocalDate.now;
@@ -261,6 +266,9 @@ public class CaseDataBuilder {
     private String respondent1OrganisationIDCopy;
     private String respondent2OrganisationIDCopy;
     private LocalDateTime addLegalRepDeadline;
+
+    private ChangeOfRepresentation changeOfRepresentation;
+    private ChangeOrganisationRequest changeOrganisationRequest;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1311,6 +1319,78 @@ public class CaseDataBuilder {
         claimNotificationDeadline = NOTIFICATION_DEADLINE;
         ccdState = CASE_ISSUED;
         respondent1OrganisationIDCopy = "QWERTY R";
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssued1v1LiP() {
+        atStatePendingClaimIssued();
+        ccdState = CASE_ISSUED;
+        respondent1Represented = NO;
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssued1v2Respondent2LiP() {
+        atStatePendingClaimIssued();
+        ccdState = CASE_ISSUED;
+        respondent2Represented = NO;
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder changeOrganisationRequestField(boolean isApplicant, boolean isRespondent2Replaced,
+                                                          String newOrgID, String oldOrgId) {
+        String caseRole = isApplicant ? CaseRole.APPLICANTSOLICITORONE.getFormattedName() :
+            isRespondent2Replaced ? CaseRole.RESPONDENTSOLICITORTWO.getFormattedName() :
+                CaseRole.RESPONDENTSOLICITORONE.getFormattedName();
+        changeOrganisationRequest = ChangeOrganisationRequest.builder()
+            .requestTimestamp(LocalDateTime.now())
+            .caseRoleId(DynamicList.fromList(Collections.singletonList(caseRole)))
+            .organisationToAdd(Organisation.builder()
+                                   .organisationID(newOrgID)
+                                   .build())
+            .organisationToRemove(Organisation.builder()
+                                      .organisationID(oldOrgId)
+                                      .build())
+            .approvalStatus(ChangeOrganisationApprovalStatus.APPROVED)
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder changeOfRepresentation(boolean isApplicant, boolean isRespondent2Replaced,
+                                                  String newOrgID, String oldOrgId) {
+        String caseRole = isApplicant ? CaseRole.APPLICANTSOLICITORONE.getFormattedName() :
+            isRespondent2Replaced ? CaseRole.RESPONDENTSOLICITORTWO.getFormattedName() :
+                CaseRole.RESPONDENTSOLICITORONE.getFormattedName();
+        changeOfRepresentation = ChangeOfRepresentation.builder()
+            .caseRole(caseRole)
+            .organisationToAddID(newOrgID)
+            .organisationToRemoveID(oldOrgId)
+            .timestamp(LocalDateTime.now())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder updateOrgPolicyAfterNoC(boolean isApplicant, boolean isRespondent2) {
+        if (isApplicant) {
+            applicant1OrganisationPolicy = OrganisationPolicy.builder()
+                .organisation(Organisation.builder().organisationID("1234").build())
+                .orgPolicyCaseAssignedRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName()).build();
+        } else {
+            if (isRespondent2) {
+                respondent2OrganisationPolicy = OrganisationPolicy.builder()
+                    .organisation(Organisation.builder().organisationID("1234").build())
+                    .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName()).build();
+            } else {
+                respondent1OrganisationPolicy = OrganisationPolicy.builder()
+                    .organisation(Organisation.builder().organisationID("1234").build())
+                    .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()).build();
+            }
+        }
         return this;
     }
 
@@ -2825,6 +2905,8 @@ public class CaseDataBuilder {
             .applicant1ProceedWithClaimSpec2v1(applicant1ProceedWithClaimSpec2v1)
             .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
+            .changeOfRepresentation(changeOfRepresentation)
+            .changeOrganisationRequestField(changeOrganisationRequest)
             .build();
     }
 }

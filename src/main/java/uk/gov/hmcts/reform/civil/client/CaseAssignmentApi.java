@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.model.noc.DecisionRequest;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -34,7 +35,7 @@ public interface CaseAssignmentApi {
         value = "/noc/check-noc-approval",
         consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    AboutToStartOrSubmitCallbackResponse checkNocApproval(
+    SubmittedCallbackResponse checkNocApproval(
         @RequestHeader(AUTHORIZATION) String authorisation,
         @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
         @RequestBody CallbackRequest callbackRequest);
