@@ -83,14 +83,11 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     public void shouldReturnHttp200() {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1L).build();
-        CaseData expectedCaseData = CaseData.builder().ccdCaseReference(1L).build();
 
         when(coreCaseDataService.getCase(1L, BEARER_TOKEN))
             .thenReturn(expectedCaseDetails);
-        when(caseDetailsConverter.toCaseData(expectedCaseDetails.getData()))
-            .thenReturn(expectedCaseData);
         doGet(BEARER_TOKEN, CASES_URL, 1L)
-            .andExpect(content().json(toJson(expectedCaseData)))
+            .andExpect(content().json(toJson(expectedCaseDetails)))
             .andExpect(status().isOk());
     }
 
@@ -124,6 +121,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .cases(Arrays
                        .asList(CaseDetails
                                    .builder()
+                                   .id(1L)
                                    .id(1L)
                                    .build()))
             .build();
