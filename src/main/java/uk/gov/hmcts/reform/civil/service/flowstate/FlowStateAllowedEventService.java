@@ -711,6 +711,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 DEFENDANT_RESPONSE_SPEC,
                 ACKNOWLEDGE_CLAIM,
+                ENTER_BREATHING_SPACE_SPEC,
+                LIFT_BREATHING_SPACE_SPEC,
                 INFORM_AGREED_EXTENSION_DATE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 WITHDRAW_CLAIM,

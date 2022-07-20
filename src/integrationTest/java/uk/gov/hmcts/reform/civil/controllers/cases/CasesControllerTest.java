@@ -5,13 +5,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
-import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
+import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
+import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 
@@ -20,6 +23,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -41,6 +45,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
         + "}";
     private static final String CLAIMANT_CLAIMS_URL = "/cases/claimant/{submitterId}";
     private static final String DEFENDANT_CLAIMS_URL = "/cases/defendant/{submitterId}";
+    private static final String SUBMIT_EVENT_URL = "/cases/{caseId}/citizen/{submitterId}/event";
     private static final List<DashboardClaimInfo> claimResults =
         Collections.singletonList(DashboardClaimInfo.builder()
                                       .claimAmount(new BigDecimal(
@@ -50,13 +55,14 @@ public class CasesControllerTest extends BaseIntegrationTest {
                                           "Mr. James Bond")
                                       .defendantName(
                                           "Mr. Roger Moore")
-                                      .responseDeadLine(
+                                      .responseDeadline(
                                           LocalDate.of(
                                               2022,
                                               1,
                                               1
                                           ))
                                       .build());
+    private static final String EVENT_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOi";
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;
@@ -68,20 +74,20 @@ public class CasesControllerTest extends BaseIntegrationTest {
     private RoleAssignmentsService roleAssignmentsService;
 
     @MockBean
-    private ClaimStoreService claimStoreService;
+    private DashboardClaimInfoService dashboardClaimInfoService;
+
+    @MockBean
+    private CaseEventService caseEventService;
 
     @Test
     @SneakyThrows
     public void shouldReturnHttp200() {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1L).build();
-        CaseData expectedCaseData = CaseData.builder().ccdCaseReference(1L).build();
 
         when(coreCaseDataService.getCase(1L, BEARER_TOKEN))
             .thenReturn(expectedCaseDetails);
-        when(caseDetailsConverter.toCaseData(expectedCaseDetails.getData()))
-            .thenReturn(expectedCaseData);
         doGet(BEARER_TOKEN, CASES_URL, 1L)
-            .andExpect(content().json(toJson(expectedCaseData)))
+            .andExpect(content().json(toJson(expectedCaseDetails)))
             .andExpect(status().isOk());
     }
 
@@ -116,6 +122,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
                        .asList(CaseDetails
                                    .builder()
                                    .id(1L)
+                                   .id(1L)
                                    .build()))
             .build();
 
@@ -134,7 +141,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     void shouldReturnClaimsForClaimantSuccessfully() {
-        when(claimStoreService.getClaimsForClaimant(any(), any())).thenReturn(claimResults);
+        when(dashboardClaimInfoService.getClaimsForClaimant(any(), any())).thenReturn(claimResults);
         doGet(BEARER_TOKEN, CLAIMANT_CLAIMS_URL, "123")
             .andExpect(content().json(toJson(claimResults)))
             .andExpect(status().isOk());
@@ -143,9 +150,28 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     void shouldReturnClaimsForDefendantSuccessfully() {
-        when(claimStoreService.getClaimsForDefendant(any(), any())).thenReturn(claimResults);
+        when(dashboardClaimInfoService.getClaimsForDefendant(any(), any())).thenReturn(claimResults);
         doGet(BEARER_TOKEN, DEFENDANT_CLAIMS_URL, "123")
             .andExpect(content().json(toJson(claimResults)))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldSubmitEventSuccessfully() {
+        CaseDetails expectedCaseDetails = CaseDetails.builder().id(1L).build();
+        CaseData expectedCaseData = CaseData.builder().ccdCaseReference(1L).build();
+        when(caseEventService.submitEvent(any())).thenReturn(expectedCaseDetails);
+        when(caseDetailsConverter.toCaseData(expectedCaseDetails))
+            .thenReturn(expectedCaseData);
+        doPost(
+            BEARER_TOKEN,
+            EventDto.builder().event(CaseEvent.DEFENDANT_RESPONSE_SPEC).caseDataUpdate(Map.of()).build(),
+            SUBMIT_EVENT_URL,
+            "123",
+            "123"
+        )
+            .andExpect(content().json(toJson(expectedCaseData)))
             .andExpect(status().isOk());
     }
 }

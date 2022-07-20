@@ -15,5 +15,4 @@ public class RoboticsCaseDataSpec implements ToJsonString {
     private String particularsOfClaim;
     private ClaimDetails claimDetails;
     private EventHistory events;
-    private RPABreathingSpace breathingSpace;
 }

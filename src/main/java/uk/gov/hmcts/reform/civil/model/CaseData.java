@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
@@ -22,11 +23,13 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
@@ -76,6 +79,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 import javax.validation.Valid;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
@@ -238,7 +243,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo specRespondent1Represented;
     private final YesOrNo specRespondent2Represented;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents;
-    private final String specClaimResponseTimelineList;
+    private final TimelineUploadTypeSpec specClaimResponseTimelineList;
     private final ResponseDocument specResponseTimelineDocumentFiles;
     private final List<Evidence> specResponselistYourEvidenceList;
 
@@ -411,8 +416,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String detailsOfDirection;
 
     private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
-    private final String hearingPreferredRegionId;
-    private final String hearingBaseLocation;
+    private final CaseLocation caseManagementLocation;
+    private final String locationName;
     private final DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;
     private final String bothDefendants;
@@ -457,7 +462,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearingDJ;
     private DisposalHearingBundle disposalHearingBundleDJ;
     private DisposalHearingNotes disposalHearingNotesDJ;
-
     //default judgement SDO fields for trial
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
     private TrialHearingDisclosureOfDocuments trialHearingDisclosureOfDocumentsDJ;
@@ -470,4 +474,40 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private TrialCreditHire trialCreditHire;
     private TrialPersonalInjury trialPersonalInjury;
     private TrialRoadTrafficAccident trialRoadTrafficAccident;
+
+    private String caseManagementOrderSelection;
+    private Document orderSDODocumentDJ;
+
+
+    /**
+     * There are several fields that can hold the I2P of applicant1 depending
+     * on multiparty scenario, which complicates all conditions depending on it.
+     * This method tries to simplify those conditions since only one field will be
+     * meaningful for that.
+     *
+     * @return value set among the fields that hold the I2P of applicant1
+     */
+    @JsonIgnore
+    public YesOrNo getApplicant1ProceedsWithClaimSpec() {
+        return Stream.of(
+                applicant1ProceedWithClaim,
+                getApplicant1ProceedWithClaimSpec2v1()
+            )
+            .filter(Objects::nonNull)
+            .findFirst().orElse(null);
+    }
+
+    public YesOrNo getRespondent1Represented() {
+        return Stream.of(respondent1Represented,
+                         specRespondent1Represented)
+            .filter(Objects::nonNull)
+            .findFirst().orElse(null);
+    }
+
+    public YesOrNo getRespondent2Represented() {
+        return Stream.of(respondent2Represented,
+                         specRespondent2Represented)
+            .filter(Objects::nonNull)
+            .findFirst().orElse(null);
+    }
 }

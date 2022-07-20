@@ -161,6 +161,31 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            assertThat(response.getData()).extracting("fastTrackAltDisputeResolutionToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackVariationOfDirectionsToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackSettlementToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackDisclosureOfDocumentsToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackWitnessOfFactToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackSchedulesOfLossToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackCostsToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackTrialToggle").isNotNull();
+            assertThat(response.getData()).extracting("fastTrackMethodToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocumentsToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingWitnessOfFactToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingMedicalEvidenceToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingQuestionsToExpertsToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingMethodToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingBundleToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingClaimSettlingToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingCostsToggle").isNotNull();
+            assertThat(response.getData()).extracting("disposalHearingApplicationsOrderToggle").isNotNull();
+            assertThat(response.getData()).extracting("smallClaimsHearingToggle").isNotNull();
+            assertThat(response.getData()).extracting("smallClaimsMethodToggle").isNotNull();
+            assertThat(response.getData()).extracting("smallClaimsDocumentsToggle").isNotNull();
+            assertThat(response.getData()).extracting("smallClaimsWitnessStatementToggle").isNotNull();
+
             assertThat(response.getData()).extracting("disposalHearingJudgesRecital").extracting("input")
                 .isEqualTo("Upon considering the claim Form and Particulars of Claim/statements of case "
                                + "[and the directions questionnaires] \n\n"
@@ -304,7 +329,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(22).toString());
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("date2")
-                .isEqualTo(LocalDate.now().plusWeeks(34).toString());
+                .isEqualTo(LocalDate.now().plusWeeks(30).toString());
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("input2")
                 .isEqualTo("If either party considers that the time estimate is insufficient, they must inform the "
                                + "court within 7 days of the date of this Order.");
@@ -371,7 +396,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "c. Evidence of any loan, overdraft or other credit facilities available to the "
                                + "claimant");
             assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input2")
-                .isEqualTo("The claimant must file and serve a witness statement addressing, (a) need to hire a "
+                .isEqualTo("3. The claimant must file and serve a witness statement addressing, (a) need to hire a "
                                + "replacement vehicle and (b) impecuniosity no later than 4pm on");
             assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(8).toString());
@@ -429,6 +454,72 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackRoadTrafficAccident").extracting("input")
                 .isEqualTo("Photographs and/or a plan of the location of the accident shall be prepared and "
                                + "agreed by the parties.");
+
+            assertThat(response.getData()).extracting("smallClaimsJudgesRecital").extracting("input")
+                .isEqualTo("District Judge Perna has considered the statements of case and the information "
+                               + "provided by the parties,"
+                               + " \n\nIT IS ORDERED that:-");
+
+            assertThat(response.getData()).extracting("smallClaimsJudgementDeductionValue").isEqualTo(null);
+
+            assertThat(response.getData()).extracting("smallClaimsHearing").extracting("input1")
+                .isEqualTo("The hearing of the claim will be on a date to be notified to you by a separate "
+                               + "notification. The hearing will have a time estimate of");
+            assertThat(response.getData()).extracting("smallClaimsHearing").extracting("input2")
+                .isEqualTo("The claimant must by no later than 14 days before the hearing date, pay the court the "
+                               + "required hearing fee or submit a fully completed application for Help with Fees. "
+                               + "If the claimant fails to pay the fee or obtain a fee exemption by that time the "
+                               + "claim will be struck without further order.");
+
+            assertThat(response.getData()).extracting("smallClaimsDocuments").extracting("input1")
+                .isEqualTo("Each party must send to the other party(ies) and to the court office to be received not "
+                               + "less than 14 days before the hearing, copies of all documents which they wish "
+                               + "the court to consider when reaching its decision.");
+            assertThat(response.getData()).extracting("smallClaimsDocuments").extracting("input2")
+                .isEqualTo("The court may refuse to consider any document which has not been sent to the other "
+                               + "party/ies and the court as set out above.");
+
+            assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("input1")
+                .isEqualTo("Each party must send to the other party(ies) and to the court office to be received not "
+                               + "less than 14 days before the hearing, copies of the statements of any witness "
+                               + "(including themselves) upon whose evidence they intend to rely at the hearing. "
+                               + "This is limited to");
+            assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("input2")
+                .isEqualTo(null);
+            assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("input3")
+                .isEqualTo(null);
+            assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("input4")
+                .isEqualTo("For this limitation, a party is counted as a witness.");
+            assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("text")
+                .isEqualTo("A witness statement must: \na) Start with the name of the case and the claim number;"
+                               + "\nb) State the full name and address of the witness; "
+                               + "\nc) Set out the witness's evidence clearly in numbered paragraphs on numbered pages;"
+                               + "\nd) End with this paragraph: 'I believe that the facts stated in this witness "
+                               + "statement are true. I understand that proceedings for contempt of court may be "
+                               + "brought against anyone who makes, or causes to be made, a false statement in a "
+                               + "document verified by a statement of truth without an honest belief in its truth'."
+                               + "\ne) be signed by the witness and dated."
+                               + "\nf) If a witness is unable to read the statement there must be a certificate that "
+                               + "it has been read or interpreted to the witness by a suitably qualified person and "
+                               + "at the final hearing there must be an independent interpreter who will not be "
+                               + "provided by the Court."
+                               + "\n\nThe judge may refuse to allow a witness to give evidence or consider any "
+                               + "statement of any witness whose statement has not been sent to the court and the "
+                               + "other party/ies in accordance with the paragraphs above."
+                               + "\n\nA witness whose statement is sent in accordance with the above should attend "
+                               + "the hearing, If they do not attend, it will be for the court to decide how much "
+                               + "reliance, if any, to place on their evidence.");
+
+            assertThat(response.getData()).extracting("smallClaimsPreferredTelephone").extracting("telephone")
+                .isEqualTo("N/A");
+
+            assertThat(response.getData()).extracting("smallClaimsPreferredEmail").extracting("email")
+                .isEqualTo("N/A");
+
+            assertThat(response.getData()).extracting("smallClaimsNotes").extracting("input")
+                .isEqualTo("This Order has been made without a hearing. Each party has the right to apply to have "
+                               + "this Order set aside or varied. Any such application must be received by the Court "
+                               + "(together with the appropriate fee) by 4pm on");
 
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input1")
                 .isEqualTo("1. If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
@@ -494,6 +585,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("disposalHearingJudgementDeductionValue").extracting("value")
                 .isEqualTo("12%");
+            assertThat(response.getData()).extracting("fastTrackJudgementDeductionValue").extracting("value")
+                .isEqualTo("12%");
+            assertThat(response.getData()).extracting("smallClaimsJudgementDeductionValue").extracting("value")
+                .isEqualTo("12%");
         }
 
         @Test
@@ -517,6 +612,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingPreferredTelephone").extracting("telephone")
                 .isEqualTo("000");
             assertThat(response.getData()).extracting("disposalHearingPreferredEmail").extracting("email")
+                .isEqualTo("test@email.com");
+            assertThat(response.getData()).extracting("fastTrackPreferredTelephone").extracting("telephone")
+                .isEqualTo("000");
+            assertThat(response.getData()).extracting("fastTrackPreferredEmail").extracting("email")
+                .isEqualTo("test@email.com");
+            assertThat(response.getData()).extracting("smallClaimsPreferredTelephone").extracting("telephone")
+                .isEqualTo("000");
+            assertThat(response.getData()).extracting("smallClaimsPreferredEmail").extracting("email")
                 .isEqualTo("test@email.com");
         }
     }
