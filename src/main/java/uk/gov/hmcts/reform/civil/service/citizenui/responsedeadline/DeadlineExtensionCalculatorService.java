@@ -13,6 +13,8 @@ public class DeadlineExtensionCalculatorService {
     private final WorkingDayIndicator workingDayIndicator;
 
     public LocalDate calculateExtendedDeadline(LocalDate dateProposed){
-        return workingDayIndicator.isWorkingDay(dateProposed)? dateProposed : workingDayIndicator.getNextWorkingDay(dateProposed);
+        return workingDayIndicator.isWorkingDay(dateProposed)
+            ? dateProposed
+            : workingDayIndicator.getNextWorkingDay(dateProposed);
     }
 }
