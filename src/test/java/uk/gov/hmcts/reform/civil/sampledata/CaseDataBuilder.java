@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingBundleType;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -49,6 +51,7 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
@@ -70,6 +73,8 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
@@ -274,7 +279,9 @@ public class CaseDataBuilder {
     private DisposalHearingMethodDJ trialHearingMethodDJ;
     private DisposalHearingMethodDJ disposalHearingMethodDJ;
     private DynamicList trialHearingMethodInPersonDJ;
-    private DynamicList disposalHearingMethodInPersonDJ;
+    private DisposalHearingBundle disposalHearingBundleDJ;
+    private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearingDJ;
+    private TrialHearingTrial trialHearingTrialDJ;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1272,6 +1279,46 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimIssuedTrialLocationInPerson() {
         trialHearingMethodInPersonDJ = DynamicList.builder().value(
             DynamicListElement.builder().label("Court 1").build()).build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedTrialHearingInfo() {
+        trialHearingTrialDJ = TrialHearingTrial
+            .builder()
+            .input1("The time provisionally allowed for the trial is")
+            .date1(LocalDate.now().plusWeeks(22))
+            .date2(LocalDate.now().plusWeeks(34))
+            .input2("If either party considers that the time estimates is"
+                        + " insufficient, they must inform the court within "
+                        + "7 days of the date of this order.")
+            .input3("Not more than seven nor less than three clear days before "
+                        + "the trial, the claimant must file at court and serve an"
+                        + "indexed and paginated bundle of documents which complies"
+                        + " with the requirements of Rule 39.5 Civil "
+                        + "Procedure Rules"
+                        + " and Practice Direction 39A. The parties must "
+                        + "endeavour to agree the contents of the "
+                        + "bundle before it is filed. "
+                        + "The bundle will include a case summary"
+                        + " and a chronology.")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedDisposalHearingInPerson() {
+        disposalHearingBundleDJ = DisposalHearingBundle.builder()
+            .input("The claimant must lodge at court at least 7 "
+                       + "days before the disposal")
+            .type(DisposalHearingBundleType.DOCUMENTS)
+            .build();
+        disposalHearingFinalDisposalHearingDJ = DisposalHearingFinalDisposalHearing
+            .builder()
+            .input("This claim be listed for final "
+                       + "disposal before a Judge on the first "
+                       + "available date after.")
+            .date(LocalDate.now().plusWeeks(16))
+            .time(DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES)
+            .build();
         return this;
     }
 
@@ -3027,6 +3074,9 @@ public class CaseDataBuilder {
             .trialHearingMethodDJ(trialHearingMethodDJ)
             .disposalHearingMethodDJ(disposalHearingMethodDJ)
             .trialHearingMethodInPersonDJ(trialHearingMethodInPersonDJ)
+            .disposalHearingBundleDJ(disposalHearingBundleDJ)
+            .disposalHearingFinalDisposalHearingDJ(disposalHearingFinalDisposalHearingDJ)
+            .trialHearingTrialDJ(trialHearingTrialDJ)
             .build();
     }
 }
