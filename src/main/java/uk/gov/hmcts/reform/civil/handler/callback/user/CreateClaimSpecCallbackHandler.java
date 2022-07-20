@@ -372,7 +372,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
 
         if (caseData.getRespondent1Represented() == NO) {
-            dataBuilder.caseToPostLRspec(CaseToPostLRspec.builder()
+            dataBuilder.respondent1CaseToPostLRspec(CaseToPostLRspec.builder()
                                        .accessCode(AccessCodeGenerator.generateAccessCode()).build());
         }
 
