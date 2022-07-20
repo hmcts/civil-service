@@ -95,7 +95,9 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private final boolean trialPersonalInjuryAddSection;
     private final boolean trialRoadTrafficAccidentAddSection;
     private final boolean trialHousingDisrepairAddSection;
+    private final boolean trialHearingMethodInPersonAddSection;
 
     private final String trialDays;
     private final String trialHearingMethod;
+    private final String trialHearingLocation;
 }

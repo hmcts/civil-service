@@ -26,6 +26,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional.OrderTypeTrialAdditionalDirectionsEmployersLiability;
 import static uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle.SHOW;
+import static uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ.disposalHearingMethodInPerson;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_DISPOSAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_TRIAL;
 
@@ -139,6 +140,9 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialHearingMethod(fillDisposalHearingMethod(caseData.getTrialHearingMethodDJ()))
             .trialHousingDisrepair(caseData.getTrialHousingDisrepair())
             .trialHousingDisrepairAddSection(nonNull(caseData.getTrialHousingDisrepair()))
+            .trialHearingMethodInPersonAddSection(checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ()))
+            .trialHearingLocation(checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ())
+                                      ? caseData.getTrialHearingMethodInPersonDJ().getValue().getLabel() : null)
             .applicant(caseData.getApplicant1().getPartyName().toUpperCase())
             .respondent(checkDefendantRequested(caseData).toUpperCase()).build();
     }
@@ -201,6 +205,10 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             default:
                 return null;
         }
+    }
+
+    private boolean checkDisposalHearingMethod(DisposalHearingMethodDJ method) {
+        return method.equals(disposalHearingMethodInPerson);
     }
 
     private String getTrialDays(TrialHearingTrial trial) {

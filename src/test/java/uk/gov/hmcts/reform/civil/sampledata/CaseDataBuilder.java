@@ -273,6 +273,8 @@ public class CaseDataBuilder {
     private LocalDateTime addLegalRepDeadline;
     private DisposalHearingMethodDJ trialHearingMethodDJ;
     private DisposalHearingMethodDJ disposalHearingMethodDJ;
+    private DynamicList trialHearingMethodInPersonDJ;
+    private DynamicList disposalHearingMethodInPersonDJ;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1264,6 +1266,12 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimIssuedTrialSDOInPersonHearing() {
         trialHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodInPerson;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedTrialLocationInPerson() {
+        trialHearingMethodInPersonDJ = DynamicList.builder().value(
+            DynamicListElement.builder().label("Court 1").build()).build();
         return this;
     }
 
@@ -3018,6 +3026,7 @@ public class CaseDataBuilder {
             .caseManagementOrderSelection(caseManagementOrderSelection)
             .trialHearingMethodDJ(trialHearingMethodDJ)
             .disposalHearingMethodDJ(disposalHearingMethodDJ)
+            .trialHearingMethodInPersonDJ(trialHearingMethodInPersonDJ)
             .build();
     }
 }
