@@ -182,8 +182,8 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
                 .extracting("camundaEvent", "status")
                 .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
 
-            assertThat(response.getData()).extracting("respondent1LitigationFriend").isNull();
-            assertThat(response.getData()).extracting("respondent2LitigationFriend").isNull();
+            assertThat(response.getData()).doesNotHaveToString("respondent1LitigationFriend");
+            assertThat(response.getData()).doesNotHaveToString("respondent2LitigationFriend");
 
         }
 
@@ -204,7 +204,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
             assertThat(response.getData()).extracting("respondent1LitigationFriendDate").isNotNull();
             assertThat(response.getData()).extracting("respondent1LitigationFriendCreatedDate").isNotNull();
-            assertThat(response.getData()).extracting("respondent2LitigationFriend").isNull();
+            assertThat(response.getData()).doesNotHaveToString("respondent2LitigationFriend");
 
         }
 
@@ -222,7 +222,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
                 .extracting("camundaEvent", "status")
                 .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
 
-            assertThat(response.getData()).extracting("respondent1LitigationFriend").isNull();
+            assertThat(response.getData()).doesNotHaveToString("respondent1LitigationFriend");
             assertThat(response.getData()).extracting("respondent2LitigationFriend").isNotNull();
             assertThat(response.getData()).extracting("respondent2LitigationFriendDate").isNotNull();
             assertThat(response.getData()).extracting("respondent2LitigationFriendCreatedDate").isNotNull();
@@ -268,7 +268,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
                 .extracting("camundaEvent", "status")
                 .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
 
-            assertThat(response.getData()).extracting("respondent1LitigationFriend").isNull();
+            assertThat(response.getData()).doesNotHaveToString("respondent1LitigationFriend");
             assertThat(response.getData()).extracting("respondent2LitigationFriend").isNotNull();
 
         }
@@ -289,7 +289,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
                 .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
 
             assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
-            assertThat(response.getData()).extracting("respondent2LitigationFriend").isNull();
+            assertThat(response.getData()).doesNotHaveToString("respondent2LitigationFriend");
 
         }
 
@@ -328,7 +328,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
                 .containsOnly(ADD_DEFENDANT_LITIGATION_FRIEND.name(), "READY");
 
             assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
-            assertThat(response.getData()).extracting("respondent2LitigationFriend").isNull();
+            assertThat(response.getData()).doesNotHaveToString("respondent2LitigationFriend");
 
         }
 
@@ -367,7 +367,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             assertThat(response.getData()).extracting("respondent1LitigationFriend").isNotNull();
             assertThat(response.getData()).extracting("respondent1LitigationFriendDate").isNotNull();
             assertThat(response.getData()).extracting("respondent1LitigationFriendCreatedDate").isNotNull();
-            assertThat(response.getData()).extracting("respondent2LitigationFriend").isNull();
+            assertThat(response.getData()).doesNotHaveToString("respondent2LitigationFriend");
         }
 
         @Test
@@ -390,7 +390,7 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
             assertThat(response.getData()).extracting("respondent2LitigationFriend").isNotNull();
             assertThat(response.getData()).extracting("respondent2LitigationFriendDate").isNotNull();
             assertThat(response.getData()).extracting("respondent2LitigationFriendCreatedDate").isNotNull();
-            assertThat(response.getData()).extracting("respondent1LitigationFriend").isNull();
+            assertThat(response.getData()).doesNotHaveToString("respondent1LitigationFriend");
         }
 
     }
