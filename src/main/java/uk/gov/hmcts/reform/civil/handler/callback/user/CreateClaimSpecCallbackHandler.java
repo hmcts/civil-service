@@ -378,7 +378,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             && toggleService.isPinInPostEnabled()) {
             dataBuilder.respondent1CaseToPostLRspec(CaseToPostLRspec.builder()
                                                         .accessCode(AccessCodeGenerator.generateAccessCode())
-                                                        .respondentCaseRole(CaseRole.RESPONDENTSOLICITORONESPEC)
+                                                        .respondentCaseRole(
+                                                            CaseRole.RESPONDENTSOLICITORONESPEC.getFormattedName())
                                                         .build());
         }
 

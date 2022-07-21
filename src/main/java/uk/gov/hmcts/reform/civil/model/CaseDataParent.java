@@ -253,6 +253,5 @@ public class CaseDataParent implements MappableObject {
      * Adding for PiP to citizen UI.
      */
     private final CaseToPostLRspec respondent1CaseToPostLRspec;
-    private final CaseToPostLRspec respondent2CaseToPostLRspec;
     private final String respondent1EmailAddress;
 }
