@@ -88,7 +88,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
             );
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
 
-            if(stitchedDocument.getError() != null &&  !stitchedDocument.getError().isEmpty()) {
+            if (stitchedDocument.getError() != null &&  !stitchedDocument.getError().isEmpty()) {
                 return AboutToStartOrSubmitCallbackResponse.builder()
                     .data(caseDataBuilder.build().toMap(objectMapper))
                     .errors(stitchedDocument.getError())

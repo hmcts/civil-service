@@ -106,7 +106,7 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
             log.info("-----------in exception------------");
         }
 
-         return caseDocument;
+        return caseDocument;
     }
 
     private CaseDetails createBundlePayload(
