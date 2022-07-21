@@ -1,15 +1,17 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.function.Predicate;
 
@@ -19,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allResponsesReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeProcessedByCamunda;
@@ -26,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaiting
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesFullDefenceReceivedSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.awaitingResponsesNonFullDefenceReceivedSpec;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.bothDefSameLegalRep;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledgedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
@@ -35,6 +40,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDis
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneRespondentRepresentative;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneUnrepresentedDefendantOnly;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedRespondent1Unrepresented;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedRespondent2Unrepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentatives;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimSpec;
@@ -48,7 +56,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionSpec;
@@ -59,6 +66,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentS
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingClaimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondentTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
@@ -133,7 +141,8 @@ class FlowPredicateTest {
             assertFalse(claimNotified.test(caseData));
         }
 
-        @Test // 1v1 Case / 1v2 Same Solicitor (Field is null)
+        // 1v1 Case / 1v2 Same Solicitor (Field is null)
+        @Test
         void shouldBeClaimNotified_whenSolicitorOptions_isNull() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified_1v1()
@@ -142,7 +151,8 @@ class FlowPredicateTest {
             assertTrue(claimNotified.test(caseData));
         }
 
-        @Test //1v2 - Notify Both Sol
+        //1v2 - Notify Both Sol
+        @Test
         void shouldBeClaimNotified_when1v2DifferentSolicitor_andNotifySolicitorOptions_isBoth() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified_1v2_andNotifyBothSolicitors()
@@ -151,7 +161,8 @@ class FlowPredicateTest {
             assertTrue(claimNotified.test(caseData));
         }
 
-        @Test //1v2 - Notify One Sol
+        //1v2 - Notify One Sol
+        @Test
         void shouldHandOffline_when1v2DifferentSolicitor_andNotifySolicitorOptions_isOneSolicitor() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor()
@@ -207,10 +218,10 @@ class FlowPredicateTest {
     }
 
     @Nested
-    class Respondent1NotRepresented {
+    class RespondentUnrepresented {
 
         @Test
-        void shouldReturnTrue_whenRespondentNotRepresented() {
+        void shouldReturnTrue_whenRespondent1NotRepresented() {
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnrepresentedDefendant().build();
             assertTrue(respondent1NotRepresented.test(caseData));
         }
@@ -219,6 +230,41 @@ class FlowPredicateTest {
         void shouldReturnFalse_whenCaseDataIsAtAwaitingCaseNotificationState() {
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
             assertFalse(respondent1NotRepresented.test(caseData));
+        }
+
+        @Test
+        void shouldResolve_whenOnlyOneUnrepresentedDefendant() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant().build();
+
+            assertTrue(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
+            assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
+        }
+
+        @Test
+        void shouldResolve_whenFirstDefendantUnrepresented() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().build();
+
+            assertFalse(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
+            assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
+            assertFalse(claimSubmittedRespondent2Unrepresented.test(caseData));
+        }
+
+        @Test
+        void shouldResolve_whenSecondDefendantUnrepresented() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant2().build();
+
+            assertFalse(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
+            assertFalse(claimSubmittedRespondent1Unrepresented.test(caseData));
+            assertTrue(claimSubmittedRespondent2Unrepresented.test(caseData));
+        }
+
+        @Test
+        void shouldResolve_whenBothDefendantsUnrepresented() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
+
+            assertFalse(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
+            assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
+            assertTrue(claimSubmittedRespondent2Unrepresented.test(caseData));
         }
     }
 
@@ -659,17 +705,9 @@ class FlowPredicateTest {
 
                 @BeforeEach
                 void setup() {
-                    caseDataBuilder = CaseDataBuilder.builder().multiPartyClaimTwoDefendantSolicitors();
-                }
-
-                @Test
-                void shouldReturnTrue_whenDefendantsBothResponded() {
-                    CaseData caseData = caseDataBuilder
-                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
-                        .respondent2Responds(FULL_DEFENCE)
-                        .build();
-
-                    assertTrue(fullDefence.test(caseData));
+                    caseDataBuilder = CaseDataBuilder.builder()
+                        .multiPartyClaimTwoDefendantSolicitors()
+                        .setSuperClaimTypeToSpecClaim();
                 }
 
                 @Test
@@ -681,17 +719,6 @@ class FlowPredicateTest {
                         .build();
 
                     assertTrue(divergentRespondGoOffline.test(caseData));
-                }
-
-                @Test
-                void shouldGenerateDQAndGoOffline_whenDivergentAndSecondDefendantRespondedWithFullDefence() {
-                    CaseData caseData = CaseDataBuilder.builder()
-                        .multiPartyClaimTwoDefendantSolicitors()
-                        .atStateRespondentPartAdmission()
-                        .respondent2Responds(FULL_DEFENCE)
-                        .build();
-
-                    assertTrue(divergentRespondWithDQAndGoOffline.test(caseData));
                 }
 
                 @Test
@@ -715,16 +742,6 @@ class FlowPredicateTest {
                 }
 
                 @Test
-                void awaitingResponsesFullDefenceReceivedShouldReturnFalse() {
-                    CaseData caseData = caseDataBuilder
-                        .multiPartyClaimTwoDefendantSolicitors()
-                        .atStateRespondentCounterClaimAfterNotifyDetails()
-                        .build();
-
-                    assertFalse(awaitingResponsesFullDefenceReceived.test(caseData));
-                }
-
-                @Test
                 void awaitingResponsesNonFullDefenceReceivedShouldReturnTrue() {
                     CaseData caseData = caseDataBuilder
                         .multiPartyClaimTwoDefendantSolicitors()
@@ -732,16 +749,6 @@ class FlowPredicateTest {
                         .build();
 
                     assertTrue(awaitingResponsesNonFullDefenceReceived.test(caseData));
-                }
-
-                @Test
-                void awaitingResponsesNonFullDefenceReceivedShouldReturnFalse() {
-                    CaseData caseData = caseDataBuilder
-                        .multiPartyClaimTwoDefendantSolicitors()
-                        .atStateRespondentFullDefenceAfterNotifyClaimDetails()
-                        .build();
-
-                    assertFalse(awaitingResponsesNonFullDefenceReceived.test(caseData));
                 }
 
                 @Test
@@ -753,6 +760,48 @@ class FlowPredicateTest {
 
                     assertTrue(fullAdmission.test(caseData));
                 }
+
+                @Test
+                void shouldReturnTrue_whenPredicateDivergentRespondGoOfflineBothNotFullDefence1v2_2() {
+                    CaseData caseData = caseDataBuilder
+                        .atStateRespondent1v2AdmitAll_AdmitPart().build().toBuilder()
+                        .respondent1ResponseDate(LocalDateTime.now())
+                        .respondent2ResponseDate(LocalDateTime.now().plusHours(1))
+                        .build();
+
+                    assertTrue(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnFalse_whenPredicateDivergentRespondGoOffline_default() {
+                    CaseData caseData = CaseData.builder().build();
+                    assertFalse(divergentRespondGoOfflineSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnFalse_whenPredicateDivergentRespondWithDQAndGoOffline_default() {
+                    CaseData caseData = CaseData.builder().build();
+                    assertFalse(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
+                }
+
+                @Test
+                void awaitingRespondent1ResponsesFullDefenceReceivedShouldReturnTrue() {
+                    CaseData caseData = caseDataBuilder
+                        .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                        .build();
+
+                    assertTrue(awaitingResponsesFullDefenceReceivedSpec.test(caseData));
+                }
+
+                @Test
+                void awaitingFirstDefendantResponsesNonFullDefenceReceivedShouldReturnTrue() {
+                    CaseData caseData = caseDataBuilder
+                        .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                        .build();
+
+                    assertTrue(awaitingResponsesNonFullDefenceReceivedSpec.test(caseData));
+                }
+
             }
 
             @Nested
@@ -768,7 +817,7 @@ class FlowPredicateTest {
                     CaseData caseData = caseDataBuilder
                         .atStateRespondentFullDefenceAfterNotifyClaimDetails()
                         .respondent2Responds(FULL_DEFENCE)
-                        .respondentResponseIsSame(YesOrNo.YES)
+                        .respondentResponseIsSame(YES)
                         .build();
 
                     assertTrue(fullDefence.test(caseData));
@@ -779,7 +828,7 @@ class FlowPredicateTest {
                     CaseData caseData = caseDataBuilder
                         .atStateRespondentFullDefenceAfterNotifyClaimDetails()
                         .respondent2Responds(FULL_DEFENCE)
-                        .respondentResponseIsSame(YesOrNo.NO)
+                        .respondentResponseIsSame(NO)
                         .build();
 
                     assertTrue(fullDefence.test(caseData));
@@ -790,7 +839,7 @@ class FlowPredicateTest {
                     CaseData caseData = caseDataBuilder
                         .atStateRespondentFullDefenceAfterNotifyClaimDetails()
                         .respondent2Responds(PART_ADMISSION)
-                        .respondentResponseIsSame(YesOrNo.NO)
+                        .respondentResponseIsSame(NO)
                         .build();
 
                     assertFalse(fullDefence.test(caseData));
@@ -1030,8 +1079,8 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoApplicants()
-                .applicant1ProceedWithClaimMultiParty2v1(YesOrNo.YES)
-                .applicant2ProceedWithClaimMultiParty2v1(YesOrNo.NO)
+                .applicant1ProceedWithClaimMultiParty2v1(YES)
+                .applicant2ProceedWithClaimMultiParty2v1(NO)
                 .build();
             assertTrue(fullDefenceProceed.test(caseData));
         }
@@ -1041,8 +1090,8 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoApplicants()
-                .applicant1ProceedWithClaimMultiParty2v1(YesOrNo.NO)
-                .applicant2ProceedWithClaimMultiParty2v1(YesOrNo.YES)
+                .applicant1ProceedWithClaimMultiParty2v1(NO)
+                .applicant2ProceedWithClaimMultiParty2v1(YES)
                 .build();
             assertTrue(fullDefenceProceed.test(caseData));
         }
@@ -1052,8 +1101,8 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimOneDefendantSolicitor()
-                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.YES)
-                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.NO)
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YES)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
                 .build();
             assertTrue(fullDefenceProceed.test(caseData));
         }
@@ -1063,8 +1112,8 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimOneDefendantSolicitor()
-                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.NO)
-                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.YES)
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(NO)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YES)
                 .build();
             assertTrue(fullDefenceProceed.test(caseData));
         }
@@ -1074,8 +1123,8 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.YES)
-                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.NO)
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YES)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
                 .build();
             assertTrue(fullDefenceProceed.test(caseData));
         }
@@ -1085,8 +1134,8 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.NO)
-                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.YES)
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(NO)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YES)
                 .build();
             assertTrue(fullDefenceProceed.test(caseData));
         }
@@ -1103,7 +1152,7 @@ class FlowPredicateTest {
         void shouldReturnTrue_whenCaseDataAtStateFullDefence1v1AndApplicantNotProceed() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
-                .applicant1ProceedWithClaim(YesOrNo.NO)
+                .applicant1ProceedWithClaim(NO)
                 .build();
             assertTrue(fullDefenceNotProceed.test(caseData));
         }
@@ -1113,8 +1162,8 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoApplicants()
-                .applicant1ProceedWithClaimMultiParty2v1(YesOrNo.NO)
-                .applicant2ProceedWithClaimMultiParty2v1(YesOrNo.NO)
+                .applicant1ProceedWithClaimMultiParty2v1(NO)
+                .applicant2ProceedWithClaimMultiParty2v1(NO)
                 .build();
             assertTrue(fullDefenceNotProceed.test(caseData));
         }
@@ -1124,8 +1173,8 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimOneDefendantSolicitor()
-                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.NO)
-                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.NO)
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(NO)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
                 .build();
             assertTrue(fullDefenceNotProceed.test(caseData));
         }
@@ -1135,8 +1184,8 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.NO)
-                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.NO)
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(NO)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
                 .build();
             assertTrue(fullDefenceNotProceed.test(caseData));
         }
@@ -1544,8 +1593,8 @@ class FlowPredicateTest {
                         .atStateApplicantRespondToDefenceAndProceed()
                         .setSuperClaimTypeToSpecClaim()
                         .multiPartyClaimTwoDefendantSolicitors()
-                        .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.NO)
-                        .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.YES)
+                        .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(NO)
+                        .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YES)
                         .build();
                     assertTrue(fullDefenceProceed.test(caseData));
                 }
@@ -1556,7 +1605,7 @@ class FlowPredicateTest {
                         .atStateApplicantRespondToDefenceAndProceed()
                         .setSuperClaimTypeToSpecClaim()
                         .multiPartyClaimTwoDefendantSolicitors()
-                        .applicant1ProceedWithClaim(YesOrNo.YES)
+                        .applicant1ProceedWithClaim(YES)
                         .build();
                     assertTrue(fullDefenceProceed.test(caseData));
                 }
@@ -1567,7 +1616,7 @@ class FlowPredicateTest {
                         .atStateApplicantRespondToDefenceAndProceed()
                         .setSuperClaimTypeToSpecClaim()
                         .multiPartyClaimTwoApplicants()
-                        .applicant1ProceedWithClaimSpec2v1(YesOrNo.YES)
+                        .applicant1ProceedWithClaimSpec2v1(YES)
                         .build();
                     assertTrue(fullDefenceProceed.test(caseData));
                 }
@@ -1591,7 +1640,7 @@ class FlowPredicateTest {
                         .respondent1ResponseDate(LocalDateTime.now().plusHours(1))
                         .build();
 
-                    assertTrue(divergentRespondGoOfflineSpec.test(caseData));
+                    assertTrue(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
                 }
 
                 @Test
@@ -1602,7 +1651,7 @@ class FlowPredicateTest {
                         .respondent2ResponseDate(LocalDateTime.now().plusHours(1))
                         .build();
 
-                    assertTrue(divergentRespondGoOfflineSpec.test(caseData));
+                    assertTrue(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
                 }
 
                 @Test
@@ -1614,7 +1663,7 @@ class FlowPredicateTest {
                         .respondent1ResponseDate(localDateTime)
                         .build();
 
-                    assertTrue(divergentRespondGoOfflineSpec.test(caseData));
+                    assertTrue(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
                 }
 
                 @Test
@@ -1731,7 +1780,7 @@ class FlowPredicateTest {
                 void shouldReturnTrue_whenDefendantsBothRespondedAndResponsesDivergent() {
                     CaseData caseData = caseDataBuilder
                         .atStateRespondent1v2AdmitAll_AdmitPart().build().toBuilder()
-                        .respondentResponseIsSame(YesOrNo.NO)
+                        .respondentResponseIsSame(NO)
                         .build();
 
                     assertTrue(divergentRespondGoOfflineSpec.test(caseData));
@@ -1741,7 +1790,7 @@ class FlowPredicateTest {
                 void shouldReturnTrue_whenDefendantsOnlyFirstRespondsFullDefenceAndResponsesDivergent() {
                     CaseData caseData = caseDataBuilder
                         .atStateRespondent1v2FullDefence_AdmitPart().build().toBuilder()
-                        .respondentResponseIsSame(YesOrNo.NO)
+                        .respondentResponseIsSame(NO)
                         .build();
 
                     assertTrue(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
@@ -1751,7 +1800,7 @@ class FlowPredicateTest {
                 void shouldReturnTrue_whenDefendantsOnlySecondRespondsFullDefenceAndResponsesDivergent() {
                     CaseData caseData = caseDataBuilder
                         .atStateRespondent1v2AdmintPart_FullDefence().build().toBuilder()
-                        .respondentResponseIsSame(YesOrNo.NO)
+                        .respondentResponseIsSame(NO)
                         .build();
 
                     assertTrue(divergentRespondWithDQAndGoOfflineSpec.test(caseData));
@@ -1762,7 +1811,7 @@ class FlowPredicateTest {
                     CaseData caseData = caseDataBuilder.build().toBuilder()
                         .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                         .respondent1ResponseDate(LocalDateTime.now())
-                        .respondentResponseIsSame(YesOrNo.YES)
+                        .respondentResponseIsSame(YES)
                         .build();
 
                     assertTrue(fullDefenceSpec.test(caseData));
@@ -1774,7 +1823,7 @@ class FlowPredicateTest {
                         .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                         .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                         .respondent1ResponseDate(LocalDateTime.now())
-                        .respondentResponseIsSame(YesOrNo.NO)
+                        .respondentResponseIsSame(NO)
                         .build();
 
                     assertTrue(fullDefenceSpec.test(caseData));
@@ -1785,7 +1834,7 @@ class FlowPredicateTest {
                     CaseData caseData = caseDataBuilder.build().toBuilder()
                         .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                         .respondent1ResponseDate(LocalDateTime.now())
-                        .respondentResponseIsSame(YesOrNo.YES)
+                        .respondentResponseIsSame(YES)
                         .build();
 
                     assertTrue(fullAdmissionSpec.test(caseData));
@@ -1797,7 +1846,7 @@ class FlowPredicateTest {
                         .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                         .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                         .respondent1ResponseDate(LocalDateTime.now())
-                        .respondentResponseIsSame(YesOrNo.NO)
+                        .respondentResponseIsSame(NO)
                         .build();
 
                     assertTrue(fullAdmissionSpec.test(caseData));
@@ -1808,7 +1857,7 @@ class FlowPredicateTest {
                     CaseData caseData = caseDataBuilder.build().toBuilder()
                         .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                         .respondent1ResponseDate(LocalDateTime.now())
-                        .respondentResponseIsSame(YesOrNo.YES)
+                        .respondentResponseIsSame(YES)
                         .build();
 
                     assertTrue(partAdmissionSpec.test(caseData));
@@ -1820,7 +1869,7 @@ class FlowPredicateTest {
                         .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
                         .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
                         .respondent1ResponseDate(LocalDateTime.now())
-                        .respondentResponseIsSame(YesOrNo.NO)
+                        .respondentResponseIsSame(NO)
                         .build();
 
                     assertTrue(counterClaimSpec.test(caseData));
@@ -1831,7 +1880,7 @@ class FlowPredicateTest {
                     CaseData caseData = caseDataBuilder.build().toBuilder()
                         .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                         .respondent1ResponseDate(LocalDateTime.now())
-                        .respondentResponseIsSame(YesOrNo.NO)
+                        .respondentResponseIsSame(NO)
                         .build();
 
                     assertFalse(fullDefenceSpec.test(caseData));
@@ -1867,6 +1916,8 @@ class FlowPredicateTest {
                 @Test
                 void shouldReturnTrue_whenResponsesToBothApplicants() {
                     CaseData caseData = caseDataBuilder.build().toBuilder()
+                        .superClaimType(SuperClaimType.SPEC_CLAIM)
+                        .respondent1ResponseDate(LocalDateTime.now())
                         .claimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                         .claimant2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                         .build();
@@ -1885,5 +1936,92 @@ class FlowPredicateTest {
                 }
             }
         }
+    }
+
+    @Test
+    public void testDisjoint() {
+        CaseData caseData = CaseData.builder()
+            .issueDate(LocalDate.now())
+            .respondent1Represented(YES)
+            .respondent1OrgRegistered(YES)
+            .addRespondent2(NO)
+            .build();
+
+        Assertions.assertTrue(pendingClaimIssued.test(caseData));
+
+        caseData = CaseData.builder()
+            .issueDate(LocalDate.now())
+            .respondent1Represented(YES)
+            .respondent1OrgRegistered(YES)
+            .addRespondent2(YES)
+            .respondent2Represented(YES)
+            .respondent2OrgRegistered(YES)
+            .build();
+
+        Assertions.assertTrue(pendingClaimIssued.test(caseData));
+    }
+
+    @Test
+    public void when1v2ssIssued_thenPendingClaimIssued() {
+        CaseData caseData = CaseData.builder()
+            .issueDate(LocalDate.now())
+            .respondent1Represented(YES)
+            .respondent1OrgRegistered(YES)
+            .respondent2(Party.builder().build())
+            .respondent2Represented(YES)
+            .respondent2SameLegalRepresentative(YES)
+            .build();
+
+        Assertions.assertTrue(pendingClaimIssued.test(caseData));
+        Assertions.assertFalse(
+            ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
+                .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                .and(bothDefSameLegalRep.negate()).test(caseData));
+    }
+
+    @Test
+    public void when1v2dsIssued_thenPendingClaimIssued() {
+        CaseData caseData = CaseData.builder()
+            .issueDate(LocalDate.now())
+            .respondent1Represented(YES)
+            .respondent1OrgRegistered(YES)
+            .respondent2(Party.builder().build())
+            .respondent2Represented(YES)
+            .respondent2SameLegalRepresentative(NO)
+            .respondent2OrgRegistered(YES)
+            .build();
+
+        Assertions.assertTrue(pendingClaimIssued.test(caseData));
+        Assertions.assertFalse(
+            ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
+                .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                .and(bothDefSameLegalRep.negate()).test(caseData));
+    }
+
+    @Test
+    public void whenXv1Issued_thenPendingClaimIssued() {
+        CaseData caseData = CaseData.builder()
+            .issueDate(LocalDate.now())
+            .respondent1Represented(YES)
+            .respondent1OrgRegistered(YES)
+            .build();
+
+        Assertions.assertTrue(pendingClaimIssued.test(caseData));
+        Assertions.assertFalse(
+            ((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                .or((respondent1OrgNotRegistered.and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
+                .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
+                        .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate())))
+                .and(bothDefSameLegalRep.negate()).test(caseData));
     }
 }

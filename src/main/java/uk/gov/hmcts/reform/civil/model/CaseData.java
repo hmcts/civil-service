@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
@@ -22,11 +23,24 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingSchedulesOfLoss;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -49,12 +63,24 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 import javax.validation.Valid;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
@@ -63,7 +89,6 @@ import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 @Jacksonized
 @EqualsAndHashCode(callSuper = true)
 @Data
-@SuppressWarnings("unchecked")
 public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -218,13 +243,31 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo specRespondent1Represented;
     private final YesOrNo specRespondent2Represented;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents;
-    private final String specClaimResponseTimelineList;
+    private final TimelineUploadTypeSpec specClaimResponseTimelineList;
     private final ResponseDocument specResponseTimelineDocumentFiles;
     private final List<Evidence> specResponselistYourEvidenceList;
 
     private final String detailsOfWhyDoesYouDisputeTheClaim;
 
     private final ResponseDocument respondent1SpecDefenceResponseDocument;
+
+    public RespondentResponseTypeSpec getRespondent1ClaimResponseTypeForSpec() {
+
+        if (respondent1ClaimResponseTypeForSpec == null) {
+            return getRespondent1ClaimResponseTestForSpec();
+        } else {
+            return respondent1ClaimResponseTypeForSpec;
+        }
+    }
+
+    public RespondentResponseTypeSpec getRespondent2ClaimResponseTypeForSpec() {
+
+        if (respondent2ClaimResponseTypeForSpec == null) {
+            return getRespondent2ClaimResponseTestForSpec();
+        } else {
+            return respondent2ClaimResponseTypeForSpec;
+        }
+    }
 
     private final RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
     private final RespondentResponseTypeSpec respondent2ClaimResponseTypeForSpec;
@@ -325,6 +368,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo claimantResponseDocumentToDefendant2Flag;
     private YesOrNo claimant2ResponseFlag;
     private RespondentResponseTypeSpec atLeastOneClaimResponseTypeForSpecIsFullDefence;
+    // used only in 2v1
     private YesOrNo specFullAdmissionOrPartAdmission;
     private YesOrNo sameSolicitorSameResponse;
     private YesOrNo specPaidLessAmountOrDisputesOrPartAdmission;
@@ -372,6 +416,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String detailsOfDirection;
 
     private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
+    private final CaseLocation caseManagementLocation;
+    private final String locationName;
     private final DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;
     private final String bothDefendants;
@@ -403,4 +449,65 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonUnwrapped(suffix = "Breathing")
     private final BreathingSpaceInfo breathing;
+    private final String applicantVRespondentText;
+
+    //default judgement SDO fields for disposal
+    private DisposalHearingJudgesRecital disposalHearingJudgesRecitalDJ;
+    private DisposalHearingDisclosureOfDocuments disposalHearingDisclosureOfDocumentsDJ;
+    private DisposalHearingWitnessOfFact disposalHearingWitnessOfFactDJ;
+    private DisposalHearingMedicalEvidence disposalHearingMedicalEvidenceDJ;
+    private DisposalHearingQuestionsToExperts disposalHearingQuestionsToExpertsDJ;
+    private DisposalHearingSchedulesOfLoss disposalHearingSchedulesOfLossDJ;
+    private DisposalHearingStandardDisposalOrder disposalHearingStandardDisposalOrderDJ;
+    private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearingDJ;
+    private DisposalHearingBundle disposalHearingBundleDJ;
+    private DisposalHearingNotes disposalHearingNotesDJ;
+    //default judgement SDO fields for trial
+    private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
+    private TrialHearingDisclosureOfDocuments trialHearingDisclosureOfDocumentsDJ;
+    private TrialHearingWitnessOfFact trialHearingWitnessOfFactDJ;
+    private TrialHearingSchedulesOfLoss trialHearingSchedulesOfLossDJ;
+    private TrialHearingTrial trialHearingTrialDJ;
+    private TrialHearingNotes trialHearingNotesDJ;
+    private TrialBuildingDispute trialBuildingDispute;
+    private TrialClinicalNegligence trialClinicalNegligence;
+    private TrialCreditHire trialCreditHire;
+    private TrialPersonalInjury trialPersonalInjury;
+    private TrialRoadTrafficAccident trialRoadTrafficAccident;
+
+    private String caseManagementOrderSelection;
+    private Document orderSDODocumentDJ;
+
+
+    /**
+     * There are several fields that can hold the I2P of applicant1 depending
+     * on multiparty scenario, which complicates all conditions depending on it.
+     * This method tries to simplify those conditions since only one field will be
+     * meaningful for that.
+     *
+     * @return value set among the fields that hold the I2P of applicant1
+     */
+    @JsonIgnore
+    public YesOrNo getApplicant1ProceedsWithClaimSpec() {
+        return Stream.of(
+                applicant1ProceedWithClaim,
+                getApplicant1ProceedWithClaimSpec2v1()
+            )
+            .filter(Objects::nonNull)
+            .findFirst().orElse(null);
+    }
+
+    public YesOrNo getRespondent1Represented() {
+        return Stream.of(respondent1Represented,
+                         specRespondent1Represented)
+            .filter(Objects::nonNull)
+            .findFirst().orElse(null);
+    }
+
+    public YesOrNo getRespondent2Represented() {
+        return Stream.of(respondent2Represented,
+                         specRespondent2Represented)
+            .filter(Objects::nonNull)
+            .findFirst().orElse(null);
+    }
 }

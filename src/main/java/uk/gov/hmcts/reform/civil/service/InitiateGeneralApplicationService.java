@@ -39,6 +39,7 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -95,6 +96,7 @@ public class InitiateGeneralApplicationService {
     }
 
     private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails, String authToken) {
+        String caseType = "";
 
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
         if (caseData.getGeneralAppEvidenceDocument() != null) {
@@ -113,9 +115,14 @@ public class InitiateGeneralApplicationService {
         if (YES.equals(caseData.getAddRespondent2())) {
             applicationBuilder.defendant2PartyName(caseData.getRespondent2().getPartyName());
         }
-        String deadline = deadlinesCalculator
+        if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+            caseType = "SPEC_CLAIM";
+        } else {
+            caseType = "UNSPEC_CLAIM";
+        }
+        LocalDateTime deadline = deadlinesCalculator
             .calculateApplicantResponseDeadline(
-                LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS).toString();
+                LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS);
         if (caseData.getGeneralAppRespondentAgreement() != null
             && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())) {
             applicationBuilder
@@ -148,8 +155,9 @@ public class InitiateGeneralApplicationService {
             .generalAppReasonsOfOrder(caseData.getGeneralAppReasonsOfOrder())
             .generalAppHearingDetails(caseData.getGeneralAppHearingDetails())
             .generalAppPBADetails(caseData.getGeneralAppPBADetails())
-            .generalAppDeadlineNotification(deadline)
+            .generalAppDateDeadline(deadline)
             .generalAppSubmittedDateGAspec(LocalDateTime.now())
+            .generalAppSuperClaimType(caseType)
             .civilServiceUserRoles(IdamUserDetails.builder().id(userDetails.getId()).email(userDetails.getEmail())
                                        .build())
             .build();

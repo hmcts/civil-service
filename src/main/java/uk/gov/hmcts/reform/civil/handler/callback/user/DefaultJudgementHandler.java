@@ -13,8 +13,12 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
+import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,9 +26,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -32,6 +38,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
@@ -48,13 +56,15 @@ public class DefaultJudgementHandler extends CallbackHandler {
     public static final String JUDGMENT_GRANTED_HEADER = "# Judgment for damages to be decided Granted ";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
     private final ObjectMapper objectMapper;
+    private final LocationRefDataService locationRefDataService;
 
     @Override
     protected Map<String, Callback> callbacks() {
-
         return Map.of(
             callbackKey(ABOUT_TO_START), this::validateDefaultJudgementEligibility,
             callbackKey(MID, "showcertifystatement"), this::checkStatus,
+            callbackKey(MID, "checkPreferredLocations"), this::getLocation,
+            callbackKey(MID, "acceptCPR"), this::acceptCPR,
             callbackKey(MID, "HearingSupportRequirementsDJ"), this::validateDateValues,
             callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm,
             callbackKey(SUBMITTED), this::buildConfirmation
@@ -102,11 +112,26 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
         var caseData = callbackParams.getCaseData();
 
-        List<Element<HearingDates>> hearingDatesElement = caseData.getHearingSupportRequirementsDJ().getHearingDates();
+        List<Element<HearingDates>> hearingDatesElement = caseData
+            .getHearingSupportRequirementsDJ().getHearingDates();
         List<String> errors = (Objects.isNull(hearingDatesElement)) ? null :
             isValidRange(hearingDatesElement);
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        List<LocationRefData> locations = (locationRefDataService
+            .getCourtLocationsForDefaultJudgments(authToken));
+        LocationRefData location = fillPreferredLocationData(locations, caseData.getHearingSupportRequirementsDJ());
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        if (Objects.nonNull(location)) {
+            caseDataBuilder.hearingSupportRequirementsDJ(caseData.getHearingSupportRequirementsDJ().toBuilder()
+                        .hearingPreferredLocation(caseData.getHearingSupportRequirementsDJ()
+                                .getHearingTemporaryLocation().getValue().getLabel()).build())
+                .caseManagementLocation(CaseLocation.builder().region(location.getRegionId()).baseLocation(
+                    location.getEpimmsId()).build());
+            caseDataBuilder.locationName(location.getSiteName());
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
             .build();
     }
@@ -143,7 +168,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     private CallbackResponse checkStatus(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.bothDefendants("One");
         if (caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
             caseDataBuilder.bothDefendants(caseData.getDefendantDetails().getValue().getLabel());
@@ -152,6 +177,34 @@ public class DefaultJudgementHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
 
+    }
+
+    private CallbackResponse getLocation(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        List<LocationRefData> locations = (locationRefDataService
+            .getCourtLocationsForDefaultJudgments(authToken));
+        caseDataBuilder.hearingSupportRequirementsDJ(
+            HearingSupportRequirementsDJ.builder()
+                .hearingTemporaryLocation(getLocationsFromList(locations))
+                .build());
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse acceptCPR(CallbackParams callbackParams) {
+        List<String> errors = new ArrayList<>();
+        var acceptance = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance");
+        var acceptance2Def = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance2Def");
+        if (Objects.isNull(acceptance) && Objects.isNull(acceptance2Def)) {
+            errors.add("To apply for default judgment, all of the statements must apply to the defendant "
+                           + "- if they do not apply, close this page and apply for default judgment when they do");
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
     }
 
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
@@ -164,13 +217,9 @@ public class DefaultJudgementHandler extends CallbackHandler {
             errors.add(format(NOT_VALID_DJ, formattedDeadline));
         }
         List<String> listData = new ArrayList<>();
-        listData.add(caseData.getRespondent1().getIndividualFirstName()
-                         + " "
-                         + caseData.getRespondent1().getIndividualLastName());
+        listData.add(getPartyNameBasedOnType(caseData.getRespondent1()));
         if (nonNull(caseData.getRespondent2())) {
-            listData.add(caseData.getRespondent2().getIndividualFirstName()
-                             + " "
-                             + caseData.getRespondent2().getIndividualLastName());
+            listData.add(getPartyNameBasedOnType(caseData.getRespondent2()));
             listData.add("Both Defendants");
             caseDataBuilder.defendantDetails(DynamicList.fromList(listData));
         }
@@ -185,12 +234,55 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        if (Objects.nonNull(caseData.getHearingSupportRequirementsDJ())) {
+            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ()
+                .toBuilder().hearingTemporaryLocation(null).build();
+            caseDataBuilder
+                .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
+        }
         caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT));
 
+        var state = "PROCEEDS_IN_HERITAGE_SYSTEM";
+        if (caseData.getRespondent2() == null || caseData.getRespondent2() != null
+            && caseData.getDefendantDetails().getValue()
+            .getLabel().startsWith("Both")) {
+            state = "JUDICIAL_REFERRAL";
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .state(state)
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
+        return fromList(locations.stream()
+                            .map(location -> location.getSiteName()
+                                + " - " + location.getCourtAddress()
+                                + " - " + location.getPostcode())
+                            .collect(Collectors.toList()));
+    }
+
+    private LocationRefData fillPreferredLocationData(final List<LocationRefData> locations,
+                                                                        HearingSupportRequirementsDJ data) {
+        if (Objects.isNull(data.getHearingTemporaryLocation()) || Objects.isNull(locations)) {
+            return null;
+        }
+        String locationLabel = data.getHearingTemporaryLocation().getValue().getLabel();
+        var preferredLocation =
+            locations
+                .stream()
+                .filter(locationRefData -> checkLocation(locationRefData,
+                                                         locationLabel)).findFirst();
+        return preferredLocation.orElse(null);
+    }
+
+    private Boolean checkLocation(final LocationRefData location, String locationTempLabel) {
+        String locationLabel = location.getSiteName()
+            + " - " + location.getCourtAddress()
+            + " - " + location.getPostcode();
+        return locationLabel.equals(locationTempLabel);
     }
 
 }

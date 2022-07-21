@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
@@ -23,8 +24,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.GeneralAppSampleDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 
@@ -62,7 +63,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     JacksonAutoConfiguration.class,
     InitiateGeneralApplicationServiceHelper.class
 })
-class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder {
+class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder {
 
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
     private static final LocalDateTime weekdayDate = LocalDate.of(2022, 2, 15).atTime(12, 0);
@@ -397,6 +398,32 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
     }
 
     @Test
+    void shoulAddSpecClaimType() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataSPEC(SuperClaimType.SPEC_CLAIM);
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue()
+                       .getGeneralAppSuperClaimType()).isEqualTo("SPEC_CLAIM");
+    }
+
+    @Test
+    void shoulAddUnSpecClaimType() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataSPEC(null);
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+
+        assertThat(result.getGeneralApplications().size()).isEqualTo(1);
+        assertThat(result.getGeneralApplications().get(0).getValue()
+                       .getGeneralAppSuperClaimType()).isEqualTo("UNSPEC_CLAIM");
+    }
+
+    @Test
     void shouldPopulateInformOtherPartyAndStatementOfTruthIfUnconsented() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
@@ -705,11 +732,10 @@ class InitiateGeneralApplicationServiceTest extends GeneralAppSampleDataBuilder 
 
     @Test
     void shouldReturnDate_whenGeneralAppNotificationDeadlineIsInvoked() {
-        String givenDate = GeneralApplication.builder()
-            .generalAppDeadlineNotification(
-                weekdayDate.toString())
+        LocalDateTime givenDate = GeneralApplication.builder()
+            .generalAppDateDeadline(weekdayDate)
             .build()
-            .getGeneralAppDeadlineNotification();
+            .getGeneralAppDateDeadline();
 
         String actual = "2022-02-15T12:00";
 
