@@ -18,14 +18,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
-import uk.gov.hmcts.reform.civil.service.citizenui.CaseEventService;
+import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
+import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 
@@ -53,7 +56,7 @@ public class CasesController {
         "/{caseId}",
     })
     @ApiOperation("get case by id from CCD")
-    public ResponseEntity<CaseData> getCaseId(
+    public ResponseEntity<CaseDetails> getCaseId(
         @PathVariable("caseId") Long caseId,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
@@ -62,10 +65,10 @@ public class CasesController {
             caseId
         );
 
-        var caseDataResponse = caseDetailsConverter
-            .toCaseData(coreCaseDataService.getCase(caseId, authorisation).getData());
+        var caseDetailsResponse = coreCaseDataService.getCase(caseId, authorisation);
+        log.info("Returning case details: {}", caseDetailsResponse);
 
-        return new ResponseEntity<>(caseDataResponse, HttpStatus.OK);
+        return new ResponseEntity<>(caseDetailsResponse, HttpStatus.OK);
     }
 
     @PostMapping(path = "/")
@@ -117,16 +120,26 @@ public class CasesController {
         return new ResponseEntity<>(defendantClaims, HttpStatus.OK);
     }
 
-    @GetMapping(path = "/defendant/{submitterId}/response/{caseId}/event-token")
-    @ApiOperation("Gets event token for defendant submit response event")
+    @PostMapping(path = "/{caseId}/citizen/{submitterId}/event")
+    @ApiOperation("Submits event")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 401, message = "Not Authorized")})
-    public ResponseEntity<String>
-        getSubmitResponseToken(@PathVariable("submitterId") String submitterId,
-                           @PathVariable("caseId") String caseId,
-                           @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-        String eventToken = caseEventService.getDefendantResponseSpecEventToken(authorization, submitterId, caseId);
-        return new ResponseEntity<>(eventToken, HttpStatus.OK);
+    public ResponseEntity<CaseData>
+        submitEvent(@PathVariable("submitterId") String submitterId,
+                    @PathVariable("caseId") String caseId,
+                    @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+                    @RequestBody EventDto eventDto) {
+        EventSubmissionParams params = EventSubmissionParams
+            .builder()
+            .authorisation(authorization)
+            .caseId(caseId)
+            .userId(submitterId)
+            .event(eventDto.getEvent())
+            .updates(eventDto.getCaseDataUpdate())
+            .build();
+        CaseData caseData = caseDetailsConverter
+            .toCaseData(caseEventService.submitEvent(params));
+        return new ResponseEntity<>(caseData, HttpStatus.OK);
     }
 }
