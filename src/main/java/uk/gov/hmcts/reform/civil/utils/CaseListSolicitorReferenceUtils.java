@@ -40,6 +40,7 @@ public class CaseListSolicitorReferenceUtils {
                     ? ofNullable(caseData.getRespondent1OrganisationPolicy().getOrgPolicyReference())
                     .map(Object::toString).orElse(null) : null,
                 YES.equals(caseData.getAddRespondent2()) && NO.equals(caseData.getRespondent2SameLegalRepresentative())
+                    && caseData.getRespondent2OrganisationPolicy() != null
                     ? ofNullable(caseData.getRespondent2OrganisationPolicy().getOrgPolicyReference())
                     .map(Object::toString).orElse(null) : null));
     }
