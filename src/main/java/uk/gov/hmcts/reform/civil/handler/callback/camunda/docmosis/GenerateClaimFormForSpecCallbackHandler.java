@@ -87,6 +87,18 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
                 caseData
             );
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
+
+            if(stitchedDocument.getError() != null &&  !stitchedDocument.getError().isEmpty()) {
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .data(caseDataBuilder.build().toMap(objectMapper))
+                    .errors(stitchedDocument.getError())
+                    .build();
+            } else {
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .data(caseDataBuilder.build().toMap(objectMapper))
+                    .build();
+            }
+
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
         }

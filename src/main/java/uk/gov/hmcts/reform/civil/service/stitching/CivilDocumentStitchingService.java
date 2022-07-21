@@ -61,6 +61,8 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
             log.info("-----------in exception------------");
         }
 
+        List<String> errors = new ArrayList<>();
+
         CaseData caseData1 =
             bundleRequestExecutor.post(
                 BundleRequest.builder().caseDetails(payload).build(),
@@ -87,20 +89,24 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
                     .createdBy(CREATED_BY)
                     .build();
             } else {
+                errors.add("Stitched document is not present for this case");
+                caseDocument = CaseDocument.builder().error(errors).build();
                 log.info("stitchedDocument is not present----------");
             }
         } else {
+            errors.add("Case data is null for this case");
+            caseDocument = CaseDocument.builder().error(errors).build();
             log.info("Case data is null----------");
         }
         try {
             ObjectMapper mapper = new ObjectMapper();
-            log.info("json- with bundle-----------" + mapper.writeValueAsString(caseDocument));
+            log.info("json- ith bundle at the end-----------" + mapper.writeValueAsString(caseDocument));
 
-        } catch (JsonProcessingException jpe) {
+        } catch (JsonProcessingException pe) {
             log.info("-----------in exception------------");
         }
 
-        return caseDocument;
+         return caseDocument;
     }
 
     private CaseDetails createBundlePayload(
