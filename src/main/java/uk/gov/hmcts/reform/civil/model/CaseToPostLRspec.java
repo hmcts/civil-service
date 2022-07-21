@@ -14,7 +14,7 @@ public class CaseToPostLRspec {
     private final CaseRole respondentCaseRole;
     // private final LocalDate expiryDate;
     // private final String citizenCaseRole;
-    // private final Boolean isAlreadyUse;
+    // private final YesOrNo pinUsedFlg;
 
     @JsonCreator
     public CaseToPostLRspec(@JsonProperty("accessCode") String accessCode,
