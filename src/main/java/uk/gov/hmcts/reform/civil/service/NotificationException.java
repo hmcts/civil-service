@@ -6,4 +6,8 @@ public class NotificationException extends RuntimeException {
         super(cause);
     }
 
+    public NotificationException(String message) {
+        super(new RuntimeException(message));
+    }
+
 }
