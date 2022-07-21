@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -371,9 +372,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder.respondent2Represented(respondent2Represented);
         }
 
-        if (caseData.getRespondent1Represented() == NO) {
+        if (caseData.getRespondent1Represented() == NO
+            && caseData.getAddRespondent2() == NO
+            && caseData.getAddApplicant2() == NO
+            && toggleService.isPinInPostEnabled()) {
             dataBuilder.respondent1CaseToPostLRspec(CaseToPostLRspec.builder()
-                                       .accessCode(AccessCodeGenerator.generateAccessCode()).build());
+                                                        .accessCode(AccessCodeGenerator.generateAccessCode())
+                                                        .respondentCaseRole(CaseRole.RESPONDENTSOLICITORONESPEC)
+                                                        .build());
         }
 
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());

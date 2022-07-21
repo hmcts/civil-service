@@ -12,14 +12,15 @@ public class CaseToPostLRspec {
 
     private final String accessCode;
     private final CaseRole respondentCaseRole;
-    private final String respondentEmail;
+    // private final LocalDate expiryDate;
+    // private final String citizenCaseRole;
+    // private final Boolean isAlreadyUse;
 
     @JsonCreator
     public CaseToPostLRspec(@JsonProperty("accessCode") String accessCode,
-                            @JsonProperty("respondentCaseRole") CaseRole respondentCaseRole,
-                            @JsonProperty("respondentEmail") String respondentEmail) {
+                            @JsonProperty("respondentCaseRole") CaseRole respondentCaseRole
+                            ) {
         this.accessCode = accessCode;
         this.respondentCaseRole = respondentCaseRole;
-        this.respondentEmail = respondentEmail;
     }
 }
