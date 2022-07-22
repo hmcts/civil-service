@@ -145,7 +145,8 @@ public class StateFlowEngine {
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
                     )))
             .transitionTo(CLAIM_SUBMITTED)
-                .onlyIf(claimSubmittedTwoRespondentRepresentatives)
+                .onlyIf(claimSubmittedTwoRespondentRepresentatives
+                            .or(claimSubmittedBothUnregisteredSolicitors))
                 .set(flags -> flags.putAll(
                     // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
                     // camunda diagram for TAKE_CASE_OFFLINE is changed
@@ -161,7 +162,6 @@ public class StateFlowEngine {
                 .onlyIf(noticeOfChangeEnabledAndLiP.negate()
                             .and((claimSubmittedBothRespondentUnrepresented
                                 .or(claimSubmittedOnlyOneRespondentRepresented)
-                                .or(claimSubmittedBothUnregisteredSolicitors)
                                 // this line MUST be removed when NOC toggle(noticeOfChangeEnabledAndLiP) is removed
                                 .or(claimSubmittedOneUnrepresentedDefendantOnly))))
                 .set(flags -> flags.putAll(

@@ -878,6 +878,8 @@ public class CaseDataBuilder {
         respondent2OrganisationPolicy = null;
         respondentSolicitor1OrganisationDetails = null;
         addRespondent2 = YES;
+        respondent1OrgRegistered = null;
+        respondent2OrgRegistered = null;
         return this;
     }
 
@@ -887,6 +889,7 @@ public class CaseDataBuilder {
         respondent2 = null;
         respondent2Represented = null;
         respondent2OrganisationPolicy = null;
+        respondent2OrgRegistered = null;
         return this;
     }
 
@@ -1017,6 +1020,8 @@ public class CaseDataBuilder {
         respondent2SameLegalRepresentative = NO;
         respondent1OrganisationPolicy = null;
         respondent2OrganisationPolicy = null;
+        respondent1Represented = NO;
+        respondent1OrgRegistered = null;
 
         respondentSolicitor2OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg2@email.com")
@@ -1038,6 +1043,7 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
+        respondent2OrgRegistered = null;
         respondent1OrganisationPolicy = null;
         respondent2OrganisationPolicy = null;
 
@@ -1198,6 +1204,27 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimSubmittedTwoRespondentRepresentativesBothUnregistered() {
+        atStateClaimSubmitted();
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
+        respondent2Represented = YES;
+        respondent1OrgRegistered = NO;
+        respondent2OrgRegistered = NO;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmittedRespondent1Unregistered() {
+        atStateClaimSubmitted();
+        respondent1OrgRegistered = NO;
+
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
+        respondent2Represented = YES;
+        respondent2OrgRegistered = YES;
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimSubmittedNoRespondentRepresented() {
         atStateClaimSubmitted();
         addRespondent2 = YES;
@@ -1323,6 +1350,19 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStatePendingClaimIssuedUnregisteredDefendant1v2() {
+        atStatePaymentSuccessful();
+        issueDate = CLAIM_ISSUED_DATE;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = NO;
+        respondent1OrganisationPolicy = null;
+        respondent2OrgRegistered = NO;
+        respondent2OrganisationPolicy = null;
+        respondent2Represented = YES;
+        addRespondent2 = YES;
+        return this;
+    }
+
     public CaseDataBuilder atStatePendingClaimIssuedUnrepresentedDefendant() {
         atStatePaymentSuccessful();
         issueDate = CLAIM_ISSUED_DATE;
@@ -1402,6 +1442,18 @@ public class CaseDataBuilder {
         claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
         ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotified1v1() {
+        atStateClaimNotified();
+        claimDetailsNotificationDate = claimNotificationDate.plusDays(1);
+        claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        respondent2OrgRegistered = null;
+        respondent2Represented = null;
+        addRespondent2 = null;
         return this;
     }
 

@@ -612,7 +612,8 @@ class CaseEventTaskHandlerTest {
         @NotNull
         private Map<String, Boolean> getFlowFlags(FlowState.Main state) {
             if (state.equals(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED)
-                || state.equals(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED)) {
+                || state.equals(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED)
+                || state.equals(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT)) {
                 return Map.of("TWO_RESPONDENT_REPRESENTATIVES", true,
                               "ONE_RESPONDENT_REPRESENTATIVE", false,
                               "RPA_CONTINUOUS_FEED", false,
@@ -642,7 +643,7 @@ class CaseEventTaskHandlerTest {
                     caseDataBuilder.atStatePendingClaimIssuedUnrepresentedDefendant();
                     break;
                 case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
-                    caseDataBuilder.atStatePendingClaimIssuedUnregisteredDefendant();
+                    caseDataBuilder.atStatePendingClaimIssuedUnregisteredDefendant1v2();
                     break;
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
                     caseDataBuilder.atStatePendingClaimIssuedUnrepresentedUnregisteredDefendant();
