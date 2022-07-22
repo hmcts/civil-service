@@ -146,12 +146,14 @@ public class StateFlowEngine {
                     )))
             .transitionTo(CLAIM_SUBMITTED)
                 .onlyIf(claimSubmittedTwoRespondentRepresentatives
-                            // To be removed when NOC is released. Needed for cases with unregistered and unrepresented defendants
+                            // To be removed when NOC is released.
+                            // Needed for cases with unregistered and unrepresented defendants
                             .or(noticeOfChangeEnabledAndLiP.negate()
                                     .and((claimSubmittedBothRespondentUnrepresented
                                         .or(claimSubmittedOnlyOneRespondentRepresented)
                                         .or(claimSubmittedBothUnregisteredSolicitors)
-                                        // this line MUST be removed when NOC toggle(noticeOfChangeEnabledAndLiP) is removed
+                                        // this line MUST be removed when
+                                        // NOC toggle(noticeOfChangeEnabledAndLiP) is removed
                                         .or(claimSubmittedOneUnrepresentedDefendantOnly))))
                 )
                 .set(flags -> flags.putAll(
