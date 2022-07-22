@@ -1198,6 +1198,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimSubmittedTwoRespondentRepresentativesBothUnregistered() {
+        atStateClaimSubmitted();
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
+        respondent2Represented = YES;
+        respondent1OrgRegistered = NO;
+        respondent2OrgRegistered = NO;
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimSubmittedNoRespondentRepresented() {
         atStateClaimSubmitted();
         addRespondent2 = YES;
