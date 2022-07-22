@@ -73,7 +73,7 @@ public class LocationRefDataService {
             .queryParam("is_hearing_location", "Y")
             .queryParam("is_case_management_location", "Y")
             .queryParam("location_type", "Court")
-            .queryParam("court_type_id","10");
+            .queryParam("court_type_id", "10");
         return builder.buildAndExpand(new HashMap<>()).toUri();
     }
 
