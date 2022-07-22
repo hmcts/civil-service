@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDet
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedBothUnregisteredSolicitors;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneRespondentRepresentative;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneUnrepresentedDefendantOnly;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedRespondent1Unrepresented;
@@ -117,6 +118,15 @@ class FlowPredicateTest {
         void shouldReturnTrue_whenCaseDataAtClaimSubmittedTwoRespondentRepresentativesState() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedTwoRespondentRepresentatives().build();
             assertTrue(claimSubmittedTwoRespondentRepresentatives.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtClaimSubmittedTwoRespondentRepresentativesUnregisteredState() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmittedTwoRespondentRepresentativesBothUnregistered()
+                .build();
+            assertTrue(claimSubmittedTwoRespondentRepresentatives.test(caseData));
+            assertTrue(claimSubmittedBothUnregisteredSolicitors.test(caseData));
         }
 
         @Test

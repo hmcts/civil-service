@@ -145,29 +145,21 @@ public class StateFlowEngine {
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
                     )))
             .transitionTo(CLAIM_SUBMITTED)
-                .onlyIf(claimSubmittedTwoRespondentRepresentatives)
+                .onlyIf(claimSubmittedTwoRespondentRepresentatives
+                            // To be removed when NOC is released. Needed for cases with unregistered and unrepresented defendants
+                            .or(noticeOfChangeEnabledAndLiP.negate()
+                                    .and((claimSubmittedBothRespondentUnrepresented
+                                        .or(claimSubmittedOnlyOneRespondentRepresented)
+                                        .or(claimSubmittedBothUnregisteredSolicitors)
+                                        // this line MUST be removed when NOC toggle(noticeOfChangeEnabledAndLiP) is removed
+                                        .or(claimSubmittedOneUnrepresentedDefendantOnly))))
+                )
                 .set(flags -> flags.putAll(
                     // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
                     // camunda diagram for TAKE_CASE_OFFLINE is changed
                     Map.of(
                         FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false,
                         FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
-                        FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
-                        FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
-                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
-                    )))
-            // To be removed when NOC is released. Needed for cases with unregistered and unrepresented defendants
-            .transitionTo(CLAIM_SUBMITTED)
-                .onlyIf(noticeOfChangeEnabledAndLiP.negate()
-                            .and((claimSubmittedBothRespondentUnrepresented
-                                .or(claimSubmittedOnlyOneRespondentRepresented)
-                                .or(claimSubmittedBothUnregisteredSolicitors)
-                                // this line MUST be removed when NOC toggle(noticeOfChangeEnabledAndLiP) is removed
-                                .or(claimSubmittedOneUnrepresentedDefendantOnly))))
-                .set(flags -> flags.putAll(
-                    // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
-                    // camunda diagram for TAKE_CASE_OFFLINE is changed
-                    Map.of(
                         FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
                         FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
