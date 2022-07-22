@@ -72,7 +72,8 @@ public class LocationRefDataService {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
             .queryParam("is_hearing_location", "Y")
             .queryParam("is_case_management_location", "Y")
-            .queryParam("location_type", "Court");
+            .queryParam("location_type", "Court")
+            .queryParam("court_type_id","10");
         return builder.buildAndExpand(new HashMap<>()).toUri();
     }
 
