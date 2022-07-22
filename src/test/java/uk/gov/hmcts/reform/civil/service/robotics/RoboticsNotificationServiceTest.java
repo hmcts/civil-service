@@ -174,7 +174,7 @@ class RoboticsNotificationServiceTest {
         String reference = caseData.getLegacyCaseReference();
         String fileName = format("CaseData_%s.json", reference);
         String message = format("Robotics case data JSON is attached for %s", reference);
-        String subject = format("Robotics case data for %s", reference);
+        String subject = format("LR v LR Case Data for %s", reference);
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
@@ -295,7 +295,7 @@ class RoboticsNotificationServiceTest {
         EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
         String reference = caseData.getLegacyCaseReference();
         String message = format("Multiparty claim data for %s - %s", reference, caseData.getCcdState());
-        String subject = format("Multiparty claim data for %s - %s - %s", reference, caseData.getCcdState(),
+        String subject = format("Multiparty LR v LR Case Data for %s - %s - %s", reference, caseData.getCcdState(),
                                 lastEventText);
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
