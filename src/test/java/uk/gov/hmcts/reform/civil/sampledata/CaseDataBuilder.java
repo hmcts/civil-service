@@ -1350,19 +1350,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStatePendingClaimIssuedUnregisteredDefendant1v2() {
-        atStatePaymentSuccessful();
-        issueDate = CLAIM_ISSUED_DATE;
-        respondent1Represented = YES;
-        respondent1OrgRegistered = NO;
-        respondent1OrganisationPolicy = null;
-        respondent2OrgRegistered = NO;
-        respondent2OrganisationPolicy = null;
-        respondent2Represented = YES;
-        addRespondent2 = YES;
-        return this;
-    }
-
     public CaseDataBuilder atStatePendingClaimIssuedUnrepresentedDefendant() {
         atStatePaymentSuccessful();
         issueDate = CLAIM_ISSUED_DATE;

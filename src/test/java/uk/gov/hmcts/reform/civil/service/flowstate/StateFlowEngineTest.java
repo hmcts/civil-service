@@ -542,10 +542,8 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT.fullName(),
                         TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
                     );
-                assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
                     entry("RPA_CONTINUOUS_FEED", true),
-                    entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                     entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
                 );
