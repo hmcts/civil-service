@@ -152,7 +152,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Test
-        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor2In1v2DSToDS() {
+        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor2In1v2DiffSolicitorToDiffSolicitor() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .multiPartyClaimTwoDefendantSolicitors()
@@ -184,7 +184,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Test
-        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor2In1v2DSToSS() {
+        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor2In1v2DiffSolicitorToSameSolicitor() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .multiPartyClaimTwoDefendantSolicitors()
@@ -217,7 +217,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Test
-        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor2In1v2SSToDS() {
+        void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor2In1v2SameSolicitorToDiffSolicitor() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .multiPartyClaimOneDefendantSolicitor()
