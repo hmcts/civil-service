@@ -380,6 +380,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                                                         .accessCode(AccessCodeGenerator.generateAccessCode())
                                                         .respondentCaseRole(
                                                             CaseRole.RESPONDENTSOLICITORONESPEC.getFormattedName())
+                                                        .pinUsedFlg(NO)
                                                         .build());
         }
 
