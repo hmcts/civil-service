@@ -403,12 +403,6 @@ class StateFlowEngineTest {
                     .atStateClaimIssuedUnrepresentedDefendants()
                     .addLegalRepDeadline(LocalDateTime.now().plusDays(14))
                     .build();
-                if (caseData.getRespondent2OrgRegistered() != null
-                    && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
-                }
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
                 assertThat(stateFlow.getState())
@@ -682,12 +676,6 @@ class StateFlowEngineTest {
             void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRes1UnregisRes2Unrep() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateProceedsOfflineUnregisteredDefendant1UnrepresentedDefendant2().build();
-                if (caseData.getRespondent2OrgRegistered() != null
-                    && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
-                }
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
                 assertThat(stateFlow.getState())
