@@ -76,6 +76,13 @@ public class CaseDetailsBuilder {
         return this;
     }
 
+    public CaseDetailsBuilder atStateAwaitingRespondentAcknowledgement1v1() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified1v1().build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
+        return this;
+    }
+
     public CaseDetailsBuilder atStateClaimAcknowledge() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         this.data = mapper.convertValue(caseData, Map.class);
@@ -142,6 +149,13 @@ public class CaseDetailsBuilder {
 
     public CaseDetailsBuilder atStateProceedsOffline() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = PROCEEDS_IN_HERITAGE_SYSTEM.name();
+        return this;
+    }
+
+    public CaseDetailsBuilder atStateProceedsOffline1v1() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant().build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = PROCEEDS_IN_HERITAGE_SYSTEM.name();
         return this;
