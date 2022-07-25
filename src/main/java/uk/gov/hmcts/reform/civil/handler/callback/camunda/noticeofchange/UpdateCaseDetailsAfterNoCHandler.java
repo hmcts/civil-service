@@ -80,6 +80,11 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
 
         uk.gov.hmcts.reform.prd.model.Organisation addedOrganisation = organisationService.findOrganisationById(
             changeOfRepresentation.getOrganisationToAddID()).orElse(null);
+        if (addedOrganisation == null) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of("Organisation to add is null"))
+                .build();
+        }
 
         UserDetails addedSolicitorDetails = getInvokerDetails(
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
@@ -91,13 +96,17 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         boolean isApplicantSolicitorRole = isApplicantOrRespondent(replacedSolicitorCaseRole);
 
         if (isApplicantSolicitorRole) {
-            updateApplicantSolicitorDetails(caseDataBuilder, addedSolicitorDetails, addedOrganisation);
+            if (addedOrganisation != null) {
+                updateApplicantSolicitorDetails(caseDataBuilder, addedSolicitorDetails, addedOrganisation);
+            }
         } else {
-            if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
+            if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                && addedOrganisation != null) {
                 updateRespondentSolicitor1Details(caseDataBuilder, addedOrganisation, addedSolicitorDetails);
                 updateAddLegalRepDeadlineIfRespondent1Replaced(caseData, caseDataBuilder);
             } else {
-                if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
+                if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                    && addedOrganisation != null) {
                     updateRespondentSolicitor2Details(caseDataBuilder, addedOrganisation, addedSolicitorDetails);
                     updateAddLegalRepDeadlineIfRespondent2Replaced(caseData, caseDataBuilder);
                 }
