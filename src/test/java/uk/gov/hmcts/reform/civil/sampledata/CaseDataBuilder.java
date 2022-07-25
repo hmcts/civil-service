@@ -3070,10 +3070,10 @@ public class CaseDataBuilder {
             .applicant1ProceedWithClaimSpec2v1(applicant1ProceedWithClaimSpec2v1)
             .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
-            .breathing(breathing)
-            .caseManagementOrderSelection(caseManagementOrderSelection)
             .specRespondent1Represented(specRespondent1Represented)
             .specRespondent2Represented(specRespondent2Represented)
+            .breathing(breathing)
+            .caseManagementOrderSelection(caseManagementOrderSelection)
             .build();
     }
 }
