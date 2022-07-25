@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
@@ -26,6 +28,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.GENERAL_ORDER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SuppressWarnings("unchecked")
@@ -775,4 +779,49 @@ public class GeneralApplicationDetailsBuilder {
         return dynamicList;
     }
 
+    public CaseData getTestCaseDataWithGeneralOrderPDFDocument(CaseData caseData) {
+        return caseData.toBuilder()
+            .ccdCaseReference(1234L)
+            .generalAppType(GAApplicationType.builder()
+                                .types(singletonList(EXTEND_TIME))
+                                .build())
+            .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+            .generalOrderDocument(singletonList(Element.<CaseDocument>builder().value(pdfDocument).build()))
+            .build();
+    }
+
+    public CaseData getTestCaseDataWithDismissalOrderPDFDocument(CaseData caseData) {
+        return caseData.toBuilder()
+            .ccdCaseReference(1234L)
+            .generalAppType(GAApplicationType.builder()
+                                .types(singletonList(EXTEND_TIME))
+                                .build())
+            .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+            .dismissalOrderDocument(singletonList(Element.<CaseDocument>builder().value(pdfDocument).build()))
+            .build();
+    }
+
+    public CaseData getTestCaseDataWithDirectionOrderPDFDocument(CaseData caseData) {
+        return caseData.toBuilder()
+            .ccdCaseReference(1234L)
+            .generalAppType(GAApplicationType.builder()
+                                .types(singletonList(EXTEND_TIME))
+                                .build())
+            .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+            .directionOrderDocument(singletonList(Element.<CaseDocument>builder().value(pdfDocument).build()))
+            .build();
+    }
+
+    public final CaseDocument pdfDocument = CaseDocument.builder()
+        .createdBy("John")
+        .documentName("documentName")
+        .documentSize(0L)
+        .documentType(GENERAL_ORDER)
+        .createdDatetime(LocalDateTime.now())
+        .documentLink(Document.builder()
+                          .documentUrl("fake-url")
+                          .documentFileName("file-name")
+                          .documentBinaryUrl("binary-url")
+                          .build())
+        .build();
 }
