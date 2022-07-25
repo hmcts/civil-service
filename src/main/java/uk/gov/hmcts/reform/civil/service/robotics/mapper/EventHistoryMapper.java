@@ -1838,7 +1838,7 @@ public class EventHistoryMapper {
                                   CaseData caseData) {
         String miscText = "RPA Reason: Case proceeds offline. Judge / Legal Advisor did not draw a Direction's Order: "
             + caseData.getClaimProceedsInCaseman().getOther();
-        LocalDateTime eventDate = LocalDateTime.parse(caseData.getClaimProceedsInCaseman().getDate().toString());
+        LocalDateTime eventDate = caseData.getClaimProceedsInCaseman().getDate().atStartOfDay();
 
         builder.miscellaneous(
             Event.builder()
