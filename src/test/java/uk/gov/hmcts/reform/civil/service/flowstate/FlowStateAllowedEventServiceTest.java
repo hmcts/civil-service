@@ -745,8 +745,8 @@ class FlowStateAllowedEventServiceTest {
                     CaseDetailsBuilder.builder().atStateAwaitingCaseDetailsNotification().build(),
                     ACKNOWLEDGE_CLAIM
                 ),
-                of(false, CaseDetailsBuilder.builder().atStateProceedsOffline().build(), AMEND_PARTY_DETAILS),
-                of(true, CaseDetailsBuilder.builder().atStateAwaitingRespondentAcknowledgement().build(),
+                of(false, CaseDetailsBuilder.builder().atStateProceedsOffline1v1().build(), AMEND_PARTY_DETAILS),
+                of(true, CaseDetailsBuilder.builder().atStateAwaitingRespondentAcknowledgement1v1().build(),
                    AMEND_PARTY_DETAILS
                 ),
                 of(
