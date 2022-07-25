@@ -105,15 +105,23 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         try {
             UserInfo userInfo = userService.getUserInfo(authorisation);
             String userRoles = String.join(",", this.documentManagementConfiguration.getUserRoles());
-            Document documentMetadata = getDocumentMetaData(authorisation, documentPath);
 
-            ResponseEntity<Resource> responseEntity = documentDownloadClientApi.downloadBinary(
+            ResponseEntity<Resource> responseEntity = caseDocumentClientApi.getDocumentBinary(
                 authorisation,
                 authTokenGenerator.generate(),
-                userRoles,
-                userInfo.getUid(),
-                URI.create(documentMetadata.links.binary.href).getPath().replaceFirst("/", "")
+                UUID.fromString(documentPath.substring(documentPath.lastIndexOf("/") + 1))
             );
+
+            if (responseEntity == null) {
+                Document documentMetadata = getDocumentMetaData(authorisation, documentPath);
+                responseEntity = documentDownloadClientApi.downloadBinary(
+                    authorisation,
+                    authTokenGenerator.generate(),
+                    userRoles,
+                    userInfo.getUid(),
+                    URI.create(documentMetadata.links.binary.href).getPath().replaceFirst("/", "")
+                );
+            }
 
             return Optional.ofNullable(responseEntity.getBody())
                 .map(ByteArrayResource.class::cast)
