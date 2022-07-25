@@ -1160,6 +1160,20 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder multiPartyClaimTwoDefendantSolicitorsUnregistered() {
+        atStateClaimDraft();
+        respondent1OrganisationPolicy = null;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = NO;
+
+        addRespondent2 = YES;
+        respondent2OrganisationPolicy = null;
+        respondent2Represented = YES;
+        respondent2OrgRegistered = NO;
+        respondent2SameLegalRepresentative = NO;
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimSubmitted() {
         atStateClaimDraft();
         legacyCaseReference = LEGACY_CASE_REFERENCE;
