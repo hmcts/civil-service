@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 
@@ -10,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -221,8 +225,10 @@ public class FlowPredicate {
                     || caseData.getRespondent2ClaimResponseType().equals(FULL_DEFENCE));
             case ONE_V_TWO_TWO_LEGAL_REP:
                 //scenario: latest response is full defence
-                return !Objects.equals(caseData.getRespondent1ClaimResponseType(),
-                                       caseData.getRespondent2ClaimResponseType())
+                return !Objects.equals(
+                    caseData.getRespondent1ClaimResponseType(),
+                    caseData.getRespondent2ClaimResponseType()
+                )
                     && ((caseData.getRespondent2ClaimResponseType().equals(FULL_DEFENCE)
                     && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()))
                     || (caseData.getRespondent1ClaimResponseType().equals(FULL_DEFENCE)
@@ -243,8 +249,10 @@ public class FlowPredicate {
     private static boolean isDivergentResponsesGoOffline(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
-                return !Objects.equals(caseData.getRespondent1ClaimResponseType(),
-                                       caseData.getRespondent2ClaimResponseType())
+                return !Objects.equals(
+                    caseData.getRespondent1ClaimResponseType(),
+                    caseData.getRespondent2ClaimResponseType()
+                )
                     //scenario: latest response is not full defence
                     && (((!caseData.getRespondent2ClaimResponseType().equals(FULL_DEFENCE)
                     && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate())
@@ -744,4 +752,26 @@ public class FlowPredicate {
 
         return predicate;
     }
+
+    public static final Predicate<CaseData> allAgreedToMediation = caseData -> {
+        if (AllocatedTrack.SMALL_CLAIM ==
+            AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null)
+            && caseData.getResponseClaimMediationSpecRequired() == YesOrNo.YES) {
+            if (caseData.getRespondent2() != null
+                && caseData.getRespondent2SameLegalRepresentative().equals(NO)
+                && caseData.getResponseClaimMediationSpec2Required() == YesOrNo.NO) {
+                return false;
+            }
+            if (Optional.ofNullable(caseData.getApplicant1ClaimMediationSpecRequired())
+                .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
+                .filter(YesOrNo.NO::equals).isPresent()
+                || Optional.ofNullable(caseData.getApplicantMPClaimMediationSpecRequired())
+                .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
+                .filter(YesOrNo.NO::equals).isPresent()) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    };
 }
