@@ -1833,7 +1833,7 @@ public class EventHistoryMapper {
                 return format("agreed extension date: %s", extensionDate);
         }
     }
-    
+
     private void buildSDONotDrawn(EventHistory.EventHistoryBuilder builder,
                                   CaseData caseData) {
 
