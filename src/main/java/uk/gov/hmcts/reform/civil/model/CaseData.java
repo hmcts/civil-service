@@ -478,6 +478,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
 
+    //general application order documents
+    private final List<Element<CaseDocument>> generalOrderDocument;
+    private final List<Element<CaseDocument>> dismissalOrderDocument;
+    private final List<Element<CaseDocument>> directionOrderDocument;
+
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
