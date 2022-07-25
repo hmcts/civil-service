@@ -10,5 +10,6 @@ public enum CaseState {
     PROCEEDS_IN_HERITAGE_SYSTEM,
     JUDICIAL_REFERRAL,
     CASE_PROGRESSION;
+
 }
 
