@@ -80,7 +80,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static java.time.LocalDate.now;
@@ -1379,7 +1378,12 @@ public class CaseDataBuilder {
                 CaseRole.RESPONDENTSOLICITORONE.getFormattedName();
         changeOrganisationRequest = ChangeOrganisationRequest.builder()
             .requestTimestamp(LocalDateTime.now())
-            .caseRoleId(DynamicList.fromList(Collections.singletonList(caseRole)))
+            .caseRoleId(DynamicList.builder()
+                            .value(DynamicListElement.builder()
+                                       .code(caseRole)
+                                       .label(caseRole)
+                                       .build())
+                            .build())
             .organisationToAdd(Organisation.builder()
                                    .organisationID(newOrgID)
                                    .build())

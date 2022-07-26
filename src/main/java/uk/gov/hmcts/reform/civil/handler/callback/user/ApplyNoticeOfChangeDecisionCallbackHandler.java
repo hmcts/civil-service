@@ -14,9 +14,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.CaseAssignmentApi;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.noc.DecisionRequest;
 
@@ -123,6 +125,10 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
      * with setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
      * so it won't be available in the request and cause errors as the field doesn't exist
      * The workaround is to add the field is added manually to the request in case of LiP scenario
+     * Additionally, the org id in the orgpolicy field is removed before Notify Claim as part of a
+     * previous ticket. If NoC is requested at this point, the ChangeOrganisationRequest will have
+     * a null value. To get around this, there is also a check to see if the org ID copy field is
+     * not null and use that instead.
      *
      * @param caseDetails caseDetails
      */
@@ -131,19 +137,55 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
             caseDetails.getData().get(CHANGE_ORGANISATION_REQUEST), ChangeOrganisationRequest.class);
 
         Organisation organisationToRemove = changeOrganisationRequestField.getOrganisationToRemove();
+        DynamicList caseRoleId = changeOrganisationRequestField.getCaseRoleId();
+        String caseRole = caseRoleId.getValue().getCode();
+
+        String orgIdCopyIfExists = getOrgIdCopyIfExists(caseDetails, caseRole);
 
         if (organisationToRemove == null) {
-            ChangeOrganisationRequest build = ChangeOrganisationRequest.builder()
+            ChangeOrganisationRequest.ChangeOrganisationRequestBuilder changeOrganisationRequestBuilder
+                = ChangeOrganisationRequest.builder()
                 .organisationToAdd(changeOrganisationRequestField.getOrganisationToAdd())
-                .organisationToRemove(Organisation.builder()
-                                          .organisationID(null)
-                                          .build())
                 .approvalStatus(changeOrganisationRequestField.getApprovalStatus())
-                .caseRoleId(changeOrganisationRequestField.getCaseRoleId())
-                .requestTimestamp(changeOrganisationRequestField.getRequestTimestamp())
-                .build();
-            caseDetails.getData().put(CHANGE_ORGANISATION_REQUEST, build);
+                .caseRoleId(caseRoleId)
+                .requestTimestamp(changeOrganisationRequestField.getRequestTimestamp());
+            if (orgIdCopyIfExists == null) {
+                changeOrganisationRequestBuilder
+                    .organisationToRemove(Organisation.builder()
+                                              .organisationID(null)
+                                              .build());
+                caseDetails.getData().put(CHANGE_ORGANISATION_REQUEST, changeOrganisationRequestBuilder.build());
+            } else {
+                changeOrganisationRequestBuilder
+                    .organisationToRemove(Organisation.builder()
+                                              .organisationID(orgIdCopyIfExists)
+                                              .build());
+                caseDetails.getData().put(CHANGE_ORGANISATION_REQUEST, changeOrganisationRequestBuilder.build());
+            }
         }
+    }
+
+    private String getOrgIdCopyIfExists(CaseDetails caseDetails, String caseRole) {
+        if (!isApplicant(caseRole)) {
+            if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
+                String respondent1OrganisationIDCopy = objectMapper.convertValue(caseDetails.getData().get(
+                    "respondent1OrganisationIDCopy"), String.class);
+                if (respondent1OrganisationIDCopy != null) {
+                    return respondent1OrganisationIDCopy;
+                }
+            } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
+                String respondent2OrganisationIDCopy = objectMapper.convertValue(caseDetails.getData().get(
+                    "respondent2OrganisationIDCopy"), String.class);
+                if (respondent2OrganisationIDCopy != null) {
+                    return respondent2OrganisationIDCopy;
+                }
+            }
+        }
+        return null;
+    }
+
+    private boolean isApplicant(String caseRole) {
+        return caseRole.equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
     }
 
     @Override
