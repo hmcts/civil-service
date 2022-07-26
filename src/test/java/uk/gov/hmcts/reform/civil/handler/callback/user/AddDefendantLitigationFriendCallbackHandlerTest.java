@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @SpringBootTest(classes = {
     AddDefendantLitigationFriendCallbackHandler.class,
@@ -134,6 +135,8 @@ class AddDefendantLitigationFriendCallbackHandlerTest extends BaseCallbackHandle
         void shouldSetIsRespondent1ToYes_whenInvokedAsRespondent2Solicitor() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateAddRespondent2LitigationFriend_1v2_DiffSolicitor()
+                .respondent2Represented(YES)
+                .respondent2OrgRegistered(YES)
                 .build();
 
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());

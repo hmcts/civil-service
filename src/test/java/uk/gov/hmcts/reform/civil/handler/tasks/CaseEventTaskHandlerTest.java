@@ -30,7 +30,6 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -58,9 +57,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.StartBusinessProcessTaskHandler.FLOW_STATE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
@@ -250,11 +255,7 @@ class CaseEventTaskHandlerTest {
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(state.fullName());
 
             CaseData caseData = getCaseData(state);
-            if (caseData.getRespondent2Represented() == null && caseData.getRespondent2OrgRegistered() != null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YesOrNo.YES)
-                    .build();
-            }
+
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
             when(coreCaseDataService.startUpdate(CASE_ID, PROCEEDS_IN_HERITAGE_SYSTEM))
@@ -619,8 +620,18 @@ class CaseEventTaskHandlerTest {
                               FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
                               FlowFlag.NOTICE_OF_CHANGE.name(), false
                 );
+            } else if (state.equals(TAKEN_OFFLINE_BY_STAFF)
+                || state.equals(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)
+                || state.equals(FULL_ADMISSION)
+                || state.equals(PART_ADMISSION)
+                || state.equals(COUNTER_CLAIM)
+                || state.equals(FULL_DEFENCE_PROCEED)
+                || state.equals(FULL_DEFENCE_NOT_PROCEED)) {
+                return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false,
+                              FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
+                              FlowFlag.NOTICE_OF_CHANGE.name(), false);
             }
-            return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false,
+            return Map.of("RPA_CONTINUOUS_FEED", false,
                           FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
                           FlowFlag.NOTICE_OF_CHANGE.name(), false);
         }
@@ -630,37 +641,67 @@ class CaseEventTaskHandlerTest {
             CaseDataBuilder caseDataBuilder = new CaseDataBuilder().businessProcess(businessProcess);
             switch (state) {
                 case FULL_ADMISSION:
-                    caseDataBuilder.atStateRespondentFullAdmissionAfterNotifyDetails();
+                    caseDataBuilder.atStateRespondentFullAdmissionAfterNotifyDetails()
+                        .addRespondent2(NO)
+                        .respondent2OrgRegistered(null)
+                        .respondent2Represented(null);
                     break;
                 case PART_ADMISSION:
-                    caseDataBuilder.atStateRespondentPartAdmissionAfterNotifyDetails();
+                    caseDataBuilder.atStateRespondentPartAdmissionAfterNotifyDetails()
+                        .addRespondent2(NO)
+                        .respondent2OrgRegistered(null)
+                        .respondent2Represented(null);
                     break;
                 case COUNTER_CLAIM:
-                    caseDataBuilder.atStateRespondentCounterClaimAfterNotifyDetails();
+                    caseDataBuilder.atStateRespondentCounterClaimAfterNotifyDetails()
+                        .addRespondent2(NO)
+                        .respondent2OrgRegistered(null)
+                        .respondent2Represented(null);
                     break;
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
                     caseDataBuilder.atStatePendingClaimIssuedUnrepresentedDefendant();
                     break;
                 case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
-                    caseDataBuilder.atStatePendingClaimIssuedUnregisteredDefendant();
+                    caseDataBuilder.atStatePendingClaimIssuedUnregisteredDefendant()
+                        .respondent1OrgRegistered(NO)
+                        .respondent1OrganisationPolicy(null)
+                        .addRespondent2(YES)
+                        .respondent2Represented(YES)
+                        .respondent2OrgRegistered(NO)
+                        .respondent2OrganisationPolicy(null);
                     break;
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
                     caseDataBuilder.atStatePendingClaimIssuedUnrepresentedUnregisteredDefendant();
                     break;
                 case FULL_DEFENCE_PROCEED:
-                    caseDataBuilder.atStateApplicantRespondToDefenceAndProceed();
+                    caseDataBuilder.atStateApplicantRespondToDefenceAndProceed()
+                        .addRespondent2(NO)
+                        .respondent2OrgRegistered(null)
+                        .respondent2Represented(null);
                     break;
                 case FULL_DEFENCE_NOT_PROCEED:
-                    caseDataBuilder.atStateApplicantRespondToDefenceAndNotProceed();
+                    caseDataBuilder.atStateApplicantRespondToDefenceAndNotProceed()
+                        .addRespondent2(NO)
+                        .respondent2OrgRegistered(null)
+                        .respondent2Represented(null);
                     break;
                 case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
-                    caseDataBuilder.atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor();
+                    caseDataBuilder.atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor()
+                        .addRespondent2(YES)
+                        .respondent2Represented(YES)
+                        .respondent2OrgRegistered(YES);
                     break;
                 case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
-                    caseDataBuilder.atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor();
+                    caseDataBuilder.atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor()
+                        .addRespondent2(YES)
+                        .respondent2Represented(YES)
+                        .respondent2OrgRegistered(YES);;
                     break;
                 case TAKEN_OFFLINE_BY_STAFF:
-                    caseDataBuilder.atStateTakenOfflineByStaff();
+                    caseDataBuilder.atStateTakenOfflineByStaff()
+                        .addRespondent2(NO)
+                        .respondent2Represented(null)
+                        .respondent2OrgRegistered(null);
                     break;
                 default:
                     throw new IllegalStateException("Unexpected flow state " + state.fullName());
