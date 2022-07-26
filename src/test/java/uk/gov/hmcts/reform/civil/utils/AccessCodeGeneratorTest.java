@@ -9,7 +9,7 @@ import static uk.gov.hmcts.reform.civil.utils.AccessCodeGenerator.generateAccess
 public class AccessCodeGeneratorTest {
 
     @Test
-    void shouldReturnNull_whenAllValuesPassedAreNull() {
+    void shouldReturnValueWithSameLengthRequired() {
         String result = generateAccessCode();
         assertNotNull(result);
         assertEquals(result.length(), 12);

@@ -18,9 +18,9 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.CaseToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
+import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -376,11 +376,13 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             && caseData.getAddRespondent2() == NO
             && caseData.getAddApplicant2() == NO
             && toggleService.isPinInPostEnabled()) {
-            dataBuilder.respondent1CaseToPostLRspec(CaseToPostLRspec.builder()
+            LocalDate expiryDate = LocalDate.now().plusDays(180);
+            dataBuilder.respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
                                                         .accessCode(AccessCodeGenerator.generateAccessCode())
                                                         .respondentCaseRole(
                                                             CaseRole.RESPONDENTSOLICITORONESPEC.getFormattedName())
-                                                        .pinUsedFlg(NO)
+                                                        .expiryDate(expiryDate)
+                                                        .pinUsed(NO)
                                                         .build());
         }
 
