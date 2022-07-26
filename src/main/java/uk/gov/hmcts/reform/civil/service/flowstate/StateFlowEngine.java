@@ -247,8 +247,6 @@ public class StateFlowEngine {
                             .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
                     .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
                             .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))
-                            .and(caseData -> MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP
-                                != MultiPartyScenario.getMultiPartyScenario(caseData))
                             .and(bothDefSameLegalRep.negate())
                     )
             )
