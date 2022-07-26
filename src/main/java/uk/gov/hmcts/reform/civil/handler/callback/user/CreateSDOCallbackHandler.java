@@ -727,7 +727,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> updatedData,
         List<OrderDetailsPagesSectionsToggle> checkList
     ) {
-
         updatedData.fastTrackAltDisputeResolutionToggle(checkList);
         updatedData.fastTrackVariationOfDirectionsToggle(checkList);
         updatedData.fastTrackSettlementToggle(checkList);
