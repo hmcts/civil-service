@@ -285,6 +285,7 @@ robotics:
     sender: hmcts.civil@gmail.com
     recipient: hmcts.civil.multiparty.robotics@gmail.com
     multipartyrecipient: hmcts.civil.multiparty.robotics@gmail.com
+    specRecipient: hmcts.civil.multiparty.robotics@gmail.com
 ---
 
 spring:
