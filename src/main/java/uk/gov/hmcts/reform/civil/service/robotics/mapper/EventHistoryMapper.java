@@ -535,7 +535,6 @@ public class EventHistoryMapper {
         }
     }
 
-
     private void buildDefenceFiled(EventHistory.EventHistoryBuilder builder,
                                    CaseData caseData,
                                    LocalDateTime respondentResponseDate,
