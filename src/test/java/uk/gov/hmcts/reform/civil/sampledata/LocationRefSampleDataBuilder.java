@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -294,5 +295,13 @@ public class LocationRefSampleDataBuilder {
         return dynamicList.getListItems().stream()
             .map(DynamicListElement::getLabel)
             .collect(Collectors.toList());
+    }
+
+    protected List<LocationRefData> getSampleCourLocationsRefObject() {
+        return List.of(
+            LocationRefData.builder().epimmsId("111").siteName("Site 1").courtAddress("Adr 1").postcode("AAA 111").build(),
+            LocationRefData.builder().epimmsId("222").siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222").build(),
+            LocationRefData.builder().epimmsId("333").siteName("Site 3").courtAddress("Adr 3").postcode("CCC 333").build()
+        );
     }
 }
