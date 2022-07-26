@@ -693,7 +693,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
     }
 
-    private void setCheckList(CaseData.CaseDataBuilder<?, ?> updatedData, List<OrderDetailsPagesSectionsToggle> checkList) {
+    private void setCheckList(
+        CaseData.CaseDataBuilder<?, ?> updatedData,
+        List<OrderDetailsPagesSectionsToggle> checkList
+    ) {
         updatedData.fastTrackAltDisputeResolutionToggle(checkList);
         updatedData.fastTrackVariationOfDirectionsToggle(checkList);
         updatedData.fastTrackSettlementToggle(checkList);
