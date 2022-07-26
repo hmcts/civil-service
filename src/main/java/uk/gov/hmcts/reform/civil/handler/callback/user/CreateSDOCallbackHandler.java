@@ -136,6 +136,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
+        List<LocationRefData> locations = locationRefDataService.getCourtLocationsForDefaultJudgments(
+            callbackParams.getParams().get(BEARER_TOKEN).toString()
+        );
+
         updatedData
             .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
             .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
@@ -145,6 +149,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .ifPresent(updatedData::caseManagementLocation);
 
         DynamicList locationsList = getLocationList(callbackParams, updatedData, preferredCourt.orElse(null));
+
         updatedData.disposalHearingMethodInPerson(locationsList);
         updatedData.fastTrackMethodInPerson(locationsList);
         updatedData.smallClaimsMethodInPerson(locationsList);
@@ -722,6 +727,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> updatedData,
         List<OrderDetailsPagesSectionsToggle> checkList
     ) {
+
         updatedData.fastTrackAltDisputeResolutionToggle(checkList);
         updatedData.fastTrackVariationOfDirectionsToggle(checkList);
         updatedData.fastTrackSettlementToggle(checkList);
