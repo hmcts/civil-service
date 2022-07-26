@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
@@ -19,6 +21,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
@@ -56,6 +59,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_AD
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_NOT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
@@ -3305,6 +3309,122 @@ class StateFlowEngineTest {
 
         private void applicantDoesntProceed1v1(CaseData.CaseDataBuilder<?, ?> builder) {
             builder.applicant1ProceedWithClaim(NO);
+        }
+    }
+
+    @Nested
+    class FromFullDefence {
+
+        @Test
+        void fullDefenceNoMediationSpec() {
+            CaseData caseData = CaseData.builder()
+                // spec claim
+                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                // claim submitted
+                .submittedDate(LocalDateTime.now())
+                .respondent1Represented(YES)
+                // payment successful
+                .paymentSuccessfulDate(LocalDateTime.now())
+                // pending claim issued
+                .issueDate(LocalDate.now())
+                .respondent1OrgRegistered(YES)
+                // claim issued
+                .claimNotificationDeadline(LocalDateTime.now())
+                // full defence
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .claimNotificationDate(LocalDateTime.now())
+                .build();
+
+            StateFlow fullState = stateFlowEngine.evaluate(caseData);
+            Assertions.assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
+
+            StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
+                                                              .applicant1ProceedWithClaim(YES)
+                                                              .build());
+
+            Assertions.assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
+            Assertions.assertNull(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
+        }
+
+        @Test
+        void fullDefencePartialMediationSpec() {
+            CaseData caseData = CaseData.builder()
+                // spec claim
+                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                // claim submitted
+                .submittedDate(LocalDateTime.now())
+                .respondent1Represented(YES)
+                // payment successful
+                .paymentSuccessfulDate(LocalDateTime.now())
+                // pending claim issued
+                .issueDate(LocalDate.now())
+                .respondent1OrgRegistered(YES)
+                // claim issued
+                .claimNotificationDeadline(LocalDateTime.now())
+                // full defence
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .claimNotificationDate(LocalDateTime.now())
+                // defendant agrees to mediation
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .responseClaimMediationSpecRequired(YES)
+                .build();
+
+            StateFlow fullState = stateFlowEngine.evaluate(caseData);
+            Assertions.assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
+
+            StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
+                                                              .applicant1ProceedWithClaim(YES)
+                                                              .applicant1ClaimMediationSpecRequired(
+                                                                  SmallClaimMedicalLRspec.builder()
+                                                                      .hasAgreedFreeMediation(NO)
+                                                                      .build()
+                                                              )
+                                                              .build());
+
+            Assertions.assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
+            Assertions.assertNull(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
+        }
+
+        @Test
+        void fullDefenceAllMediationSpec() {
+            CaseData caseData = CaseData.builder()
+                // spec claim
+                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                // claim submitted
+                .submittedDate(LocalDateTime.now())
+                .respondent1Represented(YES)
+                // payment successful
+                .paymentSuccessfulDate(LocalDateTime.now())
+                // pending claim issued
+                .issueDate(LocalDate.now())
+                .respondent1OrgRegistered(YES)
+                // claim issued
+                .claimNotificationDeadline(LocalDateTime.now())
+                // full defence
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .claimNotificationDate(LocalDateTime.now())
+                // defendant agrees to mediation
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .responseClaimMediationSpecRequired(YES)
+                .build();
+
+            StateFlow fullState = stateFlowEngine.evaluate(caseData);
+            Assertions.assertEquals(fullState.getState().getName(), FULL_DEFENCE.fullName());
+
+            StateFlow newState = stateFlowEngine.evaluate(caseData.toBuilder()
+                                                              .applicant1ProceedWithClaim(YES)
+                                                              .applicant1ClaimMediationSpecRequired(
+                                                                  SmallClaimMedicalLRspec.builder()
+                                                                      .hasAgreedFreeMediation(YES)
+                                                                      .build()
+                                                              )
+                                                              .build());
+
+            Assertions.assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
+            Assertions.assertEquals(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()), Boolean.TRUE);
         }
     }
 }
