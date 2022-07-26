@@ -422,6 +422,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
     private final CaseLocation caseManagementLocation;
+    private final String locationName;
     private final DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;
     private final String bothDefendants;
@@ -511,6 +512,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private List<DisposalAndTrialHearingDJToggle> trialHearingTrialDJToggle;
 
     private List<CaseManagementOrderAdditional> caseManagementOrderAdditional;
+    //general application order documents
+    private final List<Element<CaseDocument>> generalOrderDocument;
+    private final List<Element<CaseDocument>> dismissalOrderDocument;
+    private final List<Element<CaseDocument>> directionOrderDocument;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
