@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -754,8 +753,8 @@ public class FlowPredicate {
     }
 
     public static final Predicate<CaseData> allAgreedToMediation = caseData -> {
-        if (AllocatedTrack.SMALL_CLAIM ==
-            AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null)
+        if (SPEC_CLAIM == caseData.getSuperClaimType()
+            && AllocatedTrack.SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
             && caseData.getResponseClaimMediationSpecRequired() == YesOrNo.YES) {
             if (caseData.getRespondent2() != null
                 && caseData.getRespondent2SameLegalRepresentative().equals(NO)
