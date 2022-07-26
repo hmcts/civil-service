@@ -19,6 +19,8 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
@@ -64,6 +66,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -133,35 +136,18 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
-        updatedData.disposalHearingMethodInPerson(fromList(fetchLocationData(callbackParams)));
-        updatedData.fastTrackMethodInPerson(fromList(fetchLocationData(callbackParams)));
+        List<LocationRefData> locations = locationRefDataService.getCourtLocationsForDefaultJudgments(
+            callbackParams.getParams().get(BEARER_TOKEN).toString()
+        );
+
+        DynamicList locationsList = fromList(setPreferredLocationFirst(locations, caseData));
+
+        updatedData.disposalHearingMethodInPerson(locationsList);
+        updatedData.fastTrackMethodInPerson(locationsList);
+        updatedData.smallClaimsMethodInPerson(locationsList);
 
         List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
-
-        updatedData.fastTrackAltDisputeResolutionToggle(checkList);
-        updatedData.fastTrackVariationOfDirectionsToggle(checkList);
-        updatedData.fastTrackSettlementToggle(checkList);
-        updatedData.fastTrackDisclosureOfDocumentsToggle(checkList);
-        updatedData.fastTrackWitnessOfFactToggle(checkList);
-        updatedData.fastTrackSchedulesOfLossToggle(checkList);
-        updatedData.fastTrackCostsToggle(checkList);
-        updatedData.fastTrackTrialToggle(checkList);
-        updatedData.fastTrackMethodToggle(checkList);
-        updatedData.disposalHearingDisclosureOfDocumentsToggle(checkList);
-        updatedData.disposalHearingWitnessOfFactToggle(checkList);
-        updatedData.disposalHearingMedicalEvidenceToggle(checkList);
-        updatedData.disposalHearingQuestionsToExpertsToggle(checkList);
-        updatedData.disposalHearingSchedulesOfLossToggle(checkList);
-        updatedData.disposalHearingFinalDisposalHearingToggle(checkList);
-        updatedData.disposalHearingMethodToggle(checkList);
-        updatedData.disposalHearingBundleToggle(checkList);
-        updatedData.disposalHearingClaimSettlingToggle(checkList);
-        updatedData.disposalHearingCostsToggle(checkList);
-        updatedData.disposalHearingApplicationsOrderToggle(checkList);
-        updatedData.smallClaimsHearingToggle(checkList);
-        updatedData.smallClaimsMethodToggle(checkList);
-        updatedData.smallClaimsDocumentsToggle(checkList);
-        updatedData.smallClaimsWitnessStatementToggle(checkList);
+        setCheckList(updatedData, checkList);
 
         DisposalHearingJudgesRecital tempDisposalHearingJudgesRecital = DisposalHearingJudgesRecital.builder()
             .input("Upon considering the claim Form and Particulars of Claim/statements of case"
@@ -707,9 +693,59 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
     }
 
-    private List<String> fetchLocationData(CallbackParams callbackParams) {
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+    private void setCheckList(CaseData.CaseDataBuilder<?, ?> updatedData, List<OrderDetailsPagesSectionsToggle> checkList) {
+        updatedData.fastTrackAltDisputeResolutionToggle(checkList);
+        updatedData.fastTrackVariationOfDirectionsToggle(checkList);
+        updatedData.fastTrackSettlementToggle(checkList);
+        updatedData.fastTrackDisclosureOfDocumentsToggle(checkList);
+        updatedData.fastTrackWitnessOfFactToggle(checkList);
+        updatedData.fastTrackSchedulesOfLossToggle(checkList);
+        updatedData.fastTrackCostsToggle(checkList);
+        updatedData.fastTrackTrialToggle(checkList);
+        updatedData.fastTrackMethodToggle(checkList);
+        updatedData.disposalHearingDisclosureOfDocumentsToggle(checkList);
+        updatedData.disposalHearingWitnessOfFactToggle(checkList);
+        updatedData.disposalHearingMedicalEvidenceToggle(checkList);
+        updatedData.disposalHearingQuestionsToExpertsToggle(checkList);
+        updatedData.disposalHearingSchedulesOfLossToggle(checkList);
+        updatedData.disposalHearingFinalDisposalHearingToggle(checkList);
+        updatedData.disposalHearingMethodToggle(checkList);
+        updatedData.disposalHearingBundleToggle(checkList);
+        updatedData.disposalHearingClaimSettlingToggle(checkList);
+        updatedData.disposalHearingCostsToggle(checkList);
+        updatedData.disposalHearingApplicationsOrderToggle(checkList);
+        updatedData.smallClaimsHearingToggle(checkList);
+        updatedData.smallClaimsMethodToggle(checkList);
+        updatedData.smallClaimsDocumentsToggle(checkList);
+        updatedData.smallClaimsWitnessStatementToggle(checkList);
+    }
 
-        return locationRefDataService.getCourtLocations(authToken);
+    private List<String> setPreferredLocationFirst(List<LocationRefData> locations, CaseData caseData) {
+        String locationLabel = caseData.getCourtLocation().getApplicantPreferredCourt();
+
+        var preferredLocation =
+            locations
+                .stream()
+                .filter(locationRefData -> checkLocation(locationRefData,
+                                                         locationLabel)).findFirst();
+
+        if (preferredLocation.isPresent()) {
+            locations.remove(preferredLocation.get());
+            locations.add(0, preferredLocation.get());
+        }
+
+        return getLocationsFromList(locations);
+    }
+
+    private Boolean checkLocation(final LocationRefData location, String locationTempLabel) {
+        return location.getEpimmsId().equals(locationTempLabel);
+    }
+
+    private List<String> getLocationsFromList(final List<LocationRefData> locations) {
+        return locations.stream()
+            .map(location -> location.getSiteName()
+                + " - " + location.getCourtAddress()
+                + " - " + location.getPostcode())
+            .collect(Collectors.toList());
     }
 }
