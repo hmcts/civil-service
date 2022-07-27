@@ -80,6 +80,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.oneVsOneCase;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.multipartyCase;
 
 class FlowPredicateTest {
 
@@ -1502,6 +1504,12 @@ class FlowPredicateTest {
             CaseData caseData = caseDataBuilder.build().toBuilder().build();
             assertTrue(specClaim.test(caseData));
         }
+
+        @Test
+        void shouldReturnTrue_whenPredicateOneVsOneCase() {
+            CaseData caseData = caseDataBuilder.build().toBuilder().build();
+            assertTrue(oneVsOneCase.test(caseData));
+        }
     }
 
     @Nested
@@ -1777,6 +1785,12 @@ class FlowPredicateTest {
 
                     assertFalse(awaitingResponsesNonFullDefenceReceivedSpec.test(caseData));
                 }
+
+                @Test
+                void shouldReturnTrue_whenPredicateMultipartyCase() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder().build();
+                    assertTrue(multipartyCase.test(caseData));
+                }
             }
 
             @Nested
@@ -1914,6 +1928,12 @@ class FlowPredicateTest {
 
                     assertFalse(awaitingResponsesNonFullDefenceReceivedSpec.test(caseData));
                 }
+
+                @Test
+                void shouldReturnTrue_whenPredicateMultipartyCase() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder().build();
+                    assertTrue(multipartyCase.test(caseData));
+                }
             }
 
             @Nested
@@ -1946,6 +1966,12 @@ class FlowPredicateTest {
                         .build();
 
                     assertFalse(fullDefenceSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenPredicateMultipartyCase() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder().build();
+                    assertTrue(multipartyCase.test(caseData));
                 }
             }
         }
