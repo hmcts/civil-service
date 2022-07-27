@@ -1062,19 +1062,16 @@ public class CaseDataBuilder {
         respondent2Represented = YES;
         respondent2OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
-<<<<<<< HEAD
+
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
             .build();
         respondent2OrganisationPolicy = OrganisationPolicy.builder()
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
             .build();
-=======
-        respondent1OrganisationPolicy = null;
-        respondent2OrganisationPolicy = null;
+
         respondent1Represented = NO;
         respondent1OrgRegistered = null;
->>>>>>> b554d8b63118dd56c75ee70b4174914ca14ed206
 
         respondentSolicitor2OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg2@email.com")
@@ -1096,18 +1093,15 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
-<<<<<<< HEAD
+
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
             .build();
         respondent2OrganisationPolicy = OrganisationPolicy.builder()
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
             .build();
-=======
+
         respondent2OrgRegistered = null;
-        respondent1OrganisationPolicy = null;
-        respondent2OrganisationPolicy = null;
->>>>>>> b554d8b63118dd56c75ee70b4174914ca14ed206
 
         respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg2@email.com")
