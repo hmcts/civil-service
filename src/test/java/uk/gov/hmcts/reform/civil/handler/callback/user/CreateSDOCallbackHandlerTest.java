@@ -126,7 +126,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPrePopulateDisposalHearingPage() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).willReturn(getSampleCourLocationsRefObject());
+            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                .willReturn(getSampleCourLocationsRefObject());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
