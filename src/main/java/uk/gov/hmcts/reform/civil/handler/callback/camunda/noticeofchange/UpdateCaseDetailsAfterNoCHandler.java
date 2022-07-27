@@ -164,7 +164,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             caseDataBuilder.respondentSolicitor2EmailAddress(null);
         }
 
-        //todo multiparty 1v2 ds -> ss or vice versa
+        //todo CIV-3800 multiparty 1v2 ds -> ss or vice versa
         //if (caseData.getRespondent1Represented().equals(YES)
         // && caseData.getRespondent1OrganisationPolicy().getOrganisation().equals(
         //    addedOrganisation)
@@ -191,7 +191,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             caseDataBuilder.respondentSolicitor1EmailAddress(null);
         }
 
-        //todo multiparty 1v2 ds -> ss or vice versa
+        //todo CIV-3800 multiparty 1v2 ds -> ss or vice versa
 
         //if (caseData.getRespondent2() != null && caseData.getRespondent2Represented().equals(YES)
         // && caseData.getRespondent2OrganisationPolicy().getOrganisation().equals(
