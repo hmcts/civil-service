@@ -25,6 +25,9 @@ import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -33,12 +36,14 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialEmployersLiability;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
@@ -462,6 +467,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearingDJ;
     private DisposalHearingBundle disposalHearingBundleDJ;
     private DisposalHearingNotes disposalHearingNotesDJ;
+    private DisposalHearingMethodDJ disposalHearingMethodDJ;
+    private DynamicList trialHearingMethodInPersonDJ;
+    private DynamicList disposalHearingMethodInPersonDJ;
+
     //default judgement SDO fields for trial
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
     private TrialHearingDisclosureOfDocuments trialHearingDisclosureOfDocumentsDJ;
@@ -474,15 +483,39 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private TrialCreditHire trialCreditHire;
     private TrialPersonalInjury trialPersonalInjury;
     private TrialRoadTrafficAccident trialRoadTrafficAccident;
+    private TrialEmployersLiability trialEmployersLiability;
+    private TrialHousingDisrepair trialHousingDisrepair;
+    private DisposalHearingMethodDJ trialHearingMethodDJ;
 
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
 
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingDisclosureOfDocumentsDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingWitnessOfFactDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingMedicalEvidenceDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingQuestionsToExpertsDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingSchedulesOfLossDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingStandardDisposalOrderDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingFinalDisposalHearingDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingBundleDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingClaimSettlingDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingCostsDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> disposalHearingApplicationsDJToggle;
+
+    private List<DisposalAndTrialHearingDJToggle> trialHearingAlternativeDisputeDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialHearingVariationsDirectionsDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialHearingSettlementDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialHearingDisclosureOfDocumentsDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialHearingWitnessOfFactDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialHearingSchedulesOfLossDJToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialHearingCostsToggle;
+    private List<DisposalAndTrialHearingDJToggle> trialHearingTrialDJToggle;
+
+    private List<CaseManagementOrderAdditional> caseManagementOrderAdditional;
     //general application order documents
     private final List<Element<CaseDocument>> generalOrderDocument;
     private final List<Element<CaseDocument>> dismissalOrderDocument;
     private final List<Element<CaseDocument>> directionOrderDocument;
-
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
