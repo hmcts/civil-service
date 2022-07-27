@@ -184,7 +184,9 @@ class RoboticsDataMapperTest {
     @Test
     void shouldMapToRoboticsCaseData_whenOrganisationPolicyIsNotPresent() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants()
-            .respondent1OrganisationPolicy(null).respondentSolicitor1OrganisationDetails(null).build();
+            .respondent1OrganisationPolicy(null)
+            .respondentSolicitor1OrganisationDetails(null)
+            .respondent1OrganisationIDCopy(null).build();
 
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
 

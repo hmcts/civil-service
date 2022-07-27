@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -247,9 +246,9 @@ public class StateFlowEngine {
                             .and(respondent2OrgNotRegistered.negate().and(respondent2NotRepresented.negate())))
                     .or((respondent1OrgNotRegistered.negate().and(respondent1NotRepresented.negate()))
                             .and(respondent2OrgNotRegistered.and(respondent2NotRepresented.negate()))
-                            .and(caseData -> MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP
-                                != MultiPartyScenario.getMultiPartyScenario(caseData)))
-                            .and(bothDefSameLegalRep.negate()))
+                            .and(bothDefSameLegalRep.negate())
+                    )
+            )
             // Unrepresented and Unregistered
             // 1. Def1 unrepresented, Def2 unregistered
             // 2. Def1 unregistered, Def 2 unrepresented

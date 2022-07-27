@@ -94,7 +94,8 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         }
         try {
             ObjectMapper mapper = new ObjectMapper();
-            log.info("json- with bundle-----------" + mapper.writeValueAsString(caseDocument));
+            log.info("json- with bundle-----------");
+            mapper.writeValueAsString(caseDocument);
 
         } catch (JsonProcessingException jpe) {
             log.info("-----------in exception------------");
