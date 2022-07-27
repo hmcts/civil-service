@@ -1459,6 +1459,14 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStatePaymentSuccessfulWithCopyOrganisationOnly() {
+        atStatePaymentSuccessful();
+        respondent1OrganisationIDCopy = respondent1OrganisationPolicy.getOrganisation().getOrganisationID();
+        respondent1OrganisationPolicy = respondent1OrganisationPolicy.toBuilder()
+            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build()).build();
+        return this;
+    }
+
     public CaseDataBuilder atStatePendingClaimIssued() {
         atStatePaymentSuccessful();
         issueDate = CLAIM_ISSUED_DATE;
