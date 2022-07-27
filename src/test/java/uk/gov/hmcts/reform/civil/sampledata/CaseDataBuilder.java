@@ -1414,8 +1414,31 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atState2v1PaymentFailed() {
+        atStateClaimSubmitted();
+        multiPartyClaimTwoApplicants();
+        claimIssuedPaymentDetails = PaymentDetails.builder()
+            .status(FAILED)
+            .errorMessage("Your account is deleted")
+            .errorCode("CA-E0004")
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder atStatePaymentSuccessful() {
         atStateClaimSubmitted();
+        claimIssuedPaymentDetails = PaymentDetails.builder()
+            .status(SUCCESS)
+            .reference("RC-1604-0739-2145-4711")
+            .build();
+        paymentReference = "12345";
+        paymentSuccessfulDate = LocalDateTime.now();
+        return this;
+    }
+
+    public CaseDataBuilder atState2v1PaymentSuccessful() {
+        atStateClaimSubmitted();
+        multiPartyClaimTwoApplicants();
         claimIssuedPaymentDetails = PaymentDetails.builder()
             .status(SUCCESS)
             .reference("RC-1604-0739-2145-4711")

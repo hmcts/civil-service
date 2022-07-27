@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -73,6 +74,12 @@ public class FlowPredicate {
         caseData.getSubmittedDate() != null
             && caseData.getRespondent1Represented() == NO
             && caseData.getAddRespondent2() == NO;
+
+    public static final Predicate<CaseData> claimSubmittedTwoClaimantsOneUnrepresentedDefendantOnly = caseData ->
+        caseData.getSubmittedDate() != null
+            && caseData.getRespondent1Represented() == NO
+            && caseData.getAddRespondent2() == NO
+            &&  MultiPartyScenario.TWO_V_ONE == MultiPartyScenario.getMultiPartyScenario(caseData);
 
     public static final Predicate<CaseData> claimSubmittedRespondent1Unrepresented = caseData ->
         caseData.getSubmittedDate() != null
