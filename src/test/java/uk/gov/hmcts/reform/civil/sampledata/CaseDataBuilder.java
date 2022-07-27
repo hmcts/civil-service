@@ -271,6 +271,9 @@ public class CaseDataBuilder {
     private String caseManagementOrderSelection;
     private LocalDateTime addLegalRepDeadline;
 
+    //update pdf document from general applications
+    private List<Element<CaseDocument>> generalOrderDocument;
+
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
         return this;
@@ -882,6 +885,8 @@ public class CaseDataBuilder {
         respondent2OrganisationPolicy = OrganisationPolicy.builder()
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
             .build();
+        respondent1OrgRegistered = null;
+        respondent2OrgRegistered = null;
         return this;
     }
 
@@ -891,6 +896,7 @@ public class CaseDataBuilder {
         respondent2 = null;
         respondent2Represented = null;
         respondent2OrganisationPolicy = null;
+        respondent2OrgRegistered = null;
         return this;
     }
 
@@ -1026,6 +1032,27 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateProceedsOfflineSameUnregisteredDefendant() {
+        atStatePendingClaimIssuedUnregisteredDefendant();
+        respondent2 = PartyBuilder.builder().individual().build();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent1OrgRegistered = NO;
+        respondent2OrganisationPolicy = null;
+        respondent2Represented = YES;
+        respondent2SameLegalRepresentative = YES;
+
+        respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg@email.com")
+            .organisationName("test org name")
+            .fax("123123123")
+            .dx("test org dx")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
         addRespondent2 = YES;
@@ -1035,12 +1062,19 @@ public class CaseDataBuilder {
         respondent2Represented = YES;
         respondent2OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
+<<<<<<< HEAD
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
             .build();
         respondent2OrganisationPolicy = OrganisationPolicy.builder()
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
             .build();
+=======
+        respondent1OrganisationPolicy = null;
+        respondent2OrganisationPolicy = null;
+        respondent1Represented = NO;
+        respondent1OrgRegistered = null;
+>>>>>>> b554d8b63118dd56c75ee70b4174914ca14ed206
 
         respondentSolicitor2OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg2@email.com")
@@ -1062,12 +1096,18 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
+<<<<<<< HEAD
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
             .build();
         respondent2OrganisationPolicy = OrganisationPolicy.builder()
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
             .build();
+=======
+        respondent2OrgRegistered = null;
+        respondent1OrganisationPolicy = null;
+        respondent2OrganisationPolicy = null;
+>>>>>>> b554d8b63118dd56c75ee70b4174914ca14ed206
 
         respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg2@email.com")
@@ -1190,6 +1230,20 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder multiPartyClaimTwoDefendantSolicitorsUnregistered() {
+        atStateClaimDraft();
+        respondent1OrganisationPolicy = null;
+        respondent1Represented = YES;
+        respondent1OrgRegistered = NO;
+
+        addRespondent2 = YES;
+        respondent2OrganisationPolicy = null;
+        respondent2Represented = YES;
+        respondent2OrgRegistered = NO;
+        respondent2SameLegalRepresentative = NO;
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimSubmitted() {
         atStateClaimDraft();
         legacyCaseReference = LEGACY_CASE_REFERENCE;
@@ -1211,6 +1265,27 @@ public class CaseDataBuilder {
         atStateClaimSubmitted();
         addRespondent2 = YES;
         respondent2SameLegalRepresentative = NO;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmittedTwoRespondentRepresentativesBothUnregistered() {
+        atStateClaimSubmitted();
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
+        respondent2Represented = YES;
+        respondent1OrgRegistered = NO;
+        respondent2OrgRegistered = NO;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmittedRespondent1Unregistered() {
+        atStateClaimSubmitted();
+        respondent1OrgRegistered = NO;
+
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
+        respondent2Represented = YES;
+        respondent2OrgRegistered = YES;
         return this;
     }
 
@@ -1430,6 +1505,18 @@ public class CaseDataBuilder {
         claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
         ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotified1v1() {
+        atStateClaimNotified();
+        claimDetailsNotificationDate = claimNotificationDate.plusDays(1);
+        claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        respondent2OrgRegistered = null;
+        respondent2Represented = null;
+        addRespondent2 = null;
         return this;
     }
 
