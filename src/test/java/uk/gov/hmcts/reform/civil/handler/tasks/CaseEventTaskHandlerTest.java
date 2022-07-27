@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
@@ -710,7 +711,7 @@ class CaseEventTaskHandlerTest {
                 || state.equals(FULL_DEFENCE_NOT_PROCEED)) {
                 return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false,
                               FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
-                              FlowFlag.NOTICE_OF_CHANGE.name(), false);
+                              FlowFlag.NOTICE_OF_CHANGE.name(), true);
             }
             return Map.of("RPA_CONTINUOUS_FEED", false,
                           FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
@@ -745,11 +746,13 @@ class CaseEventTaskHandlerTest {
                 case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
                     caseDataBuilder.atStatePendingClaimIssuedUnregisteredDefendant()
                         .respondent1OrgRegistered(NO)
-                        .respondent1OrganisationPolicy(null)
+                        .respondent1OrganisationPolicy(
+                            OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]").build())
                         .addRespondent2(YES)
                         .respondent2Represented(YES)
                         .respondent2OrgRegistered(NO)
-                        .respondent2OrganisationPolicy(null);
+                        .respondent2OrganisationPolicy(
+                            OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]").build());
                     break;
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
                     caseDataBuilder.atStatePendingClaimIssuedUnrepresentedUnregisteredDefendant();
