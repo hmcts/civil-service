@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -535,7 +534,6 @@ public class EventHistoryMapper {
         }
     }
 
-
     private void buildDefenceFiled(EventHistory.EventHistoryBuilder builder,
                                    CaseData caseData,
                                    LocalDateTime respondentResponseDate,
@@ -964,7 +962,6 @@ public class EventHistoryMapper {
 
     private void buildFullDefenceProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
-        List<String> miscEventText = prepMultipartyProceedMiscText(caseData);
 
         List<Event> replyDefenceForProceedingApplicants = IntStream.range(0, applicantDetails.size())
             .mapToObj(index ->
@@ -1020,20 +1017,6 @@ public class EventHistoryMapper {
                 .collect(Collectors.toList());
             builder.directionsQuestionnaireFiled(dqForProceedingApplicants);
         }
-
-        List<Event> miscText = IntStream.range(0, miscEventText.size())
-            .mapToObj(index ->
-                          Event.builder()
-                              .eventSequence(prepareEventSequence(builder.build()))
-                              .eventCode(MISCELLANEOUS.getCode())
-                              .dateReceived(caseData.getApplicant1ResponseDate())
-                              .eventDetailsText(miscEventText.get(index))
-                              .eventDetails(EventDetails.builder()
-                                                .miscText(miscEventText.get(index))
-                                                .build())
-                              .build())
-            .collect(Collectors.toList());
-        builder.miscellaneous(miscText);
     }
 
     private List<ClaimantResponseDetails> prepareApplicantsDetails(CaseData caseData) {
@@ -1066,67 +1049,6 @@ public class EventHistoryMapper {
                                       .build());
         }
         return applicantsDetails;
-    }
-
-    private List<String> prepMultipartyProceedMiscText(CaseData caseData) {
-        List<String> eventDetailsText = new ArrayList<>();
-        String currentTime = time.now().toLocalDate().toString();
-
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_TWO_ONE_LEGAL_REP:
-            case ONE_V_TWO_TWO_LEGAL_REP: {
-                eventDetailsText.add(String.format(
-                    "RPA Reason: [1 of 2 - %s] Claimant has provided intention: %s against defendant: %s",
-                    currentTime,
-                    YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-                        ? "proceed"
-                        : "not proceed",
-                    caseData.getRespondent1().getPartyName()
-                ));
-                eventDetailsText.add(String.format(
-                    "RPA Reason: [2 of 2 - %s] Claimant has provided intention: %s against defendant: %s",
-                    currentTime,
-                    YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
-                        ? "proceed"
-                        : "not proceed",
-                    caseData.getRespondent2().getPartyName()
-                ));
-                break;
-            }
-            case TWO_V_ONE: {
-                YesOrNo app1Proceeds;
-                YesOrNo app2Proceeds;
-                if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-                    app1Proceeds = caseData.getApplicant1ProceedWithClaimSpec2v1();
-                    app2Proceeds = app1Proceeds;
-                } else {
-                    app1Proceeds = caseData.getApplicant1ProceedWithClaimMultiParty2v1();
-                    app2Proceeds = caseData.getApplicant2ProceedWithClaimMultiParty2v1();
-                }
-                eventDetailsText.add(String.format(
-                    "RPA Reason: [1 of 2 - %s] Claimant: %s has provided intention: %s",
-                    currentTime,
-                    caseData.getApplicant1().getPartyName(),
-                    YES.equals(app1Proceeds)
-                        ? "proceed"
-                        : "not proceed"
-                ));
-                eventDetailsText.add(String.format(
-                    "RPA Reason: [2 of 2 - %s] Claimant: %s has provided intention: %s",
-                    currentTime,
-                    caseData.getApplicant2().getPartyName(),
-                    YES.equals(app2Proceeds)
-                        ? "proceed"
-                        : "not proceed"
-                ));
-                break;
-            }
-            case ONE_V_ONE:
-            default: {
-                eventDetailsText.add("RPA Reason: Claimant proceeds.");
-            }
-        }
-        return eventDetailsText;
     }
 
     public String prepareEventDetailsText(DQ dq, String preferredCourtCode) {
@@ -1833,22 +1755,24 @@ public class EventHistoryMapper {
         }
     }
 
-    //How are we capturing the reason that it is dropped offline?
     private void buildSDONotDrawn(EventHistory.EventHistoryBuilder builder,
                                   CaseData caseData) {
-        String miscText = "RPA Reason: Case proceeds offline. Judge / Legal Advisor did not draw a Direction's Order: "
-            + caseData.getClaimProceedsInCaseman().getOther();
-        LocalDateTime eventDate = caseData.getClaimProceedsInCaseman().getDate().atStartOfDay();
+        if (featureToggleService.isSDOEnabled()) {
+            String miscText = "RPA Reason: Case proceeds offline. "
+                + "Judge / Legal Advisor did not draw a Direction's Order: "
+                + caseData.getClaimProceedsInCaseman().getOther();
+            LocalDateTime eventDate = caseData.getClaimProceedsInCaseman().getDate().atStartOfDay();
 
-        builder.miscellaneous(
-            Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(eventDate)
-                .eventDetailsText(miscText)
-                .eventDetails(EventDetails.builder()
-                                  .miscText(miscText)
-                                  .build())
-                .build());
+            builder.miscellaneous(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(eventDate)
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build());
+        }
     }
 }
