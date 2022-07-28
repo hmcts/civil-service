@@ -1107,6 +1107,67 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).containsOnly("Court location code is required");
         }
+
+        @Nested
+        class PopulateBlankOrgPolicies {
+            @BeforeEach
+            public void setup() {
+                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+            }
+
+            @Test
+            void oneVOne() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDraft()
+                    .respondent2OrganisationPolicy(null)
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData())
+                    .extracting("respondent2OrganisationPolicy")
+                    .extracting("OrgPolicyCaseAssignedRole")
+                    .isEqualTo("[RESPONDENTSOLICITORTWO]");
+
+                assertThat(response.getData())
+                    .extracting("respondent2OrganisationPolicy")
+                    .extracting("Organisation")
+                    .isNull();
+            }
+
+            @Test
+            void unrepresentedDefendants() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDraft()
+                    .respondent1OrganisationPolicy(null)
+                    .respondent2OrganisationPolicy(null)
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData())
+                    .extracting("respondent1OrganisationPolicy")
+                    .extracting("OrgPolicyCaseAssignedRole")
+                    .isEqualTo("[RESPONDENTSOLICITORONE]");
+
+                assertThat(response.getData())
+                    .extracting("respondent1OrganisationPolicy")
+                    .extracting("Organisation")
+                    .isNull();
+
+                assertThat(response.getData())
+                    .extracting("respondent2OrganisationPolicy")
+                    .extracting("OrgPolicyCaseAssignedRole")
+                    .isEqualTo("[RESPONDENTSOLICITORTWO]");
+
+                assertThat(response.getData())
+                    .extracting("respondent2OrganisationPolicy")
+                    .extracting("Organisation")
+                    .isNull();
+            }
+        }
     }
 
     @Nested
