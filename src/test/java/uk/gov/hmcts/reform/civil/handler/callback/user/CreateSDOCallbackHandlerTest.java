@@ -133,7 +133,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPrePopulateDisposalHearingPage() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            given(locationRefDataService.getCourtLocations(any())).willReturn(getSampleCourLocations());
+            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                .willReturn(getSampleCourLocationsRefObject());
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -144,8 +145,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             DynamicList dynamicList = getLocationDynamicListInPersonHearing(data);
 
             assertThat(dynamicList).isNotNull();
-            assertThat(locationsFromDynamicList(dynamicList))
-                .containsOnly("ABCD - RG0 0 AL", "PQRS - GU0 0EE", "WXYZ - EW0 0HE", "LMNO - NE0 0BH");
+            assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
+                "Site 1 - Adr 1 - AAA 111",
+                "Site 2 - Adr 2 - BBB 222",
+                "Site 3 - Adr 3 - CCC 333"
+            );
         }
     }
 
