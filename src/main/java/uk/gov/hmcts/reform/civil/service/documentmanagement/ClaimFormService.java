@@ -49,7 +49,7 @@ public class ClaimFormService {
         if (documentMetaDataList.size() > 1) {
             CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
                 documentMetaDataList,
-                "",
+                "",  // access token will be taken from postman
                 sealClaimForm.getDocumentName(),
                 sealClaimForm.getDocumentName(),
                 caseData
