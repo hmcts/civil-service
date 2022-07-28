@@ -222,8 +222,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
     @Test
     void shouldReturnSecondScenerio_uploadedSealedClaimForm() {
-        CaseData caseData = CaseData.builder()
-            .build();
+        CaseData caseData = CaseData.builder().build();
         CaseDocument sealClaimForm = Mockito.mock(CaseDocument.class);
         CaseDocument stitchedDocument = Mockito.mock(CaseDocument.class);
         List<DocumentMetaData> documentMetaDataList = List.of(Mockito.mock(DocumentMetaData.class),
@@ -232,8 +231,8 @@ public class DocumentControllerTest extends BaseIntegrationTest {
         Mockito.when(generateClaimFormForSpecCallbackHandler.fetchDocumentsFromCaseData(caseData, sealClaimForm))
             .thenReturn(documentMetaDataList);
 
-        Mockito.when(civilDocumentStitchingService.bundle(documentMetaDataList,BEARER_TOKEN,null,null,caseData))
-            .thenReturn(stitchedDocument);
+        Mockito.when(civilDocumentStitchingService.bundle(documentMetaDataList,BEARER_TOKEN,null,
+             null,caseData)).thenReturn(stitchedDocument);
         Assertions.assertEquals(sealClaimForm, claimFormService.uploadSealedDocument(BEARER_TOKEN, caseData));
     }
 
