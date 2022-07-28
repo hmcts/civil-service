@@ -65,7 +65,7 @@ public class DocumentControllerStitchedTest extends BaseIntegrationTest {
         Mockito.when(civilDocumentStitchingService.bundle(documentMetaDataList, BEARER_TOKEN, null,
                                                           null, caseData)).thenReturn(sealClaimForm);
 
-       Assertions.assertEquals(sealClaimForm, claimFormService.uploadSealedDocument(BEARER_TOKEN, caseData));
+        Assertions.assertEquals(sealClaimForm, claimFormService.uploadSealedDocument(BEARER_TOKEN, caseData));
     }
 
     @Test
