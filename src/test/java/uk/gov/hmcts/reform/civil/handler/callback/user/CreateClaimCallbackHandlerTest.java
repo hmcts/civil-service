@@ -11,7 +11,6 @@ import org.springframework.boot.autoconfigure.validation.ValidationAutoConfigura
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -31,9 +30,7 @@ import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -137,15 +134,32 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToStartCallback {
 
+        private static final String SUPER_CLAIM_KEY = "superClaimType";
+
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStatePendingClaimIssued().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseDetails).build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssued()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldSetSuperClaimType_WhenAboutToStartIsInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssued()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData().get(SUPER_CLAIM_KEY)).isEqualTo("UNSPEC_CLAIM");
         }
     }
 
