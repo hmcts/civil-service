@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
@@ -40,12 +42,14 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -94,6 +98,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final ValidateEmailService validateEmailService;
     private final DeadlinesCalculator deadlinesCalculator;
     private final FeatureToggleService toggleService;
+    private final CoreCaseDataService coreCaseDataService;
+    private final PaymentsConfiguration paymentsConfiguration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -390,6 +396,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        setSupplementaryData(caseData.getCcdCaseReference(), callbackParams);
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(getHeader(caseData))
@@ -438,5 +445,14 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             errorsMessages.add("Court location code is required");
         }
         return errorsMessages;
+    }
+
+    private void setSupplementaryData(Long caseId, CallbackParams callbackParams) {
+        String authorisation = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        Map<String, Map<String, Map<String, Object>>> supplementaryDataCivil = new HashMap<>();
+        supplementaryDataCivil.put("supplementary_data_updates", singletonMap("$set", singletonMap("HMCTSServiceId",
+                                                                     paymentsConfiguration.getSiteId())));
+        coreCaseDataService.setSupplementaryData(authorisation, caseId, supplementaryDataCivil);
+
     }
 }

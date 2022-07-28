@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -51,6 +53,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -58,6 +61,7 @@ import java.util.function.Function;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonMap;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -121,6 +125,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final InterestCalculator interestCalculator;
     private final FeatureToggleService toggleService;
     private final StateFlowEngine stateFlowEngine;
+    private final CoreCaseDataService coreCaseDataService;
+    private final PaymentsConfiguration paymentsConfiguration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -406,6 +412,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        setSupplementaryData(caseData.getCcdCaseReference(), callbackParams);
         if (null != callbackParams.getRequest().getEventId()
             && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
             return SubmittedCallbackResponse.builder()
@@ -657,5 +664,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void setSupplementaryData(Long caseId, CallbackParams callbackParams) {
+        String authorisation = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        Map<String, Map<String, Map<String, Object>>> supplementaryDataCivil = new HashMap<>();
+        supplementaryDataCivil.put("supplementary_data_updates", singletonMap("$set", singletonMap("HMCTSServiceId",
+                                                                   paymentsConfiguration.getSpecSiteId())));
+        coreCaseDataService.setSupplementaryData(authorisation, caseId, supplementaryDataCivil);
+
     }
 }

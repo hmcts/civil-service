@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
+import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -35,6 +36,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
@@ -53,9 +55,7 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -63,7 +63,9 @@ import static java.time.LocalDate.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -130,6 +132,12 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
+
+    @MockBean
+    private PaymentsConfiguration paymentsConfiguration;
+
+    @MockBean
+    private CoreCaseDataService coreCaseDataService;
 
     @Value("${civil.response-pack-url}")
     private String responsePackLink;
@@ -1178,6 +1186,31 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class SubmittedCallback {
+
+        @Test
+        void shouldReturnSuppleData_WhenAboutToStartIsInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse)
+                handler.handle(params);
+
+            verify(coreCaseDataService).setSupplementaryData(any(), any(), eq(supplementaryData()));
+        }
+
+        private Map<String, Map<String, Map<String, Object>>> supplementaryData() {
+            Map<String, Object> hmctsServiceIdMap = new HashMap<>();
+            hmctsServiceIdMap.put("HMCTSServiceId", "AAA7");
+
+            Map<String, Map<String, Object>> supplementaryDataRequestMap = new HashMap<>();
+            supplementaryDataRequestMap.put("$set", hmctsServiceIdMap);
+
+            Map<String, Map<String, Map<String, Object>>> supplementaryDataUpdates = new HashMap<>();
+            supplementaryDataUpdates.put("supplementary_data_updates", supplementaryDataRequestMap);
+
+            return supplementaryDataUpdates;
+        }
 
         @Nested
         class RespondentsDoNotHaveLegalRepresentation {
