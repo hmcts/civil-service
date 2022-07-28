@@ -1312,6 +1312,30 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimSubmitted2v1RespondentUnrepresented() {
+        atStateClaimSubmitted();
+        multiPartyClaimTwoApplicants();
+        respondent1Represented = NO;
+        respondent1OrgRegistered = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmitted2v1RespondentRegistered() {
+        atStateClaimSubmitted();
+        multiPartyClaimTwoApplicants();
+        respondent1Represented = YES;
+        respondent1OrgRegistered = YES;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmitted2v1RespondentUnregistered() {
+        atStateClaimSubmitted();
+        multiPartyClaimTwoApplicants();
+        respondent1Represented = YES;
+        respondent1OrgRegistered = NO;
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimIssued1v2AndBothDefendantsDefaultJudgment() {
         defendantDetails = DynamicList.builder()
             .value(DynamicListElement.builder().label("Both Defendants").build())
