@@ -25,7 +25,7 @@ import javax.validation.constraints.NotNull;
 @RequestMapping(
     path = "/case/document"
 )
-public class SupportController {
+public class DocumentController {
 
     @Autowired
     private final ClaimFormService claimFormService;

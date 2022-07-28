@@ -58,7 +58,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     private ClaimFormService claimFormService;
 
     @Autowired
-    private SupportController documentController;
+    private DocumentController documentController;
 
     @Autowired
     private ObjectMapper mapper;
