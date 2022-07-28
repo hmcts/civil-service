@@ -44,6 +44,7 @@ def secrets = [
 
 // Vars for Kubernetes
 env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
+env.EM_CCD_ORCHESTRATOR_URL = 'http://em-ccd-orchestrator-aat.service.core-compute-aat.internal'
 
 def validateRpaContract() {
   sh """ ./gradlew contract """

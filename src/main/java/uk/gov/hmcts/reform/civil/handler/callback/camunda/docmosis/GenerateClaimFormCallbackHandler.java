@@ -9,16 +9,22 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGenerator;
+import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_CLAIM_FORM;
@@ -31,7 +37,10 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_CLAIM_FORM);
     private static final String TASK_ID = "GenerateClaimForm";
+    private static final String BUNDLE_NAME = "Sealed Claim Form with LiP Claim Form";
 
+    private final CivilDocumentStitchingService civilDocumentStitchingService;
+    private final LitigantInPersonFormGenerator litigantInPersonFormGenerator;
     private final SealedClaimFormGenerator sealedClaimFormGenerator;
     private final ObjectMapper objectMapper;
     private final Time time;
@@ -62,7 +71,42 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
-        caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
+        if (caseData.getRespondent1Represented().equals(YesOrNo.NO)
+            || ofNullable(caseData.getRespondent2Represented()).isPresent()
+            && caseData.getRespondent2Represented().equals(YesOrNo.NO)) {
+
+            CaseDocument lipForm = litigantInPersonFormGenerator.generate(
+                caseDataBuilder.build(),
+                callbackParams.getParams().get(BEARER_TOKEN).toString()
+            );
+
+            List<DocumentMetaData> documents = Arrays.asList(
+                new DocumentMetaData(
+                    sealedClaim.getDocumentLink(),
+                    "Sealed Claim Form",
+                    LocalDate.now().toString()
+                ),
+                new DocumentMetaData(
+                    lipForm.getDocumentLink(),
+                    "Litigant in person claim form",
+                    LocalDate.now().toString()
+                )
+            );
+
+            CaseDocument sealedClaimFormWithLiPForm =
+                civilDocumentStitchingService.bundle(
+                    documents,
+                    callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                    sealedClaim.getDocumentName(),
+                    BUNDLE_NAME,
+                    caseData
+                );
+
+            caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaimFormWithLiPForm));
+
+        } else {
+            caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
