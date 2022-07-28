@@ -343,12 +343,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("claimFee")
-                .extracting("calculatedAmountInPence", "code", "version")
+                .extracting("calculatedAmountInPence", "code")
                 .containsExactly(
                     String.valueOf(feeData.getCalculatedAmountInPence()),
-                    feeData.getCode(),
-                    feeData.getVersion()
-                );
+                    feeData.getCode()
+                ).doesNotHaveToString("version");
 
             assertThat(response.getData())
                 .extracting("claimIssuedPaymentDetails")
@@ -376,12 +375,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("claimFee")
-                .extracting("calculatedAmountInPence", "code", "version")
+                .extracting("calculatedAmountInPence", "code")
                 .containsExactly(
                     String.valueOf(feeData.getCalculatedAmountInPence()),
-                    feeData.getCode(),
-                    feeData.getVersion()
-                );
+                    feeData.getCode()
+                ).doesNotHaveToString("version");
 
             assertThat(response.getData())
                 .extracting("claimIssuedPaymentDetails")
@@ -458,9 +456,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("email")
                 .isEqualTo(email);
             assertThat(response.getData())
-                .extracting("applicantSolicitor1UserDetails")
-                .extracting("email")
-                .isNull();
+                .doesNotHaveToString("applicantSolicitor1UserDetails")
+                .doesNotHaveToString("email");
         }
     }
 
@@ -691,8 +688,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
-                .extracting("uiStatementOfTruth")
-                .isNull();
+                .doesNotHaveToString("uiStatementOfTruth");
         }
     }
 
@@ -879,8 +875,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var respondent2OrgPolicy = response.getData().get("respondent2OrganisationPolicy");
 
-            assertThat(respondent2OrgPolicy).extracting("OrgPolicyReference").isNull();
-            assertThat(respondent2OrgPolicy).extracting("Organisation").isNull();
+            assertThat(respondent2OrgPolicy).doesNotHaveToString("OrgPolicyReference");
+            assertThat(respondent2OrgPolicy).doesNotHaveToString("Organisation");
         }
 
         @Nested
@@ -954,9 +950,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
-                    .extracting("applicantSolicitor1CheckEmail")
-                    .extracting("email")
-                    .isNull();
+                    .doesNotHaveToString("applicantSolicitor1CheckEmail")
+                    .doesNotHaveToString("email");
 
                 assertThat(response.getData())
                     .extracting("applicantSolicitor1UserDetails")
@@ -984,9 +979,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
-                    .extracting("applicantSolicitor1CheckEmail")
-                    .extracting("email")
-                    .isNull();
+                    .doesNotHaveToString("applicantSolicitor1CheckEmail")
+                    .doesNotHaveToString("email");
 
                 assertThat(response.getData())
                     .extracting("applicantSolicitor1UserDetails")
@@ -1020,8 +1014,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .extracting("uiStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly(null, null);
+                    .doesNotHaveToString("name")
+                    .doesNotHaveToString("role");
             }
         }
 
@@ -1112,6 +1106,67 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 callbackParamsOf(data, ABOUT_TO_SUBMIT));
 
             assertThat(response.getErrors()).containsOnly("Court location code is required");
+        }
+
+        @Nested
+        class PopulateBlankOrgPolicies {
+            @BeforeEach
+            public void setup() {
+                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+            }
+
+            @Test
+            void oneVOne() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDraft()
+                    .respondent2OrganisationPolicy(null)
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData())
+                    .extracting("respondent2OrganisationPolicy")
+                    .extracting("OrgPolicyCaseAssignedRole")
+                    .isEqualTo("[RESPONDENTSOLICITORTWO]");
+
+                assertThat(response.getData())
+                    .extracting("respondent2OrganisationPolicy")
+                    .extracting("Organisation")
+                    .isNull();
+            }
+
+            @Test
+            void unrepresentedDefendants() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDraft()
+                    .respondent1OrganisationPolicy(null)
+                    .respondent2OrganisationPolicy(null)
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData())
+                    .extracting("respondent1OrganisationPolicy")
+                    .extracting("OrgPolicyCaseAssignedRole")
+                    .isEqualTo("[RESPONDENTSOLICITORONE]");
+
+                assertThat(response.getData())
+                    .extracting("respondent1OrganisationPolicy")
+                    .extracting("Organisation")
+                    .isNull();
+
+                assertThat(response.getData())
+                    .extracting("respondent2OrganisationPolicy")
+                    .extracting("OrgPolicyCaseAssignedRole")
+                    .isEqualTo("[RESPONDENTSOLICITORTWO]");
+
+                assertThat(response.getData())
+                    .extracting("respondent2OrganisationPolicy")
+                    .extracting("Organisation")
+                    .isNull();
+            }
         }
     }
 
