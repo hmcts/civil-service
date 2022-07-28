@@ -50,18 +50,40 @@ public class DocumentControllerStitchedTest extends BaseIntegrationTest {
     }
 
     @Test
-    void shouldReturnSecondScenerio_uploadedSealedClaimForm() {
+    void shouldReturnFirstScenerio_uploadedSealedClaimForm() {
         CaseData caseData = CaseData.builder().build();
         CaseDocument sealClaimForm = Mockito.mock(CaseDocument.class);
         CaseDocument stitchedDocument = Mockito.mock(CaseDocument.class);
+
         List<DocumentMetaData> documentMetaDataList = List.of(Mockito.mock(DocumentMetaData.class),
                                                               Mockito.mock(DocumentMetaData.class));
         Mockito.when(sealedClaimFormGeneratorForSpec.generate(caseData, BEARER_TOKEN)).thenReturn(sealClaimForm);
         Mockito.when(generateClaimFormForSpecCallbackHandler.fetchDocumentsFromCaseData(caseData, sealClaimForm))
             .thenReturn(documentMetaDataList);
 
+        stitchedDocument.setError(List.of("Error"));
+        Mockito.when(civilDocumentStitchingService.bundle(documentMetaDataList, BEARER_TOKEN, null,
+                                                          null, caseData)).thenReturn(sealClaimForm);
+
+       Assertions.assertEquals(sealClaimForm, claimFormService.uploadSealedDocument(BEARER_TOKEN, caseData));
+    }
+
+    @Test
+    void shouldReturnSecondScenerio_uploadedSealedClaimForm() {
+        CaseData caseData = CaseData.builder().build();
+        CaseDocument sealClaimForm = Mockito.mock(CaseDocument.class);
+        CaseDocument stitchedDocument = Mockito.mock(CaseDocument.class);
+
+        List<DocumentMetaData> documentMetaDataList = List.of(Mockito.mock(DocumentMetaData.class),
+                                                              Mockito.mock(DocumentMetaData.class));
+        Mockito.when(sealedClaimFormGeneratorForSpec.generate(caseData, BEARER_TOKEN)).thenReturn(sealClaimForm);
+        Mockito.when(generateClaimFormForSpecCallbackHandler.fetchDocumentsFromCaseData(caseData, sealClaimForm))
+            .thenReturn(documentMetaDataList);
+
+        stitchedDocument.setError(List.of(""));
         Mockito.when(civilDocumentStitchingService.bundle(documentMetaDataList, BEARER_TOKEN, null,
                                                           null, caseData)).thenReturn(stitchedDocument);
+
         Assertions.assertEquals(sealClaimForm, claimFormService.uploadSealedDocument(BEARER_TOKEN, caseData));
     }
 }
