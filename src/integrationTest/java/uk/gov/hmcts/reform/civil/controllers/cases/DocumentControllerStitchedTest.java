@@ -79,7 +79,6 @@ public class DocumentControllerStitchedTest extends BaseIntegrationTest {
         Mockito.when(sealedClaimFormGeneratorForSpec.generate(caseData, BEARER_TOKEN)).thenReturn(sealClaimForm);
         Mockito.when(generateClaimFormForSpecCallbackHandler.fetchDocumentsFromCaseData(caseData, sealClaimForm))
             .thenReturn(documentMetaDataList);
-
         stitchedDocument.setError(List.of(""));
         Mockito.when(civilDocumentStitchingService.bundle(documentMetaDataList, BEARER_TOKEN, null,
                                                           null, caseData)).thenReturn(stitchedDocument);
