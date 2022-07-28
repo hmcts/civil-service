@@ -4433,12 +4433,11 @@ class EventHistoryMapperTest {
     @Nested
     class SDONotDrawn {
         @Test
-        void shouldPrepareExpectedEvents_whenClaimWithFullDefence() {
+        void shouldPrepareMiscEvents_whenClaimWithFullDefence_whenSDONotDrawn_OneVOne() {
             String miscText = "RPA Reason: Case proceeds offline. "
                 + "Judge / Legal Advisor did not draw a Direction's Order: "
                 + "unforeseen complexities";
             CaseData caseData = CaseDataBuilder.builder()
-                .atState(FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN, MultiPartyScenario.ONE_V_ONE)
                 .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
                 .build();
 
@@ -4454,7 +4453,7 @@ class EventHistoryMapperTest {
                                       .build())
                     .build(),
                 Event.builder()
-                    .eventSequence(6)
+                    .eventSequence(5)
                     .eventCode("999")
                     .dateReceived(caseData.getClaimProceedsInCaseman().getDate().atStartOfDay()
                     )
@@ -4471,6 +4470,124 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
 
         }
+
+        @Test
+        void shouldPrepareMiscEvents_whenClaimWithFullDefence_whenSDONotDrawn_OneVTwoTwoLegalRep() {
+            String miscText = "RPA Reason: Case proceeds offline. "
+                + "Judge / Legal Advisor did not draw a Direction's Order: "
+                + "unforeseen complexities";
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
+                .build();
+
+            List<Event> expectedMiscellaneousEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(LocalDate.now().plusDays(1).atStartOfDay()
+                    )
+                    .eventDetailsText("Claimant has notified defendant.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant has notified defendant.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(5)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimProceedsInCaseman().getDate().atStartOfDay()
+                    )
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build()
+            );
+
+            var eventHistory = mapper.buildEvents(caseData);
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+
+        }
+
+        @Test
+        void shouldPrepareMiscEvents_whenClaimWithFullDefence_whenSDONotDrawn_OneVTwoOneLegalRep() {
+            String miscText = "RPA Reason: Case proceeds offline. "
+                + "Judge / Legal Advisor did not draw a Direction's Order: "
+                + "unforeseen complexities";
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+                .build();
+
+            List<Event> expectedMiscellaneousEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(LocalDate.now().plusDays(1).atStartOfDay()
+                    )
+                    .eventDetailsText("Claimant has notified defendant.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant has notified defendant.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(5)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimProceedsInCaseman().getDate().atStartOfDay()
+                    )
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build()
+            );
+
+            var eventHistory = mapper.buildEvents(caseData);
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+
+        }
+
+        @Test
+        void shouldPrepareMiscEvents_whenClaimWithFullDefence_whenSDONotDrawn_TwoVOne() {
+            String miscText = "RPA Reason: Case proceeds offline. "
+                + "Judge / Legal Advisor did not draw a Direction's Order: "
+                + "unforeseen complexities";
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.TWO_V_ONE)
+                .build();
+
+            List<Event> expectedMiscellaneousEvents = List.of(
+                Event.builder()
+                    .eventSequence(1)
+                    .eventCode("999")
+                    .dateReceived(LocalDate.now().plusDays(1).atStartOfDay()
+                    )
+                    .eventDetailsText("Claimant has notified defendant.")
+                    .eventDetails(EventDetails.builder()
+                                      .miscText("Claimant has notified defendant.")
+                                      .build())
+                    .build(),
+                Event.builder()
+                    .eventSequence(5)
+                    .eventCode("999")
+                    .dateReceived(caseData.getClaimProceedsInCaseman().getDate().atStartOfDay()
+                    )
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build()
+            );
+
+            var eventHistory = mapper.buildEvents(caseData);
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+
+        }
+
     }
 
     @Nested
