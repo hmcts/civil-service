@@ -96,7 +96,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private List<DocumentMetaData> fetchDocumentsFromCaseData(CaseData caseData, CaseDocument caseDocument) {
+    public List<DocumentMetaData> fetchDocumentsFromCaseData(CaseData caseData, CaseDocument caseDocument) {
         List<DocumentMetaData> documentMetaDataList = new ArrayList<>();
         DocumentMetaData documentMetaData = new DocumentMetaData(
             caseData.getSpecClaimTemplateDocumentFiles(),
