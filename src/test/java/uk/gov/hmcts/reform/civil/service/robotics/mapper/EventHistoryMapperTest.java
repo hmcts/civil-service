@@ -1628,17 +1628,6 @@ class EventHistoryMapperTest {
                                               .build())
                             .build()
             );
-            List<Event> expectedMiscellaneousEvents = List.of(
-                Event.builder()
-                    .eventSequence(5)
-                    .eventCode("999")
-                    .dateReceived(caseData.getApplicant1ResponseDate())
-                    .eventDetailsText("RPA Reason: Claimant proceeds.")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Claimant proceeds.")
-                                      .build())
-                    .build()
-            );
 
             var eventHistory = mapper.buildEvents(caseData);
 
@@ -1647,8 +1636,6 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedDefenceFiled);
             assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
                 .contains(expectedDirectionsQuestionnaireFiled.get(0));
-            assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0));
 
             assertEmptyEvents(
                 eventHistory,
@@ -3990,7 +3977,7 @@ class EventHistoryMapperTest {
                     .dateReceived(caseData.getApplicant1ResponseDate())
                     .litigiousPartyID("001")
                     .build();
-                List<Event> expectedMiscellaneousEvents = List.of(
+                Event expectedMiscellaneousEvents =
                     Event.builder()
                         .eventSequence(1)
                         .eventCode("999")
@@ -3999,17 +3986,7 @@ class EventHistoryMapperTest {
                         .eventDetails(EventDetails.builder()
                                           .miscText("Claimant has notified defendant.")
                                           .build())
-                        .build(),
-                    Event.builder()
-                        .eventSequence(7)
-                        .eventCode("999")
-                        .dateReceived(caseData.getApplicant1ResponseDate())
-                        .eventDetailsText("RPA Reason: Claimant proceeds.")
-                        .eventDetails(EventDetails.builder()
-                                          .miscText("RPA Reason: Claimant proceeds.")
-                                          .build())
-                        .build()
-                );
+                        .build();
 
                 var eventHistory = mapper.buildEvents(caseData);
 
@@ -4021,7 +3998,7 @@ class EventHistoryMapperTest {
                         expectedDirectionsQuestionnaireRespondent,
                         expectedDirectionsQuestionnaireApplicant);
                 assertThat(eventHistory).extracting("miscellaneous").asList()
-                    .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+                    .containsExactly(expectedMiscellaneousEvents);
                 assertEmptyEvents(eventHistory, "receiptOfAdmission", "receiptOfPartAdmission");
             }
         }
@@ -4031,10 +4008,6 @@ class EventHistoryMapperTest {
 
             @Test
             void shouldPrepareExpectedEvents_whenClaimWithFullDefence() {
-                String expectedMiscText1 = "RPA Reason: [1 of 2 - 2020-08-01] "
-                    + "Claimant has provided intention: proceed against defendant: Mr. Sole Trader";
-                String expectedMiscText2 = "RPA Reason: [2 of 2 - 2020-08-01] "
-                    + "Claimant has provided intention: proceed against defendant: Mr. John Rambo";
                 CaseData caseData = CaseDataBuilder.builder()
                     .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                     .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
@@ -4107,7 +4080,7 @@ class EventHistoryMapperTest {
                         caseData.getCourtLocation().getApplicantPreferredCourt()
                     ))
                     .build();
-                List<Event> expectedMiscEvents = List.of(
+                Event expectedMiscEvents =
                     Event.builder()
                         .eventSequence(1)
                         .eventCode("999")
@@ -4116,26 +4089,8 @@ class EventHistoryMapperTest {
                         .eventDetails(EventDetails.builder()
                                           .miscText("Claimant has notified defendant.")
                                           .build())
-                        .build(),
-                    Event.builder()
-                        .eventSequence(9)
-                        .eventCode("999")
-                        .dateReceived(caseData.getApplicant1ResponseDate())
-                        .eventDetailsText(expectedMiscText1)
-                        .eventDetails(EventDetails.builder()
-                                          .miscText(expectedMiscText1)
-                                          .build())
-                        .build(),
-                    Event.builder()
-                        .eventSequence(10)
-                        .eventCode("999")
-                        .dateReceived(caseData.getApplicant1ResponseDate())
-                        .eventDetailsText(expectedMiscText2)
-                        .eventDetails(EventDetails.builder()
-                                          .miscText(expectedMiscText2)
-                                          .build())
                         .build()
-                );
+                ;
 
                 var eventHistory = mapper.buildEvents(caseData);
 
@@ -4149,7 +4104,7 @@ class EventHistoryMapperTest {
                                                         expectedRespondent2DQ,
                                                         expectedApplicantDQ);
                 assertThat(eventHistory).extracting("miscellaneous").asList()
-                    .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1), expectedMiscEvents.get(2));
+                    .containsExactly(expectedMiscEvents);
 
                 assertEmptyEvents(
                     eventHistory,
@@ -4161,10 +4116,6 @@ class EventHistoryMapperTest {
 
             @Test
             void shouldPrepareMiscellaneousEvents_whenClaimantProceedsWithOnlyFirstDefendant() {
-                String expectedMiscText1 = "RPA Reason: [1 of 2 - 2020-08-01] "
-                    + "Claimant has provided intention: proceed against defendant: Mr. Sole Trader";
-                String expectedMiscText2 = "RPA Reason: [2 of 2 - 2020-08-01] "
-                    + "Claimant has provided intention: not proceed against defendant: Mr. John Rambo";
                 CaseData caseData = CaseDataBuilder.builder()
                     .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                     .atStateApplicantRespondToDefenceAndProceedVsDefendant1Only_1v2()
@@ -4175,7 +4126,7 @@ class EventHistoryMapperTest {
                         .respondent2Represented(YES)
                         .build();
                 }
-                List<Event> expectedMiscEvents = List.of(
+                Event expectedMiscEvents =
                     Event.builder()
                         .eventSequence(1)
                         .eventCode("999")
@@ -4184,38 +4135,15 @@ class EventHistoryMapperTest {
                         .eventDetails(EventDetails.builder()
                                           .miscText("Claimant has notified defendant.")
                                           .build())
-                        .build(),
-                    Event.builder()
-                        .eventSequence(7)
-                        .eventCode("999")
-                        .dateReceived(caseData.getApplicant1ResponseDate())
-                        .eventDetailsText(expectedMiscText1)
-                        .eventDetails(EventDetails.builder()
-                                          .miscText(expectedMiscText1)
-                                          .build())
-                        .build(),
-                    Event.builder()
-                        .eventSequence(8)
-                        .eventCode("999")
-                        .dateReceived(caseData.getApplicant1ResponseDate())
-                        .eventDetailsText(expectedMiscText2)
-                        .eventDetails(EventDetails.builder()
-                                          .miscText(expectedMiscText2)
-                                          .build())
-                        .build()
-                );
+                        .build();
 
                 var eventHistory = mapper.buildEvents(caseData);
                 assertThat(eventHistory).extracting("miscellaneous").asList()
-                    .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1), expectedMiscEvents.get(2));
+                    .containsExactly(expectedMiscEvents);
             }
 
             @Test
             void shouldPrepareMiscellaneousEvents_whenClaimantProceedsWithOnlySecondDefendant() {
-                String expectedMiscText1 = "RPA Reason: [1 of 2 - 2020-08-01] "
-                    + "Claimant has provided intention: not proceed against defendant: Mr. Sole Trader";
-                String expectedMiscText2 = "RPA Reason: [2 of 2 - 2020-08-01] "
-                    + "Claimant has provided intention: proceed against defendant: Mr. John Rambo";
                 CaseData caseData = CaseDataBuilder.builder()
                     .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                     .atStateApplicantRespondToDefenceAndProceedVsDefendant2Only_1v2()
@@ -4227,7 +4155,7 @@ class EventHistoryMapperTest {
                         .respondent2Represented(YES)
                         .build();
                 }
-                List<Event> expectedMiscEvents = List.of(
+                Event expectedMiscEvents =
                     Event.builder()
                         .eventSequence(3)
                         .eventCode("999")
@@ -4236,30 +4164,11 @@ class EventHistoryMapperTest {
                         .eventDetails(EventDetails.builder()
                                           .miscText("Claimant has notified defendant.")
                                           .build())
-                        .build(),
-                    Event.builder()
-                        .eventSequence(9)
-                        .eventCode("999")
-                        .dateReceived(caseData.getApplicant1ResponseDate())
-                        .eventDetailsText(expectedMiscText1)
-                        .eventDetails(EventDetails.builder()
-                                          .miscText(expectedMiscText1)
-                                          .build())
-                        .build(),
-                    Event.builder()
-                        .eventSequence(10)
-                        .eventCode("999")
-                        .dateReceived(caseData.getApplicant1ResponseDate())
-                        .eventDetailsText(expectedMiscText2)
-                        .eventDetails(EventDetails.builder()
-                                          .miscText(expectedMiscText2)
-                                          .build())
-                        .build()
-                );
+                        .build();
 
                 var eventHistory = mapper.buildEvents(caseData);
                 assertThat(eventHistory).extracting("miscellaneous").asList()
-                    .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1), expectedMiscEvents.get(2));
+                    .containsExactly(expectedMiscEvents);
             }
         }
 
@@ -4268,10 +4177,6 @@ class EventHistoryMapperTest {
 
             @Test
             void shouldPrepareExpectedEvents_whenClaimantsProceed() {
-                String expectedMiscText1 = "RPA Reason: [1 of 2 - 2020-08-01] "
-                    + "Claimant: Mr. John Rambo has provided intention: proceed";
-                String expectedMiscText2 = "RPA Reason: [2 of 2 - 2020-08-01] "
-                    + "Claimant: Mr. Jason Rambo has provided intention: proceed";
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoApplicants()
                     .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
@@ -4335,7 +4240,7 @@ class EventHistoryMapperTest {
                         caseData.getCourtLocation().getApplicantPreferredCourt()
                     ))
                     .build();
-                List<Event> expectedMiscEvents = List.of(
+                Event expectedMiscEvents =
                     Event.builder()
                         .eventSequence(1)
                         .eventCode("999")
@@ -4344,26 +4249,7 @@ class EventHistoryMapperTest {
                         .eventDetails(EventDetails.builder()
                                           .miscText("Claimant has notified defendant.")
                                           .build())
-                        .build(),
-                    Event.builder()
-                        .eventSequence(9)
-                        .eventCode("999")
-                        .dateReceived(caseData.getApplicant1ResponseDate())
-                        .eventDetailsText(expectedMiscText1)
-                        .eventDetails(EventDetails.builder()
-                                          .miscText(expectedMiscText1)
-                                          .build())
-                        .build(),
-                    Event.builder()
-                        .eventSequence(10)
-                        .eventCode("999")
-                        .dateReceived(caseData.getApplicant1ResponseDate())
-                        .eventDetailsText(expectedMiscText2)
-                        .eventDetails(EventDetails.builder()
-                                          .miscText(expectedMiscText2)
-                                          .build())
-                        .build()
-                );
+                        .build();
 
                 var eventHistory = mapper.buildEvents(caseData);
 
@@ -4374,7 +4260,7 @@ class EventHistoryMapperTest {
                     .asList().containsExactlyInAnyOrder(expectedRespondentDQ, expectedApplicant1DQ,
                                                         expectedApplicant2DQ);
                 assertThat(eventHistory).extracting("miscellaneous").asList()
-                    .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1), expectedMiscEvents.get(2));
+                    .containsExactly(expectedMiscEvents);
 
                 assertEmptyEvents(
                     eventHistory,
@@ -4386,10 +4272,6 @@ class EventHistoryMapperTest {
 
             @Test
             void shouldPrepareExpectedEvents_whenOnlyFirstClaimantProceeds() {
-                String expectedMiscText1 = "RPA Reason: [1 of 2 - 2020-08-01] "
-                    + "Claimant: Mr. John Rambo has provided intention: proceed";
-                String expectedMiscText2 = "RPA Reason: [2 of 2 - 2020-08-01] "
-                    + "Claimant: Mr. Jason Rambo has provided intention: not proceed";
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoApplicants()
                     .atStateApplicant1RespondToDefenceAndProceed_2v1()
@@ -4436,7 +4318,7 @@ class EventHistoryMapperTest {
                         caseData.getCourtLocation().getApplicantPreferredCourt()
                     ))
                     .build();
-                List<Event> expectedMiscEvents = List.of(
+                Event expectedMiscEvents =
                     Event.builder()
                         .eventSequence(1)
                         .eventCode("999")
@@ -4445,26 +4327,7 @@ class EventHistoryMapperTest {
                         .eventDetails(EventDetails.builder()
                                           .miscText("Claimant has notified defendant.")
                                           .build())
-                        .build(),
-                    Event.builder()
-                        .eventSequence(7)
-                        .eventCode("999")
-                        .dateReceived(caseData.getApplicant1ResponseDate())
-                        .eventDetailsText(expectedMiscText1)
-                        .eventDetails(EventDetails.builder()
-                                          .miscText(expectedMiscText1)
-                                          .build())
-                        .build(),
-                    Event.builder()
-                        .eventSequence(8)
-                        .eventCode("999")
-                        .dateReceived(caseData.getApplicant2ResponseDate())
-                        .eventDetailsText(expectedMiscText2)
-                        .eventDetails(EventDetails.builder()
-                                          .miscText(expectedMiscText2)
-                                          .build())
-                        .build()
-                );
+                        .build();
 
                 var eventHistory = mapper.buildEvents(caseData);
 
@@ -4476,7 +4339,7 @@ class EventHistoryMapperTest {
                 assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
                     .asList().containsExactlyInAnyOrder(expectedRespondentDQ, expectedApplicant1DQ);
                 assertThat(eventHistory).extracting("miscellaneous").asList()
-                    .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1), expectedMiscEvents.get(2));
+                    .containsExactly(expectedMiscEvents);
 
                 assertEmptyEvents(
                     eventHistory,
@@ -4488,10 +4351,6 @@ class EventHistoryMapperTest {
 
             @Test
             void shouldPrepareExpectedEvents_whenOnlySecondClaimantProceeds() {
-                String expectedMiscText1 = "RPA Reason: [1 of 2 - 2020-08-01] "
-                    + "Claimant: Mr. John Rambo has provided intention: not proceed";
-                String expectedMiscText2 = "RPA Reason: [2 of 2 - 2020-08-01] "
-                    + "Claimant: Mr. Jason Rambo has provided intention: proceed";
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoApplicants()
                     .atStateApplicant2RespondToDefenceAndProceed_2v1()
@@ -4538,7 +4397,7 @@ class EventHistoryMapperTest {
                         caseData.getCourtLocation().getApplicantPreferredCourt()
                     ))
                     .build();
-                List<Event> expectedMiscEvents = List.of(
+                Event expectedMiscEvents =
                     Event.builder()
                         .eventSequence(1)
                         .eventCode("999")
@@ -4547,26 +4406,7 @@ class EventHistoryMapperTest {
                         .eventDetails(EventDetails.builder()
                                           .miscText("Claimant has notified defendant.")
                                           .build())
-                        .build(),
-                    Event.builder()
-                        .eventSequence(7)
-                        .eventCode("999")
-                        .dateReceived(caseData.getApplicant1ResponseDate())
-                        .eventDetailsText(expectedMiscText1)
-                        .eventDetails(EventDetails.builder()
-                                          .miscText(expectedMiscText1)
-                                          .build())
-                        .build(),
-                    Event.builder()
-                        .eventSequence(8)
-                        .eventCode("999")
-                        .dateReceived(caseData.getApplicant2ResponseDate())
-                        .eventDetailsText(expectedMiscText2)
-                        .eventDetails(EventDetails.builder()
-                                          .miscText(expectedMiscText2)
-                                          .build())
-                        .build()
-                );
+                        .build();
 
                 var eventHistory = mapper.buildEvents(caseData);
 
@@ -4578,7 +4418,7 @@ class EventHistoryMapperTest {
                 assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
                     .asList().containsExactlyInAnyOrder(expectedRespondentDQ, expectedApplicant2DQ);
                 assertThat(eventHistory).extracting("miscellaneous").asList()
-                    .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1), expectedMiscEvents.get(2));
+                    .containsExactly(expectedMiscEvents);
 
                 assertEmptyEvents(
                     eventHistory,
