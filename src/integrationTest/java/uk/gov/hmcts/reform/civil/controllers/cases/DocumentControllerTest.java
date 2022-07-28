@@ -2,10 +2,12 @@ package uk.gov.hmcts.reform.civil.controllers.cases;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,9 +19,12 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis.GenerateClaimFormForSpecCallbackHandler;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -29,10 +34,12 @@ import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.ClaimFormService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -72,6 +79,9 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     @Autowired
     private UserService userService;
 
+    @MockBean
+    private SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
+
     @Mock
     private DocumentManagementService documentManagementService;
     @Mock
@@ -79,6 +89,14 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
     @Mock
     private DeadlinesCalculator deadlinesCalculator;
+
+    @MockBean
+    private GenerateClaimFormForSpecCallbackHandler generateClaimFormForSpecCallbackHandler;
+
+    @MockBean
+    private CivilDocumentStitchingService civilDocumentStitchingService;
+
+
 
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
@@ -188,4 +206,35 @@ public class DocumentControllerTest extends BaseIntegrationTest {
                           .calculatedAmountInPence(BigDecimal.valueOf(70_00))
                           .build());
     }
+
+    @Test
+    void shouldReturn_uploadedSealedClaimForm() {
+        CaseData caseData = CaseData.builder()
+                      .build();
+        CaseDocument sealClaimForm = Mockito.mock(CaseDocument.class);
+        List<DocumentMetaData> documentMetaDataList = new ArrayList<>();
+        Mockito.when(sealedClaimFormGeneratorForSpec.generate(caseData,BEARER_TOKEN)).thenReturn(sealClaimForm);
+        Mockito.when(generateClaimFormForSpecCallbackHandler.fetchDocumentsFromCaseData(caseData, sealClaimForm))
+            .thenReturn(documentMetaDataList);
+
+        Assertions.assertEquals(sealClaimForm, claimFormService.uploadSealedDocument(BEARER_TOKEN, caseData));
+    }
+
+    @Test
+    void shouldReturnSecondScenerio_uploadedSealedClaimForm() {
+        CaseData caseData = CaseData.builder()
+            .build();
+        CaseDocument sealClaimForm = Mockito.mock(CaseDocument.class);
+        CaseDocument stitchedDocument = Mockito.mock(CaseDocument.class);
+        List<DocumentMetaData> documentMetaDataList = List.of(Mockito.mock(DocumentMetaData.class),
+                                                              Mockito.mock(DocumentMetaData.class));
+        Mockito.when(sealedClaimFormGeneratorForSpec.generate(caseData,BEARER_TOKEN)).thenReturn(sealClaimForm);
+        Mockito.when(generateClaimFormForSpecCallbackHandler.fetchDocumentsFromCaseData(caseData, sealClaimForm))
+            .thenReturn(documentMetaDataList);
+
+        Mockito.when(civilDocumentStitchingService.bundle(documentMetaDataList,BEARER_TOKEN,null,null,caseData))
+            .thenReturn(stitchedDocument);
+        Assertions.assertEquals(sealClaimForm, claimFormService.uploadSealedDocument(BEARER_TOKEN, caseData));
+    }
+
 }
