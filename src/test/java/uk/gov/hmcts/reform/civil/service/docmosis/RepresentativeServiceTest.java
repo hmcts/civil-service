@@ -29,7 +29,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -121,10 +120,6 @@ class RepresentativeServiceTest {
 
     @Nested
     class GetRespondent1Representative {
-        @BeforeEach
-        public void setup() {
-            when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-        }
 
         @Test
         void shouldReturnValidOrganisationDetails_whenDefendantIsRepresented() {
@@ -288,51 +283,10 @@ class RepresentativeServiceTest {
             assertThat(representative).extracting("serviceAddress").isNull();
 
         }
-
-        @Nested
-        class ToBeRemovedAfterNOC {
-
-            @Test
-            void prod_shouldReturnValidOrganisationDetails_whenDefendantIsNotRepresented() {
-                CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnrepresentedDefendant().build();
-
-                Representative representative = representativeService.getRespondent1Representative(caseData);
-
-                verifyNoInteractions(organisationService);
-                assertThat(representative).extracting(
-                    "organisationName", "phoneNumber", "dxAddress", "emailAddress").containsExactly(
-                    null,
-                    null,
-                    null,
-                    null
-                );
-                assertThat(representative).extracting("serviceAddress").isNull();
-
-            }
-
-            @Test
-            void prod_shouldReturnEmptyRepresentative_whenDefendantSolicitorIsNotRegistered() {
-                CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnregisteredDefendant().build();
-
-                Representative representative = representativeService.getRespondent1Representative(caseData);
-
-                verifyNoInteractions(organisationService);
-                assertThat(representative).extracting(
-                    "organisationName", "phoneNumber", "dxAddress", "emailAddress").containsExactly(
-                    null, null, null, null
-                );
-                assertThat(representative).extracting("serviceAddress").isNull();
-
-            }
-        }
     }
 
     @Nested
     class GetRespondent2Representative {
-        @BeforeEach
-        public void setup() {
-            when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-        }
 
         @Test
         void shouldReturnValidOrganisationDetails_whenDefendantIsRepresented() {
@@ -434,52 +388,41 @@ class RepresentativeServiceTest {
             );
         }
 
-        @Nested
-        class ToBeRemovedAfterNOC {
-            @BeforeEach
-            public void setup() {
-                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(false);
-            }
+        @Test
+        void shouldReturnValidOrganisationDetails_whenDefendantIsNotRepresented() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssuedUnrepresentedDefendant()
+                .multiPartyClaimTwoDefendantSolicitors().build();
 
-            @Test
-            void prod_shouldReturnValidOrganisationDetails_whenDefendantIsNotRepresented() {
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStatePendingClaimIssuedUnrepresentedDefendant()
-                    .respondent1OrganisationPolicy(null)
-                    .respondent2OrganisationPolicy(null)
-                    .multiPartyClaimTwoDefendantSolicitors().build();
+            Representative representative = representativeService.getRespondent2Representative(caseData);
 
-                Representative representative = representativeService.getRespondent2Representative(caseData);
+            verifyNoInteractions(organisationService);
+            assertThat(representative).extracting(
+                "organisationName", "phoneNumber", "dxAddress", "emailAddress").containsExactly(
+                null,
+                null,
+                null,
+                null
+            );
+            assertThat(representative).extracting("serviceAddress").isNull();
 
-                verifyNoInteractions(organisationService);
-                assertThat(representative).extracting(
-                    "organisationName", "phoneNumber", "dxAddress", "emailAddress").containsExactly(
-                    null,
-                    null,
-                    null,
-                    null
-                );
-                assertThat(representative).extracting("serviceAddress").isNull();
+        }
 
-            }
+        @Test
+        void shouldReturnEmptyRepresentative_whenDefendantSolicitorIsNotRegistered() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssuedUnregisteredDefendant()
+                .multiPartyClaimTwoDefendantSolicitors().build();
 
-            @Test
-            void prod_shouldReturnEmptyRepresentative_whenDefendantSolicitorIsNotRegistered() {
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStatePendingClaimIssuedUnregisteredDefendant()
-                    .respondent1OrganisationPolicy(null)
-                    .respondent2OrganisationPolicy(null)
-                    .multiPartyClaimTwoDefendantSolicitors().build();
+            Representative representative = representativeService.getRespondent2Representative(caseData);
 
-                Representative representative = representativeService.getRespondent2Representative(caseData);
+            verifyNoInteractions(organisationService);
+            assertThat(representative).extracting(
+                "organisationName", "phoneNumber", "dxAddress", "emailAddress").containsExactly(
+                null, null, null, null
+            );
+            assertThat(representative).extracting("serviceAddress").isNull();
 
-                verifyNoInteractions(organisationService);
-                assertThat(representative).extracting(
-                    "organisationName", "phoneNumber", "dxAddress", "emailAddress").containsExactly(
-                    null, null, null, null
-                );
-                assertThat(representative).extracting("serviceAddress").isNull();
-            }
         }
     }
 

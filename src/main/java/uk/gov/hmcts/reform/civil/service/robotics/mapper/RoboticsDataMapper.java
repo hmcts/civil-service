@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.prd.model.DxAddress;
@@ -117,7 +116,7 @@ public class RoboticsDataMapper {
 
     private Solicitor buildRespondentSolicitor(CaseData caseData, String id) {
         Solicitor.SolicitorBuilder solicitorBuilder = Solicitor.builder();
-        String organisationId = OrgPolicyUtils.getRespondent1SolicitorOrgId(caseData);
+        String organisationId = caseData.getRespondent1OrganisationIDCopy();
 
         var organisationDetails = ofNullable(
             caseData.getRespondentSolicitor1OrganisationDetails()
@@ -226,7 +225,7 @@ public class RoboticsDataMapper {
             buildLitigiousParty(
                 caseData.getApplicant1(),
                 caseData.getApplicant1LitigationFriend(),
-                caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID(),
+                caseData.getApplicant1OrganisationPolicy(),
                 "Claimant",
                 APPLICANT_ID,
                 APPLICANT_SOLICITOR_ID,
@@ -235,7 +234,7 @@ public class RoboticsDataMapper {
             buildLitigiousParty(
                 caseData.getRespondent1(),
                 caseData.getRespondent1LitigationFriend(),
-                OrgPolicyUtils.getRespondent1SolicitorOrgId(caseData),
+                caseData.getRespondent1OrganisationPolicy(),
                 "Defendant",
                 RESPONDENT_ID,
                 respondent1SolicitorId,
@@ -247,9 +246,7 @@ public class RoboticsDataMapper {
             respondentParties.add(buildLitigiousParty(
                 caseData.getApplicant2(),
                 caseData.getApplicant2LitigationFriend(),
-                caseData.getApplicant2OrganisationPolicy() != null
-                    ? caseData.getApplicant2OrganisationPolicy().getOrganisation().getOrganisationID()
-                    : null,
+                caseData.getApplicant2OrganisationPolicy(),
                 "Claimant",
                 APPLICANT2_ID,
                 APPLICANT_SOLICITOR_ID,
@@ -269,7 +266,7 @@ public class RoboticsDataMapper {
             respondentParties.add(buildLitigiousParty(
                 caseData.getRespondent2(),
                 caseData.getRespondent2LitigationFriend(),
-                OrgPolicyUtils.getRespondent2SolicitorOrgId(caseData),
+                caseData.getRespondent2OrganisationPolicy(),
                 "Defendant",
                 RESPONDENT2_ID,
                 respondent2SolicitorId,
@@ -282,7 +279,7 @@ public class RoboticsDataMapper {
     private LitigiousParty buildLitigiousParty(
         Party party,
         LitigationFriend litigationFriend,
-        String organisationId,
+        OrganisationPolicy organisationPolicy,
         String type,
         String id,
         String solicitorId,
@@ -299,13 +296,13 @@ public class RoboticsDataMapper {
                                .map(LocalDateTime::toLocalDate)
                                .map(d -> d.format(ISO_DATE))
                                .orElse(null))
-            .solicitorOrganisationID(organisationId != null ? organisationId : null)
+            .solicitorOrganisationID(getOrganisationId(organisationPolicy).orElse(null))
             .build();
     }
 
     private Solicitor buildRespondent2Solicitor(CaseData caseData, String id) {
         Solicitor.SolicitorBuilder solicitorBuilder = Solicitor.builder();
-        String organisationId = OrgPolicyUtils.getRespondent2SolicitorOrgId(caseData);
+        String organisationId = caseData.getRespondent2OrganisationIDCopy();
 
         var organisationDetails = ofNullable(
             caseData.getRespondentSolicitor2OrganisationDetails()
