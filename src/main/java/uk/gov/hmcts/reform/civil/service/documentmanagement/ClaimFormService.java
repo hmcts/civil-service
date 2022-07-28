@@ -57,12 +57,10 @@ public class ClaimFormService {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
 
             if (stitchedDocument.getError() != null &&  !stitchedDocument.getError().isEmpty()) {
-                log.info("Issue with stitching API");
                 return sealClaimForm;
 
             } else {
                 if (stitchedDocument.getDocumentSize() > 1) {
-                    log.info("Document has been stitched okay");
                     return stitchedDocument;
                 } else {
                     return sealClaimForm;
