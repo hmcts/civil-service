@@ -388,12 +388,11 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("claimFee")
-                .extracting("calculatedAmountInPence", "code", "version")
+                .extracting("calculatedAmountInPence", "code")
                 .containsExactly(
                     String.valueOf(feeData.getCalculatedAmountInPence()),
-                    feeData.getCode(),
-                    feeData.getVersion()
-                );
+                    feeData.getCode()
+                ).doesNotHaveToString("version");
 
             assertThat(response.getData())
                 .extracting("claimIssuedPaymentDetails")
@@ -421,12 +420,11 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("claimFee")
-                .extracting("calculatedAmountInPence", "code", "version")
+                .extracting("calculatedAmountInPence", "code")
                 .containsExactly(
                     String.valueOf(feeData.getCalculatedAmountInPence()),
-                    feeData.getCode(),
-                    feeData.getVersion()
-                );
+                    feeData.getCode()
+                ).doesNotHaveToString("version");
 
             assertThat(response.getData())
                 .extracting("claimIssuedPaymentDetails")
@@ -486,9 +484,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("email")
                 .isEqualTo(email);
             assertThat(response.getData())
-                .extracting("applicantSolicitor1UserDetails")
-                .extracting("email")
-                .isNull();
+                .doesNotHaveToString("applicantSolicitor1UserDetails")
+                .doesNotHaveToString("email");
         }
     }
 
@@ -719,8 +716,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
-                .extracting("uiStatementOfTruth")
-                .isNull();
+                .doesNotHaveToString("uiStatementOfTruth");
         }
     }
 
@@ -1169,9 +1165,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
-                    .extracting("applicantSolicitor1CheckEmail")
-                    .extracting("email")
-                    .isNull();
+                    .doesNotHaveToString("applicantSolicitor1CheckEmail")
+                    .doesNotHaveToString("email");
 
                 assertThat(response.getData())
                     .extracting("applicantSolicitor1UserDetails")
@@ -1199,9 +1194,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
-                    .extracting("applicantSolicitor1CheckEmail")
-                    .extracting("email")
-                    .isNull();
+                    .doesNotHaveToString("applicantSolicitor1CheckEmail")
+                    .doesNotHaveToString("email");
 
                 assertThat(response.getData())
                     .extracting("applicantSolicitor1UserDetails")
@@ -1235,8 +1229,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .extracting("uiStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly(null, null);
+                    .doesNotHaveToString("name")
+                    .doesNotHaveToString("role");
             }
         }
     }

@@ -13,8 +13,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
@@ -24,9 +26,11 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
@@ -38,13 +42,16 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -52,6 +59,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
 @Service
 @RequiredArgsConstructor
@@ -60,8 +68,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(STANDARD_DIRECTION_ORDER_DJ);
     private final ObjectMapper objectMapper;
     private final DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
+    private final LocationRefDataService locationRefDataService;
     String participantString;
-
+    public static final String DISPOSAL_HEARING = "DISPOSAL_HEARING";
     public static final String ORDER_1_CLAI = "The directions order has been sent to: "
         + "%n%n ## Claimant 1 %n%n %s";
     public static final String ORDER_1_DEF = "%n%n ## Defendant 1 %n%n %s";
@@ -140,8 +149,20 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
     private CallbackResponse populateDisposalTrialScreen(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
+        List<DisposalAndTrialHearingDJToggle> checkList = List.of(
+            DisposalAndTrialHearingDJToggle.SHOW);
+        if (caseData.getCaseManagementOrderSelection().equals(DISPOSAL_HEARING)) {
+            caseData = fillDisposalToggle(caseData, checkList);
+        } else {
+            caseData = fillTrialToggle(caseData, checkList);
+        }
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        List<LocationRefData> locations = (locationRefDataService
+            .getCourtLocationsForDefaultJudgments(authToken));
+        DynamicList locationsList = getLocationsFromList(locations);
+        caseDataBuilder.trialHearingMethodInPersonDJ(locationsList);
+        caseDataBuilder.disposalHearingMethodInPersonDJ(locationsList);
         //populates the disposal screen
         caseDataBuilder
             .disposalHearingJudgesRecitalDJ(DisposalHearingJudgesRecital
@@ -443,6 +464,19 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                 + " accident shall be prepared and "
                                                                 + "agreed by the parties.")
                                                      .build());
+        caseDataBuilder.trialHousingDisrepair(TrialHousingDisrepair.builder()
+                                                  .input1("The claimant must prepare a Scott Schedule of the items "
+                                                              + "of disrepair")
+                                                  .input2("The column headings will be as follows: Item; Alleged "
+                                                    + "disrepair; Defendant's Response; Reserved for Judge's Use")
+                                                  .input3("The claimant must serve the Scott Schedule with the "
+                                                              + "relevant columns completed by 4pm on")
+                                                  .date1(LocalDate.now().plusWeeks(10))
+                                                  .input4("The Defendant must file and serve the Scott Schedule "
+                                                              + "with the relevant column "
+                                                              + "in response completed by 4pm on")
+                                                  .date2(LocalDate.now().plusWeeks(12))
+                                        .build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -474,8 +508,58 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         CaseDocument document = defaultJudgmentOrderFormGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.orderSDODocumentDJ(document.getDocumentLink());
+        caseDataBuilder.disposalHearingMethodInPersonDJ(deleteLocationList(
+            caseData.getDisposalHearingMethodInPersonDJ()));
+        caseDataBuilder.trialHearingMethodInPersonDJ(deleteLocationList(
+            caseData.getTrialHearingMethodInPersonDJ()));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private CaseData fillDisposalToggle(CaseData caseData, List<DisposalAndTrialHearingDJToggle> checkList) {
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        caseDataBuilder.disposalHearingDisclosureOfDocumentsDJToggle(checkList);
+        caseDataBuilder.disposalHearingWitnessOfFactDJToggle(checkList);
+        caseDataBuilder.disposalHearingMedicalEvidenceDJToggle(checkList);
+        caseDataBuilder.disposalHearingQuestionsToExpertsDJToggle(checkList);
+        caseDataBuilder.disposalHearingSchedulesOfLossDJToggle(checkList);
+        caseDataBuilder.disposalHearingStandardDisposalOrderDJToggle(checkList);
+        caseDataBuilder.disposalHearingFinalDisposalHearingDJToggle(checkList);
+        caseDataBuilder.disposalHearingBundleDJToggle(checkList);
+        caseDataBuilder.disposalHearingClaimSettlingDJToggle(checkList);
+        caseDataBuilder.disposalHearingCostsDJToggle(checkList);
+        caseDataBuilder.disposalHearingApplicationsDJToggle(checkList);
+        return caseDataBuilder.build();
+    }
+
+    private CaseData fillTrialToggle(CaseData caseData, List<DisposalAndTrialHearingDJToggle> checkList) {
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.trialHearingAlternativeDisputeDJToggle(checkList);
+        caseDataBuilder.trialHearingVariationsDirectionsDJToggle(checkList);
+        caseDataBuilder.trialHearingSettlementDJToggle(checkList);
+        caseDataBuilder.trialHearingDisclosureOfDocumentsDJToggle(checkList);
+        caseDataBuilder.trialHearingWitnessOfFactDJToggle(checkList);
+        caseDataBuilder.trialHearingSchedulesOfLossDJToggle(checkList);
+        caseDataBuilder.trialHearingCostsToggle(checkList);
+        caseDataBuilder.trialHearingTrialDJToggle(checkList);
+
+        return caseDataBuilder.build();
+    }
+
+    private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
+        return fromList(locations.stream()
+                            .map(location -> location.getSiteName()
+                                + " - " + location.getCourtAddress()
+                                + " - " + location.getPostcode())
+                            .collect(Collectors.toList()));
+    }
+
+    private DynamicList deleteLocationList(DynamicList list) {
+        if (isNull(list)) {
+            return null;
+        }
+        return DynamicList.builder().value(list.getValue()).build();
     }
 }
