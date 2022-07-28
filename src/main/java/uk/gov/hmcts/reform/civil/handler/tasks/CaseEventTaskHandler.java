@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -31,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.JUDGEME
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
+import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED_NOTICE_OF_CHANGE;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -43,6 +45,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
     private final StateFlowEngine stateFlowEngine;
+    private final FeatureToggleService featureToggleService;
 
     private CaseData data;
 
@@ -160,20 +163,26 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             switch (flowState) {
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
                     return format("Unrepresented defendant: %s",
-                                  StringUtils.join(
-                                             getDefendantNames(UNREPRESENTED, caseData), " and "
-                                         ));
+                                      StringUtils.join(
+                                          getDefendantNames(UNREPRESENTED, caseData), " and "
+                                      ));
                 case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
                     return format("Unregistered defendant solicitor firm: %s",
-                                         StringUtils.join(
-                                             getDefendantNames(UNREGISTERED, caseData), " and "
-                                         ));
+                                     StringUtils.join(
+                                         getDefendantNames(featureToggleService.isNoticeOfChangeEnabled()
+                                                               ? UNREGISTERED_NOTICE_OF_CHANGE : UNREGISTERED,
+                                                           caseData), " and "
+                                     ));
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
                     return format("Unrepresented defendant and unregistered defendant solicitor firm. "
                                       + "Unrepresented defendant: %s. "
                                       + "Unregistered defendant solicitor firm: %s.",
-                                         StringUtils.join(getDefendantNames(UNREPRESENTED, caseData), " and "),
-                                         StringUtils.join(getDefendantNames(UNREGISTERED, caseData), " and "));
+                                        StringUtils.join(getDefendantNames(UNREPRESENTED, caseData), " and "),
+                                        StringUtils.join(
+                                            getDefendantNames(featureToggleService.isNoticeOfChangeEnabled()
+                                                                  ? UNREGISTERED_NOTICE_OF_CHANGE : UNREGISTERED,
+                                                              caseData), " and "
+                                        ));
                 case FULL_DEFENCE_PROCEED:
                     return !SPEC_CLAIM.equals(caseData.getSuperClaimType())
                         ? getDescriptionFullDefenceProceed(caseData) : null;
