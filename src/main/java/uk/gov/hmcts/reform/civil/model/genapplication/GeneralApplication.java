@@ -7,6 +7,7 @@ import lombok.Data;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
@@ -43,6 +44,9 @@ public class GeneralApplication implements MappableObject {
     private final String defendant1PartyName;
     private final String defendant2PartyName;
     private final String generalAppSuperClaimType;
+    private final CaseLocation caseManagementLocation;
+    private final YesOrNo isCcmccLocation;
+    private final DynamicList caseManagementCategory;
 
     @JsonCreator
     GeneralApplication(@JsonProperty("generalAppType") GAApplicationType generalAppType,
@@ -71,7 +75,11 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("claimant2PartyName") String claimant2PartyName,
                        @JsonProperty("defendant1PartyName") String defendant1PartyName,
                        @JsonProperty("defendant2PartyName") String defendant2PartyName,
-                       @JsonProperty("generalAppSuperClaimType") String generalAppSuperClaimType) {
+                       @JsonProperty("generalAppSuperClaimType") String generalAppSuperClaimType,
+                       @JsonProperty("caseManagementLocation") CaseLocation caseManagementLocation,
+                       @JsonProperty("isCcmccLocation") YesOrNo isCcmccLocation,
+                       @JsonProperty("caseManagementCategory") DynamicList caseManagementCategory
+                       ) {
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
         this.businessProcess = businessProcess;
@@ -97,5 +105,8 @@ public class GeneralApplication implements MappableObject {
         this.defendant1PartyName = defendant1PartyName;
         this.defendant2PartyName = defendant2PartyName;
         this.generalAppSuperClaimType = generalAppSuperClaimType;
+        this.caseManagementLocation = caseManagementLocation;
+        this.isCcmccLocation = isCcmccLocation;
+        this.caseManagementCategory = caseManagementCategory;
     }
 }

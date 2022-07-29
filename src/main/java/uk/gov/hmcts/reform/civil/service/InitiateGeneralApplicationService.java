@@ -3,17 +3,22 @@ package uk.gov.hmcts.reform.civil.service;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
@@ -24,6 +29,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.prd.model.Organisation;
@@ -31,6 +38,7 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,9 +47,20 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
+import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -58,6 +77,7 @@ public class InitiateGeneralApplicationService {
 
     private final OrganisationApi organisationApi;
     private final AuthTokenGenerator authTokenGenerator;
+    private final LocationRefDataService locationRefDataService;
 
     private static final int NUMBER_OF_DEADLINE_DAYS = 5;
     public static final String URGENCY_DATE_REQUIRED = "Details of urgency consideration date required.";
@@ -73,6 +93,10 @@ public class InitiateGeneralApplicationService {
         + "you must provide at least one valid Date from";
     public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after "
         + "Unavailability Date to. Please enter valid range.";
+
+    private static final List<CaseState> statesBeforeSDO = Arrays.asList(PENDING_CASE_ISSUED, CASE_ISSUED,
+            AWAITING_CASE_DETAILS_NOTIFICATION, AWAITING_RESPONDENT_ACKNOWLEDGEMENT, CASE_DISMISSED,
+            AWAITING_APPLICANT_INTENTION, PROCEEDS_IN_HERITAGE_SYSTEM);
 
     public CaseData buildCaseData(CaseData.CaseDataBuilder dataBuilder, CaseData caseData, UserDetails userDetails,
                                   String authToken) {
@@ -107,6 +131,15 @@ public class InitiateGeneralApplicationService {
         } else {
             applicationBuilder.isMultiParty(NO);
         }
+
+        Pair<CaseLocation, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
+        //caseManagementCategory
+        applicationBuilder.caseManagementCategory(getCaseManagementCategory()).build();
+
+        //Setting Work Allocation location and location name
+        applicationBuilder.caseManagementLocation(caseLocation.getLeft());
+        applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
+
         applicationBuilder.claimant1PartyName(caseData.getApplicant1().getPartyName());
         applicationBuilder.defendant1PartyName(caseData.getRespondent1().getPartyName());
         if (YES.equals(caseData.getAddApplicant2())) {
@@ -163,6 +196,15 @@ public class InitiateGeneralApplicationService {
             .build();
 
         return helper.setRespondentDetailsIfPresent(generalApplication, caseData, userDetails);
+    }
+
+    private DynamicList getCaseManagementCategory() {
+        List<String> civilCategory = List.of("Civil");
+        DynamicList cmcCivil = fromList(civilCategory);
+        Optional<DynamicListElement> first = cmcCivil.getListItems().stream()
+                .filter(l -> l.getLabel().equals(civilCategory.get(0))).findFirst();
+        first.ifPresent(cmcCivil::setValue);
+        return cmcCivil;
     }
 
     private List<Element<GeneralApplication>> addApplication(GeneralApplication application,
@@ -284,5 +326,62 @@ public class InitiateGeneralApplicationService {
             respondentCaseRoles.add(caseData.getRespondent2OrganisationPolicy().getOrgPolicyCaseAssignedRole());
         }
         return respondentCaseRoles;
+    }
+
+    private Pair<CaseLocation, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
+        if (hasSDOBeenMade(caseData.getCcdState())) {
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+                if (INDIVIDUAL.equals(caseData.getApplicant1().getType())
+                        || SOLE_TRADER.equals(caseData.getApplicant1().getType())) {
+                    return Pair.of(getClaimant1PreferredLocation(caseData), false);
+                } else {
+                    return Pair.of(getDefendant1PreferredLocation(caseData), false);
+                }
+            } else {
+                return Pair.of(getClaimant1PreferredLocation(caseData), false);
+            }
+        } else {
+            LocationRefData ccmccLocation = locationRefDataService.getCcmccLocation(authToken);
+            CaseLocation courtLocation = CaseLocation.builder()
+                    .region(ccmccLocation.getRegionId())
+                    .baseLocation(ccmccLocation.getEpimmsId())
+                    .build();
+            return Pair.of(courtLocation, true);
+        }
+    }
+
+    private boolean hasSDOBeenMade(CaseState state) {
+        return !statesBeforeSDO.contains(state);
+    }
+
+    private CaseLocation getClaimant1PreferredLocation(CaseData caseData) {
+        if (caseData.getApplicant1DQ() == null
+                || caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() == null
+                || caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode() == null) {
+            return CaseLocation.builder().build();
+        }
+        return CaseLocation.builder()
+                //.region(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getHearingPreferredRegionId())
+                .region(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode())
+                //.baseLocation(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt()
+                //.getHearingPreferredCourtVenueId())
+                .baseLocation(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode())
+                .build();
+    }
+
+    private CaseLocation getDefendant1PreferredLocation(CaseData caseData) {
+        if (caseData.getRespondent1DQ() == null
+                || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() == null
+                || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode() == null) {
+            return CaseLocation.builder().build();
+        }
+        //return caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode();
+        return CaseLocation.builder()
+                //.region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getHearingPreferredRegionId())
+                .region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode())
+                //.baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
+                //.getHearingPreferredCourtVenueId())
+                .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode())
+                .build();
     }
 }
