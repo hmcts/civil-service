@@ -133,6 +133,8 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
+                .respondent2Represented(YES)
+                .respondent2OrgRegistered(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -393,6 +395,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateNotificationAcknowledgedRespondent2()
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
+                .respondent2Represented(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())

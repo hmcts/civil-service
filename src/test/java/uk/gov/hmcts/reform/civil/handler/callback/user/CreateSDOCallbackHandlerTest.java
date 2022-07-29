@@ -181,6 +181,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingClaimSettlingToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingCostsToggle").isNotNull();
             assertThat(response.getData()).extracting("disposalHearingApplicationsOrderToggle").isNotNull();
+            assertThat(response.getData()).extracting("smallClaimsHearingToggle").isNotNull();
+            assertThat(response.getData()).extracting("smallClaimsMethodToggle").isNotNull();
+            assertThat(response.getData()).extracting("smallClaimsDocumentsToggle").isNotNull();
+            assertThat(response.getData()).extracting("smallClaimsWitnessStatementToggle").isNotNull();
 
             assertThat(response.getData()).extracting("disposalHearingJudgesRecital").extracting("input")
                 .isEqualTo("Upon considering the claim Form and Particulars of Claim/statements of case "
@@ -252,7 +256,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingNotes").extracting("date")
                 .isEqualTo(LocalDate.now().plusWeeks(1).toString());
 
-            assertThat(response.getData()).extracting("disposalHearingJudgementDeductionValue").isEqualTo(null);
+            assertThat(response.getData()).doesNotHaveToString("disposalHearingJudgementDeductionValue");
             assertThat(response.getData()).extracting("disposalHearingPreferredTelephone").extracting("telephone")
                 .isEqualTo("N/A");
             assertThat(response.getData()).extracting("disposalHearingPreferredEmail").extracting("email")
@@ -262,7 +266,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("District Judge Perna has considered the statements of case and the information provided "
                                + "by the parties, \n\nIT IS ORDERED that:-");
 
-            assertThat(response.getData()).extracting("fastTrackJudgementDeductionValue").isEqualTo(null);
+            assertThat(response.getData()).doesNotHaveToString("fastTrackJudgementDeductionValue");
 
             assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input1")
                 .isEqualTo("By serving a list with a disclosure statement by 4pm on");
@@ -288,8 +292,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "witnesses of fact on whom he intends to rely");
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input2")
                 .isEqualTo("All statements to be no more than");
-            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input3")
-                .isEqualTo(null);
+            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").doesNotHaveToString("input3");
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input4")
                 .isEqualTo("pages long, A4, double spaced and in font size 12.");
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input5")
@@ -456,7 +459,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "provided by the parties,"
                                + " \n\nIT IS ORDERED that:-");
 
-            assertThat(response.getData()).extracting("smallClaimsJudgementDeductionValue").isEqualTo(null);
+            assertThat(response.getData()).doesNotHaveToString("smallClaimsJudgementDeductionValue");
 
             assertThat(response.getData()).extracting("smallClaimsHearing").extracting("input1")
                 .isEqualTo("The hearing of the claim will be on a date to be notified to you by a separate "
@@ -480,10 +483,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "less than 14 days before the hearing, copies of the statements of any witness "
                                + "(including themselves) upon whose evidence they intend to rely at the hearing. "
                                + "This is limited to");
-            assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("input2")
-                .isEqualTo(null);
-            assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("input3")
-                .isEqualTo(null);
+            assertThat(response.getData()).extracting("smallClaimsWitnessStatement").doesNotHaveToString("input2");
+            assertThat(response.getData()).extracting("smallClaimsWitnessStatement").doesNotHaveToString("input3");
             assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("input4")
                 .isEqualTo("For this limitation, a party is counted as a witness.");
             assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("text")
@@ -565,7 +566,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPrePopulateDisposalHearingJudgementDeductionValueWhenDrawDirectionsOrderIsNotNull() {
             JudgementSum tempJudgementSum = JudgementSum.builder()
-                .judgementSum(12)
+                .judgementSum(12.0)
                 .build();
 
             CaseData caseData = CaseDataBuilder.builder()
@@ -580,11 +581,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("disposalHearingJudgementDeductionValue").extracting("value")
-                .isEqualTo("12%");
+                .isEqualTo("12.0%");
             assertThat(response.getData()).extracting("fastTrackJudgementDeductionValue").extracting("value")
-                .isEqualTo("12%");
+                .isEqualTo("12.0%");
             assertThat(response.getData()).extracting("smallClaimsJudgementDeductionValue").extracting("value")
-                .isEqualTo("12%");
+                .isEqualTo("12.0%");
         }
 
         @Test
