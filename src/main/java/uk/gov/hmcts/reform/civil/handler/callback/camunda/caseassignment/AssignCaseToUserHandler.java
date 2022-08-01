@@ -9,15 +9,20 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.singletonMap;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1;
 
@@ -31,6 +36,8 @@ public class AssignCaseToUserHandler extends CallbackHandler {
     private final CoreCaseUserService coreCaseUserService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper objectMapper;
+    private final CoreCaseDataService coreCaseDataService;
+    private final PaymentsConfiguration paymentsConfiguration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -58,7 +65,19 @@ public class AssignCaseToUserHandler extends CallbackHandler {
 
         coreCaseUserService.assignCase(caseId, submitterId, organisationId, CaseRole.APPLICANTSOLICITORONE);
         coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, submitterId, organisationId);
+        // This sets the "supplementary_data" value "HmctsServiceId to the Unspec service ID AAA7
+        setSupplementaryData(caseData.getCcdCaseReference(), callbackParams);
 
         return SubmittedCallbackResponse.builder().build();
+    }
+
+    private void setSupplementaryData(Long caseId, CallbackParams callbackParams) {
+        String authorisation = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        Map<String, Map<String, Map<String, Object>>> supplementaryDataCivil = new HashMap<>();
+        supplementaryDataCivil.put("supplementary_data_updates",
+                                   singletonMap("$set", singletonMap("HMCTSServiceId",
+                                                                     paymentsConfiguration.getSiteId())));
+        coreCaseDataService.setSupplementaryData(authorisation, caseId, supplementaryDataCivil);
+
     }
 }

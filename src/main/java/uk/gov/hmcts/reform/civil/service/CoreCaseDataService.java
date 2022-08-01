@@ -93,4 +93,11 @@ public class CoreCaseDataService {
         String userId = userService.getUserInfo(userToken).getUid();
         return UserAuthContent.builder().userToken(userToken).userId(userId).build();
     }
+
+    public CaseDetails setSupplementaryData(String authorisation, Long caseId, Map<String, Map<String,
+        Map<String, Object>>> supplementaryData) {
+        return coreCaseDataApi.submitSupplementaryData(authorisation, authTokenGenerator.generate(),
+                                                       caseId.toString(), supplementaryData);
+    }
+
 }

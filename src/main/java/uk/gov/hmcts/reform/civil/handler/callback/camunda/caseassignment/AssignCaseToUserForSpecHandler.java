@@ -5,22 +5,29 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.singletonMap;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC;
 
 @Service
@@ -34,11 +41,13 @@ public class AssignCaseToUserForSpecHandler extends CallbackHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper objectMapper;
     private final FeatureToggleService toggleService;
+    private final CoreCaseDataService coreCaseDataService;
+    private final PaymentsConfiguration paymentsConfiguration;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::assignSolicitorCaseRole
+            callbackKey(SUBMITTED), this::assignSolicitorCaseRole
         );
     }
 
@@ -65,13 +74,20 @@ public class AssignCaseToUserForSpecHandler extends CallbackHandler {
 
         coreCaseUserService.assignCase(caseId, submitterId, organisationId, CaseRole.APPLICANTSOLICITORONESPEC);
         coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, submitterId, organisationId);
+        // This sets the "supplementary_data" value "HmctsServiceId to the Spec service ID AAA6
+        setSupplementaryData(caseData.getCcdCaseReference(), callbackParams);
 
-        CaseData updated = caseData.toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(userDetails.getEmail()).build())
-            .build();
+        return SubmittedCallbackResponse.builder().build();
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updated.toMap(objectMapper))
-            .build();
+    }
+
+    private void setSupplementaryData(Long caseId, CallbackParams callbackParams) {
+        String authorisation = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        Map<String, Map<String, Map<String, Object>>> supplementaryDataCivil = new HashMap<>();
+        supplementaryDataCivil.put("supplementary_data_updates",
+                                   singletonMap("$set", singletonMap("HMCTSServiceId",
+                                                                     paymentsConfiguration.getSpecSiteId())));
+        coreCaseDataService.setSupplementaryData(authorisation, caseId, supplementaryDataCivil);
+
     }
 }
