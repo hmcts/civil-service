@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentUtil;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,6 +33,7 @@ public class ClaimFormService {
     private final GenerateClaimFormForSpecCallbackHandler generateClaimFormForSpecCallbackHandler;
     private final Time time;
     private final DeadlinesCalculator deadlinesCalculator;
+    private final DocumentUtil documentUtil;
 
     public CaseDocument uploadSealedDocument(
         String authorisation, CaseData caseData) {
@@ -43,7 +45,7 @@ public class ClaimFormService {
             .claimDismissedDate(null);
         CaseDocument sealClaimForm = sealedClaimFormGeneratorForSpec.generate(caseData, authorisation);
 
-        List<DocumentMetaData> documentMetaDataList = generateClaimFormForSpecCallbackHandler
+        List<DocumentMetaData> documentMetaDataList = documentUtil
             .fetchDocumentsFromCaseData(caseData, sealClaimForm);
 
         if (documentMetaDataList.size() > 1) {
@@ -71,9 +73,9 @@ public class ClaimFormService {
 
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealClaimForm));
-            System.out.println("before building ");
+            System.out.println("before building 1 ");
             caseDataBuilder.build();
-            System.out.println("after building ");
+            System.out.println("after building 1");
             return sealClaimForm;
         }
 
