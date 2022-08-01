@@ -59,6 +59,8 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredTelephone;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -104,6 +106,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
+    private final IdamClient idamClient;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -646,6 +649,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        caseData.setSdoSubmissionRoles(userDetails.getRoles());
+
+
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
 
         return AboutToStartOrSubmitCallbackResponse.builder()

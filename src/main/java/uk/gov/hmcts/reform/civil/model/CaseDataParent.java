@@ -184,6 +184,7 @@ public class CaseDataParent implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> smallClaimsMethodToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsDocumentsToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsWitnessStatementToggle;
+    private List<String> sdoSubmissionRoles;
 
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
