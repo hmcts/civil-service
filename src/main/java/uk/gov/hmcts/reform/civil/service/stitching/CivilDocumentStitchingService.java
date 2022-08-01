@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.stitching;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,14 +52,6 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
                 caseData
             );
 
-        try {
-            ObjectMapper mapper1 = new ObjectMapper();
-            log.info("json- with bundle-----------" + mapper1.writeValueAsString(payload));
-
-        } catch (JsonProcessingException jpe) {
-            log.info("-----------in exception------------");
-        }
-
         CaseData caseData1 =
             bundleRequestExecutor.post(
                 BundleRequest.builder().caseDetails(payload).build(),
@@ -91,14 +82,6 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
             }
         } else {
             log.info("Case data is null----------");
-        }
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            log.info("json- with bundle-----------");
-            mapper.writeValueAsString(caseDocument);
-
-        } catch (JsonProcessingException jpe) {
-            log.info("-----------in exception------------");
         }
 
         return caseDocument;
