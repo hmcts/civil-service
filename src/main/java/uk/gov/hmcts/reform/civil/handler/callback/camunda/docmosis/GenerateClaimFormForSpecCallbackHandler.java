@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGen
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentUtil;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
