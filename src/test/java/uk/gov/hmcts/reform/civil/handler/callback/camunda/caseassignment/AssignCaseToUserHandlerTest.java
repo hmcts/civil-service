@@ -61,6 +61,27 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
     private CaseData caseData;
 
     @Nested
+    class AssignHmctsServiceId {
+
+        @BeforeEach
+        void setup() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
+
+            Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
+            });
+            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
+        }
+
+        @Test
+        void shouldReturnSupplementaryDataOnSubmitted() {
+            assignCaseToUserHandler.handle(params);
+            verify(coreCaseDataService).setSupplementaryData(any(), any(), eq(supplementaryData()));
+        }
+
+    }
+
+    @Nested
     class AssignRolesIn1v1CasesRegisteredAndRespresented {
 
         @BeforeEach
@@ -81,31 +102,9 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
                                                    .build())
                 .build();
 
-            when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
-
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
             params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
-        }
-
-        @Test
-        void shouldReturnSuppleDataOnSubmitted() {
-            assignCaseToUserHandler.handle(params);
-
-            verify(coreCaseDataService).setSupplementaryData(any(), any(), eq(supplementaryData()));
-        }
-
-        private Map<String, Map<String, Map<String, Object>>> supplementaryData() {
-            Map<String, Object> hmctsServiceIdMap = new HashMap<>();
-            hmctsServiceIdMap.put("HMCTSServiceId", "AAA7");
-
-            Map<String, Map<String, Object>> supplementaryDataRequestMap = new HashMap<>();
-            supplementaryDataRequestMap.put("$set", hmctsServiceIdMap);
-
-            Map<String, Map<String, Map<String, Object>>> supplementaryDataUpdates = new HashMap<>();
-            supplementaryDataUpdates.put("supplementary_data_updates", supplementaryDataRequestMap);
-
-            return supplementaryDataUpdates;
         }
 
         @Test
@@ -267,5 +266,18 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
             "OrgId1"
         );
 
+    }
+
+    private Map<String, Map<String, Map<String, Object>>> supplementaryData() {
+        Map<String, Object> hmctsServiceIdMap = new HashMap<>();
+        hmctsServiceIdMap.put("HMCTSServiceId", "AAA7");
+
+        Map<String, Map<String, Object>> supplementaryDataRequestMap = new HashMap<>();
+        supplementaryDataRequestMap.put("$set", hmctsServiceIdMap);
+
+        Map<String, Map<String, Map<String, Object>>> supplementaryDataUpdates = new HashMap<>();
+        supplementaryDataUpdates.put("supplementary_data_updates", supplementaryDataRequestMap);
+
+        return supplementaryDataUpdates;
     }
 }
