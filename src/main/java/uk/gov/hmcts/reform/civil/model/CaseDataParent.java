@@ -252,4 +252,10 @@ public class CaseDataParent implements MappableObject {
      */
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal respondToAdmittedClaimOwingAmountPounds2;
+
+    /**
+     * Adding for PiP to citizen UI.
+     */
+    private final DefendantPinToPostLRspec respondent1PinToPostLRspec;
+    private final String respondent1EmailAddress;
 }

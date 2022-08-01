@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CloseClaim;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
+import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -276,6 +277,7 @@ public class CaseDataBuilder {
     private String respondent2OrganisationIDCopy;
     private String caseManagementOrderSelection;
     private LocalDateTime addLegalRepDeadline;
+    private DefendantPinToPostLRspec respondent1PinToPostLRspec;
     private DisposalHearingMethodDJ trialHearingMethodDJ;
     private DisposalHearingMethodDJ disposalHearingMethodDJ;
     private DynamicList trialHearingMethodInPersonDJ;
@@ -1362,6 +1364,30 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimIssued1v2AndSameUnregisteredRepresentative() {
         atStateClaimIssued1v2AndSameRepresentative();
+        respondent1OrgRegistered = NO;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmitted2v1RespondentUnrepresented() {
+        atStateClaimSubmitted();
+        multiPartyClaimTwoApplicants();
+        respondent1Represented = NO;
+        respondent1OrgRegistered = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmitted2v1RespondentRegistered() {
+        atStateClaimSubmitted();
+        multiPartyClaimTwoApplicants();
+        respondent1Represented = YES;
+        respondent1OrgRegistered = YES;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmitted2v1RespondentUnregistered() {
+        atStateClaimSubmitted();
+        multiPartyClaimTwoApplicants();
+        respondent1Represented = YES;
         respondent1OrgRegistered = NO;
         return this;
     }
@@ -3222,6 +3248,7 @@ public class CaseDataBuilder {
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
             .breathing(breathing)
             .caseManagementOrderSelection(caseManagementOrderSelection)
+            .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
             .trialHearingMethodDJ(trialHearingMethodDJ)
             .disposalHearingMethodDJ(disposalHearingMethodDJ)
             .trialHearingMethodInPersonDJ(trialHearingMethodInPersonDJ)
