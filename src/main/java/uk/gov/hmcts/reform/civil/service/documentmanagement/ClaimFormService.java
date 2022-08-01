@@ -55,7 +55,7 @@ public class ClaimFormService {
         log.info("before calling fetch document");
         List<DocumentMetaData> documentMetaDataList = generateClaimFormForSpecCallbackHandler
             .fetchDocumentsFromCaseData(caseData, sealClaimForm);
-        log.info("after calling fetch document");
+        log.info("fetch document, documentMetaDataList size "+ documentMetaDataList.size());
 
         if (documentMetaDataList.size() > 1) {
             CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
