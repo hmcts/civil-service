@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CloseClaim;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
+import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -276,6 +277,7 @@ public class CaseDataBuilder {
     private String respondent2OrganisationIDCopy;
     private String caseManagementOrderSelection;
     private LocalDateTime addLegalRepDeadline;
+    private DefendantPinToPostLRspec respondent1PinToPostLRspec;
     private DisposalHearingMethodDJ trialHearingMethodDJ;
     private DisposalHearingMethodDJ disposalHearingMethodDJ;
     private DynamicList trialHearingMethodInPersonDJ;
@@ -3226,6 +3228,7 @@ public class CaseDataBuilder {
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
             .breathing(breathing)
             .caseManagementOrderSelection(caseManagementOrderSelection)
+            .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
             .trialHearingMethodDJ(trialHearingMethodDJ)
             .disposalHearingMethodDJ(disposalHearingMethodDJ)
             .trialHearingMethodInPersonDJ(trialHearingMethodInPersonDJ)
