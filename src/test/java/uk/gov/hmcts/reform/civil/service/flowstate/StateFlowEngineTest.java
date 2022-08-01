@@ -223,6 +223,63 @@ class StateFlowEngineTest {
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
         }
 
+        @Test
+        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted2v1RespondentIsUnrepresented() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentUnrepresented()
+                .build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_SUBMITTED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(2)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
+        }
+
+        @Test
+        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted2v1RespondentIsUnregistered() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentUnregistered()
+                .build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_SUBMITTED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(2)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
+        }
+
+        @Test
+        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted2v1RespondentIsRegistered() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_SUBMITTED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(2)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
+        }
+
         // remove this when NoC is implemented
         @Nested
         class UnrepresentedTakenOfflineBeforeNoC {
