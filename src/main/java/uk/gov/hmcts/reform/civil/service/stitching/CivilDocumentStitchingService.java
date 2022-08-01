@@ -122,7 +122,8 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         List<IdValue<Bundle>> idValueList = new ArrayList<>();
         idValueList.add(new IdValue<>(
             "1",
-            new Bundle(                "1",
+            new Bundle(
+                "1",
                 bundleTitle,
                 "",
                 "yes",
