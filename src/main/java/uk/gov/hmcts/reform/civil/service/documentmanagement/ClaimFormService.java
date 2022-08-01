@@ -8,7 +8,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.CaseDetails;
-import uk.gov.hmcts.reform.civil.CaseDefinitionConstants;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis.GenerateClaimFormForSpecCallbackHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
@@ -72,10 +71,12 @@ public class ClaimFormService {
                .build();
             log.info("after building ");
             if (stitchedDocument.getError() != null &&  !stitchedDocument.getError().isEmpty()) {
+                log.info("There is issue with Stitching");
                 return sealClaimForm;
 
             } else {
                 if (stitchedDocument.getDocumentSize() > 1) {
+                    log.info("Document been stitched okay");
                     return stitchedDocument;
                 } else {
                     return sealClaimForm;
