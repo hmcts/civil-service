@@ -55,7 +55,9 @@ public class ClaimFormService {
                 caseData
             );
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
+            System.out.println("before building ");
             caseDataBuilder.build();
+            System.out.println("after building ");
             if (stitchedDocument.getError() != null &&  !stitchedDocument.getError().isEmpty()) {
                 return sealClaimForm;
 
@@ -69,7 +71,9 @@ public class ClaimFormService {
 
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealClaimForm));
+            System.out.println("before building ");
             caseDataBuilder.build();
+            System.out.println("after building ");
             return sealClaimForm;
         }
 
