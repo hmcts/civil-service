@@ -35,23 +35,23 @@ public class ClaimFormService {
 
     public CaseDocument uploadSealedDocument(
         String authorisation, CaseData caseData) {
-        System.out.println(" Called End point");
+        log.info(" Called End point");
         LocalDate issueDate = time.now().toLocalDate();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder().issueDate(issueDate)
             .respondent1ResponseDeadline(
                 deadlinesCalculator.plus14DaysAt4pmDeadline(LocalDateTime.now()))
             // .respondent1Represented(YES)
             .claimDismissedDate(null);
-        System.out.println("before calling seal claim generator");
+        log.info("before calling seal claim generator");
         CaseDocument sealClaimForm = sealedClaimFormGeneratorForSpec.generate(caseData, authorisation);
-        System.out.println(" sealClaimForm document name " + sealClaimForm.getDocumentName());
-        System.out.println(" sealClaimForm document size" + sealClaimForm.getDocumentSize());
-        System.out.println(" sealClaimForm document link" + sealClaimForm.getDocumentLink());
+        log.info(" sealClaimForm document name " + sealClaimForm.getDocumentName());
+        log.info(" sealClaimForm document size" + sealClaimForm.getDocumentSize());
+        log.info(" sealClaimForm document link" + sealClaimForm.getDocumentLink());
 
-        System.out.println("before calling fetch document");
+        log.info("before calling fetch document");
         List<DocumentMetaData> documentMetaDataList = generateClaimFormForSpecCallbackHandler
             .fetchDocumentsFromCaseData(caseData, sealClaimForm);
-        System.out.println("after calling fetch document");
+        log.info("after calling fetch document");
 
         if (documentMetaDataList.size() > 1) {
             CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
@@ -62,9 +62,9 @@ public class ClaimFormService {
                 caseData
             );
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
-            System.out.println("before building ");
+            log.info("before building ");
             caseDataBuilder.build();
-            System.out.println("after building ");
+            log.info("after building ");
             if (stitchedDocument.getError() != null &&  !stitchedDocument.getError().isEmpty()) {
                 return sealClaimForm;
 
@@ -78,9 +78,9 @@ public class ClaimFormService {
 
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealClaimForm));
-            System.out.println("before building 1 ");
+            log.info("before building 1 ");
             caseDataBuilder.build();
-            System.out.println("after building 1");
+            log.info("after building 1");
             return sealClaimForm;
         }
 
