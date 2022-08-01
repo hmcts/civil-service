@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentUtil;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 
 @RunWith(SpringRunner.class)
@@ -27,9 +26,6 @@ public class GenerateClaimFormForSpecHandlerTest {
 
     @MockBean
     private SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
-
-    @MockBean
-    private DocumentUtil documentUtil;
 
     @MockBean
     private ObjectMapper objectMapper;

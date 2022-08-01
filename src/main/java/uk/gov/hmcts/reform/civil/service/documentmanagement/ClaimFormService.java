@@ -29,10 +29,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 public class ClaimFormService {
 
     private final CivilDocumentStitchingService civilDocumentStitchingService;
-    private final GenerateClaimFormForSpecCallbackHandler generateClaimFormForSpecCallbackHandler;
     private final Time time;
     private final DeadlinesCalculator deadlinesCalculator;
-    private final DocumentUtil documentUtil;
+    private final GenerateClaimFormForSpecCallbackHandler generateClaimFormForSpecCallbackHandler;
 
     public CaseDocument uploadSealedDocument(
         String authorisation, CaseData caseData) {
@@ -44,7 +43,7 @@ public class ClaimFormService {
             .claimDismissedDate(null);
         CaseDocument sealClaimForm = sealedClaimFormGeneratorForSpec.generate(caseData, authorisation);
 
-        List<DocumentMetaData> documentMetaDataList = documentUtil
+        List<DocumentMetaData> documentMetaDataList = generateClaimFormForSpecCallbackHandler
             .fetchDocumentsFromCaseData(caseData, sealClaimForm);
 
         if (documentMetaDataList.size() > 1) {

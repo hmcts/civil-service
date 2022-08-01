@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.ClaimFormService;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentUtil;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 
 import java.util.ArrayList;
@@ -31,9 +30,6 @@ public class DocumentControllerStitchedTest extends BaseIntegrationTest {
     @MockBean
     private GenerateClaimFormForSpecCallbackHandler generateClaimFormForSpecCallbackHandler;
 
-    @MockBean
-    private DocumentUtil documentUtil;
-
     @Autowired
     private ClaimFormService claimFormService;
 
@@ -47,7 +43,7 @@ public class DocumentControllerStitchedTest extends BaseIntegrationTest {
         CaseDocument sealClaimForm = Mockito.mock(CaseDocument.class);
         List<DocumentMetaData> documentMetaDataList = new ArrayList<>();
         Mockito.when(sealedClaimFormGeneratorForSpec.generate(caseData, BEARER_TOKEN)).thenReturn(sealClaimForm);
-        Mockito.when(documentUtil.fetchDocumentsFromCaseData(caseData, sealClaimForm))
+        Mockito.when(generateClaimFormForSpecCallbackHandler.fetchDocumentsFromCaseData(caseData, sealClaimForm))
             .thenReturn(documentMetaDataList);
 
         Assertions.assertEquals(sealClaimForm, claimFormService.uploadSealedDocument(BEARER_TOKEN, caseData));
@@ -62,7 +58,7 @@ public class DocumentControllerStitchedTest extends BaseIntegrationTest {
         List<DocumentMetaData> documentMetaDataList = List.of(Mockito.mock(DocumentMetaData.class),
                                                               Mockito.mock(DocumentMetaData.class));
         Mockito.when(sealedClaimFormGeneratorForSpec.generate(caseData, BEARER_TOKEN)).thenReturn(sealClaimForm);
-        Mockito.when(documentUtil.fetchDocumentsFromCaseData(caseData, sealClaimForm))
+        Mockito.when(generateClaimFormForSpecCallbackHandler.fetchDocumentsFromCaseData(caseData, sealClaimForm))
             .thenReturn(documentMetaDataList);
 
         stitchedDocument.setError(List.of("Error"));
@@ -81,7 +77,7 @@ public class DocumentControllerStitchedTest extends BaseIntegrationTest {
         List<DocumentMetaData> documentMetaDataList = List.of(Mockito.mock(DocumentMetaData.class),
                                                               Mockito.mock(DocumentMetaData.class));
         Mockito.when(sealedClaimFormGeneratorForSpec.generate(caseData, BEARER_TOKEN)).thenReturn(sealClaimForm);
-        Mockito.when(documentUtil.fetchDocumentsFromCaseData(caseData, sealClaimForm))
+        Mockito.when(generateClaimFormForSpecCallbackHandler.fetchDocumentsFromCaseData(caseData, sealClaimForm))
             .thenReturn(documentMetaDataList);
         stitchedDocument.setError(List.of(""));
         Mockito.when(civilDocumentStitchingService.bundle(documentMetaDataList, BEARER_TOKEN, null,

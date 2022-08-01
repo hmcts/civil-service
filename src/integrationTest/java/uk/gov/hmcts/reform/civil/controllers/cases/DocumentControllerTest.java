@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.ClaimFormService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentUtil;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
@@ -57,9 +56,6 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
     @Autowired
     private ClaimFormService claimFormService;
-
-    @MockBean
-    private DocumentUtil documentUtil;
 
     @Autowired
     private DocumentController documentController;
