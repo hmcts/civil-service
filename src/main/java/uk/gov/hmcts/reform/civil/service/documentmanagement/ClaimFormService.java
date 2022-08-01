@@ -35,16 +35,23 @@ public class ClaimFormService {
 
     public CaseDocument uploadSealedDocument(
         String authorisation, CaseData caseData) {
+        System.out.println(" Called End point");
         LocalDate issueDate = time.now().toLocalDate();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder().issueDate(issueDate)
             .respondent1ResponseDeadline(
                 deadlinesCalculator.plus14DaysAt4pmDeadline(LocalDateTime.now()))
             // .respondent1Represented(YES)
             .claimDismissedDate(null);
+        System.out.println("before calling seal claim generator");
         CaseDocument sealClaimForm = sealedClaimFormGeneratorForSpec.generate(caseData, authorisation);
+        System.out.println(" sealClaimForm document name " + sealClaimForm.getDocumentName());
+        System.out.println(" sealClaimForm document size" + sealClaimForm.getDocumentSize());
+        System.out.println(" sealClaimForm document link" + sealClaimForm.getDocumentLink());
 
+        System.out.println("before calling fetch document");
         List<DocumentMetaData> documentMetaDataList = generateClaimFormForSpecCallbackHandler
             .fetchDocumentsFromCaseData(caseData, sealClaimForm);
+        System.out.println("after calling fetch document");
 
         if (documentMetaDataList.size() > 1) {
             CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
