@@ -55,7 +55,7 @@ public class ClaimFormService {
                 caseData
             );
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
-
+            caseDataBuilder.build();
             if (stitchedDocument.getError() != null &&  !stitchedDocument.getError().isEmpty()) {
                 return sealClaimForm;
 
@@ -69,8 +69,10 @@ public class ClaimFormService {
 
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealClaimForm));
+            caseDataBuilder.build();
             return sealClaimForm;
         }
+
     }
 
     @Autowired
