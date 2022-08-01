@@ -377,9 +377,19 @@ public class StateFlowEngine {
             .state(FULL_DEFENCE)
                 .transitionTo(FULL_DEFENCE_PROCEED)
             .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation))
-            .set(flags -> flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true))
+            .set(flags -> {
+                flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), true);
+                if (featureToggleService.isSdoEnabled()) {
+                    flags.put(FlowFlag.SDO_ENABLED.name(), true);
+                }
+            })
                 .transitionTo(FULL_DEFENCE_PROCEED)
             .onlyIf(fullDefenceProceed.and(FlowPredicate.allAgreedToMediation.negate()))
+                .set(flags -> {
+                    if (featureToggleService.isSdoEnabled()) {
+                        flags.put(FlowFlag.SDO_ENABLED.name(), true);
+                    }
+                })
                 .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)

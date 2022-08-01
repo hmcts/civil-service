@@ -52,6 +52,10 @@ public class FeatureToggleService {
         return isFeatureEnabled("specified-lr-journey");
     }
 
+    public boolean isSdoEnabled() {
+        return isFeatureEnabled("enableSDO");
+    }
+
     public LDUser.Builder createLDUser() {
         return new LDUser.Builder("civil-service")
             .custom("timestamp", String.valueOf(System.currentTimeMillis()))
