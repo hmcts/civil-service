@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.civil.service.documentmanagement;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.CaseDetails;
+import uk.gov.hmcts.reform.civil.CaseDefinitionConstants;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis.GenerateClaimFormForSpecCallbackHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
@@ -32,11 +35,13 @@ public class ClaimFormService {
     private final Time time;
     private final DeadlinesCalculator deadlinesCalculator;
     private final GenerateClaimFormForSpecCallbackHandler generateClaimFormForSpecCallbackHandler;
+    private final ObjectMapper objectMapper;
 
     public CaseDocument uploadSealedDocument(
         String authorisation, CaseData caseData) {
         log.info(" Called End point");
         LocalDate issueDate = time.now().toLocalDate();
+
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder().issueDate(issueDate)
             .respondent1ResponseDeadline(
                 deadlinesCalculator.plus14DaysAt4pmDeadline(LocalDateTime.now()))
@@ -63,7 +68,8 @@ public class ClaimFormService {
             );
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
             log.info("before building ");
-            caseDataBuilder.build();
+            CaseDetails.builder().data(caseDataBuilder.build().toMap(objectMapper))
+               .build();
             log.info("after building ");
             if (stitchedDocument.getError() != null &&  !stitchedDocument.getError().isEmpty()) {
                 return sealClaimForm;
@@ -79,7 +85,8 @@ public class ClaimFormService {
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealClaimForm));
             log.info("before building 1 ");
-            caseDataBuilder.build();
+            CaseDetails.builder().data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
             log.info("after building 1");
             return sealClaimForm;
         }
