@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentUtil;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
