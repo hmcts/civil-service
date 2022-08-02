@@ -239,18 +239,23 @@ public class StateFlowEngine {
                         .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
                         .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented))
                         .and(not(specClaim)))
+            .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC)
+                .onlyIf(oneVsOneCase.and(respondent1NotRepresented).and(specClaim))
             .set(flags -> {
                 if (featureToggleService.isPinInPostEnabled()) {
                     flags.put(FlowFlag.PIP_ENABLED.name(), true);
                 }
             })
-            .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC)
-                .onlyIf(oneVsOneCase.and(respondent1NotRepresented).and(specClaim))
             .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
                 .onlyIf(multipartyCase.and(respondent1NotRepresented.and(respondent2NotRepresented)
                     .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
                     .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented)))
                     .and(specClaim))
+            .set(flags -> {
+                if (featureToggleService.isPinInPostEnabled()) {
+                    flags.put(FlowFlag.PIP_ENABLED.name(), true);
+                }
+            })
             // Unregistered
             // 1. Both def1 and def2 unregistered
             // 2. Def1 unregistered, Def2 registered
