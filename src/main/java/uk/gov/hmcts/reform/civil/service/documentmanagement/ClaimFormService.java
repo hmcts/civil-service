@@ -52,9 +52,10 @@ public class ClaimFormService {
         log.info(" sealClaimForm document size" + sealClaimForm.getDocumentSize());
         log.info(" sealClaimForm document link" + sealClaimForm.getDocumentLink());
 
-        log.info("before calling fetch document");
+        log.info("before calling fetch document from case data");
         List<DocumentMetaData> documentMetaDataList = generateClaimFormForSpecCallbackHandler
             .fetchDocumentsFromCaseData(caseData, sealClaimForm);
+
         log.info("fetch document, documentMetaDataList size "+ documentMetaDataList.size());
 
         if (documentMetaDataList.size() > 1) {
@@ -86,8 +87,7 @@ public class ClaimFormService {
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealClaimForm));
             log.info("before building 1 ");
-            CaseDetails.builder().data(caseDataBuilder.build().toMap(objectMapper))
-                .build();
+            CaseDetails.builder().data(caseDataBuilder.build().toMap(objectMapper)).build();
             log.info("after building 1");
             return sealClaimForm;
         }
