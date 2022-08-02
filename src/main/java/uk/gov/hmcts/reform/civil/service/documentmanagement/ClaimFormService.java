@@ -58,8 +58,8 @@ public class ClaimFormService {
 
         log.info("fetch document, documentMetaDataList size " + documentMetaDataList.size());
 
-        if (documentMetaDataList.size() >= 1) {
-            log.info("since size is greater or equal to 1");
+        if (documentMetaDataList.size() > 1) {
+            log.info("since size is greater than 1");
             CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
                 documentMetaDataList,
                 authorisation,  //access token will be taken from postman
@@ -69,8 +69,7 @@ public class ClaimFormService {
             );
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
             log.info("before building if ");
-            CaseDetails.builder().data(caseDataBuilder.build().toMap(objectMapper))
-               .build();
+            CaseDetails.builder().data(caseDataBuilder.build().toMap(objectMapper)).build();
             log.info("after building if");
             if (stitchedDocument.getError() != null &&  !stitchedDocument.getError().isEmpty()) {
                 log.info("There is issue with Stitching");
