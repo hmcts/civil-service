@@ -78,6 +78,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.ReferToJudgeReferences;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -451,6 +452,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String currentDefendant;
     private final YesOrNo claimStarted;
     private final String currentDefendantName;
+    private final ReferToJudgeReferences referToJudgeReferences;
 
     @JsonUnwrapped(suffix = "Breathing")
     private final BreathingSpaceInfo breathing;
