@@ -123,10 +123,10 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "[and the directions questionnaires] \n\n"
                                + "IT IS ORDERED that:-");
 
-            assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocumentsDJ").extracting("input")
+            assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocumentsDJ").extracting("input1")
                 .isEqualTo("The parties shall serve on each other copies of the documents upon which reliance is "
                                + "to be placed at the disposal hearing by 4pm on");
-            assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocumentsDJ").extracting("date")
+            assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocumentsDJ").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(4).toString());
 
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input1")
@@ -145,6 +145,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "quantum as cross-examination will result in the hearing exceeding the 30 minute "
                                + "maximum time estimate for a disposal hearing");
 
+            /*
             assertThat(response.getData()).extracting("disposalHearingMedicalEvidenceDJ").extracting("input1")
                 .isEqualTo("The claimant has permission to rely upon the written expert evidence served with the "
                                + "Particulars of Claim to be disclosed by 4pm");
@@ -155,7 +156,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "4pm on the");
             assertThat(response.getData()).extracting("disposalHearingMedicalEvidenceDJ").extracting("date2")
                 .isEqualTo(LocalDate.now().plusWeeks(4).toString());
-
+            */
             assertThat(response.getData()).extracting("disposalHearingQuestionsToExpertsDJ").extracting("date")
                 .isEqualTo(LocalDate.now().plusWeeks(6).toString());
 

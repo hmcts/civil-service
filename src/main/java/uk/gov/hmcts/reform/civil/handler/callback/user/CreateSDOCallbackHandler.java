@@ -13,12 +13,18 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodTelephoneHearing;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
@@ -26,11 +32,8 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgementDeductionValu
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingPreferredEmail;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingPreferredTelephone;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
@@ -107,6 +110,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "order-details"), this::prePopulateOrderDetailsPages)
             .put(callbackKey(MID, "order-details-navigation"), this::setOrderDetailsFlags)
+            .put(callbackKey(MID, "disposal-hearing-submit"), this::testDisposalHearingFields) //remove later
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -115,6 +119,52 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private CallbackResponse testDisposalHearingFields(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        DisposalHearingFinalDisposalHearing hearing =
+            caseData.getDisposalHearingFinalDisposalHearing();
+
+        if (hearing.getTime() != null) {
+            System.out.println("hearing section, check time estimate: " + hearing.getTime());
+        } else {
+            System.out.println("time is null");
+        }
+
+        DynamicList methodInPerson = caseData.getDisposalHearingMethodInPerson();
+        if (methodInPerson != null) {
+            System.out.println("list value: " + methodInPerson.getValue());
+            System.out.println("selection: " + methodInPerson.getValue().getLabel());
+        } else {
+            System.out.println("method in person is null");
+        }
+
+        DisposalHearingMethod method = caseData.getDisposalHearingMethod();
+        System.out.println("method: " + method);
+        System.out.println("methodInPerson: " + methodInPerson);
+        DisposalHearingMethodTelephoneHearing methodTelephone =
+            caseData.getDisposalHearingMethodTelephoneHearing();
+        System.out.println("telephoneHearing: " + methodTelephone);
+        DisposalHearingMethodVideoConferenceHearing methodVideo =
+            caseData.getDisposalHearingMethodVideoConferenceHearing();
+        System.out.println("videoHearing: " + methodVideo);
+        List<Element<DisposalHearingAddNewDirections>> directions =
+            caseData.getDisposalHearingAddNewDirections();
+        System.out.println("new directions data: " + directions);
+
+        if (directions != null) {
+            for (Element<DisposalHearingAddNewDirections> direction: directions) {
+                System.out.println("text: " + direction.getValue().getDirectionComment());
+            }
+        }
+
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
+            .build();
+
     }
 
     // This is currently a mid event but once pre states are defined it should be moved to an about to start event.
@@ -153,15 +203,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.disposalHearingBundleToggle(checkList);
         updatedData.disposalHearingClaimSettlingToggle(checkList);
         updatedData.disposalHearingCostsToggle(checkList);
-        updatedData.disposalHearingApplicationsOrderToggle(checkList);
         updatedData.smallClaimsHearingToggle(checkList);
         updatedData.smallClaimsMethodToggle(checkList);
         updatedData.smallClaimsDocumentsToggle(checkList);
         updatedData.smallClaimsWitnessStatementToggle(checkList);
 
         DisposalHearingJudgesRecital tempDisposalHearingJudgesRecital = DisposalHearingJudgesRecital.builder()
-            .input("Upon considering the claim Form and Particulars of Claim/statements of case"
-                       + " [and the directions questionnaires] \n\nIT IS ORDERED that:-")
+            .input("Upon considering the claim form, particulars of claim, statements of case"
+                       + " and Directions questionnaires \n\nIt is ordered that:")
             .build();
 
         updatedData.disposalHearingJudgesRecital(tempDisposalHearingJudgesRecital).build();
@@ -179,9 +228,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         DisposalHearingDisclosureOfDocuments tempDisposalHearingDisclosureOfDocuments =
             DisposalHearingDisclosureOfDocuments.builder()
-            .input("The parties shall serve on each other copies of the documents upon which reliance is to be"
+            .input1("The parties shall serve on each other copies of the documents upon which reliance is to be"
                        + " placed at the disposal hearing by 4pm on")
-            .date(LocalDate.now().plusWeeks(4))
+            .date1(LocalDate.now().plusWeeks(4))
+            .input2("The parties must upload to the Digital Portal copies of those documents which they wish the"
+                       + "court to consider when deciding the amount of damages, by 4pm on")
+            .date2(LocalDate.now().plusWeeks(4))
             .build();
 
         updatedData.disposalHearingDisclosureOfDocuments(tempDisposalHearingDisclosureOfDocuments).build();
@@ -191,21 +243,26 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + " on whose evidence reliance is to be placed by 4pm on")
             .date1(LocalDate.now().plusWeeks(4))
             .input2("The provisions of CPR 32.6 apply to such evidence.")
-            .input3("Any application by the defendant/s pursuant to CPR 32.7 must be made by 4pm on")
-            .date2(LocalDate.now().plusWeeks(2))
-            .input4("and must be accompanied by proposed directions for allocation and listing for trial on quantum as"
-                        + " cross-examination will result in the hearing exceeding the 30 minute maximum time estimate"
-                        + " for a disposal hearing")
+            .input3("The claimant must upload to the Digital Portal copies of the witness statements of all witnesses"
+                        + " whose evidence they wish the court to consider "
+                        + "when deciding the amount of damages by 4pm on")
+            .date2(LocalDate.now().plusWeeks(4))
+            .input4("The provisions of CPR 32.6 apply to such evidence.")
+            .input5("Any application by the defendant pursuant to CPR 32.7 must be made by 4pm on")
+            .date3(LocalDate.now().plusWeeks(2))
+            .input6("and must be accompanied by proposed directions for allocation and listing for trial on quantum. "
+                        + "This is because cross-examination will cause the hearing to exceed the 30-minute "
+                        + "maximum time estimate for a disposal hearing.")
             .build();
 
         updatedData.disposalHearingWitnessOfFact(tempDisposalHearingWitnessOfFact).build();
 
         DisposalHearingMedicalEvidence tempDisposalHearingMedicalEvidence = DisposalHearingMedicalEvidence.builder()
-            .input1("The claimant has permission to rely upon the written expert evidence served with the"
-                        + " Particulars of Claim to be disclosed by 4pm")
-            .date1(LocalDate.now().plusWeeks(4))
-            .input2("and any associated correspondence and/or updating report disclosed not later than 4pm on the")
-            .date2(LocalDate.now().plusWeeks(4))
+            .input("The claimant has permission to rely upon the written expert evidence already uploaded to the"
+                        + " Digital Portal with the particulars of claim and in addition has permission to rely upon"
+                        + " any associated correspondence or updating report which is uploaded to the Digital Portal"
+                        + " by 4pm on")
+            .date(LocalDate.now().plusWeeks(4))
             .build();
 
         updatedData.disposalHearingMedicalEvidence(tempDisposalHearingMedicalEvidence).build();
@@ -219,21 +276,20 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         DisposalHearingSchedulesOfLoss tempDisposalHearingSchedulesOfLoss = DisposalHearingSchedulesOfLoss.builder()
             .input1("If there is a claim for ongoing/future loss in the original schedule of losses then the claimant"
-                        + " must send an up to date schedule of loss to the defendant by 4pm on the")
+                        + " must send an up to date schedule of loss to the defendant by 4pm on")
             .date1(LocalDate.now().plusWeeks(10))
-            .input2("The defendant, in the event of challenge, must send an up to date counter-schedule of loss"
-                        + " to the claimant by 4pm on the")
-            .date2(LocalDate.now().plusWeeks(12))
+            .input2("If there is a claim for ongoing or future loss in the original schedule of losses, the claimant"
+                        + " must upload to the Digital Portal an up-to-date schedule of loss by 4pm on")
+            .date2(LocalDate.now().plusWeeks(10))
+            .input3("If the defendant wants to challenge this claim, "
+                        + "they must send an up-to-date counter-schedule of loss to the claimant by 4pm on")
+            .date3(LocalDate.now().plusWeeks(12))
+            .input4("If the defendant want to challenge the sums claimed in the schedule of loss they must upload"
+                        + " to the Digital Portal an updated counter schedule of loss by 4pm on")
+            .date4(LocalDate.now().plusWeeks(12))
             .build();
 
         updatedData.disposalHearingSchedulesOfLoss(tempDisposalHearingSchedulesOfLoss).build();
-
-        DisposalHearingStandardDisposalOrder tempDisposalHearingStandardDisposalOrder =
-            DisposalHearingStandardDisposalOrder.builder()
-            .input("input")
-            .build();
-
-        updatedData.disposalHearingStandardDisposalOrder(tempDisposalHearingStandardDisposalOrder).build();
 
         DisposalHearingFinalDisposalHearing tempDisposalHearingFinalDisposalHearing =
             DisposalHearingFinalDisposalHearing.builder()
@@ -245,36 +301,16 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ();
 
-        String preferredTelephone = hearingSupportRequirementsDJ != null
-            ? hearingSupportRequirementsDJ.getHearingPreferredTelephoneNumber1() : "N/A";
-
-        DisposalHearingPreferredTelephone tempDisposalHearingPreferredTelephone = DisposalHearingPreferredTelephone
-            .builder()
-            .telephone(preferredTelephone)
-            .build();
-
-        updatedData.disposalHearingPreferredTelephone(tempDisposalHearingPreferredTelephone).build();
-
-        String preferredEmail = hearingSupportRequirementsDJ != null
-            ? hearingSupportRequirementsDJ.getHearingPreferredEmail() : "N/A";
-
-        DisposalHearingPreferredEmail tempDisposalHearingPreferredEmail = DisposalHearingPreferredEmail
-            .builder()
-            .email(preferredEmail)
-            .build();
-
-        updatedData.disposalHearingPreferredEmail(tempDisposalHearingPreferredEmail).build();
-
         DisposalHearingBundle tempDisposalHearingBundle = DisposalHearingBundle.builder()
-            .input("The claimant must lodge at court at least 7 days before the disposal")
+            .input("At least 7 days before the disposal hearing, the claimant must upload to the Digital Portal")
             .build();
 
         updatedData.disposalHearingBundle(tempDisposalHearingBundle).build();
 
         DisposalHearingNotes tempDisposalHearingNotes = DisposalHearingNotes.builder()
             .input("This Order has been made without a hearing. Each party has the right to apply to have this Order"
-                       + " set aside or varied. Any such application must be received by the Court"
-                       + " (together with the appropriate fee) by 4pm on")
+                       + " set aside or varied. Any such application must be uploaded to the Digital Portal"
+                       + " together with the appropriate fee, by 4pm on")
             .date(LocalDate.now().plusWeeks(1))
             .build();
 

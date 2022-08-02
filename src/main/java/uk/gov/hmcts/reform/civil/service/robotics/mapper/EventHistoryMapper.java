@@ -210,9 +210,6 @@ public class EventHistoryMapper {
                     case TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE:
                         buildClaimTakenOfflinePastApplicantResponse(builder, caseData);
                         break;
-                    case TAKEN_OFFLINE_SDO_NOT_DRAWN:
-                        buildSDONotDrawn(builder, caseData);
-                        break;
                     default:
                         break;
                 }
@@ -534,7 +531,6 @@ public class EventHistoryMapper {
                 break;
         }
     }
-
 
     private void buildDefenceFiled(EventHistory.EventHistoryBuilder builder,
                                    CaseData caseData,
@@ -1831,24 +1827,5 @@ public class EventHistoryMapper {
             default:
                 return format("agreed extension date: %s", extensionDate);
         }
-    }
-
-    //How are we capturing the reason that it is dropped offline?
-    private void buildSDONotDrawn(EventHistory.EventHistoryBuilder builder,
-                                  CaseData caseData) {
-        String miscText = "RPA Reason: Case proceeds offline. Judge / Legal Advisor did not draw a Direction's Order: "
-            + caseData.getClaimProceedsInCaseman().getOther();
-        LocalDateTime eventDate = caseData.getClaimProceedsInCaseman().getDate().atStartOfDay();
-
-        builder.miscellaneous(
-            Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(eventDate)
-                .eventDetailsText(miscText)
-                .eventDetails(EventDetails.builder()
-                                  .miscText(miscText)
-                                  .build())
-                .build());
     }
 }
