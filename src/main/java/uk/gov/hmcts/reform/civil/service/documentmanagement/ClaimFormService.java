@@ -58,7 +58,7 @@ public class ClaimFormService {
 
         log.info("fetch document, documentMetaDataList size " + documentMetaDataList.size());
 
-        if (documentMetaDataList.size() > 1) {
+        if (documentMetaDataList.size() > 0) {
             CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
                 documentMetaDataList,
                 authorisation,  //access token will be taken from postman
