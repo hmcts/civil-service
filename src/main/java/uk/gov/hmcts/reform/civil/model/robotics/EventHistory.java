@@ -41,8 +41,13 @@ public class EventHistory {
     private List<Event> breathingSpaceMentalHealthEntered;
     @Singular("breathingSpaceMentalHealthLifted")
     private List<Event> breathingSpaceMentalHealthLifted;
+    @Singular("interlocutoryJudgment")
+    private List<Event> interlocutoryJudgment;
+    @Singular("defaultJudgment")
+    private List<Event> defaultJudgment;
     @Singular("statesPaid")
     private List<Event> statesPaid;
+
 
     @JsonIgnore
     public List<Event> flatEvents() {
@@ -60,7 +65,10 @@ public class EventHistory {
             breathingSpaceLifted,
             breathingSpaceMentalHealthEntered,
             breathingSpaceMentalHealthLifted,
+            interlocutoryJudgment,
+            defaultJudgment,
             statesPaid
+
         );
         return eventsList.stream()
             .filter(Objects::nonNull)
