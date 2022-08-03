@@ -43,6 +43,12 @@ public interface NotificationData {
     String CLAIMANT_EMAIL = "ClaimantLegalOrgName";
     String LEGAL_ORG_APPLICANT1 = "legalOrgApplicant1";
 
+    // CUI Pin in Post
+    String CLAIMANT_NAME = "claimantName";
+    String RESPOND_URL = "respondToClaimUrl";
+    String PIN = "pin";
+    String FRONTEND_URL = "frontendBaseUrl";
+
     Map<String, String> addProperties(CaseData caseData);
 
 }

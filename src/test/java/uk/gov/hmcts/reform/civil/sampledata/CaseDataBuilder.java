@@ -3053,6 +3053,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addRespondent1PinToPostLRspec(DefendantPinToPostLRspec respondent1PinToPostLRspec) {
+        this.respondent1PinToPostLRspec = respondent1PinToPostLRspec;
+        return this;
+    }
+
     public CaseDataBuilder atSpecAoSRespondent2HomeAddressRequired(YesOrNo specAoSRespondent2HomeAddressRequired) {
         this.specAoSRespondent2HomeAddressRequired = specAoSRespondent2HomeAddressRequired;
         return this;
