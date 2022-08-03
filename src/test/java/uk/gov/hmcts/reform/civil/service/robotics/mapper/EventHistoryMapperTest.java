@@ -3602,7 +3602,8 @@ class EventHistoryMapperTest {
                         .dateReceived(caseData.getRespondent1ResponseDate())
                         .eventDetailsText("RPA Reason: Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
                         .eventDetails(EventDetails.builder()
-                                          .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
+                                          .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded:"
+                                                       + " FULL_ADMISSION")
                                           .build())
                         .build()
                 );
@@ -3658,7 +3659,8 @@ class EventHistoryMapperTest {
                         .dateReceived(caseData.getRespondent1ResponseDate())
                         .eventDetailsText("RPA Reason: Defendant: Mr. Sole Trader has responded: PART_ADMISSION")
                         .eventDetails(EventDetails.builder()
-                                          .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded: PART_ADMISSION")
+                                          .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded: "
+                                                        + "PART_ADMISSION")
                                           .build())
                         .build()
                 );
@@ -6031,11 +6033,12 @@ class EventHistoryMapperTest {
                 .extracting("eventCode").asString().contains("45");
         }
     }
+
     @Nested
     class InterlocutoryJudgment {
 
         @Test
-        public void shouldgenerateRPAfeedfor_IJNODivergent() {
+        public void shouldgenerateRPAfeedfor_IJNoDivergent() {
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .ccdState(CaseState.JUDICIAL_REFERRAL)
@@ -6083,9 +6086,8 @@ class EventHistoryMapperTest {
     @Nested
     class DefaultJudgment {
 
-
         @Test
-        public void shouldgenerateRPAfeedfor_DJNODivergent() {
+        public void shouldgenerateRPAfeedfor_DJNoDivergent() {
             CaseData caseData = CaseDataBuilder.builder()
                 .setSuperClaimTypeToSpecClaim()
                 .atStateNotificationAcknowledged().build().toBuilder()
