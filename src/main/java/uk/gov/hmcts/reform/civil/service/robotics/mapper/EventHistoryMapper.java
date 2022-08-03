@@ -297,8 +297,8 @@ public class EventHistoryMapper {
         BigDecimal amountClaimedWithInterest = caseData.getTotalClaimAmount().add(claimInterest);
         var partialPaymentPennies = isNotEmpty(caseData.getPartialPaymentAmount())
             ? new BigDecimal(caseData.getPartialPaymentAmount()) : null;
-        var partialPaymentPounds = isNotEmpty(partialPaymentPennies) ?
-            MonetaryConversions.penniesToPounds(partialPaymentPennies).doubleValue() : null;
+        var partialPaymentPounds = isNotEmpty(partialPaymentPennies)
+            ? MonetaryConversions.penniesToPounds(partialPaymentPennies).doubleValue() : null;
         return (Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(DEFAULT_JUDGMENT_GRANTED.getCode())
@@ -312,12 +312,12 @@ public class EventHistoryMapper {
                               .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES)
                                                             ? new BigDecimal(partialPaymentPounds) : null)
                               .isJudgmentForthwith(isNotEmpty(caseData.getRespondent2()))
-                              .paymentInFullDate((caseData.getPaymentTypeSelection().equals("IMMEDIATELY")) ?
-                                                     LocalDateTime.now()
+                              .paymentInFullDate((caseData.getPaymentTypeSelection().equals("IMMEDIATELY"))
+                                                   ?  LocalDateTime.now()
                                                      : (caseData.getPaymentTypeSelection().equals("SET_DAT"))
                                   ? caseData.getPaymentSetDate().atStartOfDay() : null)
-                              .installmentAmount((caseData.getPaymentTypeSelection().equals("REPAYMENT_PLAN")) ?
-                                                     new BigDecimal(caseData.getRepaymentSuggestion()) : null)
+                              .installmentAmount((caseData.getPaymentTypeSelection().equals("REPAYMENT_PLAN"))
+                                                    ? new BigDecimal(caseData.getRepaymentSuggestion()) : null)
                               .installmentPeriod(getInstallmentPeriod(caseData))
                               .firstInstallmentDate(caseData.getRepaymentDate())
                               .dateOfJudgment(LocalDateTime.now())
@@ -1902,8 +1902,8 @@ public class EventHistoryMapper {
 
     private void buildMiscellaneousIJEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         Boolean grantedFlag = caseData.getRespondent2() != null
-            && caseData.getDefendantDetails() != null &&
-            !caseData.getDefendantDetails().getValue()
+            && caseData.getDefendantDetails() != null
+            && !caseData.getDefendantDetails().getValue()
                 .getLabel().startsWith("Both");
         String miscText = "RPA Reason: Summary Judgment requested and claim moved offline.";
         if (grantedFlag) {
@@ -1923,8 +1923,8 @@ public class EventHistoryMapper {
     private void buildMiscellaneousDJEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
 
         Boolean grantedFlag = caseData.getRespondent2() != null
-            && caseData.getDefendantDetailsSpec() != null &&
-            !caseData.getDefendantDetailsSpec().getValue()
+            && caseData.getDefendantDetailsSpec() != null
+            && !caseData.getDefendantDetailsSpec().getValue()
                 .getLabel().startsWith("Both");
         String miscText = "RPA Reason: Default Judgment requested and claim moved offline.";
         if (grantedFlag) {
@@ -1959,10 +1959,10 @@ public class EventHistoryMapper {
 
         String repaymentSummary = data.getRepaymentSummaryObject();
         BigDecimal fixedCost = repaymentSummary.contains( "Fixed" )
-             ? new BigDecimal(repaymentSummary.substring(
-                repaymentSummary.indexOf("Fixed cost amount \n£")  +  20,
-                repaymentSummary.indexOf("\n### Claim fee amount ")
-            )) : null;
+             ? new BigDecimal( repaymentSummary.substring(
+                repaymentSummary.indexOf( "Fixed cost amount \n£" )  +  20,
+                repaymentSummary.indexOf( "\n### Claim fee amount " )
+            ) )  : null;
 
         BigDecimal claimCost = new BigDecimal(repaymentSummary.substring(
             repaymentSummary.indexOf( "Claim fee amount \n £" )  +  20,
