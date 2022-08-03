@@ -3,13 +3,7 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
-import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -35,6 +29,7 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -61,22 +56,7 @@ import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenari
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_ENTERED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_LIFTED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CONSENT_EXTENSION_FILING_DEFENCE;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFAULT_JUDGMENT_GRANTED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_AND_COUNTER_CLAIM;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.INTERLOCUTORY_JUDGMENT_GRANTED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_BREATHING_SPACE_ENTERED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_BREATHING_SPACE_LIFTED;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMISSION;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.REPLY_TO_DEFENCE;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.*;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT2_ID;
@@ -247,35 +227,35 @@ public class EventHistoryMapper {
         buildDefaultJudgment(builder, caseData);
         buildMiscellaneousDJEvent(builder, caseData);
         buildInformAgreedExtensionDateForSpec(builder, caseData);
+
         return eventHistorySequencer.sortEvents(builder.build());
     }
 
     private void buildInterlocutoryJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
 
         List<Event> events = new ArrayList<>();
-        Boolean grantedFlag = caseData.getRespondent2() != null
-            && caseData.getDefendantDetails() != null
-            && !caseData.getDefendantDetails().getValue()
-            .getLabel().startsWith("Both");
-        if (!grantedFlag && null != caseData.getHearingSupportRequirementsDJ()) {
+            // only populate it if Default judgment submitted
+        if (null != caseData.getHearingSupportRequirementsDJ())  {
             events.add(prepareInterlocutoryJudgment(builder, caseData));
-
+            // To Cover 1v2 case
             if (null != caseData.getRespondent2()) {
                 events.add(prepareInterlocutoryJudgment(builder, caseData));
             }
             builder.interlocutoryJudgment(events);
         }
+
+
     }
 
-    private Event prepareInterlocutoryJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        return (Event.builder()
+    private Event prepareInterlocutoryJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData){
+        return  ( Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(INTERLOCUTORY_JUDGMENT_GRANTED.getCode())
             .dateReceived(LocalDateTime.now())
             .litigiousPartyID(PartyUtils.respondent1Data(caseData).getRole().equals(RESPONDENT_ONE)
-                                  ? RESPONDENT_ID : RESPONDENT2_ID)
-            .eventDetailsText("")
-            .eventDetails(EventDetails.builder().miscText(" Interlocutory Judgment - defendant  and claimant notified")
+                                   ? RESPONDENT_ID : RESPONDENT2_ID)
+            .eventDetailsText(" Interlocutory Judgment - defendant  and claimant notified")
+            .eventDetails(EventDetails.builder().miscText(" Interlocutory Judgment - defendant  and claimant notified" )
                               .build())
             .build());
     }
@@ -283,14 +263,10 @@ public class EventHistoryMapper {
     private void buildDefaultJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
 
         List<Event> events = new ArrayList<>();
-        Boolean grantedFlag = caseData.getRespondent2() != null
-            && caseData.getDefendantDetailsSpec() != null
-            && !caseData.getDefendantDetailsSpec().getValue()
-            .getLabel().startsWith("Both");
-
-        if (!grantedFlag && null != caseData.getDefendantDetailsSpec()) {
+        // only populate it if Default judgment submitted
+        if (null != caseData.getDefendantDetailsSpec()) {
             events.add(prepareDefaultJudgment(builder, caseData));
-
+            // To Cover 1v2 case
             if (null != caseData.getRespondent2()) {
                 events.add(prepareDefaultJudgment(builder, caseData));
             }
@@ -299,41 +275,37 @@ public class EventHistoryMapper {
 
     }
 
-    private Event prepareDefaultJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+    private Event prepareDefaultJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData){
         BigDecimal claimInterest = caseData.getTotalInterest() != null
             ? caseData.getTotalInterest() : BigDecimal.ZERO;
         BigDecimal amountClaimedWithInterest = caseData.getTotalClaimAmount().add(claimInterest);
-        var partialPaymentPennies = isNotEmpty(caseData.getPartialPaymentAmount())
-            ? new BigDecimal(caseData.getPartialPaymentAmount()) : null;
-        var partialPaymentPounds = isNotEmpty(partialPaymentPennies)
-            ? MonetaryConversions.penniesToPounds(partialPaymentPennies) : null;
-
-        return (Event.builder()
+        var partialPaymentPennies = isNotEmpty(caseData.getPartialPaymentAmount()) ?
+            new BigDecimal(caseData.getPartialPaymentAmount()):null;
+        var partialPaymentPounds = isNotEmpty(partialPaymentPennies) ?
+            MonetaryConversions.penniesToPounds(partialPaymentPennies).doubleValue(): null;
+        return  ( Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
-            .eventCode(DEFAULT_JUDGMENT_GRANTED.getCode())
+           .eventCode(DEFAULT_JUDGMENT_GRANTED.getCode() )
             .dateReceived(LocalDateTime.now())
             .litigiousPartyID(PartyUtils.respondent1Data(caseData).getRole().equals(RESPONDENT_ONE)
                                   ? RESPONDENT_ID : RESPONDENT2_ID)
-            .eventDetailsText("")
-            .eventDetails(EventDetails.builder().miscText(" Default Judgment - defendant and claimant notified")
+            .eventDetailsText(" Default Judgment - defendant  and claimant notified")
+            .eventDetails(EventDetails.builder().miscText(" Default Judgment - defendant  and claimant notified" )
                               .amountOfJudgment(amountClaimedWithInterest)
                               .amountOfCosts(getCostOfJudgment(caseData))
                               .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES)
-                                                            ? partialPaymentPounds : null)
+                                                            ?new BigDecimal(partialPaymentPounds):null)
                               .isJudgmentForthwith(isNotEmpty(caseData.getRespondent2()))
-                              .paymentInFullDate((caseData.getPaymentTypeSelection()
-                                  .equals(DJPaymentTypeSelection.IMMEDIATELY))
-                                                   ?  LocalDateTime.now()
-                                                     : (caseData.getPaymentTypeSelection()
-                                  .equals(DJPaymentTypeSelection.SET_DATE))
-                                  ? caseData.getPaymentSetDate().atStartOfDay() : null)
-                              .installmentAmount((caseData.getPaymentTypeSelection()
-                                  .equals(DJPaymentTypeSelection.REPAYMENT_PLAN))
-                                                    ? new BigDecimal(caseData.getRepaymentSuggestion()) : null)
+                              .paymentInFullDate((caseData.getPaymentTypeSelection().equals("IMMEDIATELY")) ?
+                                                    LocalDateTime.now()
+                                                     :(caseData.getPaymentTypeSelection().equals("SET_DAT"))
+                                                     ?caseData.getPaymentSetDate().atStartOfDay() :null)
+                              .installmentAmount((caseData.getPaymentTypeSelection().equals("REPAYMENT_PLAN")) ?
+                                                     new BigDecimal( caseData.getRepaymentSuggestion()):null)
                               .installmentPeriod(getInstallmentPeriod(caseData))
                               .firstInstallmentDate(caseData.getRepaymentDate())
                               .dateOfJudgment(LocalDateTime.now())
-                              .jointJudgment(caseData.getRespondent2() != null)
+                              .jointJudgment(caseData.getRespondent2() != null ? true : false)
                               .judgmentToBeRegistered(false)
                               .build())
             .build());
@@ -1913,28 +1885,12 @@ public class EventHistoryMapper {
     }
 
     private void buildMiscellaneousIJEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        Boolean grantedFlag = caseData.getRespondent2() != null
-            && caseData.getDefendantDetails() != null
-            && !caseData.getDefendantDetails().getValue()
+        Boolean grantedFlag =caseData.getRespondent2() != null
+            && caseData.getDefendantDetails()!= null &&
+            !caseData.getDefendantDetails().getValue()
                 .getLabel().startsWith("Both");
-        String miscTextRequested = "RPA Reason: Summary judgment requested and referred to judge.";
-        String miscTextGranted = "RPA Reason: Summary granted requested and referred to judge.";
-
-            builder.miscellaneous(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(LocalDateTime.now())
-                    .eventDetailsText(grantedFlag ? miscTextRequested : miscTextGranted )
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(grantedFlag ? miscTextRequested : miscTextGranted)
-                                      .build())
-                    .build());
-
-    }
-
-    private void buildMiscellaneousDJEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-       String miscText = "RPA Reason: Default Judgment requested and claim moved offline.";
+        String miscText = "RPA Reason: Summary Judgment requested and claim moved offline.";
+        if( grantedFlag) {
             builder.miscellaneous(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
@@ -1945,43 +1901,55 @@ public class EventHistoryMapper {
                                       .miscText(miscText)
                                       .build())
                     .build());
+        }
+    }
+
+    private void buildMiscellaneousDJEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+
+        Boolean grantedFlag =caseData.getRespondent2() != null
+            && caseData.getDefendantDetailsSpec()!= null &&
+            !caseData.getDefendantDetailsSpec().getValue()
+            .getLabel().startsWith("Both");
+        String miscText = "RPA Reason: Default Judgment requested and claim moved offline.";
+        if(grantedFlag) {
+            builder.miscellaneous(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(LocalDateTime.now())
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build());
+        }
     }
 
     private String getInstallmentPeriod(CaseData data) {
-        if (data.getPaymentTypeSelection().equals(DJPaymentTypeSelection.REPAYMENT_PLAN)) {
+        if (data.getPaymentTypeSelection().equals("REPAYMENT_PLAN")) {
 
-            if (data.getRepaymentFrequency().equals(RepaymentFrequencyDJ.ONCE_ONE_WEEK)) {
+            if (data.getRepaymentFrequency().equals("ONCE_ONE_WEEK")) {
                 return "WK";
-            } else if (data.getRepaymentFrequency().equals(RepaymentFrequencyDJ.ONCE_TWO_WEEKS)) {
+            } else if (data.getRepaymentFrequency().equals("ONCE_TWO_WEEKS")) {
                 return "FOR";
-            } else if (data.getRepaymentFrequency().equals(RepaymentFrequencyDJ.ONCE_ONE_MONTH)) {
-                return "MTH";
+            } else if (data.getRepaymentFrequency().equals("ONCE_ONE_MONTH")) {
+                 return "MN";
             }
-        }else if (data.getPaymentTypeSelection().equals(DJPaymentTypeSelection.IMMEDIATELY)) {
-            return "FW";
         }
         return "FUL";
     }
 
     private BigDecimal getCostOfJudgment(CaseData data) {
+         String repaymentSummary = data.getRepaymentSummaryObject();
+         BigDecimal fixedCost =repaymentSummary.contains("Fixed") ?
+             new BigDecimal(repaymentSummary.substring(repaymentSummary.indexOf("Fixed cost amount \n£")+20,
+                                                       repaymentSummary.indexOf("\n### Claim fee amount "))): null;
 
-        String repaymentSummary = data.getRepaymentSummaryObject();
-        BigDecimal fixedCost = null;
-        BigDecimal claimCost = null;
-        if (null != repaymentSummary) {
-            fixedCost = repaymentSummary.contains("Fixed")
-                ? new BigDecimal(repaymentSummary.substring(
-                repaymentSummary.indexOf("Fixed cost amount \n£") + 20,
-                repaymentSummary.indexOf("\n### Claim fee amount ")
-            )) : null;
-            claimCost = new BigDecimal(repaymentSummary.substring(
-                repaymentSummary.indexOf("Claim fee amount \n £") + 20,
-                repaymentSummary.indexOf("\n ## Subtotal")
-            ));
-        }
+         BigDecimal claimCost = new BigDecimal(repaymentSummary.substring(
+              repaymentSummary.indexOf( "Claim fee amount \n £")+20,
+                                                       repaymentSummary.indexOf("\n ## Subtotal")));
 
-        return fixedCost != null && claimCost != null ? fixedCost.add(claimCost) : claimCost;
+        return isNotEmpty(fixedCost) ? fixedCost.add(claimCost) : claimCost;
 
     }
-
 }
