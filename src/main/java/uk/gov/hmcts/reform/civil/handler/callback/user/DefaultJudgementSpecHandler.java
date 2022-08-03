@@ -378,7 +378,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_SPEC));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            //.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
+            .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
