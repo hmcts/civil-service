@@ -300,7 +300,8 @@ public class EventHistoryMapper {
         var partialPaymentPennies = isNotEmpty(caseData.getPartialPaymentAmount())
             ? new BigDecimal(caseData.getPartialPaymentAmount()) : null;
         var partialPaymentPounds = isNotEmpty(partialPaymentPennies)
-            ? new BigDecimal(MonetaryConversions.penniesToPounds(partialPaymentPennies).doubleValue()) : null;
+            ? MonetaryConversions.penniesToPounds(partialPaymentPennies) : null;
+
         return (Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(DEFAULT_JUDGMENT_GRANTED.getCode())
@@ -1992,7 +1993,7 @@ public class EventHistoryMapper {
             ));
         }
 
-        return isNotEmpty(fixedCost) ? fixedCost.add(claimCost) : claimCost;
+        return fixedCost != null && claimCost != null ? fixedCost.add(claimCost) : claimCost;
 
     }
 
