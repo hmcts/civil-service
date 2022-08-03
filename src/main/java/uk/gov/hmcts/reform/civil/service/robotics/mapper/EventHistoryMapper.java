@@ -326,7 +326,7 @@ public class EventHistoryMapper {
                               .installmentPeriod(getInstallmentPeriod(caseData))
                               .firstInstallmentDate(caseData.getRepaymentDate())
                               .dateOfJudgment(LocalDateTime.now())
-                              .jointJudgment(caseData.getRespondent2() != null ? true : false)
+                              .jointJudgment(caseData.getRespondent2() != null)
                               .judgmentToBeRegistered(false)
                               .build())
             .build());
