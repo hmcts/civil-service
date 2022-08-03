@@ -8,6 +8,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis.GenerateClaimFormForSpecCallbackHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
@@ -36,9 +39,8 @@ public class ClaimFormService {
     private final GenerateClaimFormForSpecCallbackHandler generateClaimFormForSpecCallbackHandler;
     private final ObjectMapper objectMapper;
 
-    public CaseDocument uploadSealedDocument(
+    public CallbackResponse uploadSealedDocument(
         String authorisation, CaseData caseData) {
-        log.info(" Called End point");
         LocalDate issueDate = time.now().toLocalDate();
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder().issueDate(issueDate)
@@ -46,13 +48,11 @@ public class ClaimFormService {
                 deadlinesCalculator.plus14DaysAt4pmDeadline(LocalDateTime.now()))
             // .respondent1Represented(YES)
             .claimDismissedDate(null);
-        log.info("before calling seal claim generator");
         CaseDocument sealClaimForm = sealedClaimFormGeneratorForSpec.generate(caseData, authorisation);
         log.info(" sealClaimForm document name " + sealClaimForm.getDocumentName());
         log.info(" sealClaimForm document size" + sealClaimForm.getDocumentSize());
         log.info(" sealClaimForm document link" + sealClaimForm.getDocumentLink());
 
-        log.info("before calling fetch document from case data");
         List<DocumentMetaData> documentMetaDataList = generateClaimFormForSpecCallbackHandler
             .fetchDocumentsFromCaseData(caseData, sealClaimForm);
 
@@ -67,31 +67,27 @@ public class ClaimFormService {
                 sealClaimForm.getDocumentName(),
                 caseData
             );
-            caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
-            log.info("before building if ");
-            CaseDetails.builder().data(caseDataBuilder.build().toMap(objectMapper)).build();
-            log.info("after building if");
-            if (stitchedDocument.getError() != null &&  !stitchedDocument.getError().isEmpty()) {
+           if (stitchedDocument.getError() != null &&  !stitchedDocument.getError().isEmpty()) {
                 log.info("There is issue with Stitching");
-                return sealClaimForm;
-
-            } else {
-                if (stitchedDocument.getDocumentSize() > 1) {
+            } else if (stitchedDocument.getDocumentSize() > 1) {
+                {
+                    caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
+                    //CaseDetails.builder().data(caseDataBuilder.build().toMap(objectMapper)).build();
                     log.info("Document been stitched okay");
-                    return stitchedDocument;
-                } else {
-                    return sealClaimForm;
                 }
             }
 
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealClaimForm));
-            log.info("before building else ");
-            CaseDetails.builder().data(caseDataBuilder.build().toMap(objectMapper)).build();
-            log.info("after building else");
-            return sealClaimForm;
-        }
+            //CaseDetails.builder().data(caseDataBuilder.build().toMap(objectMapper)).build();
 
+        }
+        log.info("before AboutToStartOrSubmitCallbackResponse");
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+
+       // return SubmittedCallbackResponse.builder().build();
     }
 
     @Autowired
