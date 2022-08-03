@@ -5,18 +5,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingDisclosureOfDocuments;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingSchedulesOfLoss;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.*;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
@@ -39,16 +28,16 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private final String respondent;
 
     //default judgement SDO fields for disposal
-    private final DisposalHearingJudgesRecital disposalHearingJudgesRecitalDJ;
-    private final DisposalHearingDisclosureOfDocuments disposalHearingDisclosureOfDocumentsDJ;
-    private final DisposalHearingWitnessOfFact disposalHearingWitnessOfFactDJ;
-    private final DisposalHearingMedicalEvidence disposalHearingMedicalEvidenceDJ;
-    private final DisposalHearingQuestionsToExperts disposalHearingQuestionsToExpertsDJ;
-    private final DisposalHearingSchedulesOfLoss disposalHearingSchedulesOfLossDJ;
-    private final DisposalHearingStandardDisposalOrder disposalHearingStandardDisposalOrderDJ;
-    private final DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearingDJ;
-    private final DisposalHearingBundle disposalHearingBundleDJ;
-    private final DisposalHearingNotes disposalHearingNotesDJ;
+    private final DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
+    private final DisposalHearingDisclosureOfDocumentsDJ disposalHearingDisclosureOfDocumentsDJ;
+    private final DisposalHearingWitnessOfFactDJ disposalHearingWitnessOfFactDJ;
+    private final DisposalHearingMedicalEvidenceDJ disposalHearingMedicalEvidenceDJ;
+    private final DisposalHearingQuestionsToExpertsDJ disposalHearingQuestionsToExpertsDJ;
+    private final DisposalHearingSchedulesOfLossDJ disposalHearingSchedulesOfLossDJ;
+    private final DisposalHearingStandardDisposalOrderDJ disposalHearingStandardDisposalOrderDJ;
+    private final DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
+    private final DisposalHearingBundleDJ disposalHearingBundleDJ;
+    private final DisposalHearingNotesDJ disposalHearingNotesDJ;
 
     //default judgement SDO fields for trial
     private final TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
