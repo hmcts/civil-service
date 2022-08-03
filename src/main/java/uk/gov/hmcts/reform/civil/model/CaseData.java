@@ -489,6 +489,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
+    private final String eventDescriptionRTJ;
+    private final String additionalInformationRTJ;
 
     private List<DisposalAndTrialHearingDJToggle> disposalHearingDisclosureOfDocumentsDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingWitnessOfFactDJToggle;
