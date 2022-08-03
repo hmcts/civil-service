@@ -299,7 +299,7 @@ public class EventHistoryMapper {
         var partialPaymentPennies = isNotEmpty(caseData.getPartialPaymentAmount())
             ? new BigDecimal(caseData.getPartialPaymentAmount()) : null;
         var partialPaymentPounds = isNotEmpty(partialPaymentPennies)
-            ? MonetaryConversions.penniesToPounds(partialPaymentPennies).doubleValue() : null;
+            ? new BigDecimal(MonetaryConversions.penniesToPounds(partialPaymentPennies).doubleValue()) : null;
         return (Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(DEFAULT_JUDGMENT_GRANTED.getCode())
@@ -311,7 +311,7 @@ public class EventHistoryMapper {
                               .amountOfJudgment(amountClaimedWithInterest)
                               .amountOfCosts(getCostOfJudgment(caseData))
                               .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES)
-                                                            ? new BigDecimal(partialPaymentPounds) : null)
+                                                            ? partialPaymentPounds : null)
                               .isJudgmentForthwith(isNotEmpty(caseData.getRespondent2()))
                               .paymentInFullDate((caseData.getPaymentTypeSelection()
                                   .equals(DJPaymentTypeSelection.IMMEDIATELY))
@@ -1962,16 +1962,21 @@ public class EventHistoryMapper {
     private BigDecimal getCostOfJudgment(CaseData data) {
 
         String repaymentSummary = data.getRepaymentSummaryObject();
-        BigDecimal fixedCost = repaymentSummary.contains("Fixed")
-            ? new BigDecimal(repaymentSummary.substring(
-            repaymentSummary.indexOf("Fixed cost amount \n£") + 20,
-            repaymentSummary.indexOf("\n### Claim fee amount ")
-        )) : null;
+        BigDecimal fixedCost = null;
+        BigDecimal claimCost = null;
+        if (null != repaymentSummary) {
+                fixedCost = repaymentSummary.contains("Fixed")
+                ? new BigDecimal(repaymentSummary.substring(
+                repaymentSummary.indexOf("Fixed cost amount \n£") + 20,
+                repaymentSummary.indexOf("\n### Claim fee amount ")
+            )) : null;
+           claimCost = new BigDecimal(repaymentSummary.substring(
+                repaymentSummary.indexOf("Claim fee amount \n £") + 20,
+                repaymentSummary.indexOf("\n ## Subtotal")
+            ));
+        }
 
-        BigDecimal claimCost = new BigDecimal(repaymentSummary.substring(
-            repaymentSummary.indexOf("Claim fee amount \n £") + 20,
-            repaymentSummary.indexOf("\n ## Subtotal")
-        ));
+
 
         return isNotEmpty(fixedCost) ? fixedCost.add(claimCost) : claimCost;
 
