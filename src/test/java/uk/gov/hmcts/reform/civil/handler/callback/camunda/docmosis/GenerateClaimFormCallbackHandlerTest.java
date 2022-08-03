@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.NestedTestConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -253,5 +255,48 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         assertThat(handler.camundaActivityId(params)).isEqualTo("GenerateClaimForm");
+    }
+
+    @NestedTestConfiguration(NestedTestConfiguration.EnclosingConfiguration.OVERRIDE)
+    @Nested
+    @TestPropertySource(properties = "stitching.enabled=false")
+    @ExtendWith(SpringExtension.class)
+    @SpringBootTest(classes = {
+        GenerateClaimFormCallbackHandler.class,
+        JacksonAutoConfiguration.class,
+        CaseDetailsConverter.class
+    })
+    class GenerateSealedClaimNoStitch {
+
+        @MockBean
+        private Time time;
+        @MockBean
+        private CivilDocumentStitchingService civilDocumentStitchingService;
+        @MockBean
+        private LitigantInPersonFormGenerator litigantInPersonFormGenerator;
+        @MockBean
+        private SealedClaimFormGenerator sealedClaimFormGenerator;
+
+        @Autowired
+        private GenerateClaimFormCallbackHandler handler;
+
+        @BeforeEach
+        void setup() {
+            when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
+            when(time.now()).thenReturn(issueDate.atStartOfDay());
+        }
+
+        @Test
+        void testSingleSealedClaimGeneratedWhenStitchingDisabled() {
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnrepresentedDefendant().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
+            verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
+        }
+
     }
 }

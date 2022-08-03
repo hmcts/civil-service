@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -45,6 +46,9 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final Time time;
 
+    @Value("${stitching.enabled}")
+    private boolean stitchEnabled;
+
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID;
@@ -71,9 +75,9 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
-        if (caseData.getRespondent1Represented().equals(YesOrNo.NO)
+        if (stitchEnabled && (caseData.getRespondent1Represented().equals(YesOrNo.NO)
             || ofNullable(caseData.getRespondent2Represented()).isPresent()
-            && caseData.getRespondent2Represented().equals(YesOrNo.NO)) {
+            && caseData.getRespondent2Represented().equals(YesOrNo.NO))) {
 
             CaseDocument lipForm = litigantInPersonFormGenerator.generate(
                 caseDataBuilder.build(),
