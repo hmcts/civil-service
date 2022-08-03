@@ -7,10 +7,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import uk.gov.hmcts.reform.civil.enums.*;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.PartyRole;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.model.*;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CaseNote;
+import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PartyData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
@@ -19,7 +31,6 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
@@ -65,22 +76,206 @@ import static uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationSer
 class EventHistoryMapperTest {
 
     private static final Event EMPTY_EVENT = Event.builder().build();
-
-    @MockBean
-    private FeatureToggleService featureToggleService;
-
     @Autowired
     EventHistoryMapper mapper;
-
+    LocalDateTime localDateTime;
+    @MockBean
+    private FeatureToggleService featureToggleService;
     @MockBean
     private Time time;
-
-    LocalDateTime localDateTime;
 
     @BeforeEach
     void setup() {
         localDateTime = LocalDateTime.of(2020, 8, 1, 12, 0, 0);
         when(time.now()).thenReturn(localDateTime);
+    }
+
+    private void assertEmptyEvents(EventHistory eventHistory, String... eventNames) {
+        Stream.of(eventNames).forEach(
+            eventName -> assertThat(eventHistory).extracting(eventName).asList().containsOnly(EMPTY_EVENT));
+    }
+
+    @Test
+    public void specCaseEvents() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v1UnrepresentedDefendant()
+            .build().toBuilder()
+            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .build();
+        when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(false);
+        Event expectedEvent = Event.builder()
+            .eventSequence(1)
+            .eventCode("999")
+            .dateReceived(caseData.getSubmittedDate())
+            .eventDetailsText("RPA Reason: Unrepresented defendant: Mr. Sole Trader")
+            .eventDetails(EventDetails.builder()
+                              .miscText("RPA Reason: Unrepresented defendant: Mr. Sole Trader")
+                              .build())
+            .build();
+
+        var eventHistory = mapper.buildEvents(caseData);
+
+        assertThat(eventHistory).isNotNull();
+        assertThat(eventHistory)
+            .extracting("miscellaneous")
+            .asList()
+            .containsExactly(expectedEvent);
+        assertEmptyEvents(
+            eventHistory,
+            "acknowledgementOfServiceReceived",
+            "consentExtensionFilingDefence",
+            "defenceFiled",
+            "defenceAndCounterClaim",
+            "receiptOfPartAdmission",
+            "receiptOfAdmission",
+            "replyToDefence",
+            "directionsQuestionnaireFiled"
+        );
+    }
+
+    @Test
+    void specShouldPrepareMiscellaneousEvent_whenCaseNoteAdded() {
+        LocalDateTime noteCreatedOn = LocalDateTime.now().plusDays(3);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimNotified_1v1()
+            .caseNotes(CaseNote.builder()
+                           .createdOn(noteCreatedOn)
+                           .createdBy("createdBy")
+                           .note("my note")
+                           .build())
+            .build().toBuilder()
+            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .respondent1LitigationFriendCreatedDate(LocalDateTime.now())
+            .build();
+        when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+        Event claimIssuedEvent = Event.builder()
+            .eventSequence(1)
+            .eventCode("999")
+            .dateReceived(caseData.getIssueDate().atStartOfDay())
+            .eventDetailsText("Claim issued in CCD.")
+            .eventDetails(EventDetails.builder()
+                              .miscText("Claim issued in CCD.")
+                              .build())
+            .build();
+
+        String miscText = "Litigation friend added for respondent: " + caseData.getRespondent1().getPartyName();
+        Event respondent1LitigationFriendEvent = Event.builder()
+            .eventSequence(2)
+            .eventCode("999")
+            .dateReceived(caseData.getRespondent1LitigationFriendCreatedDate())
+            .eventDetailsText(miscText)
+            .eventDetails(EventDetails.builder()
+                              .miscText(miscText)
+                              .build())
+            .build();
+
+        Event caseNoteEvent = Event.builder()
+            .eventSequence(3)
+            .eventCode("999")
+            .dateReceived(noteCreatedOn)
+            .eventDetailsText("case note added: my note")
+            .eventDetails(EventDetails.builder()
+                              .miscText("case note added: my note")
+                              .build())
+            .build();
+
+        var eventHistory = mapper.buildEvents(caseData);
+
+        assertThat(eventHistory).isNotNull();
+        assertThat(eventHistory)
+            .extracting("miscellaneous")
+            .asList()
+            .containsExactly(claimIssuedEvent, respondent1LitigationFriendEvent, caseNoteEvent);
+        assertEmptyEvents(
+            eventHistory,
+            "acknowledgementOfServiceReceived",
+            "consentExtensionFilingDefence",
+            "defenceFiled",
+            "defenceAndCounterClaim",
+            "receiptOfPartAdmission",
+            "receiptOfAdmission",
+            "replyToDefence",
+            "directionsQuestionnaireFiled"
+        );
+    }
+
+    @Test
+    void specShouldPrepareFriendEvent_whenRespondent2Friend() {
+        LocalDateTime noteCreatedOn = LocalDateTime.now().plusDays(3);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimNotified_1v1()
+            .caseNotes(CaseNote.builder()
+                           .createdOn(noteCreatedOn)
+                           .createdBy("createdBy")
+                           .note("my note")
+                           .build())
+            .build().toBuilder()
+            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .respondent2(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .companyName("Company Name")
+                             .build())
+            .respondent2LitigationFriendCreatedDate(LocalDateTime.now())
+            .build();
+        if (caseData.getRespondent2OrgRegistered() != null
+            && caseData.getRespondent2Represented() == null) {
+            caseData = caseData.toBuilder()
+                .respondent2Represented(YES)
+                .build();
+        }
+        when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+        Event claimIssuedEvent = Event.builder()
+            .eventSequence(1)
+            .eventCode("999")
+            .dateReceived(caseData.getIssueDate().atStartOfDay())
+            .eventDetailsText("Claim issued in CCD.")
+            .eventDetails(EventDetails.builder()
+                              .miscText("Claim issued in CCD.")
+                              .build())
+            .build();
+
+        String miscText = "Litigation friend added for respondent: " + caseData.getRespondent2().getPartyName();
+        Event respondent1LitigationFriendEvent = Event.builder()
+            .eventSequence(2)
+            .eventCode("999")
+            .dateReceived(caseData.getRespondent2LitigationFriendCreatedDate())
+            .eventDetailsText(miscText)
+            .eventDetails(EventDetails.builder()
+                              .miscText(miscText)
+                              .build())
+            .build();
+
+        Event caseNoteEvent = Event.builder()
+            .eventSequence(3)
+            .eventCode("999")
+            .dateReceived(noteCreatedOn)
+            .eventDetailsText("case note added: my note")
+            .eventDetails(EventDetails.builder()
+                              .miscText("case note added: my note")
+                              .build())
+            .build();
+
+        var eventHistory = mapper.buildEvents(caseData);
+
+        assertThat(eventHistory).isNotNull();
+        assertThat(eventHistory)
+            .extracting("miscellaneous")
+            .asList()
+            .containsExactly(claimIssuedEvent, respondent1LitigationFriendEvent, caseNoteEvent);
+        assertEmptyEvents(
+            eventHistory,
+            "acknowledgementOfServiceReceived",
+            "consentExtensionFilingDefence",
+            "defenceFiled",
+            "defenceAndCounterClaim",
+            "receiptOfPartAdmission",
+            "receiptOfAdmission",
+            "replyToDefence",
+            "directionsQuestionnaireFiled"
+        );
     }
 
     @Nested
@@ -1127,6 +1322,20 @@ class EventHistoryMapperTest {
             when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
         }
 
+        public Event expectedDeadLineExtendedEvent(PartyData partyData, String expectedMessage) {
+            return Event.builder()
+                .eventSequence(4)
+                .eventCode("45")
+                .dateReceived(partyData.getTimeExtensionDate())
+                .litigiousPartyID(partyLitIdMap.get(partyData.getRole()))
+                .eventDetails(EventDetails.builder()
+                                  .agreedExtensionDate(partyData.getSolicitorAgreedDeadlineExtension()
+                                                           .format(ISO_DATE))
+                                  .build())
+                .eventDetailsText(expectedMessage)
+                .build();
+        }
+
         @Nested
         class OneVOne {
 
@@ -1233,20 +1442,6 @@ class EventHistoryMapperTest {
                 assertThat(eventHistory).extracting("consentExtensionFilingDefence").asList()
                     .containsExactly(deadlineExtendedEvent);
             }
-        }
-
-        public Event expectedDeadLineExtendedEvent(PartyData partyData, String expectedMessage) {
-            return Event.builder()
-                .eventSequence(4)
-                .eventCode("45")
-                .dateReceived(partyData.getTimeExtensionDate())
-                .litigiousPartyID(partyLitIdMap.get(partyData.getRole()))
-                .eventDetails(EventDetails.builder()
-                                  .agreedExtensionDate(partyData.getSolicitorAgreedDeadlineExtension()
-                                                           .format(ISO_DATE))
-                                  .build())
-                .eventDetailsText(expectedMessage)
-                .build();
         }
     }
 
@@ -5672,204 +5867,6 @@ class EventHistoryMapperTest {
         }
     }
 
-    private void assertEmptyEvents(EventHistory eventHistory, String... eventNames) {
-        Stream.of(eventNames).forEach(
-            eventName -> assertThat(eventHistory).extracting(eventName).asList().containsOnly(EMPTY_EVENT));
-    }
-
-    @Test
-    public void specCaseEvents() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued1v2UnrepresentedDefendant()
-            .build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
-            .build();
-        when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
-        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(false);
-        Event expectedEvent = Event.builder()
-            .eventSequence(1)
-            .eventCode("999")
-            .dateReceived(caseData.getSubmittedDate())
-            .eventDetailsText("RPA Reason: [1 of 2 - 2020-08-01] Unrepresented defendant: Mr. Sole Trader")
-            .eventDetails(EventDetails.builder()
-                              .miscText("RPA Reason: [1 of 2 - 2020-08-01] Unrepresented defendant: Mr. Sole Trader")
-                              .build())
-            .build();
-
-        Event expectedEvent2 = Event.builder()
-            .eventSequence(2)
-            .eventCode("999")
-            .dateReceived(caseData.getSubmittedDate())
-            .eventDetailsText("RPA Reason: [2 of 2 - 2020-08-01] Unrepresented defendant: Mr. John Rambo")
-            .eventDetails(EventDetails.builder()
-                              .miscText("RPA Reason: [2 of 2 - 2020-08-01] Unrepresented defendant: Mr. John Rambo")
-                              .build())
-            .build();
-
-        var eventHistory = mapper.buildEvents(caseData);
-
-        assertThat(eventHistory).isNotNull();
-        assertThat(eventHistory)
-            .extracting("miscellaneous")
-            .asList()
-            .containsExactly(expectedEvent, expectedEvent2);
-        assertEmptyEvents(
-            eventHistory,
-            "acknowledgementOfServiceReceived",
-            "consentExtensionFilingDefence",
-            "defenceFiled",
-            "defenceAndCounterClaim",
-            "receiptOfPartAdmission",
-            "receiptOfAdmission",
-            "replyToDefence",
-            "directionsQuestionnaireFiled"
-        );
-    }
-
-    @Test
-    void specShouldPrepareMiscellaneousEvent_whenCaseNoteAdded() {
-        LocalDateTime noteCreatedOn = LocalDateTime.now().plusDays(3);
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimNotified_1v1()
-            .caseNotes(CaseNote.builder()
-                           .createdOn(noteCreatedOn)
-                           .createdBy("createdBy")
-                           .note("my note")
-                           .build())
-            .build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
-            .respondent1LitigationFriendCreatedDate(LocalDateTime.now())
-            .build();
-        when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
-
-        Event claimIssuedEvent = Event.builder()
-            .eventSequence(1)
-            .eventCode("999")
-            .dateReceived(caseData.getIssueDate().atStartOfDay())
-            .eventDetailsText("Claim issued in CCD.")
-            .eventDetails(EventDetails.builder()
-                              .miscText("Claim issued in CCD.")
-                              .build())
-            .build();
-
-        String miscText = "Litigation friend added for respondent: " + caseData.getRespondent1().getPartyName();
-        Event respondent1LitigationFriendEvent = Event.builder()
-            .eventSequence(2)
-            .eventCode("999")
-            .dateReceived(caseData.getRespondent1LitigationFriendCreatedDate())
-            .eventDetailsText(miscText)
-            .eventDetails(EventDetails.builder()
-                              .miscText(miscText)
-                              .build())
-            .build();
-
-        Event caseNoteEvent = Event.builder()
-            .eventSequence(3)
-            .eventCode("999")
-            .dateReceived(noteCreatedOn)
-            .eventDetailsText("case note added: my note")
-            .eventDetails(EventDetails.builder()
-                              .miscText("case note added: my note")
-                              .build())
-            .build();
-
-        var eventHistory = mapper.buildEvents(caseData);
-
-        assertThat(eventHistory).isNotNull();
-        assertThat(eventHistory)
-            .extracting("miscellaneous")
-            .asList()
-            .containsExactly(claimIssuedEvent, respondent1LitigationFriendEvent, caseNoteEvent);
-        assertEmptyEvents(
-            eventHistory,
-            "acknowledgementOfServiceReceived",
-            "consentExtensionFilingDefence",
-            "defenceFiled",
-            "defenceAndCounterClaim",
-            "receiptOfPartAdmission",
-            "receiptOfAdmission",
-            "replyToDefence",
-            "directionsQuestionnaireFiled"
-        );
-    }
-
-    @Test
-    void specShouldPrepareFriendEvent_whenRespondent2Friend() {
-        LocalDateTime noteCreatedOn = LocalDateTime.now().plusDays(3);
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimNotified_1v1()
-            .caseNotes(CaseNote.builder()
-                           .createdOn(noteCreatedOn)
-                           .createdBy("createdBy")
-                           .note("my note")
-                           .build())
-            .build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
-            .respondent2(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .companyName("Company Name")
-                             .build())
-            .respondent2LitigationFriendCreatedDate(LocalDateTime.now())
-            .build();
-        if (caseData.getRespondent2OrgRegistered() != null
-            && caseData.getRespondent2Represented() == null) {
-            caseData = caseData.toBuilder()
-                .respondent2Represented(YES)
-                .build();
-        }
-        when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
-
-        Event claimIssuedEvent = Event.builder()
-            .eventSequence(1)
-            .eventCode("999")
-            .dateReceived(caseData.getIssueDate().atStartOfDay())
-            .eventDetailsText("Claim issued in CCD.")
-            .eventDetails(EventDetails.builder()
-                              .miscText("Claim issued in CCD.")
-                              .build())
-            .build();
-
-        String miscText = "Litigation friend added for respondent: " + caseData.getRespondent2().getPartyName();
-        Event respondent1LitigationFriendEvent = Event.builder()
-            .eventSequence(2)
-            .eventCode("999")
-            .dateReceived(caseData.getRespondent2LitigationFriendCreatedDate())
-            .eventDetailsText(miscText)
-            .eventDetails(EventDetails.builder()
-                              .miscText(miscText)
-                              .build())
-            .build();
-
-        Event caseNoteEvent = Event.builder()
-            .eventSequence(3)
-            .eventCode("999")
-            .dateReceived(noteCreatedOn)
-            .eventDetailsText("case note added: my note")
-            .eventDetails(EventDetails.builder()
-                              .miscText("case note added: my note")
-                              .build())
-            .build();
-
-        var eventHistory = mapper.buildEvents(caseData);
-
-        assertThat(eventHistory).isNotNull();
-        assertThat(eventHistory)
-            .extracting("miscellaneous")
-            .asList()
-            .containsExactly(claimIssuedEvent, respondent1LitigationFriendEvent, caseNoteEvent);
-        assertEmptyEvents(
-            eventHistory,
-            "acknowledgementOfServiceReceived",
-            "consentExtensionFilingDefence",
-            "defenceFiled",
-            "defenceAndCounterClaim",
-            "receiptOfPartAdmission",
-            "receiptOfAdmission",
-            "replyToDefence",
-            "directionsQuestionnaireFiled"
-        );
-    }
-
     @Nested
     class BreathingSpaceEvents {
 
@@ -6088,7 +6085,7 @@ class EventHistoryMapperTest {
     class InterlocutoryJudgment {
 
         @Test
-        public void shouldgenerateRPAfeedfor_IJNODivergent() {
+        public void shouldgenerateRPAfeedfor_IJNoDivergent() {
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .ccdState(CaseState.JUDICIAL_REFERRAL)
@@ -6136,9 +6133,8 @@ class EventHistoryMapperTest {
     @Nested
     class DefaultJudgment {
 
-
         @Test
-        public void shouldgenerateRPAfeedfor_DJNODivergent() {
+        public void shouldgenerateRPAfeedfor_DJNoDivergent() {
             CaseData caseData = CaseDataBuilder.builder()
                 .setSuperClaimTypeToSpecClaim()
                 .atStateNotificationAcknowledged().build().toBuilder()
@@ -6148,10 +6144,13 @@ class EventHistoryMapperTest {
                 .addRespondent2(YES)
                 .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
                 .repaymentSummaryObject(
-                    "The judgment will order dsfsdf ffdg to pay £1072.00, including the claim fee and interest," +
-                        " if applicable, as shown:\n### Claim amount \n £1000.00\n ### Fixed cost amount" +
-                        " \n£102.00\n### Claim fee amount \n £70.00\n ## Subtotal \n £1172.00\n\n ### Amount" +
-                        " already paid \n£100.00\n ## Total still owed \n £1072.00")
+                    "The judgment will order dsfsdf ffdg to pay £1072.00,"
+                        + " including the claim fee and interest,"
+                        + " if applicable, as shown:\n### Claim amount \n"
+                        + " £1000.00\n ### Fixed cost amount"
+                        + " \n£102.00\n### Claim fee amount \n £70.00\n ##"
+                        + " Subtotal \n £1172.00\n\n ### Amount"
+                        + " already paid \n£100.00\n ## Total still owed \n £1072.00")
                 .respondent2SameLegalRepresentative(YES)
                 .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
@@ -6178,10 +6177,13 @@ class EventHistoryMapperTest {
                 .addRespondent2(YES)
                 .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
                 .repaymentSummaryObject(
-                    "The judgment will order dsfsdf ffdg to pay £1072.00, including the claim fee and interest," +
-                        " if applicable, as shown:\n### Claim amount \n £1000.00\n ### Fixed cost amount" +
-                        " \n£102.00\n### Claim fee amount \n £70.00\n ## Subtotal \n £1172.00\n\n ### Amount" +
-                        " already paid \n£100.00\n ## Total still owed \n £1072.00")
+                    "The judgment will order dsfsdf ffdg to pay £1072.00,"
+                        + " including the claim fee and interest,"
+                        + " if applicable, as shown:\n### Claim amount \n"
+                        + " £1000.00\n ### Fixed cost amount"
+                        + " \n£102.00\n### Claim fee amount \n £70.00\n"
+                        + " ## Subtotal \n £1172.00\n\n ### Amount"
+                        + " already paid \n£100.00\n ## Total still owed \n £1072.00")
                 .respondent2SameLegalRepresentative(YES)
                 .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
@@ -6199,6 +6201,4 @@ class EventHistoryMapperTest {
         }
 
     }
-
-
 }
