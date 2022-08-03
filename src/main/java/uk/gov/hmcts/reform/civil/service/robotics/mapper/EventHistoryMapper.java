@@ -1981,18 +1981,16 @@ public class EventHistoryMapper {
         BigDecimal fixedCost = null;
         BigDecimal claimCost = null;
         if (null != repaymentSummary) {
-                fixedCost = repaymentSummary.contains("Fixed")
+            fixedCost = repaymentSummary.contains("Fixed")
                 ? new BigDecimal(repaymentSummary.substring(
                 repaymentSummary.indexOf("Fixed cost amount \n£") + 20,
                 repaymentSummary.indexOf("\n### Claim fee amount ")
             )) : null;
-           claimCost = new BigDecimal(repaymentSummary.substring(
+            claimCost = new BigDecimal(repaymentSummary.substring(
                 repaymentSummary.indexOf("Claim fee amount \n £") + 20,
                 repaymentSummary.indexOf("\n ## Subtotal")
             ));
         }
-
-
 
         return isNotEmpty(fixedCost) ? fixedCost.add(claimCost) : claimCost;
 
