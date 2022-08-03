@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
+import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
@@ -312,11 +314,14 @@ public class EventHistoryMapper {
                               .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES)
                                                             ? new BigDecimal(partialPaymentPounds) : null)
                               .isJudgmentForthwith(isNotEmpty(caseData.getRespondent2()))
-                              .paymentInFullDate((caseData.getPaymentTypeSelection().equals("IMMEDIATELY"))
+                              .paymentInFullDate((caseData.getPaymentTypeSelection()
+                                  .equals(DJPaymentTypeSelection.IMMEDIATELY))
                                                    ?  LocalDateTime.now()
-                                                     : (caseData.getPaymentTypeSelection().equals("SET_DAT"))
+                                                     : (caseData.getPaymentTypeSelection()
+                                  .equals(DJPaymentTypeSelection.SET_DATE))
                                   ? caseData.getPaymentSetDate().atStartOfDay() : null)
-                              .installmentAmount((caseData.getPaymentTypeSelection().equals("REPAYMENT_PLAN"))
+                              .installmentAmount((caseData.getPaymentTypeSelection()
+                                  .equals(DJPaymentTypeSelection.REPAYMENT_PLAN))
                                                     ? new BigDecimal(caseData.getRepaymentSuggestion()) : null)
                               .installmentPeriod(getInstallmentPeriod(caseData))
                               .firstInstallmentDate(caseData.getRepaymentDate())
@@ -1940,7 +1945,7 @@ public class EventHistoryMapper {
         Boolean grantedFlag = caseData.getRespondent2() != null
             && caseData.getDefendantDetailsSpec() != null
             && !caseData.getDefendantDetailsSpec().getValue()
-                .getLabel().startsWith("Both");
+            .getLabel().startsWith("Both");
         String miscText = "RPA Reason: Default Judgment requested and claim moved offline.";
         if (grantedFlag) {
             builder.miscellaneous(
@@ -1957,13 +1962,13 @@ public class EventHistoryMapper {
     }
 
     private String getInstallmentPeriod(CaseData data) {
-        if (data.getPaymentTypeSelection().equals("REPAYMENT_PLAN")) {
+        if (data.getPaymentTypeSelection().equals(DJPaymentTypeSelection.REPAYMENT_PLAN)) {
 
-            if (data.getRepaymentFrequency().equals("ONCE_ONE_WEEK")) {
+            if (data.getRepaymentFrequency().equals(RepaymentFrequencyDJ.ONCE_ONE_WEEK)) {
                 return "WK";
-            } else if (data.getRepaymentFrequency().equals("ONCE_TWO_WEEKS")) {
+            } else if (data.getRepaymentFrequency().equals(RepaymentFrequencyDJ.ONCE_TWO_WEEKS)) {
                 return "FOR";
-            } else if (data.getRepaymentFrequency().equals("ONCE_ONE_MONTH")) {
+            } else if (data.getRepaymentFrequency().equals(RepaymentFrequencyDJ.ONCE_ONE_MONTH)) {
                 return "MN";
             }
         }
@@ -1973,15 +1978,15 @@ public class EventHistoryMapper {
     private BigDecimal getCostOfJudgment(CaseData data) {
 
         String repaymentSummary = data.getRepaymentSummaryObject();
-        BigDecimal fixedCost = repaymentSummary.contains( "Fixed" )
-             ? new BigDecimal( repaymentSummary.substring(
-                repaymentSummary.indexOf( "Fixed cost amount \n£" )  +  20,
-                repaymentSummary.indexOf( "\n### Claim fee amount " )
-            ) )  : null;
+        BigDecimal fixedCost = repaymentSummary.contains("Fixed")
+            ? new BigDecimal(repaymentSummary.substring(
+            repaymentSummary.indexOf("Fixed cost amount \n£") + 20,
+            repaymentSummary.indexOf("\n### Claim fee amount ")
+        )) : null;
 
         BigDecimal claimCost = new BigDecimal(repaymentSummary.substring(
-            repaymentSummary.indexOf( "Claim fee amount \n £" )  +  20,
-            repaymentSummary.indexOf( "\n ## Subtotal" )
+            repaymentSummary.indexOf("Claim fee amount \n £") + 20,
+            repaymentSummary.indexOf("\n ## Subtotal")
         ));
 
         return isNotEmpty(fixedCost) ? fixedCost.add(claimCost) : claimCost;
