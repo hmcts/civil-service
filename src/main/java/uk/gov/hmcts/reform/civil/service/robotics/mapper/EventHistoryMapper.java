@@ -33,7 +33,6 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -1972,4 +1971,5 @@ public class EventHistoryMapper {
         return isNotEmpty(fixedCost) ? fixedCost.add(claimCost) : claimCost;
 
     }
+
 }
