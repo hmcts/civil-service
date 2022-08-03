@@ -7,14 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.PartyRole;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -6093,6 +6086,8 @@ class EventHistoryMapperTest {
                 .atStateNotificationAcknowledged().build().toBuilder()
                 .ccdState(CaseState.JUDICIAL_REFERRAL)
                 .totalClaimAmount(new BigDecimal(1000))
+                .repaymentSuggestion("100")
+                .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH)
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
                 .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
@@ -6140,6 +6135,8 @@ class EventHistoryMapperTest {
                 .respondent2SameLegalRepresentative(YES)
                 .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .repaymentSuggestion("100")
+                .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH)
                 .defendantDetailsSpec(DynamicList.builder()
                                           .value(DynamicListElement.builder()
                                                      .label("Test User")
