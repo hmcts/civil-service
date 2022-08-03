@@ -48,7 +48,6 @@ public class EventHistory {
     @Singular("statesPaid")
     private List<Event> statesPaid;
 
-
     @JsonIgnore
     public List<Event> flatEvents() {
         List<List<Event>> eventsList = Lists.newArrayList(
@@ -68,8 +67,8 @@ public class EventHistory {
             interlocutoryJudgment,
             defaultJudgment,
             statesPaid
-
         );
+
         return eventsList.stream()
             .filter(Objects::nonNull)
             .flatMap(Collection::stream)
