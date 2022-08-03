@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
@@ -188,7 +189,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var acceptanceSpec = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance");
         if (Objects.isNull(acceptanceSpec) && Objects.isNull(acceptance2DefSpec)) {
             listErrors.add("To apply for default judgment, all of the statements must apply to the defendant "
-                               + "- if they do not apply, close this page and apply for default judgment when they do");
+                           + "- if they do not apply, close this page and apply for default judgment when they do");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(listErrors)
@@ -377,8 +378,11 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_SPEC));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
+            //.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 }
+
+
+

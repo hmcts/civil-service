@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_DJ_UNSPEC;
 @Service
 public class NotifyDefaultJudgmentHandler extends NotifyRoboticsHandler {
 
+
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_RPA_DJ_UNSPEC,
         NOTIFY_RPA_DJ_SPEC
