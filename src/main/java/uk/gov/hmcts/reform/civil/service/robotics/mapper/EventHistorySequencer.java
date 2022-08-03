@@ -88,6 +88,12 @@ public class EventHistorySequencer {
                 case MENTAL_HEALTH_BREATHING_SPACE_LIFTED:
                     builder.breathingSpaceMentalHealthLifted(event);
                     break;
+                case  INTERLOCUTORY_JUDGMENT_GRANTED:
+                    builder.interlocutoryJudgment(event);
+                    break;
+                case  DEFAULT_JUDGMENT_GRANTED:
+                    builder.defaultJudgment(event);
+                    break;
                 default:
                     throw new IllegalStateException("Unexpected event type: " + eventType);
             }
@@ -131,6 +137,12 @@ public class EventHistorySequencer {
         if (isEmpty(builder.build().getBreathingSpaceMentalHealthLifted())) {
             builder.breathingSpaceMentalHealthLifted(List.of(Event.builder().build()));
         }
+        if (isEmpty(builder.build().getInterlocutoryJudgment())) {
+            builder.interlocutoryJudgment(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getDefaultJudgment())) {
+            builder.defaultJudgment(List.of(Event.builder().build()));
+        }
         return builder
             .build();
     }
@@ -161,7 +173,9 @@ public class EventHistorySequencer {
             eventHistory.getBreathingSpaceEntered(),
             eventHistory.getBreathingSpaceLifted(),
             eventHistory.getBreathingSpaceMentalHealthEntered(),
-            eventHistory.getBreathingSpaceMentalHealthLifted()
+            eventHistory.getBreathingSpaceMentalHealthLifted(),
+            eventHistory.getInterlocutoryJudgment(),
+            eventHistory.getDefaultJudgment()
         );
         return eventsList.stream()
             .filter(Objects::nonNull)
