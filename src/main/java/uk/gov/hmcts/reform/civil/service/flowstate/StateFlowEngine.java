@@ -62,6 +62,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClai
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentFailed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentSuccessful;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingClaimIssued;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pinInPostEnabledAndLiP;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2NotRepresented;
@@ -283,7 +284,10 @@ public class StateFlowEngine {
                 .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT)
                     .onlyIf(takenOfflineBySystem.and(pastAddLegalRepDeadline))
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC)
-                .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued)
+                .transitionTo(CLAIM_ISSUED)
+                    .onlyIf(claimIssued.and(pinInPostEnabledAndLiP))
+                .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT)
+                    .onlyIf(takenOfflineBySystem.and(pastAddLegalRepDeadline.and(not(pinInPostEnabledAndLiP))))
             .state(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT)
                 .transitionTo(TAKEN_OFFLINE_UNREGISTERED_DEFENDANT).onlyIf(takenOfflineBySystem)
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)
