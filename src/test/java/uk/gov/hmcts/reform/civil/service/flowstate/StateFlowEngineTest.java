@@ -677,7 +677,7 @@ class StateFlowEngineTest {
             // Unregistered
             // 1. Both def1 and def2 unregistered
             @Test
-            void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedRespondentsNotRegisteredSpec() {
+            void shouldReturnProceedsWithOfflineJourney_whenRespondentsNotRegisteredSpec() {
                 CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnregisteredDefendants().build()
                     .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
 
