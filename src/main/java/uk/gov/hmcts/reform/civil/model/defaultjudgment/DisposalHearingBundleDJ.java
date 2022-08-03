@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingBundleType;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 
 @Data
 @Builder(toBuilder = true)
