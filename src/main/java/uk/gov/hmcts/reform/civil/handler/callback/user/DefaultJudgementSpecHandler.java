@@ -60,6 +60,8 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private static final int COMMENCEMENT_FIXED_COST_110 = 110;
     private static final int ENTRY_FIXED_COST_22 = 22;
     private static final int ENTRY_FIXED_COST_30 = 30;
+    public static final String DJ_TYPE_GRANTED = "Granted";
+    public static final String DJ_TYPE_REQUESTED = "Requested";
     private final ObjectMapper objectMapper;
     private final InterestCalculator interestCalculator;
     private final FeesService feesService;
@@ -96,9 +98,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private String getHeader(CaseData caseData) {
-        if (caseData.getRespondent2() != null
-            && !caseData.getDefendantDetailsSpec().getValue()
-            .getLabel().startsWith("Both")) {
+        if (isJudgmentRequested(caseData)) {
             return format(JUDGMENT_REQUESTED_HEADER);
 
         } else {
@@ -108,9 +108,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     }
 
     private String getBody(CaseData caseData) {
-        if (caseData.getRespondent2() != null
-            && !caseData.getDefendantDetailsSpec().getValue()
-            .getLabel().startsWith("Both")) {
+        if (isJudgmentRequested(caseData)) {
             return format(JUDGMENT_REQUESTED, caseData.getDefendantDetailsSpec().getValue().getLabel());
         } else {
             return format(JUDGMENT_GRANTED, format(
@@ -123,7 +121,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
 
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
         if (nonNull(caseData.getRespondent1ResponseDeadline())
             && caseData.getRespondent1ResponseDeadline().isAfter(LocalDateTime.now())) {
@@ -160,7 +158,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private CallbackResponse checkStatus(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.bothDefendantsSpec("One");
         // populate the title of next screen if only one defendant chosen
         var currentDefendantString = ("Has " + caseData.getDefendantDetailsSpec()
@@ -255,7 +253,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private CallbackResponse repaymentBreakdownCalculate(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         var claimfee = feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount());
         var claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
@@ -335,7 +333,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private CallbackResponse overallTotalAndDate(CallbackParams callbackParams) {
 
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         //Set the hint date for repayment to be 30 days in the future
         String formattedDeadline = formatLocalDateTime(LocalDateTime.now().plusDays(30), DATE);
         caseDataBuilder.currentDatebox(formattedDeadline);
@@ -372,12 +370,17 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_SPEC));
-
+        caseDataBuilder.defaultJudgmentType(isJudgmentRequested(caseData) ? DJ_TYPE_REQUESTED : DJ_TYPE_GRANTED);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private Boolean isJudgmentRequested(CaseData caseData) {
+        return nonNull(caseData.getRespondent2())
+            && !caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both");
     }
 }
 

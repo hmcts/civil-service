@@ -436,6 +436,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String repaymentSuggestion;
     private final String currentDatebox;
     private final LocalDate repaymentDate;
+    private final String defaultJudgmentType;
 
     @Builder.Default
     private final List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
