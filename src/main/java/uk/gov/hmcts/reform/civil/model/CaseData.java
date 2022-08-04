@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
@@ -422,6 +423,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
     private final CaseLocation caseManagementLocation;
+    private final CaseManagementCategory caseManagementCategory;
     private final String locationName;
     private final DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;

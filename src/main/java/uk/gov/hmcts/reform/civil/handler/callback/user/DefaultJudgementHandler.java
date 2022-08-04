@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseManagementCategory;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
@@ -39,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -129,7 +132,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
                     location.getEpimmsId()).build());
             caseDataBuilder.locationName(location.getSiteName());
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
@@ -176,7 +178,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
-
     }
 
     private CallbackResponse getLocation(CallbackParams callbackParams) {
@@ -249,7 +250,12 @@ public class DefaultJudgementHandler extends CallbackHandler {
             .getLabel().startsWith("Both")) {
             state = "JUDICIAL_REFERRAL";
         }
-
+        CaseManagementCategoryElement civil =
+            CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
+        List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
+        itemList.add(element(civil));
+        caseDataBuilder.caseManagementCategory(
+            CaseManagementCategory.builder().value(civil).list_items(itemList).build());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(state)
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -283,6 +289,10 @@ public class DefaultJudgementHandler extends CallbackHandler {
             + " - " + location.getCourtAddress()
             + " - " + location.getPostcode();
         return locationLabel.equals(locationTempLabel);
+    }
+
+    private String fillCaseManagementCategory() {
+        return "";
     }
 
 }
