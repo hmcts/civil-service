@@ -34,6 +34,16 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseManagementCategory;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingMedicalEvidenceDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingNotesDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingQuestionsToExpertsDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingSchedulesOfLossDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingStandardDisposalOrderDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingWitnessOfFactDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
@@ -69,16 +79,6 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgesRecital;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -459,21 +459,21 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String applicantVRespondentText;
 
     //default judgement SDO fields for disposal
-    private DisposalHearingJudgesRecital disposalHearingJudgesRecitalDJ;
-    private DisposalHearingDisclosureOfDocuments disposalHearingDisclosureOfDocumentsDJ;
-    private DisposalHearingWitnessOfFact disposalHearingWitnessOfFactDJ;
-    private DisposalHearingMedicalEvidence disposalHearingMedicalEvidenceDJ;
-    private DisposalHearingQuestionsToExperts disposalHearingQuestionsToExpertsDJ;
-    private DisposalHearingSchedulesOfLoss disposalHearingSchedulesOfLossDJ;
-    private DisposalHearingStandardDisposalOrder disposalHearingStandardDisposalOrderDJ;
-    private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearingDJ;
-    private DisposalHearingBundle disposalHearingBundleDJ;
-    private DisposalHearingNotes disposalHearingNotesDJ;
+    private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
+    private DisposalHearingDisclosureOfDocumentsDJ disposalHearingDisclosureOfDocumentsDJ;
+    private DisposalHearingWitnessOfFactDJ disposalHearingWitnessOfFactDJ;
+    private DisposalHearingMedicalEvidenceDJ disposalHearingMedicalEvidenceDJ;
+    private DisposalHearingQuestionsToExpertsDJ disposalHearingQuestionsToExpertsDJ;
+    private DisposalHearingSchedulesOfLossDJ disposalHearingSchedulesOfLossDJ;
+    private DisposalHearingStandardDisposalOrderDJ disposalHearingStandardDisposalOrderDJ;
+    private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
+    private DisposalHearingBundleDJ disposalHearingBundleDJ;
+    private DisposalHearingNotesDJ disposalHearingNotesDJ;
     private DisposalHearingMethodDJ disposalHearingMethodDJ;
     private DynamicList trialHearingMethodInPersonDJ;
     private DynamicList disposalHearingMethodInPersonDJ;
 
-    //default judgement SDO fields for trial
+    //default judgement SDO fields for trial/fast track
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
     private TrialHearingDisclosureOfDocuments trialHearingDisclosureOfDocumentsDJ;
     private TrialHearingWitnessOfFact trialHearingWitnessOfFactDJ;
