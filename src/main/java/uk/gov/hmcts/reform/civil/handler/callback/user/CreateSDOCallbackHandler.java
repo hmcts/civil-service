@@ -435,16 +435,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .date3(LocalDate.now().plusWeeks(8))
             .input7("and the claimant's evidence is reply if so advised to be uploaded by 4pm on")
             .date4(LocalDate.now().plusWeeks(10))
-            .input8("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
-                        + "paragraph above, each party may rely upon the written evidence by way of witness statement "
-                        + "of one witness to provide evidence of basic hire rates available within the claimant's "
-                        + "geographical location from a mainstream supplier, or a local reputable supplier if none is "
-                        + "available.")
-            .input9("The defendant’s evidence is to be uploaded to the Digital Portal by 4pm on")
-            .date5(LocalDate.now().plusWeeks(8))
-            .input10(", and the claimant’s evidence in reply if so advised is to be uploaded by 4pm on")
-            .date6(LocalDate.now().plusWeeks(10))
-            .input11("This witness statement is limited to 10 pages per party, including any appendices.")
+            .input8("This witness statement is limited to 10 pages per party, including any appendices.")
             .build();
 
         updatedData.fastTrackCreditHire(tempFastTrackCreditHire).build();
