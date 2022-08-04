@@ -139,6 +139,7 @@ public class AcknowledgementOfClaimGenerator implements TemplateDataGenerator<Ac
                 .issueDate(caseData.getIssueDate())
                 .responseDeadline(responseDeadline)
                 .respondent(prepareRespondentMultiParty(caseData, multiPartyScenario))
+                .responseIntentions(DocmosisTemplateDataUtils.fetchResponseIntentions(caseData))
                 .build();
 
     }

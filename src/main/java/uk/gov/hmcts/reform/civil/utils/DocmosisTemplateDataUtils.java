@@ -2,18 +2,20 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.*;
 
 public class DocmosisTemplateDataUtils {
 
@@ -193,5 +195,38 @@ public class DocmosisTemplateDataUtils {
                 .build();
         }
 
+    }
+
+    public static List<String> fetchResponseIntentions(CaseData caseData) {
+        List<String> responseIntentions = new ArrayList<>();
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            //case where respondent 2 acknowledges first
+            if ((caseData.getRespondent1AcknowledgeNotificationDate() == null)
+                && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
+                responseIntentions.add(caseData.getRespondent2ClaimResponseIntentionType().getLabel());
+            } else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null)//case where both respondents acklg
+                && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
+                //case where resp 1 acknowledges first
+                if (caseData.getRespondent2AcknowledgeNotificationDate()
+                    .isAfter(caseData.getRespondent1AcknowledgeNotificationDate())) {
+                    responseIntentions.add(caseData.getRespondent2ClaimResponseIntentionType().getLabel());
+                } else {
+                    responseIntentions.add(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+                }
+            } else { //case where respondent 1 acknowledges first
+                responseIntentions.add(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+            }
+        } else if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {  //cases other than ONE_V_TWO_ONE_LEGAL_REP
+            responseIntentions.add("Defendant 1 :"+caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+            responseIntentions.add("Defendant 2 :"+caseData.getRespondent2ClaimResponseIntentionType().getLabel());
+        }else if (multiPartyScenario == TWO_V_ONE) {  //cases other than ONE_V_TWO_ONE_LEGAL_REP
+            responseIntentions.add("Against Claimant 1: "+caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+            responseIntentions.add("Against Claimant 2: "+caseData.getRespondent1ClaimResponseIntentionTypeApplicant2().getLabel());
+        } else { //other cases
+            responseIntentions.add(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+        }
+
+        return responseIntentions;
     }
 }
