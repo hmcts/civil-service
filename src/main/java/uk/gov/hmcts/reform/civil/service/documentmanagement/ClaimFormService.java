@@ -39,7 +39,7 @@ public class ClaimFormService {
     private final GenerateClaimFormForSpecCallbackHandler generateClaimFormForSpecCallbackHandler;
     private final ObjectMapper objectMapper;
 
-    public CallbackResponse uploadSealedDocument(
+    public CaseDocument uploadSealedDocument(
         String authorisation, CaseData caseData) {
         LocalDate issueDate = time.now().toLocalDate();
 
@@ -67,27 +67,32 @@ public class ClaimFormService {
                 sealClaimForm.getDocumentName(),
                 caseData
             );
-           if (stitchedDocument.getError() != null &&  !stitchedDocument.getError().isEmpty()) {
+
+            if (stitchedDocument.getError() != null &&  !stitchedDocument.getError().isEmpty()) {
                 log.info("There is issue with Stitching");
-            } else if (stitchedDocument.getDocumentSize() > 1) {
-                {
+                return sealClaimForm;
+
+            } else {
+                if (stitchedDocument.getDocumentSize() > 1) {
                     caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
-                    //CaseDetails.builder().data(caseDataBuilder.build().toMap(objectMapper)).build();
+                    CaseDetails.builder().data(caseDataBuilder.build().toMap(objectMapper)).build();
                     log.info("Document been stitched okay");
+                    return stitchedDocument;
+                } else {
+                    caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealClaimForm));
+                    CaseDetails.builder().data(caseDataBuilder.build().toMap(objectMapper)).build();
+                    return sealClaimForm;
                 }
             }
 
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealClaimForm));
-            //CaseDetails.builder().data(caseDataBuilder.build().toMap(objectMapper)).build();
-
+            CaseDetails.builder().data(caseDataBuilder.build().toMap(objectMapper)).build();
+            return sealClaimForm;
         }
-        log.info("before AboutToStartOrSubmitCallbackResponse");
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
-
-       // return SubmittedCallbackResponse.builder().build();
+        //caseData.toBuilder().data.build();
+       // .data(caseDataBuilder.build().toMap(objectMapper))
+     // caseDataBuilder;
     }
 
     @Autowired
