@@ -14,9 +14,9 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingBundleType;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -52,6 +52,8 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -74,8 +76,6 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
@@ -281,8 +281,8 @@ public class CaseDataBuilder {
     private DisposalHearingMethodDJ trialHearingMethodDJ;
     private DisposalHearingMethodDJ disposalHearingMethodDJ;
     private DynamicList trialHearingMethodInPersonDJ;
-    private DisposalHearingBundle disposalHearingBundleDJ;
-    private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearingDJ;
+    private DisposalHearingBundleDJ disposalHearingBundleDJ;
+    private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private TrialHearingTrial trialHearingTrialDJ;
 
     //update pdf document from general applications
@@ -1431,12 +1431,12 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssuedDisposalHearingInPerson() {
-        disposalHearingBundleDJ = DisposalHearingBundle.builder()
+        disposalHearingBundleDJ = DisposalHearingBundleDJ.builder()
             .input("The claimant must lodge at court at least 7 "
                        + "days before the disposal")
             .type(DisposalHearingBundleType.DOCUMENTS)
             .build();
-        disposalHearingFinalDisposalHearingDJ = DisposalHearingFinalDisposalHearing
+        disposalHearingFinalDisposalHearingDJ = DisposalHearingFinalDisposalHearingDJ
             .builder()
             .input("This claim be listed for final "
                        + "disposal before a Judge on the first "
