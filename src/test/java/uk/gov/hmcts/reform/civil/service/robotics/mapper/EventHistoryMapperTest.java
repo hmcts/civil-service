@@ -4591,6 +4591,196 @@ class EventHistoryMapperTest {
     }
 
     @Nested
+    class SDONotDrawn {
+        @Test
+        void shouldPrepareMiscEvents_whenClaimWithFullDefence_whenSDONotDrawn_OneVOne() {
+
+            when(featureToggleService.isSDOEnabled()).thenReturn(true);
+
+            if (featureToggleService.isSDOEnabled()) {
+                String miscText = "RPA Reason: Case proceeds offline. "
+                    + "Judge / Legal Advisor did not draw a Direction's Order: "
+                    + "unforeseen complexities";
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
+                    .build();
+
+                List<Event> expectedMiscellaneousEvents = List.of(
+                    Event.builder()
+                        .eventSequence(1)
+                        .eventCode("999")
+                        .dateReceived(LocalDate.now().plusDays(1).atStartOfDay()
+                        )
+                        .eventDetailsText("Claimant has notified defendant.")
+                        .eventDetails(EventDetails.builder()
+                                          .miscText("Claimant has notified defendant.")
+                                          .build())
+                        .build(),
+                    Event.builder()
+                        .eventSequence(5)
+                        .eventCode("999")
+                        .dateReceived(caseData.getClaimProceedsInCaseman().getDate().atStartOfDay()
+                        )
+                        .eventDetailsText(miscText)
+                        .eventDetails(EventDetails.builder()
+                                          .miscText(miscText)
+                                          .build())
+                        .build()
+                );
+
+                var eventHistory = mapper.buildEvents(caseData);
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory).extracting("miscellaneous").asList()
+                    .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+
+            }
+
+        }
+
+        @Test
+        void shouldPrepareMiscEvents_whenClaimWithFullDefence_whenSDONotDrawnInactive_OneVOne() {
+
+            when(featureToggleService.isSDOEnabled()).thenReturn(false);
+
+            if (!featureToggleService.isSDOEnabled()) {
+                String miscText = "RPA Reason: Case proceeds offline. "
+                    + "Judge / Legal Advisor did not draw a Direction's Order: "
+                    + "unforeseen complexities";
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
+                    .build();
+
+                List<Event> expectedMiscellaneousEvents = List.of(
+                    Event.builder()
+                        .eventSequence(1)
+                        .eventCode("999")
+                        .dateReceived(LocalDate.now().plusDays(1).atStartOfDay()
+                        )
+                        .eventDetailsText("Claimant has notified defendant.")
+                        .eventDetails(EventDetails.builder()
+                                          .miscText("Claimant has notified defendant.")
+                                          .build())
+                        .build(),
+                    Event.builder()
+                        .eventSequence(5)
+                        .eventCode("999")
+                        .dateReceived(caseData.getClaimProceedsInCaseman().getDate().atStartOfDay()
+                        )
+                        .eventDetailsText(miscText)
+                        .eventDetails(EventDetails.builder()
+                                          .miscText(miscText)
+                                          .build())
+                        .build()
+                );
+
+                var eventHistory = mapper.buildEvents(caseData);
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory).extracting("miscellaneous").asList()
+                    .containsExactly(expectedMiscellaneousEvents.get(0));
+
+            }
+
+        }
+
+        @Test
+        void shouldPrepareMiscEvents_whenClaimWithFullDefence_whenSDONotDrawn_OneVTwoTwoLegalRep() {
+
+            when(featureToggleService.isSDOEnabled()).thenReturn(true);
+
+            if (featureToggleService.isSDOEnabled()) {
+                String miscText = "RPA Reason: Case proceeds offline. "
+                    + "Judge / Legal Advisor did not draw a Direction's Order: "
+                    + "unforeseen complexities";
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
+                    .build();
+
+                Event expectedMiscellaneousEvents =
+                    Event.builder()
+                        .eventSequence(5)
+                        .eventCode("999")
+                        .dateReceived(caseData.getClaimProceedsInCaseman().getDate().atStartOfDay()
+                        )
+                        .eventDetailsText(miscText)
+                        .eventDetails(EventDetails.builder()
+                                          .miscText(miscText)
+                                          .build())
+                        .build();
+
+                var eventHistory = mapper.buildEvents(caseData);
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory).extracting("miscellaneous").asList()
+                    .containsExactly(expectedMiscellaneousEvents);
+            }
+        }
+
+        @Test
+        void shouldPrepareMiscEvents_whenClaimWithFullDefence_whenSDONotDrawn_OneVTwoOneLegalRep() {
+
+            when(featureToggleService.isSDOEnabled()).thenReturn(true);
+
+            if (featureToggleService.isSDOEnabled()) {
+                String miscText = "RPA Reason: Case proceeds offline. "
+                    + "Judge / Legal Advisor did not draw a Direction's Order: "
+                    + "unforeseen complexities";
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+                    .build();
+
+                Event expectedMiscellaneousEvents =
+                    Event.builder()
+                        .eventSequence(5)
+                        .eventCode("999")
+                        .dateReceived(caseData.getClaimProceedsInCaseman().getDate().atStartOfDay()
+                        )
+                        .eventDetailsText(miscText)
+                        .eventDetails(EventDetails.builder()
+                                          .miscText(miscText)
+                                          .build())
+                        .build();
+
+                var eventHistory = mapper.buildEvents(caseData);
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory).extracting("miscellaneous").asList()
+                    .containsExactly(expectedMiscellaneousEvents);
+            }
+        }
+
+        @Test
+        void shouldPrepareMiscEvents_whenClaimWithFullDefence_whenSDONotDrawn_TwoVOne() {
+
+            when(featureToggleService.isSDOEnabled()).thenReturn(true);
+
+            if (featureToggleService.isSDOEnabled()) {
+                String miscText = "RPA Reason: Case proceeds offline. "
+                    + "Judge / Legal Advisor did not draw a Direction's Order: "
+                    + "unforeseen complexities";
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.TWO_V_ONE)
+                    .build();
+
+                Event expectedMiscellaneousEvents =
+                    Event.builder()
+                        .eventSequence(5)
+                        .eventCode("999")
+                        .dateReceived(caseData.getClaimProceedsInCaseman().getDate().atStartOfDay()
+                        )
+                        .eventDetailsText(miscText)
+                        .eventDetails(EventDetails.builder()
+                                          .miscText(miscText)
+                                          .build())
+                        .build();
+
+                var eventHistory = mapper.buildEvents(caseData);
+                assertThat(eventHistory).isNotNull();
+                assertThat(eventHistory).extracting("miscellaneous").asList()
+                    .containsExactly(expectedMiscellaneousEvents);
+            }
+        }
+
+    }
+
+    @Nested
     class TakenOfflineByStaff {
 
         @Test

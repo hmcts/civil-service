@@ -854,6 +854,8 @@ public class CaseDataBuilder {
                 return atStateTakenOfflinePastApplicantResponseDeadline();
             case CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE:
                 return atStateClaimDismissedPastClaimNotificationDeadline();
+            case TAKEN_OFFLINE_SDO_NOT_DRAWN:
+                return atStateTakenOfflineSDONotDrawn(mpScenario);
             default:
                 throw new IllegalArgumentException("Invalid internal state: " + flowState);
         }
@@ -2790,6 +2792,17 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateTakenOfflinePastApplicantResponseDeadline() {
         atStatePastApplicantResponseDeadline();
         takenOfflineDate = respondent1ResponseDate.plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflineSDONotDrawn(MultiPartyScenario mpScenario) {
+        atStateApplicantRespondToDefenceAndProceed(mpScenario);
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        claimProceedsInCaseman = ClaimProceedsInCaseman.builder()
+            .date(LocalDate.now().plusDays(2))
+            .other("unforeseen complexities")
+            .build();
+        takenOfflineDate = LocalDateTime.now();
         return this;
     }
 
