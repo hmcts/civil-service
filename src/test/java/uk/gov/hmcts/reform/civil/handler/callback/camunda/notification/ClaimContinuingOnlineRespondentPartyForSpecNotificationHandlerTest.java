@@ -120,6 +120,26 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
             );
         }
 
+        @Test
+        void shouldNotNotifyRespondent1Solicitor_whenNoEmailiIsEntered() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
+                                 .build())
+                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
+                                                   .accessCode("TEST1234")
+                                                   .expiryDate(LocalDate.now().plusDays(180))
+                                                   .build())
+                .claimDetailsNotificationDate(LocalDateTime.now())
+                .respondent1ResponseDeadline(LocalDateTime.now())
+                .addRespondent2(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC")
+                    .build()).build();
+
+            handler.handle(params);
+        }
+
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 RESPONDENT_NAME, "Mr. Sole Trader",
