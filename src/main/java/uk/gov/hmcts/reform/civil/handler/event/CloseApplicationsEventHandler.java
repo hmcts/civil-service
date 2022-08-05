@@ -20,7 +20,6 @@ public class CloseApplicationsEventHandler {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
 
-
     @EventListener
     public void triggerApplicationClosedEvent(CloseApplicationsEvent event) {
         log.info("Inside CloseApplicationsEventHandler");
