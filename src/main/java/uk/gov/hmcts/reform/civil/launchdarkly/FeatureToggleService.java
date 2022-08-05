@@ -86,8 +86,13 @@ public class FeatureToggleService {
         return internalClient.boolVariation("pin-in-post", createLDUser().build(), false);
     }
 
+<<<<<<< HEAD
     public boolean isAccessProfilesEnabled() {
         return internalClient.boolVariation("access-profiles", createLDUser().build(), false);
+=======
+    public boolean isSDOEnabled() {
+        return internalClient.boolVariation("enableSDO", createLDUser().build(), false);
+>>>>>>> 5c2e7ad1c (Created SDO RPA event updater, and tests)
     }
 
     private void close() {
