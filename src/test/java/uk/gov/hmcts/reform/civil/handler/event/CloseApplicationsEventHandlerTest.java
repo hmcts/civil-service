@@ -20,7 +20,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAIN_CASE_CLOSED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VERIFY_AND_CLOSE_APPLICATION;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
@@ -55,8 +55,8 @@ class CloseApplicationsEventHandlerTest {
                 .thenReturn(getCaseWithTwoGeneralApplications(1234L, 5678L));
         handler.triggerApplicationClosedEvent(event);
 
-        verify(coreCaseDataService, times(1)).triggerEvent(1234L, MAIN_CASE_CLOSED);
-        verify(coreCaseDataService, times(1)).triggerEvent(5678L, MAIN_CASE_CLOSED);
+        verify(coreCaseDataService, times(1)).triggerEvent(1234L, VERIFY_AND_CLOSE_APPLICATION);
+        verify(coreCaseDataService, times(1)).triggerEvent(5678L, VERIFY_AND_CLOSE_APPLICATION);
     }
 
     private CaseData getCaseWithNoApplications() {

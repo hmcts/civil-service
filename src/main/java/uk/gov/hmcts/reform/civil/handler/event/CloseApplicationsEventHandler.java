@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import static java.lang.Long.parseLong;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAIN_CASE_CLOSED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VERIFY_AND_CLOSE_APPLICATION;
 
 @Slf4j
 @Service
@@ -22,7 +22,6 @@ public class CloseApplicationsEventHandler {
 
     @EventListener
     public void triggerApplicationClosedEvent(CloseApplicationsEvent event) {
-        log.info("Inside CloseApplicationsEventHandler");
         CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(event.getCaseId()));
         if (caseData.getGeneralApplications() != null) {
             caseData.getGeneralApplications()
@@ -33,7 +32,9 @@ public class CloseApplicationsEventHandler {
 
     private void triggerEvent(Long caseId) {
         try {
-            coreCaseDataService.triggerEvent(caseId, MAIN_CASE_CLOSED);
+            log.info("Triggering VERIFY_AND_CLOSE_APPLICATION event to close the underlying general application: [{}]",
+                    caseId);
+            coreCaseDataService.triggerEvent(caseId, VERIFY_AND_CLOSE_APPLICATION);
         } catch (Exception e) {
             log.error("Could not trigger event to close application [{}]", caseId);
         }
