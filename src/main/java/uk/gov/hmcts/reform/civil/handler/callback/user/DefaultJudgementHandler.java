@@ -290,9 +290,4 @@ public class DefaultJudgementHandler extends CallbackHandler {
             + " - " + location.getPostcode();
         return locationLabel.equals(locationTempLabel);
     }
-
-    private String fillCaseManagementCategory() {
-        return "";
-    }
-
 }
