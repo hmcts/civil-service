@@ -30,10 +30,7 @@ import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
-import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
-import uk.gov.hmcts.reform.civil.service.FeesService;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.*;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
@@ -115,6 +112,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final DateOfBirthValidator dateOfBirthValidator;
     private final FeesService feesService;
     private final OrganisationService organisationService;
+    private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final IdamClient idamClient;
     private final OrgPolicyValidator orgPolicyValidator;
     private final ObjectMapper objectMapper;
@@ -376,14 +374,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             && caseData.getAddRespondent2() == NO
             && caseData.getAddApplicant2() == NO
             && toggleService.isPinInPostEnabled()) {
-            LocalDate expiryDate = LocalDate.now().plusDays(180);
-            dataBuilder.respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
-                                                        .accessCode(AccessCodeGenerator.generateAccessCode())
-                                                        .respondentCaseRole(
-                                                            CaseRole.RESPONDENTSOLICITORONESPEC.getFormattedName())
-                                                        .expiryDate(expiryDate)
-                                                        .pinUsed(NO)
-                                                        .build());
+                dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         }
 
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
