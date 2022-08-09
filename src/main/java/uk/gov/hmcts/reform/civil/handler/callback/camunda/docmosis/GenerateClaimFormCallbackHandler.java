@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_CLAIM_FORM;
@@ -75,9 +74,8 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
-        if (stitchEnabled && (caseData.getRespondent1Represented().equals(YesOrNo.NO)
-            || ofNullable(caseData.getRespondent2Represented()).isPresent()
-            && caseData.getRespondent2Represented().equals(YesOrNo.NO))) {
+        if (stitchEnabled && (YesOrNo.NO.equals(caseData.getRespondent1Represented())
+            || YesOrNo.NO.equals(caseData.getRespondent2Represented()))) {
 
             CaseDocument lipForm = litigantInPersonFormGenerator.generate(
                 caseDataBuilder.build(),

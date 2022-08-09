@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_CLAIM_FORM_SPEC;
@@ -125,9 +124,8 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
             ));
         }
 
-        if (caseData.getSpecRespondent1Represented().equals(YesOrNo.NO)
-            || ofNullable(caseData.getSpecRespondent2Represented()).isPresent()
-            && caseData.getSpecRespondent2Represented().equals(YesOrNo.NO)) {
+        if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())
+            || YesOrNo.NO.equals(caseData.getSpecRespondent2Represented())) {
 
             CaseDocument lipForm = litigantInPersonFormGenerator.generate(
                 caseDataBuilder.build(),
