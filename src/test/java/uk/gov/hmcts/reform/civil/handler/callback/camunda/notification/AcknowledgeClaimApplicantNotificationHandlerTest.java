@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.AcknowledgeClaimApplicantNotificationHandler.TASK_ID;
@@ -37,10 +38,12 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONSE_INTENTION;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseIntentionForEmail;
 
 @SpringBootTest(classes = {
     AcknowledgeClaimApplicantNotificationHandler.class,
@@ -65,7 +68,7 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT").build())
                 .build();
@@ -82,7 +85,7 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedWithCcEvent() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT_CC").build())
                 .build();
@@ -108,6 +111,7 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
                 .respondent2AcknowledgeNotificationDate(LocalDateTime.now())
                 .respondent1ResponseDeadline(null)
                 .respondent2ResponseDeadline(LocalDateTime.now().plusDays(14))
+                .respondent2ClaimResponseIntentionType(FULL_DEFENCE)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT_CC").build())
@@ -134,6 +138,7 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
                 .respondent1AcknowledgeNotificationDate(LocalDateTime.now().minusDays(2))
                 .respondent1ResponseDeadline(LocalDateTime.now().plusDays(14))
                 .respondent2ResponseDeadline(LocalDateTime.now().plusDays(14))
+                .respondent2ClaimResponseIntentionType(FULL_DEFENCE)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT_CC").build())
@@ -233,7 +238,8 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 RESPONDENT_NAME, respondent.getPartyName(),
                 PARTY_REFERENCES, buildPartiesReferences(caseData),
-                RESPONSE_DEADLINE, formatLocalDate(responseDeadline.toLocalDate(), DATE)
+                RESPONSE_DEADLINE, formatLocalDate(responseDeadline.toLocalDate(), DATE),
+                RESPONSE_INTENTION, getResponseIntentionForEmail(caseData)
             );
         }
     }

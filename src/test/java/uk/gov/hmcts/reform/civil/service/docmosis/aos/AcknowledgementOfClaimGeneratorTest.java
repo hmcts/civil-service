@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -108,6 +109,7 @@ class AcknowledgementOfClaimGeneratorTest {
             .solicitorReferences(caseData.getSolicitorReferences())
             .issueDate(caseData.getIssueDate())
             .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
+            .responseIntentions(DocmosisTemplateDataUtils.fetchResponseIntentionsDocmosisTemplate(caseData))
             .respondent(new ArrayList<>(List.of(
                 Party.builder()
                     .name(caseData.getRespondent1().getPartyName())
@@ -143,6 +145,7 @@ class AcknowledgementOfClaimGeneratorTest {
             .respondent2(PartyBuilder.builder().individual().build())
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(YES)
+            .respondent2ClaimResponseIntentionType(FULL_DEFENCE)
             .build();
 
         AcknowledgementOfClaimForm expectedDocmosisData = AcknowledgementOfClaimForm.builder()
@@ -151,6 +154,7 @@ class AcknowledgementOfClaimGeneratorTest {
             .solicitorReferences(caseData.getSolicitorReferences())
             .issueDate(caseData.getIssueDate())
             .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
+            .responseIntentions(DocmosisTemplateDataUtils.fetchResponseIntentionsDocmosisTemplate(caseData))
             .respondent(new ArrayList<>(List.of(
                 Party.builder()
                     .name(caseData.getRespondent1().getPartyName())
@@ -203,6 +207,7 @@ class AcknowledgementOfClaimGeneratorTest {
             .solicitorReferences(caseData.getSolicitorReferences())
             .issueDate(caseData.getIssueDate())
             .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
+            .responseIntentions(DocmosisTemplateDataUtils.fetchResponseIntentionsDocmosisTemplate(caseData))
             .respondent(new ArrayList<>(List.of(
                 Party.builder()
                     .name(caseData.getRespondent1().getPartyName())
@@ -265,6 +270,7 @@ class AcknowledgementOfClaimGeneratorTest {
             .solicitorReferences(caseData.getSolicitorReferences())
             .issueDate(caseData.getIssueDate())
             .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
+            .responseIntentions(DocmosisTemplateDataUtils.fetchResponseIntentionsDocmosisTemplate(caseData))
             .respondent(new ArrayList<>(List.of(
                 Party.builder()
                     .name(caseData.getRespondent2().getPartyName())
