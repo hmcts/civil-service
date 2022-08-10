@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -41,6 +42,8 @@ import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
@@ -83,12 +86,14 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     CreateClaimCallbackHandler.class,
     CaseDetailsConverter.class,
     ClaimIssueConfiguration.class,
+    CourtLocationUtils.class,
     DateOfBirthValidator.class,
     DeadlinesCalculator.class,
     ExitSurveyConfiguration.class,
     ExitSurveyContentService.class,
     InterestCalculator.class,
     JacksonAutoConfiguration.class,
+    LocationRefDataService.class,
     MockDatabaseConfiguration.class,
     OrgPolicyValidator.class,
     StateFlowEngine.class,
@@ -130,6 +135,12 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
+
+    @MockBean
+    private LocationRefDataService locationRefDataService;
+
+    @MockBean
+    private CourtLocationUtils courtLocationUtility;
 
     @Value("${civil.response-pack-url}")
     private String responsePackLink;
@@ -1064,6 +1075,34 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             }
         }
 
+        @Nested
+        class HandleCourtLocation {
+            @Test
+            void shouldHandleCourtLocationData() {
+                LocationRefData locationA = LocationRefData.builder()
+                    .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").build();
+
+                given(courtLocationUtility.findPreferredLocationData(any(), any(DynamicList.class)))
+                    .willReturn(locationA);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData())
+                    .extracting("courtLocation")
+                    .extracting("applicantPreferredCourtLocationList").isNull();
+
+                assertThat(response.getData())
+                    .extracting("courtLocation")
+                    .extracting("caseLocation")
+                    .extracting("region", "baseLocation")
+                    .containsExactly("regionId1", "epimmsId1");
+
+                assertThat(response.getData())
+                    .extracting("courtLocation")
+                    .extracting("applicantPreferredCourt").isEqualTo("312");
+            }
+        }
+
         @Test
         void shouldUpdateCaseListAndUnassignedListData() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -1105,7 +1144,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedErrorMessagesInResponse_whenInvokedWithNullApplicantPreferredCourt() {
             CaseData data = caseData.toBuilder()
-                .courtLocation(CourtLocation.builder().applicantPreferredCourt(null).build())
+                .courtLocation(CourtLocation.builder().applicantPreferredCourtLocationList(null).build())
                 .build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(

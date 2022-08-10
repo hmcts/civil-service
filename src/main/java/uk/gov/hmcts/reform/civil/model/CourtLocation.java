@@ -17,7 +17,6 @@ public class CourtLocation {
     private final DynamicList applicantPreferredCourtLocationList;
     private final CaseLocation caseLocation;
 
-
     @JsonCreator
     CourtLocation(@JsonProperty("applicantPreferredCourt") String applicantPreferredCourt,
                   @JsonProperty("applicantPreferredCourtLocationList") DynamicList applicantPreferredCourtLocationList,

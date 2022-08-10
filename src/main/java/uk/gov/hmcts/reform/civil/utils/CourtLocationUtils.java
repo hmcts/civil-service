@@ -3,9 +3,11 @@ package uk.gov.hmcts.reform.civil.utils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
 @Component
@@ -19,20 +21,20 @@ public class CourtLocationUtils {
                             .collect(Collectors.toList()));
     }
 
-    public LocationRefData fillPreferredLocationData(final List<LocationRefData> locations,
-                                                      DynamicList data) {
+    public LocationRefData findPreferredLocationData(final List<LocationRefData> locations,
+                                                            DynamicList data) {
         if (Objects.isNull(data.getValue()) || Objects.isNull(locations)) {
             return null;
         }
         String locationLabel = data.getValue().getLabel();
         var preferredLocation =
-            locations
-                .stream()
-                .filter(locationRefData -> checkLocation(locationRefData, locationLabel)).findFirst();
+            locations.stream()
+                .filter(locationRefData -> checkLocation(locationRefData, locationLabel))
+                .findFirst();
         return preferredLocation.orElse(null);
     }
 
-    public Boolean checkLocation(final LocationRefData location, String locationTempLabel) {
+    private Boolean checkLocation(final LocationRefData location, String locationTempLabel) {
         String locationLabel = location.getSiteName()
             + " - " + location.getCourtAddress()
             + " - " + location.getPostcode();

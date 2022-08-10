@@ -1130,7 +1130,8 @@ public class CaseDataBuilder {
             .respondentSolicitor1Reference("6789")
             .build();
         courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("127")
+            .applicantPreferredCourtLocationList(
+                DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
             .build();
         claimValue = ClaimValue.builder()
             .statementOfValueInPennies(BigDecimal.valueOf(10000000))

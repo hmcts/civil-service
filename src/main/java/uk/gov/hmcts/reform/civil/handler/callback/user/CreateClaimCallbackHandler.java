@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -441,7 +442,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         // Tactical fix. We have an issue where null courtLocation is being submitted.
         // We are validating it exists on submission if not we return an error to the user.
         if (caseData.getCourtLocation() == null
-            && caseData.getCourtLocation().getApplicantPreferredCourtLocationList().getValue() == null) {
+            || caseData.getCourtLocation().getApplicantPreferredCourtLocationList() == null
+            || caseData.getCourtLocation().getApplicantPreferredCourtLocationList().getValue() == null) {
             errorsMessages.add("Court location code is required");
         }
         return errorsMessages;
@@ -451,17 +453,18 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                                          CallbackParams callbackParams) {
         // data for court location
         DynamicList courtLocations = caseData.getCourtLocation().getApplicantPreferredCourtLocationList();
-        LocationRefData courtLocation = courtLocationUtils.fillPreferredLocationData(
+        LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
             fetchLocationData(callbackParams), courtLocations);
         if (Objects.nonNull(courtLocation)) {
             CourtLocation.CourtLocationBuilder courtLocationBuilder = caseData.getCourtLocation().toBuilder();
             dataBuilder
                 .courtLocation(courtLocationBuilder
-                                   .applicantPreferredCourtLocationList(courtLocations)
                                    .applicantPreferredCourt(courtLocation.getCourtLocationCode())
                                    .caseLocation(CaseLocation.builder()
                                                      .region(courtLocation.getRegionId())
                                                      .baseLocation(courtLocation.getEpimmsId()).build())
+                                   //to clear list of court locations from caseData
+                                   .applicantPreferredCourtLocationList(null)
                                    .build());
         }
     }
