@@ -1954,7 +1954,7 @@ public class EventHistoryMapper {
             } else if (data.getRepaymentFrequency().equals(RepaymentFrequencyDJ.ONCE_TWO_WEEKS)) {
                 return "FOR";
             } else if (data.getRepaymentFrequency().equals(RepaymentFrequencyDJ.ONCE_ONE_MONTH)) {
-                return "MN";
+                return "MTH";
             }
         }
         return "FUL";
