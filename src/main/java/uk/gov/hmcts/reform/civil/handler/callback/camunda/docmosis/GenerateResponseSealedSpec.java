@@ -62,19 +62,19 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
-        if (stitchEnabled) {
-            List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
-            CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
-                documentMetaDataList,
-                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                sealedForm.getDocumentName(),
-                sealedForm.getDocumentName(),
-                caseData
-            );
-            caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
-        } else {
+//        if (stitchEnabled) {
+//            List<DocumentMetaData> documentMetaDataList = fetchDocumentsToStitch(caseData, sealedForm);
+//            CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
+//                documentMetaDataList,
+//                callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+//                sealedForm.getDocumentName(),
+//                sealedForm.getDocumentName(),
+//                caseData
+//            );
+//            caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
+//        } else {
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(sealedForm));
-        }
+//        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))

@@ -271,14 +271,14 @@ class Respondent1DQTest extends DQTest {
             RequestedCourt court = buildRespondent1Dq().toBuilder()
                 .respondent1DQRequestedCourt(null)
                 .respondToCourtLocation(RequestedCourt.builder()
-                                            .responseCourtCode(courtCode)
+//                                            .responseCourtCode(courtCode)
                                             .reasonForHearingAtSpecificCourt(reason)
                                             .requestHearingAtSpecificCourt(YES)
                                             .build())
                 .build().getRequestedCourt();
 
             assertThat(court.getRequestHearingAtSpecificCourt()).isEqualTo(YES);
-            assertThat(court.getResponseCourtCode()).isEqualTo(courtCode);
+//            assertThat(court.getResponseCourtCode()).isEqualTo(courtCode);
             assertThat(court.getReasonForHearingAtSpecificCourt()).isEqualTo(reason);
         }
 

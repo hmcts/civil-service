@@ -23,18 +23,23 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
@@ -48,7 +53,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -92,6 +96,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private final StateFlowEngine stateFlowEngine;
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
+    private final LocationRefDataService locationRefDataService;
+    private final CourtLocationUtils courtLocationUtils;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -151,15 +157,24 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             isRespondent1 = NO;
         }
 
+        var courtLocationList = courtLocationUtils.getLocationsFromList(fetchLocationData(callbackParams));
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQRequestedCourt(
+                                   RequestedCourt.builder().responseCourtLocations(courtLocationList).build())
+                               .build())
             .isRespondent1(isRespondent1);
 
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            updatedCaseData.respondent2Copy(caseData.getRespondent2());
-            updatedCaseData.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
+            updatedCaseData
+                .respondent2Copy(caseData.getRespondent2())
+                .respondent2DetailsForClaimDetailsTab(caseData.getRespondent2())
+                .respondent2DQ(Respondent2DQ.builder().respondent2DQRequestedCourt(
+                    RequestedCourt.builder().responseCourtLocations(courtLocationList).build()
+                ).build());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -342,11 +357,21 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
                 // moving statement of truth value to correct field, this was not possible in mid event.
                 StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-                Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
-                    .respondent1DQStatementOfTruth(statementOfTruth)
-                    .build();
+                Respondent1DQ.Respondent1DQBuilder dq = caseData.getRespondent1DQ().toBuilder()
+                    .respondent1DQStatementOfTruth(statementOfTruth);
 
-                updatedData.respondent1DQ(dq);
+                handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
+//                // court location
+//                DynamicList courtLocations = caseData.getCourtLocation().getApplicantPreferredCourtLocationList();
+//                LocationRefData courtLocation = courtLocationUtils.fillPreferredLocationData(
+//                    fetchLocationData(callbackParams), courtLocations);
+//                if (YES.equals(caseData.getRespondent1DQ().getRequestedCourt().getRequestHearingAtSpecificCourt())) {
+//                    dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ().getRequestedCourt().toBuilder()
+//                                                       .responseCourtCode(courtLocation.getCourtLocationCode())
+//                                                       .build());
+//                }
+
+                updatedData.respondent1DQ(dq.build());
                 // resetting statement of truth to make sure it's empty the next time it appears in the UI.
                 updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
                 //1v2 same Solicitor responding to respondents individually
@@ -362,11 +387,12 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
                 if (caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
                     // moving statement of truth value to correct field, this was not possible in mid event.
-                    Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
-                        .respondent1DQStatementOfTruth(statementOfTruth)
-                        .build();
+                    Respondent1DQ.Respondent1DQBuilder dq = caseData.getRespondent1DQ().toBuilder()
+                        .respondent1DQStatementOfTruth(statementOfTruth);
 
-                    updatedData.respondent1DQ(dq);
+                    handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
+
+                    updatedData.respondent1DQ(dq.build());
                 } else {
                     //required as ccd populated the respondent DQ with null objects.
                     updatedData.respondent1DQ(null);
@@ -374,11 +400,12 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
                 if (caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
 
-                    Respondent2DQ dq2 = caseData.getRespondent2DQ().toBuilder()
-                        .respondent2DQStatementOfTruth(statementOfTruth)
-                        .build();
+                    Respondent2DQ.Respondent2DQBuilder dq2 = caseData.getRespondent2DQ().toBuilder()
+                        .respondent2DQStatementOfTruth(statementOfTruth);
 
-                    updatedData.respondent2DQ(dq2);
+                    handleCourtLocationForRespondent2DQ(caseData, dq2, callbackParams);
+
+                    updatedData.respondent2DQ(dq2.build());
                 } else {
                     updatedData.respondent2DQ(null);
                 }
@@ -406,11 +433,11 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             // or wait for 2nd respondent response before setting deadline
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-            Respondent2DQ dq = caseData.getRespondent2DQ().toBuilder()
-                .respondent2DQStatementOfTruth(statementOfTruth)
-                .build();
+            Respondent2DQ.Respondent2DQBuilder dq = caseData.getRespondent2DQ().toBuilder()
+                .respondent2DQStatementOfTruth(statementOfTruth);
+            handleCourtLocationForRespondent2DQ(caseData, dq, callbackParams);
 
-            updatedData.respondent2DQ(dq);
+            updatedData.respondent2DQ(dq.build());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         } else {
@@ -453,17 +480,19 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-            Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
-                .respondent1DQStatementOfTruth(statementOfTruth)
-                .build();
+            Respondent1DQ.Respondent1DQBuilder dq = caseData.getRespondent1DQ().toBuilder()
+                .respondent1DQStatementOfTruth(statementOfTruth);
 
-            updatedData.respondent1DQ(dq);
+            handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
+
+            updatedData.respondent1DQ(dq.build());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
         updatedData.isRespondent1(null);
         assembleResponseDocuments(caseData, updatedData);
         retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), updatedData, caseData);
+
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
 
@@ -476,6 +505,32 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .data(updatedData.build().toMap(objectMapper))
             .state("AWAITING_APPLICANT_INTENTION")
             .build();
+    }
+
+    private void handleCourtLocationForRespondent1DQ(CaseData caseData, Respondent1DQ.Respondent1DQBuilder dq,
+                                                     CallbackParams callbackParams) {
+        // data for court location
+        DynamicList courtLocations = caseData.getCourtLocation().getApplicantPreferredCourtLocationList();
+        LocationRefData courtLocation = courtLocationUtils.fillPreferredLocationData(
+            fetchLocationData(callbackParams), courtLocations);
+        if (YES.equals(caseData.getRespondent1DQ().getRequestedCourt().getRequestHearingAtSpecificCourt())) {
+            dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ().getRequestedCourt().toBuilder()
+                                               .responseCourtCode(courtLocation.getCourtLocationCode())
+                                               .build());
+        }
+    }
+
+    private void handleCourtLocationForRespondent2DQ(CaseData caseData, Respondent2DQ.Respondent2DQBuilder dq,
+                                                     CallbackParams callbackParams) {
+        // data for court location
+        DynamicList courtLocations = caseData.getCourtLocation().getApplicantPreferredCourtLocationList();
+        LocationRefData courtLocation = courtLocationUtils.fillPreferredLocationData(
+            fetchLocationData(callbackParams), courtLocations);
+        if (YES.equals(caseData.getRespondent2DQ().getRequestedCourt().getRequestHearingAtSpecificCourt())) {
+            dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ().getRequestedCourt().toBuilder()
+                                               .responseCourtCode(courtLocation.getCourtLocationCode())
+                                               .build());
+        }
     }
 
     private void retainSolicitorReferences(Map<String, Object> beforeCaseData,
@@ -651,5 +706,11 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         return caseData.getRespondent1ClaimResponseType() != null
             && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)
             && isRespondent1.equals(YES);
+    }
+
+    private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        // Potentially renaming this method to something more generic not DJ
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 }

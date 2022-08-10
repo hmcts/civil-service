@@ -112,6 +112,8 @@ public class Applicant1DQ implements DQ {
             return RequestedCourt.builder()
                 .requestHearingAtSpecificCourt(applicant1DQRequestedCourt.getRequestHearingAtSpecificCourt())
                 .responseCourtCode(applicant1DQRequestedCourt.getResponseCourtCode())
+                .responseCourtLocations(applicant1DQRequestedCourt.getResponseCourtLocations())
+//                .caseLocation(applicant1DQRequestedCourt.getCaseLocation())
                 .reasonForHearingAtSpecificCourt(applicant1DQRequestedCourt.getReasonForHearingAtSpecificCourt())
                 .build();
         }

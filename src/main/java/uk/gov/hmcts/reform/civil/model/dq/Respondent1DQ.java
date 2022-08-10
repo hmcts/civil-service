@@ -7,6 +7,7 @@ import lombok.Setter;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.account.AccountSimple;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 
@@ -136,6 +137,12 @@ public class Respondent1DQ implements DQ {
                 optRespond.map(RequestedCourt::getResponseCourtCode)
             ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
 
+            //what do i do here?
+            DynamicList responseCourtLocations = Stream.of(
+                optRespondentDQ.map(RequestedCourt::getResponseCourtLocations),
+                optRespond.map(RequestedCourt::getResponseCourtLocations)
+            ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
+
             String reasonForHearingAtSpecificCourt = Stream.of(
                 optRespondentDQ.map(RequestedCourt::getReasonForHearingAtSpecificCourt),
                 optRespond.map(RequestedCourt::getReasonForHearingAtSpecificCourt)
@@ -144,6 +151,7 @@ public class Respondent1DQ implements DQ {
             return RequestedCourt.builder()
                 .requestHearingAtSpecificCourt(requestHearingAtSpecificCourt)
                 .responseCourtCode(responseCourtCode)
+                .responseCourtLocations(responseCourtLocations)
                 .reasonForHearingAtSpecificCourt(reasonForHearingAtSpecificCourt)
                 .build();
         }

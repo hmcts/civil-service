@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
@@ -441,6 +442,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             return RequestedCourt.builder()
                 .requestHearingAtSpecificCourt(ofNullable(rc.getRequestHearingAtSpecificCourt()).orElse(NO))
                 .responseCourtCode(rc.getResponseCourtCode())
+//                .responseCourtLocations(rc.getResponseCourtLocations())
+//                .caseLocation(CaseLocation.builder()
+//                                  .build())
                 .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt())
                 .build();
         }
