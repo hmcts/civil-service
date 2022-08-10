@@ -23,7 +23,7 @@ public class CourtLocationUtils {
 
     public LocationRefData findPreferredLocationData(final List<LocationRefData> locations,
                                                             DynamicList data) {
-        if (Objects.isNull(data.getValue()) || Objects.isNull(locations)) {
+        if (Objects.isNull(data) || Objects.isNull(data.getValue()) || Objects.isNull(locations)) {
             return null;
         }
         String locationLabel = data.getValue().getLabel();
