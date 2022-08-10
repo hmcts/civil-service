@@ -18,18 +18,23 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
+import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
@@ -42,8 +47,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -92,6 +97,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final ValidateEmailService validateEmailService;
     private final DeadlinesCalculator deadlinesCalculator;
     private final FeatureToggleService toggleService;
+    private final LocationRefDataService locationRefDataService;
+    private final CourtLocationUtils courtLocationUtils;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -121,8 +128,23 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private CallbackResponse startClaim(CallbackParams callbackParams) {
+        List<LocationRefData> locations = fetchLocationData(callbackParams);
+
+        CaseData caseData = CaseData.builder()
+            .claimStarted(YES)
+            .courtLocation(CourtLocation.builder()
+                               .applicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations))
+                               .build())
+            .build();
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(CaseData.builder().claimStarted(YES).build().toMap(objectMapper)).build();
+            .data(caseData.toMap(objectMapper)).build();
+    }
+
+    private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        // Potentially renaming this method to something more generic not DJ
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 
     private CallbackResponse validateApplicant1DateOfBirth(CallbackParams callbackParams) {
@@ -322,6 +344,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         dataBuilder.claimStarted(null);
 
+        handleCourtLocationData(caseData, dataBuilder, callbackParams);
+
         if (toggleService.isNoticeOfChangeEnabled()) {
             // LiP are not represented or registered
             if (areAnyRespondentsLitigantInPerson(caseData) == true)  {
@@ -416,9 +440,29 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         List<String> errorsMessages = new ArrayList<>();
         // Tactical fix. We have an issue where null courtLocation is being submitted.
         // We are validating it exists on submission if not we return an error to the user.
-        if (caseData.getCourtLocation() == null || caseData.getCourtLocation().getApplicantPreferredCourt() == null) {
+        if (caseData.getCourtLocation() == null
+            && caseData.getCourtLocation().getApplicantPreferredCourtLocationList().getValue() == null) {
             errorsMessages.add("Court location code is required");
         }
         return errorsMessages;
+    }
+
+    private void handleCourtLocationData(CaseData caseData, CaseData.CaseDataBuilder dataBuilder,
+                                         CallbackParams callbackParams) {
+        // data for court location
+        DynamicList courtLocations = caseData.getCourtLocation().getApplicantPreferredCourtLocationList();
+        LocationRefData courtLocation = courtLocationUtils.fillPreferredLocationData(
+            fetchLocationData(callbackParams), courtLocations);
+        if (Objects.nonNull(courtLocation)) {
+            CourtLocation.CourtLocationBuilder courtLocationBuilder = caseData.getCourtLocation().toBuilder();
+            dataBuilder
+                .courtLocation(courtLocationBuilder
+                                   .applicantPreferredCourtLocationList(courtLocations)
+                                   .applicantPreferredCourt(courtLocation.getCourtLocationCode())
+                                   .caseLocation(CaseLocation.builder()
+                                                     .region(courtLocation.getRegionId())
+                                                     .baseLocation(courtLocation.getEpimmsId()).build())
+                                   .build());
+        }
     }
 }
