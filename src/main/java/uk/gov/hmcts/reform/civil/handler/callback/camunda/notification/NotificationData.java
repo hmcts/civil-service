@@ -22,7 +22,6 @@ public interface NotificationData {
     String CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC = "defendantLegalRep";
     String DEFENDANT_NAME_SPEC = "defendantLR";
     String CLAIM_NAME_SPEC = "claimantLR";
-
     String RESPONSE_INTENTION = "responseIntention";
 
     //Optional Multiparty fields for notifications
