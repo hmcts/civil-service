@@ -13,6 +13,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+
+import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +26,7 @@ import java.util.Map;
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 
@@ -33,6 +40,9 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         + "%n%nIf a legal adviser has submitted this information a notification will be sent to a judge for review.";
 
     private final ObjectMapper objectMapper;
+    private final UserService userService;
+    private final RoleAssignmentsService roleAssignmentsService;
+
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -50,6 +60,18 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private CallbackResponse submitNotSuitableSDO(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
+
+        String authorisation = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        UserInfo user = userService.getUserInfo(authorisation);
+        RoleAssignmentServiceResponse roleAssignments = roleAssignmentsService.getRoleAssignments(
+            user.getUid(),
+            authorisation
+        );
+
+        if (roleAssignments.getRoleAssignmentResponse().stream()
+            .anyMatch(assignment -> "judge".equalsIgnoreCase(assignment.getRoleName()))) {
+            dataBuilder.businessProcess(BusinessProcess.ready(CaseEvent.UNSUITABLE_FOR_SDO_JUDGE));
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
@@ -77,7 +99,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     private String getHeader(CaseData caseData) {
         return format("# Your request was accepted%n## Case has now moved offline");
     }
-    
+
     protected CallbackResponse emptyCallbackResponse(CallbackParams callbackParams) {
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
