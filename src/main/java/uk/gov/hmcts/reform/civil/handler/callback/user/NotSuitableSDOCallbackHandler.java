@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +77,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     private String getHeader(CaseData caseData) {
         return format("# Your request was accepted%n## Case has now moved offline");
     }
-
+    
     protected CallbackResponse emptyCallbackResponse(CallbackParams callbackParams) {
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
@@ -86,4 +85,5 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     private String getBody(CaseData caseData) {
         return format(NotSuitableSDO_CONFIRMATION_BODY);
     }
+
 }
