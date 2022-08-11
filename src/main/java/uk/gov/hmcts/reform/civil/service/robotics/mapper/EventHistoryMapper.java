@@ -254,8 +254,11 @@ public class EventHistoryMapper {
     private void buildInterlocutoryJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
 
         List<Event> events = new ArrayList<>();
-
-        if (null != caseData.getHearingSupportRequirementsDJ()) {
+        Boolean grantedFlag = caseData.getRespondent2() != null
+            && caseData.getDefendantDetails() != null
+            && !caseData.getDefendantDetails().getValue()
+            .getLabel().startsWith("Both");
+        if (!grantedFlag && null != caseData.getHearingSupportRequirementsDJ()) {
             events.add(prepareInterlocutoryJudgment(builder, caseData));
 
             if (null != caseData.getRespondent2()) {
@@ -272,7 +275,7 @@ public class EventHistoryMapper {
             .dateReceived(LocalDateTime.now())
             .litigiousPartyID(PartyUtils.respondent1Data(caseData).getRole().equals(RESPONDENT_ONE)
                                   ? RESPONDENT_ID : RESPONDENT2_ID)
-            .eventDetailsText(" Interlocutory Judgment - defendant  and claimant notified")
+            .eventDetailsText("")
             .eventDetails(EventDetails.builder().miscText(" Interlocutory Judgment - defendant  and claimant notified")
                               .build())
             .build());
@@ -281,8 +284,12 @@ public class EventHistoryMapper {
     private void buildDefaultJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
 
         List<Event> events = new ArrayList<>();
+        Boolean grantedFlag = caseData.getRespondent2() != null
+            && caseData.getDefendantDetailsSpec() != null
+            && !caseData.getDefendantDetailsSpec().getValue()
+            .getLabel().startsWith("Both");
 
-        if (null != caseData.getDefendantDetailsSpec()) {
+        if (!grantedFlag && null != caseData.getDefendantDetailsSpec()) {
             events.add(prepareDefaultJudgment(builder, caseData));
 
             if (null != caseData.getRespondent2()) {
@@ -308,8 +315,8 @@ public class EventHistoryMapper {
             .dateReceived(LocalDateTime.now())
             .litigiousPartyID(PartyUtils.respondent1Data(caseData).getRole().equals(RESPONDENT_ONE)
                                   ? RESPONDENT_ID : RESPONDENT2_ID)
-            .eventDetailsText(" Default Judgment - defendant  and claimant notified")
-            .eventDetails(EventDetails.builder().miscText(" Default Judgment - defendant  and claimant notified")
+            .eventDetailsText("")
+            .eventDetails(EventDetails.builder().miscText(" Default Judgment - defendant and claimant notified")
                               .amountOfJudgment(amountClaimedWithInterest)
                               .amountOfCosts(getCostOfJudgment(caseData))
                               .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES)
@@ -1926,29 +1933,24 @@ public class EventHistoryMapper {
             && caseData.getDefendantDetails() != null
             && !caseData.getDefendantDetails().getValue()
                 .getLabel().startsWith("Both");
-        String miscText = "RPA Reason: Summary Judgment requested and claim moved offline.";
-        if (grantedFlag) {
+        String miscTextRequested = "RPA Reason: Summary judgment requested and referred to judge.";
+        String miscTextGranted = "RPA Reason: Summary granted requested and referred to judge.";
+
             builder.miscellaneous(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(MISCELLANEOUS.getCode())
                     .dateReceived(LocalDateTime.now())
-                    .eventDetailsText(miscText)
+                    .eventDetailsText(grantedFlag ? miscTextRequested : miscTextGranted )
                     .eventDetails(EventDetails.builder()
-                                      .miscText(miscText)
+                                      .miscText(grantedFlag ? miscTextRequested : miscTextGranted)
                                       .build())
                     .build());
-        }
+
     }
 
     private void buildMiscellaneousDJEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-
-        Boolean grantedFlag = caseData.getRespondent2() != null
-            && caseData.getDefendantDetailsSpec() != null
-            && !caseData.getDefendantDetailsSpec().getValue()
-            .getLabel().startsWith("Both");
-        String miscText = "RPA Reason: Default Judgment requested and claim moved offline.";
-        if (grantedFlag) {
+       String miscText = "RPA Reason: Default Judgment requested and claim moved offline.";
             builder.miscellaneous(
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
@@ -1959,7 +1961,6 @@ public class EventHistoryMapper {
                                       .miscText(miscText)
                                       .build())
                     .build());
-        }
     }
 
     private String getInstallmentPeriod(CaseData data) {
@@ -1972,6 +1973,8 @@ public class EventHistoryMapper {
             } else if (data.getRepaymentFrequency().equals(RepaymentFrequencyDJ.ONCE_ONE_MONTH)) {
                 return "MTH";
             }
+        }else if (data.getPaymentTypeSelection().equals(DJPaymentTypeSelection.IMMEDIATELY)) {
+            return "FW";
         }
         return "FUL";
     }
