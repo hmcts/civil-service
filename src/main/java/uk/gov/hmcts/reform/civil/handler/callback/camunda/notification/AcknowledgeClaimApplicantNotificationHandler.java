@@ -69,7 +69,7 @@ public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandle
 
         notificationService.sendMail(
             recipient,
-            notificationsProperties.getRespondentSolicitorAcknowledgeClaimNew(),
+            notificationsProperties.getRespondentSolicitorAcknowledgeClaim(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
