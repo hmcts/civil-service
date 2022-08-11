@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -30,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.PART_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.AcknowledgeClaimApplicantNotificationHandler.TASK_ID;
@@ -168,6 +170,59 @@ class AcknowledgeClaimApplicantNotificationHandlerTest extends BaseCallbackHandl
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT_CC").build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentsolicitor@example.com",
+                "template-id",
+                getNotificationDataMap(caseData),
+                "acknowledge-claim-applicant-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondentSolicitor1v2SameSolicitor_whenInvokedWithCcEvent() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent1AcknowledgeNotificationDate(LocalDateTime.now())
+                .respondent2AcknowledgeNotificationDate(LocalDateTime.now().minusDays(2))
+                .respondent2ResponseDeadline(LocalDateTime.now().plusDays(14))
+                .respondent1ResponseDeadline(LocalDateTime.now().plusDays(14))
+                .respondent2ClaimResponseIntentionType(FULL_DEFENCE)
+                .respondent1ClaimResponseIntentionType(PART_DEFENCE)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT_CC")
+                        .build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentsolicitor@example.com",
+                "template-id",
+                getNotificationDataMap(caseData),
+                "acknowledge-claim-applicant-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondentSolicitor2v1SameSolicitor_whenInvokedWithCcEvent() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .addApplicant2(YesOrNo.YES)
+                .applicant2(PartyBuilder.builder().individual().build())
+                .respondent1AcknowledgeNotificationDate(LocalDateTime.now())
+                .respondent1ResponseDeadline(LocalDateTime.now().plusDays(14))
+                .respondent1ClaimResponseIntentionTypeApplicant2(FULL_DEFENCE)
+                .respondent1ClaimResponseIntentionType(PART_DEFENCE)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder()
+                        .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_ACKNOWLEDGEMENT_CC").build())
                 .build();
 
             handler.handle(params);
