@@ -42,7 +42,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     public static final String NotSuitableSDO_CONFIRMATION_BODY = "<br />If a Judge has submitted this information, "
         + "a notification will be sent to the listing officer to look at this case offline."
-        + "%n%nIf a legal advisor has submitted this information a notification will be sent to a judge for review.";
+        + "%n%nIf a legal adviser has submitted this information a notification will be sent to a judge for review.";
 
     private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
