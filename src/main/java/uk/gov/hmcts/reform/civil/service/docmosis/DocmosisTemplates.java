@@ -29,7 +29,11 @@ public enum DocmosisTemplates {
     ),
     DJ_SDO_DISPOSAL("CV-UNS-DEC-ENG-01132.docx", "Order_disposal_pdf_%s.pdf"),
     DJ_SDO_TRIAL("CV-UNS-DEC-ENG-01133.docx", "Order_trial_pdf_%s.pdf"),
-    CLAIMANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01062.docx", "%s_directions_questionnaire_form_%s.pdf");
+    CLAIMANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01062.docx", "%s_directions_questionnaire_form_%s.pdf"),
+    // TODO once the templates are set, we need their names here
+    SDO_FAST("", "fast_track_sdo_%s.pdf"),
+    SDO_SMALL("small-claims-pdf.docx", "small_claims_sdo_%s.pdf"),
+    SDO_DISPOSAL("", "disposal_hearing_sdo_%s.pdf");
 
     private final String template;
     private final String documentTitle;

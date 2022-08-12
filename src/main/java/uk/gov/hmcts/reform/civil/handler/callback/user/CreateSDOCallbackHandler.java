@@ -12,13 +12,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
-import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
+import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
@@ -56,6 +56,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
+import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
@@ -100,8 +101,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         + "<br/>%n%n<strong>Defendant 2</strong>%n"
         + "<br/>%s";
 
-    private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
+    private final ObjectMapper objectMapper;
+    private final SdoGeneratorService sdoGeneratorService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -109,6 +111,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "order-details"), this::prePopulateOrderDetailsPages)
             .put(callbackKey(MID, "order-details-navigation"), this::setOrderDetailsFlags)
+            .put(callbackKey(MID, "generate-sdo-order"), this::generateSdoOrder)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -133,6 +136,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.disposalHearingMethodInPerson(fromList(fetchLocationData(callbackParams)));
         updatedData.fastTrackMethodInPerson(fromList(fetchLocationData(callbackParams)));
+        updatedData.smallClaimsMethodInPerson(fromList(fetchLocationData(callbackParams)));
 
         List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
 
@@ -609,29 +613,34 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
 
-        YesOrNo drawDirectionsOrderRequired = caseData.getDrawDirectionsOrderRequired();
-        YesOrNo drawDirectionsOrderSmallClaims = caseData.getDrawDirectionsOrderSmallClaims();
-        ClaimsTrack claimsTrack = caseData.getClaimsTrack();
-        OrderType orderType = caseData.getOrderType();
+        updatedData.setSmallClaimsFlag(YesOrNo.NO).build();
+        updatedData.setFastTrackFlag(YesOrNo.NO).build();
 
-        Boolean smallClaimsPath1 = (drawDirectionsOrderRequired == YesOrNo.NO)
-            && (claimsTrack == ClaimsTrack.smallClaimsTrack);
-        Boolean smallClaimsPath2 = (drawDirectionsOrderRequired == YesOrNo.YES)
-            && (drawDirectionsOrderSmallClaims == YesOrNo.YES);
-        Boolean fastTrackPath1 = (drawDirectionsOrderRequired == YesOrNo.NO)
-            && (claimsTrack == ClaimsTrack.fastTrack);
-        Boolean fastTrackPath2 = (drawDirectionsOrderRequired == YesOrNo.YES)
-            && (drawDirectionsOrderSmallClaims == YesOrNo.NO) && (orderType == OrderType.DECIDE_DAMAGES);
-
-        updatedData.setSmallClaimsFlag(YesOrNo.NO);
-        updatedData.setFastTrackFlag(YesOrNo.NO);
-
-        if (smallClaimsPath1 || smallClaimsPath2) {
+        if (SdoHelper.isSmallClaimsTrack(caseData)) {
             updatedData.setSmallClaimsFlag(YesOrNo.YES)
                 .build();
-        } else if (fastTrackPath1 || fastTrackPath2) {
+        } else if (SdoHelper.isFastTrack(caseData)) {
             updatedData.setFastTrackFlag(YesOrNo.YES)
                 .build();
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+
+        CaseDocument document = sdoGeneratorService.generate(
+            caseData,
+            callbackParams.getParams().get(BEARER_TOKEN).toString()
+        );
+
+        // TODO: once fast track and disposal templates are done the if conditional is not needed
+        if (document != null) {
+             updatedData.sdoOrderDocument(document.getDocumentLink()); // need to add this as a ccd field
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
