@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
+import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementSelection;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
@@ -41,7 +42,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         DefaultJudgmentSDOOrderForm templateData = getDefaultJudgmentForms(caseData);
-        DocmosisTemplates docmosisTemplate = caseData.getCaseManagementOrderSelection().equals(DISPOSAL_HEARING)
+        DocmosisTemplates docmosisTemplate = caseData.getCaseManagementOrderSelection()
+            .equals(CaseManagementSelection.DISPOSAL_HEARING)
             ? getDocmosisTemplate()
             : getDocmosisTemplateTrial();
         DocmosisDocument docmosisDocument =
@@ -66,7 +68,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentForms(CaseData caseData) {
-        return caseData.getCaseManagementOrderSelection().equals(DISPOSAL_HEARING)
+        return caseData.getCaseManagementOrderSelection().equals(CaseManagementSelection.DISPOSAL_HEARING)
             ? getDefaultJudgmentFormHearing(caseData)
             : getDefaultJudgmentFormTrial(caseData);
     }

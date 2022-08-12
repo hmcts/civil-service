@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementSelection;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -151,7 +152,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         List<DisposalAndTrialHearingDJToggle> checkList = List.of(
             DisposalAndTrialHearingDJToggle.SHOW);
-        if (caseData.getCaseManagementOrderSelection().equals(DISPOSAL_HEARING)) {
+        if (caseData.getCaseManagementOrderSelection().equals(CaseManagementSelection.DISPOSAL_HEARING)) {
             caseData = fillDisposalToggle(caseData, checkList);
         } else {
             caseData = fillTrialToggle(caseData, checkList);

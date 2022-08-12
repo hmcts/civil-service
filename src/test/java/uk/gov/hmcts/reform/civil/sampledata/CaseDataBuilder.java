@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementSelection;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
@@ -104,7 +105,6 @@ import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
-import static uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator.DISPOSAL_HEARING;
 
 public class CaseDataBuilder {
 
@@ -275,7 +275,7 @@ public class CaseDataBuilder {
 
     private String respondent1OrganisationIDCopy;
     private String respondent2OrganisationIDCopy;
-    private String caseManagementOrderSelection;
+    private CaseManagementSelection caseManagementOrderSelection;
     private LocalDateTime addLegalRepDeadline;
     private DefendantPinToPostLRspec respondent1PinToPostLRspec;
     private DisposalHearingMethodDJ trialHearingMethodDJ;
@@ -1387,12 +1387,12 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssuedDisposalHearing() {
-        caseManagementOrderSelection = DISPOSAL_HEARING;
+        caseManagementOrderSelection = CaseManagementSelection.DISPOSAL_HEARING;
         return this;
     }
 
     public CaseDataBuilder atStateClaimIssuedTrialHearing() {
-        caseManagementOrderSelection = "TRIAL_HEARING";
+        caseManagementOrderSelection = CaseManagementSelection.TRIAL_HEARING;
         return this;
     }
 

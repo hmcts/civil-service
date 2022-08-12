@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
+import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementSelection;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
@@ -487,7 +488,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private TrialHousingDisrepair trialHousingDisrepair;
     private DisposalHearingMethodDJ trialHearingMethodDJ;
 
-    private String caseManagementOrderSelection;
+    private CaseManagementSelection caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
 
     private List<DisposalAndTrialHearingDJToggle> disposalHearingDisclosureOfDocumentsDJToggle;
