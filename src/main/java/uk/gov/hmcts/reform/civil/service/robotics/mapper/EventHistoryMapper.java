@@ -1918,7 +1918,7 @@ public class EventHistoryMapper {
             && !caseData.getDefendantDetails().getValue()
             .getLabel().startsWith("Both");
         String miscTextRequested = "RPA Reason: Summary judgment requested and referred to judge.";
-        String miscTextGranted = "RPA Reason: Summary granted requested and referred to judge.";
+        String miscTextGranted = "RPA Reason: Summary judgment granted and referred to judge.";
 
         builder.miscellaneous(
             Event.builder()
@@ -1934,15 +1934,20 @@ public class EventHistoryMapper {
     }
 
     private void buildMiscellaneousDJEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        String miscText = "RPA Reason: Default Judgment requested and claim moved offline.";
+        Boolean grantedFlag = caseData.getRespondent2() != null
+            && caseData.getDefendantDetailsSpec() != null
+            && !caseData.getDefendantDetailsSpec().getValue()
+            .getLabel().startsWith("Both");
+        String miscTextRequested = "RPA Reason: Default Judgment requested and claim moved offline.";
+        String miscTextGranted= "RPA Reason: Default Judgment granted and claim moved offline.";
         builder.miscellaneous(
             Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
                 .eventCode(MISCELLANEOUS.getCode())
                 .dateReceived(LocalDateTime.now())
-                .eventDetailsText(miscText)
+                .eventDetailsText(grantedFlag ? miscTextRequested : miscTextGranted)
                 .eventDetails(EventDetails.builder()
-                                  .miscText(miscText)
+                                  .miscText(miscTextRequested)
                                   .build())
                 .build());
     }
