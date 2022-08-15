@@ -1919,17 +1919,18 @@ public class EventHistoryMapper {
             .getLabel().startsWith("Both");
         String miscTextRequested = "RPA Reason: Summary judgment requested and referred to judge.";
         String miscTextGranted = "RPA Reason: Summary judgment granted and referred to judge.";
-
-        builder.miscellaneous(
-            Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(LocalDateTime.now())
-                .eventDetailsText(grantedFlag ? miscTextRequested : miscTextGranted)
-                .eventDetails(EventDetails.builder()
-                                  .miscText(grantedFlag ? miscTextRequested : miscTextGranted)
-                                  .build())
-                .build());
+       if (caseData.getDefendantDetails() != null) {
+           builder.miscellaneous(
+               Event.builder()
+                   .eventSequence(prepareEventSequence(builder.build()))
+                   .eventCode(MISCELLANEOUS.getCode())
+                   .dateReceived(LocalDateTime.now())
+                   .eventDetailsText(grantedFlag ? miscTextRequested : miscTextGranted)
+                   .eventDetails(EventDetails.builder()
+                                     .miscText(grantedFlag ? miscTextRequested : miscTextGranted)
+                                     .build())
+                   .build());
+       }
 
     }
 
@@ -1940,16 +1941,18 @@ public class EventHistoryMapper {
             .getLabel().startsWith("Both");
         String miscTextRequested = "RPA Reason: Default Judgment requested and claim moved offline.";
         String miscTextGranted = "RPA Reason: Default Judgment granted and claim moved offline.";
-        builder.miscellaneous(
-            Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(LocalDateTime.now())
-                .eventDetailsText(grantedFlag ? miscTextRequested : miscTextGranted)
-                .eventDetails(EventDetails.builder()
-                                  .miscText(miscTextRequested)
-                                  .build())
-                .build());
+        if (caseData.getDefendantDetailsSpec() != null) {
+            builder.miscellaneous(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(LocalDateTime.now())
+                    .eventDetailsText(grantedFlag ? miscTextRequested : miscTextGranted)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscTextRequested)
+                                      .build())
+                    .build());
+        }
     }
 
     private String getInstallmentPeriod(CaseData data) {
