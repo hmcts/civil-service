@@ -34,9 +34,9 @@ public class CloseApplicationsEventHandler {
         try {
             log.info("Triggering VERIFY_AND_CLOSE_APPLICATION event to close the underlying general application: [{}]",
                     caseId);
-            coreCaseDataService.triggerEvent(caseId, VERIFY_AND_CLOSE_APPLICATION);
+            coreCaseDataService.triggerGeneralApplicationEvent(caseId, VERIFY_AND_CLOSE_APPLICATION);
         } catch (Exception e) {
-            log.error("Could not trigger event to close application [{}]", caseId);
+            log.error("Could not trigger event to close application [{}]", caseId, e);
         }
     }
 }
