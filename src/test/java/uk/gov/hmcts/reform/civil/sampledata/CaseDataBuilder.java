@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
@@ -263,6 +264,7 @@ public class CaseDataBuilder {
     private Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
     private PartnerAndDependentsLRspec respondent1PartnerAndDependent;
     private PartnerAndDependentsLRspec respondent2PartnerAndDependent;
+    private ReasonNotSuitableSDO reasonNotSuitableSDO;
     private RepaymentPlanLRspec respondent1RepaymentPlan;
     private RepaymentPlanLRspec respondent2RepaymentPlan;
     private YesOrNo applicantsProceedIntention;
@@ -2798,11 +2800,9 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateTakenOfflineSDONotDrawn(MultiPartyScenario mpScenario) {
         atStateApplicantRespondToDefenceAndProceed(mpScenario);
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
-        claimProceedsInCaseman = ClaimProceedsInCaseman.builder()
-            .date(LocalDate.now().plusDays(2))
-            .other("unforeseen complexities")
-            .build();
-        takenOfflineDate = LocalDateTime.now();
+        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
+                                                   .input("unforeseen complexities")
+                                                   .build();
         return this;
     }
 
