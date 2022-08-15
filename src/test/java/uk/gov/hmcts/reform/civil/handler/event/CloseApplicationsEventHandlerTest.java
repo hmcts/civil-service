@@ -43,7 +43,8 @@ class CloseApplicationsEventHandlerTest {
         when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(getCaseWithNoApplications());
         handler.triggerApplicationClosedEvent(event);
 
-        verify(coreCaseDataService, times(0)).triggerEvent(anyLong(), any(CaseEvent.class));
+        verify(coreCaseDataService, times(0))
+                .triggerGeneralApplicationEvent(anyLong(), any(CaseEvent.class));
     }
 
     @Test
@@ -55,8 +56,10 @@ class CloseApplicationsEventHandlerTest {
                 .thenReturn(getCaseWithTwoGeneralApplications(1234L, 5678L));
         handler.triggerApplicationClosedEvent(event);
 
-        verify(coreCaseDataService, times(1)).triggerEvent(1234L, VERIFY_AND_CLOSE_APPLICATION);
-        verify(coreCaseDataService, times(1)).triggerEvent(5678L, VERIFY_AND_CLOSE_APPLICATION);
+        verify(coreCaseDataService, times(1))
+                .triggerGeneralApplicationEvent(1234L, VERIFY_AND_CLOSE_APPLICATION);
+        verify(coreCaseDataService, times(1))
+                .triggerGeneralApplicationEvent(5678L, VERIFY_AND_CLOSE_APPLICATION);
     }
 
     private CaseData getCaseWithNoApplications() {
