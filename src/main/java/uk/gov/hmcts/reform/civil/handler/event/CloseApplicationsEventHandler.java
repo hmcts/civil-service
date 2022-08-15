@@ -23,7 +23,7 @@ public class CloseApplicationsEventHandler {
     @EventListener
     public void triggerApplicationClosedEvent(CloseApplicationsEvent event) {
         CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(event.getCaseId()));
-        if (caseData.getGeneralApplications() != null) {
+        if (caseData.getGeneralApplications() != null && caseData.getGeneralApplications().size() > 0) {
             caseData.getGeneralApplications()
                     .forEach(application ->
                             triggerEvent(parseLong(application.getValue().getCaseLink().getCaseReference())));

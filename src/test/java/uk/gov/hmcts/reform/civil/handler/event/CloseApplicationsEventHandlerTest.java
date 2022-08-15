@@ -36,11 +36,27 @@ class CloseApplicationsEventHandlerTest {
     private CloseApplicationsEventHandler handler;
 
     @Test
+    void shouldNotTriggerCloseApplicationEventWhenCaseHaveNoGeneralApplication() {
+        CloseApplicationsEvent event = new CloseApplicationsEvent(1L);
+        CaseData caseData = CaseData.builder().generalApplications(null).build();
+
+        when(coreCaseDataService.getCase(event.getCaseId()))
+                .thenReturn(CaseDetailsBuilder.builder().data(caseData).build());
+        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
+        handler.triggerApplicationClosedEvent(event);
+
+        verify(coreCaseDataService, times(0))
+                .triggerGeneralApplicationEvent(anyLong(), any(CaseEvent.class));
+    }
+
+    @Test
     void shouldNotTriggerCloseApplicationEventWhenCaseDoesNotHaveAnyGeneralApplication() {
         CloseApplicationsEvent event = new CloseApplicationsEvent(1L);
+        CaseData caseData = CaseData.builder().build();
+
         when(coreCaseDataService.getCase(event.getCaseId()))
-                .thenReturn(CaseDetailsBuilder.builder().data(getCaseWithNoApplications()).build());
-        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(getCaseWithNoApplications());
+                .thenReturn(CaseDetailsBuilder.builder().data(caseData).build());
+        when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
         handler.triggerApplicationClosedEvent(event);
 
         verify(coreCaseDataService, times(0))
@@ -60,10 +76,6 @@ class CloseApplicationsEventHandlerTest {
                 .triggerGeneralApplicationEvent(1234L, VERIFY_AND_CLOSE_APPLICATION);
         verify(coreCaseDataService, times(1))
                 .triggerGeneralApplicationEvent(5678L, VERIFY_AND_CLOSE_APPLICATION);
-    }
-
-    private CaseData getCaseWithNoApplications() {
-        return CaseData.builder().build();
     }
 
     private CaseData getCaseWithTwoGeneralApplications(Long id1, Long id2) {

@@ -50,6 +50,7 @@ class CoreCaseDataServiceTest {
     private static final String USER_AUTH_TOKEN = "Bearer user-xyz";
     private static final String SERVICE_AUTH_TOKEN = "Bearer service-xyz";
     private static final String CASE_TYPE = "CIVIL";
+    private static final String GENERALAPPLICATION_CASE_TYPE = "GENERALAPPLICATION";
 
     @MockBean
     private SystemUpdateUserConfiguration userConfig;
@@ -113,6 +114,21 @@ class CoreCaseDataServiceTest {
                 any(CaseDataContent.class)
                  )
             ).thenReturn(caseDetails);
+            when(coreCaseDataApi.startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID, JURISDICTION,
+                                                         GENERALAPPLICATION_CASE_TYPE, CASE_ID, EVENT_ID
+            )).thenReturn(buildStartEventResponse());
+
+            when(coreCaseDataApi.submitEventForCaseWorker(
+                eq(USER_AUTH_TOKEN),
+                eq(SERVICE_AUTH_TOKEN),
+                eq(USER_ID),
+                eq(JURISDICTION),
+                eq(GENERALAPPLICATION_CASE_TYPE),
+                eq(CASE_ID),
+                anyBoolean(),
+                any(CaseDataContent.class)
+                 )
+            ).thenReturn(caseDetails);
         }
 
         @Test
@@ -128,6 +144,25 @@ class CoreCaseDataServiceTest {
                 eq(USER_ID),
                 eq(JURISDICTION),
                 eq(CASE_TYPE),
+                eq(CASE_ID),
+                anyBoolean(),
+                any(CaseDataContent.class)
+            );
+        }
+
+        @Test
+        void shouldStartAndSubmitGeneralApplicationEvent_WhenCalled() {
+            service.triggerGeneralApplicationEvent(Long.valueOf(CASE_ID), CaseEvent.valueOf(EVENT_ID));
+
+            verify(coreCaseDataApi).startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID, JURISDICTION,
+                    GENERALAPPLICATION_CASE_TYPE, CASE_ID, EVENT_ID
+            );
+            verify(coreCaseDataApi).submitEventForCaseWorker(
+                eq(USER_AUTH_TOKEN),
+                eq(SERVICE_AUTH_TOKEN),
+                eq(USER_ID),
+                eq(JURISDICTION),
+                eq(GENERALAPPLICATION_CASE_TYPE),
                 eq(CASE_ID),
                 anyBoolean(),
                 any(CaseDataContent.class)
