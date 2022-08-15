@@ -382,7 +382,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                                                         .respondentCaseRole(
                                                             CaseRole.RESPONDENTSOLICITORONESPEC.getFormattedName())
                                                         .expiryDate(expiryDate)
-                                                        .pinUsed(NO)
                                                         .build());
         }
 

@@ -16,19 +16,16 @@ public class DefendantPinToPostLRspec {
     private final String respondentCaseRole;
     private final LocalDate expiryDate;
     private final String citizenCaseRole;
-    private final YesOrNo pinUsed;
 
     @JsonCreator
     public DefendantPinToPostLRspec(@JsonProperty("accessCode") String accessCode,
                                     @JsonProperty("respondentCaseRole") String respondentCaseRole,
                                     @JsonProperty("expiryDate") LocalDate expiryDate,
-                                    @JsonProperty("citizenCaseRole") String citizenCaseRole,
-                                    @JsonProperty("pinUsed") YesOrNo pinUsed
+                                    @JsonProperty("citizenCaseRole") String citizenCaseRole
     ) {
         this.accessCode = accessCode;
         this.respondentCaseRole = respondentCaseRole;
         this.expiryDate = expiryDate;
         this.citizenCaseRole = citizenCaseRole;
-        this.pinUsed = pinUsed;
     }
 }
