@@ -29,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
@@ -104,7 +105,7 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
 
@@ -118,14 +119,14 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
 
         entry(
             CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
             List.of(ADD_CASE_NOTE, INITIATE_GENERAL_APPLICATION, CREATE_SDO,
-                    CaseEvent.NotSuitable_SDO)
+                    NotSuitable_SDO)
         ),
 
         entry(
@@ -143,7 +144,7 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
 
@@ -166,7 +167,7 @@ public class FlowStateAllowedEventService {
 
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
 
@@ -188,7 +189,7 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 STANDARD_DIRECTION_ORDER_DJ,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
         entry(
@@ -208,7 +209,7 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
 
@@ -229,7 +230,7 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 DEFAULT_JUDGEMENT,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
 
@@ -250,7 +251,7 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 DEFAULT_JUDGEMENT,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
 
@@ -270,7 +271,7 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
 
@@ -290,7 +291,7 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
 
@@ -308,7 +309,7 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
 
@@ -324,7 +325,7 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
 
@@ -340,7 +341,7 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
 
@@ -356,7 +357,7 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
 
@@ -372,7 +373,7 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
 
@@ -388,7 +389,7 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
         entry(
@@ -398,7 +399,7 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
         entry(
@@ -408,7 +409,7 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
         entry(
@@ -426,7 +427,7 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
         entry(
@@ -436,7 +437,7 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                CaseEvent.NotSuitable_SDO
+                NotSuitable_SDO
             )
         ),
         entry(
