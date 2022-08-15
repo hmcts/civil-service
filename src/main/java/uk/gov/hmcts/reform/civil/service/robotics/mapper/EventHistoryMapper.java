@@ -1925,7 +1925,7 @@ public class EventHistoryMapper {
                 .eventSequence(prepareEventSequence(builder.build()))
                 .eventCode(MISCELLANEOUS.getCode())
                 .dateReceived(LocalDateTime.now())
-                .eventDetailsText(grantedFlag ? miscTextRequested : miscTextGranted )
+                .eventDetailsText(grantedFlag ? miscTextRequested : miscTextGranted)
                 .eventDetails(EventDetails.builder()
                                   .miscText(grantedFlag ? miscTextRequested : miscTextGranted)
                                   .build())
@@ -1939,7 +1939,7 @@ public class EventHistoryMapper {
             && !caseData.getDefendantDetailsSpec().getValue()
             .getLabel().startsWith("Both");
         String miscTextRequested = "RPA Reason: Default Judgment requested and claim moved offline.";
-        String miscTextGranted= "RPA Reason: Default Judgment granted and claim moved offline.";
+        String miscTextGranted = "RPA Reason: Default Judgment granted and claim moved offline.";
         builder.miscellaneous(
             Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
@@ -1954,17 +1954,19 @@ public class EventHistoryMapper {
 
     private String getInstallmentPeriod(CaseData data) {
         if (data.getPaymentTypeSelection().equals(DJPaymentTypeSelection.REPAYMENT_PLAN)) {
-
             if (data.getRepaymentFrequency().equals(RepaymentFrequencyDJ.ONCE_ONE_WEEK)) {
+
                 return "WK";
             } else if (data.getRepaymentFrequency().equals(RepaymentFrequencyDJ.ONCE_TWO_WEEKS)) {
                 return "FOR";
             } else if (data.getRepaymentFrequency().equals(RepaymentFrequencyDJ.ONCE_ONE_MONTH)) {
                 return "MTH";
             }
-        }else if (data.getPaymentTypeSelection().equals(DJPaymentTypeSelection.IMMEDIATELY)) {
+
+        } else if (data.getPaymentTypeSelection().equals(DJPaymentTypeSelection.IMMEDIATELY)) {
             return "FW";
         }
+
         return "FUL";
     }
 
