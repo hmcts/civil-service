@@ -55,6 +55,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
@@ -276,7 +278,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                     .build();
             }
 
-            organisationPolicy2Builder.orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]");
+            organisationPolicy2Builder.orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
             caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2Builder.build());
         }
     }
@@ -328,6 +330,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             if (areAnyRespondentsLitigantInPerson(caseData) == true)  {
                 dataBuilder.addLegalRepDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(time.now()));
             }
+            populateBlankOrgPolicies(dataBuilder, caseData);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -344,6 +347,21 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                       YES.equals(caseData.getAddRespondent2())
                           && NO.equals(caseData.getRespondent2SameLegalRepresentative())
                             ? ", " + caseData.getRespondent2().getPartyName() : "");
+    }
+
+    private void populateBlankOrgPolicies(CaseData.CaseDataBuilder dataBuilder, CaseData caseData) {
+        if (caseData.getRespondent1OrganisationPolicy() == null) {
+            dataBuilder
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
+                                                   .build());
+        }
+        if (caseData.getRespondent2OrganisationPolicy() == null) {
+            dataBuilder
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
+                                                   .build());
+        }
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {

@@ -13,7 +13,12 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -49,14 +54,13 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredEmail;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredTelephone;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 
@@ -156,9 +160,36 @@ public class CaseDataParent implements MappableObject {
     private SmallClaimsJudgementDeductionValue smallClaimsJudgementDeductionValue;
     private SmallClaimsJudgesRecital smallClaimsJudgesRecital;
     private SmallClaimsNotes smallClaimsNotes;
-    private SmallClaimsPreferredEmail smallClaimsPreferredEmail;
-    private SmallClaimsPreferredTelephone smallClaimsPreferredTelephone;
     private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
+    private final List<SmallTrack> smallClaims;
+    private final SmallClaimsMethod smallClaimsMethod;
+    private final SmallClaimsMethodTelephoneHearing smallClaimsMethodTelephoneHearing;
+    private final SmallClaimsMethodVideoConferenceHearing smallClaimsMethodVideoConferenceHearing;
+    private final List<Element<SmallClaimsAddNewDirections>> smallClaimsAddNewDirections;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackAltDisputeResolutionToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackVariationOfDirectionsToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackSettlementToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackDisclosureOfDocumentsToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackWitnessOfFactToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackSchedulesOfLossToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackCostsToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackTrialToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackMethodToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingDisclosureOfDocumentsToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingWitnessOfFactToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingMedicalEvidenceToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingQuestionsToExpertsToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingSchedulesOfLossToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingFinalDisposalHearingToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingMethodToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingBundleToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingClaimSettlingToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingCostsToggle;
+    private List<OrderDetailsPagesSectionsToggle> disposalHearingApplicationsOrderToggle;
+    private List<OrderDetailsPagesSectionsToggle> smallClaimsHearingToggle;
+    private List<OrderDetailsPagesSectionsToggle> smallClaimsMethodToggle;
+    private List<OrderDetailsPagesSectionsToggle> smallClaimsDocumentsToggle;
+    private List<OrderDetailsPagesSectionsToggle> smallClaimsWitnessStatementToggle;
 
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
@@ -227,4 +258,10 @@ public class CaseDataParent implements MappableObject {
      */
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal respondToAdmittedClaimOwingAmountPounds2;
+
+    /**
+     * Adding for PiP to citizen UI.
+     */
+    private final DefendantPinToPostLRspec respondent1PinToPostLRspec;
+    private final String respondent1EmailAddress;
 }

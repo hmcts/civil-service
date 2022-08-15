@@ -56,5 +56,9 @@
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/fees/ranges_GET" : "ignore",
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/case/document/downloadSealedDoc_POST" : "ignore",
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/case/document/generateSealedDoc_POST" : "ignore",
-  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/cases/defendant/submitterId/response/caseId/event-token_GET" : "ignore"
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/cases/defendant/submitterId/response/caseId/event-token_GET" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/cases/caseId/citizen/submitterId/event_POST": "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/feature-toggle/noc_GET": "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/feature-toggle/toggle_GET": "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/cases/response/deadline_POST": "ignore"
 }

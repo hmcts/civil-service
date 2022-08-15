@@ -219,6 +219,63 @@ class StateFlowEngineTest {
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
         }
 
+        @Test
+        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted2v1RespondentIsUnrepresented() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentUnrepresented()
+                .build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_SUBMITTED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(2)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
+        }
+
+        @Test
+        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted2v1RespondentIsUnregistered() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentUnregistered()
+                .build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_SUBMITTED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(2)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
+        }
+
+        @Test
+        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted2v1RespondentIsRegistered() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_SUBMITTED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(2)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
+        }
+
         // remove this when NoC is implemented
         @Nested
         class UnrepresentedTakenOfflineBeforeNoC {
@@ -403,12 +460,6 @@ class StateFlowEngineTest {
                     .atStateClaimIssuedUnrepresentedDefendants()
                     .addLegalRepDeadline(LocalDateTime.now().plusDays(14))
                     .build();
-                if (caseData.getRespondent2OrgRegistered() != null
-                    && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
-                }
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
                 assertThat(stateFlow.getState())
@@ -617,6 +668,34 @@ class StateFlowEngineTest {
                     entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
                 );
             }
+
+            // 1v2 Same Unregistered Solicitor
+            @Test
+            void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedSameUnregisteredSolicitor() {
+                CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineSameUnregisteredDefendant().build();
+
+                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+                assertThat(stateFlow.getState())
+                    .extracting(State::getName)
+                    .isNotNull()
+                    .isEqualTo(TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName());
+                assertThat(stateFlow.getStateHistory())
+                    .hasSize(5)
+                    .extracting(State::getName)
+                    .containsExactly(
+                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                        PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT.fullName(),
+                        TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
+                    );
+                verify(featureToggleService).isRpaContinuousFeedEnabled();
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
+                    entry("ONE_RESPONDENT_REPRESENTATIVE", true),
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                );
+            }
         }
 
         @Nested
@@ -654,12 +733,6 @@ class StateFlowEngineTest {
             void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRes1UnregisRes2Unrep() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateProceedsOfflineUnregisteredDefendant1UnrepresentedDefendant2().build();
-                if (caseData.getRespondent2OrgRegistered() != null
-                    && caseData.getRespondent2Represented() == null) {
-                    caseData = caseData.toBuilder()
-                        .respondent2Represented(YES)
-                        .build();
-                }
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
                 assertThat(stateFlow.getState())
