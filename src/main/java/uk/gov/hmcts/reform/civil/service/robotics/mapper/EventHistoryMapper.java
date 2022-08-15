@@ -1840,8 +1840,8 @@ public class EventHistoryMapper {
         if (featureToggleService.isSDOEnabled()) {
             String miscText = "RPA Reason: Case proceeds offline. "
                 + "Judge / Legal Advisor did not draw a Direction's Order: "
-                + caseData.getClaimProceedsInCaseman().getOther();
-            LocalDateTime eventDate = caseData.getClaimProceedsInCaseman().getDate().atStartOfDay();
+                + caseData.getReasonNotSuitableSDO().getInput();
+            LocalDateTime eventDate = time.now().toLocalDate().atStartOfDay();
 
             builder.miscellaneous(
                 Event.builder()
