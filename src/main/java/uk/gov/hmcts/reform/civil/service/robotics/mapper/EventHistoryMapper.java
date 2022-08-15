@@ -1919,18 +1919,18 @@ public class EventHistoryMapper {
             .getLabel().startsWith("Both");
         String miscTextRequested = "RPA Reason: Summary judgment requested and referred to judge.";
         String miscTextGranted = "RPA Reason: Summary judgment granted and referred to judge.";
-       if (caseData.getDefendantDetails() != null) {
-           builder.miscellaneous(
-               Event.builder()
-                   .eventSequence(prepareEventSequence(builder.build()))
-                   .eventCode(MISCELLANEOUS.getCode())
-                   .dateReceived(LocalDateTime.now())
-                   .eventDetailsText(grantedFlag ? miscTextRequested : miscTextGranted)
-                   .eventDetails(EventDetails.builder()
-                                     .miscText(grantedFlag ? miscTextRequested : miscTextGranted)
-                                     .build())
-                   .build());
-       }
+        if (caseData.getDefendantDetails() != null) {
+            builder.miscellaneous(
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(LocalDateTime.now())
+                    .eventDetailsText(grantedFlag ? miscTextRequested : miscTextGranted)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(grantedFlag ? miscTextRequested : miscTextGranted)
+                                      .build())
+                    .build());
+        }
 
     }
 
