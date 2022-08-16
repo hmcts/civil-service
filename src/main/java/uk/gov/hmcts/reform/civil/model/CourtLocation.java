@@ -8,7 +8,6 @@ import lombok.Setter;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 
-@Setter
 @Data
 @Builder(toBuilder = true)
 public class CourtLocation {

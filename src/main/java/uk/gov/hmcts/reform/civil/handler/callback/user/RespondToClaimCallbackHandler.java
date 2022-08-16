@@ -670,8 +670,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        // Potentially renaming this method to something more generic not DJ
-        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
+        return locationRefDataService.getCourtLocationsAsLocationRefData(authToken);
     }
 
     private void handleCourtLocationForRespondent1DQ(CaseData caseData, Respondent1DQ.Respondent1DQBuilder dq,
