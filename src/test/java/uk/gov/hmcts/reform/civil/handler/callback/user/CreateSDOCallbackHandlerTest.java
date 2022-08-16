@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-//import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -187,8 +186,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("disposalHearingJudgesRecital").extracting("input")
                 .isEqualTo("Upon considering the claim form, particulars of claim, statements of case"
-                               + " and Directions questionnaires \n\n"
-                               + "It is ordered that:");
+                               + " and Directions questionnaires");
 
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocuments").extracting("input1")
                 .isEqualTo("The parties shall serve on each other copies of the documents upon which reliance is "
@@ -219,7 +217,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("input5")
                 .isEqualTo("Any application by the defendant pursuant to CPR 32.7 must be made by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("date3")
-                .isEqualTo(LocalDate.now().plusWeeks(2).toString());
+                .isEqualTo(LocalDate.now().plusWeeks(6).toString());
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("input6")
                 .isEqualTo("and must be accompanied by proposed directions for allocation and listing for trial on "
                                + "quantum. This is because cross-examination will cause the hearing to exceed "
@@ -261,7 +259,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(LocalDate.now().plusWeeks(12).toString());
 
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearing").extracting("input")
-                .isEqualTo("This claim be listed for final disposal before a Judge on the first available date after.");
+                .isEqualTo("This claim will be listed for final disposal "
+                               + "before a judge on the first available date after");
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearing").extracting("date")
                 .isEqualTo(LocalDate.now().plusWeeks(16).toString());
 

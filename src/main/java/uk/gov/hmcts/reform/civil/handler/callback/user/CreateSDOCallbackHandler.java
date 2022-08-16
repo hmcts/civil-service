@@ -13,18 +13,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodTelephoneHearing;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
@@ -110,7 +104,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "order-details"), this::prePopulateOrderDetailsPages)
             .put(callbackKey(MID, "order-details-navigation"), this::setOrderDetailsFlags)
-            .put(callbackKey(MID, "disposal-hearing-submit"), this::testDisposalHearingFields) //remove later
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -119,52 +112,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
-    }
-
-    private CallbackResponse testDisposalHearingFields(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        DisposalHearingFinalDisposalHearing hearing =
-            caseData.getDisposalHearingFinalDisposalHearing();
-
-        if (hearing.getTime() != null) {
-            System.out.println("hearing section, check time estimate: " + hearing.getTime());
-        } else {
-            System.out.println("time is null");
-        }
-
-        DynamicList methodInPerson = caseData.getDisposalHearingMethodInPerson();
-        if (methodInPerson != null) {
-            System.out.println("list value: " + methodInPerson.getValue());
-            System.out.println("selection: " + methodInPerson.getValue().getLabel());
-        } else {
-            System.out.println("method in person is null");
-        }
-
-        DisposalHearingMethod method = caseData.getDisposalHearingMethod();
-        System.out.println("method: " + method);
-        System.out.println("methodInPerson: " + methodInPerson);
-        DisposalHearingMethodTelephoneHearing methodTelephone =
-            caseData.getDisposalHearingMethodTelephoneHearing();
-        System.out.println("telephoneHearing: " + methodTelephone);
-        DisposalHearingMethodVideoConferenceHearing methodVideo =
-            caseData.getDisposalHearingMethodVideoConferenceHearing();
-        System.out.println("videoHearing: " + methodVideo);
-        List<Element<DisposalHearingAddNewDirections>> directions =
-            caseData.getDisposalHearingAddNewDirections();
-        System.out.println("new directions data: " + directions);
-
-        if (directions != null) {
-            for (Element<DisposalHearingAddNewDirections> direction: directions) {
-                System.out.println("text: " + direction.getValue().getDirectionComment());
-            }
-        }
-
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
-            .build();
-
     }
 
     // This is currently a mid event but once pre states are defined it should be moved to an about to start event.
@@ -210,7 +157,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         DisposalHearingJudgesRecital tempDisposalHearingJudgesRecital = DisposalHearingJudgesRecital.builder()
             .input("Upon considering the claim form, particulars of claim, statements of case"
-                       + " and Directions questionnaires \n\nIt is ordered that:")
+                       + " and Directions questionnaires")
             .build();
 
         updatedData.disposalHearingJudgesRecital(tempDisposalHearingJudgesRecital).build();
@@ -249,7 +196,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .date2(LocalDate.now().plusWeeks(4))
             .input4("The provisions of CPR 32.6 apply to such evidence.")
             .input5("Any application by the defendant pursuant to CPR 32.7 must be made by 4pm on")
-            .date3(LocalDate.now().plusWeeks(2))
+            .date3(LocalDate.now().plusWeeks(6))
             .input6("and must be accompanied by proposed directions for allocation and listing for trial on quantum. "
                         + "This is because cross-examination will cause the hearing to exceed the 30-minute "
                         + "maximum time estimate for a disposal hearing.")
@@ -293,9 +240,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         DisposalHearingFinalDisposalHearing tempDisposalHearingFinalDisposalHearing =
             DisposalHearingFinalDisposalHearing.builder()
-            .input("This claim be listed for final disposal before a Judge on the first available date after.")
-            .date(LocalDate.now().plusWeeks(16))
-            .build();
+                .input("This claim will be listed for final disposal before a judge on the first available date after")
+                .date(LocalDate.now().plusWeeks(16))
+                .build();
 
         updatedData.disposalHearingFinalDisposalHearing(tempDisposalHearingFinalDisposalHearing).build();
 
