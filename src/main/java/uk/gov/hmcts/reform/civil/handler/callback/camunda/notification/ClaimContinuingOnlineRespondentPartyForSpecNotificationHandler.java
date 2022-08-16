@@ -101,6 +101,9 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private void generatePIPLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        //TODO: temp parameters, change
+        notificationService.sendLetter("", Collections.emptyMap() , caseData.getLegacyCaseReference());
     }
 
     private void generatePIPEmail(CaseData caseData) {
