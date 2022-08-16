@@ -28,7 +28,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.DefendantPinToPostLRspecService;
+import uk.gov.hmcts.reform.civil.service.DefendantPinToPostCUIService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
@@ -57,7 +57,7 @@ public class CasesController {
     private final DashboardClaimInfoService dashboardClaimInfoService;
     private final CaseEventService caseEventService;
     private final DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
-    private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
+    private final DefendantPinToPostCUIService defendantPinToPostCUIService;
 
     @GetMapping(path = {
         "/{caseId}",
@@ -163,16 +163,17 @@ public class CasesController {
         return new ResponseEntity<>(calculatedDeadline, HttpStatus.OK);
     }
 
-    @GetMapping(path = {
+    @PostMapping(path = {
         "/claim-reference/{caseId}/claim-pin/{pin}",
     })
     @ApiOperation("get validate the pin for the LR case")
     public ResponseEntity<CaseDetails> getCaseIdWithValidation(
         @PathVariable("caseId") Long caseId,
         @PathVariable("pin") String pin,
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
+        @RequestBody EventDto eventDto
     ) {
-        var caseDetailsResponse = defendantPinToPostLRspecService.checkPinValid(caseId, authorisation, pin);
+        var caseDetailsResponse = defendantPinToPostCUIService.checkPinValid(caseId, authorisation, pin, eventDto);
 
         if (caseDetailsResponse != null){
             log.info("Returning case details: {}", caseDetailsResponse);
@@ -189,7 +190,7 @@ public class CasesController {
         @PathVariable("caseId") Long caseId,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
-        var caseDetailsResponse = defendantPinToPostLRspecService.getLRCase(caseId, authorisation);
+        var caseDetailsResponse = defendantPinToPostCUIService.getLRCase(caseId, authorisation);
 
         if (caseDetailsResponse != null){
             log.info("Returning case details: {}", caseDetailsResponse);
