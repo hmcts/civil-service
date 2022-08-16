@@ -481,7 +481,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
-
     private void handleCourtLocationData(CaseData caseData, CaseData.CaseDataBuilder dataBuilder,
                                          CallbackParams callbackParams) {
         // data for court location

@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
@@ -66,7 +65,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -1178,8 +1176,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             class OneVTwoSameSolicitor {
                 @Test
                 void shouldHandleCourtLocationData_SameResponse() {
-                    when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
-                    when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+                    when(coreCaseUserService.userHasCaseRole(any(), any(),
+                                                             eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+                    when(coreCaseUserService.userHasCaseRole(any(), any(),
+                                                             eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
                     LocationRefData locationA = LocationRefData.builder()
                         .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
@@ -1221,8 +1221,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 @Test
                 void shouldHandleCourtLocationData_DifferentResponse() {
-                    when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
-                    when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+                    when(coreCaseUserService.userHasCaseRole(any(), any(),
+                                                             eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+                    when(coreCaseUserService.userHasCaseRole(any(), any(),
+                                                             eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
                     LocationRefData locationA = LocationRefData.builder()
                         .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
@@ -1330,7 +1332,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 @Test
                 void shouldHandleCourtLocationData_when1stRespondentAnsweringBefore2nd() {
-                    when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+                    when(coreCaseUserService.userHasCaseRole(any(), any(),
+                                                             eq(RESPONDENTSOLICITORONE))).thenReturn(true);
 
                     LocationRefData locationA = LocationRefData.builder()
                         .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
