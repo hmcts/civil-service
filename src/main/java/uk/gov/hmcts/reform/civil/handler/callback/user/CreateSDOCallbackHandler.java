@@ -119,8 +119,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     //  FlowStateAllowedEventService.java.
     // This way pressing previous on the ccd page won't end up calling this method again and thus
     // repopulating the fields if they have been changed.
-    // There is no reason to add conditionals to avoid this here since having it as an about to start event will mean
-    // it is only ever called once.
+    // There is no reason to add conditionals to avoid this here since having it as an about to start event will
+    //  mean it is only ever called once.
     // Then any changes to fields in ccd will persist in ccd regardless of backwards or forwards page navigation.
     private CallbackResponse prePopulateOrderDetailsPages(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
