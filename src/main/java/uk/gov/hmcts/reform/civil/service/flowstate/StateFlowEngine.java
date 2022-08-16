@@ -148,17 +148,17 @@ public class StateFlowEngine {
                     FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
                 )))
             .transitionTo(CLAIM_SUBMITTED)
-            .onlyIf(claimSubmittedTwoRespondentRepresentatives)
-            .set(flags -> flags.putAll(
-                // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
-                // camunda diagram for TAKE_CASE_OFFLINE is changed
-                Map.of(
-                    FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false,
-                    FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
-                    FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
-                    FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
-                    FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
-                )))
+                .onlyIf(claimSubmittedTwoRespondentRepresentatives)
+                .set(flags -> flags.putAll(
+                    // Do not set UNREPRESENTED_DEFENDANT_ONE or UNREPRESENTED_DEFENDANT_TWO to false here unless
+                    // camunda diagram for TAKE_CASE_OFFLINE is changed
+                    Map.of(
+                        FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false,
+                        FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
+                        FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
+                        FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
+                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
+                    )))
             // To be removed when NOC is released. Needed for cases with unregistered and unrepresented defendants
             .transitionTo(CLAIM_SUBMITTED)
             .onlyIf(noticeOfChangeEnabledAndLiP.negate()
