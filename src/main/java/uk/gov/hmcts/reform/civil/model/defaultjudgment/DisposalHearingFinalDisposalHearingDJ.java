@@ -1,9 +1,10 @@
-package uk.gov.hmcts.reform.civil.model.sdo;
+package uk.gov.hmcts.reform.civil.model.defaultjudgment;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 
 import java.time.LocalDate;
 import javax.validation.constraints.Future;
@@ -12,17 +13,11 @@ import javax.validation.constraints.Future;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class FastTrackWitnessOfFact {
+public class DisposalHearingFinalDisposalHearingDJ {
 
-    private String input1;
-    private String input2;
-    private String input3;
-    private String input4;
-    private String input5;
-    private String input6;
-    private String input7;
-    private String input8;
+    private String input;
     @Future(message = "The date entered must be in the future")
     private LocalDate date;
-    private String input9;
+    private DisposalHearingFinalDisposalHearingTimeEstimate time;
+
 }
