@@ -68,6 +68,7 @@ public interface FlowState {
         PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA,
         CONTACT_DETAILS_CHANGE,
         TAKEN_OFFLINE_SDO_NOT_DRAWN;
+
         public static final String FLOW_NAME = "MAIN";
 
         @Override
