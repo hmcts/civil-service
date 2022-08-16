@@ -210,9 +210,6 @@ public class EventHistoryMapper {
                     case TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE:
                         buildClaimTakenOfflinePastApplicantResponse(builder, caseData);
                         break;
-                    case TAKEN_OFFLINE_SDO_NOT_DRAWN:
-                        buildSDONotDrawn(builder, caseData);
-                        break;
                     default:
                         break;
                 }
@@ -534,7 +531,6 @@ public class EventHistoryMapper {
                 break;
         }
     }
-
 
     private void buildDefenceFiled(EventHistory.EventHistoryBuilder builder,
                                    CaseData caseData,
@@ -1021,19 +1017,73 @@ public class EventHistoryMapper {
             builder.directionsQuestionnaireFiled(dqForProceedingApplicants);
         }
 
-        List<Event> miscText = IntStream.range(0, miscEventText.size())
-            .mapToObj(index ->
-                          Event.builder()
-                              .eventSequence(prepareEventSequence(builder.build()))
-                              .eventCode(MISCELLANEOUS.getCode())
-                              .dateReceived(caseData.getApplicant1ResponseDate())
-                              .eventDetailsText(miscEventText.get(index))
-                              .eventDetails(EventDetails.builder()
-                                                .miscText(miscEventText.get(index))
-                                                .build())
-                              .build())
-            .collect(Collectors.toList());
-        builder.miscellaneous(miscText);
+        if (!featureToggleService.isSDOEnabled()) {
+            List<Event> miscText = IntStream.range(0, miscEventText.size())
+                .mapToObj(index ->
+                              Event.builder()
+                                  .eventSequence(prepareEventSequence(builder.build()))
+                                  .eventCode(MISCELLANEOUS.getCode())
+                                  .dateReceived(caseData.getApplicant1ResponseDate())
+                                  .eventDetailsText(miscEventText.get(index))
+                                  .eventDetails(EventDetails.builder()
+                                                    .miscText(miscEventText.get(index))
+                                                    .build())
+                                  .build())
+                .collect(Collectors.toList());
+            builder.miscellaneous(miscText);
+        } else {
+
+            switch (getMultiPartyScenario(caseData)) {
+
+                case ONE_V_TWO_ONE_LEGAL_REP:
+                case ONE_V_TWO_TWO_LEGAL_REP:
+
+                    YesOrNo proceedRespondent1 =
+                        caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2();
+                    YesOrNo proceedRespondent2 =
+                        caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2();
+
+                    if (NO.equals(proceedRespondent1) || NO.equals(proceedRespondent2)) {
+                        List<Event> miscText = IntStream.range(0, miscEventText.size())
+                            .mapToObj(index ->
+                                          Event.builder()
+                                              .eventSequence(prepareEventSequence(builder.build()))
+                                              .eventCode(MISCELLANEOUS.getCode())
+                                              .dateReceived(caseData.getApplicant1ResponseDate())
+                                              .eventDetailsText(miscEventText.get(index))
+                                              .eventDetails(EventDetails.builder()
+                                                                .miscText(miscEventText.get(index))
+                                                                .build())
+                                              .build())
+                            .collect(Collectors.toList());
+                        builder.miscellaneous(miscText);
+                    }
+                    break;
+                case TWO_V_ONE:
+
+                    YesOrNo applicant1Proceeds = caseData.getApplicant1ProceedWithClaimMultiParty2v1();
+                    YesOrNo applicant2Proceeds = caseData.getApplicant2ProceedWithClaimMultiParty2v1();
+
+                    if (NO.equals(applicant1Proceeds) || NO.equals(applicant2Proceeds)) {
+                        List<Event> miscText = IntStream.range(0, miscEventText.size())
+                            .mapToObj(index ->
+                                          Event.builder()
+                                              .eventSequence(prepareEventSequence(builder.build()))
+                                              .eventCode(MISCELLANEOUS.getCode())
+                                              .dateReceived(caseData.getApplicant1ResponseDate())
+                                              .eventDetailsText(miscEventText.get(index))
+                                              .eventDetails(EventDetails.builder()
+                                                                .miscText(miscEventText.get(index))
+                                                                .build())
+                                              .build())
+                            .collect(Collectors.toList());
+                        builder.miscellaneous(miscText);
+                    }
+                    break;
+                default:
+            }
+        }
+
     }
 
     private List<ClaimantResponseDetails> prepareApplicantsDetails(CaseData caseData) {
@@ -1066,6 +1116,14 @@ public class EventHistoryMapper {
                                       .build());
         }
         return applicantsDetails;
+    }
+
+    public String prepareEventDetailsText(DQ dq, String preferredCourtCode) {
+        return format(
+            "preferredCourtCode: %s; stayClaim: %s",
+            preferredCourtCode,
+            isStayClaim(dq)
+        );
     }
 
     private List<String> prepMultipartyProceedMiscText(CaseData caseData) {
@@ -1127,14 +1185,6 @@ public class EventHistoryMapper {
             }
         }
         return eventDetailsText;
-    }
-
-    public String prepareEventDetailsText(DQ dq, String preferredCourtCode) {
-        return format(
-            "preferredCourtCode: %s; stayClaim: %s",
-            preferredCourtCode,
-            isStayClaim(dq)
-        );
     }
 
     public boolean isStayClaim(DQ dq) {
@@ -1831,24 +1881,5 @@ public class EventHistoryMapper {
             default:
                 return format("agreed extension date: %s", extensionDate);
         }
-    }
-
-    //How are we capturing the reason that it is dropped offline?
-    private void buildSDONotDrawn(EventHistory.EventHistoryBuilder builder,
-                                  CaseData caseData) {
-        String miscText = "RPA Reason: Case proceeds offline. Judge / Legal Advisor did not draw a Direction's Order: "
-            + caseData.getClaimProceedsInCaseman().getOther();
-        LocalDateTime eventDate = caseData.getClaimProceedsInCaseman().getDate().atStartOfDay();
-
-        builder.miscellaneous(
-            Event.builder()
-                .eventSequence(prepareEventSequence(builder.build()))
-                .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(eventDate)
-                .eventDetailsText(miscText)
-                .eventDetails(EventDetails.builder()
-                                  .miscText(miscText)
-                                  .build())
-                .build());
     }
 }

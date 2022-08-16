@@ -66,6 +66,10 @@ public class FeatureToggleService {
         return internalClient.boolVariation("pin-in-post", createLDUser().build(), false);
     }
 
+    public boolean isSDOEnabled() {
+        return internalClient.boolVariation("enableSDO", createLDUser().build(), false);
+    }
+
     private void close() {
         try {
             internalClient.close();
