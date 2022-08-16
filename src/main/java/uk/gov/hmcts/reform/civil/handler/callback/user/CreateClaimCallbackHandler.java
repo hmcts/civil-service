@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -106,7 +107,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_START), this::setSuperClaimType)
             .put(callbackKey(MID, "start-claim"), this::startClaim)
             .put(callbackKey(MID, "applicant"), this::validateApplicant1DateOfBirth)
             .put(callbackKey(MID, "applicant2"), this::validateApplicant2DateOfBirth)
@@ -465,6 +466,21 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
         return errorsMessages;
     }
+
+    /**
+     * Sets the super claim type in case data to un-specified claims.
+     * @param callbackParams callback containing case data
+     * @return AboutToStartOrSubmitCallback response with super claim type set to un-specified claim
+     */
+    private CallbackResponse setSuperClaimType(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.superClaimType(SuperClaimType.UNSPEC_CLAIM);
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
 
     private void handleCourtLocationData(CaseData caseData, CaseData.CaseDataBuilder dataBuilder,
                                          CallbackParams callbackParams) {
