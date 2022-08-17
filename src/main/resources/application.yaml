@@ -209,7 +209,7 @@ launchdarkly:
 
 testing:
   support:
-    enabled: ${TESTING_SUPPORT_ENABLED:false}
+    enabled: ${TESTING_SUPPORT_ENABLED:true}
 
 exit-survey:
   applicant-link: https://www.smartsurvey.co.uk/s/CivilDamages_ExitSurvey_Claimant/
