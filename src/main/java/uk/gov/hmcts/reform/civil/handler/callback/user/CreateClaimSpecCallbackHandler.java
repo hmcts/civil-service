@@ -13,12 +13,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
+import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -35,6 +37,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+import uk.gov.hmcts.reform.civil.utils.AccessCodeGenerator;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -367,6 +370,20 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder.respondent1Represented(respondent1Represented);
             var respondent2Represented = caseData.getSpecRespondent2Represented();
             dataBuilder.respondent2Represented(respondent2Represented);
+        }
+
+        if (caseData.getRespondent1Represented() == NO
+            && caseData.getAddRespondent2() == NO
+            && caseData.getAddApplicant2() == NO
+            && toggleService.isPinInPostEnabled()) {
+            LocalDate expiryDate = LocalDate.now().plusDays(180);
+            dataBuilder.respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
+                                                        .accessCode(AccessCodeGenerator.generateAccessCode())
+                                                        .respondentCaseRole(
+                                                            CaseRole.RESPONDENTSOLICITORONESPEC.getFormattedName())
+                                                        .expiryDate(expiryDate)
+                                                        .pinUsed(NO)
+                                                        .build());
         }
 
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
