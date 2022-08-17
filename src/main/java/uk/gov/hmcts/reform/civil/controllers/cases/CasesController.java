@@ -164,16 +164,16 @@ public class CasesController {
     }
 
     @PostMapping(path = {
-        "/claim-reference/{caseId}/claim-pin/{pin}",
+        "/claim-reference/{caseRef}/claim-pin/{pin}",
     })
     @ApiOperation("get validate the pin for the LR case")
     public ResponseEntity<CaseDetails> getCaseIdWithValidation(
-        @PathVariable("caseId") Long caseId,
+        @PathVariable("caseRef") String caseRef,
         @PathVariable("pin") String pin,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @RequestBody EventDto eventDto
     ) {
-        var caseDetailsResponse = defendantPinToPostCUIService.checkPinValid(caseId, authorisation, pin, eventDto);
+        var caseDetailsResponse = defendantPinToPostCUIService.checkPinValid(caseRef, authorisation, pin);
 
         if (caseDetailsResponse != null){
             log.info("Returning case details: {}", caseDetailsResponse);
