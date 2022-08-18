@@ -182,20 +182,20 @@ public class CasesController {
         return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
     }
 
-    @GetMapping(path = {
-        "/claim-reference/{caseId}",
-    })
-    @ApiOperation("get LR case by id from CCD and validate the pin")
-    public ResponseEntity<CaseDetails> getLRCaseId(
-        @PathVariable("caseId") Long caseId,
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
-    ) {
-        var caseDetailsResponse = defendantPinToPostCUIService.getLRCase(caseId, authorisation);
-
-        if (caseDetailsResponse != null){
-            log.info("Returning case details: {}", caseDetailsResponse);
-            return new ResponseEntity<>(caseDetailsResponse, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+//    @GetMapping(path = {
+//        "/claim-reference/{caseId}",
+//    })
+//    @ApiOperation("get LR case by id from CCD and validate the pin")
+//    public ResponseEntity<CaseDetails> getLRCaseId(
+//        @PathVariable("caseId") Long caseId,
+//        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+//    ) {
+//        var caseDetailsResponse = defendantPinToPostCUIService.getLRCase(caseId, authorisation);
+//
+//        if (caseDetailsResponse != null){
+//            log.info("Returning case details: {}", caseDetailsResponse);
+//            return new ResponseEntity<>(caseDetailsResponse, HttpStatus.OK);
+//        }
+//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//    }
 }

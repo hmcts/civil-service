@@ -52,7 +52,6 @@ public class DefendantPinToPostCUIService {
     public void removePinInPostData(Long caseId) {
         try {
             var startEventResponse = coreCaseDataService.startUpdate(caseId.toString(), UPDATE_CASE_DATA);
-
             coreCaseDataService.submitUpdate(caseId.toString(), removePinInPostDataContent(startEventResponse));
         } catch (FeignException e) {
             log.error(String.format("Updating case data failed: %s", e.contentUTF8()));
