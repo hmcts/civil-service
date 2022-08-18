@@ -201,14 +201,4 @@ public class CasesController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping(path = {
-        "/reference/{caseReference}"
-    })
-    public ResponseEntity<CaseData> getCaseDataByReference(
-        @PathVariable("caseReference") String caseReference,
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation ) {
-        log.info("case reference {}", caseReference);
-        CaseData caseData = caseByLegacyReferenceSearchService.getCaseDataByLegacyReference(caseReference, authorisation);
-        return new ResponseEntity<>(caseData, HttpStatus.OK);
-    }
 }
