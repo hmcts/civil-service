@@ -183,20 +183,20 @@ public class PartyUtils {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 if ((caseData.getRespondent1AcknowledgeNotificationDate() == null)
                     && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
-                    //case where respondent 2 acknowledges first - working
+                    //case where respondent 2 acknowledges first
                     responseIntentions.append(caseData.getRespondent2ClaimResponseIntentionType().getLabel());
                 } else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null)
                     && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
                     if (caseData.getRespondent2AcknowledgeNotificationDate()
                         .isAfter(caseData.getRespondent1AcknowledgeNotificationDate())) {
-                        //case where respondent 2 acknowledges 2nd - working
+                        //case where respondent 2 acknowledges 2nd
                         responseIntentions.append(caseData.getRespondent2ClaimResponseIntentionType().getLabel());
                     } else {
-                        //case where respondent 1 acknowledges 2nd - working
+                        //case where respondent 1 acknowledges 2nd
                         responseIntentions.append(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
                     }
                 } else {
-                    //case where respondent 1 acknowledges first - working
+                    //case where respondent 1 acknowledges first
                     responseIntentions.append(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
                 }
                 break;
