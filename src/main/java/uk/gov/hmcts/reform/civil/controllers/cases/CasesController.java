@@ -28,13 +28,11 @@ import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
-import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 
 import java.time.LocalDate;
@@ -58,8 +56,6 @@ public class CasesController {
     private final DashboardClaimInfoService dashboardClaimInfoService;
     private final CaseEventService caseEventService;
     private final DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
-    private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
-    private final CaseLegacyReferenceSearchService caseByLegacyReferenceSearchService;
 
     @GetMapping(path = {
         "/{caseId}",
@@ -164,41 +160,4 @@ public class CasesController {
         LocalDate calculatedDeadline = deadlineExtensionCalculatorService.calculateExtendedDeadline(extendedDeadline);
         return new ResponseEntity<>(calculatedDeadline, HttpStatus.OK);
     }
-
-    @PostMapping(path = {
-        "/claim-reference/{caseRef}/claim-pin/{pin}",
-    })
-    @ApiOperation("get validate the pin for the LR case")
-    public ResponseEntity<CaseDetails> getCaseIdWithValidation(
-        @PathVariable("caseRef") String caseRef,
-        @PathVariable("pin") String pin,
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
-        @RequestBody EventDto eventDto
-    ) {
-        var caseDetailsResponse = defendantPinToPostLRspecService.checkPinValid(caseRef, authorisation, pin);
-
-        if (caseDetailsResponse != null) {
-            log.info("Returning case details: {}", caseDetailsResponse);
-            return new ResponseEntity<>(caseDetailsResponse, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-    }
-
-    @GetMapping(path = {
-        "/claim-reference/{caseId}",
-    })
-    @ApiOperation("get LR case by id from CCD and validate the pin")
-    public ResponseEntity<CaseDetails> getLRCaseId(
-        @PathVariable("caseId") Long caseId,
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
-    ) {
-        var caseDetailsResponse = defendantPinToPostCUIService.getLRCase(caseId, authorisation);
-
-        if (caseDetailsResponse != null){
-            log.info("Returning case details: {}", caseDetailsResponse);
-            return new ResponseEntity<>(caseDetailsResponse, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
 }

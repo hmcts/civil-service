@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService;
 
 @Api
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService
 public class CaseAssignmentController {
 
     private final CaseLegacyReferenceSearchService caseByLegacyReferenceSearchService;
+    private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
 
     @PostMapping(path = {
         "/reference/{caseReference}"
@@ -40,6 +42,8 @@ public class CaseAssignmentController {
         @PathVariable("caseReference") String caseReference, @RequestBody String pin) {
         log.info("case reference {}", caseReference);
         CaseData caseData = caseByLegacyReferenceSearchService.getCaseDataByLegacyReference(caseReference);
+//        defendantPinToPostLRspecService.checkPinValid(caseData, pin);
+//        defendantPinToPostLRspecService.removePinInPostData(caseData.getCcdCaseReference());
         return new ResponseEntity<>(caseData, HttpStatus.OK);
     }
 }

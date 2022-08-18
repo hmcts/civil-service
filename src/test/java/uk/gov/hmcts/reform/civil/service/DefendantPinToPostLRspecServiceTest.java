@@ -17,10 +17,14 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
+import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
+import uk.gov.hmcts.reform.civil.service.search.exceptions.CaseNotFoundException;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -76,6 +80,21 @@ class DefendantPinToPostLRspecServiceTest {
 
             verify(coreCaseDataService).startUpdate(caseData.getCcdCaseReference().toString(), UPDATE_CASE_DATA);
             verify(coreCaseDataService).submitUpdate(eq(caseData.getCcdCaseReference().toString()), any(CaseDataContent.class));
+        }
+
+        @Test
+        void shouldCheckPinNotValid_whenInvoked() {
+            CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
+                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
+                                                   .accessCode("TEST1234")
+                                                   .expiryDate(LocalDate.now().plusDays(180))
+                                                   .build())
+                .build();
+
+            assertThrows(
+                PinNotMatchException.class,
+                () ->  defendantPinToPostLRspecService.checkPinValid(caseData, "TEST0000"));
         }
     }
 

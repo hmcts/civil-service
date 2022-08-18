@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
+import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 import uk.gov.hmcts.reform.civil.service.search.exceptions.CaseNotFoundException;
 
 @Slf4j
@@ -22,5 +23,10 @@ public class ResourceExceptionHandler {
     @ExceptionHandler(CaseNotFoundException.class)
     public ResponseEntity<Object> caseNotFoundUnauthorised(CaseNotFoundException caseNotFoundException) {
         return new ResponseEntity<>("UNAUTHORIZED", new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(CaseNotFoundException.class)
+    public ResponseEntity<Object> caseNotFoundUnauthorised(PinNotMatchException pinNotMatchException) {
+        return new ResponseEntity<>("NOT MATCH", new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }
 }

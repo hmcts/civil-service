@@ -1,17 +1,17 @@
-package uk.gov.hmcts.reform.civil.service;
+package uk.gov.hmcts.reform.civil.service.pininpost;
 
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 import uk.gov.hmcts.reform.civil.utils.AccessCodeGenerator;
 
 import java.time.LocalDate;
@@ -25,19 +25,14 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 public class DefendantPinToPostLRspecService {
 
     private final CoreCaseDataService coreCaseDataService;
-    private final CaseDetailsConverter caseDetailsConverter;
 
-    public CaseDetails checkPinValid(String caseRef, String authorisation, String pin) {
-        // search Case
-        var caseDetailsResponse = coreCaseDataService.getCase(caseRef.chars().count(), authorisation);
-        CaseData caseData = caseDetailsConverter.toCaseData(caseDetailsResponse);
+    public void checkPinValid(CaseData caseData, String pin) {
         DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
         // Checking on the Pin entered valid
-        if (pinInPostData != null && pinInPostData.getAccessCode().equals(pin)) {
-            removePinInPostData(caseData.getCcdCaseReference());
-            return caseDetailsResponse;
+        if(pinInPostData == null || !pinInPostData.getAccessCode().equals(pin) || pinInPostData.getExpiryDate().isBefore(LocalDate.now())){
+            log.error("pin not match for {}", caseData.getLegacyCaseReference());
+            throw new PinNotMatchException();
         }
-        return null;
     }
 
     public void removePinInPostData(Long caseId) {
