@@ -8,9 +8,11 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
+import uk.gov.hmcts.reform.civil.utils.AccessCodeGenerator;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -67,6 +69,16 @@ public class DefendantPinToPostLRspecService {
             .eventToken(startEventResponse.getToken())
             .event(Event.builder().id(startEventResponse.getEventId()).build())
             .data(data)
+            .build();
+    }
+
+    public DefendantPinToPostLRspec buildDefendantPinToPost() {
+        LocalDate expiryDate = LocalDate.now().plusDays(180);
+        return DefendantPinToPostLRspec.builder()
+            .accessCode(AccessCodeGenerator.generateAccessCode())
+            .respondentCaseRole(
+                CaseRole.RESPONDENTSOLICITORONESPEC.getFormattedName())
+            .expiryDate(expiryDate)
             .build();
     }
 }
