@@ -20,7 +20,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class DefendantPinToPostCUIService {
+public class DefendantPinToPostLRspecService {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
