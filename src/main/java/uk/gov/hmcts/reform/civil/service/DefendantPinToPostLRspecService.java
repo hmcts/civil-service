@@ -40,17 +40,6 @@ public class DefendantPinToPostLRspecService {
         return null;
     }
 
-    public CaseDetails getLRCase(Long caseId, String authorisation) {
-        var caseDetailsResponse = coreCaseDataService.getCase(caseId, authorisation);
-        CaseData caseData = caseDetailsConverter.toCaseData(caseDetailsResponse);
-        DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
-        // Checking if case is expired and used already
-        if (pinInPostData == null || pinInPostData.getExpiryDate().isAfter(LocalDate.now())) {
-            return null;
-        }
-        return caseDetailsResponse;
-    }
-
     public void removePinInPostData(Long caseId) {
         try {
             var startEventResponse = coreCaseDataService.startUpdate(caseId.toString(), UPDATE_CASE_DATA);
@@ -63,7 +52,7 @@ public class DefendantPinToPostLRspecService {
 
     private CaseDataContent removePinInPostDataContent(StartEventResponse startEventResponse) {
         Map<String, Object> data = startEventResponse.getCaseDetails().getData();
-        data.replace("respondent1PinToPostLRspec", null);
+        data.replace("respondent1PinToPostLRspec.accessCode", null);
 
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
