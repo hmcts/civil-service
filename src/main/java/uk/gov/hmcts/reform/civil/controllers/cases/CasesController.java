@@ -160,4 +160,5 @@ public class CasesController {
         LocalDate calculatedDeadline = deadlineExtensionCalculatorService.calculateExtendedDeadline(extendedDeadline);
         return new ResponseEntity<>(calculatedDeadline, HttpStatus.OK);
     }
+
 }
