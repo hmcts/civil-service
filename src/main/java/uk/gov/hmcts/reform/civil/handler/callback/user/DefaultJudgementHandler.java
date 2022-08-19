@@ -57,6 +57,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
     private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
+    private String participantString;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -170,9 +171,17 @@ public class DefaultJudgementHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.bothDefendants("One");
+        participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getDefendantDetails()
+            .getValue().getLabel());
+
         if (caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
             caseDataBuilder.bothDefendants(caseData.getDefendantDetails().getValue().getLabel());
+            participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
+                .getPartyName() + " and " + caseData.getRespondent2().getPartyName());
         }
+
+        caseDataBuilder.caseNameHmctsInternal(participantString);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
