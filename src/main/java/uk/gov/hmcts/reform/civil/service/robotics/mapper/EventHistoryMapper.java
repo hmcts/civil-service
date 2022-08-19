@@ -1965,7 +1965,7 @@ public class EventHistoryMapper {
                     .dateReceived(LocalDateTime.now())
                     .eventDetailsText(grantedFlag ? miscTextRequested : miscTextGranted)
                     .eventDetails(EventDetails.builder()
-                                      .miscText(miscTextRequested)
+                                      .miscText(grantedFlag ? miscTextRequested : miscTextGranted)
                                       .build())
                     .build());
         }
