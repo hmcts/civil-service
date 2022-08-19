@@ -92,7 +92,7 @@ class DefendantPinToPostLRspecServiceTest {
 
             assertThrows(
                 PinNotMatchException.class,
-                () ->  defendantPinToPostLRspecService.checkPinValid(caseData, "TEST0000"));
+                () ->  defendantPinToPostLRspecService.validatePin(caseData, "TEST0000"));
         }
     }
 

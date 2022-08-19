@@ -24,7 +24,7 @@ public class DefendantPinToPostLRspecService {
 
     private final CoreCaseDataService coreCaseDataService;
 
-    public void checkPinValid(CaseData caseData, String pin) {
+    public void validatePin(CaseData caseData, String pin) {
         DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
         if (pinInPostData == null || !pinInPostData.getAccessCode().equals(pin)
             || pinInPostData.getExpiryDate().isBefore(LocalDate.now())) {

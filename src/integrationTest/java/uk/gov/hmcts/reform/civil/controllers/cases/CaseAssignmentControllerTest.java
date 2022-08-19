@@ -51,7 +51,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void givenIncorrectPin_whenValidateCaseAndPin_shouldReturnUnauthorised() {
         givenCaseIsFound();
-        doThrow(new PinNotMatchException()).when(defendantPinToPostLRspecService).checkPinValid(
+        doThrow(new PinNotMatchException()).when(defendantPinToPostLRspecService).validatePin(
             any(CaseData.class),
             anyString()
         );
