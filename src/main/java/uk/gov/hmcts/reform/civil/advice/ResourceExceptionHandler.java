@@ -19,14 +19,4 @@ public class ResourceExceptionHandler {
         log.debug(exception.getMessage(), exception);
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
-
-    @ExceptionHandler(CaseNotFoundException.class)
-    public ResponseEntity<Object> caseNotFoundUnauthorised(CaseNotFoundException caseNotFoundException) {
-        return new ResponseEntity<>("UNAUTHORIZED", new HttpHeaders(), HttpStatus.UNAUTHORIZED);
-    }
-
-    @ExceptionHandler(CaseNotFoundException.class)
-    public ResponseEntity<Object> caseNotFoundUnauthorised(PinNotMatchException pinNotMatchException) {
-        return new ResponseEntity<>("NOT MATCH", new HttpHeaders(), HttpStatus.UNAUTHORIZED);
-    }
 }
