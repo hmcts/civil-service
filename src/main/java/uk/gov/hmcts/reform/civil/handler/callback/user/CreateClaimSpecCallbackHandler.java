@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -371,6 +372,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
         ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
+        dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
