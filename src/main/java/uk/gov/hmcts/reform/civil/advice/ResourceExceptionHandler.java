@@ -7,8 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
-import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
-import uk.gov.hmcts.reform.civil.service.search.exceptions.CaseNotFoundException;
 
 @Slf4j
 @ControllerAdvice

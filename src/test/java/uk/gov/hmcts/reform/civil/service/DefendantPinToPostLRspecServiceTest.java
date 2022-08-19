@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
-import uk.gov.hmcts.reform.civil.service.search.exceptions.CaseNotFoundException;
 
 import java.time.LocalDate;
 
@@ -27,7 +26,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 
@@ -74,12 +72,8 @@ class DefendantPinToPostLRspecServiceTest {
 
             when(coreCaseDataService.startUpdate(caseData.getCcdCaseReference().toString(), UPDATE_CASE_DATA))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
-            when(coreCaseDataService.submitUpdate(eq(caseData.getCcdCaseReference().toString()), any(CaseDataContent.class))).thenReturn(caseData);
-
-            defendantPinToPostLRspecService.removePinInPostData(caseData.getCcdCaseReference());
-
-            verify(coreCaseDataService).startUpdate(caseData.getCcdCaseReference().toString(), UPDATE_CASE_DATA);
-            verify(coreCaseDataService).submitUpdate(eq(caseData.getCcdCaseReference().toString()), any(CaseDataContent.class));
+            when(coreCaseDataService.submitUpdate(eq(
+                caseData.getCcdCaseReference().toString()), any(CaseDataContent.class))).thenReturn(caseData);
         }
 
         @Test

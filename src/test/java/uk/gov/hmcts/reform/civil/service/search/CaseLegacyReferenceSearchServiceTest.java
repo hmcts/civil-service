@@ -42,34 +42,37 @@ class CaseLegacyReferenceSearchServiceTest {
 
     private SearchResult searchResult;
 
-    private final String REFERENCE = "ABC";
-    private final Query EXPECTED_QUERY = new Query(boolQuery().must(matchQuery("data.legacyCaseReference", REFERENCE)), List.of(), 0);
+    private static final String REFERENCE = "ABC";
+    private static final Query EXPECTED_QUERY =
+        new Query(boolQuery().must(matchQuery("data.legacyCaseReference", REFERENCE)), List.of(), 0);
 
     @BeforeEach
-    private void setUp(){
+    private void setUp() {
         searchResult = mock(SearchResult.class);
         given(coreCaseDataService.searchCases(any())).willReturn(searchResult);
     }
+
     @Test
-    void shouldReturnCaseDataSuccessfully_whenCaseExits(){
+    void shouldReturnCaseDataSuccessfully_whenCaseExits() {
         CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
         CaseData caseData = CaseData.builder().build();
         given(searchResult.getCases()).willReturn(Arrays.asList(caseDetails));
         given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseData);
 
-       CaseData result = caseLegacyReferenceSearchService.getCaseDataByLegacyReference(REFERENCE);
+        CaseData result = caseLegacyReferenceSearchService.getCaseDataByLegacyReference(REFERENCE);
 
-       assertThat(result).isNotNull();
-       verify(coreCaseDataService).searchCases(refEq(EXPECTED_QUERY));
-       verify(caseDetailsConverter).toCaseData(caseDetails);
+        assertThat(result).isNotNull();
+        verify(coreCaseDataService).searchCases(refEq(EXPECTED_QUERY));
+        verify(caseDetailsConverter).toCaseData(caseDetails);
     }
 
     @Test
-    void shouldThrowException_whenCaseIsNotFound(){
+    void shouldThrowException_whenCaseIsNotFound() {
         given(searchResult.getCases()).willReturn(Collections.emptyList());
 
-        assertThrows(CaseNotFoundException.class,
-                     () -> caseLegacyReferenceSearchService.getCaseDataByLegacyReference(REFERENCE));
+        assertThrows(
+            CaseNotFoundException.class, () ->
+                caseLegacyReferenceSearchService.getCaseDataByLegacyReference(REFERENCE));
     }
 
 }

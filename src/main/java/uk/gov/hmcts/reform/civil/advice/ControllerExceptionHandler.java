@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.service.search.exceptions.CaseNotFoundException
 @Slf4j
 @ControllerAdvice
 public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
+
     @ExceptionHandler(CaseNotFoundException.class)
     public ResponseEntity<Object> caseNotFoundUnauthorised(CaseNotFoundException caseNotFoundException) {
         log.error(caseNotFoundException.getMessage());

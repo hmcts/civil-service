@@ -4,9 +4,6 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
-import uk.gov.hmcts.reform.ccd.client.model.Event;
-import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
@@ -15,6 +12,7 @@ import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchExceptio
 import uk.gov.hmcts.reform.civil.utils.AccessCodeGenerator;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
@@ -28,32 +26,27 @@ public class DefendantPinToPostLRspecService {
 
     public void checkPinValid(CaseData caseData, String pin) {
         DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
-        // Checking on the Pin entered valid
-        if(pinInPostData == null || !pinInPostData.getAccessCode().equals(pin) || pinInPostData.getExpiryDate().isBefore(LocalDate.now())){
+        if (pinInPostData == null || !pinInPostData.getAccessCode().equals(pin)
+            || pinInPostData.getExpiryDate().isBefore(LocalDate.now())) {
             log.error("pin not match for {}", caseData.getLegacyCaseReference());
             throw new PinNotMatchException();
         }
     }
 
-    public void removePinInPostData(Long caseId) {
+    public void removePinInPostData(Long caseId, DefendantPinToPostLRspec pinInPostData) {
         try {
-            var startEventResponse = coreCaseDataService.startUpdate(caseId.toString(), UPDATE_CASE_DATA);
-            coreCaseDataService.submitUpdate(caseId.toString(), removePinInPostDataContent(startEventResponse));
+            DefendantPinToPostLRspec updatePinInPostData = DefendantPinToPostLRspec.builder()
+                .citizenCaseRole(pinInPostData.getCitizenCaseRole())
+                .respondentCaseRole(pinInPostData.getRespondentCaseRole())
+                .expiryDate(pinInPostData.getExpiryDate()).build();
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("respondent1PinToPostLRspec", updatePinInPostData);
+            coreCaseDataService.triggerEvent(caseId, UPDATE_CASE_DATA, data);
         } catch (FeignException e) {
             log.error(String.format("Updating case data failed: %s", e.contentUTF8()));
             throw e;
         }
-    }
-
-    private CaseDataContent removePinInPostDataContent(StartEventResponse startEventResponse) {
-        Map<String, Object> data = startEventResponse.getCaseDetails().getData();
-        data.replace("respondent1PinToPostLRspec.accessCode", null);
-
-        return CaseDataContent.builder()
-            .eventToken(startEventResponse.getToken())
-            .event(Event.builder().id(startEventResponse.getEventId()).build())
-            .data(data)
-            .build();
     }
 
     public DefendantPinToPostLRspec buildDefendantPinToPost() {
