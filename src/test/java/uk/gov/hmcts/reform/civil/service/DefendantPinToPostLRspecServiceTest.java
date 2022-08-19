@@ -6,9 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -16,17 +13,16 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 
 @SpringBootTest(classes = {
@@ -65,15 +61,23 @@ class DefendantPinToPostLRspecServiceTest {
         @Test
         void shouldRunRemovePinInPostData_whenInvoked() {
             CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
+                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
+                                                   .accessCode("TEST1234")
+                                                   .expiryDate(LocalDate.now().plusDays(180))
+                                                   .build())
                 .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
                 .build();
 
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            DefendantPinToPostLRspec pinInPostData = DefendantPinToPostLRspec.builder()
+                .expiryDate(LocalDate.now().plusDays(180))
+                .build();
 
-            when(coreCaseDataService.startUpdate(caseData.getCcdCaseReference().toString(), UPDATE_CASE_DATA))
-                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
-            when(coreCaseDataService.submitUpdate(eq(
-                caseData.getCcdCaseReference().toString()), any(CaseDataContent.class))).thenReturn(caseData);
+            Map<String, Object> data = new HashMap<>();
+            data.put("respondent1PinToPostLRspec", pinInPostData);
+
+            defendantPinToPostLRspecService.removePinInPostData(caseData.getCcdCaseReference(), pinInPostData);
+
+            verify(coreCaseDataService).triggerEvent(caseData.getCcdCaseReference(), UPDATE_CASE_DATA, data);
         }
 
         @Test
