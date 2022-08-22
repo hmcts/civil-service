@@ -140,7 +140,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
-                CREATE_SDO
+                CREATE_SDO,
+                HEARING_SCHEDULED
             )
         ),
 
