@@ -26,7 +26,8 @@ public class DefendantPinToPostLRspecService {
 
     public void validatePin(CaseData caseData, String pin) {
         DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
-        if (pinInPostData == null || !pinInPostData.getAccessCode().equals(pin)
+        if (pinInPostData == null || pinInPostData.getAccessCode() == null
+            || !pinInPostData.getAccessCode().equals(pin)
             || pinInPostData.getExpiryDate().isBefore(LocalDate.now())) {
             log.error("pin not match for {}", caseData.getLegacyCaseReference());
             throw new PinNotMatchException();
