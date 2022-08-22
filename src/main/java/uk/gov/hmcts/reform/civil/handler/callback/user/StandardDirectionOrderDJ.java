@@ -140,6 +140,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 participantString = (caseData.getApplicant1().getPartyName() + " and " + caseData.getApplicant2()
                     .getPartyName() + " v " + caseData.getRespondent1().getPartyName());
                 break;
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                participantString = (caseData.getApplicant1().getPartyName() + " and " + caseData.getApplicant2()
+                    .getPartyName() + " v " + caseData.getRespondent1().getPartyName());
+                break;
+
             default:
                 throw new CallbackException(String.format("Invalid participants"));
         }
