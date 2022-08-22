@@ -124,29 +124,13 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     }
 
     public String caseParticipants(CaseData caseData) {
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        switch (multiPartyScenario) {
 
-            case ONE_V_ONE:
-                participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
-                    .getPartyName());
-                break;
-            case ONE_V_TWO_ONE_LEGAL_REP:
-                participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
-                    .getPartyName() + " and " + caseData.getRespondent2().getPartyName());
-                break;
-
-            case TWO_V_ONE:
-                participantString = (caseData.getApplicant1().getPartyName() + " and " + caseData.getApplicant2()
-                    .getPartyName() + " v " + caseData.getRespondent1().getPartyName());
-                break;
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                participantString = (caseData.getApplicant1().getPartyName() + " and " + caseData.getApplicant2()
-                    .getPartyName() + " v " + caseData.getRespondent1().getPartyName());
-                break;
-
-            default:
-                throw new CallbackException(String.format("Invalid participants"));
+        if (caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
+            participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
+                .getPartyName());
+        } else {
+            participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
+                .getPartyName() + " and " + caseData.getRespondent2().getPartyName());
         }
         return participantString;
 
