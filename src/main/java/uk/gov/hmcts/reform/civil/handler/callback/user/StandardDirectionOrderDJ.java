@@ -129,6 +129,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
                 .getPartyName() + " and " + caseData.getRespondent2().getPartyName());
 
+        } else if (caseData.getApplicant2() != null) {
+            participantString = (caseData.getApplicant1().getPartyName() + " and "
+                + caseData.getApplicant2().getPartyName() +" v " + caseData.getRespondent1()
+                .getPartyName());
+
         } else {
             participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
                 .getPartyName());
