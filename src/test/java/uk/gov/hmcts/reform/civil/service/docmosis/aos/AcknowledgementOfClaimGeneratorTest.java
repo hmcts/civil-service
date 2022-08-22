@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.CONTEST_JURISDICTION;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -108,6 +110,7 @@ class AcknowledgementOfClaimGeneratorTest {
             .solicitorReferences(caseData.getSolicitorReferences())
             .issueDate(caseData.getIssueDate())
             .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
+            .responseIntentions(DocmosisTemplateDataUtils.fetchResponseIntentionsDocmosisTemplate(caseData))
             .respondent(new ArrayList<>(List.of(
                 Party.builder()
                     .name(caseData.getRespondent1().getPartyName())
@@ -143,6 +146,7 @@ class AcknowledgementOfClaimGeneratorTest {
             .respondent2(PartyBuilder.builder().individual().build())
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(YES)
+            .respondent2ClaimResponseIntentionType(FULL_DEFENCE)
             .build();
 
         AcknowledgementOfClaimForm expectedDocmosisData = AcknowledgementOfClaimForm.builder()
@@ -151,6 +155,7 @@ class AcknowledgementOfClaimGeneratorTest {
             .solicitorReferences(caseData.getSolicitorReferences())
             .issueDate(caseData.getIssueDate())
             .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
+            .responseIntentions(DocmosisTemplateDataUtils.fetchResponseIntentionsDocmosisTemplate(caseData))
             .respondent(new ArrayList<>(List.of(
                 Party.builder()
                     .name(caseData.getRespondent1().getPartyName())
@@ -203,6 +208,7 @@ class AcknowledgementOfClaimGeneratorTest {
             .solicitorReferences(caseData.getSolicitorReferences())
             .issueDate(caseData.getIssueDate())
             .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
+            .responseIntentions(DocmosisTemplateDataUtils.fetchResponseIntentionsDocmosisTemplate(caseData))
             .respondent(new ArrayList<>(List.of(
                 Party.builder()
                     .name(caseData.getRespondent1().getPartyName())
@@ -265,6 +271,7 @@ class AcknowledgementOfClaimGeneratorTest {
             .solicitorReferences(caseData.getSolicitorReferences())
             .issueDate(caseData.getIssueDate())
             .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
+            .responseIntentions(DocmosisTemplateDataUtils.fetchResponseIntentionsDocmosisTemplate(caseData))
             .respondent(new ArrayList<>(List.of(
                 Party.builder()
                     .name(caseData.getRespondent2().getPartyName())
@@ -272,6 +279,57 @@ class AcknowledgementOfClaimGeneratorTest {
                     .representative(representative)
                     .litigationFriendName(
                         ofNullable(caseData.getRespondent2LitigationFriend())
+                            .map(LitigationFriend::getFullName)
+                            .orElse(""))
+                    .build()
+            )))
+            .build();
+
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+        verify(documentGeneratorService)
+            .generateDocmosisDocument(expectedDocmosisData, N11);
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM));
+        verify(documentGeneratorService).generateDocmosisDocument(
+            any(AcknowledgementOfClaimForm.class), eq(N11));
+    }
+
+    @Test
+    void shouldGenerateAcknowledgementOfClaim_when2v1DataIsProvided() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N11)))
+            .thenReturn(new DocmosisDocument(N11.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, ACKNOWLEDGEMENT_OF_CLAIM)))
+            .thenReturn(CASE_DOCUMENT);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .applicant2(PartyBuilder.builder().individual().build())
+            .respondent1AcknowledgeNotificationDate(null)
+            .addApplicant2(YES)
+            .respondent1ClaimResponseIntentionTypeApplicant2(CONTEST_JURISDICTION)
+            .respondentSolicitor2Reference("5678")
+            .solicitorReferences(SolicitorReferences.builder()
+                                     .applicantSolicitor1Reference("12345")
+                                     .respondentSolicitor1Reference("1234")
+                                     .build())
+
+            .build();
+        AcknowledgementOfClaimForm expectedDocmosisData = AcknowledgementOfClaimForm.builder()
+            .caseName("1 Mr. John Rambo & 2 Mr. John Rambo \nvs Mr. Sole Trader T/A Sole Trader co")
+            .referenceNumber(LEGACY_CASE_REFERENCE)
+            .solicitorReferences(caseData.getSolicitorReferences())
+            .issueDate(caseData.getIssueDate())
+            .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
+            .responseIntentions(DocmosisTemplateDataUtils.fetchResponseIntentionsDocmosisTemplate(caseData))
+            .respondent(new ArrayList<>(List.of(
+                Party.builder()
+                    .name(caseData.getRespondent1().getPartyName())
+                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                    .representative(representative)
+                    .litigationFriendName(
+                        ofNullable(caseData.getRespondent1LitigationFriend())
                             .map(LitigationFriend::getFullName)
                             .orElse(""))
                     .build()
