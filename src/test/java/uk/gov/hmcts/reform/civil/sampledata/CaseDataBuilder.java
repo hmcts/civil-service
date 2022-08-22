@@ -1333,6 +1333,20 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1() {
+        atStateClaimDetailsNotified();
+        changeOfRepresentation(false, false, "New-sol-id", "Previous-sol-id");
+        changeOfRepresentation.setFormerRepresentationEmailAddress("previous-solicitor@example.com");
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeLip() {
+        atStateClaimDetailsNotified();
+        changeOfRepresentation(false, false, "New-sol-id", "Lip");
+        changeOfRepresentation.setOrganisationToRemoveID(null);
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimIssued1v2AndSameRepresentative() {
         atStatePaymentSuccessful();
         respondent1Represented = YES;
@@ -2282,7 +2296,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atState1v2SameSolicitorDivergentResponse(RespondentResponseType respondent1Response,
-                                                       RespondentResponseType respondent2Response) {
+                                                                    RespondentResponseType respondent2Response) {
         atStateClaimDetailsNotified();
         respondent1ClaimResponseType = respondent1Response;
         respondent2Responds(respondent2Response);
@@ -2311,7 +2325,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atState1v2DivergentResponseSpec(RespondentResponseTypeSpec respondent1Response,
-                                                       RespondentResponseTypeSpec respondent2Response) {
+                                                           RespondentResponseTypeSpec respondent2Response) {
         respondent1ClaimResponseTypeForSpec = respondent1Response;
         respondent1ResponseDate = LocalDateTime.now().plusDays(1);
         respondent2RespondsSpec(respondent2Response);
@@ -2328,10 +2342,10 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addEnterBreathingSpace() {
         this.enter = BreathingSpaceEnterInfo.builder()
-                    .type(BreathingSpaceType.STANDARD)
-                    .reference("12345")
-                    .start(LocalDate.now())
-                    .build();
+            .type(BreathingSpaceType.STANDARD)
+            .reference("12345")
+            .start(LocalDate.now())
+            .build();
 
         this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
 
@@ -2340,10 +2354,10 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addEnterMentalHealthBreathingSpace() {
         this.enter = BreathingSpaceEnterInfo.builder()
-                    .type(BreathingSpaceType.MENTAL_HEALTH)
-                    .reference("12345")
-                    .start(LocalDate.now())
-                    .build();
+            .type(BreathingSpaceType.MENTAL_HEALTH)
+            .reference("12345")
+            .start(LocalDate.now())
+            .build();
 
         this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
 
@@ -2625,7 +2639,8 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atState1v2SameSolicitorDivergentResponseSpec(RespondentResponseTypeSpec respondent1Response,
-                                                                       RespondentResponseTypeSpec respondent2Response) {
+                                                                        RespondentResponseTypeSpec
+                                                                            respondent2Response) {
         atStateNotificationAcknowledged();
         respondent1ClaimResponseTypeForSpec = respondent1Response;
         respondent2RespondsSpec(respondent2Response);

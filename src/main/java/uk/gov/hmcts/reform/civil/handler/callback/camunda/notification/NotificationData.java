@@ -43,6 +43,14 @@ public interface NotificationData {
     String CLAIMANT_EMAIL = "ClaimantLegalOrgName";
     String LEGAL_ORG_APPLICANT1 = "legalOrgApplicant1";
 
+    //NoC
+    String CASE_NAME = "case name";
+    String ISSUE_DATE = "issue date";
+    String CCD_REF = "ccd reference code";
+    String NEW_SOL = "new solicitor";
+    String FORMER_SOL = "former solicitor";
+    String OTHER_SOL_NAME = "other solicitor name";
+
     Map<String, String> addProperties(CaseData caseData);
 
 }
