@@ -1424,12 +1424,12 @@ class EventHistoryMapperTest {
                     .dateReceived(caseData.getRespondent1ResponseDate())
                     .litigiousPartyID("002")
                     .build(),
-                Event.builder()
-                    .eventSequence(4)
-                    .eventCode("40")
-                    .dateReceived(caseData.getRespondent2ResponseDate())
-                    .litigiousPartyID("003")
-                    .build())
+                 Event.builder()
+                     .eventSequence(4)
+                     .eventCode("40")
+                     .dateReceived(caseData.getRespondent2ResponseDate())
+                     .litigiousPartyID("003")
+                     .build())
                 ;
             String respondent1MiscText =
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
@@ -1633,7 +1633,7 @@ class EventHistoryMapperTest {
                                               .preferredCourtName("")
                                               .build())
                             .build()
-                );
+            );
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
                     .eventSequence(5)
@@ -3089,17 +3089,17 @@ class EventHistoryMapperTest {
                 mapper.prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
 
             Event expectedReceiptOfAdmission = Event.builder()
-                .eventSequence(2)
-                .eventCode("40")
-                .dateReceived(caseData.getRespondent1ResponseDate())
-                .litigiousPartyID("002")
-                .build();
+                    .eventSequence(2)
+                    .eventCode("40")
+                    .dateReceived(caseData.getRespondent1ResponseDate())
+                    .litigiousPartyID("002")
+                    .build();
             Event expectedReceiptOfPartAdmission = Event.builder()
-                .eventSequence(4)
-                .eventCode("60")
-                .dateReceived(caseData.getRespondent2ResponseDate())
-                .litigiousPartyID("003")
-                .build();
+                    .eventSequence(4)
+                    .eventCode("60")
+                    .dateReceived(caseData.getRespondent2ResponseDate())
+                    .litigiousPartyID("003")
+                    .build();
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
                     .eventSequence(1)
@@ -3391,7 +3391,7 @@ class EventHistoryMapperTest {
                                       .miscText(respondent1MiscText)
                                       .build())
                     .build()
-                );
+            );
 
             var eventHistory = mapper.buildEvents(caseData);
 
@@ -3603,7 +3603,8 @@ class EventHistoryMapperTest {
                         .dateReceived(caseData.getRespondent1ResponseDate())
                         .eventDetailsText("RPA Reason: Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
                         .eventDetails(EventDetails.builder()
-                            .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
+                                          .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded:"
+                                                        + " FULL_ADMISSION")
                                           .build())
                         .build()
                 );
@@ -3659,7 +3660,8 @@ class EventHistoryMapperTest {
                         .dateReceived(caseData.getRespondent1ResponseDate())
                         .eventDetailsText("RPA Reason: Defendant: Mr. Sole Trader has responded: PART_ADMISSION")
                         .eventDetails(EventDetails.builder()
-                            .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded: PART_ADMISSION")
+                                          .miscText("RPA Reason: Defendant: Mr. Sole Trader has responded: "
+                                                        + "PART_ADMISSION")
                                           .build())
                         .build()
                 );
@@ -4147,7 +4149,7 @@ class EventHistoryMapperTest {
 
                 assertThat(eventHistory).isNotNull();
                 assertThat(eventHistory).extracting("defenceFiled").asList()
-                        .containsExactly(expectedDefence1, expectedDefence2);
+                    .containsExactly(expectedDefence1, expectedDefence2);
                 assertThat(eventHistory).extracting("replyToDefence").asList()
                     .containsExactly(expectedReplyToDefence);
                 assertThat(eventHistory).extracting("directionsQuestionnaireFiled")
