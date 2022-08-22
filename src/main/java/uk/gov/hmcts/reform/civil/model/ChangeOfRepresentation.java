@@ -26,5 +26,7 @@ public class ChangeOfRepresentation {
     private String caseRole;
     @JsonProperty("timestamp")
     private LocalDateTime timestamp;
+    @JsonProperty("formerRepresentationEmailAddress")
+    private String formerRepresentationEmailAddress;
 
 }

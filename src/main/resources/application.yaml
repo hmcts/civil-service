@@ -177,6 +177,8 @@ notifications:
   interimJudgmentRequestedDefendant: "d9e33565-ecdc-4475-a77b-e50cd4c07b61"
   interimJudgmentApprovalDefendant: "2e98fa16-ba9e-4229-b99f-fc72d40303f8"
 
+  noticeOfChangeFormerSolicitor: "de751f1b-9348-40be-b3c5-a275616a7cf5"
+  noticeOfChangeOtherParties: "80a327da-8124-40a5-bec4-fe0d64e28a91"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}

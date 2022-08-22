@@ -72,17 +72,21 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(updatedCaseData, updatedCaseDataBuilder);
 
         updatedCaseDataBuilder.businessProcess(BusinessProcess.ready(APPLY_NOC_DECISION))
-            .changeOfRepresentation(getChangeOfRepresentation(corFieldBeforeNoC));
+            .changeOfRepresentation(getChangeOfRepresentation(corFieldBeforeNoC, updatedCaseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseDataBuilder.build().toMap(objectMapper)).build();
     }
 
-    private ChangeOfRepresentation getChangeOfRepresentation(ChangeOrganisationRequest corFieldBeforeNoC) {
+    private ChangeOfRepresentation getChangeOfRepresentation(ChangeOrganisationRequest corFieldBeforeNoC,
+                                                             CaseData caseData) {
         ChangeOfRepresentation.ChangeOfRepresentationBuilder builder = ChangeOfRepresentation.builder()
+            .organisationToRemoveID(getChangedOrg(caseData, corFieldBeforeNoC))
             .organisationToAddID(corFieldBeforeNoC.getOrganisationToAdd().getOrganisationID())
             .caseRole(corFieldBeforeNoC.getCaseRoleId().getValue().getCode())
-            .timestamp(corFieldBeforeNoC.getRequestTimestamp());
+            .timestamp(corFieldBeforeNoC.getRequestTimestamp())
+            .formerRepresentationEmailAddress(
+                getFormerEmail(corFieldBeforeNoC.getCaseRoleId().getValue().getCode(), caseData));
 
         if (corFieldBeforeNoC.getOrganisationToRemove() != null) {
             builder.organisationToRemoveID(corFieldBeforeNoC.getOrganisationToRemove().getOrganisationID());
@@ -184,6 +188,17 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         return null;
     }
 
+    private String getFormerEmail(String caseRole, CaseData caseData) {
+        if (caseRole.equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName())) {
+            return caseData.getApplicantSolicitor1UserDetails().getEmail();
+        } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
+            return caseData.getRespondentSolicitor1EmailAddress();
+        } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
+            return caseData.getRespondentSolicitor2EmailAddress();
+        }
+        return null;
+    }
+
     private boolean isApplicant(String caseRole) {
         return caseRole.equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
     }
@@ -192,4 +207,36 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
+
+    /**
+     * Checks if the Change organisation request object has a null org to remove, then gets the organisation from
+     * caseData organisation copy, else returns the existing object in Change organisation request.
+     * @param caseData Case Data
+     * @param request Change Organisation Request
+     * @return string of org to remove id
+     */
+    public String getChangedOrg(CaseData caseData, ChangeOrganisationRequest request) {
+        String caseRole = request.getCaseRoleId().getValue().getCode();
+        if (request.getOrganisationToRemove() == null) {
+            if (!isApplicant(caseRole)) {
+                if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
+                    String respondent1OrganisationIDCopy = caseData.getRespondent1OrganisationIDCopy();
+                    if (respondent1OrganisationIDCopy != null) {
+                        return respondent1OrganisationIDCopy;
+                    }
+                } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
+                    String respondent2OrganisationIDCopy = caseData.getRespondent2OrganisationIDCopy();
+                    if (respondent2OrganisationIDCopy != null) {
+                        return respondent2OrganisationIDCopy;
+                    }
+                }
+            }
+        } else {
+            return request.getOrganisationToRemove().getOrganisationID();
+        }
+        return null;
+    }
 }
+//TODO something might be wrong with how im doing things since i merged and fuxked up the braches, check it still
+// works youve just pulled some changes so try make another case and see if its working now, if not check what else
+// is changed on the branch feat/civ-1616-noc-notificaitons
