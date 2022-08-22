@@ -1832,14 +1832,17 @@ public class EventHistoryMapper {
         }
     }
 
-    //How are we capturing the reason that it is dropped offline?
     private void buildSDONotDrawn(EventHistory.EventHistoryBuilder builder,
                                   CaseData caseData) {
 
         if (featureToggleService.isSDOEnabled()) {
-            String miscText = "RPA Reason: Case proceeds offline. "
-                + "Judge / Legal Advisor did not draw a Direction's Order: "
-                + caseData.getReasonNotSuitableSDO().getInput();
+
+            String miscText = left(format(
+                "RPA Reason: Case proceeds offline. "
+                    + "Judge / Legal Advisor did not draw a Direction's Order: %s",
+                caseData.getReasonNotSuitableSDO().getInput()
+            ), 250);
+
             LocalDateTime eventDate = time.now().toLocalDate().atStartOfDay();
 
             builder.miscellaneous(
