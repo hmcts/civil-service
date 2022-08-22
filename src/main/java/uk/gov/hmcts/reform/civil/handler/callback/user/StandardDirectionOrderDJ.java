@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
-import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -124,12 +123,13 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     }
 
     public String caseParticipants(CaseData caseData) {
-
-        if (caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
+        MultiPartyScenario multiPartyScenario  = getMultiPartyScenario(caseData);
+        if (multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+            || multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)) {
             participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
                 .getPartyName() + " and " + caseData.getRespondent2().getPartyName());
 
-        } else if (caseData.getApplicant2() != null) {
+        } else if (multiPartyScenario.equals(MultiPartyScenario.TWO_V_ONE)) {
             participantString = (caseData.getApplicant1().getPartyName() + " and "
                 + caseData.getApplicant2().getPartyName() +" v " + caseData.getRespondent1()
                 .getPartyName());
