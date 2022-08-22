@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class FastTrackPreferredTelephone {
+public class DisposalHearingAddNewDirections {
 
-    private String telephone;
+    private String directionComment;
 }
