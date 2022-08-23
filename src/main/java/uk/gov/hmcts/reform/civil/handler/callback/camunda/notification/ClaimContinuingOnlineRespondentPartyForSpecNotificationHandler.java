@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
@@ -37,6 +38,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private static final String respondToClaimUrl =  "https://moneyclaims.aat.platform.hmcts.net/first-contact/start";
     private static final String frontendBaseUrl =  "https://cmc-citizen-frontend-staging.service.core-compute-aat.internal";
 
+    private final DeadlinesCalculator deadlinesCalculator;
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final ObjectMapper objectMapper;
@@ -93,7 +95,9 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
             RESPOND_URL, respondToClaimUrl,
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             PIN, caseData.getRespondent1PinToPostLRspec().getAccessCode(),
-            RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1PinToPostLRspec().getExpiryDate(), DATE),
+            RESPONSE_DEADLINE, formatLocalDate(deadlinesCalculator
+                                                   .plus14DaysDeadline(caseData.getRespondent1ResponseDeadline())
+                                                   .toLocalDate(), DATE),
             FRONTEND_URL, frontendBaseUrl
         );
     }
