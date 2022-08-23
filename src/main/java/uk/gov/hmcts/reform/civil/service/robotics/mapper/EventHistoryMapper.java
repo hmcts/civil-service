@@ -1895,7 +1895,7 @@ public class EventHistoryMapper {
                 caseData.getReasonNotSuitableSDO().getInput()
             ), 250);
 
-            LocalDateTime eventDate = time.now().toLocalDate().atStartOfDay();
+            LocalDateTime eventDate = caseData.getUnsuitableSDODate();
 
             builder.miscellaneous(
                 Event.builder()

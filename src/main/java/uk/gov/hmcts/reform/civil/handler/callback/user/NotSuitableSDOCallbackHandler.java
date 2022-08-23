@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::addUnsuitableSDODate)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitNotSuitableSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -75,6 +77,17 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse addUnsuitableSDODate(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData().toBuilder()
+            .businessProcess(BusinessProcess.ready(CaseEvent.UNSUITABLE_FOR_SDO_JUDGE))
+            .unsuitableSDODate(LocalDateTime.now())
+            .build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 
