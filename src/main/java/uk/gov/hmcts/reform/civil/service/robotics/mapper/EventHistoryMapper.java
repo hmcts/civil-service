@@ -243,10 +243,11 @@ public class EventHistoryMapper {
                 }
             }
         }
-        buildInterlocutoryJudgment(builder, caseData);
-        buildMiscellaneousIJEvent(builder, caseData);
-        buildDefaultJudgment(builder, caseData);
         buildMiscellaneousDJEvent(builder, caseData);
+        buildMiscellaneousIJEvent(builder, caseData);
+        buildInterlocutoryJudgment(builder, caseData);
+        buildDefaultJudgment(builder, caseData);
+
         buildInformAgreedExtensionDateForSpec(builder, caseData);
         return eventHistorySequencer.sortEvents(builder.build());
     }
