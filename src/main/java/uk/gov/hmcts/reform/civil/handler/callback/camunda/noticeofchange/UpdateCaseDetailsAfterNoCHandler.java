@@ -246,27 +246,29 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
 
     private void updateSolicitorReferences(CaseData caseData,
                                            CaseData.CaseDataBuilder<?, ?> caseDataBuilder, String replacedCaseRole) {
-        SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
-        String applicantReference = replacedCaseRole.equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
-            ? null : solicitorReferences.getApplicantSolicitor1Reference();
+        if (caseData.getSolicitorReferences() != null) {
+            SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
+            String applicantReference = replacedCaseRole.equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
+                ? null : solicitorReferences.getApplicantSolicitor1Reference();
 
-        String respondent1Reference = replacedCaseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
-            ? null : solicitorReferences.getRespondentSolicitor1Reference();
+            String respondent1Reference = replacedCaseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                ? null : solicitorReferences.getRespondentSolicitor1Reference();
 
-        String respondent2Reference = replacedCaseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
-            ? null : solicitorReferences.getRespondentSolicitor2Reference();
+            String respondent2Reference = replacedCaseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                ? null : solicitorReferences.getRespondentSolicitor2Reference();
 
-        SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
-            .applicantSolicitor1Reference(applicantReference)
-            .respondentSolicitor1Reference(respondent1Reference)
-            .respondentSolicitor2Reference(respondent2Reference)
-            .build();
+            SolicitorReferences updatedSolicitorReferences = SolicitorReferences.builder()
+                .applicantSolicitor1Reference(applicantReference)
+                .respondentSolicitor1Reference(respondent1Reference)
+                .respondentSolicitor2Reference(respondent2Reference)
+                .build();
 
-        caseDataBuilder.solicitorReferences(updatedSolicitorReferences);
+            caseDataBuilder.solicitorReferences(updatedSolicitorReferences);
 
-        // only update if it's been created during acknowledge claim
-        if (caseData.getSolicitorReferencesCopy() != null) {
-            caseDataBuilder.solicitorReferencesCopy(updatedSolicitorReferences);
+            // only update if it's been created during acknowledge claim
+            if (caseData.getSolicitorReferencesCopy() != null) {
+                caseDataBuilder.solicitorReferencesCopy(updatedSolicitorReferences);
+            }  
         }
     }
 
