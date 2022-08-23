@@ -119,7 +119,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     // This is currently a mid event but once pre states are defined it should be moved to an about to start event.
     // Once it has been moved to an about to start event the following file will need to be updated:
-    //  FlowStateAllowedEventService.java.
+    // FlowStateAllowedEventService.java.
     // This way pressing previous on the ccd page won't end up calling this method again and thus
     // repopulating the fields if they have been changed.
     // There is no reason to add conditionals to avoid this here since having it as an about to start event will mean
