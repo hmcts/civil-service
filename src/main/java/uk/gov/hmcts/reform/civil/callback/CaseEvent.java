@@ -151,4 +151,5 @@ public enum CaseEvent {
     public boolean isCamundaEvent() {
         return this.getUserType() == CAMUNDA;
     }
+
 }
