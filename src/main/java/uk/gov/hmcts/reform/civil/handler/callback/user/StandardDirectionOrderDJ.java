@@ -131,7 +131,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
         } else if (multiPartyScenario.equals(MultiPartyScenario.TWO_V_ONE)) {
             participantString = (caseData.getApplicant1().getPartyName() + " and "
-                + caseData.getApplicant2().getPartyName() +" v " + caseData.getRespondent1()
+                + caseData.getApplicant2().getPartyName() + " v " + caseData.getRespondent1()
                 .getPartyName());
 
         } else {
