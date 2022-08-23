@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
@@ -18,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
@@ -29,6 +32,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Collections.singletonMap;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -36,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
@@ -57,6 +62,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
     private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
+    private final CoreCaseDataService coreCaseDataService;
+    private final PaymentsConfiguration paymentsConfiguration;
     private String participantString;
 
     @Override
@@ -103,6 +110,9 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
+
+        setSupplementaryData(caseData.getCcdCaseReference(), callbackParams);
+
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(getHeader(caseData))
             .confirmationBody(getBody(caseData))
@@ -171,16 +181,11 @@ public class DefaultJudgementHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.bothDefendants("One");
-        participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getDefendantDetails()
-            .getValue().getLabel());
-
         if (caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
             caseDataBuilder.bothDefendants(caseData.getDefendantDetails().getValue().getLabel());
-            participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
-                .getPartyName() + " and " + caseData.getRespondent2().getPartyName());
         }
 
-        caseDataBuilder.caseNameHmctsInternal(participantString);
+        caseDataBuilder.caseNameHmctsInternal(caseParticipants(caseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -287,6 +292,36 @@ public class DefaultJudgementHandler extends CallbackHandler {
             + " - " + location.getCourtAddress()
             + " - " + location.getPostcode();
         return locationLabel.equals(locationTempLabel);
+    }
+
+    private void setSupplementaryData(Long caseId, CallbackParams callbackParams) {
+        String authorisation = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        Map<String, Map<String, Map<String, Object>>> supplementaryDataCivil = new HashMap<>();
+        supplementaryDataCivil.put("supplementary_data_updates",
+                                   singletonMap("$set", singletonMap("HMCTSServiceId",
+                                                                     paymentsConfiguration.getSiteId())));
+        coreCaseDataService.setSupplementaryData(authorisation, caseId, supplementaryDataCivil);
+
+    }
+
+    public String caseParticipants(CaseData caseData) {
+        MultiPartyScenario multiPartyScenario  = getMultiPartyScenario(caseData);
+        if (multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+            || multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)) {
+            participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
+                .getPartyName() + " and " + caseData.getRespondent2().getPartyName());
+
+        } else if (multiPartyScenario.equals(MultiPartyScenario.TWO_V_ONE)) {
+            participantString = (caseData.getApplicant1().getPartyName() + " and "
+                + caseData.getApplicant2().getPartyName() + " v " + caseData.getRespondent1()
+                .getPartyName());
+
+        } else {
+            participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
+                .getPartyName());
+        }
+        return participantString;
+
     }
 
 }

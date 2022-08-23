@@ -114,31 +114,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-        caseDataBuilder.applicantVRespondentText(caseParticipants(caseData));
+        caseDataBuilder.applicantVRespondentText(caseData.getCaseNameHmctsInternal());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
-
-    }
-
-    public String caseParticipants(CaseData caseData) {
-        MultiPartyScenario multiPartyScenario  = getMultiPartyScenario(caseData);
-        if (multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
-            || multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)) {
-            participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
-                .getPartyName() + " and " + caseData.getRespondent2().getPartyName());
-
-        } else if (multiPartyScenario.equals(MultiPartyScenario.TWO_V_ONE)) {
-            participantString = (caseData.getApplicant1().getPartyName() + " and "
-                + caseData.getApplicant2().getPartyName() + " v " + caseData.getRespondent1()
-                .getPartyName());
-
-        } else {
-            participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
-                .getPartyName());
-        }
-        return participantString;
 
     }
 
