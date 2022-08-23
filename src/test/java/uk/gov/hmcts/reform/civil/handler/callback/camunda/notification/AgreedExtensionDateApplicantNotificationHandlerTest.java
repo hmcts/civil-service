@@ -25,11 +25,13 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.fetchDefendantName;
 
 @SpringBootTest(classes = {
     AgreedExtensionDateApplicantNotificationHandler.class,
@@ -198,7 +200,8 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 AGREED_EXTENSION_DATE, formatLocalDate(extensionDate, DATE),
-                PARTY_REFERENCES, buildPartiesReferences(caseData)
+                PARTY_REFERENCES, buildPartiesReferences(caseData),
+                DEFENDANT_NAME, fetchDefendantName(caseData)
             );
         }
 
