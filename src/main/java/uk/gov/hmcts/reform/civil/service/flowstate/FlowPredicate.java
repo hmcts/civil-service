@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import org.apache.commons.lang.StringUtils;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -388,6 +390,10 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> fullDefenceProceed = caseData ->
         getPredicateForClaimantIntentionProceed(caseData);
+
+    public static final Predicate<CaseData> takenOfflineSDONotDrawn = caseData ->
+         StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+            && caseData.getCcdState() == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 
     public static final Predicate<CaseData> fullDefenceNotProceed = caseData ->
         getPredicateForClaimantIntentionNotProceed(caseData);
