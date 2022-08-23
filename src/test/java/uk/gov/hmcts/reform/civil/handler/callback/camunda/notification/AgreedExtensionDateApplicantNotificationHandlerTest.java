@@ -14,9 +14,11 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -200,7 +202,7 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
-                    .respondentSolicitor1AgreedDeadlineExtension(LocalDate.now().minusDays(1))
+                    .respondent1TimeExtensionDate(LocalDateTime.now().minusDays(1))
                     .build();
 
                 expectedNotificationData = getNotificationDataMap(
@@ -222,7 +224,7 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
-                    .respondentSolicitor2AgreedDeadlineExtension(LocalDate.now().minusDays(1))
+                    .respondent2TimeExtensionDate(LocalDateTime.now().minusDays(1))
                     .build();
 
                 expectedNotificationData = getNotificationDataMap(
@@ -244,6 +246,7 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
                     .addRespondent2(YES)
+                    .respondent2(PartyBuilder.builder().individual().build())
                     .respondent2SameLegalRepresentative(YES)
                     .build();
 
