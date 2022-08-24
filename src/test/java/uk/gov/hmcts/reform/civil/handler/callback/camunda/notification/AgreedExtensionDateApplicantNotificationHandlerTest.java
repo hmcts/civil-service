@@ -25,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
@@ -208,6 +209,27 @@ class AgreedExtensionDateApplicantNotificationHandlerTest extends BaseCallbackHa
                 expectedNotificationData = getNotificationDataMap(
                     caseData.getRespondent2ResponseDeadline().toLocalDate()
                 );
+
+                invokeAboutToSubmitWithEvent("NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC");
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor2@example.com",
+                    templateId,
+                    expectedNotificationData,
+                    reference
+                );
+            }
+
+            @Test
+            void shouldNotifyWithCorrectExtensionDate_when1v2DSRespondentSolicitor1ExtendsFirst() {
+                caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledgedRespondent1TimeExtension()
+                    .respondent1(PartyBuilder.builder().individual().build())
+                    .addRespondent2(YES)
+                    .respondent2SameLegalRepresentative(NO)
+                    .respondent2(PartyBuilder.builder().soleTrader().build())
+                    .respondent1TimeExtensionDate(LocalDateTime.now().minusDays(1))
+                    .build();
 
                 invokeAboutToSubmitWithEvent("NOTIFY_RESPONDENT_SOLICITOR2_FOR_AGREED_EXTENSION_DATE_CC");
 
