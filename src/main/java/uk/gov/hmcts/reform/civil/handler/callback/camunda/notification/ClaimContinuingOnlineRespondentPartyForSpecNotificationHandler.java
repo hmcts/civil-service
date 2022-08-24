@@ -9,9 +9,11 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
@@ -34,14 +36,14 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RESPONDENT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC);
     public static final String TASK_ID_Respondent1 = "CreateClaimContinuingOnlineNotifyRespondent1ForSpec";
     private static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
-    private static final String respondToClaimUrl =  "https://moneyclaims.aat.platform.hmcts.net/first-contact/start";
-    private static final String frontendBaseUrl =  "https://cmc-citizen-frontend-staging.service.core-compute-aat.internal";
 
+    private final DeadlinesCalculator deadlinesCalculator;
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final ObjectMapper objectMapper;
     private final Time time;
     private final FeatureToggleService toggleService;
+    private final PinInPostConfiguration pipInPostConfiguration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -90,11 +92,13 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
-            RESPOND_URL, respondToClaimUrl,
+            RESPOND_URL, pipInPostConfiguration.getMoneyClaimUrl(),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             PIN, caseData.getRespondent1PinToPostLRspec().getAccessCode(),
-            RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1PinToPostLRspec().getExpiryDate(), DATE),
-            FRONTEND_URL, frontendBaseUrl
+            RESPONSE_DEADLINE, formatLocalDate(deadlinesCalculator
+                                                   .plus14DaysDeadline(caseData.getRespondent1ResponseDeadline())
+                                                   .toLocalDate(), DATE),
+            FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl()
         );
     }
 

@@ -13,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -33,6 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,6 +60,8 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_R
 public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
+    private DeadlinesCalculator deadlinesCalculator;
+    @MockBean
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
@@ -66,12 +71,12 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
     private FeatureToggleService toggleService;
     @MockBean
     private Time time;
+    @MockBean
+    private PinInPostConfiguration pinInPostConfiguration;
 
     @Autowired
     private ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler handler;
 
-    private static final String respondToClaimUrl =  "https://moneyclaims.aat.platform.hmcts.net/first-contact/start";
-    private static final String frontendBaseUrl =  "https://cmc-citizen-frontend-staging.service.core-compute-aat.internal";
     public static final String TASK_ID_Respondent1 = "CreateClaimContinuingOnlineNotifyRespondent1ForSpec";
 
     @org.junit.Test
@@ -83,13 +88,18 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
 
     @Nested
     class AboutToSubmitCallback {
+        private LocalDateTime responseDeadline;
 
         @BeforeEach
         void setup() {
+            responseDeadline = LocalDateTime.now().plusDays(14);
             when(notificationsProperties.getRespondentDefendantResponseForSpec())
                 .thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("test solicatior").build()));
+                .thenReturn(Optional.of(Organisation.builder().name("test solicitor").build()));
+            when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
+            when(pinInPostConfiguration.getMoneyClaimUrl()).thenReturn("dummy_respond_to_claim_url");
+            when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
         }
 
         @Test
@@ -121,7 +131,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
         }
 
         @Test
-        void shouldNotNotifyRespondent1Solicitor_whenNoEmailiIsEntered() {
+        void shouldNotNotifyRespondent1Solicitor_whenNoEmailIsEntered() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
                                  .build())
@@ -145,11 +155,13 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
                 RESPONDENT_NAME, "Mr. Sole Trader",
                 CLAIMANT_NAME, "Mr. John Rambo",
                 ISSUED_ON, formatLocalDate(LocalDate.now(), DATE),
-                RESPOND_URL, respondToClaimUrl,
+                RESPOND_URL, "dummy_respond_to_claim_url",
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 PIN, "TEST1234",
-                RESPONSE_DEADLINE, formatLocalDate(LocalDate.now().plusDays(180), DATE),
-                FRONTEND_URL, frontendBaseUrl
+                RESPONSE_DEADLINE, formatLocalDate(
+                    deadlinesCalculator.plus14DaysDeadline(caseData.getRespondent1ResponseDeadline())
+                        .toLocalDate(), DATE),
+                FRONTEND_URL, "dummy_cui_front_end_url"
             );
         }
     }
