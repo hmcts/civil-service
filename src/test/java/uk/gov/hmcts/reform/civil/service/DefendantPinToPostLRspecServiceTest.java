@@ -94,6 +94,46 @@ class DefendantPinToPostLRspecServiceTest {
                 PinNotMatchException.class,
                 () ->  defendantPinToPostLRspecService.validatePin(caseData, "TEST0000"));
         }
+
+        @Test
+        void shouldCheckPinNotValidNoAccessCode_whenInvoked() {
+            CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
+                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
+                                                   .expiryDate(LocalDate.now().plusDays(180))
+                                                   .build())
+                .build();
+
+            assertThrows(
+                PinNotMatchException.class,
+                () ->  defendantPinToPostLRspecService.validatePin(caseData, "TEST0000"));
+        }
+
+        @Test
+        void shouldCheckPinNotValidNoPinToPostObject_whenInvoked() {
+            CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
+                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .build();
+
+            assertThrows(
+                PinNotMatchException.class,
+                () ->  defendantPinToPostLRspecService.validatePin(caseData, "TEST1234"));
+        }
+
+        @Test
+        void shouldCheckPinNotValidPinExpired_whenInvoked() {
+            CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
+                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
+                                                   .accessCode("TEST1234")
+                                                   .expiryDate(LocalDate.now().minusDays(1))
+                                                   .build())
+                .build();
+
+            assertThrows(
+                PinNotMatchException.class,
+                () ->  defendantPinToPostLRspecService.validatePin(caseData, "TEST1234"));
+        }
     }
 
     private LocalDate getDate180days() {
