@@ -41,7 +41,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingMedicalEvi
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingQuestionsToExpertsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingSchedulesOfLossDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingStandardDisposalOrderDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingWitnessOfFactDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
@@ -463,7 +462,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DisposalHearingMedicalEvidenceDJ disposalHearingMedicalEvidenceDJ;
     private DisposalHearingQuestionsToExpertsDJ disposalHearingQuestionsToExpertsDJ;
     private DisposalHearingSchedulesOfLossDJ disposalHearingSchedulesOfLossDJ;
-    private DisposalHearingStandardDisposalOrderDJ disposalHearingStandardDisposalOrderDJ;
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private DisposalHearingBundleDJ disposalHearingBundleDJ;
     private DisposalHearingNotesDJ disposalHearingNotesDJ;

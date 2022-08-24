@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -55,6 +56,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     @MockBean
     private LocationRefDataService locationRefDataService;
+    @MockBean
+    private IdamClient idamClient;
 
     @Nested
     class AboutToStartCallback {
@@ -119,7 +122,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("disposalHearingJudgesRecitalDJ").extracting("input")
-                .isEqualTo("Upon considering the claim Form and Particulars of Claim/statements of case "
+                .isEqualTo("Upon considering the claim form and Particulars of Claim/statements of case "
                                + "[and the directions questionnaires] \n\n"
                                + "IT IS ORDERED that:-");
 
@@ -137,23 +140,32 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input2")
                 .isEqualTo("The provisions of CPR 32.6 apply to such evidence.");
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input3")
-                .isEqualTo("Any application by the defendant/s pursuant to CPR 32.7 must be made by 4pm on");
+                .isEqualTo("The claimant must upload to the Digital Portal copies of the "
+                               + "witness statements of all witnesses whose evidence they "
+                               + "wish the court to consider when deciding the amount of "
+                               + "damages by by 4pm on ");
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("date2")
-                .isEqualTo(LocalDate.now().plusWeeks(2).toString());
+                .isEqualTo(LocalDate.now().plusWeeks(4).toString());
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input4")
+                .isEqualTo("The provisions of CPR 32.6 apply to such evidence.");
+            assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input5")
+                .isEqualTo("Any application by the defendant/s pursuant to CPR 32.7 must be made by 4pm on");
+            assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("date3")
+                .isEqualTo(LocalDate.now().plusWeeks(2).toString());
+            assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input6")
                 .isEqualTo("and must be accompanied by proposed directions for allocation and listing for trial on "
                                + "quantum as cross-examination will result in the hearing exceeding the 30 minute "
                                + "maximum time estimate for a disposal hearing");
 
             assertThat(response.getData()).extracting("disposalHearingMedicalEvidenceDJ").extracting("input1")
-                .isEqualTo("The claimant has permission to rely upon the written expert evidence served with the "
-                               + "Particulars of Claim to be disclosed by 4pm");
+                .isEqualTo("The claimant has permission to rely upon the"
+                               + " written expert evidence already uploaded to"
+                               + " the Digital Portal with the particulars of "
+                               + "claim and in addition has permission to rely"
+                               + " upon any associated correspondence or "
+                               + "updating report which is uploaded to the "
+                               + "Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingMedicalEvidenceDJ").extracting("date1")
-                .isEqualTo(LocalDate.now().plusWeeks(4).toString());
-            assertThat(response.getData()).extracting("disposalHearingMedicalEvidenceDJ").extracting("input2")
-                .isEqualTo("and any associated correspondence and/or updating report disclosed not later than "
-                               + "4pm on the");
-            assertThat(response.getData()).extracting("disposalHearingMedicalEvidenceDJ").extracting("date2")
                 .isEqualTo(LocalDate.now().plusWeeks(4).toString());
 
             assertThat(response.getData()).extracting("disposalHearingQuestionsToExpertsDJ").extracting("date")
@@ -165,13 +177,20 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossDJ").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(10).toString());
             assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossDJ").extracting("input2")
-                .isEqualTo("The defendant, in the event of challenge, must send an up to date counter-schedule of loss"
-                               + " to the claimant by 4pm on the");
+                .isEqualTo("If the defendant wants to challenge this claim,"
+                               + " they must send an up-to-date "
+                               + "counter-schedule of loss to the "
+                               + "claimant by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossDJ").extracting("date2")
                 .isEqualTo(LocalDate.now().plusWeeks(12).toString());
+            assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossDJ").extracting("input3")
+                .isEqualTo("If the defendant wants to challenge the"
+                               + " sums claimed in the schedule of loss they"
+                               + " must upload to the Digital Portal an "
+                               + "updated counter schedule of loss by 4pm on");
+            assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossDJ").extracting("date3")
+                .isEqualTo(LocalDate.now().plusWeeks(12).toString());
 
-            assertThat(response.getData()).extracting("disposalHearingStandardDisposalOrderDJ").extracting("input")
-                .isEqualTo("input");
 
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingDJ").extracting("input")
                 .isEqualTo("This claim be listed for final disposal before a Judge on the first available date after.");
@@ -182,9 +201,11 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo("The claimant must lodge at court at least 7 days before the disposal");
 
             assertThat(response.getData()).extracting("disposalHearingNotesDJ").extracting("input")
-                .isEqualTo("This Order has been made without a hearing. Each party has the right to apply to have "
-                               + "this Order set aside or varied. Any such application must be received by the Court "
-                               + "(together with the appropriate fee) by 4pm on");
+                .isEqualTo("This order has been made without a hearing. Each "
+                               + "party has the right to apply to have this order set "
+                               + "aside or varied. Any such application must be uploaded "
+                               + "to the Digital Portal together with payment of any "
+                               + "appropriate fee, by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingNotesDJ").extracting("date")
                 .isEqualTo(LocalDate.now().plusWeeks(1).toString());
 

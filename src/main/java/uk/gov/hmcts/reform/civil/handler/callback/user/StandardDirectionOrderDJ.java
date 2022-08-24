@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingMedicalEvi
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingQuestionsToExpertsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingSchedulesOfLossDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingStandardDisposalOrderDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingWitnessOfFactDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
@@ -43,6 +42,7 @@ import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -76,6 +76,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public static final String ORDER_1_DEF = "%n%n ## Defendant 1 %n%n %s";
     public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
+    private String judgeNameTitle;
+    private final IdamClient idamClient;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -163,11 +165,14 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         DynamicList locationsList = getLocationsFromList(locations);
         caseDataBuilder.trialHearingMethodInPersonDJ(locationsList);
         caseDataBuilder.disposalHearingMethodInPersonDJ(locationsList);
+
+        //UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+
         //populates the disposal screen
         caseDataBuilder
             .disposalHearingJudgesRecitalDJ(DisposalHearingJudgesRecitalDJ
                                                            .builder()
-                                                           .input("Upon considering the claim Form and "
+                                                           .input("Upon considering the claim form and "
                                                                       + "Particulars of Claim/statements of case"
                                                                       + " [and the directions questionnaires] "
                                                                       + "\n\nIT IS ORDERED that:-").build());
@@ -190,10 +195,16 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                             + " on whose evidence reliance is to be placed by 4pm on")
                                                 .date1(LocalDate.now().plusWeeks(4))
                                                 .input2("The provisions of CPR 32.6 apply to such evidence.")
-                                                .input3("Any application by the defendant/s pursuant to CPR 32.7 "
+                                                .input3("The claimant must upload to the Digital Portal copies of the "
+                                                            + "witness statements of all witnesses whose evidence they "
+                                                            + "wish the court to consider when deciding the amount of "
+                                                            + "damages by by 4pm on ")
+                                                .date2(LocalDate.now().plusWeeks(4))
+                                                .input4("The provisions of CPR 32.6 apply to such evidence.")
+                                                .input5("Any application by the defendant/s pursuant to CPR 32.7 "
                                                             + "must be made by 4pm on")
-                                                .date2(LocalDate.now().plusWeeks(2))
-                                                .input4("and must be accompanied by proposed directions for "
+                                                .date3(LocalDate.now().plusWeeks(2))
+                                                .input6("and must be accompanied by proposed directions for "
                                                             + "allocation and listing for trial on quantum as"
                                                             + " cross-examination will result in the hearing "
                                                             + "exceeding the 30 minute maximum time estimate"
@@ -203,14 +214,14 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.disposalHearingMedicalEvidenceDJ(DisposalHearingMedicalEvidenceDJ
                                                              .builder()
                                                              .input1("The claimant has permission to rely upon the"
-                                                                         + " written expert evidence served with the"
-                                                                         + " Particulars of Claim to be disclosed "
-                                                                         + "by 4pm")
+                                                                     + " written expert evidence already uploaded to"
+                                                                     + " the Digital Portal with the particulars of "
+                                                                     + "claim and in addition has permission to rely"
+                                                                     + " upon any associated correspondence or "
+                                                                     + "updating report which is uploaded to the "
+                                                                     + "Digital Portal by 4pm on")
                                                              .date1(LocalDate.now().plusWeeks(4))
-                                                             .input2("and any associated correspondence and/or "
-                                                                         + "updating report disclosed not later "
-                                                                         + "than 4pm on the")
-                                                             .date2(LocalDate.now().plusWeeks(4))
+
                                                              .build());
 
         caseDataBuilder.disposalHearingQuestionsToExpertsDJ(DisposalHearingQuestionsToExpertsDJ
@@ -226,17 +237,17 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                          + " must send an up to date schedule of "
                                                                          + "loss to the defendant by 4pm on the")
                                                              .date1(LocalDate.now().plusWeeks(10))
-                                                             .input2("The defendant, in the event of challenge, "
-                                                                         + "must send an up to date counter-schedule "
-                                                                         + "of loss"
-                                                                         + " to the claimant by 4pm on the")
+                                                             .input2("If the defendant wants to challenge this claim,"
+                                                                         + " they must send an up-to-date "
+                                                                         + "counter-schedule of loss to the "
+                                                                         + "claimant by 4pm on")
                                                              .date2(LocalDate.now().plusWeeks(12))
+                                                             .input3("If the defendant wants to challenge the"
+                                                                         + " sums claimed in the schedule of loss they"
+                                                                         + " must upload to the Digital Portal an "
+                                                                         + "updated counter schedule of loss by 4pm on")
+                                                             .date3(LocalDate.now().plusWeeks(12))
                                                              .build());
-
-        caseDataBuilder.disposalHearingStandardDisposalOrderDJ(DisposalHearingStandardDisposalOrderDJ
-                                                                   .builder()
-                                                                   .input("input")
-                                                                   .build());
 
         caseDataBuilder.disposalHearingFinalDisposalHearingDJ(DisposalHearingFinalDisposalHearingDJ
                                                                   .builder()
@@ -254,11 +265,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
         caseDataBuilder.disposalHearingNotesDJ(DisposalHearingNotesDJ
                                                  .builder()
-                                                 .input("This Order has been made without a hearing. Each party "
-                                                            + "has the right to apply to have this Order"
-                                                            + " set aside or varied. Any such application must be "
-                                                            + "received by the Court"
-                                                            + " (together with the appropriate fee) by 4pm on")
+                                                 .input("This order has been made without a hearing. Each "
+                                                     + "party has the right to apply to have this order set "
+                                                     + "aside or varied. Any such application must be uploaded "
+                                                     + "to the Digital Portal together with payment of any "
+                                                     + "appropriate fee, by 4pm on")
                                                  .date(LocalDate.now().plusWeeks(1))
                                                  .build());
 
@@ -562,4 +573,5 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         }
         return DynamicList.builder().value(list.getValue()).build();
     }
+
 }

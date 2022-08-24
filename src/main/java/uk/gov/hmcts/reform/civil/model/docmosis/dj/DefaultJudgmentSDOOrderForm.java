@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingMedicalEvi
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingQuestionsToExpertsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingSchedulesOfLossDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingStandardDisposalOrderDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingWitnessOfFactDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
@@ -45,7 +44,6 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private final DisposalHearingMedicalEvidenceDJ disposalHearingMedicalEvidenceDJ;
     private final DisposalHearingQuestionsToExpertsDJ disposalHearingQuestionsToExpertsDJ;
     private final DisposalHearingSchedulesOfLossDJ disposalHearingSchedulesOfLossDJ;
-    private final DisposalHearingStandardDisposalOrderDJ disposalHearingStandardDisposalOrderDJ;
     private final DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private final DisposalHearingBundleDJ disposalHearingBundleDJ;
     private final DisposalHearingNotesDJ disposalHearingNotesDJ;
