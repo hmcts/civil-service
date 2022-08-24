@@ -182,7 +182,8 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 STANDARD_DIRECTION_ORDER_DJ,
-                CREATE_SDO
+                CREATE_SDO,
+                TAKE_CASE_OFFLINE
             )
         ),
         entry(
@@ -452,6 +453,7 @@ public class FlowStateAllowedEventService {
             TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED.fullName(),
             List.of(ADD_CASE_NOTE)
         )
+
     );
 
     private static final Map<String, List<CaseEvent>> ALLOWED_EVENTS_ON_FLOW_STATE_SPEC = Map.ofEntries(

@@ -232,7 +232,8 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL,
-                        STANDARD_DIRECTION_ORDER_DJ
+                        STANDARD_DIRECTION_ORDER_DJ,
+                        TAKE_CASE_OFFLINE
 
                     }
                 ),
