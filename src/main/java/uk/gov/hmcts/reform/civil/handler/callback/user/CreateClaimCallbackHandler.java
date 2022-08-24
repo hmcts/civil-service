@@ -323,7 +323,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         dataBuilder.claimStarted(null);
 
-        dataBuilder.caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+        dataBuilder.CaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
 
         if (toggleService.isNoticeOfChangeEnabled()) {
             // LiP are not represented or registered
