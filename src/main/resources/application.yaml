@@ -73,6 +73,11 @@ genApp:
   jrd:
     endpoint: /refdata/judicial/users/search
 
+pin-in-post:
+  money-claims:
+    url: https://moneyclaims.aat.platform.hmcts.net/first-contact/start
+  cui-front-end:
+    url: https://cmc-citizen-frontend-staging.service.core-compute-aat.internal
 
 payments:
   api:

@@ -13,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -70,12 +71,12 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
     private FeatureToggleService toggleService;
     @MockBean
     private Time time;
+    @MockBean
+    private PinInPostConfiguration pinInPostConfiguration;
 
     @Autowired
     private ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler handler;
 
-    private static final String respondToClaimUrl =  "https://moneyclaims.aat.platform.hmcts.net/first-contact/start";
-    private static final String frontendBaseUrl =  "https://cmc-citizen-frontend-staging.service.core-compute-aat.internal";
     public static final String TASK_ID_Respondent1 = "CreateClaimContinuingOnlineNotifyRespondent1ForSpec";
 
     @org.junit.Test
@@ -97,6 +98,8 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("test solicitor").build()));
             when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
+            when(pinInPostConfiguration.getMoneyClaimUrl()).thenReturn("dummy_respond_to_claim_url");
+            when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
         }
 
         @Test
@@ -152,13 +155,13 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
                 RESPONDENT_NAME, "Mr. Sole Trader",
                 CLAIMANT_NAME, "Mr. John Rambo",
                 ISSUED_ON, formatLocalDate(LocalDate.now(), DATE),
-                RESPOND_URL, respondToClaimUrl,
+                RESPOND_URL, "dummy_respond_to_claim_url",
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 PIN, "TEST1234",
                 RESPONSE_DEADLINE, formatLocalDate(
                     deadlinesCalculator.plus14DaysDeadline(caseData.getRespondent1ResponseDeadline())
                         .toLocalDate(), DATE),
-                FRONTEND_URL, frontendBaseUrl
+                FRONTEND_URL, "dummy_cui_front_end_url"
             );
         }
     }
