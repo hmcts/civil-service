@@ -244,7 +244,6 @@ public class EventHistoryMapper {
             }
         }
 
-
         buildInterlocutoryJudgment(builder, caseData);
         buildMiscellaneousIJEvent(builder, caseData);
         buildDefaultJudgment(builder, caseData);
