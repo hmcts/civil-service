@@ -122,15 +122,13 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
-                CREATE_SDO,
-                NotSuitable_SDO
+                CREATE_SDO
             )
         ),
 
         entry(
             CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-            List.of(ADD_CASE_NOTE, INITIATE_GENERAL_APPLICATION, CREATE_SDO,
-                    NotSuitable_SDO)
+            List.of(ADD_CASE_NOTE, INITIATE_GENERAL_APPLICATION, CREATE_SDO)
         ),
 
         entry(
