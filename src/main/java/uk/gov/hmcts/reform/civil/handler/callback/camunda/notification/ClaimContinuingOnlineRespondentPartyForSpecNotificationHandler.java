@@ -14,9 +14,11 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.notification.letter.BulkPrintService;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +39,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private static final String respondToClaimUrl =  "https://moneyclaims.aat.platform.hmcts.net/first-contact/start";
     private static final String frontendBaseUrl =  "https://cmc-citizen-frontend-staging.service.core-compute-aat.internal";
 
+    private final BulkPrintService bulkPrintService;
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final ObjectMapper objectMapper;
@@ -76,7 +79,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
         }
 
         // TODO Set Up for sending Mail
-        generatePIPLetter(callbackParams);
+        generatePIPLetter(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -98,12 +101,9 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
         );
     }
 
-    private void generatePIPLetter(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
-        //TODO: temp parameters, change
-        notificationService.sendLetter("", Collections.emptyMap() , caseData.getLegacyCaseReference());
+    private void generatePIPLetter(CaseData caseData) {
+        Map<String, Object> letterProperties = new HashMap<>(addProperties(caseData));
+        bulkPrintService.printLetter(letterProperties, notificationsProperties.getRespondentDefendantResponseForSpec());
     }
 
     private void generatePIPEmail(CaseData caseData) {

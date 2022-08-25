@@ -63,7 +63,7 @@ public class FeatureToggleService {
     }
 
     public boolean isPinInPostEnabled() {
-        return internalClient.boolVariation("pin-in-post", createLDUser().build(), false);
+        return internalClient.boolVariation("pin-in-post", createLDUser().build(), true);
     }
 
     private void close() {
