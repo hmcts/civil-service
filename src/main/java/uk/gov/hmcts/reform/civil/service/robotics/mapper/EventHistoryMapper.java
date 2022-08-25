@@ -242,6 +242,7 @@ public class EventHistoryMapper {
                     buildBreathingSpaceEvent(builder, caseData, MENTAL_HEALTH_BREATHING_SPACE_LIFTED, "Lifted");
                 }
             }
+
         }
 
         buildInterlocutoryJudgment(builder, caseData);
