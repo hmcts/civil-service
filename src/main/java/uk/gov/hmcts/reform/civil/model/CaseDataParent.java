@@ -274,4 +274,6 @@ public class CaseDataParent implements MappableObject {
      * Adding for PiP to citizen UI.
      */
     private final DefendantPinToPostLRspec respondent1PinToPostLRspec;
+
+    private final ScheduledHearing nextHearingDetails;
 }
