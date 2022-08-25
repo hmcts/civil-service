@@ -41,7 +41,6 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::prePopulateReasonNotSuitableSDODetailsPages)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitNotSuitableSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -50,21 +49,6 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
-    }
-
-    private CallbackResponse prePopulateReasonNotSuitableSDODetailsPages(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-
-        ReasonNotSuitableSDO tempReasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input("")
-            .build();
-
-        updatedData.reasonNotSuitableSDO(tempReasonNotSuitableSDO);
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
-            .build();
     }
 
     private CallbackResponse submitNotSuitableSDO(CallbackParams callbackParams) {
