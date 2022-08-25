@@ -314,8 +314,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     public String caseParticipants(CaseData caseData) {
         MultiPartyScenario multiPartyScenario  = getMultiPartyScenario(caseData);
-        if (caseData.getDefendantDetails().getValue()
-            .getLabel().startsWith("Both") && multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+        if (multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
             || multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)) {
             participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
                 .getPartyName() + " and " + caseData.getRespondent2().getPartyName());
