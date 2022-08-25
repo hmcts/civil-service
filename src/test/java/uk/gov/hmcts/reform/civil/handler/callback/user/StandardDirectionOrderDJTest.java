@@ -62,6 +62,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedResponse_WhenCase1v1() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .caseNameHmctsInternal("Mr. John Rambo v Mr. Sole Trader")
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
@@ -73,8 +74,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedResponse_WhenCase2v1() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                .multiPartyClaimTwoApplicants()
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .caseNameHmctsInternal("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader")
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
@@ -87,9 +88,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedResponse_WhenCase1v2() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
+                .caseNameHmctsInternal("Mr. John Rambo v Mr. Sole Trader and Mr. John Rambo")
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
