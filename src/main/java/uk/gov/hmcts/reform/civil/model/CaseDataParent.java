@@ -275,4 +275,6 @@ public class CaseDataParent implements MappableObject {
      */
     private final DefendantPinToPostLRspec respondent1PinToPostLRspec;
     private final String respondent1EmailAddress;
+
+    private final ScheduledHearing nextHearingDetails;
 }
