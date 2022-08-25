@@ -159,7 +159,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 PIN, "TEST1234",
                 RESPONSE_DEADLINE, formatLocalDate(
-                    deadlinesCalculator.plus14DaysDeadline(caseData.getRespondent1ResponseDeadline())
+                    caseData.getRespondent1ResponseDeadline()
                         .toLocalDate(), DATE),
                 FRONTEND_URL, "dummy_cui_front_end_url"
             );
