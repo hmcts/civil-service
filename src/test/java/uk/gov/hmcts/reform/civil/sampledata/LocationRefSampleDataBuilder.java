@@ -332,6 +332,7 @@ public class LocationRefSampleDataBuilder {
             LocationRefData.builder()
                 .epimmsId("444").siteName("A Site 3").courtAddress("Adr 3").postcode("AAA 111")
                 .courtLocationCode("court4").build()
+
         ));
     }
 }
