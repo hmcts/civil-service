@@ -117,14 +117,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             && YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
             updatedCaseData.applicant1ProceedWithClaim(YES);
         }
-        List<LocationRefData> locations = fetchLocationData(callbackParams);
-        updatedCaseData.applicant1DQ(caseData.getApplicant1DQ().toBuilder()
-                          .applicant1DQRequestedCourt(
-                              RequestedCourt.builder()
-                                  .responseCourtLocations(courtLocationUtils.getLocationsFromList(locations))
-                                  .build()
-                          )
-                          .build());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
@@ -201,10 +193,20 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private CallbackResponse populateCaseData(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
 
+        List<LocationRefData> locations = fetchLocationData(callbackParams);
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
             .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
             .superClaimType(SPEC_CLAIM)
+            .applicant1DQ(caseData.getApplicant1DQ().toBuilder()
+                              .applicant1DQRequestedCourt(
+                                  RequestedCourt.builder()
+                                      .reasonForHearingAtSpecificCourt("A reason")
+                                      .requestHearingAtSpecificCourt(YES)
+                                      .responseCourtLocations(courtLocationUtils.getLocationsFromList(locations))
+                                      .build()
+                              )
+                              .build())
             .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
