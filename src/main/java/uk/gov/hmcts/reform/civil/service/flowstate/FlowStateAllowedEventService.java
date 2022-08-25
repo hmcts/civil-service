@@ -425,8 +425,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
-                INITIATE_GENERAL_APPLICATION,
-                CREATE_SDO
+                INITIATE_GENERAL_APPLICATION
             )
         ),
         entry(
