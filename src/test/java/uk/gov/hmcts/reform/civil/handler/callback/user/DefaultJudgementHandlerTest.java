@@ -219,7 +219,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("Mr. John Rambo v Mr. Sole Trader");
+                .isEqualTo("Mr. John Rambo v Mr. Sole Trader and Mr. John Rambo");
         }
 
         @Nested
