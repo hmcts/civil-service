@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
@@ -21,8 +22,13 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+<<<<<<< HEAD
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
+=======
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+>>>>>>> b8e9a543d (feat/CIV-3178 unit tests expanded)
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
@@ -144,6 +150,97 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "Site 3 - Adr 3 - CCC 333"
             );
         }
+
+        @Test
+        void shouldPrePopulateDisposalHearingPageSpec1() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
+                .toBuilder()
+                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .build();
+            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                .willReturn(getSampleCourLocationsRefObject());
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            DynamicList dynamicList = getLocationDynamicListInPersonHearing(data);
+
+            assertThat(dynamicList).isNotNull();
+            assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
+                "Site 1 - Adr 1 - AAA 111",
+                "Site 2 - Adr 2 - BBB 222",
+                "Site 3 - Adr 3 - CCC 333"
+            );
+        }
+
+
+        @Test
+        void shouldPrePopulateDisposalHearingPageSpec2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
+                .toBuilder()
+                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQRequestedCourt(
+                                      RequestedCourt.builder()
+                                          .requestHearingAtSpecificCourt(YesOrNo.NO)
+                                          .build()
+                                  )
+                                  .build())
+                .build();
+            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                .willReturn(getSampleCourLocationsRefObject());
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            DynamicList dynamicList = getLocationDynamicListInPersonHearing(data);
+
+            assertThat(dynamicList).isNotNull();
+            assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
+                "Site 1 - Adr 1 - AAA 111",
+                "Site 2 - Adr 2 - BBB 222",
+                "Site 3 - Adr 3 - CCC 333"
+            );
+        }
+
+        @Test
+        void shouldPrePopulateDisposalHearingPageSpec3() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
+                .toBuilder()
+                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQRequestedCourt(
+                                      RequestedCourt.builder()
+                                          .requestHearingAtSpecificCourt(YesOrNo.YES)
+                                          .responseCourtCode("333")
+                                          .build()
+                                  )
+                                  .build())
+                .build();
+            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                .willReturn(getSampleCourLocationsRefObject());
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            DynamicList dynamicList = getLocationDynamicListInPersonHearing(data);
+
+            assertThat(dynamicList).isNotNull();
+            assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 1 - Adr 1 - AAA 111",
+                "Site 2 - Adr 2 - BBB 222"
+            );
+        }
     }
 
     @Nested
@@ -263,7 +360,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("disposalHearingBundle").extracting("input")
                 .isEqualTo("At least 7 days before the disposal hearing, "
-                                + "the claimant must upload to the Digital Portal");
+                               + "the claimant must upload to the Digital Portal");
 
             assertThat(response.getData()).extracting("disposalHearingNotes").extracting("input")
                 .isEqualTo("This Order has been made without a hearing. Each party has the right to apply to have"
