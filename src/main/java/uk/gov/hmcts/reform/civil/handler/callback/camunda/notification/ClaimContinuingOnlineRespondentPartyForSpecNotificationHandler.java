@@ -95,8 +95,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
             RESPOND_URL, pipInPostConfiguration.getMoneyClaimUrl(),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             PIN, caseData.getRespondent1PinToPostLRspec().getAccessCode(),
-            RESPONSE_DEADLINE, formatLocalDate(deadlinesCalculator
-                                                   .plus14DaysDeadline(caseData.getRespondent1ResponseDeadline())
+            RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline()
                                                    .toLocalDate(), DATE),
             FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl()
         );
