@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
@@ -61,6 +62,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -714,7 +716,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private List<String> setPreferredLocationFirst(List<LocationRefData> locations, CaseData caseData) {
         String locationLabel;
         if (caseData.getSuperClaimType() == SuperClaimType.SPEC_CLAIM) {
-            RequestedCourt courtRequest = caseData.getApplicant1DQ().getRequestedCourt();
+            RequestedCourt courtRequest = Optional.ofNullable(caseData.getApplicant1DQ())
+                .map(Applicant1DQ::getRequestedCourt).orElse(null);
             if (courtRequest != null && courtRequest.getRequestHearingAtSpecificCourt() == YesOrNo.YES) {
                 locationLabel = courtRequest.getResponseCourtCode();
             } else {
