@@ -135,7 +135,7 @@ notifications:
   solicitorDefendantResponseCaseTakenOffline: "e41ab7af-71ab-4e87-a636-25c134a2d11d"
   claimantSolicitorDefendantResponseFullDefence: "27040d5f-8e43-4a00-b6dc-bcd3b21b66bc"
   solicitorDefendantResponseCaseTakenOfflineMultiparty: "7e1e7b92-84aa-4231-92c1-a61516e93c31"
-  respondentSolicitorAcknowledgeClaim: "b06244fd-f24d-4181-8171-1e440fab447e"
+  respondentSolicitorAcknowledgeClaim: "b7ade9ca-da8b-4605-a296-ccee3d7d7a93"
   failedPayment: "b7b98d09-6794-4d8d-8550-cc219c91ee8c"
   solicitorClaimDismissed: "e2f1d745-979e-43e6-9f50-e35bb30c88c1"
   claimantSolicitorCaseWillProgressOffline: "d004304d-a7f4-4440-a13b-753cb2d57a74"
@@ -281,6 +281,7 @@ robotics:
     sender: hmcts.civil@gmail.com
     recipient: hmcts.civil.multiparty.robotics@gmail.com
     multipartyrecipient: hmcts.civil.multiparty.robotics@gmail.com
+    specRecipient: hmcts.civil.multiparty.robotics@gmail.com
 ---
 
 spring:

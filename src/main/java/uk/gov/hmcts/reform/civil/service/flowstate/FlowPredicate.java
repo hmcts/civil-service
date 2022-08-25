@@ -38,7 +38,7 @@ public class FlowPredicate {
             || caseData.getAddRespondent2() == NO
             || (caseData.getAddRespondent2() == YES && caseData.getRespondent2SameLegalRepresentative() == YES));
 
-    public static final Predicate<CaseData> claimSubmittedTwoRespondentRepresentatives = caseData ->
+    public static final Predicate<CaseData> claimSubmittedTwoRegisteredRespondentRepresentatives = caseData ->
         caseData.getSubmittedDate() != null
             && caseData.getAddRespondent2() == YES
             && caseData.getRespondent2SameLegalRepresentative() == NO
@@ -46,6 +46,15 @@ public class FlowPredicate {
             && caseData.getRespondent2Represented() == YES
             && caseData.getRespondent1OrgRegistered() == YES
             && caseData.getRespondent2OrgRegistered() == YES;
+
+    public static final Predicate<CaseData> claimSubmittedTwoRespondentRepresentativesOneUnregistered = caseData ->
+        caseData.getSubmittedDate() != null
+            && caseData.getAddRespondent2() == YES
+            && caseData.getRespondent2SameLegalRepresentative() == NO
+            && caseData.getRespondent1Represented() == YES
+            && caseData.getRespondent2Represented() == YES
+            && ((caseData.getRespondent1OrgRegistered() == YES && caseData.getRespondent2OrgRegistered() == NO)
+            || (caseData.getRespondent2OrgRegistered() == YES && caseData.getRespondent1OrgRegistered() == NO));
 
     // have to use this for now because cannot use featureToggleService.isNoticeOfChangeEnabled() as predicate
     public static final Predicate<CaseData> noticeOfChangeEnabledAndLiP = caseData ->
@@ -72,7 +81,7 @@ public class FlowPredicate {
     public static final Predicate<CaseData> claimSubmittedOneUnrepresentedDefendantOnly = caseData ->
         caseData.getSubmittedDate() != null
             && caseData.getRespondent1Represented() == NO
-            && caseData.getAddRespondent2() == NO;
+            && caseData.getAddRespondent2() != YES;
 
     public static final Predicate<CaseData> claimSubmittedRespondent1Unrepresented = caseData ->
         caseData.getSubmittedDate() != null

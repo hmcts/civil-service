@@ -30,11 +30,8 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgementDeductionValu
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingPreferredEmail;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingPreferredTelephone;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
@@ -45,8 +42,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPreferredEmail;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPreferredTelephone;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
@@ -58,8 +53,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredEmail;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsPreferredTelephone;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
@@ -153,8 +146,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         setCheckList(updatedData, checkList);
 
         DisposalHearingJudgesRecital tempDisposalHearingJudgesRecital = DisposalHearingJudgesRecital.builder()
-            .input("Upon considering the claim Form and Particulars of Claim/statements of case"
-                       + " [and the directions questionnaires] \n\nIT IS ORDERED that:-")
+            .input("Upon considering the claim form, particulars of claim, statements of case"
+                       + " and Directions questionnaires")
             .build();
 
         updatedData.disposalHearingJudgesRecital(tempDisposalHearingJudgesRecital).build();
@@ -172,9 +165,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         DisposalHearingDisclosureOfDocuments tempDisposalHearingDisclosureOfDocuments =
             DisposalHearingDisclosureOfDocuments.builder()
-            .input("The parties shall serve on each other copies of the documents upon which reliance is to be"
+            .input1("The parties shall serve on each other copies of the documents upon which reliance is to be"
                        + " placed at the disposal hearing by 4pm on")
-            .date(LocalDate.now().plusWeeks(4))
+            .date1(LocalDate.now().plusWeeks(4))
+            .input2("The parties must upload to the Digital Portal copies of those documents which they wish the"
+                       + "court to consider when deciding the amount of damages, by 4pm on")
+            .date2(LocalDate.now().plusWeeks(4))
             .build();
 
         updatedData.disposalHearingDisclosureOfDocuments(tempDisposalHearingDisclosureOfDocuments).build();
@@ -184,21 +180,26 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + " on whose evidence reliance is to be placed by 4pm on")
             .date1(LocalDate.now().plusWeeks(4))
             .input2("The provisions of CPR 32.6 apply to such evidence.")
-            .input3("Any application by the defendant/s pursuant to CPR 32.7 must be made by 4pm on")
-            .date2(LocalDate.now().plusWeeks(2))
-            .input4("and must be accompanied by proposed directions for allocation and listing for trial on quantum as"
-                        + " cross-examination will result in the hearing exceeding the 30 minute maximum time estimate"
-                        + " for a disposal hearing")
+            .input3("The claimant must upload to the Digital Portal copies of the witness statements of all witnesses"
+                        + " whose evidence they wish the court to consider "
+                        + "when deciding the amount of damages by 4pm on")
+            .date2(LocalDate.now().plusWeeks(4))
+            .input4("The provisions of CPR 32.6 apply to such evidence.")
+            .input5("Any application by the defendant pursuant to CPR 32.7 must be made by 4pm on")
+            .date3(LocalDate.now().plusWeeks(6))
+            .input6("and must be accompanied by proposed directions for allocation and listing for trial on quantum. "
+                        + "This is because cross-examination will cause the hearing to exceed the 30-minute "
+                        + "maximum time estimate for a disposal hearing.")
             .build();
 
         updatedData.disposalHearingWitnessOfFact(tempDisposalHearingWitnessOfFact).build();
 
         DisposalHearingMedicalEvidence tempDisposalHearingMedicalEvidence = DisposalHearingMedicalEvidence.builder()
-            .input1("The claimant has permission to rely upon the written expert evidence served with the"
-                        + " Particulars of Claim to be disclosed by 4pm")
-            .date1(LocalDate.now().plusWeeks(4))
-            .input2("and any associated correspondence and/or updating report disclosed not later than 4pm on the")
-            .date2(LocalDate.now().plusWeeks(4))
+            .input("The claimant has permission to rely upon the written expert evidence already uploaded to the"
+                        + " Digital Portal with the particulars of claim and in addition has permission to rely upon"
+                        + " any associated correspondence or updating report which is uploaded to the Digital Portal"
+                        + " by 4pm on")
+            .date(LocalDate.now().plusWeeks(4))
             .build();
 
         updatedData.disposalHearingMedicalEvidence(tempDisposalHearingMedicalEvidence).build();
@@ -212,71 +213,48 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         DisposalHearingSchedulesOfLoss tempDisposalHearingSchedulesOfLoss = DisposalHearingSchedulesOfLoss.builder()
             .input1("If there is a claim for ongoing/future loss in the original schedule of losses then the claimant"
-                        + " must send an up to date schedule of loss to the defendant by 4pm on the")
+                        + " must send an up to date schedule of loss to the defendant by 4pm on")
             .date1(LocalDate.now().plusWeeks(10))
-            .input2("The defendant, in the event of challenge, must send an up to date counter-schedule of loss"
-                        + " to the claimant by 4pm on the")
-            .date2(LocalDate.now().plusWeeks(12))
+            .input2("If there is a claim for ongoing or future loss in the original schedule of losses, the claimant"
+                        + " must upload to the Digital Portal an up-to-date schedule of loss by 4pm on")
+            .date2(LocalDate.now().plusWeeks(10))
+            .input3("If the defendant wants to challenge this claim, "
+                        + "they must send an up-to-date counter-schedule of loss to the claimant by 4pm on")
+            .date3(LocalDate.now().plusWeeks(12))
+            .input4("If the defendant want to challenge the sums claimed in the schedule of loss they must upload"
+                        + " to the Digital Portal an updated counter schedule of loss by 4pm on")
+            .date4(LocalDate.now().plusWeeks(12))
             .build();
 
         updatedData.disposalHearingSchedulesOfLoss(tempDisposalHearingSchedulesOfLoss).build();
 
-        DisposalHearingStandardDisposalOrder tempDisposalHearingStandardDisposalOrder =
-            DisposalHearingStandardDisposalOrder.builder()
-            .input("input")
-            .build();
-
-        updatedData.disposalHearingStandardDisposalOrder(tempDisposalHearingStandardDisposalOrder).build();
-
         DisposalHearingFinalDisposalHearing tempDisposalHearingFinalDisposalHearing =
             DisposalHearingFinalDisposalHearing.builder()
-            .input("This claim be listed for final disposal before a Judge on the first available date after.")
-            .date(LocalDate.now().plusWeeks(16))
-            .build();
+                .input("This claim will be listed for final disposal before a judge on the first available date after")
+                .date(LocalDate.now().plusWeeks(16))
+                .build();
 
         updatedData.disposalHearingFinalDisposalHearing(tempDisposalHearingFinalDisposalHearing).build();
 
         HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ();
 
-        String preferredTelephone = hearingSupportRequirementsDJ != null
-            ? hearingSupportRequirementsDJ.getHearingPreferredTelephoneNumber1() : "N/A";
-
-        DisposalHearingPreferredTelephone tempDisposalHearingPreferredTelephone = DisposalHearingPreferredTelephone
-            .builder()
-            .telephone(preferredTelephone)
-            .build();
-
-        updatedData.disposalHearingPreferredTelephone(tempDisposalHearingPreferredTelephone).build();
-
-        String preferredEmail = hearingSupportRequirementsDJ != null
-            ? hearingSupportRequirementsDJ.getHearingPreferredEmail() : "N/A";
-
-        DisposalHearingPreferredEmail tempDisposalHearingPreferredEmail = DisposalHearingPreferredEmail
-            .builder()
-            .email(preferredEmail)
-            .build();
-
-        updatedData.disposalHearingPreferredEmail(tempDisposalHearingPreferredEmail).build();
-
         DisposalHearingBundle tempDisposalHearingBundle = DisposalHearingBundle.builder()
-            .input("The claimant must lodge at court at least 7 days before the disposal")
+            .input("At least 7 days before the disposal hearing, the claimant must upload to the Digital Portal")
             .build();
 
         updatedData.disposalHearingBundle(tempDisposalHearingBundle).build();
 
         DisposalHearingNotes tempDisposalHearingNotes = DisposalHearingNotes.builder()
             .input("This Order has been made without a hearing. Each party has the right to apply to have this Order"
-                       + " set aside or varied. Any such application must be received by the Court"
-                       + " (together with the appropriate fee) by 4pm on")
+                       + " set aside or varied. Any such application must be uploaded to the Digital Portal"
+                       + " together with the appropriate fee, by 4pm on")
             .date(LocalDate.now().plusWeeks(1))
             .build();
 
         updatedData.disposalHearingNotes(tempDisposalHearingNotes).build();
 
         FastTrackJudgesRecital tempFastTrackJudgesRecital = FastTrackJudgesRecital.builder()
-            .input("District Judge Perna has considered the statements of case and the information provided by the "
-                       + "parties,"
-                       + " \n\nIT IS ORDERED that:-")
+            .input("Upon considering the statements of case and the information provided by the parties,")
             .build();
 
         updatedData.fastTrackJudgesRecital(tempFastTrackJudgesRecital).build();
@@ -291,185 +269,194 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
 
         FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
-            .input1("By serving a list with a disclosure statement by 4pm on")
+            .input1("Documents will be disclosed by uploading to the Digital Portal a list with a disclosure "
+                        + "statement by 4pm on ")
             .date1(LocalDate.now().plusWeeks(4))
-            .input2("Any request to inspect or for a copy of a document shall be made by 4pm on")
+            .input2("Any request to inspect a document, or for a copy of a document, shall be made directly to "
+                        + "the other party by 4pm on ")
             .date2(LocalDate.now().plusWeeks(6))
-            .input3("and complied with within 7 days of receipt of the request.")
-            .input4("Each party must serve and file with the court a list of issues relevant to the search for and "
-                        + "disclosure of electronically stored documents, or must confirm there are no such issues, "
-                        + "following Civil Procedure Rule Practise Direction 31B.")
-            .input5("By 4pm on")
+            .input3("Requests will be complied with within 7 days of the receipt of the request.")
+            .input4("Each party must upload to the Digital Portal copies of those documents on which they wish to"
+                        + " rely at trial by 4pm on")
             .date3(LocalDate.now().plusWeeks(4))
             .build();
 
         updatedData.fastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments).build();
 
         FastTrackWitnessOfFact tempFastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
-            .input1("Each party shall serve on every other party the witness statements of all "
-                        + "witnesses of fact on whom he intends to rely")
-            .input2("All statements to be no more than")
+            .input1("Each party must upload to the Digital Portal copies of the statements of all witnesses of "
+                        + "fact on whom they intend to rely. This is limited to ")
+            .input2("")
             .input3("")
-            .input4("pages long, A4, double spaced and in font size 12.")
-            .input5("There shall be simultaneous exchange of such statements by 4pm on")
+            .input4("For this limitation, a party is counted as a witness.")
+            .input5("Each witness statement should be no more than ")
+            .input6("")
+            .input7("A4 pages. Statements should be double spaced using a font size of 12.")
+            .input8("Witness statements shall be uploaded to the Digital Portal by 4pm on")
             .date(LocalDate.now().plusWeeks(8))
-            .input6("Oral evidence will not be permitted at trail from a witness whose statement has not been served "
-                        + "in accordance with this order or has been served late, except with "
-                        + "permission from the Court.")
+            .input9("Oral evidence will only be permitted at trial with permission from the Court from witnesses"
+                        + " whose statements have not been uploaded to the Digital Portal in accordance with this "
+                        + "order, or whose statements that have been served late.")
             .build();
 
         updatedData.fastTrackWitnessOfFact(tempFastTrackWitnessOfFact).build();
 
         FastTrackSchedulesOfLoss tempFastTrackSchedulesOfLoss = FastTrackSchedulesOfLoss.builder()
-            .input1("The claimant shall serve an updated schedule of loss on the defendant(s) by 4pm on")
+            .input1("The claimant must upload to the Digital Portal an up-to-date schedule of loss to the "
+                        + "defendant by 4pm on ")
             .date1(LocalDate.now().plusWeeks(10))
-            .input2("The defendant(s) shall serve a counter schedule on the Claimant by 4pm on")
+            .input2("If the defendant wants to challenge this claim, upload to the Digital Portal "
+                        + "counter-schedule of loss by 4pm on ")
             .date2(LocalDate.now().plusWeeks(12))
-            .input3("If there is a claim for future pecuniary loss and the parties have not already set out their case "
-                        + "on periodical payments, then they must do so in the respective schedule "
-                        + "and counter-schedule.")
+            .input3("If there is a claim for future pecuniary loss and the parties have not already set out "
+                        + "their case on periodical payments, they must do so in the respective schedule and "
+                        + "counter-schedule.")
             .input4("Upon it being noted that the schedule of loss contains no claim for continuing loss and is "
-                        + "therefore final, no further schedule of loss shall be served without permission to amend. "
-                        + "The defendant shall file a counter-schedule of loss by 4pm on")
+                        + "therefore final, no further schedule of loss shall be uploaded without permission to amend. "
+                        + "The defendant shall upload to the Digital Portal an up-to-date counter schedule of loss by "
+                        + "4pm on ")
             .date3(LocalDate.now().plusWeeks(12))
             .build();
 
         updatedData.fastTrackSchedulesOfLoss(tempFastTrackSchedulesOfLoss).build();
 
         FastTrackTrial tempFastTrackTrial = FastTrackTrial.builder()
-            .input1("The time provisionally allowed for the trial is")
+            .input1("The time provisionally allowed for this trial is ")
             .date1(LocalDate.now().plusWeeks(22))
             .date2(LocalDate.now().plusWeeks(30))
             .input2("If either party considers that the time estimate is insufficient, they must inform the court "
-                        + "within 7 days of the date of this Order.")
-
-            .input3("Not more than seven nor less than three clear days before the trial, "
-                        + "the claimant must file at court and serve an indexed and paginated bundle of "
-                        + "documents which complies with the requirements of Rule 39.5 Civil Procedure Rules and "
-                        + "Practice Direction 39A. The parties must endeavour to agree the contents of the bundle "
-                        + "before it is filed. the bundle will include a case summary and a chronology.")
+                        + "within 7 days of the date stated on this order.")
+            .input3("At least 7 days before the trial, the claimant must upload to the Digital Portal an indexed"
+                        + " bundle of documents, with each page clearly numbered / an electronic bundle of digital "
+                        + "documents / a case summary containing no more than 500 words.")
             .build();
 
         updatedData.fastTrackTrial(tempFastTrackTrial).build();
 
         FastTrackNotes tempFastTrackNotes = FastTrackNotes.builder()
             .input("This Order has been made without a hearing. Each party has the right to apply to have this Order "
-                        + "set aside or varied. Any such application must be received by the Court "
-                        + "(together with the appropriate fee) by 4pm on")
+                        + "set aside or varied. Any application must be received by the Court, "
+                        + "together with the appropriate fee by 4pm on")
             .date(LocalDate.now().plusWeeks(1))
             .build();
 
         updatedData.fastTrackNotes(tempFastTrackNotes).build();
 
         FastTrackBuildingDispute tempFastTrackBuildingDispute = FastTrackBuildingDispute.builder()
-            .input1("The claimant must prepare a Scott Schedule of the defects, items of damage "
+            .input1("The claimant must prepare a Scott Schedule of the defects, items of damage, "
                         + "or any other relevant matters")
-            .input2("The column headings will be as follows: Item; Alleged Defect; claimant's Costing; "
-                        + "defendant's Response; defendant's Costing; Reserved for Judge's Use")
-            .input3("The claimant must serve the Scott Schedule with the relevant columns completed by 4pm on")
+            .input2("The columns should be headed:\n"
+                        + "•Item\n"
+                        + "•Alleged defect\n"
+                        + "•Claimant’s costing\n"
+                        + "•Defendant’s response\n"
+                        + "•Defendant’s costing\n"
+                        + "•Reserved for Judge’s use")
+            .input3("The claimant must upload to the Digital Portal the Scott Schedule with the relevant columns"
+                        + " completed by 4pm on ")
             .date1(LocalDate.now().plusWeeks(10))
-            .input4("The defendant must file and serve the Scott Schedule with the relevant columns "
-                        + "in response completed by 4pm on")
+            .input4("The defendant must upload to the Digital Portal an amended version of the Scott Schedule "
+                        + "with the relevant columns in response completed by 4pm on ")
             .date2(LocalDate.now().plusWeeks(12))
             .build();
 
         updatedData.fastTrackBuildingDispute(tempFastTrackBuildingDispute).build();
 
         FastTrackClinicalNegligence tempFastTrackClinicalNegligence = FastTrackClinicalNegligence.builder()
-            .input1("Documents are to be retained as follows:")
-            .input2("the parties must retain all electronically stored documents relating to the issues in this Claim.")
-            .input3("the defendant must retain the original clinical notes relating to the issues in this Claim. "
-                        + "The defendant must give facilities for inspection by the claimant, "
-                        + "the claimant's legal advisers and experts of these original notes on 7 days written notice.")
-            .input4("Legible copies of the medical and educational records of the claimant / Deceased / "
-                        + "claimant's Mother are to be placed in a separate paginated bundle by the "
-                        + "claimant's Solicitors and kept up to date. All references to medical notes are to be made "
-                        + "by reference to the pages in that bundle.")
+            .input1("Documents should be retained as follows:")
+            .input2("a) The parties must retain all electronically stored documents relating to the issues in this "
+                        + "claim.")
+            .input3("b) the defendant must retain the original clinical notes relating to the issues in this claim. "
+                        + "The defendant must give facilities for inspection by the claimant, the claimant's legal "
+                        + "advisers and experts of these original notes on 7 days written notice.")
+            .input4("c) Legible copies of the medical and educational records of the claimant, the deceased, and the"
+                        + " claimant's mother are to be placed in a separate paginated bundle by the claimant's "
+                        + "solicitors and kept up to date. All references to medical notes are to be made by reference "
+                        + "to the pages in that bundle.")
             .build();
 
         updatedData.fastTrackClinicalNegligence(tempFastTrackClinicalNegligence).build();
 
         FastTrackCreditHire tempFastTrackCreditHire = FastTrackCreditHire.builder()
-            .input1("1. If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
-                        + "disclosure as ordered earlier in this order must include:\n"
-                        + "a. Evidence of all income from all sources for a period of 3 months prior to the "
-                        + "commencement of hire until the earlier of i) 3 months after cessation of hire or ii) "
-                        + "the repair/replacement of the claimant's vehicle;\n"
-                        + "b. Copy statements of all blank, credit care and savings accounts for a period of 3 months "
-                        + "prior to the commencement of hire until the earlier of i) 3 months after cessation of hire "
-                        + "or ii) the repair/replacement of the claimant's vehicle;\n"
-                        + "c. Evidence of any loan, overdraft or other credit facilities available to the claimant")
-            .input2("3. The claimant must file and serve a witness statement addressing, (a) need to hire a replacement"
-                        + " vehicle and (b) impecuniosity no later than 4pm on")
-            .date1(LocalDate.now().plusWeeks(8))
-            .input3("Failure to comply with the paragraph above will result in the claimant being debarred from "
+            .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
+                        + "disclosure as ordered earlier in this Order must include:\n"
+                        + "a) Evidence of all income from all sources for a period of 3 months prior to the "
+                        + "commencement of hire until the earlier of:\n "
+                        + "     i) 3 months after cessation of hire\n"
+                        + "     ii) the repair or replacement of the claimant's vehicle\n"
+                        + "b) Copies of all bank, credit card, and saving account statements for a period of 3 months "
+                        + "prior to the commencement of hire until the earlier of:\n"
+                        + "     i) 3 months after cessation of hire\n"
+                        + "     ii) the repair or replacement of the claimant's vehicle\n"
+                        + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.")
+            .input2("The claimant must upload to the Digital Portal a witness statement addressing\n"
+                        + "a) the need to hire a replacement vehicle; and\n"
+                        + "b) impecuniosity")
+            .date1(LocalDate.now().plusWeeks(4))
+            .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
                         + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
                         + "save with permission of the Trial Judge.")
-            .input4("4. The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
-                        + "later than 4pm on.")
-            .date2(LocalDate.now().plusWeeks(10))
-            .input5("5. If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
+            .input4("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
+                        + "later than 4pm on")
+            .date2(LocalDate.now().plusWeeks(6))
+            .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
                         + "paragraph above, each party may rely upon written evidence by way of witness statement of "
                         + "one witness to provide evidence of basic hire rates available within the claimant's "
-                        + "geographical location, from a mainstream (or, if none available, a local reputable) "
-                        + "supplier. The defendant's evidence to be served by 4pm on")
-            .date3(LocalDate.now().plusWeeks(12))
-            .input6("and the claimant's evidence in reply if so advised to be served by 4pm on")
-            .date4(LocalDate.now().plusWeeks(14))
-            .input7("This witness statement is limited to 10 pages per party (to include any appendices).")
+                        + "geographical location, from a mainstream supplier, or a local reputable supplier if none "
+                        + "is available.")
+            .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
+            .date3(LocalDate.now().plusWeeks(8))
+            .input7("and the claimant's evidence is reply if so advised to be uploaded by 4pm on")
+            .date4(LocalDate.now().plusWeeks(10))
+            .input8("This witness statement is limited to 10 pages per party, including any appendices.")
             .build();
 
         updatedData.fastTrackCreditHire(tempFastTrackCreditHire).build();
 
         FastTrackHousingDisrepair tempFastTrackHousingDisrepair = FastTrackHousingDisrepair.builder()
-            .input1("The claimant must prepare a Scott Schedule of the items of disrepair")
-            .input2("The column headings will be as follows: Item; Alleged disrepair; "
-                        + "Defendant's Response; Reserved for Judge's Use")
-            .input3("The claimant must serve the Scott Schedule with the relevant columns completed by 4pm on")
-            .date1(LocalDate.now().plusWeeks(10)) // date to be confirmed, placeholder for now
-            .input4("The Defendant must file and serve the Scott Schedule with the relevant column "
-                        + "in response completed by 4pm on")
-            .date2(LocalDate.now().plusWeeks(12)) // date to be confirmed, placeholder for now
+            .input1("The claimant must prepare a Scott Schedule of the items in disrepair.")
+            .input2("38.The columns should be headed:\n"
+                        + "•Item\n"
+                        + "•Alleged disrepair\n"
+                        + "•Defendant’s response\n"
+                        + "•Reserved for Judge’s use")
+            .input3("The claimant must uploaded to the Digital Portal the Scott Schedule with the relevant "
+                        + "columns completed by 4pm on ")
+            .date1(LocalDate.now().plusWeeks(7))
+            .input4("The defendant must uploaded to the Digital Portal the amended Scott Schedule with the "
+                        + "relevant columns in response completed by 4pm on ")
+            .date2(LocalDate.now().plusWeeks(9))
             .build();
 
         updatedData.fastTrackHousingDisrepair(tempFastTrackHousingDisrepair).build();
 
         FastTrackPersonalInjury tempFastTrackPersonalInjury = FastTrackPersonalInjury.builder()
-            .input1("1. The claimant has permission to rely on the written expert evidence annexed to the "
-                        + "Particulars of Claim. Defendant may raise written questions of the expert by 4pm on")
+            .input1("The claimant has permission to rely upon the written expert evidence already uploaded to "
+                        + "the Digital Portal with the particulars of claim and in addition has permission to rely upon"
+                        + " any associated correspondence or updating report which is uploaded to the Digital Portal by"
+                        + " 4pm on ")
             .date1(LocalDate.now().plusWeeks(4))
-            .input2("which must be answered by 4pm on")
+            .input2("Any questions which are to be addressed to an expert must be sent to the expert directly "
+                        + "and uploaded to the Digital Portal by 4pm on ")
             .date2(LocalDate.now().plusWeeks(8))
-            .input3("No other permission is given for expert evidence.")
+            .input3("The answers to the questions shall be answered by the Expert by ")
+            .date3(LocalDate.now().plusWeeks(8))
+            .input4("and uploaded to the Digital Portal by ")
+            .date4(LocalDate.now().plusWeeks(8))
             .build();
 
         updatedData.fastTrackPersonalInjury(tempFastTrackPersonalInjury).build();
 
         FastTrackRoadTrafficAccident tempFastTrackRoadTrafficAccident = FastTrackRoadTrafficAccident.builder()
-            .input("Photographs and/or a plan of the location of the accident shall be prepared and "
-                        + "agreed by the parties.")
+            .input("Photographs and/or a place of the accident location shall be prepared and agreed by the "
+                       + "parties and uploaded to the Digital Portal by 4pm on ")
+            .date(LocalDate.now().plusWeeks(8))
             .build();
 
         updatedData.fastTrackRoadTrafficAccident(tempFastTrackRoadTrafficAccident).build();
 
-        FastTrackPreferredTelephone tempFastTrackPreferredTelephone = FastTrackPreferredTelephone
-            .builder()
-            .telephone(preferredTelephone)
-            .build();
-
-        updatedData.fastTrackPreferredTelephone(tempFastTrackPreferredTelephone).build();
-
-        FastTrackPreferredEmail tempFastTrackPreferredEmail = FastTrackPreferredEmail
-            .builder()
-            .email(preferredEmail)
-            .build();
-
-        updatedData.fastTrackPreferredEmail(tempFastTrackPreferredEmail).build();
-
         SmallClaimsJudgesRecital tempSmallClaimsJudgesRecital = SmallClaimsJudgesRecital.builder()
-            .input("District Judge Perna has considered the statements of case and the information provided by the "
-                       + "parties,"
-                       + " \n\nIT IS ORDERED that:-")
+            .input("Upon considering the statements of case and the information provided by the parties,")
             .build();
 
         updatedData.smallClaimsJudgesRecital(tempSmallClaimsJudgesRecital).build();
@@ -484,19 +471,18 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
 
         SmallClaimsDocuments tempSmallClaimsDocuments = SmallClaimsDocuments.builder()
-            .input1("Each party must send to the other party(ies) and to the court office to be received not less "
-                        + "than 14 days before the hearing, copies of all documents which they wish the court to "
-                        + "consider when reaching its decision.")
-            .input2("The court may refuse to consider any document which has not been sent to the other "
-                        + "party/ies and the court as set out above.")
+            .input1("Each party must upload to the Digital Portal copies of all documents which they wish the court to"
+                        + " consider when reaching its decision not less than 14 days before the hearing.")
+            .input2("The court may refuse to consider any document which has not been uploaded to the "
+                        + "Digital Portal by the above date.")
             .build();
 
         updatedData.smallClaimsDocuments(tempSmallClaimsDocuments).build();
 
         SmallClaimsWitnessStatement tempSmallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
-            .input1("Each party must send to the other party(ies) and to the court office to be received not less "
-                        + "than 14 days before the hearing, copies of the statements of any witness (including "
-                        + "themselves) upon whose evidence they intend to rely at the hearing. This is limited to")
+            .input1("Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
+                        + " upon whose evidence they intend to rely at the hearing not less than 14 days before"
+                        + " the hearing.")
             .input2("")
             .input3("")
             .input4("For this limitation, a party is counted as a witness.")
@@ -513,10 +499,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                       + "at the final hearing there must be an independent interpreter who will not be "
                       + "provided by the Court."
                       + "\n\nThe judge may refuse to allow a witness to give evidence or consider any "
-                      + "statement of any witness whose statement has not been sent to the court and the "
-                      + "other party/ies in accordance with the paragraphs above."
-                      + "\n\nA witness whose statement is sent in accordance with the above should attend "
-                      + "the hearing, If they do not attend, it will be for the court to decide how much "
+                      + "statement of any witness whose statement has not been uploaded to the Digital Portal in "
+                      + "accordance with the paragraphs above."
+                      + "\n\nA witness whose statement has been uploaded in accordance with the above must attend "
+                      + "the hearing. If they do not attend, it will be for the court to decide how much "
                       + "reliance, if any, to place on their evidence.")
             .build();
 
@@ -533,64 +519,63 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.smallClaimsHearing(tempSmallClaimsHearing).build();
 
-        SmallClaimsPreferredTelephone tempSmallClaimsPreferredTelephone = SmallClaimsPreferredTelephone
-            .builder()
-            .telephone(preferredTelephone)
-            .build();
-
-        updatedData.smallClaimsPreferredTelephone(tempSmallClaimsPreferredTelephone).build();
-
-        SmallClaimsPreferredEmail tempSmallClaimsPreferredEmail = SmallClaimsPreferredEmail
-            .builder()
-            .email(preferredEmail)
-            .build();
-
-        updatedData.smallClaimsPreferredEmail(tempSmallClaimsPreferredEmail).build();
-
         SmallClaimsNotes tempSmallClaimsNotes = SmallClaimsNotes.builder()
             .input("This Order has been made without a hearing. Each party has the right to apply to have this Order "
-                       + "set aside or varied. Any such application must be received by the Court "
-                       + "(together with the appropriate fee) by 4pm on")
+                       + "set aside or varied. Any such application must be received by the Court, "
+                       + "together with the appropriate fee by 4pm on")
             .date(LocalDate.now().plusWeeks(1))
             .build();
 
         updatedData.smallClaimsNotes(tempSmallClaimsNotes).build();
 
         SmallClaimsCreditHire tempSmallClaimsCreditHire = SmallClaimsCreditHire.builder()
-            .input1("1. If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
-                        + "disclosure as ordered earlier in this order must include:\n"
-                        + "a. Evidence of all income from all sources for a period of 3 months prior to the "
-                        + "commencement of hire until the earlier of i) 3 months after cessation of hire or ii) "
-                        + "the repair/replacement of the claimant's vehicle;\n"
-                        + "b. Copy statements of all blank, credit care and savings accounts for a period of 3 months "
-                        + "prior to the commencement of hire until the earlier of i) 3 months after cessation of hire "
-                        + "or ii) the repair/replacement of the claimant's vehicle;\n"
-                        + "c. Evidence of any loan, overdraft or other credit facilities available to the claimant")
-            .input2("3. The claimant must file and serve a witness statement addressing, (a) need to hire a replacement"
-                        + " vehicle and (b) impecuniosity no later than 4pm on")
+            .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
+                        + "disclosure as ordered earlier in this Order must include:\n"
+                        + "a) Evidence of all income from all sources for a period of 3 months prior to the "
+                        + "commencement of hire until the earlier of:\n "
+                        + "     i) 3 months after cessation of hire\n"
+                        + "     ii) the repair or replacement of the claimant's vehicle\n"
+                        + "b) Copies of all bank, credit card, and saving account statements for a period of 3 months "
+                        + "prior to the commencement of hire until the earlier of:\n"
+                        + "     i) 3 months after cessation of hire\n"
+                        + "     ii) the repair or replacement of the claimant's vehicle\n"
+                        + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.")
+            .input2("The claimant must upload to the Digital Portal a witness statement addressing\n"
+                        + "a) the need to hire a replacement vehicle; and\n"
+                        + "b) impecuniosity")
             .date1(LocalDate.now().plusWeeks(4))
-            .input3("Failure to comply with the paragraph above will result in the claimant being debarred from "
+            .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
                         + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
                         + "save with permission of the Trial Judge.")
-            .input4("4. The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
+            .input4("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
                         + "later than 4pm on.")
             .date2(LocalDate.now().plusWeeks(6))
-            .input5("5. If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
+            .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
                         + "paragraph above, each party may rely upon written evidence by way of witness statement of "
                         + "one witness to provide evidence of basic hire rates available within the claimant's "
-                        + "geographical location, from a mainstream (or, if none available, a local reputable) "
-                        + "supplier. The defendant's evidence to be served by 4pm on")
+                        + "geographical location, from a mainstream supplier, or a local reputable supplier if none "
+                        + "is available.")
+            .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
             .date3(LocalDate.now().plusWeeks(8))
-            .input6("and the claimant's evidence in reply if so advised to be served by 4pm on")
+            .input7("and the claimant's evidence is reply if so advised to be uploaded by 4pm on")
             .date4(LocalDate.now().plusWeeks(10))
-            .input7("This witness statement is limited to 10 pages per party (to include any appendices).")
+            .input8("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
+                + "paragraph above, each party may rely upon the written evidence by way of witness statement "
+                + "of one witness to provide evidence of basic hire rates available within the claimant's "
+                + "geographical location from a mainstream supplier, or a local reputable supplier if none is "
+                + "available.")
+            .input9("The defendant’s evidence is to be uploaded to the Digital Portal by 4pm on")
+            .date5(LocalDate.now().plusWeeks(8))
+            .input10(", and the claimant’s evidence in reply if so advised is to be uploaded by 4pm on")
+            .date6(LocalDate.now().plusWeeks(10))
+            .input11("This witness statement is limited to 10 pages per party, including any appendices.")
             .build();
 
         updatedData.smallClaimsCreditHire(tempSmallClaimsCreditHire).build();
 
         SmallClaimsRoadTrafficAccident tempSmallClaimsRoadTrafficAccident = SmallClaimsRoadTrafficAccident.builder()
-            .input("Photographs and/or a plan of the location of the accident shall be prepared and "
-                       + "agreed by the parties.")
+            .input("Photographs and/or a place of the accident location shall be prepared and agreed by the parties"
+                       + " and uploaded to the Digital Portal no later than 14 days before the hearing.")
             .build();
 
         updatedData.smallClaimsRoadTrafficAccident(tempSmallClaimsRoadTrafficAccident).build();
@@ -724,6 +709,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsMethodToggle(checkList);
         updatedData.smallClaimsDocumentsToggle(checkList);
         updatedData.smallClaimsWitnessStatementToggle(checkList);
+        updatedData.disposalHearingApplicationsOrderToggle(checkList);
     }
 
     private List<String> setPreferredLocationFirst(List<LocationRefData> locations, CaseData caseData) {
