@@ -29,7 +29,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
@@ -91,7 +90,6 @@ import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCatego
 public class FlowStateAllowedEventService {
 
     private final StateFlowEngine stateFlowEngine;
-
     private final CaseDetailsConverter caseDetailsConverter;
     private final FeatureToggleService toggleService;
 
