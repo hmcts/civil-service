@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
-
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -113,9 +112,6 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private String getHeader(CaseData caseData) {
         return format("# Your request was accepted%n## Case has now moved offline");
-    }
-    protected CallbackResponse emptyCallbackResponse(CallbackParams callbackParams) {
-        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     protected CallbackResponse emptyCallbackResponse(CallbackParams callbackParams) {
