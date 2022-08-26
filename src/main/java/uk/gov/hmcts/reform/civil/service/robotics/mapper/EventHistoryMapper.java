@@ -260,22 +260,22 @@ public class EventHistoryMapper {
             && !caseData.getDefendantDetails().getValue()
             .getLabel().startsWith("Both");
         if (!grantedFlag && null != caseData.getHearingSupportRequirementsDJ()) {
-            events.add(prepareInterlocutoryJudgment(builder, caseData));
+            events.add(prepareInterlocutoryJudgment(builder, caseData, RESPONDENT_ID));
 
             if (null != caseData.getRespondent2()) {
-                events.add(prepareInterlocutoryJudgment(builder, caseData));
+                events.add(prepareInterlocutoryJudgment(builder, caseData, RESPONDENT2_ID));
             }
             builder.interlocutoryJudgment(events);
         }
     }
 
-    private Event prepareInterlocutoryJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+    private Event prepareInterlocutoryJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData,
+                                              String litigiousPartyID  ) {
         return (Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(INTERLOCUTORY_JUDGMENT_GRANTED.getCode())
             .dateReceived(LocalDateTime.now())
-            .litigiousPartyID(PartyUtils.respondent1Data(caseData).getRole().equals(RESPONDENT_ONE)
-                                  ? RESPONDENT_ID : RESPONDENT2_ID)
+            .litigiousPartyID(litigiousPartyID)
             .eventDetailsText("")
             .eventDetails(EventDetails.builder().miscText(" Interlocutory Judgment - defendant  and claimant notified")
                               .build())
@@ -291,17 +291,18 @@ public class EventHistoryMapper {
             .getLabel().startsWith("Both");
 
         if (!grantedFlag && null != caseData.getDefendantDetailsSpec()) {
-            events.add(prepareDefaultJudgment(builder, caseData));
+            events.add(prepareDefaultJudgment(builder, caseData, RESPONDENT_ID));
 
             if (null != caseData.getRespondent2()) {
-                events.add(prepareDefaultJudgment(builder, caseData));
+                events.add(prepareDefaultJudgment(builder, caseData, RESPONDENT2_ID));
             }
             builder.defaultJudgment(events);
         }
 
     }
 
-    private Event prepareDefaultJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+    private Event prepareDefaultJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData,
+                                         String litigiousPartyID) {
         BigDecimal claimInterest = caseData.getTotalInterest() != null
             ? caseData.getTotalInterest() : BigDecimal.ZERO;
         BigDecimal amountClaimedWithInterest = caseData.getTotalClaimAmount().add(claimInterest);
@@ -314,8 +315,7 @@ public class EventHistoryMapper {
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(DEFAULT_JUDGMENT_GRANTED.getCode())
             .dateReceived(LocalDateTime.now())
-            .litigiousPartyID(PartyUtils.respondent1Data(caseData).getRole().equals(RESPONDENT_ONE)
-                                  ? RESPONDENT_ID : RESPONDENT2_ID)
+            .litigiousPartyID(litigiousPartyID)
             .eventDetailsText("")
             .eventDetails(EventDetails.builder().miscText(" Default Judgment - defendant and claimant notified")
                               .amountOfJudgment(amountClaimedWithInterest)
