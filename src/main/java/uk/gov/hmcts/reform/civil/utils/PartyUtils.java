@@ -220,4 +220,47 @@ public class PartyUtils {
 
         return responseIntentions.toString();
     }
+
+    public static String fetchDefendantName(CaseData caseData) {
+        StringBuilder defendantNames = new StringBuilder();
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                if ((caseData.getRespondent1TimeExtensionDate() == null)
+                    && (caseData.getRespondent2TimeExtensionDate() != null)) {
+                    //case where respondent 2 extends first
+                    defendantNames.append("\nDefendant : ")
+                        .append(caseData.getRespondent2().getPartyName());
+                } else if ((caseData.getRespondent1TimeExtensionDate() != null)
+                    && (caseData.getRespondent2TimeExtensionDate() != null)) {
+                    if (caseData.getRespondent2TimeExtensionDate()
+                        .isAfter(caseData.getRespondent1TimeExtensionDate())) {
+                        //case where respondent 2 extends 2nd
+                        defendantNames.append("\nDefendant : ")
+                            .append(caseData.getRespondent2().getPartyName());
+                    } else {
+                        //case where respondent 1 extends 2nd
+                        defendantNames.append("\nDefendant : ")
+                            .append(caseData.getRespondent1().getPartyName());
+                    }
+                } else {
+                    //case where respondent 1 extends first
+                    defendantNames.append("\nDefendant : ")
+                        .append(caseData.getRespondent1().getPartyName());
+                }
+                break;
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                defendantNames.append("\nDefendant 1: ")
+                    .append(caseData.getRespondent1().getPartyName());
+                defendantNames.append("\n");
+                defendantNames.append("Defendant 2: ")
+                    .append(caseData.getRespondent2().getPartyName());
+                break;
+            default:
+                defendantNames.append("\nDefendant : ")
+                    .append(caseData.getRespondent1().getPartyName());
+                break;
+        }
+        return defendantNames.toString();
+    }
+
 }
