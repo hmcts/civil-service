@@ -94,9 +94,11 @@ public class CoreCaseDataService {
         return UserAuthContent.builder().userToken(userToken).userId(userId).build();
     }
 
-    public CaseDetails setSupplementaryData(String authorisation, Long caseId, Map<String, Map<String,
+    public CaseDetails setSupplementaryData(Long caseId, Map<String, Map<String,
         Map<String, Object>>> supplementaryData) {
-        return coreCaseDataApi.submitSupplementaryData(authorisation, authTokenGenerator.generate(),
+        UserAuthContent systemUpdateUser = getSystemUpdateUser();
+
+        return coreCaseDataApi.submitSupplementaryData(systemUpdateUser.getUserToken(), authTokenGenerator.generate(),
                                                        caseId.toString(), supplementaryData);
     }
 

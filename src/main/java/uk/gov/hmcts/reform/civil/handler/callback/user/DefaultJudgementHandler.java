@@ -303,12 +303,11 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private void setSupplementaryData(Long caseId, CallbackParams callbackParams) {
-        String authorisation = callbackParams.getParams().get(BEARER_TOKEN).toString();
         Map<String, Map<String, Map<String, Object>>> supplementaryDataCivil = new HashMap<>();
         supplementaryDataCivil.put("supplementary_data_updates",
                                    singletonMap("$set", singletonMap("HMCTSServiceId",
                                                                      paymentsConfiguration.getSiteId())));
-        coreCaseDataService.setSupplementaryData(authorisation, caseId, supplementaryDataCivil);
+        coreCaseDataService.setSupplementaryData(caseId, supplementaryDataCivil);
 
     }
 
