@@ -179,14 +179,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                                    //to clear list of court locations from caseData
                                    .applicantPreferredCourtLocationList(null)
                                    .build());
-            dq.applicant1DQRequestedCourt(RequestedCourt.builder()
-                                              .requestHearingAtSpecificCourt(YES)
-//                                              .reasonForHearingAtSpecificCourt(caseData.getCourtLocation().g)
-                                              .build());
-        } else {
-            dq.applicant1DQRequestedCourt(RequestedCourt.builder()
-                                              .requestHearingAtSpecificCourt(NO)
-                                              .build());
         }
     }
 
