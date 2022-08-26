@@ -126,7 +126,5 @@ public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(NotSuitable_SDO);
-    }
+    void handleEventsReturnsTheExpectedCallbackEvent() {assertThat(handler.handledEvents()).contains(NotSuitable_SDO);}
 }
