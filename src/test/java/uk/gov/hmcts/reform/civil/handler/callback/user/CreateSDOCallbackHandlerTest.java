@@ -151,6 +151,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             );
         }
 
+        /**
+         * spec claim, but no preferred court location.
+         */
         @Test
         void shouldPrePopulateDisposalHearingPageSpec1() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
@@ -176,7 +179,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             );
         }
 
-
+        /**
+         * spec claim, specified no preference for court.
+         */
         @Test
         void shouldPrePopulateDisposalHearingPageSpec2() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
@@ -209,6 +214,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             );
         }
 
+        /**
+         * spec claim, preferred court specified.
+         */
         @Test
         void shouldPrePopulateDisposalHearingPageSpec3() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
