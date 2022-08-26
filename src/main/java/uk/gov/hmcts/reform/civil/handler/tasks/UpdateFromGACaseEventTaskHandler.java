@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Long.parseLong;
@@ -53,25 +54,34 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
     }
 
     private Map<String, Object> getUpdatedCaseData(CaseData civilCaseData, CaseData generalAppCaseData) {
-        List<Element<CaseDocument>> generalOrderDocument = newArrayList();
+        List<Element<CaseDocument>> generalOrderDocument = Optional
+            .ofNullable(civilCaseData.getGeneralOrderDocument())
+            .orElse(newArrayList());
+
         if (generalAppCaseData.getGeneralOrderDocument() != null) {
-            generalOrderDocument.add(generalAppCaseData.getGeneralOrderDocument().get(0));
+            generalOrderDocument.addAll(generalAppCaseData.getGeneralOrderDocument());
         }
 
-        List<Element<CaseDocument>> dismissalOrderDocument = newArrayList();
+        List<Element<CaseDocument>> dismissalOrderDocument = Optional
+            .ofNullable(civilCaseData.getDismissalOrderDocument())
+            .orElse(newArrayList());
+
         if (generalAppCaseData.getDismissalOrderDocument() != null) {
-            dismissalOrderDocument.add(generalAppCaseData.getDismissalOrderDocument().get(0));
+            dismissalOrderDocument.addAll(generalAppCaseData.getDismissalOrderDocument());
         }
 
-        List<Element<CaseDocument>> directionOrderDocumnet = newArrayList();
+        List<Element<CaseDocument>> directionOrderDocument = Optional
+            .ofNullable(civilCaseData.getDirectionOrderDocument())
+            .orElse(newArrayList());
+
         if (generalAppCaseData.getDirectionOrderDocument() != null) {
-            directionOrderDocumnet.add(generalAppCaseData.getDirectionOrderDocument().get(0));
+            directionOrderDocument.addAll(generalAppCaseData.getDirectionOrderDocument());
         }
 
         Map<String, Object> output = civilCaseData.toMap(mapper);
         output.put("generalOrderDocument", generalOrderDocument.isEmpty() ? null : generalOrderDocument);
         output.put("dismissalOrderDocument", dismissalOrderDocument.isEmpty() ? null : dismissalOrderDocument);
-        output.put("directionOrderDocument", directionOrderDocumnet.isEmpty() ? null : directionOrderDocumnet);
+        output.put("directionOrderDocument", directionOrderDocument.isEmpty() ? null : directionOrderDocument);
 
         return output;
     }
