@@ -1080,18 +1080,7 @@ public class EventHistoryMapper {
                         && respondent1MediationRequired == YesOrNo.YES
                         && applicant1MediationRequired == YesOrNo.YES
                     ) {
-                        List<Event> miscText = IntStream.range(0, miscEventText.size())
-                            .mapToObj(index ->
-                                          Event.builder()
-                                              .eventSequence(prepareEventSequence(builder.build()))
-                                              .eventCode(MISCELLANEOUS.getCode())
-                                              .dateReceived(caseData.getApplicant1ResponseDate())
-                                              .eventDetailsText(miscEventText.get(index))
-                                              .eventDetails(EventDetails.builder()
-                                                                .miscText(miscEventText.get(index))
-                                                                .build())
-                                              .build())
-                            .collect(Collectors.toList());
+                        List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                         builder.miscellaneous(miscText);
                     }
                     break;
@@ -1109,18 +1098,7 @@ public class EventHistoryMapper {
                             && applicant1MediationRequired == YesOrNo.YES
                         )
                     ) {
-                        List<Event> miscText = IntStream.range(0, miscEventText.size())
-                            .mapToObj(index ->
-                                          Event.builder()
-                                              .eventSequence(prepareEventSequence(builder.build()))
-                                              .eventCode(MISCELLANEOUS.getCode())
-                                              .dateReceived(caseData.getApplicant1ResponseDate())
-                                              .eventDetailsText(miscEventText.get(index))
-                                              .eventDetails(EventDetails.builder()
-                                                                .miscText(miscEventText.get(index))
-                                                                .build())
-                                              .build())
-                            .collect(Collectors.toList());
+                        List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                         builder.miscellaneous(miscText);
                     }
                     break;
@@ -1141,18 +1119,7 @@ public class EventHistoryMapper {
                             && applicant1MediationRequired == YesOrNo.YES
                         )
                     ) {
-                        List<Event> miscText = IntStream.range(0, miscEventText.size())
-                            .mapToObj(index ->
-                                          Event.builder()
-                                              .eventSequence(prepareEventSequence(builder.build()))
-                                              .eventCode(MISCELLANEOUS.getCode())
-                                              .dateReceived(caseData.getApplicant1ResponseDate())
-                                              .eventDetailsText(miscEventText.get(index))
-                                              .eventDetails(EventDetails.builder()
-                                                                .miscText(miscEventText.get(index))
-                                                                .build())
-                                              .build())
-                            .collect(Collectors.toList());
+                        List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                         builder.miscellaneous(miscText);
                     }
                     break;
@@ -1170,18 +1137,7 @@ public class EventHistoryMapper {
                             && applicant2MediationRequired == YesOrNo.YES
                         )
                     ) {
-                        List<Event> miscText = IntStream.range(0, miscEventText.size())
-                            .mapToObj(index ->
-                                          Event.builder()
-                                              .eventSequence(prepareEventSequence(builder.build()))
-                                              .eventCode(MISCELLANEOUS.getCode())
-                                              .dateReceived(caseData.getApplicant1ResponseDate())
-                                              .eventDetailsText(miscEventText.get(index))
-                                              .eventDetails(EventDetails.builder()
-                                                                .miscText(miscEventText.get(index))
-                                                                .build())
-                                              .build())
-                            .collect(Collectors.toList());
+                        List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                         builder.miscellaneous(miscText);
                     }
                     break;
@@ -1291,6 +1247,22 @@ public class EventHistoryMapper {
             }
         }
         return eventDetailsText;
+    }
+
+    public List<Event> prepareMiscEventList(EventHistory.EventHistoryBuilder builder, CaseData caseData,
+                                            List<String> miscEventText) {
+        return IntStream.range(0, miscEventText.size())
+            .mapToObj(index ->
+                          Event.builder()
+                              .eventSequence(prepareEventSequence(builder.build()))
+                              .eventCode(MISCELLANEOUS.getCode())
+                              .dateReceived(caseData.getApplicant1ResponseDate())
+                              .eventDetailsText(miscEventText.get(index))
+                              .eventDetails(EventDetails.builder()
+                                                .miscText(miscEventText.get(index))
+                                                .build())
+                              .build())
+            .collect(Collectors.toList());
     }
 
     public boolean isStayClaim(DQ dq) {
