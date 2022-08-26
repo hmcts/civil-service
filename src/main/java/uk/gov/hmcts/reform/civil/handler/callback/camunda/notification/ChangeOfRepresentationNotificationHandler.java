@@ -82,8 +82,6 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
-        System.out.println("the email stuff is here: " + addProperties(caseData));
-
         notificationService.sendMail(
             getRecipientEmail(caseData),
             getTemplateId(),
