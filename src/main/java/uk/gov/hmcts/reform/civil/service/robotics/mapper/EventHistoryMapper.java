@@ -270,7 +270,7 @@ public class EventHistoryMapper {
     }
 
     private Event prepareInterlocutoryJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData,
-                                              String litigiousPartyID  ) {
+                                              String litigiousPartyID) {
         return (Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(INTERLOCUTORY_JUDGMENT_GRANTED.getCode())
