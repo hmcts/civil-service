@@ -3,10 +3,12 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -1033,17 +1035,112 @@ public class EventHistoryMapper {
             builder.miscellaneous(miscText);
         } else {
 
+            YesOrNo proceedRespondent1;
+            YesOrNo proceedRespondent2;
+            YesOrNo applicant1Proceeds;
+            YesOrNo applicant2Proceeds;
+            YesOrNo applicant1MediationRequired;
+
+            if (caseData.getApplicant1ClaimMediationSpecRequired() == null
+                || caseData.getApplicant1ClaimMediationSpecRequired()
+                .getHasAgreedFreeMediation() == null
+            ) {
+                applicant1MediationRequired = NO;
+            } else {
+                applicant1MediationRequired = caseData.getApplicant1ClaimMediationSpecRequired()
+                    .getHasAgreedFreeMediation();
+            }
+
+            YesOrNo applicant2MediationRequired;
+
+            if (caseData.getApplicantMPClaimMediationSpecRequired() == null
+                || caseData.getApplicantMPClaimMediationSpecRequired()
+                .getHasAgreedFreeMediation() == null
+            ) {
+                applicant2MediationRequired = NO;
+            } else {
+                applicant2MediationRequired = caseData.getApplicantMPClaimMediationSpecRequired()
+                    .getHasAgreedFreeMediation();
+            }
+
+            YesOrNo respondent1MediationRequired;
+            YesOrNo respondent2MediationRequired;
+
+            SuperClaimType claimType = caseData.getSuperClaimType();
+            String track = caseData.getResponseClaimTrack();
+
             switch (getMultiPartyScenario(caseData)) {
 
+                case ONE_V_ONE:
+
+                    respondent1MediationRequired = caseData.getResponseClaimMediationSpecRequired();
+
+                    if (claimType == SPEC_CLAIM
+                        && AllocatedTrack.SMALL_CLAIM.name().equals(track)
+                        && respondent1MediationRequired == YesOrNo.YES
+                        && applicant1MediationRequired == YesOrNo.YES
+                    ) {
+                        List<Event> miscText = IntStream.range(0, miscEventText.size())
+                            .mapToObj(index ->
+                                          Event.builder()
+                                              .eventSequence(prepareEventSequence(builder.build()))
+                                              .eventCode(MISCELLANEOUS.getCode())
+                                              .dateReceived(caseData.getApplicant1ResponseDate())
+                                              .eventDetailsText(miscEventText.get(index))
+                                              .eventDetails(EventDetails.builder()
+                                                                .miscText(miscEventText.get(index))
+                                                                .build())
+                                              .build())
+                            .collect(Collectors.toList());
+                        builder.miscellaneous(miscText);
+                    }
+                    break;
                 case ONE_V_TWO_ONE_LEGAL_REP:
+                    proceedRespondent1 =
+                        caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2();
+                    proceedRespondent2 =
+                        caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2();
+                    respondent1MediationRequired = caseData.getResponseClaimMediationSpecRequired();
+
+                    if (NO.equals(proceedRespondent1) || NO.equals(proceedRespondent2)
+                        || (claimType == SPEC_CLAIM
+                            && AllocatedTrack.SMALL_CLAIM.name().equals(track)
+                            && respondent1MediationRequired == YesOrNo.YES
+                            && applicant1MediationRequired == YesOrNo.YES
+                        )
+                    ) {
+                        List<Event> miscText = IntStream.range(0, miscEventText.size())
+                            .mapToObj(index ->
+                                          Event.builder()
+                                              .eventSequence(prepareEventSequence(builder.build()))
+                                              .eventCode(MISCELLANEOUS.getCode())
+                                              .dateReceived(caseData.getApplicant1ResponseDate())
+                                              .eventDetailsText(miscEventText.get(index))
+                                              .eventDetails(EventDetails.builder()
+                                                                .miscText(miscEventText.get(index))
+                                                                .build())
+                                              .build())
+                            .collect(Collectors.toList());
+                        builder.miscellaneous(miscText);
+                    }
+                    break;
                 case ONE_V_TWO_TWO_LEGAL_REP:
 
-                    YesOrNo proceedRespondent1 =
+                    proceedRespondent1 =
                         caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2();
-                    YesOrNo proceedRespondent2 =
+                    proceedRespondent2 =
                         caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2();
+                    respondent1MediationRequired = caseData.getResponseClaimMediationSpecRequired();
+                    respondent2MediationRequired = caseData.getResponseClaimMediationSpec2Required();
 
-                    if (NO.equals(proceedRespondent1) || NO.equals(proceedRespondent2)) {
+                    if (NO.equals(proceedRespondent1) || NO.equals(proceedRespondent2)
+                        || (claimType == SPEC_CLAIM
+                            && AllocatedTrack.SMALL_CLAIM.name().equals(track)
+                            && respondent1MediationRequired == YesOrNo.YES
+                            && respondent2MediationRequired == YesOrNo.YES
+                            && applicant1MediationRequired == YesOrNo.YES
+                        )
+                    ) {
                         List<Event> miscText = IntStream.range(0, miscEventText.size())
                             .mapToObj(index ->
                                           Event.builder()
@@ -1061,10 +1158,18 @@ public class EventHistoryMapper {
                     break;
                 case TWO_V_ONE:
 
-                    YesOrNo applicant1Proceeds = caseData.getApplicant1ProceedWithClaimMultiParty2v1();
-                    YesOrNo applicant2Proceeds = caseData.getApplicant2ProceedWithClaimMultiParty2v1();
+                    applicant1Proceeds = caseData.getApplicant1ProceedWithClaimMultiParty2v1();
+                    applicant2Proceeds = caseData.getApplicant2ProceedWithClaimMultiParty2v1();
+                    respondent1MediationRequired = caseData.getResponseClaimMediationSpecRequired();
 
-                    if (NO.equals(applicant1Proceeds) || NO.equals(applicant2Proceeds)) {
+                    if (NO.equals(applicant1Proceeds) || NO.equals(applicant2Proceeds)
+                        || (claimType == SPEC_CLAIM
+                            && AllocatedTrack.SMALL_CLAIM.name().equals(track)
+                            && respondent1MediationRequired == YesOrNo.YES
+                            && applicant1MediationRequired == YesOrNo.YES
+                            && applicant2MediationRequired == YesOrNo.YES
+                        )
+                    ) {
                         List<Event> miscText = IntStream.range(0, miscEventText.size())
                             .mapToObj(index ->
                                           Event.builder()
