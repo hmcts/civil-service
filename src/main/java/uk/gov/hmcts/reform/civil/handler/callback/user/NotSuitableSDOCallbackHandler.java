@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Collections;
@@ -18,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 
 @Service
@@ -36,6 +37,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
+            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitNotSuitableSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -58,6 +60,8 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
 
+        dataBuilder.businessProcess(BusinessProcess.ready(NotSuitable_SDO));
+
         return dataBuilder;
     }
 
@@ -72,6 +76,9 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private String getHeader(CaseData caseData) {
         return format("# Your request was accepted%n## Case has now moved offline");
+    }
+    protected CallbackResponse emptyCallbackResponse(CallbackParams callbackParams) {
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     private String getBody(CaseData caseData) {
