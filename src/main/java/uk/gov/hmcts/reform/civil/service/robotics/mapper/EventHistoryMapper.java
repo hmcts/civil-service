@@ -303,6 +303,7 @@ public class EventHistoryMapper {
 
     private Event prepareDefaultJudgment(EventHistory.EventHistoryBuilder builder, CaseData caseData,
                                          String litigiousPartyID) {
+
         BigDecimal claimInterest = caseData.getTotalInterest() != null
             ? caseData.getTotalInterest() : BigDecimal.ZERO;
         BigDecimal amountClaimedWithInterest = caseData.getTotalClaimAmount().add(claimInterest);
