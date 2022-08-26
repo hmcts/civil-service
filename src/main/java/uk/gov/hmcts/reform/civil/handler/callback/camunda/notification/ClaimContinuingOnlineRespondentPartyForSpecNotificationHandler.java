@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 import uk.gov.hmcts.reform.civil.service.notification.letter.BulkPrintService;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -45,6 +47,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private final ObjectMapper objectMapper;
     private final Time time;
     private final FeatureToggleService toggleService;
+    private final PiPLetterGenerator pipLetterGenerator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -79,7 +82,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
         }
 
         // TODO Set Up for sending Mail
-        generatePIPLetter(caseData);
+        generatePIPLetter(callbackParams);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -101,9 +104,10 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
         );
     }
 
-    private void generatePIPLetter(CaseData caseData) {
-        Map<String, Object> letterProperties = new HashMap<>(addProperties(caseData));
-        bulkPrintService.printLetter(letterProperties, notificationsProperties.getRespondentDefendantResponseForSpec());
+    private void generatePIPLetter(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        byte[] letter = pipLetterGenerator.downloadLetter(caseData);
+        bulkPrintService.printLetter(letter);
     }
 
     private void generatePIPEmail(CaseData caseData) {

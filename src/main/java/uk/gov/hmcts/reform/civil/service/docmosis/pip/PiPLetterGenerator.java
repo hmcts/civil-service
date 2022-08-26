@@ -4,25 +4,43 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
+import uk.gov.hmcts.reform.civil.model.docmosis.pip.PiPLetter;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 
-import java.io.IOException;
+import java.time.LocalDate;
+
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.PIN_IN_THE_POST_LETTER;
 
 @AllArgsConstructor
 @Service
-public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetterGenerator> {
-
-    private final DocumentManagementService documentManagementService;
+public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
     private final DocumentGeneratorService documentGeneratorService;
 
-    public DocmosisDocument generate(CaseData caseData, String authentication){
+    private DocmosisDocument generate(CaseData caseData){
+       return documentGeneratorService.generateDocmosisDocument(
+            getTemplateData(caseData),
+            PIN_IN_THE_POST_LETTER
+        );
+    }
 
+    public byte[] downloadLetter(CaseData caseData){
+        DocmosisDocument pipLetter = generate(caseData);
+        return pipLetter.getBytes();
     }
 
     @Override
-    public PiPLetterGenerator getTemplateData(CaseData caseData) throws IOException {
-        return null;
+    public PiPLetter getTemplateData(CaseData caseData){
+        return PiPLetter
+            .builder()
+            .pin(caseData.getRespondent1PinToPostLRspec().getAccessCode())
+            .claimReferenceNumber(caseData.getLegacyCaseReference())
+            .claimantFullName(caseData.getApplicant1().getPartyName())
+            .defendant(caseData.getRespondent1())
+            .responseDeadline(caseData.getRespondent1ResponseDeadline())
+            .issueDate(LocalDate.now())
+            .build();
     }
+
+
 }

@@ -6,6 +6,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.sendletter.api.Document;
 import uk.gov.hmcts.reform.sendletter.api.Letter;
@@ -24,21 +25,20 @@ public class BulkPrintService {
     public static final String XEROX_TYPE_PARAMETER = "CMC001";
 
     private final SendLetterApi sendLetterApi;
-    private final DocumentManagementService documentManagementService;
     private final AuthTokenGenerator authTokenGenerator;
 
     @Retryable(
         value = RuntimeException.class,
         backoff = @Backoff(delay = 200)
     )
-    public SendLetterResponse printLetter(Map<String, Object> letterParams, String letterDocumentPath){
+    public SendLetterResponse printLetter(byte[] letterContent){
         String authorisation = authTokenGenerator.generate();
-        Letter letter = generateLetter(authorisation, letterParams, letterDocumentPath);
+        Letter letter = generateLetter(Map.of(), letterContent);
         return sendLetterApi.sendLetter(authorisation, letter);
     }
 
-    private Letter generateLetter(String authorisation, Map<String, Object> letterParams, String letterDocumentPath){
-        String templateLetter = Base64.getEncoder().encodeToString(documentManagementService.downloadDocument(authorisation, letterDocumentPath));
+    private Letter generateLetter( Map<String, Object> letterParams, byte[] letterContent){
+        String templateLetter = Base64.getEncoder().encodeToString(letterContent);
         Document document = new Document(templateLetter, letterParams);
         return new Letter(List.of(document), XEROX_TYPE_PARAMETER);
     }
