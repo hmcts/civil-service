@@ -325,8 +325,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
                 .getPartyName());
 
         } else {
-            participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData
-                .getDefendantDetails().getValue().getLabel());
+            participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
+                .getPartyName());
         }
         return participantString;
 
