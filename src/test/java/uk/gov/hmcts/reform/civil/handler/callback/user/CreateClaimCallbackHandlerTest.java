@@ -11,7 +11,6 @@ import org.springframework.boot.autoconfigure.validation.ValidationAutoConfigura
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -31,9 +30,7 @@ import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -137,15 +134,32 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToStartCallback {
 
+        private static final String SUPER_CLAIM_KEY = "superClaimType";
+
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStatePendingClaimIssued().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseDetails).build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssued()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldSetSuperClaimType_WhenAboutToStartIsInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssued()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData().get(SUPER_CLAIM_KEY)).isEqualTo("UNSPEC_CLAIM");
         }
     }
 
@@ -343,12 +357,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("claimFee")
-                .extracting("calculatedAmountInPence", "code", "version")
+                .extracting("calculatedAmountInPence", "code")
                 .containsExactly(
                     String.valueOf(feeData.getCalculatedAmountInPence()),
-                    feeData.getCode(),
-                    feeData.getVersion()
-                );
+                    feeData.getCode()
+                ).doesNotHaveToString("version");
 
             assertThat(response.getData())
                 .extracting("claimIssuedPaymentDetails")
@@ -376,12 +389,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("claimFee")
-                .extracting("calculatedAmountInPence", "code", "version")
+                .extracting("calculatedAmountInPence", "code")
                 .containsExactly(
                     String.valueOf(feeData.getCalculatedAmountInPence()),
-                    feeData.getCode(),
-                    feeData.getVersion()
-                );
+                    feeData.getCode()
+                ).doesNotHaveToString("version");
 
             assertThat(response.getData())
                 .extracting("claimIssuedPaymentDetails")
@@ -458,9 +470,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("email")
                 .isEqualTo(email);
             assertThat(response.getData())
-                .extracting("applicantSolicitor1UserDetails")
-                .extracting("email")
-                .isNull();
+                .doesNotHaveToString("applicantSolicitor1UserDetails")
+                .doesNotHaveToString("email");
         }
     }
 
@@ -691,8 +702,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
-                .extracting("uiStatementOfTruth")
-                .isNull();
+                .doesNotHaveToString("uiStatementOfTruth");
         }
     }
 
@@ -879,8 +889,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var respondent2OrgPolicy = response.getData().get("respondent2OrganisationPolicy");
 
-            assertThat(respondent2OrgPolicy).extracting("OrgPolicyReference").isNull();
-            assertThat(respondent2OrgPolicy).extracting("Organisation").isNull();
+            assertThat(respondent2OrgPolicy).doesNotHaveToString("OrgPolicyReference");
+            assertThat(respondent2OrgPolicy).doesNotHaveToString("Organisation");
         }
 
         @Nested
@@ -954,9 +964,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
-                    .extracting("applicantSolicitor1CheckEmail")
-                    .extracting("email")
-                    .isNull();
+                    .doesNotHaveToString("applicantSolicitor1CheckEmail")
+                    .doesNotHaveToString("email");
 
                 assertThat(response.getData())
                     .extracting("applicantSolicitor1UserDetails")
@@ -984,9 +993,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
-                    .extracting("applicantSolicitor1CheckEmail")
-                    .extracting("email")
-                    .isNull();
+                    .doesNotHaveToString("applicantSolicitor1CheckEmail")
+                    .doesNotHaveToString("email");
 
                 assertThat(response.getData())
                     .extracting("applicantSolicitor1UserDetails")
@@ -1020,8 +1028,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .extracting("uiStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly(null, null);
+                    .doesNotHaveToString("name")
+                    .doesNotHaveToString("role");
             }
         }
 

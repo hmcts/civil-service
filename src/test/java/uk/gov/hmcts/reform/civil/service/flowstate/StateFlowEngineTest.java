@@ -155,6 +155,38 @@ class StateFlowEngineTest {
         }
 
         @Test
+        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmittedTwoRepresentativesOneUnreg() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmittedTwoRespondentRepresentatives()
+                .respondent2Represented(YES)
+                .respondent2OrgRegistered(YES)
+                .respondent1OrgRegistered(NO)
+                .respondent2SameLegalRepresentative(NO)
+                .build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_SUBMITTED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(2)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
+            verify(featureToggleService).isRpaContinuousFeedEnabled();
+
+            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                entry("TWO_RESPONDENT_REPRESENTATIVES", true),
+                entry("RPA_CONTINUOUS_FEED", true),
+                entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false),
+                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false)
+            );
+        }
+
+        @Test
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmittedNoRespondentIsRepresented() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedNoRespondentRepresented().build();
 
@@ -206,6 +238,63 @@ class StateFlowEngineTest {
                     .respondent2Represented(YES)
                     .build();
             }
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_SUBMITTED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(2)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
+        }
+
+        @Test
+        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted2v1RespondentIsUnrepresented() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentUnrepresented()
+                .build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_SUBMITTED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(2)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
+        }
+
+        @Test
+        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted2v1RespondentIsUnregistered() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentUnregistered()
+                .build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(CLAIM_SUBMITTED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(2)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
+        }
+
+        @Test
+        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted2v1RespondentIsRegistered() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmitted2v1RespondentRegistered()
+                .build();
+
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
             assertThat(stateFlow.getState())

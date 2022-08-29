@@ -44,7 +44,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSub
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneUnrepresentedDefendantOnly;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedRespondent1Unrepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedRespondent2Unrepresented;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentatives;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRegisteredRespondentRepresentatives;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedTwoRespondentRepresentativesOneUnregistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOffline;
@@ -120,7 +121,7 @@ class FlowPredicateTest {
                 .respondent2Represented(YES)
                 .respondent2OrgRegistered(YES)
                 .build();
-            assertTrue(claimSubmittedTwoRespondentRepresentatives.test(caseData));
+            assertTrue(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
         }
 
         @Test
@@ -128,14 +129,38 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimSubmittedTwoRespondentRepresentativesBothUnregistered()
                 .build();
-            assertFalse(claimSubmittedTwoRespondentRepresentatives.test(caseData));
+            assertFalse(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
             assertTrue(claimSubmittedBothUnregisteredSolicitors.test(caseData));
         }
 
         @Test
         void shouldReturnFalse_whenCaseDataAtDraftState() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            assertFalse(claimSubmittedTwoRespondentRepresentatives.test(caseData));
+            assertFalse(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtClaimSubmittedTwoRepresentativesStateRespOneUnreg() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedTwoRespondentRepresentatives()
+                .respondent2Represented(YES)
+                .respondent2OrgRegistered(YES)
+                .respondent1OrgRegistered(NO)
+                .respondent2SameLegalRepresentative(NO)
+                .build();
+            assertFalse(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
+            assertTrue(claimSubmittedTwoRespondentRepresentativesOneUnregistered.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtClaimSubmittedTwoRepresentativesStateRespTwoUnreg() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedTwoRespondentRepresentatives()
+                .respondent2Represented(YES)
+                .respondent2OrgRegistered(NO)
+                .respondent1OrgRegistered(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .build();
+            assertFalse(claimSubmittedTwoRegisteredRespondentRepresentatives.test(caseData));
+            assertTrue(claimSubmittedTwoRespondentRepresentativesOneUnregistered.test(caseData));
         }
     }
 

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class DisposalHearingPreferredEmail {
+public class DisposalHearingAddNewDirections {
 
-    private String email;
+    private String directionComment;
 }

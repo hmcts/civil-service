@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.fetchDefendantName;
 
 @Service
 @RequiredArgsConstructor
@@ -100,7 +101,8 @@ public class AgreedExtensionDateApplicantNotificationHandler extends CallbackHan
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             AGREED_EXTENSION_DATE, formatLocalDate(extensionDate.toLocalDate(), DATE),
-            PARTY_REFERENCES, buildPartiesReferences(caseData)
+            PARTY_REFERENCES, buildPartiesReferences(caseData),
+            DEFENDANT_NAME, fetchDefendantName(caseData)
         );
     }
 
