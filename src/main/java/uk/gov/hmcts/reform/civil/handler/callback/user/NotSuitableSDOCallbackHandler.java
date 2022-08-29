@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -35,10 +38,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(NotSuitable_SDO);
-
     public static final String NotSuitableSDO_CONFIRMATION_BODY = "<br />If a Judge has submitted this information, "
         + "a notification will be sent to the listing officer to look at this case offline."
-        + "%n%nIf a legal advisor has submitted this information a notification will be sent to a judge for review.";
+        + "%n%nIf a legal adviser has submitted this information a notification will be sent to a judge for review.";
 
     private final ObjectMapper objectMapper;
     private final UserService userService;
@@ -47,7 +49,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(MID, "not-suitableSDO-details"), this::prePopulateReasonNotSuitableSDODetailsPages)
+            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitNotSuitableSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -56,29 +58,6 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
-    }
-
-    // This is currently a mid event but once pre states are defined it should be moved to an about to start event.
-    // Once it has been moved to an about to start event the following file will need to be updated:
-    //  FlowStateAllowedEventService.java.
-    // This way pressing previous on the ccd page won't end up calling this method again and thus
-    // repopulating the fields if they have been changed.
-    // There is no reason to add conditionals to avoid this here since having it as an about to start event will mean
-    // it is only ever called once.
-    // Then any changes to fields in ccd will persist in ccd regardless of backwards or forwards page navigation.
-    private CallbackResponse prePopulateReasonNotSuitableSDODetailsPages(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-
-        ReasonNotSuitableSDO tempReasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input("")
-            .build();
-
-        updatedData.reasonNotSuitableSDO(tempReasonNotSuitableSDO).build();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
-            .build();
     }
 
     private CallbackResponse submitNotSuitableSDO(CallbackParams callbackParams) {
@@ -121,6 +100,10 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private String getHeader(CaseData caseData) {
         return format("# Your request was accepted%n## Case has now moved offline");
+    }
+
+    protected CallbackResponse emptyCallbackResponse(CallbackParams callbackParams) {
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     private String getBody(CaseData caseData) {
