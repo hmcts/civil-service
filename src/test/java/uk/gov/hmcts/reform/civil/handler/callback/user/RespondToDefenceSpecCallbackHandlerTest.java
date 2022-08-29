@@ -38,6 +38,8 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
 import java.time.LocalDateTime;
@@ -66,7 +68,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     JacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class,
     UnavailableDateValidator.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    CourtLocationUtils.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -78,6 +81,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private UnavailableDateValidator unavailableDateValidator;
+
+    @MockBean
+    private LocationRefDataService locationRefDataService;
 
     @MockBean
     private Time time;
