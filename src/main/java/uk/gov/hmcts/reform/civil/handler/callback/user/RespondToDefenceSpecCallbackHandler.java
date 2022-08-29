@@ -78,7 +78,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag,
-            callbackKey(MID, "check-court"), this::aboutToSubmit,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(ABOUT_TO_START), this::populateCaseData,
             callbackKey(SUBMITTED), this::buildConfirmation
@@ -163,22 +162,31 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private void handleCourtLocationData(CaseData caseData, CaseData.CaseDataBuilder dataBuilder,
                                          Applicant1DQ.Applicant1DQBuilder dq,
                                          CallbackParams callbackParams) {
-        // TODO use the field in Applicant1DQ
-        // data for court location
-        DynamicList courtLocations = caseData.getCourtLocation().getApplicantPreferredCourtLocationList();
-        LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
-            fetchLocationData(callbackParams), courtLocations);
-        if (Objects.nonNull(courtLocation)) {
-            CourtLocation.CourtLocationBuilder courtLocationBuilder = caseData.getCourtLocation().toBuilder();
-            dataBuilder
-                .courtLocation(courtLocationBuilder
-                                   .applicantPreferredCourt(courtLocation.getCourtLocationCode())
-                                   .caseLocation(CaseLocation.builder()
-                                                     .region(courtLocation.getRegionId())
-                                                     .baseLocation(courtLocation.getEpimmsId()).build())
-                                   //to clear list of court locations from caseData
-                                   .applicantPreferredCourtLocationList(null)
-                                   .build());
+        RequestedCourt requestedCourt = caseData.getApplicant1DQ().getApplicant1DQRequestedCourt();
+        if (requestedCourt != null && requestedCourt.getRequestHearingAtSpecificCourt() == YES) {
+            LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
+                fetchLocationData(callbackParams), requestedCourt.getResponseCourtLocations());
+            if (Objects.nonNull(courtLocation)) {
+                dataBuilder
+                    .courtLocation(CourtLocation.builder()
+                                       .applicantPreferredCourt(courtLocation.getCourtLocationCode())
+                                       .caseLocation(CaseLocation.builder()
+                                                         .region(courtLocation.getRegionId())
+                                                         .baseLocation(courtLocation.getEpimmsId()).build())
+                                       .applicantPreferredCourtLocationList(null)
+                                       .build())
+                    .applicant1DQ(dq
+                                      .applicant1DQRequestedCourt(
+                                          caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().toBuilder()
+                                              .responseCourtLocations(null)
+                                              .caseLocation(CaseLocation.builder()
+                                                                .region(courtLocation.getRegionId())
+                                                                .baseLocation(courtLocation.getEpimmsId())
+                                                                .build())
+                                              .responseCourtCode(courtLocation.getCourtLocationCode()).build()
+                                      )
+                                      .build());
+            }
         }
     }
 
@@ -190,11 +198,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .respondent1Copy(caseData.getRespondent1())
             .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
             .superClaimType(SPEC_CLAIM)
+            .courtLocation(CourtLocation.builder()
+                               .applicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations))
+                               .build())
             .applicant1DQ(caseData.getApplicant1DQ().toBuilder()
                               .applicant1DQRequestedCourt(
                                   RequestedCourt.builder()
-                                      .reasonForHearingAtSpecificCourt("A reason")
-                                      .requestHearingAtSpecificCourt(YES)
                                       .responseCourtLocations(courtLocationUtils.getLocationsFromList(locations))
                                       .build()
                               )
