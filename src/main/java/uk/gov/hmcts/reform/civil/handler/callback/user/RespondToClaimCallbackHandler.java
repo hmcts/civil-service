@@ -683,13 +683,15 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtLocations();
             LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
                 fetchLocationData(callbackParams), courtLocations);
-            dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().toBuilder()
-                                               .responseCourtLocations(null)
-                                               .caseLocation(CaseLocation.builder()
-                                                                 .region(courtLocation.getRegionId())
-                                                                 .baseLocation(courtLocation.getEpimmsId())
-                                                                 .build())
-                                               .responseCourtCode(courtLocation.getCourtLocationCode()).build());
+            if (courtLocation != null) {
+                dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().toBuilder()
+                                                   .responseCourtLocations(null)
+                                                   .caseLocation(CaseLocation.builder()
+                                                                     .region(courtLocation.getRegionId())
+                                                                     .baseLocation(courtLocation.getEpimmsId())
+                                                                     .build())
+                                                   .responseCourtCode(courtLocation.getCourtLocationCode()).build());
+            }
         }
 
     }
@@ -705,13 +707,15 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .getRespondent2DQ().getRespondent2DQRequestedCourt().getResponseCourtLocations();
             LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
                 fetchLocationData(callbackParams), courtLocations);
-            dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ().getRequestedCourt().toBuilder()
-                                               .responseCourtLocations(null)
-                                               .caseLocation(CaseLocation.builder()
-                                                                 .region(courtLocation.getRegionId())
-                                                                 .baseLocation(courtLocation.getEpimmsId())
-                                                                 .build())
-                                               .responseCourtCode(courtLocation.getCourtLocationCode()).build());
+            if (courtLocation != null) {
+                dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ().getRequestedCourt().toBuilder()
+                                                   .responseCourtLocations(null)
+                                                   .caseLocation(CaseLocation.builder()
+                                                                     .region(courtLocation.getRegionId())
+                                                                     .baseLocation(courtLocation.getEpimmsId())
+                                                                     .build())
+                                                   .responseCourtCode(courtLocation.getCourtLocationCode()).build());
+            }
         }
     }
 }
