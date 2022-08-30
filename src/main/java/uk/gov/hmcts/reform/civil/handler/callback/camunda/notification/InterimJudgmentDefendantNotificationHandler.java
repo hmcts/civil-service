@@ -126,8 +126,6 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     }
 
     private String getLegalOrganizationName(final CaseData caseData) {
-        log.info("ORG ID : "+caseData.getRespondent1OrganisationPolicy()
-                     .getOrganisation().getOrganisationID());
         Optional<Organisation> organisation = organisationService
             .findOrganisationById(caseData.getRespondent1OrganisationPolicy()
                                       .getOrganisation().getOrganisationID());
@@ -140,6 +138,11 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     }
 
     private String getLegalOrganizationNameDefendant2(final CaseData caseData) {
+        log.info("ORG ID : "+caseData.getRespondent2OrganisationPolicy());
+        log.info("ORG ID : "+caseData.getRespondent2OrganisationPolicy()
+            .getOrganisation());
+        log.info("ORG ID : "+caseData.getRespondent1OrganisationPolicy()
+            .getOrganisation().getOrganisationID());
 
         Optional<Organisation> organisation = organisationService
             .findOrganisationById(caseData.getRespondent2OrganisationPolicy()
