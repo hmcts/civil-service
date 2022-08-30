@@ -103,6 +103,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
@@ -2691,6 +2692,18 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atState1v2DifferentSolicitorDivergentResponseSpec(RespondentResponseTypeSpec respondent1Response,
+                                                                        RespondentResponseTypeSpec respondent2Response) {
+        atStateNotificationAcknowledged();
+        respondent1ClaimResponseTypeForSpec = respondent1Response;
+        respondent2RespondsSpec(respondent2Response);
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondentResponseIsSame(NO);
+        respondent2ResponseDate = respondent1ResponseDate;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        return this;
+    }
+
     public CaseDataBuilder respondent2RespondsSpec(RespondentResponseTypeSpec responseType) {
         this.respondent2ClaimResponseTypeForSpec = responseType;
         this.respondent2ResponseDate = LocalDateTime.now().plusDays(1);
@@ -2988,6 +3001,9 @@ public class CaseDataBuilder {
         } else if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP) {
             atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2();
             atStateRespondentFullDefenceSpec();
+        } else if (mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2();
+            atState1v2DifferentSolicitorDivergentResponseSpec(RespondentResponseTypeSpec.FULL_DEFENCE, RespondentResponseTypeSpec.FULL_DEFENCE);
         } else if (mpScenario == TWO_V_ONE) {
             applicant1ProceedWithClaimSpec2v1 = YES;
             atStateBothApplicantsRespondToDefenceAndProceed_2v1_SPEC();
