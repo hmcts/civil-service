@@ -2954,8 +2954,12 @@ public class CaseDataBuilder {
         superClaimType = SPEC_CLAIM;
 
         atStateApplicantRespondToDefenceAndProceed(mpScenario);
-        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP) {
+
+        if (mpScenario == ONE_V_ONE) {
+            atStateRespondentFullDefenceSpec();
+        } else if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP) {
             atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2();
+            atStateRespondentFullDefenceSpec();
         } else if (mpScenario == TWO_V_ONE) {
             applicant1ProceedWithClaimSpec2v1 = YES;
             atStateBothApplicantsRespondToDefenceAndProceed_2v1_SPEC();
