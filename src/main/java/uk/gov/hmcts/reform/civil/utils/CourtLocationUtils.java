@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.utils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
-
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -18,6 +18,7 @@ public class CourtLocationUtils {
                             .map(location -> location.getSiteName()
                                 + " - " + location.getCourtAddress()
                                 + " - " + location.getPostcode())
+                            .sorted()
                             .collect(Collectors.toList()));
     }
 
