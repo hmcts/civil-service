@@ -132,9 +132,12 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     }
 
     private String getLegalOrganizationNameDefendant2(final CaseData caseData) {
+        System.out.println(">>>>>>>>>"+caseData.getRespondent2OrganisationPolicy()
+            .getOrganisation().getOrganisationID());
         Optional<Organisation> organisation = organisationService
             .findOrganisationById(caseData.getRespondent2OrganisationPolicy()
                                       .getOrganisation().getOrganisationID());
+        System.out.println(">>>>>>>>>"+organisation);
         if (organisation.isPresent()) {
             return organisation.get().getName();
         }

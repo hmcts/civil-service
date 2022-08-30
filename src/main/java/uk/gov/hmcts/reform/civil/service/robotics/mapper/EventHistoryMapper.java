@@ -277,7 +277,7 @@ public class EventHistoryMapper {
             .dateReceived(LocalDateTime.now())
             .litigiousPartyID(litigiousPartyID)
             .eventDetailsText("")
-            .eventDetails(EventDetails.builder().miscText(" Interlocutory Judgment - defendant  and claimant notified")
+            .eventDetails(EventDetails.builder().miscText("")
                               .build())
             .build());
     }
@@ -318,7 +318,7 @@ public class EventHistoryMapper {
             .dateReceived(LocalDateTime.now())
             .litigiousPartyID(litigiousPartyID)
             .eventDetailsText("")
-            .eventDetails(EventDetails.builder().miscText(" Default Judgment - defendant and claimant notified")
+            .eventDetails(EventDetails.builder().miscText("")
                               .amountOfJudgment(amountClaimedWithInterest)
                               .amountOfCosts(getCostOfJudgment(caseData))
                               .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES)
