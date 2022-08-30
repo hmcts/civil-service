@@ -36,6 +36,7 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private final String caseNumber;
     private final String applicant;
     private final String respondent;
+    private final String judgeNameTitle;
 
     //default judgement SDO fields for disposal
     private final DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;

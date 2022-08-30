@@ -169,6 +169,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         //UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         //populates the disposal screen
+        caseDataBuilder.disposalHearingJudgesRecitalDJName("[Title] [Surname]");
         caseDataBuilder
             .disposalHearingJudgesRecitalDJ(DisposalHearingJudgesRecitalDJ
                                                            .builder()

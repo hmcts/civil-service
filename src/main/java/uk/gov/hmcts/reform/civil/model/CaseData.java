@@ -456,6 +456,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String applicantVRespondentText;
 
     //default judgement SDO fields for disposal
+    private final String disposalHearingJudgesRecitalDJName;
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private DisposalHearingDisclosureOfDocumentsDJ disposalHearingDisclosureOfDocumentsDJ;
     private DisposalHearingWitnessOfFactDJ disposalHearingWitnessOfFactDJ;
