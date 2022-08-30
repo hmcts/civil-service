@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -26,6 +28,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_INTERIM_JUDGME
 @Service
 @RequiredArgsConstructor
 public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler implements NotificationData {
+
+    Logger log = LoggerFactory.getLogger(InterimJudgmentDefendantNotificationHandler.class);
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -122,9 +126,13 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     }
 
     private String getLegalOrganizationName(final CaseData caseData) {
+        log.info("ORG ID : "+caseData.getRespondent1OrganisationPolicy()
+                     .getOrganisation().getOrganisationID());
         Optional<Organisation> organisation = organisationService
             .findOrganisationById(caseData.getRespondent1OrganisationPolicy()
                                       .getOrganisation().getOrganisationID());
+
+        log.info("ORG Details : "+organisation);
         if (organisation.isPresent()) {
             return organisation.get().getName();
         }
@@ -132,12 +140,11 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     }
 
     private String getLegalOrganizationNameDefendant2(final CaseData caseData) {
-        System.out.println(">>>>>>>>>"+caseData.getRespondent2OrganisationPolicy()
-            .getOrganisation().getOrganisationID());
+
         Optional<Organisation> organisation = organisationService
             .findOrganisationById(caseData.getRespondent2OrganisationPolicy()
                                       .getOrganisation().getOrganisationID());
-        System.out.println(">>>>>>>>>"+organisation);
+
         if (organisation.isPresent()) {
             return organisation.get().getName();
         }
