@@ -1129,13 +1129,7 @@ public class EventHistoryMapper {
                     applicant2Proceeds = caseData.getApplicant2ProceedWithClaimMultiParty2v1();
                     respondent1MediationRequired = caseData.getResponseClaimMediationSpecRequired();
 
-                    if (NO.equals(applicant1Proceeds) || NO.equals(applicant2Proceeds)
-                        || (claimType == SPEC_CLAIM
-                            && AllocatedTrack.SMALL_CLAIM.name().equals(track)
-                            && respondent1MediationRequired == YesOrNo.YES
-                            && applicant1MediationRequired == YesOrNo.YES
-                            && applicant2MediationRequired == YesOrNo.YES
-                        )
+                    if (NO.equals(applicant1Proceeds) || NO.equals(applicant2Proceeds) || (claimType == SPEC_CLAIM && AllocatedTrack.SMALL_CLAIM.name().equals(track) && respondent1MediationRequired == YesOrNo.YES && applicant1MediationRequired == YesOrNo.YES && applicant2MediationRequired == YesOrNo.YES)
                     ) {
                         List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                         builder.miscellaneous(miscText);

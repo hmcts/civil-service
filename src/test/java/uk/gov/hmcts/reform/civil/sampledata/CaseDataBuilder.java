@@ -18,34 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
-import uk.gov.hmcts.reform.civil.model.Address;
-import uk.gov.hmcts.reform.civil.model.Bundle;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.CaseNote;
-import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
-import uk.gov.hmcts.reform.civil.model.ClaimValue;
-import uk.gov.hmcts.reform.civil.model.CloseClaim;
-import uk.gov.hmcts.reform.civil.model.CorrectEmail;
-import uk.gov.hmcts.reform.civil.model.CourtLocation;
-import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
-import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.IdValue;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
-import uk.gov.hmcts.reform.civil.model.LitigationFriend;
-import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
-import uk.gov.hmcts.reform.civil.model.RespondToClaim;
-import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
-import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
-import uk.gov.hmcts.reform.civil.model.ResponseDocument;
-import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
-import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.UnemployedComplexTypeLRspec;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
@@ -92,6 +65,7 @@ import java.util.List;
 
 import static java.time.LocalDate.now;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
@@ -154,6 +128,7 @@ public class CaseDataBuilder {
     protected String paymentReference;
     protected String legacyCaseReference;
     protected AllocatedTrack allocatedTrack;
+    protected String responseClaimTrack;
     protected CaseState ccdState;
     protected List<Element<CaseDocument>> systemGeneratedCaseDocuments;
     protected PaymentDetails claimIssuedPaymentDetails;
@@ -271,16 +246,21 @@ public class CaseDataBuilder {
     private List<IdValue<Bundle>> caseBundles;
     private RespondToClaim respondToClaim;
     private RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
+    private YesOrNo defendantSingleResponseToBothClaimants;
     private RespondentResponseTypeSpec respondent2ClaimResponseTypeForSpec;
     private UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
     private RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
     private Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
+    private YesOrNo respondent1MediationRequired;
+    private YesOrNo respondent2MediationRequired;
     private PartnerAndDependentsLRspec respondent1PartnerAndDependent;
     private PartnerAndDependentsLRspec respondent2PartnerAndDependent;
     private ReasonNotSuitableSDO reasonNotSuitableSDO;
     private RepaymentPlanLRspec respondent1RepaymentPlan;
     private RepaymentPlanLRspec respondent2RepaymentPlan;
     private YesOrNo applicantsProceedIntention;
+    private SmallClaimMedicalLRspec applicant1ClaimMediationSpecRequired;
+    private SmallClaimMedicalLRspec applicantMPClaimMediationSpecRequired;
     private YesOrNo specAoSApplicantCorrespondenceAddressRequired;
     private Address specAoSApplicantCorrespondenceAddressDetails;
     private YesOrNo specAoSRespondent2HomeAddressRequired;
@@ -2762,6 +2742,27 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateBothApplicantsRespondToDefenceAndProceed_2v1_SPEC() {
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        defendantSingleResponseToBothClaimants = YES;
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        applicant1ProceedWithClaimMultiParty2v1 = YES;
+        applicant2ProceedWithClaimMultiParty2v1 = YES;
+
+        applicant1DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response-1.pdf").build())
+            .build();
+        applicant1DQ();
+        applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        applicant2DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response-1.pdf").build())
+            .build();
+        applicant2DQ();
+        applicant2ResponseDate = respondent1ResponseDate.plusDays(1);
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
     public CaseDataBuilder atStateApplicant1RespondToDefenceAndProceed_2v1() {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
@@ -2940,6 +2941,26 @@ public class CaseDataBuilder {
                                                    .input("unforeseen complexities")
                                                    .build();
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateApplicantProceedAllMediation(MultiPartyScenario mpScenario) {
+
+        applicant1ClaimMediationSpecRequired = new SmallClaimMedicalLRspec(YES);
+        applicantMPClaimMediationSpecRequired = new SmallClaimMedicalLRspec(YES);
+        respondent1MediationRequired = YES;
+        respondent2MediationRequired = YES;
+        responseClaimTrack = SMALL_CLAIM.name();
+        superClaimType = SPEC_CLAIM;
+
+        atStateApplicantRespondToDefenceAndProceed(mpScenario);
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP) {
+            atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2();
+        } else if (mpScenario == TWO_V_ONE) {
+            applicant1ProceedWithClaimSpec2v1 = YES;
+            atStateBothApplicantsRespondToDefenceAndProceed_2v1_SPEC();
+        }
+
         return this;
     }
 
@@ -3393,6 +3414,11 @@ public class CaseDataBuilder {
             .claimant2ClaimResponseTypeForSpec(claimant2ClaimResponseTypeForSpec)
             .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
             .respondent2ClaimResponseTypeForSpec(respondent2ClaimResponseTypeForSpec)
+            .responseClaimTrack(responseClaimTrack)
+            .applicant1ClaimMediationSpecRequired(applicant1ClaimMediationSpecRequired)
+            .applicantMPClaimMediationSpecRequired(applicantMPClaimMediationSpecRequired)
+            .responseClaimMediationSpecRequired(respondent1MediationRequired)
+            .responseClaimMediationSpec2Required(respondent1MediationRequired)
             .respondentSolicitor2Reference(respondentSolicitor2Reference)
             .claimant1ClaimResponseTypeForSpec(claimant1ClaimResponseTypeForSpec)
             .claimant2ClaimResponseTypeForSpec(claimant2ClaimResponseTypeForSpec)
@@ -3409,6 +3435,7 @@ public class CaseDataBuilder {
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
             .specRespondent1Represented(specRespondent1Represented)
             .specRespondent2Represented(specRespondent2Represented)
+            .defendantSingleResponseToBothClaimants(defendantSingleResponseToBothClaimants)
             .breathing(breathing)
             .caseManagementOrderSelection(caseManagementOrderSelection)
             .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
