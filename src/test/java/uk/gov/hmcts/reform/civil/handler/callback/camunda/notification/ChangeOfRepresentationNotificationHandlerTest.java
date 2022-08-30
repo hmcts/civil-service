@@ -89,7 +89,7 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
         class NotifyPreviousSolicitorEvent {
 
             @Test
-            void shouldNotifyFormerSolicitorWhenInvoked_whenInvoked() {
+            void shouldNotifyFormerSolicitor_whenInvoked() {
                 CaseData caseData =
                     CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1().build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
