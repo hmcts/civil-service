@@ -6,8 +6,6 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.sendletter.api.Document;
 import uk.gov.hmcts.reform.sendletter.api.Letter;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
@@ -31,13 +29,13 @@ public class BulkPrintService {
         value = RuntimeException.class,
         backoff = @Backoff(delay = 200)
     )
-    public SendLetterResponse printLetter(byte[] letterContent){
+    public SendLetterResponse printLetter(byte[] letterContent) {
         String authorisation = authTokenGenerator.generate();
         Letter letter = generateLetter(Map.of(), letterContent);
         return sendLetterApi.sendLetter(authorisation, letter);
     }
 
-    private Letter generateLetter( Map<String, Object> letterParams, byte[] letterContent){
+    private Letter generateLetter(Map<String, Object> letterParams, byte[] letterContent) {
         String templateLetter = Base64.getEncoder().encodeToString(letterContent);
         Document document = new Document(templateLetter, letterParams);
         return new Letter(List.of(document), XEROX_TYPE_PARAMETER);
