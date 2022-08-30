@@ -38,9 +38,9 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
             .claimantFullName(caseData.getApplicant1().getPartyName())
             .defendant(caseData.getRespondent1())
             .responseDeadline(caseData.getRespondent1ResponseDeadline())
+            .totalAmountOfClaim(caseData.getTotalClaimAmount())
             .issueDate(LocalDate.now())
             .build();
     }
-
 
 }

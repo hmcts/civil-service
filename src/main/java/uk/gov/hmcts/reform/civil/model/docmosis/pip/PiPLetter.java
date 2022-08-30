@@ -10,6 +10,7 @@ import lombok.Getter;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -22,7 +23,7 @@ public class PiPLetter implements MappableObject {
     private final Party defendant;
     private final String claimantFullName;
     private final String respondToClaimUrl;
-    private final String totalAmountOfClaim;
+    private final BigDecimal totalAmountOfClaim;
     private final String claimReferenceNumber;
     private final String pin;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
