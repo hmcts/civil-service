@@ -2,13 +2,9 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RecipientData;
 
 public class NocNotificationUtils {
-
-    private static String otherSolicitor1Email;
-    private static String otherSolicitor1OrgId;
-    private static String otherSolicitor2Email;
-    private static String otherSolicitor2OrgId;
 
     private NocNotificationUtils() {
         //NO-OP
@@ -18,51 +14,57 @@ public class NocNotificationUtils {
         return caseData.getChangeOfRepresentation().getFormerRepresentationEmailAddress();
     }
 
-    private static void setOtherSolicitor1(CaseData caseData) {
+    private static RecipientData getOtherSolicitor1(CaseData caseData) {
         if (isRespondent2NewSolicitor(caseData)) {
-            otherSolicitor1Email = caseData.getApplicantSolicitor1UserDetails().getEmail();
-            otherSolicitor1OrgId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
-        } else if (caseData.getChangeOfRepresentation().getCaseRole().equals(CaseRole.APPLICANTSOLICITORONE)) {
-            otherSolicitor1Email = caseData.getRespondentSolicitor2EmailAddress();
-            otherSolicitor1OrgId = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+            return RecipientData.builder()
+                .email(caseData.getApplicantSolicitor1UserDetails().getEmail())
+                .orgId(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
+                .build();
+        } else if (caseData.getChangeOfRepresentation().getCaseRole()
+            .equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName())) {
+            return RecipientData.builder()
+                .email(caseData.getRespondentSolicitor2EmailAddress())
+                .orgId(caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID())
+                .build();
         } else {
-            otherSolicitor1Email = caseData.getRespondentSolicitor1EmailAddress();
-            otherSolicitor1OrgId = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+            return RecipientData.builder()
+                .email(caseData.getRespondentSolicitor1EmailAddress())
+                .orgId(caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
+                .build();
         }
     }
 
-    private static void setOtherSolicitor2(CaseData caseData) {
+    private static RecipientData getOtherSolicitor2(CaseData caseData) {
         if (isRespondent2NewSolicitor(caseData)) {
-            otherSolicitor2Email = caseData.getRespondentSolicitor1EmailAddress();
-            otherSolicitor2OrgId = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+            return RecipientData.builder().email(caseData.getRespondentSolicitor1EmailAddress())
+                .orgId(caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
+                .build();
         } else {
-            otherSolicitor2Email = caseData.getRespondentSolicitor2EmailAddress();
-            otherSolicitor2OrgId = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+            return RecipientData.builder().email(caseData.getRespondentSolicitor2EmailAddress())
+                .orgId(caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID())
+                .build();
         }
     }
 
     public static String getOtherSolicitor1Email(CaseData caseData) {
-        setOtherSolicitor1(caseData);
-        return otherSolicitor1Email;
+        return getOtherSolicitor1(caseData).getEmail();
     }
 
     public static String getOtherSolicitor1Name(CaseData caseData) {
-        setOtherSolicitor1(caseData);
-        return otherSolicitor1OrgId;
+        return getOtherSolicitor1(caseData).getOrgId();
     }
 
     public static String getOtherSolicitor2Email(CaseData caseData) {
-        setOtherSolicitor2(caseData);
-        return otherSolicitor2Email;
+        return getOtherSolicitor2(caseData).getEmail();
     }
 
     public static String getOtherSolicitor2Name(CaseData caseData) {
-        setOtherSolicitor2(caseData);
-        return otherSolicitor2OrgId;
+        return getOtherSolicitor2(caseData).getOrgId();
     }
 
-    public static boolean isRespondent2NewSolicitor(CaseData caseData) {
-        return caseData.getChangeOfRepresentation().getCaseRole().equals(CaseRole.RESPONDENTSOLICITORTWO);
+    private static boolean isRespondent2NewSolicitor(CaseData caseData) {
+        return caseData.getChangeOfRepresentation().getCaseRole()
+            .equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
     }
 
     public static String getCaseName(CaseData caseData) {
