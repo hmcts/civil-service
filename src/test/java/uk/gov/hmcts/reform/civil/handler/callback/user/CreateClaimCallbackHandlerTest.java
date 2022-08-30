@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
@@ -803,7 +804,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class AboutToSubmitCallback {
+    class AboutToSubmitCallbackOld {
 
         private CallbackParams params;
         private CaseData caseData;
@@ -815,7 +816,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .courtLocation_old()
+                .build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
 
@@ -874,7 +877,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCopyRespondent1OrgPolicyReferenceForSameRegisteredSolicitorScenario_whenInvoked() {
-            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative().build();
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative()
+                .courtLocation_old().build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(
                     caseData,
@@ -890,7 +894,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotCopyRespondent1OrgPolicyDetailsFor1v2SameUnregisteredSolicitorScenario_whenInvoked() {
-            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameUnregisteredRepresentative().build();
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameUnregisteredRepresentative()
+                .courtLocation_old().build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(
@@ -910,7 +915,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldSetAddLegalRepDeadline_whenInvoked() {
                 when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
                 when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
-                caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant().build();
+                caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant().courtLocation_old()
+                    .build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
@@ -923,7 +929,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldSetAddLegalRepDeadline_1v2_2LiPs_whenInvoked() {
                 when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
                 when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
-                caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
+                caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().courtLocation_old()
+                    .build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
@@ -936,7 +943,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldSetAddLegalRepDeadline_1v2_1LiP_whenInvoked() {
                 when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
                 when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
-                caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().build();
+                caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().courtLocation_old()
+                    .build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
@@ -961,7 +969,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldAddIdamEmailToIdamDetails_whenIdamEmailIsCorrect() {
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().courtLocation_old()
+                    .build().toBuilder()
                     .applicantSolicitor1CheckEmail(CorrectEmail.builder()
                                                        .email(EMAIL)
                                                        .correct(YES)
@@ -990,7 +999,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 given(idamClient.getUserDetails(any()))
                     .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().courtLocation_old()
+                    .build().toBuilder()
                     .applicantSolicitor1CheckEmail(CorrectEmail.builder()
                                                        .email(EMAIL)
                                                        .correct(NO)
@@ -998,6 +1008,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                                                         .email(DIFFERENT_EMAIL)
                                                         .build())
+
                     .build();
 
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1058,6 +1069,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             void oneVTwo() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDraft()
+                    .courtLocation_old()
                     .multiPartyClaimTwoDefendantSolicitors()
                     .build();
 
@@ -1072,6 +1084,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             void twoVOne() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDraft()
+                    .courtLocation_old()
                     .multiPartyClaimTwoApplicants()
                     .build();
 
@@ -1083,38 +1096,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             }
         }
 
-        @Nested
-        class HandleCourtLocation {
-            @Test
-            void shouldHandleCourtLocationData() {
-                LocationRefData locationA = LocationRefData.builder()
-                    .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").build();
-
-                given(courtLocationUtility.findPreferredLocationData(any(), any(DynamicList.class)))
-                    .willReturn(locationA);
-
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-                assertThat(response.getData())
-                    .extracting("courtLocation")
-                    .extracting("applicantPreferredCourtLocationList").isNull();
-
-                assertThat(response.getData())
-                    .extracting("courtLocation")
-                    .extracting("caseLocation")
-                    .extracting("region", "baseLocation")
-                    .containsExactly("regionId1", "epimmsId1");
-
-                assertThat(response.getData())
-                    .extracting("courtLocation")
-                    .extracting("applicantPreferredCourt").isEqualTo("312");
-            }
-        }
-
         @Test
         void shouldUpdateCaseListAndUnassignedListData() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
+                .courtLocation_old()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                                                   .orgPolicyReference("CLAIMANTREF1")
@@ -1172,6 +1158,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             void oneVOne() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDraft()
+                    .courtLocation_old()
                     .respondent2OrganisationPolicy(null)
                     .build();
 
@@ -1193,12 +1180,437 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             void unrepresentedDefendants() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDraft()
+                    .courtLocation_old()
                     .respondent1OrganisationPolicy(null)
                     .respondent2OrganisationPolicy(null)
                     .build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData())
+                    .extracting("respondent1OrganisationPolicy")
+                    .extracting("OrgPolicyCaseAssignedRole")
+                    .isEqualTo("[RESPONDENTSOLICITORONE]");
+
+                assertThat(response.getData())
+                    .extracting("respondent1OrganisationPolicy")
+                    .extracting("Organisation")
+                    .isNull();
+
+                assertThat(response.getData())
+                    .extracting("respondent2OrganisationPolicy")
+                    .extracting("OrgPolicyCaseAssignedRole")
+                    .isEqualTo("[RESPONDENTSOLICITORTWO]");
+
+                assertThat(response.getData())
+                    .extracting("respondent2OrganisationPolicy")
+                    .extracting("Organisation")
+                    .isNull();
+            }
+        }
+    }
+
+    @Nested
+    class AboutToSubmitCallback {
+
+        private CallbackParams params;
+        private CaseData caseData;
+        private String userId;
+
+        private static final String EMAIL = "example@email.com";
+        private static final String DIFFERENT_EMAIL = "other_example@email.com";
+        private final LocalDateTime submittedDate = LocalDateTime.now();
+
+        @BeforeEach
+        void setup() {
+            caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+            userId = UUID.randomUUID().toString();
+
+            given(idamClient.getUserDetails(any()))
+                .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
+
+            given(time.now()).willReturn(submittedDate);
+        }
+
+        @Test
+        void shouldAddCaseReferenceSubmittedDateAndAllocatedTrack_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .containsEntry("legacyCaseReference", REFERENCE_NUMBER)
+                .containsEntry("submittedDate", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME))
+                .containsEntry("allocatedTrack", MULTI_CLAIM.name());
+        }
+
+        @Test
+        void shouldUpdateRespondentAndApplicantWithPartyNameAndPartyTypeDisplayValue_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            Party respondent1 = caseData.getRespondent1();
+            Party applicant1 = caseData.getApplicant1();
+
+            assertThat(response.getData())
+                .extracting("respondent1")
+                .extracting("partyName", "partyTypeDisplayValue")
+                .containsExactly(getPartyNameBasedOnType(respondent1), respondent1.getType().getDisplayValue());
+
+            assertThat(response.getData())
+                .extracting("applicant1")
+                .extracting("partyName", "partyTypeDisplayValue")
+                .containsExactly(getPartyNameBasedOnType(applicant1), applicant1.getType().getDisplayValue());
+        }
+
+        @Test
+        void shouldUpdateBusinessProcess_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(CREATE_CLAIM.name(), "READY");
+        }
+
+        @Test
+        void shouldClearClaimStartedFlag_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(CallbackVersion.V_1, caseData.toBuilder().claimStarted(YES).build(), ABOUT_TO_SUBMIT));
+
+            assertThat(response.getData())
+                .doesNotContainEntry("claimStarted", YES);
+        }
+
+        @Test
+        void shouldCopyRespondent1OrgPolicyReferenceForSameRegisteredSolicitorScenario_whenInvoked() {
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative().build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(
+                    CallbackVersion.V_1,
+                    caseData,
+                    ABOUT_TO_SUBMIT
+                ));
+            var respondent2OrgPolicy = response.getData().get("respondent2OrganisationPolicy");
+
+            assertThat(respondent2OrgPolicy).extracting("OrgPolicyReference").isEqualTo("org1PolicyReference");
+            assertThat(respondent2OrgPolicy)
+                .extracting("Organisation").extracting("OrganisationID")
+                .isEqualTo("org1");
+        }
+
+        @Test
+        void shouldNotCopyRespondent1OrgPolicyDetailsFor1v2SameUnregisteredSolicitorScenario_whenInvoked() {
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameUnregisteredRepresentative().build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(
+                    CallbackVersion.V_1,
+                    caseData,
+                    ABOUT_TO_SUBMIT
+                ));
+
+            var respondent2OrgPolicy = response.getData().get("respondent2OrganisationPolicy");
+
+            assertThat(respondent2OrgPolicy).doesNotHaveToString("OrgPolicyReference");
+            assertThat(respondent2OrgPolicy).doesNotHaveToString("Organisation");
+        }
+
+        @Nested
+        class AddLegalRepDeadline {
+            @Test
+            void shouldSetAddLegalRepDeadline_whenInvoked() {
+                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
+                caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant().build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData()).extracting("addLegalRepDeadline")
+                    .isEqualTo(submittedDate.format(ISO_DATE_TIME));
+            }
+
+            @Test
+            void shouldSetAddLegalRepDeadline_1v2_2LiPs_whenInvoked() {
+                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
+                caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData()).extracting("addLegalRepDeadline")
+                    .isEqualTo(submittedDate.format(ISO_DATE_TIME));
+            }
+
+            @Test
+            void shouldSetAddLegalRepDeadline_1v2_1LiP_whenInvoked() {
+                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
+                caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData()).extracting("addLegalRepDeadline")
+                    .isEqualTo(submittedDate.format(ISO_DATE_TIME));
+            }
+
+        }
+
+        @Nested
+        class IdamEmail {
+
+            @BeforeEach
+            void setup() {
+                caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+                userId = UUID.randomUUID().toString();
+
+                given(idamClient.getUserDetails(any()))
+                    .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
+            }
+
+            @Test
+            void shouldAddIdamEmailToIdamDetails_whenIdamEmailIsCorrect() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                    .applicantSolicitor1CheckEmail(CorrectEmail.builder()
+                                                       .email(EMAIL)
+                                                       .correct(YES)
+                                                       .build())
+                    .applicantSolicitor1UserDetails(IdamUserDetails.builder()
+                                                        .email(DIFFERENT_EMAIL)
+                                                        .build())
+                    .build();
+
+                params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData())
+                    .doesNotHaveToString("applicantSolicitor1CheckEmail")
+                    .doesNotHaveToString("email");
+
+                assertThat(response.getData())
+                    .extracting("applicantSolicitor1UserDetails")
+                    .extracting("id", "email")
+                    .containsExactly(userId, EMAIL);
+            }
+
+            @Test
+            void shouldAddDifferentEmailToIdamDetails_whenIdamEmailIsNotCorrect() {
+                userId = UUID.randomUUID().toString();
+                given(idamClient.getUserDetails(any()))
+                    .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
+
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                    .applicantSolicitor1CheckEmail(CorrectEmail.builder()
+                                                       .email(EMAIL)
+                                                       .correct(NO)
+                                                       .build())
+                    .applicantSolicitor1UserDetails(IdamUserDetails.builder()
+                                                        .email(DIFFERENT_EMAIL)
+                                                        .build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData())
+                    .doesNotHaveToString("applicantSolicitor1CheckEmail")
+                    .doesNotHaveToString("email");
+
+                assertThat(response.getData())
+                    .extracting("applicantSolicitor1UserDetails")
+                    .extracting("id", "email")
+                    .containsExactly(userId, DIFFERENT_EMAIL);
+            }
+        }
+
+        @Nested
+        class ResetStatementOfTruth {
+
+            @Test
+            void shouldMoveStatementOfTruthToCorrectFieldAndResetUIField_whenInvoked() {
+                String name = "John Smith";
+                String role = "Solicitor";
+
+                CaseData data = caseData.toBuilder()
+                    .uiStatementOfTruth(StatementOfTruth.builder().name(name).role(role).build())
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(
+                        CallbackVersion.V_1,
+                        data,
+                        ABOUT_TO_SUBMIT
+                    ));
+
+                assertThat(response.getData())
+                    .extracting("applicantSolicitor1ClaimStatementOfTruth")
+                    .extracting("name", "role")
+                    .containsExactly(name, role);
+
+                assertThat(response.getData())
+                    .extracting("uiStatementOfTruth")
+                    .doesNotHaveToString("name")
+                    .doesNotHaveToString("role");
+            }
+        }
+
+        @Nested
+        class GetAllPartyNames {
+            @Test
+            void oneVOne() {
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData())
+                    .containsEntry("allPartyNames", "Mr. John Rambo V Mr. Sole Trader");
+            }
+
+            @Test
+            void oneVTwo() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDraft()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData())
+                    .containsEntry("allPartyNames", "Mr. John Rambo V Mr. Sole Trader, Mr. John Rambo");
+            }
+
+            @Test
+            void twoVOne() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDraft()
+                    .multiPartyClaimTwoApplicants()
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData())
+                    .containsEntry("allPartyNames", "Mr. John Rambo, Mr. Jason Rambo V Mr. Sole Trader");
+            }
+        }
+
+        @Nested
+        class HandleCourtLocation {
+            @Test
+            void shouldHandleCourtLocationData() {
+                LocationRefData locationA = LocationRefData.builder()
+                    .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").build();
+
+                given(courtLocationUtility.findPreferredLocationData(any(), any(DynamicList.class)))
+                    .willReturn(locationA);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData())
+                    .extracting("courtLocation")
+                    .extracting("applicantPreferredCourtLocationList").isNull();
+
+                assertThat(response.getData())
+                    .extracting("courtLocation")
+                    .extracting("caseLocation")
+                    .extracting("region", "baseLocation")
+                    .containsExactly("regionId1", "epimmsId1");
+
+                assertThat(response.getData())
+                    .extracting("courtLocation")
+                    .extracting("applicantPreferredCourt").isEqualTo("312");
+            }
+        }
+
+        @Test
+        void shouldUpdateCaseListAndUnassignedListData() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                                  .orgPolicyReference("CLAIMANTREF1")
+                                                  .build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyReference("DEFENDANTREF1")
+                                                   .build())
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyReference("DEFENDANTREF2")
+                                                   .build())
+                .build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+
+            assertThat(response.getData())
+                .containsEntry("unassignedCaseListDisplayOrganisationReferences",
+                               "CLAIMANTREF1, DEFENDANTREF1, DEFENDANTREF2");
+            assertThat(response.getData())
+                .containsEntry("caseListDisplayDefendantSolicitorReferences", "6789, 01234");
+        }
+
+        @Test
+        void shouldReturnExpectedErrorMessagesInResponse_whenInvokedWithNullCourtLocation() {
+            CaseData data = caseData.toBuilder()
+                .courtLocation(null)
+                .build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(CallbackVersion.V_1, data, ABOUT_TO_SUBMIT));
+
+            assertThat(response.getErrors()).containsOnly("Court location code is required");
+        }
+
+        @Test
+        void shouldReturnExpectedErrorMessagesInResponse_whenInvokedWithNullApplicantPreferredCourt() {
+            CaseData data = caseData.toBuilder()
+                .courtLocation(CourtLocation.builder().applicantPreferredCourtLocationList(null).build())
+                .build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(CallbackVersion.V_1, data, ABOUT_TO_SUBMIT));
+
+            assertThat(response.getErrors()).containsOnly("Court location code is required");
+        }
+
+        @Nested
+        class PopulateBlankOrgPolicies {
+            @BeforeEach
+            public void setup() {
+                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+            }
+
+            @Test
+            void oneVOne() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDraft()
+                    .respondent2OrganisationPolicy(null)
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData())
+                    .extracting("respondent2OrganisationPolicy")
+                    .extracting("OrgPolicyCaseAssignedRole")
+                    .isEqualTo("[RESPONDENTSOLICITORTWO]");
+
+                assertThat(response.getData())
+                    .extracting("respondent2OrganisationPolicy")
+                    .extracting("Organisation")
+                    .isNull();
+            }
+
+            @Test
+            void unrepresentedDefendants() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDraft()
+                    .respondent1OrganisationPolicy(null)
+                    .respondent2OrganisationPolicy(null)
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData())
                     .extracting("respondent1OrganisationPolicy")

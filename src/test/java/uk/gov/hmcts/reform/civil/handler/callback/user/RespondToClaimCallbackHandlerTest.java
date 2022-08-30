@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -1153,7 +1154,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .build()).build())
                         .build();
 
-                    CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                    CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
                     assertThat(response.getData())
@@ -1201,7 +1202,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .build()).build())
                         .build();
 
-                    CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                    CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
                     assertThat(response.getData())
@@ -1252,7 +1253,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .build()).build())
                         .build();
 
-                    CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                    CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
                     assertThat(response.getData())
@@ -1312,7 +1313,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .respondent2Copy(PartyBuilder.builder().individual().build())
                         .build();
 
-                    CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                    CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
                     assertThat(response.getData())
@@ -1354,7 +1355,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .build()).build())
                         .build();
 
-                    CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                    CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
                     var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
                     assertThat(response.getData())
