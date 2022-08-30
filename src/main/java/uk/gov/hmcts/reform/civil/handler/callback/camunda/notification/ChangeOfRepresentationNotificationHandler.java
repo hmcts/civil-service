@@ -39,6 +39,8 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
     public static final String TASK_ID_NOTIFY_OTHER_SOLICITOR_1 = "NotifyOtherSolicitor1";
     public static final String TASK_ID_NOTIFY_OTHER_SOLICITOR_2 = "NotifyOtherSolicitor2";
 
+    private static final String EVENT_NOT_FOUND_MESSAGE = "Callback handler received illegal event: %s";
+
     private static final String REFERENCE_TEMPLATE = "notice-of-change-%s";
 
     private final NotificationService notificationService;
@@ -63,7 +65,7 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
             case NOTIFY_OTHER_SOLICITOR_2:
                 return TASK_ID_NOTIFY_OTHER_SOLICITOR_2;
             default:
-                throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
+                throw new CallbackException(String.format(EVENT_NOT_FOUND_MESSAGE, caseEvent));
         }
     }
 
@@ -100,7 +102,7 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
             case NOTIFY_OTHER_SOLICITOR_2:
                 return NocNotificationUtils.getOtherSolicitor2Email(caseData);
             default:
-                throw new CallbackException(String.format("Callback handler received illegal event: %s", event));
+                throw new CallbackException(String.format(EVENT_NOT_FOUND_MESSAGE, event));
         }
     }
 
@@ -112,7 +114,7 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
             case NOTIFY_OTHER_SOLICITOR_2:
                 return notificationsProperties.getNoticeOfChangeOtherParties();
             default:
-                throw new CallbackException(String.format("Callback handler received illegal event: %s", event));
+                throw new CallbackException(String.format(EVENT_NOT_FOUND_MESSAGE, event));
         }
     }
 
