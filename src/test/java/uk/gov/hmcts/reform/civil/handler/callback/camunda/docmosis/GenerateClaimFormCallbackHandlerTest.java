@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
@@ -62,6 +63,9 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
     private LitigantInPersonFormGenerator litigantInPersonFormGenerator;
     @MockBean
     private SealedClaimFormGenerator sealedClaimFormGenerator;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     private GenerateClaimFormCallbackHandler handler;
@@ -128,6 +132,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     void setup() {
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
         when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
         when(litigantInPersonFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(LIP_FORM);
         when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
@@ -298,5 +303,37 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
             verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
         }
 
+    }
+
+    @Nested
+    @ExtendWith(SpringExtension.class)
+    @SpringBootTest(classes = {
+        GenerateClaimFormCallbackHandler.class,
+        JacksonAutoConfiguration.class,
+        CaseDetailsConverter.class
+    })
+    class GenerateSealedClaimNoNoC {
+
+        @Autowired
+        private GenerateClaimFormCallbackHandler handler;
+
+        @BeforeEach
+        void setup() {
+            when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(false);
+            when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
+            when(time.now()).thenReturn(issueDate.atStartOfDay());
+        }
+
+        @Test
+        void testSingleSealedClaimGeneratedWhenNoCDisabled() {
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnrepresentedDefendant().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
+            verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
+        }
     }
 }
