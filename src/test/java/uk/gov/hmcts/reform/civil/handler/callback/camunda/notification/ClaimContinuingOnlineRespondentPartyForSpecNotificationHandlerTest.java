@@ -117,7 +117,6 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
             );
         }
 
-
         @Test
         void shouldNotNotifyRespondent1Solicitor_whenNoEmailiIsEntered() {
             CaseData caseData = getCaseData(null);
@@ -150,8 +149,6 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
             );
         }
     }
-
-
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
