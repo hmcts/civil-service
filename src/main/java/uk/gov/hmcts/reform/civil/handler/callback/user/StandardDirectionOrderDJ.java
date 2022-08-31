@@ -289,17 +289,16 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder
             .trialHearingDisclosureOfDocumentsDJ(TrialHearingDisclosureOfDocuments
                                                      .builder()
-                                                     .input1("By serving a list with a disclosure statement by 4pm on")
+                                                     .input1("By uploading to a Digital Portal a list with a "
+                                                                 + "disclosure statement by 4pm on")
                                                      .date1(LocalDate.now().plusWeeks(4))
                                                      .input2("Any request to inspect or for a copy of a document "
                                                                  + "shall by made by 4pm on")
                                                      .date2(LocalDate.now().plusWeeks(6))
                                                      .input3("and complied with with 7 days of the request")
-                                                     .input4("Each party must serve and file with the court a "
-                                                                 + "list of issues relevant to the search for and "
-                                                                 + "disclosure of electronically stored documents, "
-                                                                 + "or must confirm there are no such issues, following"
-                                                                 + " Civil Rule Practice Direction 31B.")
+                                                     .input4("Each party must upload to the Digital Portal copies "
+                                                                 + "of those documents on which they wish to "
+                                                                 + "rely at trial")
                                                      .input5("By 4pm on")
                                                      .date3(LocalDate.now().plusWeeks(4))
                                                      .build());
@@ -307,18 +306,19 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder
             .trialHearingWitnessOfFactDJ(TrialHearingWitnessOfFact
                                              .builder()
-                                             .input1("Each party shall serve on every other party the witness "
-                                                         + "statements of all witnesses of fact on whom he "
-                                                         + "intends to rely")
+                                             .input1("Each party must upload to the Digital Portal copies of the "
+                                                         + "statements of all witnesses of fact on whom they "
+                                                         + "intend to rely.")
                                              .input2("All statements to be no more than")
                                              .input4("pages long, A4, double spaced and in font size 12.")
-                                             .input5("There shall be simultaneous exchange of such "
-                                                         + "statements by 4pm on")
+                                             .input5("Witness statements shall be uploaded to the Digital Portal"
+                                                         + " by 4pm on")
                                              .date1(LocalDate.now().plusWeeks(8))
-                                             .input6("Oral evidence will not be permitted at trial from a "
-                                                         + "witness whose statement has not been served in accordance"
-                                                         + " with this order or has been served late, except with "
-                                                         + "permission from the court")
+                                             .input6("Oral evidence will only be permitted at trial with permission "
+                                                         + "from the Court from witnesses whose statements have not"
+                                                         + " been uploaded to the Digital Portal in accordance with "
+                                                         + "this order, or whose statements that have"
+                                                         + " been served late.")
                                              .build());
 
         caseDataBuilder
