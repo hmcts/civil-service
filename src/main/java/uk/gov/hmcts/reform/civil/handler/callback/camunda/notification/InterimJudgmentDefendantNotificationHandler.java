@@ -130,7 +130,7 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
             .findOrganisationById(caseData.getRespondent1OrganisationPolicy()
                                       .getOrganisation().getOrganisationID());
 
-        log.info("ORG Details : "+organisation);
+        log.info("ORG Details : " + organisation);
         if (organisation.isPresent()) {
             return organisation.get().getName();
         }
@@ -138,10 +138,10 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     }
 
     private String getLegalOrganizationNameDefendant2(final CaseData caseData) {
-        log.info("ORG ID : "+caseData.getRespondent2OrganisationPolicy());
-        log.info("ORG ID : "+caseData.getRespondent2OrganisationPolicy()
+        log.info("ORG ID : " + caseData.getRespondent2OrganisationPolicy());
+        log.info("ORG ID : " + caseData.getRespondent2OrganisationPolicy()
             .getOrganisation());
-        log.info("ORG ID : "+caseData.getRespondent1OrganisationPolicy()
+        log.info("ORG ID : " + caseData.getRespondent1OrganisationPolicy()
             .getOrganisation().getOrganisationID());
 
         Optional<Organisation> organisation = organisationService
