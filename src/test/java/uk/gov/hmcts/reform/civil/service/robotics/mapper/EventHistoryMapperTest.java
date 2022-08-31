@@ -4553,7 +4553,7 @@ class EventHistoryMapperTest {
             }
 
             @Test
-            void shouldPrepareExpectedEvents_whenClaimWithFullDefenceMediationSDO_ONEREP() {
+            void shouldPrepareExpectedEvents_whenClaimWithFullDefenceMediationSDO_OneRep() {
 
                 when(featureToggleService.isSDOEnabled()).thenReturn(true);
 
@@ -4680,7 +4680,7 @@ class EventHistoryMapperTest {
             }
 
             @Test
-            void shouldPrepareExpectedEvents_whenClaimWithFullDefenceMediationSDO_TWOREP() {
+            void shouldPrepareExpectedEvents_whenClaimWithFullDefenceMediationSDO_TwoRep() {
 
                 when(featureToggleService.isSDOEnabled()).thenReturn(true);
 

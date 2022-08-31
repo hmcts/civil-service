@@ -212,6 +212,9 @@ public class EventHistoryMapper {
                     case TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE:
                         buildClaimTakenOfflinePastApplicantResponse(builder, caseData);
                         break;
+                    case TAKEN_OFFLINE_SDO_NOT_DRAWN:
+                        buildSDONotDrawn(builder, caseData);
+                        break;
                     default:
                         break;
                 }

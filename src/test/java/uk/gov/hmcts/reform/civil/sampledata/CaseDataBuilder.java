@@ -2692,8 +2692,9 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atState1v2DifferentSolicitorDivergentResponseSpec(RespondentResponseTypeSpec respondent1Response,
-                                                                        RespondentResponseTypeSpec respondent2Response) {
+    public CaseDataBuilder atState1v2DifferentSolicitorDivergentResponseSpec(
+                                                                    RespondentResponseTypeSpec respondent1Response,
+                                                                    RespondentResponseTypeSpec respondent2Response) {
         atStateNotificationAcknowledged();
         respondent1ClaimResponseTypeForSpec = respondent1Response;
         respondent2RespondsSpec(respondent2Response);
@@ -3003,7 +3004,8 @@ public class CaseDataBuilder {
             atStateRespondentFullDefenceSpec();
         } else if (mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2();
-            atState1v2DifferentSolicitorDivergentResponseSpec(RespondentResponseTypeSpec.FULL_DEFENCE, RespondentResponseTypeSpec.FULL_DEFENCE);
+            atState1v2DifferentSolicitorDivergentResponseSpec(RespondentResponseTypeSpec.FULL_DEFENCE,
+                                                              RespondentResponseTypeSpec.FULL_DEFENCE);
         } else if (mpScenario == TWO_V_ONE) {
             applicant1ProceedWithClaimSpec2v1 = YES;
             atStateBothApplicantsRespondToDefenceAndProceed_2v1_SPEC();

@@ -97,4 +97,5 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     private String getBody(CaseData caseData) {
         return format(NotSuitableSDO_CONFIRMATION_BODY);
     }
+
 }

@@ -461,6 +461,10 @@ public class FlowStateAllowedEventService {
         entry(
             TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED.fullName(),
             List.of(ADD_CASE_NOTE)
+        ),
+        entry(
+            TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName(),
+            List.of(ADD_CASE_NOTE)
         )
     );
 
