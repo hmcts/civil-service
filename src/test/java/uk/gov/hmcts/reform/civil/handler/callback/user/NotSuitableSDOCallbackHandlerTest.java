@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -27,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static java.lang.String.format;
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -39,6 +42,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
     NotSuitableSDOCallbackHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
+    ClaimIssueConfiguration.class,
+    MockDatabaseConfiguration.class,
     ValidationAutoConfiguration.class})
 public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -57,15 +62,33 @@ public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToStartCallback {
 
+        private CallbackParams params;
+        private CaseData caseData;
+        private String userId;
+
+        private static final String EMAIL = "example@email.com";
+        private LocalDateTime startedDate;
+
+        @BeforeEach
+        void setup() {
+            caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            params = callbackParamsOf(caseData, ABOUT_TO_START);
+            userId = UUID.randomUUID().toString();
+
+            given(idamClient.getUserDetails(any()))
+                .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
+
+            startedDate = LocalDateTime.now();
+            given(time.now()).willReturn(startedDate);
+
+        }
+
         @Test
-        void shouldReturnNoError_WhenAboutToSubmitIsInvoked() {
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStatePendingClaimIssued().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseDetails).build();
+        void checkUnsuitableSDODate() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            assertThat(response.getData()).extracting("unsuitableSDODate").isEqualTo(time.now().toString().substring(0, 27));
 
-            assertThat(response.getErrors()).isNull();
         }
     }
 
@@ -89,6 +112,7 @@ public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
+
         }
 
         @Test
@@ -99,6 +123,7 @@ public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(NotSuitable_SDO.name(), "READY");
+
         }
     }
 
@@ -114,7 +139,7 @@ public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             String header = format("# Your request was accepted%n## Case has now moved offline");
             String body = format("<br />If a Judge has submitted this information, "
                 + "a notification will be sent to the listing officer to look at this case offline."
-                + "%n%nIf a legal adviser has submitted this information a notification will be sent "
+                + "%n%nIf a legal advisor has submitted this information a notification will be sent "
                                      + "to a judge for review.");
 
             assertThat(response).usingRecursiveComparison().isEqualTo(

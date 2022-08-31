@@ -182,7 +182,6 @@ public class CaseDataParent implements MappableObject {
     private final SmallClaimsMethodTelephoneHearing smallClaimsMethodTelephoneHearing;
     private final SmallClaimsMethodVideoConferenceHearing smallClaimsMethodVideoConferenceHearing;
     private final List<Element<SmallClaimsAddNewDirections>> smallClaimsAddNewDirections;
-    private ReasonNotSuitableSDO reasonNotSuitableSDO;
     private List<OrderDetailsPagesSectionsToggle> fastTrackAltDisputeResolutionToggle;
     private List<OrderDetailsPagesSectionsToggle> fastTrackVariationOfDirectionsToggle;
     private List<OrderDetailsPagesSectionsToggle> fastTrackSettlementToggle;
