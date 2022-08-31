@@ -232,7 +232,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
             //trialHearingDisclosureOfDocumentsDJ
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input1")
-                .isEqualTo("By serving a list with a disclosure statement by 4pm on");
+                .isEqualTo("By uploading to a Digital Portal a list with a disclosure statement by 4pm on");
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(4).toString());
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input2")
@@ -243,11 +243,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input3")
                 .isEqualTo("and complied with with 7 days of the request");
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input4")
-                .isEqualTo("Each party must serve and file with the court a "
-                               + "list of issues relevant to the search for and "
-                               + "disclosure of electronically stored documents, "
-                               + "or must confirm there are no such issues, following"
-                               + " Civil Rule Practice Direction 31B.");
+                .isEqualTo("Each party must upload to the Digital Portal copies "
+                               + "of those documents on which they wish to rely at trial");
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input5")
                 .isEqualTo("By 4pm on");
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("date3")
@@ -255,42 +252,43 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
             //trialHearingWitnessOfFactDJ
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input1")
-                .isEqualTo("Each party shall serve on every other party the witness "
-                               + "statements of all witnesses of fact on whom he "
-                               + "intends to rely");
+                .isEqualTo("Each party must upload to the Digital Portal"
+                               + " copies of the statements of all witnesses of fact on whom they intend to rely.");
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input2")
                 .isEqualTo("All statements to be no more than");
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input4")
                 .isEqualTo("pages long, A4, double spaced and in font size 12.");
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input5")
-                .isEqualTo("There shall be simultaneous exchange of such "
-                               + "statements by 4pm on");
+                .isEqualTo("Witness statements shall be uploaded to the Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(8).toString());
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input6")
-                .isEqualTo("Oral evidence will not be permitted at trial from a "
-                               + "witness whose statement has not been served in accordance"
-                               + " with this order or has been served late, except with "
-                               + "permission from the court");
+                .isEqualTo("Oral evidence will only be permitted at trial with permission from the Court "
+                               + "from witnesses whose statements have not been uploaded to the Digital "
+                               + "Portal in accordance with this order, or whose statements that "
+                               + "have been served late.");
 
             //trialHearingSchedulesOfLossDJ
             assertThat(response.getData()).extracting("trialHearingSchedulesOfLossDJ").extracting("input1")
-                .isEqualTo("The claimant shall serve an updated schedule of loss "
-                               + "on the defendant(s) by 4pm on");
+                .isEqualTo("The claimant must upload to the Digital Portal "
+                               + "an up-to-date schedule of loss to the defendant by 4pm on");
             assertThat(response.getData()).extracting("trialHearingSchedulesOfLossDJ").extracting("input2")
-                .isEqualTo("The defendant(s) shall serve a counter "
-                               + "schedule on the claimant by 4pm on");
+                .isEqualTo("If the defendant wants to challenge this claim, "
+                               + "upload to the Digital Portal counter-schedule"
+                               + " of loss by 4pm on");
             assertThat(response.getData()).extracting("trialHearingSchedulesOfLossDJ").extracting("input3")
                 .isEqualTo("If there is a claim for future pecuniary loss and the parties"
                                + " have not already set out their case on periodical payments. "
                                + "then they must do so in the respective schedule "
                                + "and counter-schedule");
             assertThat(response.getData()).extracting("trialHearingSchedulesOfLossDJ").extracting("input4")
-                .isEqualTo("Upon it being noted that the schedule of loss contains no claim "
-                               + "for continuing loss and is therefore final, no further"
-                               + " schedule of loss shall be served without permission "
-                               + "to amend. The defendant shall file a counter-schedule "
-                               + "of loss by 4pm on");
+                .isEqualTo("Upon it being noted that the schedule of loss "
+                               + "contains no claim for continuing loss and is "
+                               + "therefore final, no further schedule of loss shall"
+                               + " be uploaded without permission to amend. "
+                               + "The defendant shall upload to the Digital Portal"
+                               + " an up-to-date counter "
+                               + "schedule of loss by 4pm on");
             assertThat(response.getData()).extracting("trialHearingSchedulesOfLossDJ").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(10).toString());
             assertThat(response.getData()).extracting("trialHearingSchedulesOfLossDJ").extracting("date2")
@@ -310,16 +308,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + " insufficient, they must inform the court within "
                                + "7 days of the date of this order.");
             assertThat(response.getData()).extracting("trialHearingTrialDJ").extracting("input3")
-                .isEqualTo("Not more than seven nor less than three clear days before "
-                               + "the trial, the claimant must file at court and serve an"
-                               + "indexed and paginated bundle of documents which complies"
-                               + " with the requirements of Rule 39.5 Civil "
-                               + "Procedure Rules"
-                               + " and Practice Direction 39A. The parties must "
-                               + "endeavour to agree the contents of the "
-                               + "bundle before it is filed. "
-                               + "The bundle will include a case summary"
-                               + " and a chronology.");
+                .isEqualTo("At least 7 days before the trial, the claimant must"
+                               + " upload to the Digital Portal");
 
             //trialHearingNotesDJ
             assertThat(response.getData()).extracting("trialHearingNotesDJ").extracting("input")

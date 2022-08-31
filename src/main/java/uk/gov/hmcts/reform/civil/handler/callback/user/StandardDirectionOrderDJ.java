@@ -296,9 +296,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                  + "shall by made by 4pm on")
                                                      .date2(LocalDate.now().plusWeeks(6))
                                                      .input3("and complied with with 7 days of the request")
-                                                     .input4("Each party must upload to the Digital Portal copies "
-                                                                 + "of those documents on which they wish to "
-                                                                 + "rely at trial")
+                                                     .input4("Each party must upload to the Digital Portal"
+                                                         + " copies of those documents on which they wish to rely"
+                                                         + " at trial")
                                                      .input5("By 4pm on")
                                                      .date3(LocalDate.now().plusWeeks(4))
                                                      .build());
@@ -324,11 +324,12 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder
             .trialHearingSchedulesOfLossDJ(TrialHearingSchedulesOfLoss
                                                .builder()
-                                               .input1("The claimant shall serve an updated schedule of loss "
-                                                           + "on the defendant(s) by 4pm on")
+                                               .input1("The claimant must upload to the Digital Portal an "
+                                                   + "up-to-date schedule of loss to the defendant by 4pm on")
                                                .date1(LocalDate.now().plusWeeks(10))
-                                               .input2("The defendant(s) shall serve a counter "
-                                                           + "schedule on the claimant by 4pm on")
+                                               .input2("If the defendant wants to challenge this claim, "
+                                                           + "upload to the Digital Portal counter-schedule"
+                                                           + " of loss by 4pm on")
                                                .date2(LocalDate.now().plusWeeks(12))
                                                .input3("If there is a claim for future pecuniary loss and the parties"
                                                            + " have not already set out their "
@@ -336,11 +337,12 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                            + "then they must do so in the respective schedule "
                                                            + "and counter-schedule")
                                                .input4("Upon it being noted that the schedule of loss "
-                                                           + "contains no claim "
-                                                           + "for continuing loss and is therefore final, no further"
-                                                           + " schedule of loss shall be served without permission "
-                                                           + "to amend. The defendant shall file a counter-schedule "
-                                                           + "of loss by 4pm on")
+                                                           + "contains no claim for continuing loss and is "
+                                                           + "therefore final, no further schedule of loss shall"
+                                                           + " be uploaded without permission to amend. "
+                                                           + "The defendant shall upload to the Digital Portal"
+                                                           + " an up-to-date counter "
+                                                           + "schedule of loss by 4pm on")
                                                .date3(LocalDate.now().plusWeeks(12))
                                                .build());
 
@@ -352,16 +354,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                 .input2("If either party considers that the time estimates is"
                                                             + " insufficient, they must inform the court within "
                                                             + "7 days of the date of this order.")
-                                                .input3("Not more than seven nor less than three clear days before "
-                                                            + "the trial, the claimant must file at court and serve an"
-                                                            + "indexed and paginated bundle of documents which complies"
-                                                            + " with the requirements of Rule 39.5 Civil "
-                                                            + "Procedure Rules"
-                                                            + " and Practice Direction 39A. The parties must "
-                                                            + "endeavour to agree the contents of the "
-                                                            + "bundle before it is filed. "
-                                                            + "The bundle will include a case summary"
-                                                            + " and a chronology.")
+                                                .input3("At least 7 days before the trial, the claimant must"
+                                                            + " upload to the Digital Portal")
                                                 .build());
 
         caseDataBuilder.trialHearingNotesDJ(TrialHearingNotes
