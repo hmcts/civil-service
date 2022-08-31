@@ -306,7 +306,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         Map<String, Map<String, Map<String, Object>>> supplementaryDataCivil = new HashMap<>();
         supplementaryDataCivil.put("supplementary_data_updates",
                                    singletonMap("$set", singletonMap("HMCTSServiceId",
-                                                                     paymentsConfiguration.getSiteId())));
+                                                                     "AAA7")));
         coreCaseDataService.setSupplementaryData(caseId, supplementaryDataCivil);
 
     }
