@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
@@ -45,6 +46,8 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final Time time;
 
+    private final FeatureToggleService featureToggleService;
+
     @Value("${stitching.enabled}")
     private boolean stitchEnabled;
 
@@ -74,7 +77,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
-        if (stitchEnabled && (YesOrNo.NO.equals(caseData.getRespondent1Represented())
+        if (featureToggleService.isNoticeOfChangeEnabled() && stitchEnabled && (YesOrNo.NO.equals(caseData.getRespondent1Represented())
             || YesOrNo.NO.equals(caseData.getRespondent2Represented()))) {
 
             CaseDocument lipForm = litigantInPersonFormGenerator.generate(
