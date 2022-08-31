@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.genapplication;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -16,8 +17,10 @@ import java.util.List;
 
 @Data
 @Builder(toBuilder = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GeneralApplication implements MappableObject {
 
+    private final String generalApplicationState;
     private final GAApplicationType generalAppType;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
     private final BusinessProcess businessProcess;
@@ -43,9 +46,12 @@ public class GeneralApplication implements MappableObject {
     private final String defendant1PartyName;
     private final String defendant2PartyName;
     private final String generalAppSuperClaimType;
+    private final LocalDateTime applicationClosedDate;
+    private final LocalDateTime applicationTakenOfflineDate;
 
     @JsonCreator
-    GeneralApplication(@JsonProperty("generalAppType") GAApplicationType generalAppType,
+    GeneralApplication(@JsonProperty("generalApplicationState") String generalApplicationState,
+                       @JsonProperty("generalAppType") GAApplicationType generalAppType,
                        @JsonProperty("generalAppRespondentAgreement")
                            GARespondentOrderAgreement generalAppRespondentAgreement,
                        @JsonProperty("businessProcess") BusinessProcess businessProcess,
@@ -71,7 +77,11 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("claimant2PartyName") String claimant2PartyName,
                        @JsonProperty("defendant1PartyName") String defendant1PartyName,
                        @JsonProperty("defendant2PartyName") String defendant2PartyName,
-                       @JsonProperty("generalAppSuperClaimType") String generalAppSuperClaimType) {
+                       @JsonProperty("generalAppSuperClaimType") String generalAppSuperClaimType,
+                       @JsonProperty("applicationClosedDate") LocalDateTime applicationClosedDate,
+                       @JsonProperty("applicationTakenOfflineDate") LocalDateTime applicationTakenOfflineDate
+                       ) {
+        this.generalApplicationState = generalApplicationState;
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
         this.businessProcess = businessProcess;
@@ -97,5 +107,7 @@ public class GeneralApplication implements MappableObject {
         this.defendant1PartyName = defendant1PartyName;
         this.defendant2PartyName = defendant2PartyName;
         this.generalAppSuperClaimType = generalAppSuperClaimType;
+        this.applicationClosedDate = applicationClosedDate;
+        this.applicationTakenOfflineDate = applicationTakenOfflineDate;
     }
 }

@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
@@ -25,14 +26,15 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static java.time.LocalDate.EPOCH;
+import static java.time.LocalDateTime.now;
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -274,6 +276,34 @@ public class GeneralApplicationDetailsBuilder {
                         .unavailableTrialRequiredYesOrNo(YES)
                         .supportRequirementLanguageInterpreter(STRING_CONSTANT)
                         .build())
+                .build();
+    }
+
+    public CaseData getTestCaseDataWithDetails(CaseData caseData) {
+
+        return caseData.toBuilder()
+            .ccdCaseReference(1234L)
+                .generalApplicationsDetails(wrapElements(
+                        getGADetails("1234", "Application Submitted - Awaiting Judicial Decision"),
+                        getGADetails("2345", "Order Made"),
+                        getGADetails("3456", "Awaiting Respondent Response"),
+                        getGADetails("4567", "Directions Order Made"),
+                        getGADetails("5678", "Awaiting Written Representations"),
+                        getGADetails("6789", "Additional Information Require"),
+                        getGADetails("7890", "Application Dismissed"),
+                        getGADetails("8910", "Proceeds In Heritage"),
+                        getGADetails("1011", "Listed for a Hearing")
+
+                ))
+                .build();
+    }
+
+    private GeneralApplicationsDetails getGADetails(String applicationId, String caseState) {
+        return GeneralApplicationsDetails.builder()
+                .generalApplicationType("Summary Judgement")
+                .generalAppSubmittedDateGAspec(now())
+                .caseLink(CaseLink.builder().caseReference(applicationId).build())
+                .caseState(caseState)
                 .build();
     }
 
@@ -817,7 +847,7 @@ public class GeneralApplicationDetailsBuilder {
         .documentName("documentName")
         .documentSize(0L)
         .documentType(GENERAL_ORDER)
-        .createdDatetime(LocalDateTime.now())
+        .createdDatetime(now())
         .documentLink(Document.builder()
                           .documentUrl("fake-url")
                           .documentFileName("file-name")
