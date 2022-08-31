@@ -83,8 +83,9 @@ public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void checkUnsuitableSDODate() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            String timeString = time.now().toString();
             assertThat(response.getData()).extracting("unsuitableSDODate")
-                .isEqualTo(time.now().toString().substring(0, 27));
+                .isEqualTo(timeString.substring(0, Math.min(timeString.length(), 27)));
 
         }
     }
