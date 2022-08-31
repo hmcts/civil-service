@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -50,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DefaultJudgementHandler extends CallbackHandler {
@@ -69,6 +72,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
     private final CoreCaseDataService coreCaseDataService;
     private final PaymentsConfiguration paymentsConfiguration;
     private String participantString;
+    @Value("${payments.api.site_id}") String siteId;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -306,8 +310,9 @@ public class DefaultJudgementHandler extends CallbackHandler {
         Map<String, Map<String, Map<String, Object>>> supplementaryDataCivil = new HashMap<>();
         supplementaryDataCivil.put("supplementary_data_updates",
                                    singletonMap("$set", singletonMap("HMCTSServiceId",
-                                                                     "AAA7")));
+                                                                     paymentsConfiguration.getSiteId())));
         coreCaseDataService.setSupplementaryData(caseId, supplementaryDataCivil);
+        log.info("HMCTSServiceId should equal " + paymentsConfiguration.getSiteId());
 
     }
 
