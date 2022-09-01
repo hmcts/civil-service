@@ -13,6 +13,15 @@ import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixe
 public class DefaultJudgmentUtilsTest {
 
     @Test
+    void shouldReturnFixedCost_whenClaimAmountIsInZeroInstalment() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .addRespondent2(YesOrNo.NO)
+            .totalClaimAmount(new BigDecimal(10)).build();
+        BigDecimal result = calculateFixedCosts(caseData);
+        assertThat(result).isEqualTo(new BigDecimal(0));
+    }
+
+    @Test
     void shouldReturnFixedCost_whenClaimAmountIsInFirstInstalment() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .addRespondent2(YesOrNo.NO)

@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
+import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -100,6 +101,38 @@ public class DJCaseworkerReceivedNotificationHandlerTest {
             );
         }
 
+        @Test
+        void shouldNotifyApplicantSolicitor_whenInvokedPartialPaymentAnd1v1() {
+            when(interestCalculator.calculateInterest(any()))
+                .thenReturn(BigDecimal.valueOf(100)
+                );
+            when(feesService.getFeeDataByTotalClaimAmount(any()))
+                .thenReturn(Fee.builder()
+                                .calculatedAmountInPence(BigDecimal.valueOf(100))
+                                .version("1")
+                                .code("CODE")
+                                .build());
+            //send Received email
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .addRespondent2(YesOrNo.NO)
+                .totalClaimAmount(new BigDecimal(1000))
+                .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
+                .repaymentSuggestion("10000")
+                .repaymentFrequency(RepaymentFrequencyDJ.ONCE_TWO_WEEKS)
+                .paymentConfirmationDecisionSpec(YesOrNo.YES)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "caseworker@hmcts.net",
+                "test-template-received-id",
+                getNotificationDataMapPartialPayment(caseData),
+                "default-judgment-caseworker-received-notification-000DC001"
+            );
+        }
+
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
@@ -112,6 +145,17 @@ public class DJCaseworkerReceivedNotificationHandlerTest {
             );
         }
 
+        @NotNull
+        private Map<String, String> getNotificationDataMapPartialPayment(CaseData caseData) {
+            return Map.of(
+                CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+                PAYMENT_TYPE, "By installments of £100.00 per two weeks",
+                AMOUNT_CLAIMED, "1100",
+                AMOUNT_OF_COSTS, "103.00",
+                AMOUNT_PAID, "0",
+                AMOUNT_OF_JUDGMENT, "1203.00"
+            );
+        }
     }
 
     @Test
