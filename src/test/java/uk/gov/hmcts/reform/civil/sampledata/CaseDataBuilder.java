@@ -774,15 +774,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder defendantDetails(String defaultValue) {
-        this.defendantDetails = DynamicList.builder()
-            .value(DynamicListElement.builder()
-                       .label(defaultValue)
-                       .build())
-            .build();
-        return this;
-    }
-
     public CaseDataBuilder defendantSolicitorNotifyClaimDetailsOptions(String defaultValue) {
         this.defendantSolicitorNotifyClaimDetailsOptions = DynamicList.builder()
             .value(DynamicListElement.builder()

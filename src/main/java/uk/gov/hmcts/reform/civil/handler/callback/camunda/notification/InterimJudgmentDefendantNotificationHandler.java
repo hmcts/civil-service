@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -22,14 +20,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_INTERIM_JUDGMENT_DEFENDANT;
 
 @Service
 @RequiredArgsConstructor
 public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler implements NotificationData {
-
-    Logger log = LoggerFactory.getLogger(InterimJudgmentDefendantNotificationHandler.class);
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -129,8 +126,6 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
         Optional<Organisation> organisation = organisationService
             .findOrganisationById(caseData.getRespondent1OrganisationPolicy()
                                       .getOrganisation().getOrganisationID());
-
-        log.info("ORG Details : " + organisation);
         if (organisation.isPresent()) {
             return organisation.get().getName();
         }
@@ -138,16 +133,8 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     }
 
     private String getLegalOrganizationNameDefendant2(final CaseData caseData) {
-        log.info("ORG ID : " + caseData.getRespondent2OrganisationPolicy());
-        log.info("ORG ID : " + caseData.getRespondent2OrganisationPolicy()
-            .getOrganisation());
-        log.info("ORG ID : " + caseData.getRespondent1OrganisationPolicy()
-            .getOrganisation().getOrganisationID());
-
         Optional<Organisation> organisation = organisationService
-            .findOrganisationById(caseData.getRespondent2OrganisationPolicy()
-                                      .getOrganisation().getOrganisationID());
-
+            .findOrganisationById(getOrganisationIdRespondent2(caseData));
         if (organisation.isPresent()) {
             return organisation.get().getName();
         }
@@ -156,6 +143,15 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
 
     private Boolean checkIfBothDefendants(CaseData caseData) {
         return BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel());
+    }
+
+    private String getOrganisationIdRespondent2(final CaseData caseData) {
+        if (isNull(caseData.getRespondent2OrganisationPolicy())
+            || isNull(caseData.getRespondent2OrganisationPolicy().getOrganisation())) {
+            return caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+        } else {
+            return caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+        }
     }
 }
 
