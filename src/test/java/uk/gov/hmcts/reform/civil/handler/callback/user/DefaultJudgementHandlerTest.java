@@ -60,10 +60,6 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
     private DefaultJudgementHandler handler;
     @MockBean
     private LocationRefDataService locationRefDataService;
-    @MockBean
-    private CoreCaseDataService coreCaseDataService;
-    @MockBean
-    private PaymentsConfiguration paymentsConfiguration;
 
     @Nested
     class AboutToStartCallback {
