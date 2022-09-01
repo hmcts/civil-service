@@ -43,8 +43,6 @@ public class CaseAssignmentController {
         log.info("case reference {}", caseReference);
         CaseData caseData = caseByLegacyReferenceSearchService.getCaseDataByLegacyReference(caseReference);
         defendantPinToPostLRspecService.validatePin(caseData, pin);
-        defendantPinToPostLRspecService.removePinInPostData(caseData.getCcdCaseReference(),
-                                                            caseData.getRespondent1PinToPostLRspec());
         return new ResponseEntity<>(caseData, HttpStatus.OK);
     }
 }
