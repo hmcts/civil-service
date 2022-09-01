@@ -13,6 +13,10 @@ public class DefaultJudgmentUtils {
     private static final int ENTRY_FIXED_COST_22 = 22;
     private static final int ENTRY_FIXED_COST_30 = 30;
 
+    private DefaultJudgmentUtils() {
+
+    }
+
     public static BigDecimal calculateFixedCosts(CaseData caseData) {
 
         int fixedCost = 0;

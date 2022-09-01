@@ -37,7 +37,7 @@ public class DJCaseworkerReceivedNotificationHandler extends CallbackHandler imp
     private final FeesService feesService;
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CASEWORKER_DJ_RECEIVED);
     private static final String REFERENCE_TEMPLATE_CASEWORKER = "default-judgment-caseworker-received-notification-%s";
-    private static final String TASK_ID_CASEWORKER = "NotifyCaseworkerDJReceived";
+    public static final String TASK_ID = "NotifyCaseworkerDJReceived";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -48,7 +48,7 @@ public class DJCaseworkerReceivedNotificationHandler extends CallbackHandler imp
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID_CASEWORKER;
+        return TASK_ID;
     }
 
     private CallbackResponse notifyDJApprovedCaseworker(CallbackParams callbackParams) {
