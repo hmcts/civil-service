@@ -138,7 +138,7 @@ notifications:
   respondentSolicitorClaimIssueMultipartyEmailTemplate: "6e63242f-a26a-442e-ad2c-f201072195e2"
   respondentSolicitorClaimDetailsEmailTemplate: "a565e057-8ad0-413d-aa78-2c21705853fd"
   solicitorDefendantResponseCaseTakenOffline: "e41ab7af-71ab-4e87-a636-25c134a2d11d"
-  claimantSolicitorDefendantResponseFullDefence: "27040d5f-8e43-4a00-b6dc-bcd3b21b66bc"
+  claimantSolicitorDefendantResponseFullDefence: "9a31a29f-85cf-4402-b188-e65cf628fff2"
   solicitorDefendantResponseCaseTakenOfflineMultiparty: "7e1e7b92-84aa-4231-92c1-a61516e93c31"
   respondentSolicitorAcknowledgeClaim: "b7ade9ca-da8b-4605-a296-ccee3d7d7a93"
   failedPayment: "b7b98d09-6794-4d8d-8550-cc219c91ee8c"
