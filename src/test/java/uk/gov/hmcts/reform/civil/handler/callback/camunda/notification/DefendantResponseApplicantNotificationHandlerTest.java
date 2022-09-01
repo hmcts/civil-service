@@ -32,6 +32,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.toStringValueForEmail;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -40,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.De
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID_CC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID_CC_RESP1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID_CC_RESP2;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ALLOCATED_TRACK;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
@@ -382,7 +384,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 return Map.of(
                     CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                     RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                    PARTY_REFERENCES, buildPartiesReferences(caseData)
+                    PARTY_REFERENCES, buildPartiesReferences(caseData),
+                    ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
                 );
             } else {
                 //if there are 2 respondents on the case, concatenate the names together for the template subject line
@@ -392,7 +395,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                     getPartyNameBasedOnType(caseData.getRespondent1())
                         .concat(" and ")
                         .concat(getPartyNameBasedOnType(caseData.getRespondent2())),
-                    PARTY_REFERENCES, buildPartiesReferences(caseData)
+                    PARTY_REFERENCES, buildPartiesReferences(caseData),
+                    ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
                 );
             }
         }
