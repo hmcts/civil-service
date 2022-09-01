@@ -150,4 +150,10 @@ public class NotificationsProperties {
     @NotEmpty
     private String standardDirectionOrderDJTemplate;
 
+    @NotEmpty
+    private String caseworkerDefaultJudgmentRequested;
+
+    @NotEmpty
+    private String caseworkerEmailDefaultJudgmentRequested;
+
 }

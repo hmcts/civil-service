@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixedCosts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -54,12 +55,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     public static final String BREATHING_SPACE = "Default judgment cannot be applied for while claim is in"
         + " breathing space";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT_SPEC);
-    private static final int COMMENCEMENT_FIXED_COST_60 = 60;
-    private static final int COMMENCEMENT_FIXED_COST_80 = 80;
-    private static final int COMMENCEMENT_FIXED_COST_90 = 90;
-    private static final int COMMENCEMENT_FIXED_COST_110 = 110;
-    private static final int ENTRY_FIXED_COST_22 = 22;
-    private static final int ENTRY_FIXED_COST_30 = 30;
     private final ObjectMapper objectMapper;
     private final InterestCalculator interestCalculator;
     private final FeesService feesService;
@@ -231,25 +226,6 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
 
     private boolean checkPastDateValidation(LocalDate localDate) {
         return localDate != null && localDate.isBefore(LocalDate.now());
-    }
-
-    private BigDecimal calculateFixedCosts(CaseData caseData) {
-
-        int fixedCost = 0;
-        int totalClaimAmount = caseData.getTotalClaimAmount().intValue();
-        if (totalClaimAmount > 25 && totalClaimAmount <= 5000) {
-            if (totalClaimAmount <= 500) {
-                fixedCost = COMMENCEMENT_FIXED_COST_60;
-            } else if (totalClaimAmount <= 1000) {
-                fixedCost = COMMENCEMENT_FIXED_COST_80;
-            } else {
-                fixedCost = COMMENCEMENT_FIXED_COST_90;
-            }
-            fixedCost = fixedCost + ENTRY_FIXED_COST_22;
-        } else if (totalClaimAmount > 5000) {
-            fixedCost = COMMENCEMENT_FIXED_COST_110 + ENTRY_FIXED_COST_30;
-        }
-        return new BigDecimal(fixedCost);
     }
 
     private CallbackResponse repaymentBreakdownCalculate(CallbackParams callbackParams) {

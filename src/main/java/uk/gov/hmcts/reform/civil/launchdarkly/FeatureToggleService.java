@@ -41,15 +41,11 @@ public class FeatureToggleService {
     }
 
     public boolean isSpecRpaContinuousFeedEnabled() {
-        return internalClient.boolVariation(
-            "specified-rpa-continuous-feed",
-            createLDUser().build(),
-            false
-        );
+        return true;
     }
 
     public boolean isLrSpecEnabled() {
-        return isFeatureEnabled("specified-lr-journey");
+        return true;
     }
 
     public LDUser.Builder createLDUser() {

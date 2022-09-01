@@ -43,6 +43,11 @@ public interface NotificationData {
     String DEFENDANT_EMAIL = "DefendantLegalOrgName";
     String CLAIMANT_EMAIL = "ClaimantLegalOrgName";
     String LEGAL_ORG_APPLICANT1 = "legalOrgApplicant1";
+    String PAYMENT_TYPE = "payment type";
+    String AMOUNT_CLAIMED = "amountClaimed";
+    String AMOUNT_OF_COSTS = "amountOfCosts";
+    String AMOUNT_PAID = "amountPaidBeforeJudgment";
+    String AMOUNT_OF_JUDGMENT = "amountOfJudgment";
 
     Map<String, String> addProperties(CaseData caseData);
 

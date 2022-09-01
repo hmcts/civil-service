@@ -32,17 +32,12 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DJ_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC;
+import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixedCosts;
 
 @Service
 @RequiredArgsConstructor
 public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<DefaultJudgmentForm> {
 
-    private static final int COMMENCEMENT_FIXED_COST_60 = 60;
-    private static final int COMMENCEMENT_FIXED_COST_80 = 80;
-    private static final int COMMENCEMENT_FIXED_COST_90 = 90;
-    private static final int COMMENCEMENT_FIXED_COST_110 = 110;
-    private static final int ENTRY_FIXED_COST_22 = 22;
-    private static final int ENTRY_FIXED_COST_30 = 30;
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final OrganisationService organisationService;
@@ -204,26 +199,6 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             partialPaymentPounds = MonetaryConversions.penniesToPounds(partialPaymentPennies);
         }
         return partialPaymentPounds;
-    }
-
-    private BigDecimal calculateFixedCosts(CaseData caseData) {
-
-        int fixedCost = 0;
-        int totalClaimAmount = caseData.getTotalClaimAmount().intValue();
-        if (totalClaimAmount > 25 && totalClaimAmount <= 5000) {
-            if (totalClaimAmount <= 500) {
-                fixedCost = COMMENCEMENT_FIXED_COST_60;
-            } else if (totalClaimAmount <= 1000) {
-                fixedCost = COMMENCEMENT_FIXED_COST_80;
-            } else {
-                fixedCost = COMMENCEMENT_FIXED_COST_90;
-            }
-            fixedCost = fixedCost + ENTRY_FIXED_COST_22;
-        } else if (totalClaimAmount > 5000) {
-            fixedCost = COMMENCEMENT_FIXED_COST_110 + ENTRY_FIXED_COST_30;
-        }
-
-        return new BigDecimal(fixedCost);
     }
 
 }
