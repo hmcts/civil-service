@@ -69,10 +69,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
     private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
-    private final CoreCaseDataService coreCaseDataService;
-    private final PaymentsConfiguration paymentsConfiguration;
     private String participantString;
-    @Value("${payments.api.site_id}") String siteId;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -118,8 +115,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-
-        setSupplementaryData(caseData.getCcdCaseReference(), callbackParams);
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(getHeader(caseData))
@@ -304,16 +299,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
             + " - " + location.getCourtAddress()
             + " - " + location.getPostcode();
         return locationLabel.equals(locationTempLabel);
-    }
-
-    private void setSupplementaryData(Long caseId, CallbackParams callbackParams) {
-        Map<String, Map<String, Map<String, Object>>> supplementaryDataCivil = new HashMap<>();
-        supplementaryDataCivil.put("supplementary_data_updates",
-                                   singletonMap("$set", singletonMap("HMCTSServiceId",
-                                                                     paymentsConfiguration.getSiteId())));
-        coreCaseDataService.setSupplementaryData(caseId, supplementaryDataCivil);
-        log.info("HMCTSServiceId should equal " + paymentsConfiguration.getSiteId());
-
     }
 
     public String caseParticipants(CaseData caseData) {
