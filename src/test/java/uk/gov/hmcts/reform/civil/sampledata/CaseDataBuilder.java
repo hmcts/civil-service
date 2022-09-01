@@ -1347,6 +1347,20 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeOtherSol1Lip() {
+        atStateClaimDetailsNotified();
+        changeOfRepresentation(true, false, "New-sol-id", "Lip");
+        respondent1OrganisationPolicy = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeOtherSol2Lip() {
+        atStateClaimDetailsNotified();
+        changeOfRepresentation(true, false, "New-sol-id", "Lip");
+        respondent2OrganisationPolicy = null;
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimIssued1v2AndSameRepresentative() {
         atStatePaymentSuccessful();
         respondent1Represented = YES;

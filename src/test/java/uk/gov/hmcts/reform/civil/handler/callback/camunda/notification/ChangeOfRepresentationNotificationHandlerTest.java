@@ -181,19 +181,6 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
     }
 
     @Test
-    void shouldNotSendEmailWhenNotifyingFormerSolForLip() {
-        CaseData caseData =
-            CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeLip().build();
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-            .request(CallbackRequest.builder()
-                         .eventId(NOTIFY_FORMER_SOLICITOR.name()).build()).build();
-
-        handler.handle(params);
-
-        verifyNoInteractions(notificationService);
-    }
-
-    @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler
                        .camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
@@ -209,5 +196,48 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                        .camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
                            NOTIFY_OTHER_SOLICITOR_2.name()).build()).build()))
             .isEqualTo(TASK_ID_NOTIFY_OTHER_SOLICITOR_2);
+    }
+
+    @Nested
+    class SkipNotifyParties {
+
+        @Test
+        void shouldNotSendEmailWhenNotifyingFormerSolForLip() {
+            CaseData caseData =
+                CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeLip().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(NOTIFY_FORMER_SOLICITOR.name()).build()).build();
+
+            handler.handle(params);
+
+            verifyNoInteractions(notificationService);
+        }
+
+        @Test
+        void shouldNotSendEmailWhenNotifyingOtherSol1ForLip() {
+            CaseData caseData =
+                CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeOtherSol1Lip().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(NOTIFY_OTHER_SOLICITOR_1.name()).build()).build();
+
+            handler.handle(params);
+
+            verifyNoInteractions(notificationService);
+        }
+
+        @Test
+        void shouldNotSendEmailWhenNotifyingOtherSol2ForLip() {
+            CaseData caseData =
+                CaseDataBuilder.builder().atStateClaimDetailsNotifiedWithNoticeOfChangeOtherSol2Lip().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(NOTIFY_OTHER_SOLICITOR_2.name()).build()).build();
+
+            handler.handle(params);
+
+            verifyNoInteractions(notificationService);
+        }
     }
 }

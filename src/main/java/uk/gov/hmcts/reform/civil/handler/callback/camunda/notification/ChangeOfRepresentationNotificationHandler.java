@@ -78,9 +78,8 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
         event = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         CaseData caseData = callbackParams.getCaseData();
 
-        //skip the former email notification if LiP as there isn't a sol to notify
-        if (event.equals(NOTIFY_FORMER_SOLICITOR)
-            && caseData.getChangeOfRepresentation().getOrganisationToRemoveID() == null) {
+        //skip the event if the party is LIP as there would be no one to notify
+        if (shouldSkipEvent(event, caseData)) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
@@ -137,5 +136,18 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
         return organisationService.findOrganisationById(orgToName).orElseThrow(() -> {
             throw new CallbackException("Organisation is not valid for: " + orgToName);
         }).getName();
+    }
+
+    private boolean shouldSkipEvent(CaseEvent event, CaseData caseData) {
+        switch (event) {
+            case NOTIFY_FORMER_SOLICITOR:
+                return caseData.getChangeOfRepresentation().getOrganisationToRemoveID() == null;
+            case NOTIFY_OTHER_SOLICITOR_1:
+                return NocNotificationUtils.isOtherParty1Lip(caseData);
+            case NOTIFY_OTHER_SOLICITOR_2:
+                return NocNotificationUtils.isOtherParty2Lip(caseData);
+            default:
+                throw new CallbackException(String.format(EVENT_NOT_FOUND_MESSAGE, event));
+        }
     }
 }
