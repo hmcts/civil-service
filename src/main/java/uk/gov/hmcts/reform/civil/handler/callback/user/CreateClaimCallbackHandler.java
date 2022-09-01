@@ -314,11 +314,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        List<String> validationErrors = validateCaseData(caseData);
+        List<String> validationErrors;
+
+        if (V_1.equals(callbackParams.getVersion())) {
+            validationErrors = validateCaseData(caseData);
+        } else {
+            validationErrors = validateCaseDataOld(caseData);
+        }
+
         if (validationErrors.size() > 0) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(validationErrors)
-                .build();
+            return AboutToStartOrSubmitCallbackResponse.builder().errors(validationErrors).build();
         }
 
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
