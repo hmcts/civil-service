@@ -109,7 +109,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::setSuperClaimType)
-            .put(callbackKey(MID, "start-claim"), this::startClaimOld)
+            .put(callbackKey(MID, "start-claim"), this::startClaim)
             .put(callbackKey(V_1, MID, "start-claim"), this::startClaim)
             .put(callbackKey(MID, "applicant"), this::validateApplicant1DateOfBirth)
             .put(callbackKey(MID, "applicant2"), this::validateApplicant2DateOfBirth)
@@ -123,7 +123,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaimOld)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -134,23 +134,21 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return EVENTS;
     }
 
-    private CallbackResponse startClaimOld(CallbackParams callbackParams) {
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(CaseData.builder().claimStarted(YES).build().toMap(objectMapper)).build();
-    }
-
     private CallbackResponse startClaim(CallbackParams callbackParams) {
-        List<LocationRefData> locations = fetchLocationData(callbackParams);
+        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        caseDataBuilder.claimStarted(YES);
 
-        CaseData caseData = CaseData.builder()
-            .claimStarted(YES)
-            .courtLocation(CourtLocation.builder()
-                               .applicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations))
-                               .build())
-            .build();
+        if (V_1.equals(callbackParams.getVersion())) {
+            List<LocationRefData> locations = fetchLocationData(callbackParams);
+
+            caseDataBuilder
+                .courtLocation(CourtLocation.builder()
+                   .applicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations))
+                   .build());
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper)).build();
+            .data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
 
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
@@ -355,56 +353,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         dataBuilder.claimStarted(null);
 
-        handleCourtLocationData(caseData, dataBuilder, callbackParams);
-
-        if (toggleService.isNoticeOfChangeEnabled()) {
-            // LiP are not represented or registered
-            if (areAnyRespondentsLitigantInPerson(caseData) == true)  {
-                dataBuilder.addLegalRepDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(time.now()));
-            }
-            populateBlankOrgPolicies(dataBuilder, caseData);
+        if (V_1.equals(callbackParams.getVersion())) {
+            handleCourtLocationData(caseData, dataBuilder, callbackParams);
         }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(dataBuilder.build().toMap(objectMapper))
-            .build();
-    }
-
-    private CallbackResponse submitClaimOld(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        List<String> validationErrors = validateCaseDataOld(caseData);
-        if (validationErrors.size() > 0) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(validationErrors)
-                .build();
-        }
-        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
-        addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder);
-        if (caseData.getRespondent1OrgRegistered() == YES
-            && caseData.getRespondent1Represented() == YES
-            && caseData.getRespondent2SameLegalRepresentative() == YES) {
-            // Predicate: Def1 registered, Def 2 unregistered.
-            // This is required to ensure mutual exclusion in 1v2 same solicitor case.
-            dataBuilder.respondent2OrgRegistered(YES);
-        }
-        // moving statement of truth value to correct field, this was not possible in mid event.
-        // resetting statement of truth to make sure it's empty the next time it appears in the UI.
-        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-        dataBuilder
-            .uiStatementOfTruth(StatementOfTruth.builder().build())
-            .applicantSolicitor1ClaimStatementOfTruth(statementOfTruth)
-            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
-        // data for case list and unassigned list
-        dataBuilder
-            .allPartyNames(getAllPartyNames(caseData))
-            .unassignedCaseListDisplayOrganisationReferences(getAllOrganisationPolicyReferences(caseData))
-            .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData));
-        if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
-        }
-
-        dataBuilder.claimStarted(null);
 
         if (toggleService.isNoticeOfChangeEnabled()) {
             // LiP are not represented or registered
