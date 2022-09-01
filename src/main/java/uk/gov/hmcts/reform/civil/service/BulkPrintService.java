@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.notification.letter;
+package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -17,7 +17,6 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "send-letter", name = "url")
 public class BulkPrintService {
 
     public static final String XEROX_TYPE_PARAMETER = "CMC001";

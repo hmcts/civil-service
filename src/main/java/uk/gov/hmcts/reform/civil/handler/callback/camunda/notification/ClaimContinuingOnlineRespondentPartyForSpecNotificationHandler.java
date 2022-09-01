@@ -15,15 +15,13 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
-import uk.gov.hmcts.reform.civil.service.notification.letter.BulkPrintService;
+import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -41,13 +39,13 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private static final String respondToClaimUrl =  "https://moneyclaims.aat.platform.hmcts.net/first-contact/start";
     private static final String frontendBaseUrl =  "https://cmc-citizen-frontend-staging.service.core-compute-aat.internal";
 
-    private final BulkPrintService bulkPrintService;
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final ObjectMapper objectMapper;
     private final Time time;
     private final FeatureToggleService toggleService;
     private final PiPLetterGenerator pipLetterGenerator;
+    private final BulkPrintService bulkPrintService;
 
     @Override
     protected Map<String, Callback> callbacks() {
