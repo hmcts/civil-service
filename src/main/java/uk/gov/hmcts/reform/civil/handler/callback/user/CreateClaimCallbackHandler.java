@@ -59,6 +59,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
@@ -109,6 +110,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::setSuperClaimType)
             .put(callbackKey(MID, "start-claim"), this::startClaim)
+            .put(callbackKey(V_1, MID, "start-claim"), this::startClaim)
             .put(callbackKey(MID, "applicant"), this::validateApplicant1DateOfBirth)
             .put(callbackKey(MID, "applicant2"), this::validateApplicant2DateOfBirth)
             .put(callbackKey(MID, "fee"), this::calculateFee)
@@ -122,6 +124,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
+            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -132,17 +135,20 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private CallbackResponse startClaim(CallbackParams callbackParams) {
-        List<LocationRefData> locations = fetchLocationData(callbackParams);
+        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        caseDataBuilder.claimStarted(YES);
 
-        CaseData caseData = CaseData.builder()
-            .claimStarted(YES)
-            .courtLocation(CourtLocation.builder()
-                               .applicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations))
-                               .build())
-            .build();
+        if (V_1.equals(callbackParams.getVersion())) {
+            List<LocationRefData> locations = fetchLocationData(callbackParams);
+
+            caseDataBuilder
+                .courtLocation(CourtLocation.builder()
+                   .applicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations))
+                   .build());
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper)).build();
+            .data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
 
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
@@ -347,7 +353,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         dataBuilder.claimStarted(null);
 
-        handleCourtLocationData(caseData, dataBuilder, callbackParams);
+        if (V_1.equals(callbackParams.getVersion())) {
+            handleCourtLocationData(caseData, dataBuilder, callbackParams);
+        }
 
         if (toggleService.isNoticeOfChangeEnabled()) {
             // LiP are not represented or registered
@@ -356,7 +364,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             }
             populateBlankOrgPolicies(dataBuilder, caseData);
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
@@ -462,6 +469,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         if (caseData.getCourtLocation() == null
             || caseData.getCourtLocation().getApplicantPreferredCourtLocationList() == null
             || caseData.getCourtLocation().getApplicantPreferredCourtLocationList().getValue() == null) {
+            errorsMessages.add("Court location code is required");
+        }
+        return errorsMessages;
+    }
+
+    private List<String> validateCaseDataOld(CaseData caseData) {
+        List<String> errorsMessages = new ArrayList<>();
+        // Tactical fix. We have an issue where null courtLocation is being submitted.
+        // We are validating it exists on submission if not we return an error to the user.
+        if (caseData.getCourtLocation() == null || caseData.getCourtLocation().getApplicantPreferredCourt() == null) {
             errorsMessages.add("Court location code is required");
         }
         return errorsMessages;

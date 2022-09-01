@@ -62,6 +62,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
@@ -110,6 +111,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::populateRespondentCopyObjects)
+            .put(callbackKey(V_1, ABOUT_TO_START), this::populateRespondentCopyObjects)
             .put(callbackKey(MID, "confirm-details"), this::validateDateOfBirth)
             .put(callbackKey(MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlag)
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
@@ -118,6 +120,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .put(callbackKey(MID, "upload"), this::emptyCallbackResponse)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
+            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -163,21 +166,27 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
-            .isRespondent1(isRespondent1)
-            .respondent1DQ(Respondent1DQ.builder()
-                               .respondent1DQRequestedCourt(
-                                   RequestedCourt.builder().responseCourtLocations(courtLocationList).build())
-                               .build());
+            .isRespondent1(isRespondent1);
+
+        if (V_1.equals(callbackParams.getVersion())) {
+            updatedCaseData.respondent1DQ(Respondent1DQ.builder()
+                           .respondent1DQRequestedCourt(
+                               RequestedCourt.builder().responseCourtLocations(courtLocationList).build())
+                           .build());
+        }
 
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedCaseData
                 .respondent2Copy(caseData.getRespondent2())
-                .respondent2DetailsForClaimDetailsTab(caseData.getRespondent2())
-                .respondent2DQ(Respondent2DQ.builder().respondent2DQRequestedCourt(
-                    RequestedCourt.builder().responseCourtLocations(courtLocationList).build()
-                ).build());
+                .respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
+
+            if (V_1.equals(callbackParams.getVersion())) {
+                updatedCaseData
+                    .respondent2DQ(Respondent2DQ.builder().respondent2DQRequestedCourt(
+                        RequestedCourt.builder().responseCourtLocations(courtLocationList).build()).build());
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -362,7 +371,11 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
                 Respondent1DQ.Respondent1DQBuilder dq = caseData.getRespondent1DQ().toBuilder()
                     .respondent1DQStatementOfTruth(statementOfTruth);
-                handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
+
+                if (V_1.equals(callbackParams.getVersion())) {
+                    handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
+                }
+
                 updatedData.respondent1DQ(dq.build());
                 // resetting statement of truth to make sure it's empty the next time it appears in the UI.
                 updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
@@ -381,7 +394,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                     // moving statement of truth value to correct field, this was not possible in mid event.
                     Respondent1DQ.Respondent1DQBuilder dq = caseData.getRespondent1DQ().toBuilder()
                         .respondent1DQStatementOfTruth(statementOfTruth);
-                    handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
+                    if (V_1.equals(callbackParams.getVersion())) {
+                        handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
+                    }
                     updatedData.respondent1DQ(dq.build());
                 } else {
                     //required as ccd populated the respondent DQ with null objects.
@@ -392,7 +407,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
                     Respondent2DQ.Respondent2DQBuilder dq2 = caseData.getRespondent2DQ().toBuilder()
                         .respondent2DQStatementOfTruth(statementOfTruth);
-                    handleCourtLocationForRespondent2DQ(caseData, dq2, callbackParams);
+                    if (V_1.equals(callbackParams.getVersion())) {
+                        handleCourtLocationForRespondent2DQ(caseData, dq2, callbackParams);
+                    }
                     updatedData.respondent2DQ(dq2.build());
                 } else {
                     updatedData.respondent2DQ(null);
@@ -423,7 +440,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Respondent2DQ.Respondent2DQBuilder dq = caseData.getRespondent2DQ().toBuilder()
                 .respondent2DQStatementOfTruth(statementOfTruth);
-            handleCourtLocationForRespondent2DQ(caseData, dq, callbackParams);
+            if (V_1.equals(callbackParams.getVersion())) {
+                handleCourtLocationForRespondent2DQ(caseData, dq, callbackParams);
+            }
             updatedData.respondent2DQ(dq.build());
 
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
@@ -470,7 +489,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Respondent1DQ.Respondent1DQBuilder dq = caseData.getRespondent1DQ().toBuilder()
                 .respondent1DQStatementOfTruth(statementOfTruth);
-            handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
+            if (V_1.equals(callbackParams.getVersion())) {
+                handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
+            }
             updatedData.respondent1DQ(dq.build());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());

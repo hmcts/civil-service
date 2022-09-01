@@ -18,6 +18,7 @@ public class CourtLocationUtils {
                             .map(location -> location.getSiteName()
                                 + " - " + location.getCourtAddress()
                                 + " - " + location.getPostcode())
+                            .sorted()
                             .collect(Collectors.toList()));
     }
 
