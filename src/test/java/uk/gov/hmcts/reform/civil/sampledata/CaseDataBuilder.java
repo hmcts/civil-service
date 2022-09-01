@@ -705,6 +705,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent1ClaimResponseType(RespondentResponseType respondent1ClaimResponseType) {
+        this.respondent1ClaimResponseType = respondent1ClaimResponseType;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2ClaimResponseType(RespondentResponseType respondent2ClaimResponseType) {
+        this.respondent2ClaimResponseType = respondent2ClaimResponseType;
+        return this;
+    }
+
     public CaseDataBuilder setRespondent1LitigationFriendCreatedDate(LocalDateTime createdDate) {
         this.respondent1LitigationFriendCreatedDate = createdDate;
         return this;
