@@ -137,7 +137,7 @@ public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             String header = format("# Your request was accepted%n## Case has now moved offline");
             String body = format("<br />If a Judge has submitted this information, "
                 + "a notification will be sent to the listing officer to look at this case offline."
-                + "%n%nIf a legal advisor has submitted this information a notification will be sent "
+                + "%n%nIf a legal adviser has submitted this information a notification will be sent "
                                      + "to a judge for review.");
 
             assertThat(response).usingRecursiveComparison().isEqualTo(

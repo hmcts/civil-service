@@ -25,7 +25,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 
-
 @Service
 @RequiredArgsConstructor
 public class NotSuitableSDOCallbackHandler extends CallbackHandler {
@@ -38,7 +37,6 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
 
     private final Time time;
-
 
     @Override
     protected Map<String, Callback> callbacks() {
