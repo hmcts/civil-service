@@ -43,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -77,7 +78,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
+            callbackKey(V_1, ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(ABOUT_TO_START), this::populateCaseData,
+            callbackKey(V_1, ABOUT_TO_START), this::populateCaseData,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -145,7 +148,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Applicant1DQ.Applicant1DQBuilder dq = caseData.getApplicant1DQ().toBuilder()
                 .applicant1DQStatementOfTruth(statementOfTruth);
-            handleCourtLocationData(caseData, builder, dq, callbackParams);
+            if (V_1.equals(callbackParams.getVersion())) {
+                handleCourtLocationData(caseData, builder, dq, callbackParams);
+            }
 
             builder.applicant1DQ(dq.build());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
@@ -191,24 +196,25 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private CallbackResponse populateCaseData(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
 
-        List<LocationRefData> locations = fetchLocationData(callbackParams);
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
             .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-            .superClaimType(SPEC_CLAIM)
-            .courtLocation(CourtLocation.builder()
-                               .applicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations))
-                               .build())
-            .applicant1DQ(caseData.getApplicant1DQ().toBuilder()
-                              .applicant1DQRequestedCourt(
-                                  RequestedCourt.builder()
-                                      .responseCourtLocations(courtLocationUtils.getLocationsFromList(locations))
-                                      .build()
-                              )
-                              .build())
-            .build();
+            .superClaimType(SPEC_CLAIM);
+
+        if (V_1.equals(callbackParams.getVersion())) {
+            List<LocationRefData> locations = fetchLocationData(callbackParams);
+            updatedCaseData.applicant1DQ(caseData.getApplicant1DQ().toBuilder()
+                                             .applicant1DQRequestedCourt(
+                                                 RequestedCourt.builder()
+                                                     .responseCourtLocations(
+                                                         courtLocationUtils.getLocationsFromList(locations))
+                                                     .build()
+                                             )
+                                             .build());
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(updatedCaseData.build().toMap(objectMapper))
             .build();
     }
 
