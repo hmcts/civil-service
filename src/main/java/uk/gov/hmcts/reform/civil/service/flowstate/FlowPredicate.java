@@ -14,8 +14,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_ADMISSION;
@@ -762,6 +764,23 @@ public class FlowPredicate {
 
         return predicate;
     }
+
+    public static final Predicate<CaseData> oneVsOneCase = caseData ->
+        getPredicateFor1v1Case(caseData);
+
+    private static boolean getPredicateFor1v1Case(CaseData caseData) {
+        return ONE_V_ONE.equals(getMultiPartyScenario(caseData));
+    }
+
+    public static final Predicate<CaseData> multipartyCase = caseData ->
+        getPredicateForMultipartyCase(caseData);
+
+    private static boolean getPredicateForMultipartyCase(CaseData caseData) {
+        return isMultiPartyScenario(caseData);
+    }
+
+    public static final Predicate<CaseData> pinInPostEnabledAndLiP = caseData ->
+        caseData.getRespondent1PinToPostLRspec() != null;
 
     public static final Predicate<CaseData> allAgreedToMediation = caseData -> {
         if (SPEC_CLAIM == caseData.getSuperClaimType()

@@ -62,7 +62,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefe
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.multipartyCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.oneVsOneCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimDetailsNotificationDeadline;
@@ -1531,6 +1533,12 @@ class FlowPredicateTest {
             CaseData caseData = caseDataBuilder.build().toBuilder().build();
             assertTrue(specClaim.test(caseData));
         }
+
+        @Test
+        void shouldReturnTrue_whenPredicateOneVsOneCase() {
+            CaseData caseData = caseDataBuilder.build().toBuilder().build();
+            assertTrue(oneVsOneCase.test(caseData));
+        }
     }
 
     @Nested
@@ -1806,6 +1814,12 @@ class FlowPredicateTest {
 
                     assertFalse(awaitingResponsesNonFullDefenceReceivedSpec.test(caseData));
                 }
+
+                @Test
+                void shouldReturnTrue_whenPredicateMultipartyCase() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder().build();
+                    assertTrue(multipartyCase.test(caseData));
+                }
             }
 
             @Nested
@@ -1943,6 +1957,12 @@ class FlowPredicateTest {
 
                     assertFalse(awaitingResponsesNonFullDefenceReceivedSpec.test(caseData));
                 }
+
+                @Test
+                void shouldReturnTrue_whenPredicateMultipartyCase() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder().build();
+                    assertTrue(multipartyCase.test(caseData));
+                }
             }
 
             @Nested
@@ -1975,6 +1995,12 @@ class FlowPredicateTest {
                         .build();
 
                     assertFalse(fullDefenceSpec.test(caseData));
+                }
+
+                @Test
+                void shouldReturnTrue_whenPredicateMultipartyCase() {
+                    CaseData caseData = caseDataBuilder.build().toBuilder().build();
+                    assertTrue(multipartyCase.test(caseData));
                 }
             }
         }
