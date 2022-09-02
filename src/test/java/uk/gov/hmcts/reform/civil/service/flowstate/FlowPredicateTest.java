@@ -2094,7 +2094,7 @@ class FlowPredicateTest {
     }
 
     @Nested
-    class allAgreedToMediation {
+    class AllAgreedToMediation {
 
         @Test
         public void whenUnspec_false() {
