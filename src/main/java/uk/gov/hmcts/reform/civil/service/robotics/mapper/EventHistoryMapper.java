@@ -322,7 +322,7 @@ public class EventHistoryMapper {
                               .amountOfJudgment(amountClaimedWithInterest)
                               .amountOfCosts(getCostOfJudgment(caseData))
                               .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES)
-                                                            ? partialPaymentPounds : null)
+                                                            ? partialPaymentPounds : BigDecimal.ZERO)
                               .isJudgmentForthwith((caseData.getPaymentTypeSelection()
                                   .equals(DJPaymentTypeSelection.IMMEDIATELY)) ? true : false)
                               .paymentInFullDate((caseData.getPaymentTypeSelection()
