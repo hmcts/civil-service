@@ -4184,6 +4184,16 @@ class EventHistoryMapperTest {
                         Event.builder()
                             .eventSequence(7)
                             .eventCode("999")
+                            .dateReceived(LocalDate.now().plusDays(5).atStartOfDay()
+                            )
+                            .eventDetailsText("Claimant proceeds.")
+                            .eventDetails(EventDetails.builder()
+                                              .miscText("Claimant proceeds.")
+                                              .build())
+                            .build(),
+                        Event.builder()
+                            .eventSequence(8)
+                            .eventCode("999")
                             .dateReceived(LocalDate.now().plusDays(6).atStartOfDay()
                             )
                             .eventDetailsText(miscText)
@@ -4202,7 +4212,9 @@ class EventHistoryMapperTest {
                             expectedDirectionsQuestionnaireRespondent,
                             expectedDirectionsQuestionnaireApplicant);
                     assertThat(eventHistory).extracting("miscellaneous").asList()
-                        .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+                        .containsExactly(expectedMiscellaneousEvents.get(0),
+                                         expectedMiscellaneousEvents.get(1),
+                                         expectedMiscellaneousEvents.get(2));
                     assertEmptyEvents(eventHistory, "receiptOfAdmission", "receiptOfPartAdmission");
                 }
             }
@@ -4213,10 +4225,6 @@ class EventHistoryMapperTest {
                 when(featureToggleService.isSDOEnabled()).thenReturn(true);
 
                 if (featureToggleService.isSDOEnabled()) {
-
-                    String miscText = "RPA Reason: Case proceeds offline. "
-                        + "Judge / Legal Advisor did not draw a Direction's Order: "
-                        + "unforeseen complexities";
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atState(FULL_DEFENCE_PROCEED)
@@ -4523,6 +4531,15 @@ class EventHistoryMapperTest {
                                 Event.builder()
                                     .eventSequence(9)
                                     .eventCode("999")
+                                    .dateReceived(caseData.getApplicant1ResponseDate())
+                                    .eventDetailsText("Claimant proceeds.")
+                                    .eventDetails(EventDetails.builder()
+                                                      .miscText("Claimant proceeds.")
+                                                      .build())
+                                    .build(),
+                                Event.builder()
+                                    .eventSequence(10)
+                                    .eventCode("999")
                                     .dateReceived(caseData.getUnsuitableSDODate())
                                     .eventDetailsText(miscText)
                                     .eventDetails(EventDetails.builder()
@@ -4541,7 +4558,9 @@ class EventHistoryMapperTest {
                                                             expectedRespondent2DQ,
                                                             expectedApplicantDQ);
                     assertThat(eventHistory).extracting("miscellaneous").asList()
-                        .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1));
+                        .containsExactly(expectedMiscEvents.get(0),
+                                         expectedMiscEvents.get(1),
+                                         expectedMiscEvents.get(2));
 
                     assertEmptyEvents(
                         eventHistory,
@@ -5248,6 +5267,15 @@ class EventHistoryMapperTest {
                         Event.builder()
                             .eventSequence(9)
                             .eventCode("999")
+                            .dateReceived(caseData.getApplicant1ResponseDate())
+                            .eventDetailsText("Claimants proceed.")
+                            .eventDetails(EventDetails.builder()
+                                              .miscText("Claimants proceed.")
+                                              .build())
+                            .build(),
+                        Event.builder()
+                            .eventSequence(10)
+                            .eventCode("999")
                             .dateReceived(caseData.getUnsuitableSDODate())
                             .eventDetailsText(miscText)
                             .eventDetails(EventDetails.builder()
@@ -5265,7 +5293,9 @@ class EventHistoryMapperTest {
                         .asList().containsExactlyInAnyOrder(expectedRespondentDQ, expectedApplicant1DQ,
                                                             expectedApplicant2DQ);
                     assertThat(eventHistory).extracting("miscellaneous").asList()
-                        .containsExactly(expectedMiscEvents.get(0), expectedMiscEvents.get(1));
+                        .containsExactly(expectedMiscEvents.get(0),
+                                         expectedMiscEvents.get(1),
+                                         expectedMiscEvents.get(2));
 
                     assertEmptyEvents(
                         eventHistory,

@@ -1085,6 +1085,11 @@ public class EventHistoryMapper {
                     ) {
                         List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                         builder.miscellaneous(miscText);
+                    } else {
+                        List<String> applicantProceedsText = new ArrayList<>();
+                        applicantProceedsText.add("Claimant proceeds.");
+                        List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
+                        builder.miscellaneous(miscText);
                     }
                     break;
                 case ONE_V_TWO_ONE_LEGAL_REP:
@@ -1102,6 +1107,11 @@ public class EventHistoryMapper {
                         )
                     ) {
                         List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
+                        builder.miscellaneous(miscText);
+                    } else {
+                        List<String> applicantProceedsText = new ArrayList<>();
+                        applicantProceedsText.add("Claimant proceeds.");
+                        List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
                         builder.miscellaneous(miscText);
                     }
                     break;
@@ -1124,6 +1134,11 @@ public class EventHistoryMapper {
                     ) {
                         List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                         builder.miscellaneous(miscText);
+                    } else {
+                        List<String> applicantProceedsText = new ArrayList<>();
+                        applicantProceedsText.add("Claimant proceeds.");
+                        List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
+                        builder.miscellaneous(miscText);
                     }
                     break;
                 case TWO_V_ONE:
@@ -1141,6 +1156,11 @@ public class EventHistoryMapper {
                         )
                     ) {
                         List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
+                        builder.miscellaneous(miscText);
+                    } else {
+                        List<String> applicantProceedsText = new ArrayList<>();
+                        applicantProceedsText.add("Claimants proceed.");
+                        List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
                         builder.miscellaneous(miscText);
                     }
                     break;
