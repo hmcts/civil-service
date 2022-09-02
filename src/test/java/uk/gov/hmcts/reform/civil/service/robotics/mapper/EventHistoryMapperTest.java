@@ -5633,7 +5633,7 @@ class EventHistoryMapperTest {
     @Test
     public void specCaseEvents() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued1v1UnrepresentedDefendant()
+            .atStateClaimIssued1v2UnrepresentedDefendant()
             .build().toBuilder()
             .superClaimType(SuperClaimType.SPEC_CLAIM)
             .build();
@@ -5643,9 +5643,19 @@ class EventHistoryMapperTest {
             .eventSequence(1)
             .eventCode("999")
             .dateReceived(caseData.getSubmittedDate())
-            .eventDetailsText("RPA Reason: Unrepresented defendant: Mr. Sole Trader")
+            .eventDetailsText("RPA Reason: [1 of 2 - 2020-08-01] Unrepresented defendant: Mr. Sole Trader")
             .eventDetails(EventDetails.builder()
-                              .miscText("RPA Reason: Unrepresented defendant: Mr. Sole Trader")
+                              .miscText("RPA Reason: [1 of 2 - 2020-08-01] Unrepresented defendant: Mr. Sole Trader")
+                              .build())
+            .build();
+
+        Event expectedEvent2 = Event.builder()
+            .eventSequence(2)
+            .eventCode("999")
+            .dateReceived(caseData.getSubmittedDate())
+            .eventDetailsText("RPA Reason: [2 of 2 - 2020-08-01] Unrepresented defendant: Mr. John Rambo")
+            .eventDetails(EventDetails.builder()
+                              .miscText("RPA Reason: [2 of 2 - 2020-08-01] Unrepresented defendant: Mr. John Rambo")
                               .build())
             .build();
 
@@ -5655,7 +5665,7 @@ class EventHistoryMapperTest {
         assertThat(eventHistory)
             .extracting("miscellaneous")
             .asList()
-            .containsExactly(expectedEvent);
+            .containsExactly(expectedEvent, expectedEvent2);
         assertEmptyEvents(
             eventHistory,
             "acknowledgementOfServiceReceived",
