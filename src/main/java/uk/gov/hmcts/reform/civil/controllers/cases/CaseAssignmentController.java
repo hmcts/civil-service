@@ -42,6 +42,7 @@ public class CaseAssignmentController {
         @PathVariable("caseReference") String caseReference, @RequestBody String pin) {
         log.info("case reference {}", caseReference);
         CaseData caseData = caseByLegacyReferenceSearchService.getCaseDataByLegacyReference(caseReference);
+        log.info("validating Pin {}", pin);
         defendantPinToPostLRspecService.validatePin(caseData, pin);
         return new ResponseEntity<>(caseData, HttpStatus.OK);
     }

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -21,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
 import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataContentFromStartEventResponse;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CoreCaseDataService {
@@ -75,7 +77,9 @@ public class CoreCaseDataService {
     }
 
     public SearchResult searchCases(Query query) {
+        log.info("before search");
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        log.info("user token {} {}", userConfig.getUserName(), userConfig.getPassword());
         return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, query.toString());
     }
 
