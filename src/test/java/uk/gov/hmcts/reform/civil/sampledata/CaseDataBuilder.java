@@ -924,6 +924,26 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimIssued1v1UnrepresentedDefendantSpec() {
+        atStateClaimIssuedUnrepresentedDefendants();
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        addRespondent2 = NO;
+        respondent2 = null;
+        respondent2Represented = null;
+        respondent2OrganisationPolicy = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssued1v2UnrepresentedDefendant() {
+        atStateClaimIssuedUnrepresentedDefendants();
+        addRespondent2 = YES;
+        respondent2 = PartyBuilder.builder().individual().build();
+        takenOfflineDate = LocalDateTime.now();
+        respondentSolicitor2OrganisationDetails = null;
+        respondent2OrganisationPolicy = null;
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimIssuedUnrepresentedDefendant1() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
         addRespondent2 = YES;
@@ -3040,6 +3060,11 @@ public class CaseDataBuilder {
     public CaseDataBuilder atSpecAoSApplicantCorrespondenceAddressDetails(
         Address specAoSApplicantCorrespondenceAddressDetails) {
         this.specAoSApplicantCorrespondenceAddressDetails = specAoSApplicantCorrespondenceAddressDetails;
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent1PinToPostLRspec(DefendantPinToPostLRspec respondent1PinToPostLRspec) {
+        this.respondent1PinToPostLRspec = respondent1PinToPostLRspec;
         return this;
     }
 
