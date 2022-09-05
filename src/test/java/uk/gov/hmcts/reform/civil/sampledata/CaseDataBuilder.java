@@ -54,6 +54,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -288,6 +289,7 @@ public class CaseDataBuilder {
     private DisposalHearingBundleDJ disposalHearingBundleDJ;
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private TrialHearingTrial trialHearingTrialDJ;
+    private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
 
     //update pdf document from general applications
     private List<Element<CaseDocument>> generalOrderDocument;
@@ -1429,6 +1431,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimIssuedDisposalHearing() {
         caseManagementOrderSelection = DISPOSAL_HEARING;
+
+        disposalHearingJudgesRecitalDJ = DisposalHearingJudgesRecitalDJ
+            .builder()
+            .judgeNameTitle("test name")
+            .build();
         return this;
     }
 
@@ -3292,6 +3299,7 @@ public class CaseDataBuilder {
             .disposalHearingBundleDJ(disposalHearingBundleDJ)
             .disposalHearingFinalDisposalHearingDJ(disposalHearingFinalDisposalHearingDJ)
             .trialHearingTrialDJ(trialHearingTrialDJ)
+            .disposalHearingJudgesRecitalDJ(disposalHearingJudgesRecitalDJ)
             .build();
     }
 }

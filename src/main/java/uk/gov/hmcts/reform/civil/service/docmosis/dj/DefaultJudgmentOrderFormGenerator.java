@@ -73,7 +73,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormHearing(CaseData caseData) {
         return DefaultJudgmentSDOOrderForm.builder()
-            .judgeNameTitle(caseData.getDisposalHearingJudgesRecitalDJName())
+            .judgeNameTitle(caseData.getDisposalHearingJudgesRecitalDJ().getJudgeNameTitle())
             .caseNumber(caseData.getLegacyCaseReference())
             .disposalHearingBundleDJ(caseData.getDisposalHearingBundleDJ())
             .disposalHearingBundleDJAddSection(nonNull(caseData.getDisposalHearingBundleDJ()))
