@@ -146,11 +146,13 @@ public enum CaseEvent {
     NOTIFY_RESPONDENT_SOLICITOR_DJ_RECEIVED(CAMUNDA),
     ADD_PDF_TO_MAIN_CASE(CAMUNDA),
     NOTIFY_RPA_DJ_UNSPEC(CAMUNDA),
-    NOTIFY_RPA_DJ_SPEC(CAMUNDA);
+    NOTIFY_RPA_DJ_SPEC(CAMUNDA),
+    JUDICIAL_REFERRAL(CAMUNDA);
 
     private final UserType userType;
 
     public boolean isCamundaEvent() {
         return this.getUserType() == CAMUNDA;
     }
+
 }
