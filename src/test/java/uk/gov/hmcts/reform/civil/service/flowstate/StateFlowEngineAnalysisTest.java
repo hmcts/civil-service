@@ -35,7 +35,45 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOfflineSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.*;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_FAILED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_SUCCESSFUL;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_NOT_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -133,10 +171,10 @@ class StateFlowEngineAnalysisTest {
             );
         }
 
-      /*
-       Testing initialState -> CLAIM_SUBMITTED for claimSubmittedTwoRegisteredRespondentRepresentatives
-       2 respondents present but different legal representative
-      */
+        /*
+           Testing initialState -> CLAIM_SUBMITTED for claimSubmittedTwoRegisteredRespondentRepresentatives
+           2 respondents present but different legal representative
+        */
 
         @Test
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmittedTwoRespondentRepresentatives() {
@@ -210,6 +248,7 @@ class StateFlowEngineAnalysisTest {
         Testing initialState -> CLAIM_SUBMITTED for claimSubmittedBothRespondentUnrepresented
         Both the respondents are unrepresented
         */
+
         @Test
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmittedNoRespondentIsRepresented() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedNoRespondentRepresented().build();
@@ -232,6 +271,7 @@ class StateFlowEngineAnalysisTest {
         Testing initialState -> CLAIM_SUBMITTED for claimSubmittedOneUnrepresentedDefendantOnly
         Only first respondent is present
         */
+
         @Test
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmittedOnlyFirstRespondentIsRepresented() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -261,6 +301,7 @@ class StateFlowEngineAnalysisTest {
         Testing initialState -> CLAIM_SUBMITTED for claimSubmittedOneUnrepresentedDefendantOnly
         Only second respondent is present
         */
+
         @Test
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmittedOnlySecondRespondentIsRepresented() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -288,6 +329,7 @@ class StateFlowEngineAnalysisTest {
        Testing initialState -> CLAIM_SUBMITTED for claimSubmittedBothUnregisteredSolicitors
        Both the respondent organisations are unregistered
        */
+
         @Test
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmittedBothUnregisteredSolicitors() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -316,6 +358,7 @@ class StateFlowEngineAnalysisTest {
         Respondent1 unrepresented
         Respondent2 represented
         */
+
         @Test
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmittedResp1UnreprResp2Repres() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -346,6 +389,7 @@ class StateFlowEngineAnalysisTest {
        AddLegalRepDeadline is not null
        Both the respondents are unrepresented
        */
+
         @Test
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmittedBothResUnrepresentedWithLegalRepDeadline() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -460,6 +504,7 @@ class StateFlowEngineAnalysisTest {
             // 1v2
             // Unrepresented
             // 1. Both def1 and def2 unrepresented
+
             @Test
             void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedRespondentsNotRepresented() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
@@ -487,6 +532,7 @@ class StateFlowEngineAnalysisTest {
 
             // Unrepresented
             // 2. Def1 unrepresented, Def2 registered
+
             @Test
             void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedRespondent1NotRepresented() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().build();
@@ -514,6 +560,7 @@ class StateFlowEngineAnalysisTest {
 
             // Unrepresented
             // 3. Def1 registered, Def 2 unrepresented
+
             @Test
             void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedRespondent2NotRepresented() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant2().build();
@@ -575,6 +622,7 @@ class StateFlowEngineAnalysisTest {
 
             // 1v1
             // Unrepresented
+
             @Test
             void shouldContinueOnline_1v1_whenDefendantIsUnrepresented() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -606,6 +654,7 @@ class StateFlowEngineAnalysisTest {
             // 1v2
             // Unrepresented
             // 1. Both def1 and def2 unrepresented
+
             @Test
             void shouldContinueOnline_WhenBothDefendantsAreUnrepresented() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -637,6 +686,7 @@ class StateFlowEngineAnalysisTest {
 
             // Unrepresented
             // 2. Def1 unrepresented, Def2 registered
+
             @Test
             void shouldContinueOnline_WhenCaseDataAtStateClaimDraftIssuedAndRespondent1NotRepresented() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -669,6 +719,7 @@ class StateFlowEngineAnalysisTest {
 
             // Unrepresented
             // 3. Def1 registered, Def 2 unrepresented
+
             @Test
             void shouldContinueOnline_WhenCaseDataAtStateClaimDraftIssuedAndRespondent2NotRepresented() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -760,6 +811,7 @@ class StateFlowEngineAnalysisTest {
 
             // Unregistered
             // 2. Def1 unregistered, Def2 registered
+
             @Test
             void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedRespondent1NotRegistered() {
                 CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnregisteredDefendant1().build();
@@ -789,6 +841,7 @@ class StateFlowEngineAnalysisTest {
 
             // Unregistered
             // 3. Def1 registered, Def 2 unregistered
+
             @Test
             void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedRespondent2NotRegistered() {
                 CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnregisteredDefendant2().build();
@@ -822,6 +875,7 @@ class StateFlowEngineAnalysisTest {
             }
 
             // 1v2 Same Unregistered Solicitor
+
             @Test
             void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedSameUnregisteredSolicitor() {
                 CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineSameUnregisteredDefendant().build();
@@ -882,6 +936,7 @@ class StateFlowEngineAnalysisTest {
 
             // Unrepresented and Unregistered
             // 2. Def1 unregistered, Def 2 unrepresented
+
             @Test
             void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedAndRes1UnregisRes2Unrep() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -942,6 +997,7 @@ class StateFlowEngineAnalysisTest {
         Testing CLAIM_SUBMITTED -> CLAIM_ISSUED_PAYMENT_SUCCESSFUL for paymentSuccessful
         Payment successful same representative
         */
+
         @Test
         void shouldReturnPaymentSuccessful_whenCaseDataAtStatePaymentSuccessful1v2SameRepresentative() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -970,6 +1026,7 @@ class StateFlowEngineAnalysisTest {
         Testing CLAIM_SUBMITTED -> CLAIM_ISSUED_PAYMENT_FAILED for paymentFailed
         Payment failed
         */
+
         @Test
         void shouldReturnPaymentFailed_whenCaseDataAtStatePaymentFailed() {
             CaseData caseData = CaseDataBuilder.builder().atStatePaymentFailed().build();
@@ -998,6 +1055,7 @@ class StateFlowEngineAnalysisTest {
        Payment failed then successful again
        TO DO dont know how to test it
        */
+
         @Test
         void shouldReturnPaymentFailed_whenCaseDataAtStatePaymentFailedChangesToPaymentSuccessful() {
             CaseData caseData = CaseDataBuilder.builder().atStatePaymentFailed().build();
@@ -1025,6 +1083,7 @@ class StateFlowEngineAnalysisTest {
         Testing CLAIM_ISSUED_PAYMENT_SUCCESSFUL -> PENDING_CLAIM_ISSUED for pendingClaimIssued
         Payment failed
         */
+
         @Test
         void shouldReturnAwaitingCaseNotification_whenCaseDataAtStateAwaitingCaseNotification() {
             CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
@@ -1059,6 +1118,7 @@ class StateFlowEngineAnalysisTest {
         Testing CLAIM_ISSUED -> TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED for takenOfflineAfterClaimNotified
         TO DO no negative testing and not checking the predicates
         */
+
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimIssued_andOneSolicitorIsToBeNotified() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -1099,6 +1159,7 @@ class StateFlowEngineAnalysisTest {
         DefendantSolicitorNotifyClaimOptions is not null and
         Notify claim option is Both
         */
+
         @Test
         void shouldReturnClaimNotified_whenCaseDataAtStateClaimNotified_andBothSolicitorsAreToBeNotified() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -1138,6 +1199,7 @@ class StateFlowEngineAnalysisTest {
         Testing CLAIM_ISSUED -> CLAIM_NOTIFIED for claimNotified
         DefendantSolicitorNotifyClaimOptions is null
         */
+
         @Test
         void shouldReturnAwaitingCaseNotification_whenCaseDataAtStateAwaitingCaseDetailsNotification() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
@@ -1169,6 +1231,7 @@ class StateFlowEngineAnalysisTest {
             );
         }
         //Testing CLAIM_ISSUED -> PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA for pastClaimNotificationDeadline
+
         @Test
         void shouldReturnAwaitingCamundaState_whenPastClaimNotificationDeadline() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimPastClaimNotificationDeadline().build();
@@ -1196,12 +1259,20 @@ class StateFlowEngineAnalysisTest {
         //TO DO CLAIM_ISSUED -> FULL_DEFENCE for fullDefenceSpec
         //TO DO CLAIM_ISSUED -> PART_ADMISSION for partAdmissionSpec
         //TO DO CLAIM_ISSUED -> COUNTER_CLAIM for counterClaimSpec
-        //TO DO CLAIM_ISSUED -> AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED for awaitingResponsesFullDefenceReceivedSpec.and(specClaim)
-        //TO DO CLAIM_ISSUED -> AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED for awaitingResponsesNonFullDefenceReceivedSpec.and(specClaim)
-        //TO DO CLAIM_ISSUED -> DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE for divergentRespondWithDQAndGoOfflineSpec.and(specClaim)
+
+        //TO DO CLAIM_ISSUED -> AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED
+        // for awaitingResponsesFullDefenceReceivedSpec.and(specClaim)
+
+        //TO DO CLAIM_ISSUED -> AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED
+        // for awaitingResponsesNonFullDefenceReceivedSpec.and(specClaim)
+
+        //TO DO CLAIM_ISSUED -> DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE
+        // for divergentRespondWithDQAndGoOfflineSpec.and(specClaim)
+
         //TO DO CLAIM_ISSUED -> DIVERGENT_RESPOND_GO_OFFLINE for divergentRespondGoOfflineSpec.and(specClaim)
 
         //Testing CLAIM_NOTIFIED -> CLAIM_DETAILS_NOTIFIED for claimDetailsNotified
+
         @Test
         void shouldReturnClaimDetailsNotified_whenCaseDataAtStateClaimDetailsNotified() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
@@ -1229,6 +1300,7 @@ class StateFlowEngineAnalysisTest {
             );
         }
         //Testing CLAIM_NOTIFIED -> CLAIM_DETAILS_NOTIFIED for claimDetailsNotified
+
         @Test
         void shouldReturnClaimDetailsNotified_whenCaseDataAtStateClaimDetailsNotifiedBothSolicitors1v2() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -1265,6 +1337,7 @@ class StateFlowEngineAnalysisTest {
             );
         }
         //Testing CLAIM_NOTIFIED -> TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED for takenOfflineAfterClaimDetailsNotified
+
         @Test
         void shouldReturnClaimDetailsNotified_whenCaseDataAtStateClaimDetailsNotifiedSingleSolicitorIn1v2() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -1294,7 +1367,9 @@ class StateFlowEngineAnalysisTest {
         }
 
         //Testing CLAIM_DETAILS_NOTIFIED -> CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION for respondentTimeExtension
-        //TO DO not checking not(notificationAcknowledged) as complete predicate is respondentTimeExtension.and(not(notificationAcknowledged))
+        //TO DO not checking not(notificationAcknowledged) as complete predicate is
+        // respondentTimeExtension.and(not(notificationAcknowledged))
+
         @Test
         void shouldReturnClaimDetailsNotifiedTimeExtension_whenCaseDataAtStateClaimDetailsNotifiedTimeExtension() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension().build();
@@ -1323,6 +1398,7 @@ class StateFlowEngineAnalysisTest {
         }
 
         //Testing CLAIM_DETAILS_NOTIFIED -> NOTIFICATION_ACKNOWLEDGED for notificationAcknowledged
+
         @Test
         void shouldReturnClaimAcknowledge_whenCaseDataAtStateClaimAcknowledge() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
@@ -1361,7 +1437,8 @@ class StateFlowEngineAnalysisTest {
         //TO DO NOTIFICATION_ACKNOWLEDGED -> ALL_RESPONSES_RECEIVED
         //TO DO NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION -> ALL_RESPONSES_RECEIVED
 
-        //Testing NOTIFICATION_ACKNOWLEDGED -> NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION for notificationAcknowledged.and(respondentTimeExtension)
+        //Testing NOTIFICATION_ACKNOWLEDGED -> NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION
+        // for notificationAcknowledged.and(respondentTimeExtension)
         @Test
         void shouldReturnNotificationAcknowledgedTimeExtension_whenCaseDataAtStateClaimAcknowledgeTimeExtension() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -1398,11 +1475,14 @@ class StateFlowEngineAnalysisTest {
 
         //TO DO CLAIM_DETAILS_NOTIFIED -> AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED full combination not tested
         //TO DO CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION -> AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED
-        //TO DO CLAIM_DETAILS_NOTIFIED -> PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA caseDismissedAfterDetailNotified
+        //TO DO CLAIM_DETAILS_NOTIFIED -> PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDAcaseDismissedAfterDetailNotified
 
-        /*Testing NOTIFICATION_ACKNOWLEDGED -> CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE for respondentTimeExtension.and(not(notificationAcknowledged))
-            And NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION -> PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA for caseDismissedAfterClaimAcknowledgedExtension
-         */
+        /*Testing NOTIFICATION_ACKNOWLEDGED -> CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE
+        for respondentTimeExtension.and(not(notificationAcknowledged))
+        And NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION -> PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA
+        for caseDismissedAfterClaimAcknowledgedExtension
+        */
+
         @Test
         void shouldReturnClaimDismissed_whenCaseDataAtStateClaimAcknowledgeAndCcdStateIsDismissed() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -1438,6 +1518,7 @@ class StateFlowEngineAnalysisTest {
 
         //Testing CLAIM_DETAILS_NOTIFIED -> CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION for
         // respondentTimeExtension.and(not(notificationAcknowledged))
+
         @Test
         void shouldReturnExtensionRequested_whenCaseDataAtStateClaimDetailsNotifiedTimeExtension() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension().build();
@@ -1464,8 +1545,6 @@ class StateFlowEngineAnalysisTest {
                 entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
             );
         }
-
-        //TO DO
 
         @Nested
         class RespondentResponse {
@@ -1658,8 +1737,10 @@ class StateFlowEngineAnalysisTest {
                     entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
                 );
             }
-            //Testing CLAIM_DETAILS_NOTIFIED -> AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED for awaitingResponsesNonFullDefenceReceived
+            //Testing CLAIM_DETAILS_NOTIFIED -> AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED
+            // for awaitingResponsesNonFullDefenceReceived
             //1v2 Different solicitor scenario-first response FullDefence received
+
             @Test
             void shouldGenerateDQ_1v2DiffSol_whenFirstResponseIsNotFullDefence() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -1696,8 +1777,10 @@ class StateFlowEngineAnalysisTest {
                     entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
                 );
             }
-            //Testing CLAIM_DETAILS_NOTIFIED -> AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED for awaitingResponsesFullDefenceReceived
+            //Testing CLAIM_DETAILS_NOTIFIED -> AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED
+            // for awaitingResponsesFullDefenceReceived
             //1v2 Different solicitor scenario-first response FullDefence received
+
             @Test
             void shouldGenerateDQ_in1v2Scenario_whenFirstPartySubmitFullDefenceResponse() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -1737,6 +1820,7 @@ class StateFlowEngineAnalysisTest {
             //Testing CLAIM_DETAILS_NOTIFIED -> AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED for notificationAcknowledged
             //1v2 Different solicitor scenario-first party acknowledges, not responds
             // second party submits response FullDefence
+
             @Test
             void shouldGenerateDQ_in1v2Scenario_whenSecondPartySubmitFullDefenceResponse() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -1775,6 +1859,7 @@ class StateFlowEngineAnalysisTest {
             }
 
             //Respondent 1 submits FULL DEFENCE, Respondent 2 submits FULL DEFENCE
+
             @Test
             void shouldReturnFullDefence_in1v2Scenario_whenBothPartiesSubmitFullDefenceResponses() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -1813,6 +1898,7 @@ class StateFlowEngineAnalysisTest {
             }
 
             //Respondent 1 and 2 acknowledges claim, then submits  FULL DEFENCE
+
             @Test
             void shouldReturnFullDefence_in1v2Scenario_whenBothPartiesAcknowledgedAndSubmitFullDefenceResponses() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -1852,6 +1938,7 @@ class StateFlowEngineAnalysisTest {
             }
 
             //Respondent 1 acknowledges claim, then Respondent 1 & 2 submits  FULL DEFENCE
+
             @Test
             void shouldReturnFullDefence_in1v2Scenario_whenRep1AcknowledgedAndBothSubmitFullDefenceResponses() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -1892,6 +1979,7 @@ class StateFlowEngineAnalysisTest {
             }
 
             // Respondent 2 acknowledges claim, Respondent 1 & 2 submits  FULL DEFENCE
+
             @Test
             void shouldReturnFullDefence_in1v2Scenario_whenRep2AcknowledgedAndBothSubmitFullDefenceResponses() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -1933,6 +2021,7 @@ class StateFlowEngineAnalysisTest {
             }
 
             //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
+
             @Test
             void shouldReturnDivergentResponseAndGoOffline_1v2Scenario_whenFirstRespondentSubmitsFullDefenceResponse() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -1972,6 +2061,7 @@ class StateFlowEngineAnalysisTest {
             // Testing CLAIM_ISSUED -> DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE
             // for divergentRespondWithDQAndGoOfflineSpec.and(specClaim)
             //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
+
             @Test
             void shouldReturnDivergentResponse_in1v2SameSolicitorScenario_whenOneRespondentSubmitsFullDefence() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -2010,6 +2100,7 @@ class StateFlowEngineAnalysisTest {
             }
 
             //Respondent 1 submits ADMITS PART, Respondent 2 submits COUNTER CLAIM
+
             @Test
             void shouldReturnDivergentResponse_in1v2Scenario_whenNeitherRespondentSubmitsFullDefenceResponse() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -2048,6 +2139,7 @@ class StateFlowEngineAnalysisTest {
             }
 
             //Respondent 1 submits ADMITS PART, Respondent 2 submits ADMITS PART
+
             @Test
             void shouldReturnAdmitsPartResponse_in1v2Scenario_whenBothRespondentsSubmitAdmitPartResponses() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -2121,6 +2213,7 @@ class StateFlowEngineAnalysisTest {
             names = {"FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED"}
         )
         //Testing FULL_DEFENCE->FULL_DEFENCE_PROCEED for fullDefenceProceed
+
         void shouldReturnFullDefenceProceed_whenCaseDataAtStateApplicantRespondToDefence(FlowState.Main flowState) {
             CaseData caseData = CaseDataBuilder.builder().atState(flowState)
                 .takenOfflineDate(LocalDateTime.now())
@@ -2156,6 +2249,7 @@ class StateFlowEngineAnalysisTest {
         //                        notificationAcknowledged.and(respondentTimeExtension)
         //                        .and(awaitingResponsesFullDefenceReceived)
         //                        .and(not(caseDismissedAfterClaimAcknowledgedExtension))
+
         @Test
         void shouldAwaitResponse_1v2DiffSol_whenFirstResponseIsFullDefenceAndTimeExtension() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -2201,7 +2295,8 @@ class StateFlowEngineAnalysisTest {
         }
 
         @Test
-            //1v2 Different solicitor scenario-both responses FullDefence received and with time extension
+        //1v2 Different solicitor scenario-both responses FullDefence received and with time extension
+
         void shouldAwaitResponse_1v2DiffSol_whenBothRespondFullDefenceAndTimeExtension() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotifiedTimeExtension_Defendent2()
@@ -2247,6 +2342,7 @@ class StateFlowEngineAnalysisTest {
         }
 
         //1v2 Different solicitor scenario-first response FullDefence received and with time extension
+
         @Test
         void shouldAwaitResponse_1v2DiffSol_whenFirstResponseIsFullDefenceAfterAcknowledgeClaimAndTimeExtension() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -2289,6 +2385,7 @@ class StateFlowEngineAnalysisTest {
 
 
         //TO DO FULL_DEFENCE -> PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA for applicantOutOfTime
+
         @Test
         void shouldReturnAwaitingCamundaState_whenDefendantHasRespondedAndApplicantIsOutOfTime() {
             CaseData caseData = CaseDataBuilder.builder().atStatePastApplicantResponseDeadline().build();
@@ -2311,7 +2408,9 @@ class StateFlowEngineAnalysisTest {
                 );
         }
 
-        //Testing PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA -> TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE for claimDismissedByCamunda
+        //Testing PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA -> TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE
+        // for claimDismissedByCamunda
+
         @Test
         void shouldReturnTakenOffline_whenApplicantIsOutOfTimeAndCamundaHasProcessedCase() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflinePastApplicantResponseDeadline().build();
@@ -2342,8 +2441,9 @@ class StateFlowEngineAnalysisTest {
             );
         }
 
-// Testing PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA-> CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE
-// for claimDismissedByCamunda
+        // Testing PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA-> CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE
+        // for claimDismissedByCamunda
+
         @Test
         void shouldReturnClaimDismissedState_whenPastClaimNotificationDeadlineAndProcessedByCamunda() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastClaimNotificationDeadline().build();
@@ -2374,6 +2474,7 @@ class StateFlowEngineAnalysisTest {
 
         //Testing for CLAIM_NOTIFIED -> PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA
         // for pastClaimDetailsNotificationDeadline
+
         @Test
         void shouldReturnAwaitingCamundaState_whenCaseDataIsPastClaimDetailsNotification() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -2404,6 +2505,7 @@ class StateFlowEngineAnalysisTest {
         //Testing PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA ->
         // CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE
         //for claimDismissedByCamunda
+
         @Test
         void shouldReturnCaseDismissedState_whenCaseDataIsPastClaimDetailsNotificationAndProcessedByCamunda() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -2437,7 +2539,8 @@ class StateFlowEngineAnalysisTest {
 
     @Nested
     class TakenOfflineByStaff {
-       //Testing CLAIM_ISSUED -> TAKEN_OFFLINE_BY_STAFF for takenOfflineByStaffAfterClaimIssue
+        //Testing CLAIM_ISSUED -> TAKEN_OFFLINE_BY_STAFF for takenOfflineByStaffAfterClaimIssue
+
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseTakenOfflineAfterClaimIssue() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff()
@@ -2463,6 +2566,7 @@ class StateFlowEngineAnalysisTest {
             );
         }
         //Testing CLAIM_NOTIFIED -> TAKEN_OFFLINE_BY_STAFF for takenOfflineByStaffAfterClaimNotified
+
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseTakenOfflineAfterClaimNotified() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterClaimNotified().build();
@@ -2488,6 +2592,7 @@ class StateFlowEngineAnalysisTest {
             );
         }
         //Testing CLAIM_DETAILS_NOTIFIED -> TAKEN_OFFLINE_BY_STAFF for takenOfflineByStaffAfterClaimNotified
+
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseTakenOfflineAfterClaimDetailsNotified() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterClaimDetailsNotified().build();
@@ -2514,6 +2619,7 @@ class StateFlowEngineAnalysisTest {
         }
         //Testing CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION -> TAKEN_OFFLINE_BY_STAFF
         // for takenOfflineByStaffAfterClaimDetailsNotifiedExtension
+
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseTakenOfflineAfterClaimDetailsNotifiedExtension() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterClaimDetailsNotifiedExtension()
@@ -2549,6 +2655,7 @@ class StateFlowEngineAnalysisTest {
 
         //Testing NOTIFICATION_ACKNOWLEDGED -> TAKEN_OFFLINE_BY_STAFF
         // for takenOfflineByStaffAfterNotificationAcknowledged
+
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseTakenOfflineAfterNotificationAcknowledged() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterNotificationAcknowledged()
@@ -2578,6 +2685,7 @@ class StateFlowEngineAnalysisTest {
 
         //Testing NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION -> TAKEN_OFFLINE_BY_STAFF
         // for takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension
+
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseTakenOfflineAfterNotificationAcknowledgeExtension() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -2607,6 +2715,7 @@ class StateFlowEngineAnalysisTest {
             );
         }
         //Testing FULL_DEFENCE -> TAKEN_OFFLINE_BY_STAFF for takenOfflineByStaff
+
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseTakenOfflineAfterDefendantResponse() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterDefendantResponse()
@@ -2634,6 +2743,7 @@ class StateFlowEngineAnalysisTest {
             );
         }
         //Testing CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE -> TAKEN_OFFLINE_BY_STAFF for takenOfflineByStaff
+
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseTakenOfflinePastClaimNotificationDeadline() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastClaimNotificationDeadline()
@@ -2663,6 +2773,7 @@ class StateFlowEngineAnalysisTest {
             );
         }
         //Testing CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE -> TAKEN_OFFLINE_BY_STAFF
+
         // for takenOfflineByStaff
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseTakenOfflinePastClaimDetailsNotificationDeadline() {
@@ -3029,7 +3140,7 @@ class StateFlowEngineAnalysisTest {
         class DefendantResponseMultiparty {
 
             @Test
-                //1v2 Different solicitor scenario-first response FullDefence received
+            //1v2 Different solicitor scenario-first response FullDefence received
             void shouldGenerateDQ_1v2DiffSol_whenFirstResponseIsFullDefence() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
@@ -3071,6 +3182,7 @@ class StateFlowEngineAnalysisTest {
                                     .and(awaitingResponsesFullDefenceReceived)
                                     .and(not(caseDismissedAfterClaimAcknowledgedExtension))
              */
+
             @Test
             //Testing CLAIM_DETAILS_NOTIFIED -> AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED
             // for awaitingResponsesNonFullDefenceReceived
@@ -3112,7 +3224,7 @@ class StateFlowEngineAnalysisTest {
             }
 
             @Test
-                //1v2 Different solicitor scenario-first response FullDefence received
+            //1v2 Different solicitor scenario-first response FullDefence received
             void shouldGenerateDQ_in1v2Scenario_whenFirstPartySubmitFullDefenceResponse() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
@@ -3151,8 +3263,9 @@ class StateFlowEngineAnalysisTest {
             }
 
             @Test
-                //1v2 Different solicitor scenario-first party acknowledges, not responds
-                // second party submits response FullDefence
+            //1v2 Different solicitor scenario-first party acknowledges, not responds
+            // second party submits response FullDefence
+
             void shouldGenerateDQ_in1v2Scenario_whenSecondPartySubmitFullDefenceResponse() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefenceRespondent2()
@@ -3190,7 +3303,8 @@ class StateFlowEngineAnalysisTest {
             }
 
             @Test
-                //Respondent 1 submits FULL DEFENCE, Respondent 2 submits FULL DEFENCE
+            //Respondent 1 submits FULL DEFENCE, Respondent 2 submits FULL DEFENCE
+
             void shouldReturnFullDefence_in1v2Scenario_whenBothPartiesSubmitFullDefenceResponses() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
@@ -3229,7 +3343,8 @@ class StateFlowEngineAnalysisTest {
             }
 
             @Test
-                //Respondent 1 and 2 acknowledges claim, then submits  FULL DEFENCE
+            //Respondent 1 and 2 acknowledges claim, then submits  FULL DEFENCE
+
             void shouldReturnFullDefence_in1v2Scenario_whenBothPartiesAcknowledgedAndSubmitFullDefenceResponses() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
@@ -3268,7 +3383,8 @@ class StateFlowEngineAnalysisTest {
             }
 
             @Test
-                //Respondent 1 acknowledges claim, then Respondent 1 & 2 submits  FULL DEFENCE
+            //Respondent 1 acknowledges claim, then Respondent 1 & 2 submits  FULL DEFENCE
+
             void shouldReturnFullDefence_in1v2Scenario_whenRep1AcknowledgedAndBothSubmitFullDefenceResponses() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
@@ -3308,7 +3424,8 @@ class StateFlowEngineAnalysisTest {
             }
 
             @Test
-                // Respondent 2 acknowledges claim, Respondent 1 & 2 submits  FULL DEFENCE
+            // Respondent 2 acknowledges claim, Respondent 1 & 2 submits  FULL DEFENCE
+
             void shouldReturnFullDefence_in1v2Scenario_whenRep2AcknowledgedAndBothSubmitFullDefenceResponses() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
@@ -3349,7 +3466,8 @@ class StateFlowEngineAnalysisTest {
             }
 
             @Test
-                //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
+            //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
+
             void shouldReturnDivergentResponseAndGoOffline_1v2Scenario_whenFirstRespondentSubmitsFullDefenceResponse() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
@@ -3390,6 +3508,7 @@ class StateFlowEngineAnalysisTest {
             // Testing CLAIM_ISSUED -> DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE for
             // divergentRespondWithDQAndGoOfflineSpec.and(specClaim)
             //Respondent 1 submits FULL DEFENCE, Respondent 2 submits COUNTER CLAIM
+
             void shouldReturnDivergentResponse_in1v2SameSolicitorScenario_whenOneRespondentSubmitsFullDefence() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateDivergentResponseWithFullDefence1v2SameSol_NotSingleDQ()
@@ -3428,6 +3547,7 @@ class StateFlowEngineAnalysisTest {
 
             //Respondent 1 submits ADMITS PART, Respondent 2 submits COUNTER CLAIM
             // Testing CLAIM_ISSUED -> DIVERGENT_RESPOND_GO_OFFLINE for divergentRespondGoOfflineSpec.and(specClaim)
+
             @Test
             void shouldReturnDivergentResponse_in1v2Scenario_whenNeitherRespondentSubmitsFullDefenceResponse() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -3466,6 +3586,7 @@ class StateFlowEngineAnalysisTest {
             }
 
             //Respondent 1 submits ADMITS PART, Respondent 2 submits ADMITS PART
+
             @Test
             void shouldReturnAdmitsPartResponse_in1v2Scenario_whenBothRespondentsSubmitAdmitPartResponses() {
                 CaseData caseData = CaseDataBuilder.builder()
