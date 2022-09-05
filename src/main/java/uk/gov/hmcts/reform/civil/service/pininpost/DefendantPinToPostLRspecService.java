@@ -4,7 +4,9 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -23,8 +25,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 public class DefendantPinToPostLRspecService {
 
     private final CoreCaseDataService coreCaseDataService;
+    private final CaseDetailsConverter caseDetailsConverter;
 
-    public void validatePin(CaseData caseData, String pin) {
+    public void validatePin(CaseDetails caseDetails, String pin) {
+        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
         if (pinInPostData == null || pinInPostData.getAccessCode() == null
             || !pinInPostData.getAccessCode().equals(pin)

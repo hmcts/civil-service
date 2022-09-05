@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 
@@ -23,11 +25,11 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 
 @SpringBootTest(classes = {
-    DefendantPinToPostLRspecService.class,
-    CaseDetailsConverter.class,
+    DefendantPinToPostLRspecService.class
 })
 
 class DefendantPinToPostLRspecServiceTest {
@@ -42,6 +44,9 @@ class DefendantPinToPostLRspecServiceTest {
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;
+
+    @MockBean
+    private CaseDetailsConverter caseDetailsConverter;
 
     @Nested
     class BuildDefendantPinToPost {
@@ -90,9 +95,13 @@ class DefendantPinToPostLRspecServiceTest {
                                                    .build())
                 .build();
 
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+
             assertThrows(
                 PinNotMatchException.class,
-                () ->  defendantPinToPostLRspecService.validatePin(caseData, "TEST0000"));
+                () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST0000"));
         }
 
         @Test
@@ -104,9 +113,13 @@ class DefendantPinToPostLRspecServiceTest {
                                                    .build())
                 .build();
 
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+
             assertThrows(
                 PinNotMatchException.class,
-                () ->  defendantPinToPostLRspecService.validatePin(caseData, "TEST0000"));
+                () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST0000"));
         }
 
         @Test
@@ -115,9 +128,13 @@ class DefendantPinToPostLRspecServiceTest {
                 .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
                 .build();
 
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+
             assertThrows(
                 PinNotMatchException.class,
-                () ->  defendantPinToPostLRspecService.validatePin(caseData, "TEST1234"));
+                () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST1234"));
         }
 
         @Test
@@ -130,9 +147,13 @@ class DefendantPinToPostLRspecServiceTest {
                                                    .build())
                 .build();
 
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+
             assertThrows(
                 PinNotMatchException.class,
-                () ->  defendantPinToPostLRspecService.validatePin(caseData, "TEST1234"));
+                () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST1234"));
         }
     }
 

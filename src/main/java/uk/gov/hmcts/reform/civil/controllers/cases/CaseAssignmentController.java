@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService;
 
@@ -37,13 +37,14 @@ public class CaseAssignmentController {
     @ApiOperation("Validates case reference and pin")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 401, message = "Not Authorized")})
-    public ResponseEntity<CaseData> validateCaseAndPin(
+        @ApiResponse(code = 401, message = "Not Authorized"),
+        @ApiResponse(code = 400, message = "Bad Request")})
+    public ResponseEntity<CaseDetails> validateCaseAndPin(
         @PathVariable("caseReference") String caseReference, @RequestBody String pin) {
         log.info("case reference {}", caseReference);
-        CaseData caseData = caseByLegacyReferenceSearchService.getCaseDataByLegacyReference(caseReference);
+        CaseDetails caseDetails = caseByLegacyReferenceSearchService.getCaseDataByLegacyReference(caseReference);
         log.info("validating Pin {}", pin);
-        defendantPinToPostLRspecService.validatePin(caseData, pin);
-        return new ResponseEntity<>(caseData, HttpStatus.OK);
+        defendantPinToPostLRspecService.validatePin(caseDetails, pin);
+        return new ResponseEntity<>(caseDetails, HttpStatus.OK);
     }
 }

@@ -3,9 +3,8 @@ package uk.gov.hmcts.reform.civil.service.search;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.search.exceptions.CaseNotFoundException;
@@ -21,9 +20,8 @@ import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 public class CaseLegacyReferenceSearchService {
 
     private final CoreCaseDataService coreCaseDataService;
-    private final CaseDetailsConverter caseDetailsConverter;
 
-    public CaseData getCaseDataByLegacyReference(String legacyReference) {
+    public CaseDetails getCaseDataByLegacyReference(String legacyReference) {
         log.info("building query {}", legacyReference);
         Query query = new Query(boolQuery().must(
             matchQuery("data.legacyCaseReference", legacyReference)), List.of(), 0);
@@ -32,7 +30,7 @@ public class CaseLegacyReferenceSearchService {
             log.error("no case found for {}", legacyReference);
             throw new CaseNotFoundException();
         }
-        return caseDetailsConverter.toCaseData(searchResult.getCases().get(0));
+        return searchResult.getCases().get(0);
     }
 
 }

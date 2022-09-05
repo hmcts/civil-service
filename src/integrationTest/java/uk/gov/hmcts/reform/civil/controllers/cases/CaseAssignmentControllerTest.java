@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.civil.controllers.cases;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService;
@@ -30,10 +30,10 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     void givenCorrectPinAndReference_whenValidateCaseAndPin_shouldReturnCaseData() {
-        CaseData caseData = givenCaseIsFound();
+        CaseDetails caseDetails = givenCaseIsFound();
 
         doPost("", "123", VALIDATE_PIN_URL, "123")
-            .andExpect(content().json(toJson(caseData)))
+            .andExpect(content().json(toJson(caseDetails)))
             .andExpect(status().isOk());
     }
 
@@ -52,7 +52,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
     void givenIncorrectPin_whenValidateCaseAndPin_shouldReturnUnauthorised() {
         givenCaseIsFound();
         doThrow(new PinNotMatchException()).when(defendantPinToPostLRspecService).validatePin(
-            any(CaseData.class),
+            any(CaseDetails.class),
             anyString()
         );
 
@@ -60,10 +60,10 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
             .andExpect(status().isUnauthorized());
     }
 
-    private CaseData givenCaseIsFound() {
-        CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
-        when(caseByLegacyReferenceSearchService.getCaseDataByLegacyReference(any())).thenReturn(caseData);
-        return caseData;
+    private CaseDetails givenCaseIsFound() {
+        CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
+        when(caseByLegacyReferenceSearchService.getCaseDataByLegacyReference(any())).thenReturn(caseDetails);
+        return caseDetails;
     }
 
 }

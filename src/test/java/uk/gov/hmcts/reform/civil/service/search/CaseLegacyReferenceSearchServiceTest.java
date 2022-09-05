@@ -9,7 +9,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.search.exceptions.CaseNotFoundException;
@@ -53,17 +52,14 @@ class CaseLegacyReferenceSearchServiceTest {
     }
 
     @Test
-    void shouldReturnCaseDataSuccessfully_whenCaseExits() {
+    void shouldReturnCaseDetailsSuccessfully_whenCaseExits() {
         CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
-        CaseData caseData = CaseData.builder().build();
         given(searchResult.getCases()).willReturn(Arrays.asList(caseDetails));
-        given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseData);
 
-        CaseData result = caseLegacyReferenceSearchService.getCaseDataByLegacyReference(REFERENCE);
+        CaseDetails result = caseLegacyReferenceSearchService.getCaseDataByLegacyReference(REFERENCE);
 
         assertThat(result).isNotNull();
         verify(coreCaseDataService).searchCases(refEq(EXPECTED_QUERY));
-        verify(caseDetailsConverter).toCaseData(caseDetails);
     }
 
     @Test
