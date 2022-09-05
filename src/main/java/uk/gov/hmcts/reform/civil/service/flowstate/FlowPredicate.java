@@ -774,4 +774,7 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> pinInPostEnabledAndLiP = caseData ->
         caseData.getRespondent1PinToPostLRspec() != null;
+
+    public static final Predicate<CaseData> contactDetailsChange = caseData ->
+        YES.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());
 }
