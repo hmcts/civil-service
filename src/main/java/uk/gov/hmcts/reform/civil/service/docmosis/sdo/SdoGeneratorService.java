@@ -67,7 +67,7 @@ public class SdoGeneratorService {
     private SdoDocumentFormDisposal getTemplateDataDisposal(CaseData caseData, String judgeName) {
         return SdoDocumentFormDisposal.builder()
             .currentDate(LocalDate.now())
-            .judgeName("Judge " + judgeName)
+            .judgeName(judgeName)
             .caseNumber(caseData.getLegacyCaseReference())
             .applicant1(caseData.getApplicant1())
             .hasApplicant2(
@@ -144,7 +144,7 @@ public class SdoGeneratorService {
     private SdoDocumentFormFast getTemplateDataFast(CaseData caseData, String judgeName) {
         return SdoDocumentFormFast.builder()
             .currentDate(LocalDate.now())
-            .judgeName("Judge " + judgeName)
+            .judgeName(judgeName)
             .caseNumber(caseData.getLegacyCaseReference())
             .applicant1(caseData.getApplicant1())
             .hasApplicant2(
@@ -241,7 +241,7 @@ public class SdoGeneratorService {
     private SdoDocumentFormSmall getTemplateDataSmall(CaseData caseData, String judgeName) {
         return SdoDocumentFormSmall.builder()
             .currentDate(LocalDate.now())
-            .judgeName("Judge " + judgeName)
+            .judgeName(judgeName)
             .caseNumber(caseData.getLegacyCaseReference())
             .applicant1(caseData.getApplicant1())
             .hasApplicant2(
