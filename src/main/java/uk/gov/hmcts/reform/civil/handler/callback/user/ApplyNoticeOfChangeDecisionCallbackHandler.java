@@ -72,14 +72,16 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(updatedCaseData, updatedCaseDataBuilder);
 
         updatedCaseDataBuilder.businessProcess(BusinessProcess.ready(APPLY_NOC_DECISION))
-            .changeOfRepresentation(getChangeOfRepresentation(corFieldBeforeNoC));
+            .changeOfRepresentation(getChangeOfRepresentation(corFieldBeforeNoC, updatedCaseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseDataBuilder.build().toMap(objectMapper)).build();
     }
 
-    private ChangeOfRepresentation getChangeOfRepresentation(ChangeOrganisationRequest corFieldBeforeNoC) {
+    private ChangeOfRepresentation getChangeOfRepresentation(ChangeOrganisationRequest corFieldBeforeNoC,
+                                                             CaseData caseData) {
         ChangeOfRepresentation.ChangeOfRepresentationBuilder builder = ChangeOfRepresentation.builder()
+            .organisationToRemoveID(getChangedOrg(caseData, corFieldBeforeNoC))
             .organisationToAddID(corFieldBeforeNoC.getOrganisationToAdd().getOrganisationID())
             .caseRole(corFieldBeforeNoC.getCaseRoleId().getValue().getCode())
             .timestamp(corFieldBeforeNoC.getRequestTimestamp());
@@ -191,5 +193,34 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    /**
+     * Checks if the Change organisation request object has a null org to remove, then gets the organisation from
+     * caseData organisation copy, else returns the existing object in Change organisation request.
+     * @param caseData Case Data
+     * @param request Change Organisation Request
+     * @return string of org to remove id
+     */
+    public String getChangedOrg(CaseData caseData, ChangeOrganisationRequest request) {
+        String caseRole = request.getCaseRoleId().getValue().getCode();
+        if (request.getOrganisationToRemove() == null) {
+            if (!isApplicant(caseRole)) {
+                if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
+                    String respondent1OrganisationIDCopy = caseData.getRespondent1OrganisationIDCopy();
+                    if (respondent1OrganisationIDCopy != null) {
+                        return respondent1OrganisationIDCopy;
+                    }
+                } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
+                    String respondent2OrganisationIDCopy = caseData.getRespondent2OrganisationIDCopy();
+                    if (respondent2OrganisationIDCopy != null) {
+                        return respondent2OrganisationIDCopy;
+                    }
+                }
+            }
+        } else {
+            return request.getOrganisationToRemove().getOrganisationID();
+        }
+        return null;
     }
 }
