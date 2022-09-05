@@ -79,6 +79,8 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                 .thenReturn(Optional.of(Organisation.builder().name(NEW_SOLICITOR).build()));
             when(organisationService.findOrganisationById("QWERTY R"))
                 .thenReturn(Optional.of(Organisation.builder().name(OTHER_SOLICITOR).build()));
+            when(organisationService.findOrganisationById("QWERTY A"))
+                .thenReturn(Optional.of(Organisation.builder().name(OTHER_SOLICITOR).build()));
             when(organisationService.findOrganisationById("QWERTY R2"))
                 .thenReturn(Optional.of(Organisation.builder().name(OTHER_SOLICITOR_2).build()));
             when(notificationsProperties.getNoticeOfChangeFormerSolicitor()).thenReturn(PREVIOUS_SOL_TEMPLATE);
@@ -139,7 +141,7 @@ class ChangeOfRepresentationNotificationHandlerTest extends BaseCallbackHandlerT
                 handler.handle(params);
 
                 verify(notificationService).sendMail(
-                    "respondentsolicitor@example.com",
+                    "applicantsolicitor@example.com",
                     OTHER_SOL_TEMPLATE,
                     expectedProperties,
                     REFERENCE

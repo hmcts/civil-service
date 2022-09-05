@@ -14,10 +14,21 @@ public class NocNotificationUtils {
         //NO-OP
     }
 
+    /**
+     * Get Change of representation former email address.
+     * @param caseData data with change of representation in.
+     * @return string email of the former solicitor.
+     */
     public static String getPreviousSolicitorEmail(CaseData caseData) {
         return caseData.getChangeOfRepresentation().getFormerRepresentationEmailAddress();
     }
 
+    /**
+     * will return applicant 1 details if the changed solicitor isnt applicant one.
+     * @param caseData data with the changed solicitor.
+     * @return Recipient data model that contains a String email and a String Organisation id, else returns null if
+     *     the part is a LiP.
+     */
     private static RecipientData getOtherSolicitor1(CaseData caseData) {
         if (isRespondent2NewSolicitor(caseData)) {
             return RecipientData.builder()
@@ -40,6 +51,13 @@ public class NocNotificationUtils {
         return null;
     }
 
+    /**
+     * Gets the other solicitor 2 to compliment other solicitor 1 if its a 1v1. if its a 2v1 itll get the applicant 1
+     * solicitor as oppose to applicant2 as theyre the same solicitor.
+     * @param caseData data that contains which party has changed
+     * @return Recipient data model that contains a String email and a String Organisation id, else returns null if
+     *     the part is a LiP.
+     */
     private static RecipientData getOtherSolicitor2(CaseData caseData) {
         if (isRespondent2NewSolicitor(caseData)) {
             if (!isOtherPartyLip(caseData.getRespondent1OrganisationPolicy())) {
@@ -97,18 +115,41 @@ public class NocNotificationUtils {
             .equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
     }
 
+    /**
+     * checks if the organisation policy is null to determine if the party is LiP or not.
+     * @param organisationToCheck Object to check null
+     * @return true if the organisation is null meaning the party is a LiP
+     */
     private static boolean isOtherPartyLip(OrganisationPolicy organisationToCheck) {
         return organisationToCheck == null;
     }
 
+    /**
+     * checks the value of the other solicitor 1 to determine if the other party lip check was true or not to skip
+     * the notification process.
+     * @param caseData data containing the other solicitor 1
+     * @return true if the other party 1 is a LiP
+     */
     public static boolean isOtherParty1Lip(CaseData caseData) {
         return getOtherSolicitor1(caseData) == null;
     }
 
+    /**
+     * checks the value of the other solicitor 2 to determine if the other party lip check was true or not to skip
+     * the notification process.
+     * @param caseData data containing the other solicitor 2
+     * @return true if the other party 2 is a LiP
+     */
     public static boolean isOtherParty2Lip(CaseData caseData) {
         return getOtherSolicitor2(caseData) == null;
     }
 
+    /**
+     * Builds the case name based on the applicant 1 and applicant 2 if there is one vs respondent 1 and respondent 2
+     * if there is one.
+     * @param caseData data with the party names in to build the case name
+     * @return String of the party names concatenated
+     */
     public static String getCaseName(CaseData caseData) {
         String applicants = caseData.getApplicant1().getPartyName();
         if (caseData.getApplicant2() != null) {

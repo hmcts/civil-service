@@ -12,10 +12,9 @@ import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class NocNotificationIUtilsTest {
+public class NocNotificationUtilsTest {
 
     private CaseData caseData;
     private ChangeOfRepresentation change;
