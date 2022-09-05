@@ -148,7 +148,9 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
             .build();
     }
 
-    private void prepareDQForSameLegalRepScenario(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private void prepareDQForSameLegalRepScenario(CallbackParams callbackParams,
+                                                  CaseData caseData,
+                                                  CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         if (caseData.getRespondentResponseIsSame() == NO) {
             if (caseData.getRespondent1DQ() != null
                 && caseData.getRespondent1ClaimResponseTypeForSpec() != null
