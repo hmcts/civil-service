@@ -285,6 +285,9 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Autowired
         private GenerateClaimFormCallbackHandler handler;
 
+        @MockBean
+        private FeatureToggleService featureToggleService;
+
         @BeforeEach
         void setup() {
             when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
