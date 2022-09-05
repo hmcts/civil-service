@@ -95,27 +95,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                 caseDataBuilder
             );
         } else if (respondent2HasSameLegalRep(caseData)) {
-            if (caseData.getRespondentResponseIsSame() == NO) {
-                if (caseData.getRespondent1DQ() != null
-                    && caseData.getRespondent1ClaimResponseTypeForSpec() != null
-                    && caseData.getRespondent1ClaimResponseTypeForSpec()
-                    .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
-                    generateDQ1v2SameSol(callbackParams, "ONE");
-                }
-
-                if (caseData.getRespondent2DQ() != null
-                    && caseData.getRespondent2ClaimResponseTypeForSpec() != null
-                    && caseData.getRespondent2ClaimResponseTypeForSpec()
-                    .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
-                    generateDQ1v2SameSol(callbackParams, "TWO");
-                }
-            } else {
-                singleResponseFile(
-                    callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                    caseData,
-                    caseDataBuilder
-                );
-            }
+            prepareDQForSameLegalRepScenario(callbackParams, caseData, caseDataBuilder);
         } else {
             /*
             for MultiParty, when there is a single respondent, this block is executed (when only one respondent
@@ -166,6 +146,30 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void prepareDQForSameLegalRepScenario(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        if (caseData.getRespondentResponseIsSame() == NO) {
+            if (caseData.getRespondent1DQ() != null
+                && caseData.getRespondent1ClaimResponseTypeForSpec() != null
+                && caseData.getRespondent1ClaimResponseTypeForSpec()
+                .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
+                generateDQ1v2SameSol(callbackParams, "ONE");
+            }
+
+            if (caseData.getRespondent2DQ() != null
+                && caseData.getRespondent2ClaimResponseTypeForSpec() != null
+                && caseData.getRespondent2ClaimResponseTypeForSpec()
+                .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
+                generateDQ1v2SameSol(callbackParams, "TWO");
+            }
+        } else {
+            singleResponseFile(
+                callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                caseData,
+                caseDataBuilder
+            );
+        }
     }
 
     /**
