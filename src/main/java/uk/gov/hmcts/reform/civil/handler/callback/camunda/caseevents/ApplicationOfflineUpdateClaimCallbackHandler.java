@@ -28,14 +28,14 @@ import static java.lang.Long.parseLong;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UPDATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ApplicationClosurdUpdateClaimCallbackHandler extends CallbackHandler {
+public class ApplicationOfflineUpdateClaimCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(APPLICATION_CLOSED_UPDATE_CLAIM);
+    private static final List<CaseEvent> EVENTS = List.of(APPLICATION_OFFLINE_UPDATE_CLAIM);
 
     private static final List<String> NON_LIVE_STATES = List.of(
             "Application Closed",
@@ -44,8 +44,8 @@ public class ApplicationClosurdUpdateClaimCallbackHandler extends CallbackHandle
             "Listed for a Hearing",
             "Application Dismissed"
     );
-    private static final String APPLICATION_CLOSED = "APPLICATION_CLOSED";
-    private static final String APPLICATION_CLOSED_DESCRIPTION = "Application Closed";
+    private static final String APPLICATION_PROCEEDS_OFFLINE = "PROCEEDS_IN_HERITAGE";
+    private static final String APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION = "Proceeds in Heritage";
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -88,21 +88,21 @@ public class ApplicationClosurdUpdateClaimCallbackHandler extends CallbackHandle
         if (!isEmpty(gaDetails)) {
             gaDetails.forEach(gaDetails1 -> {
                 if (applicationFilterCriteria(gaDetails1.getValue(), generalApplicationMap)) {
-                    gaDetails1.getValue().setCaseState(APPLICATION_CLOSED_DESCRIPTION);
+                    gaDetails1.getValue().setCaseState(APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION);
                 }
             });
         }
         if (!isEmpty(respondentSpecficGADetails)) {
             respondentSpecficGADetails.forEach(respondentSolElement -> {
                 if (applicationFilterCriteria(respondentSolElement.getValue(), generalApplicationMap)) {
-                    respondentSolElement.getValue().setCaseState(APPLICATION_CLOSED_DESCRIPTION);
+                    respondentSolElement.getValue().setCaseState(APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION);
                 }
             });
         }
         if (!isEmpty(respondentSpecficGADetailsTwo)) {
             respondentSpecficGADetailsTwo.forEach(respondentSolElementTwo -> {
                 if (applicationFilterCriteria(respondentSolElementTwo.getValue(), generalApplicationMap)) {
-                    respondentSolElementTwo.getValue().setCaseState(APPLICATION_CLOSED_DESCRIPTION);
+                    respondentSolElementTwo.getValue().setCaseState(APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION);
                 }
             });
         }
@@ -137,7 +137,7 @@ public class ApplicationClosurdUpdateClaimCallbackHandler extends CallbackHandle
                                                           Map<Long, GeneralApplication> generalApplicationMap) {
         return generalApplicationMap != null
                 && generalApplicationMap.containsKey(caseId)
-                && APPLICATION_CLOSED.equals(generalApplicationMap.get(caseId).getGeneralApplicationState())
+                && APPLICATION_PROCEEDS_OFFLINE.equals(generalApplicationMap.get(caseId).getGeneralApplicationState())
                 && (generalApplicationMap.get(caseId).getApplicationClosedDate() != null);
     }
 

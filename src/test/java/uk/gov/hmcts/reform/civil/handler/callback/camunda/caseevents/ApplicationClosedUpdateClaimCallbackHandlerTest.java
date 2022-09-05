@@ -18,7 +18,7 @@ import static java.lang.Long.parseLong;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @ExtendWith(SpringExtension.class)
-class ApplicationClosurdUpdateClaimCallbackHandlerTest {
+class ApplicationClosedUpdateClaimCallbackHandlerTest {
     private static final List<String> NON_LIVE_STATES = List.of(
             "Application Closed",
             "Proceeds In Heritage",
