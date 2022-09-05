@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -76,8 +77,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public static final String ORDER_1_DEF = "%n%n ## Defendant 1 %n%n %s";
     public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
-    private String judgeNameTitle;
     private final IdamClient idamClient;
+    public String judgeNameTitle;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -166,14 +167,16 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.trialHearingMethodInPersonDJ(locationsList);
         caseDataBuilder.disposalHearingMethodInPersonDJ(locationsList);
 
-        //UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        judgeNameTitle = userDetails.getForename() + " " + userDetails.getSurname().get();
+        caseDataBuilder.disposalHearingJudgesRecitalDJName(judgeNameTitle);
 
         //populates the disposal screen
-        caseDataBuilder.disposalHearingJudgesRecitalDJName("[Title] [Surname]");
         caseDataBuilder
             .disposalHearingJudgesRecitalDJ(DisposalHearingJudgesRecitalDJ
                                                            .builder()
-                                                           .input("Upon considering the claim form and "
+                                                           .input(judgeNameTitle
+                                                                      + ", Upon considering the claim form and "
                                                                       + "Particulars of Claim/statements of case"
                                                                       + " [and the directions questionnaires] "
                                                                       + "\n\nIT IS ORDERED that:-").build());

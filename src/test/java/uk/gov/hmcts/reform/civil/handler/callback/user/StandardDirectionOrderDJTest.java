@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,16 +24,20 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -58,6 +63,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private LocationRefDataService locationRefDataService;
     @MockBean
     private IdamClient idamClient;
+    @MockBean
+    private UserDetails userDetails;
 
     @Nested
     class AboutToStartCallback {
@@ -109,6 +116,13 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
         private static final String PAGE_ID = "trial-disposal-screen";
 
+        @BeforeEach
+        void setup() {
+
+            given(idamClient.getUserDetails(any()))
+                .willReturn(UserDetails.builder().forename("test").surname("judge").build());
+        }
+
         @Test
         void shouldPrePopulateDJDisposalAndTrialHearingPage() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -122,7 +136,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("disposalHearingJudgesRecitalDJ").extracting("input")
-                .isEqualTo("Upon considering the claim form and Particulars of Claim/statements of case "
+                .isEqualTo("test judge, Upon considering the claim form and Particulars of Claim/statements of case "
                                + "[and the directions questionnaires] \n\n"
                                + "IT IS ORDERED that:-");
 
