@@ -4,6 +4,8 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -12,6 +14,8 @@ import uk.gov.hmcts.reform.payments.client.models.FeeDto;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.request.CreditAccountPaymentRequest;
 import uk.gov.hmcts.reform.prd.model.Organisation;
+
+import java.util.Map;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
@@ -24,6 +28,8 @@ public class PaymentsService {
     private final PaymentsConfiguration paymentsConfiguration;
     private final OrganisationService organisationService;
     private final FeatureToggleService featureToggleService;
+    private final CoreCaseDataService coreCaseDataService;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     public PaymentDto createCreditAccountPayment(CaseData caseData, String authToken) throws FeignException {
         return paymentsClient.createCreditAccountPayment(authToken, buildRequest(caseData));
@@ -70,4 +76,23 @@ public class PaymentsService {
         }
         return creditAccountPaymentRequest;
     }
+
+    public void updateStatus(Map<String, Object> paymentUpdate) {
+        String caseNumber = paymentUpdate.get("ccd_case_number").toString();
+        CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(Long.parseLong(caseNumber)));
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+
+        if (paymentUpdate.get("service_request_status") == "paid") {
+
+            PaymentDetails hearingFeePaymentDetails = PaymentDetails
+                .builder()
+                .status(PaymentStatus.SUCCESS)
+                .reference(paymentUpdate.get("payment_reference").toString())
+                .build();
+
+            updatedData.hearingFeePaymentDetails(hearingFeePaymentDetails).build();
+        }
+
+    }
+
 }
