@@ -83,7 +83,7 @@ public class RoboticsDataMapper {
             .caseNumber(caseData.getLegacyCaseReference())
             .owningCourtCode("390")
             .owningCourtName("CCMCC")
-            .caseType("PERSONAL INJURY")
+            .caseType(buildClaimType(caseData))
             .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
             .caseAllocatedTo(buildAllocatedTrack(caseData.getAllocatedTrack()))
             .build();
@@ -97,6 +97,27 @@ public class RoboticsDataMapper {
                 return "MULTI TRACK";
             case SMALL_CLAIM:
                 return "SMALL CLAIM TRACK";
+            default:
+                return "";
+        }
+    }
+
+    private String buildClaimType(CaseData caseData) {
+        switch (caseData.getClaimType()) {
+            case PERSONAL_INJURY:
+                return "PERSONAL INJURY";
+            case CLINICAL_NEGLIGENCE:
+                return "CLINICAL NEGLIGENCE";
+            case PROFESSIONAL_NEGLIGENCE:
+                return "PROFESSIONAL NEGLIGENCE";
+            case BREACH_OF_CONTRACT:
+                return "BREACH OF CONTRACT";
+            case CONSUMER:
+                return "CONSUMER";
+            case CONSUMER_CREDIT:
+                return "CONSUMER CREDIT";
+            case OTHER:
+                return "DAMAGES OTHER";
             default:
                 return "";
         }

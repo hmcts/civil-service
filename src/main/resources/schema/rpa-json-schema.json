@@ -48,6 +48,12 @@
           "type": "string",
           "enum": [
             "PERSONAL INJURY",
+            "CLINICAL NEGLIGENCE",
+            "PROFESSIONAL NEGLIGENCE",
+            "BREACH OF CONTRACT",
+            "CONSUMER",
+            "CONSUMER CREDIT",
+            "DAMAGES OTHER",
             "CLAIM - SPEC ONLY"
           ],
           "description": ""
