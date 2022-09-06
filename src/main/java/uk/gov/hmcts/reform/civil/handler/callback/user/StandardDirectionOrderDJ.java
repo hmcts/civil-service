@@ -355,7 +355,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                             + " insufficient, they must inform the court within "
                                                             + "7 days of the date of this order.")
                                                 .input3("At least 7 days before the trial, the claimant must"
-                                                            + " upload to the Digital Portal")
+                                                            + " upload to the Digital Portal ")
                                                 .build());
 
         caseDataBuilder.trialHearingNotesDJ(TrialHearingNotes

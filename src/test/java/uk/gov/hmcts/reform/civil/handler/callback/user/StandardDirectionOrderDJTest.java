@@ -309,7 +309,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "7 days of the date of this order.");
             assertThat(response.getData()).extracting("trialHearingTrialDJ").extracting("input3")
                 .isEqualTo("At least 7 days before the trial, the claimant must"
-                               + " upload to the Digital Portal");
+                               + " upload to the Digital Portal ");
 
             //trialHearingNotesDJ
             assertThat(response.getData()).extracting("trialHearingNotesDJ").extracting("input")

@@ -121,6 +121,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialCreditHireAddSection(nonNull(caseData.getTrialCreditHire()))
             .trialHearingJudgesRecitalDJ(caseData.getTrialHearingJudgesRecitalDJ())
             .trialHearingTrialDJ(caseData.getTrialHearingTrialDJ())
+            .typeBundleInfo(nonNull(caseData.getTrialHearingTrialDJ())
+                                ? fillTypeBundleInfo(caseData.getTrialHearingTrialDJ().getType()) : null)
             .trialHearingTrialDJAddSection(
                 getToggleValue(caseData.getTrialHearingTrialDJToggle()))
             .trialDays(getTrialDays(caseData.getTrialHearingTrialDJ()))
