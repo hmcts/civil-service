@@ -373,22 +373,22 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                  .input1("The claimant must prepare a Scott Schedule of the defects,"
                                                              + " items of damage "
                                                              + "or any other relevant matters")
-                                                 .input2("The column headings will be as follows: Item; "
-                                                             + "Alleged Defect; claimant's Costing; "
-                                                             + "defendant's Response; defendant's Costing; "
-                                                             + "Reserved for Judge's Use")
-                                                 .input3("The claimant must serve the Scott Schedule with the "
-                                                             + "relevant columns completed by 4pm on")
+                                                 .input2("The columns should be headed: Item; Alleged Defect; "
+                                                             + "Claimant's costing; Defendant's response; Defendant's"
+                                                             + " costing; Reserved for Judge's use.")
+                                                 .input3("The claimant must upload to the Digital Portal the "
+                                                             + "Scott Schedule with the relevant "
+                                                             + "columns completed by 4pm on")
                                                  .date1(LocalDate.now().plusWeeks(10))
-                                                 .input4("The defendant must file and serve the Scott Schedule "
-                                                             + "with the relevant columns "
-                                                             + "in response completed by 4pm on")
+                                                 .input4("The defendant must upload to the Digital Portal "
+                                                     + "an amended version of the Scott Schedule with the relevant"
+                                                         + " columns in response completed by 4pm on")
                                                  .date2(LocalDate.now().plusWeeks(12))
                                                  .build());
 
         caseDataBuilder.trialClinicalNegligence(TrialClinicalNegligence
                                                     .builder()
-                                                    .input1("Documents are to be retained as follows:")
+                                                    .input1("Documents should be retained as follows:")
                                                     .input2("the parties must retain all electronically stored "
                                                                 +
                                                                 "documents relating to the issues in this Claim.")
@@ -425,20 +425,20 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                         + "or ii) the repair/replacement of the claimant's vehicle;\n"
                                                         + "c. Evidence of any loan, overdraft or other credit "
                                                         + "facilities available to the claimant")
-                                            .input2("The claimant must file and serve a witness statement addressing, "
-                                                        + "(a) need to hire a replacement "
-                                                        + "vehicle and (b) impecuniosity no later than 4pm on")
+                                            .input2("The claimant must upload to the Digital Portal a witness "
+                                                        + "statement addressing a)the need to hire a replacement "
+                                                        + "vehicle; and b)impecuniosity")
+                                            .input3("This statement must be uploaded to the Digital Portal by 4pm on")
                                             .date1(LocalDate.now().plusWeeks(8))
-                                            .input3("Failure to comply with the paragraph above will result in the "
-                                                        + "claimant being debarred from "
-                                                        + "asserting need or relying on impecuniosity as the case"
-                                                        + " may be at the final hearing, "
-                                                        + "save with permission of the Trial Judge.")
-                                            .input4("4. The parties are to liaise and use reasonable endeavours to"
+                                            .input4("A failure to comply will result in the claimant being "
+                                                        + "debarred from asserting need or relying on impecuniosity "
+                                                        + "as the case may be at the final hearing, unless they "
+                                                        + "have the permission of the trial Judge.")
+                                            .input5("4. The parties are to liaise and use reasonable endeavours to"
                                                         + " agree the basic hire rate no "
                                                         + "later than 4pm on.")
                                             .date2(LocalDate.now().plusWeeks(10))
-                                            .input5("5. If the parties fail to agree rates subject to liability and/or"
+                                            .input6("5. If the parties fail to agree rates subject to liability and/or"
                                                         + " other issues pursuant to the "
                                                         + "paragraph above, each party may rely upon written evidence "
                                                         + "by way of witness statement of "
@@ -448,42 +448,51 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                         + " available, a local reputable) "
                                                         + "supplier. The defendant's evidence to be served by 4pm on")
                                             .date3(LocalDate.now().plusWeeks(12))
-                                            .input6("and the claimant's evidence in reply if so advised to be"
-                                                        + " served by 4pm on")
+                                            .input7("and the claimant’s evidence in reply if "
+                                                        + "so advised is to be uploaded by 4pm on")
                                             .date4(LocalDate.now().plusWeeks(14))
-                                            .input7("This witness statement is limited to 10 pages per party "
+                                            .input8("This witness statement is limited to 10 pages per party "
                                                         + "(to include any appendices).")
                                             .build());
 
         caseDataBuilder.trialPersonalInjury(TrialPersonalInjury
                                                 .builder()
-                                                .input1("1. The claimant has permission to rely on the written"
-                                                            + " expert evidence annexed to the "
-                                                            + "Particulars of Claim. Defendant may raise written "
-                                                            + "questions of the expert by 4pm on")
+                                                .input1("The claimant has permission to rely upon the written "
+                                                            + "expert evidence already uploaded to the Digital"
+                                                            + " Portal with the particulars of claim and in addition "
+                                                            + "has permission to rely upon any associated "
+                                                            + "correspondence or updating report which is uploaded "
+                                                            + "to the Digital Portal by 4pm on")
                                                 .date1(LocalDate.now().plusWeeks(4))
                                                 .input2("which must be answered by 4pm on")
                                                 .date2(LocalDate.now().plusWeeks(8))
-                                                .input3("No other permission is given for expert evidence.")
+                                                .input3("Any questions which are to be addressed to an expert" +
+                                                    " must be sent to the expert directly and uploaded to " +
+                                                        "the Digital Portal by 4pm on")
+                                                .date3(LocalDate.now().plusWeeks(4))
                                                 .build());
 
         caseDataBuilder.trialRoadTrafficAccident(TrialRoadTrafficAccident
                                                      .builder()
-                                                     .input("Photographs and/or a plan of the location of the"
-                                                                + " accident shall be prepared and "
-                                                                + "agreed by the parties.")
+                                                     .input("Photographs and/or a place of the accident location "
+                                                                + "shall be prepared "
+                                                                + "and agreed by the parties and uploaded to the"
+                                                                + " Digital Portal by 4pm on")
+                                                     .date1(LocalDate.now().plusWeeks(4))
                                                      .build());
+
         caseDataBuilder.trialHousingDisrepair(TrialHousingDisrepair.builder()
                                                   .input1("The claimant must prepare a Scott Schedule of the items "
                                                               + "of disrepair")
                                                   .input2("The column headings will be as follows: Item; Alleged "
                                                     + "disrepair; Defendant's Response; Reserved for Judge's Use")
-                                                  .input3("The claimant must serve the Scott Schedule with the "
-                                                              + "relevant columns completed by 4pm on")
+                                                  .input3("The claimant must uploaded to the Digital Portal the "
+                                                              + "Scott Schedule with the relevant columns "
+                                                              + "completed by 4pm on")
                                                   .date1(LocalDate.now().plusWeeks(10))
-                                                  .input4("The Defendant must file and serve the Scott Schedule "
-                                                              + "with the relevant column "
-                                                              + "in response completed by 4pm on")
+                                                  .input4("The defendant must uploaded to the Digital Portal "
+                                                      + "the amended Scott Schedule with the relevant columns "
+                                                      + "in response completed by 4pm on")
                                                   .date2(LocalDate.now().plusWeeks(12))
                                         .build());
 
