@@ -39,12 +39,12 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
-    void givenIncorrectReference_whenValidateCaseAndPin_shouldReturnUnauthorised() {
+    void givenIncorrectReference_whenValidateCaseAndPin_shouldReturnBadRequest() {
         when(caseByLegacyReferenceSearchService
                  .getCaseDataByLegacyReference(any())).thenThrow(new CaseNotFoundException());
 
         doPost("", "123", VALIDATE_PIN_URL, "123")
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isBadRequest());
     }
 
     @Test
