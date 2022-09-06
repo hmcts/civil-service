@@ -338,14 +338,5 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
             verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
         }
-
-        @Test
-        void shouldReturnCorrectActivityId_whenRequested() {
-            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            assertThat(handler.camundaActivityId(params)).isEqualTo("GenerateClaimForm");
-        }
     }
 }
