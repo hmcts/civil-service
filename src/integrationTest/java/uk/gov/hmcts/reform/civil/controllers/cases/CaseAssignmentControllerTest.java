@@ -44,7 +44,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
                  .getCaseDataByLegacyReference(any())).thenThrow(new CaseNotFoundException());
 
         doPost("", "123", VALIDATE_PIN_URL, "123")
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -57,7 +57,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
         );
 
         doPost("", "123", VALIDATE_PIN_URL, "123")
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isBadRequest());
     }
 
     private CaseDetails givenCaseIsFound() {
