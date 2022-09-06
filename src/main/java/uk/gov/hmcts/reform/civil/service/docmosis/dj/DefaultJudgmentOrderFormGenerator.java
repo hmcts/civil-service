@@ -56,7 +56,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     @Override
-    public DefaultJudgmentSDOOrderForm getTemplateData(CaseData caseData) throws IOException {
+        public DefaultJudgmentSDOOrderForm getTemplateData(CaseData caseData) throws IOException {
         return null;
     }
 
@@ -112,6 +112,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormTrial(CaseData caseData) {
         return DefaultJudgmentSDOOrderForm.builder()
+            .judgeNameTitle(caseData.getTrialHearingJudgesRecitalDJ().getJudgeNameTitle())
             .caseNumber(caseData.getLegacyCaseReference())
             .trialBuildingDispute(caseData.getTrialBuildingDispute())
             .trialBuildingDisputeAddSection(nonNull(caseData.getTrialBuildingDispute()))
@@ -121,8 +122,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialCreditHireAddSection(nonNull(caseData.getTrialCreditHire()))
             .trialHearingJudgesRecitalDJ(caseData.getTrialHearingJudgesRecitalDJ())
             .trialHearingTrialDJ(caseData.getTrialHearingTrialDJ())
-//            .typeBundleInfo(nonNull(caseData.getTrialHearingTrialDJ())
-//                                ? fillTypeBundleInfo(caseData.getTrialHearingTrialDJ().getType()) : null)
+            .typeBundleInfo(nonNull(caseData.getTrialHearingTrialDJ())
+                                ? fillTypeBundleInfo(caseData.getTrialHearingTrialDJ().getType()) : null)
             .trialHearingTrialDJAddSection(
                 getToggleValue(caseData.getTrialHearingTrialDJToggle()))
             .trialDays(getTrialDays(caseData.getTrialHearingTrialDJ()))

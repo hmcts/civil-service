@@ -281,7 +281,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder
             .trialHearingJudgesRecitalDJ(TrialHearingJudgesRecital
                                              .builder()
-                                             .input("[Title] [your name] has considered the statements of "
+                                             .judgeNameTitle(judgeNameTitle)
+                                             .input(judgeNameTitle
+                                                        + " has considered the statements of "
                                                         + "the case and the information provided "
                                                         + "by the parties, \n\n "
                                                         + "IT IS ORDERED THAT:").build());

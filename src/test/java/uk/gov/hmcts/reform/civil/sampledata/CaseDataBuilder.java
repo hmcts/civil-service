@@ -1474,9 +1474,6 @@ public class CaseDataBuilder {
                         + "bundle before it is filed. "
                         + "The bundle will include a case summary"
                         + " and a chronology.")
-            .build();
-
-        trialHearingTrialDJ = TrialHearingTrial.builder()
             .type(DisposalHearingBundleType.DOCUMENTS)
             .build();
         return this;
