@@ -50,6 +50,12 @@ public interface NotificationData {
     String AMOUNT_PAID = "amountPaidBeforeJudgment";
     String AMOUNT_OF_JUDGMENT = "amountOfJudgment";
 
+    // CUI Pin in Post
+    String CLAIMANT_NAME = "claimantName";
+    String RESPOND_URL = "respondToClaimUrl";
+    String PIN = "pin";
+    String FRONTEND_URL = "frontendBaseUrl";
+
     Map<String, String> addProperties(CaseData caseData);
 
 }
