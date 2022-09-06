@@ -715,8 +715,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("uiStatementOfTruth")
-                .extracting("name", "role")
-                .containsExactly(null, null);
+                .doesNotHaveToString("name")
+                .doesNotHaveToString("role");
         }
     }
 
@@ -922,14 +922,11 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
-                .extracting("solicitorReferences")
-                .isNull();
+                .doesNotHaveToString("solicitorReferences");
             assertThat(response.getData())
-                .extracting("respondentSolicitor2Reference")
-                .isNull();
+                .doesNotHaveToString("respondentSolicitor2Reference");
             assertThat(response.getData())
-                .extracting("caseListDisplayDefendantSolicitorReferences")
-                .isNull();
+                .doesNotHaveToString("caseListDisplayDefendantSolicitorReferences");
         }
 
         @Test
@@ -980,12 +977,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).extracting("applicant1ResponseDeadline").isNull();
+            assertThat(response.getData()).doesNotHaveToString("applicant1ResponseDeadline");
             assertThat(response.getData())
                 .containsEntry("nextDeadline", caseData.getRespondent2ResponseDeadline().toLocalDate().toString());
             assertThat(response.getData()).extracting("respondent1ResponseDate")
                 .isEqualTo(responseDate.format(ISO_DATE_TIME));
-            assertThat(response.getData()).extracting("respondent2ResponseDate").isNull();
+            assertThat(response.getData()).doesNotHaveToString("respondent2ResponseDate");
             assertThat(response.getState()).isNull();
         }
 
@@ -1003,12 +1000,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).extracting("applicant1ResponseDeadline").isNull();
+            assertThat(response.getData()).doesNotHaveToString("applicant1ResponseDeadline");
             assertThat(response.getData())
                 .containsEntry("nextDeadline", caseData.getRespondent1ResponseDeadline().toLocalDate().toString());
             assertThat(response.getData()).extracting("respondent2ResponseDate")
                 .isEqualTo(responseDate.format(ISO_DATE_TIME));
-            assertThat(response.getData()).extracting("respondent1ResponseDate").isNull();
+            assertThat(response.getData()).doesNotHaveToString("respondent1ResponseDate");
             assertThat(response.getState()).isNull();
         }
 
@@ -1055,7 +1052,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("applicant1ResponseDeadline", deadline.format(ISO_DATE_TIME))
                 .containsEntry("respondent1ResponseDate", responseDate.format(ISO_DATE_TIME));
 
-            assertThat(response.getData()).extracting("respondent2ResponseDate").isNull();
+            assertThat(response.getData()).doesNotHaveToString("respondent2ResponseDate");
             assertThat(response.getData())
                 .containsEntry("nextDeadline", deadline.toLocalDate().toString());
             assertThat(response.getData())
@@ -1089,8 +1086,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .extracting("uiStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly(null, null);
+                    .doesNotHaveToString("name")
+                    .doesNotHaveToString("role");
             }
 
             @Test
@@ -1116,8 +1113,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .extracting("uiStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly(null, null);
+                    .doesNotHaveToString("name")
+                    .doesNotHaveToString("role");
             }
         }
     }
@@ -1282,10 +1279,24 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldSetMultiPartyResponseTypeFlags_2v1BothNonFullDefence() {
+        void shouldSetMultiPartyResponseTypeFlags_2v1PartAdmission() {
             CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
                 .respondent1ClaimResponseType(COUNTER_CLAIM)
                 .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("PART_ADMISSION");
+        }
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_2v1NonFullDefence() {
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+                .respondent1ClaimResponseType(COUNTER_CLAIM)
+                .respondent1ClaimResponseTypeToApplicant2(COUNTER_CLAIM)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);

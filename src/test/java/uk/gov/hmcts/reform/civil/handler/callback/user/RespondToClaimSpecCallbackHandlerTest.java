@@ -1054,7 +1054,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getData())
-                .extracting("sameSolicitorSameResponse").isNull();
+                .doesNotHaveToString("sameSolicitorSameResponse");
         }
     }
 }

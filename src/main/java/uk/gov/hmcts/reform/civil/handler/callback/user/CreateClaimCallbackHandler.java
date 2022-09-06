@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -55,6 +56,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
@@ -97,7 +100,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_START), this::setSuperClaimType)
             .put(callbackKey(MID, "start-claim"), this::startClaim)
             .put(callbackKey(MID, "applicant"), this::validateApplicant1DateOfBirth)
             .put(callbackKey(MID, "applicant2"), this::validateApplicant2DateOfBirth)
@@ -276,7 +279,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                     .build();
             }
 
-            organisationPolicy2Builder.orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]");
+            organisationPolicy2Builder.orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
             caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2Builder.build());
         }
     }
@@ -330,6 +333,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             if (areAnyRespondentsLitigantInPerson(caseData) == true)  {
                 dataBuilder.addLegalRepDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(time.now()));
             }
+            populateBlankOrgPolicies(dataBuilder, caseData);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -346,6 +350,21 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                       YES.equals(caseData.getAddRespondent2())
                           && NO.equals(caseData.getRespondent2SameLegalRepresentative())
                             ? ", " + caseData.getRespondent2().getPartyName() : "");
+    }
+
+    private void populateBlankOrgPolicies(CaseData.CaseDataBuilder dataBuilder, CaseData caseData) {
+        if (caseData.getRespondent1OrganisationPolicy() == null) {
+            dataBuilder
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
+                                                   .build());
+        }
+        if (caseData.getRespondent2OrganisationPolicy() == null) {
+            dataBuilder
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
+                                                   .build());
+        }
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
@@ -424,4 +443,19 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
         return errorsMessages;
     }
+
+    /**
+     * Sets the super claim type in case data to un-specified claims.
+     * @param callbackParams callback containing case data
+     * @return AboutToStartOrSubmitCallback response with super claim type set to un-specified claim
+     */
+    private CallbackResponse setSuperClaimType(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.superClaimType(SuperClaimType.UNSPEC_CLAIM);
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
 }

@@ -14,6 +14,9 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -24,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CloseClaim;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
+import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -48,6 +52,9 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
@@ -192,6 +199,10 @@ public class CaseDataBuilder {
     protected YesOrNo addApplicant2;
     protected SuperClaimType superClaimType;
     protected YesOrNo addRespondent2;
+
+    protected YesOrNo specRespondent1Represented;
+    protected YesOrNo specRespondent2Represented;
+
     protected YesOrNo respondent2SameLegalRepresentative;
     protected LitigationFriend respondent1LitigationFriend;
     protected LitigationFriend respondent2LitigationFriend;
@@ -270,6 +281,16 @@ public class CaseDataBuilder {
     private String respondent2OrganisationIDCopy;
     private String caseManagementOrderSelection;
     private LocalDateTime addLegalRepDeadline;
+    private DefendantPinToPostLRspec respondent1PinToPostLRspec;
+    private DisposalHearingMethodDJ trialHearingMethodDJ;
+    private DisposalHearingMethodDJ disposalHearingMethodDJ;
+    private DynamicList trialHearingMethodInPersonDJ;
+    private DisposalHearingBundleDJ disposalHearingBundleDJ;
+    private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
+    private TrialHearingTrial trialHearingTrialDJ;
+
+    //update pdf document from general applications
+    private List<Element<CaseDocument>> generalOrderDocument;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -688,6 +709,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent1ClaimResponseType(RespondentResponseType respondent1ClaimResponseType) {
+        this.respondent1ClaimResponseType = respondent1ClaimResponseType;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2ClaimResponseType(RespondentResponseType respondent2ClaimResponseType) {
+        this.respondent2ClaimResponseType = respondent2ClaimResponseType;
+        return this;
+    }
+
     public CaseDataBuilder setRespondent1LitigationFriendCreatedDate(LocalDateTime createdDate) {
         this.respondent1LitigationFriendCreatedDate = createdDate;
         return this;
@@ -874,10 +905,16 @@ public class CaseDataBuilder {
         respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
-        respondent1OrganisationPolicy = null;
-        respondent2OrganisationPolicy = null;
         respondentSolicitor1OrganisationDetails = null;
         addRespondent2 = YES;
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
+        respondent1OrgRegistered = null;
+        respondent2OrgRegistered = null;
         return this;
     }
 
@@ -886,6 +923,27 @@ public class CaseDataBuilder {
         addRespondent2 = NO;
         respondent2 = null;
         respondent2Represented = null;
+        respondent2OrganisationPolicy = null;
+        respondent2OrgRegistered = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssued1v1UnrepresentedDefendantSpec() {
+        atStateClaimIssuedUnrepresentedDefendants();
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        addRespondent2 = NO;
+        respondent2 = null;
+        respondent2Represented = null;
+        respondent2OrganisationPolicy = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssued1v2UnrepresentedDefendant() {
+        atStateClaimIssuedUnrepresentedDefendants();
+        addRespondent2 = YES;
+        respondent2 = PartyBuilder.builder().individual().build();
+        takenOfflineDate = LocalDateTime.now();
+        respondentSolicitor2OrganisationDetails = null;
         respondent2OrganisationPolicy = null;
         return this;
     }
@@ -896,13 +954,17 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondentSolicitor1OrganisationDetails = null;
-        respondent1OrganisationPolicy = null;
         respondent2Represented = YES;
         respondent2OrgRegistered = YES;
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R").build())
-            .build();
         respondentSolicitor1OrganisationDetails = null;
+
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .organisation(Organisation.builder().organisationID("QWERTY R2").build())
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
         return this;
     }
 
@@ -913,13 +975,17 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondentSolicitor2OrganisationDetails = null;
-        respondent2OrganisationPolicy = null;
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
+        respondentSolicitor1OrganisationDetails = null;
+
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY R").build())
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
             .build();
-        respondentSolicitor1OrganisationDetails = null;
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
         return this;
     }
 
@@ -929,8 +995,12 @@ public class CaseDataBuilder {
         respondent2 = PartyBuilder.builder().individual().build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
-        respondent1OrganisationPolicy = null;
-        respondent2OrganisationPolicy = null;
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
         respondent1OrgRegistered = NO;
         respondent2OrgRegistered = NO;
         respondent1Represented = YES;
@@ -968,7 +1038,9 @@ public class CaseDataBuilder {
         atStatePendingClaimIssuedUnregisteredDefendant();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
-        respondent1OrganisationPolicy = null;
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
@@ -990,10 +1062,33 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1OrgRegistered = YES;
-        respondent2OrganisationPolicy = null;
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
         respondent2Represented = YES;
         respondent2OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
+
+        respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg@email.com")
+            .organisationName("test org name")
+            .fax("123123123")
+            .dx("test org dx")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateProceedsOfflineSameUnregisteredDefendant() {
+        atStatePendingClaimIssuedUnregisteredDefendant();
+        respondent2 = PartyBuilder.builder().individual().build();
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = LocalDateTime.now();
+        respondent1OrgRegistered = NO;
+        respondent2OrganisationPolicy = null;
+        respondent2Represented = YES;
+        respondent2SameLegalRepresentative = YES;
 
         respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg@email.com")
@@ -1015,8 +1110,16 @@ public class CaseDataBuilder {
         respondent2Represented = YES;
         respondent2OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
-        respondent1OrganisationPolicy = null;
-        respondent2OrganisationPolicy = null;
+
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
+
+        respondent1Represented = NO;
+        respondent1OrgRegistered = null;
 
         respondentSolicitor2OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg2@email.com")
@@ -1038,8 +1141,15 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
-        respondent1OrganisationPolicy = null;
-        respondent2OrganisationPolicy = null;
+
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
+
+        respondent2OrgRegistered = null;
 
         respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
             .email("testorg2@email.com")
@@ -1146,9 +1256,11 @@ public class CaseDataBuilder {
             .build();
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY R").build())
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
             .build();
         respondent2OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY R2").build())
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
             .build();
         respondent1OrganisationIDCopy = respondent1OrganisationPolicy.getOrganisation().getOrganisationID();
         respondent2OrganisationIDCopy = respondent2OrganisationPolicy.getOrganisation().getOrganisationID();
@@ -1198,6 +1310,27 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimSubmittedTwoRespondentRepresentativesBothUnregistered() {
+        atStateClaimSubmitted();
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
+        respondent2Represented = YES;
+        respondent1OrgRegistered = NO;
+        respondent2OrgRegistered = NO;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmittedRespondent1Unregistered() {
+        atStateClaimSubmitted();
+        respondent1OrgRegistered = NO;
+
+        addRespondent2 = YES;
+        respondent2SameLegalRepresentative = NO;
+        respondent2Represented = YES;
+        respondent2OrgRegistered = YES;
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimSubmittedNoRespondentRepresented() {
         atStateClaimSubmitted();
         addRespondent2 = YES;
@@ -1217,7 +1350,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimSubmitted1v2AndSecondRespondentIsRepresented() {
+    public CaseDataBuilder atStateClaimSubmitted1v2AndOnlySecondRespondentIsRepresented() {
         atStateClaimSubmitted();
         addRespondent2 = YES;
         respondent2SameLegalRepresentative = NO;
@@ -1249,6 +1382,30 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimSubmitted2v1RespondentUnrepresented() {
+        atStateClaimSubmitted();
+        multiPartyClaimTwoApplicants();
+        respondent1Represented = NO;
+        respondent1OrgRegistered = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmitted2v1RespondentRegistered() {
+        atStateClaimSubmitted();
+        multiPartyClaimTwoApplicants();
+        respondent1Represented = YES;
+        respondent1OrgRegistered = YES;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmitted2v1RespondentUnregistered() {
+        atStateClaimSubmitted();
+        multiPartyClaimTwoApplicants();
+        respondent1Represented = YES;
+        respondent1OrgRegistered = NO;
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimIssued1v2AndBothDefendantsDefaultJudgment() {
         defendantDetails = DynamicList.builder()
             .value(DynamicListElement.builder().label("Both Defendants").build())
@@ -1270,6 +1427,62 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimIssuedTrialHearing() {
         caseManagementOrderSelection = "TRIAL_HEARING";
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedTrialSDOInPersonHearing() {
+        trialHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodInPerson;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedTrialLocationInPerson() {
+        trialHearingMethodInPersonDJ = DynamicList.builder().value(
+            DynamicListElement.builder().label("Court 1").build()).build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedTrialHearingInfo() {
+        trialHearingTrialDJ = TrialHearingTrial
+            .builder()
+            .input1("The time provisionally allowed for the trial is")
+            .date1(LocalDate.now().plusWeeks(22))
+            .date2(LocalDate.now().plusWeeks(34))
+            .input2("If either party considers that the time estimates is"
+                        + " insufficient, they must inform the court within "
+                        + "7 days of the date of this order.")
+            .input3("Not more than seven nor less than three clear days before "
+                        + "the trial, the claimant must file at court and serve an"
+                        + "indexed and paginated bundle of documents which complies"
+                        + " with the requirements of Rule 39.5 Civil "
+                        + "Procedure Rules"
+                        + " and Practice Direction 39A. The parties must "
+                        + "endeavour to agree the contents of the "
+                        + "bundle before it is filed. "
+                        + "The bundle will include a case summary"
+                        + " and a chronology.")
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedDisposalHearingInPerson() {
+        disposalHearingBundleDJ = DisposalHearingBundleDJ.builder()
+            .input("The claimant must lodge at court at least 7 "
+                       + "days before the disposal")
+            .type(DisposalHearingBundleType.DOCUMENTS)
+            .build();
+        disposalHearingFinalDisposalHearingDJ = DisposalHearingFinalDisposalHearingDJ
+            .builder()
+            .input("This claim be listed for final "
+                       + "disposal before a Judge on the first "
+                       + "available date after.")
+            .date(LocalDate.now().plusWeeks(16))
+            .time(DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES)
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedDisposalSDOVideoCall() {
+        disposalHearingMethodDJ = DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing;
         return this;
     }
 
@@ -1306,6 +1519,14 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStatePaymentSuccessfulWithCopyOrganisationOnly() {
+        atStatePaymentSuccessful();
+        respondent1OrganisationIDCopy = respondent1OrganisationPolicy.getOrganisation().getOrganisationID();
+        respondent1OrganisationPolicy = respondent1OrganisationPolicy.toBuilder()
+            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build()).build();
+        return this;
+    }
+
     public CaseDataBuilder atStatePendingClaimIssued() {
         atStatePaymentSuccessful();
         issueDate = CLAIM_ISSUED_DATE;
@@ -1317,9 +1538,13 @@ public class CaseDataBuilder {
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
-        respondent1OrganisationPolicy = null;
         respondent2OrgRegistered = NO;
-        respondent2OrganisationPolicy = null;
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
         return this;
     }
 
@@ -1328,10 +1553,14 @@ public class CaseDataBuilder {
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = NO;
         respondent1OrgRegistered = NO;
-        respondent1OrganisationPolicy = null;
         respondent2Represented = NO;
         respondent2OrgRegistered = NO;
-        respondent2OrganisationPolicy = null;
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
         return this;
     }
 
@@ -1340,11 +1569,15 @@ public class CaseDataBuilder {
         issueDate = CLAIM_ISSUED_DATE;
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
-        respondent1OrganisationPolicy = null;
         respondent2Represented = NO;
         respondent2OrgRegistered = NO;
-        respondent2OrganisationPolicy = null;
         respondent2 = PartyBuilder.builder().individual().build();
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+            .build();
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
+            .build();
         return this;
     }
 
@@ -1402,6 +1635,18 @@ public class CaseDataBuilder {
         claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
         respondent1ResponseDeadline = RESPONSE_DEADLINE;
         ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotified1v1() {
+        atStateClaimNotified();
+        claimDetailsNotificationDate = claimNotificationDate.plusDays(1);
+        claimDismissedDeadline = LocalDateTime.now().plusMonths(6);
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        respondent2OrgRegistered = null;
+        respondent2Represented = null;
+        addRespondent2 = null;
         return this;
     }
 
@@ -2612,7 +2857,6 @@ public class CaseDataBuilder {
         LocalDateTime tomrrowsDateTime = LocalDateTime.now().plusDays(1);
         this.respondent1LitigationFriendDate = tomrrowsDateTime;
         this.respondent1LitigationFriendCreatedDate = tomrrowsDateTime;
-
         return this;
     }
 
@@ -2658,6 +2902,16 @@ public class CaseDataBuilder {
         this.addRespondent2 = YES;
         this.respondent2 = PartyBuilder.builder().individual().build();
         this.respondent2SameLegalRepresentative = YES;
+        return this;
+    }
+
+    public CaseDataBuilder multiPartyClaimTwoDefendantSolicitorsSpec() {
+        this.addRespondent2 = YES;
+        this.respondent2 = PartyBuilder.builder().individual().build();
+        this.respondent2SameLegalRepresentative = NO;
+        this.respondentSolicitor2Reference = "01234";
+        this.specRespondent1Represented = YES;
+        this.specRespondent2Represented = YES;
         return this;
     }
 
@@ -2819,6 +3073,11 @@ public class CaseDataBuilder {
     public CaseDataBuilder atSpecAoSApplicantCorrespondenceAddressDetails(
         Address specAoSApplicantCorrespondenceAddressDetails) {
         this.specAoSApplicantCorrespondenceAddressDetails = specAoSApplicantCorrespondenceAddressDetails;
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent1PinToPostLRspec(DefendantPinToPostLRspec respondent1PinToPostLRspec) {
+        this.respondent1PinToPostLRspec = respondent1PinToPostLRspec;
         return this;
     }
 
@@ -3015,8 +3274,17 @@ public class CaseDataBuilder {
             .applicant1ProceedWithClaimSpec2v1(applicant1ProceedWithClaimSpec2v1)
             .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
+            .specRespondent1Represented(specRespondent1Represented)
+            .specRespondent2Represented(specRespondent2Represented)
             .breathing(breathing)
             .caseManagementOrderSelection(caseManagementOrderSelection)
+            .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
+            .trialHearingMethodDJ(trialHearingMethodDJ)
+            .disposalHearingMethodDJ(disposalHearingMethodDJ)
+            .trialHearingMethodInPersonDJ(trialHearingMethodInPersonDJ)
+            .disposalHearingBundleDJ(disposalHearingBundleDJ)
+            .disposalHearingFinalDisposalHearingDJ(disposalHearingFinalDisposalHearingDJ)
+            .trialHearingTrialDJ(trialHearingTrialDJ)
             .build();
     }
 }

@@ -17,11 +17,13 @@ public interface NotificationData {
     String AGREED_EXTENSION_DATE = "agreedExtensionDate";
     String REASON = "reason";
     String PARTY_REFERENCES = "partyReferences";
+    String ALLOCATED_TRACK = "allocatedTrack";
 
     String CLAIM_LEGAL_ORG_NAME_SPEC = "legalOrgName";
     String CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC = "defendantLegalRep";
     String DEFENDANT_NAME_SPEC = "defendantLR";
     String CLAIM_NAME_SPEC = "claimantLR";
+    String RESPONSE_INTENTION = "responseIntention";
 
     //Optional Multiparty fields for notifications
     String RESPONDENT_ONE_NAME = "defendantOneName";
@@ -42,6 +44,12 @@ public interface NotificationData {
     String DEFENDANT_EMAIL = "DefendantLegalOrgName";
     String CLAIMANT_EMAIL = "ClaimantLegalOrgName";
     String LEGAL_ORG_APPLICANT1 = "legalOrgApplicant1";
+
+    // CUI Pin in Post
+    String CLAIMANT_NAME = "claimantName";
+    String RESPOND_URL = "respondToClaimUrl";
+    String PIN = "pin";
+    String FRONTEND_URL = "frontendBaseUrl";
 
     Map<String, String> addProperties(CaseData caseData);
 

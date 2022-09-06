@@ -426,8 +426,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("uiStatementOfTruth")
-                .extracting("name", "role")
-                .containsExactly(null, null);
+                .doesNotHaveToString("name")
+                .doesNotHaveToString("role");
         }
     }
 
@@ -531,8 +531,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .extracting("uiStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly(null, null);
+                    .doesNotHaveToString("name")
+                    .doesNotHaveToString("role");
             }
         }
 

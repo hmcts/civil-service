@@ -14,11 +14,14 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -37,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @SpringBootTest(classes = {
+    DeadlinesCalculator.class,
     DefendantClaimDetailsNotificationHandler.class,
     JacksonAutoConfiguration.class,
 })
@@ -53,13 +57,19 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
     @Autowired
     private DefendantClaimDetailsNotificationHandler handler;
 
+    @MockBean
+    private DeadlinesCalculator deadlinesCalculator;
+
     @Nested
     class AboutToSubmitCallback {
+        private LocalDateTime responseDeadline;
 
         @BeforeEach
         void setup() {
+            responseDeadline = LocalDateTime.now().plusDays(14);
             when(notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate())
                 .thenReturn(templateId);
+            when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
         }
 
         @Test
@@ -100,8 +110,9 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONSE_DEADLINE, formatLocalDate(caseData.getClaimDetailsNotificationDeadline().toLocalDate(), DATE),
-                RESPONSE_DEADLINE_PLUS_28, formatLocalDate(caseData.getRespondent1ResponseDeadline().plusDays(28)
-                                                                                 .toLocalDate(), DATE),
+                RESPONSE_DEADLINE_PLUS_28, formatLocalDate(
+                    deadlinesCalculator.plus14DaysDeadline(caseData.getRespondent1ResponseDeadline())
+                         .toLocalDate(), DATE),
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         }

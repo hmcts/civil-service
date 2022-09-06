@@ -133,6 +133,8 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
+                .respondent2Represented(YES)
+                .respondent2OrgRegistered(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -228,7 +230,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void setup() {
             newDeadline = LocalDateTime.now().plusDays(14);
             nextDeadline = LocalDateTime.now().plusDays(7);
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(newDeadline);
+            when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(newDeadline);
             when(deadlinesCalculator.nextDeadline(any())).thenReturn(nextDeadline);
             acknowledgementDate = LocalDateTime.now();
             when(time.now()).thenReturn(acknowledgementDate);
@@ -393,6 +395,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateNotificationAcknowledgedRespondent2()
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
+                .respondent2Represented(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
