@@ -39,7 +39,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
-    void givenIncorrectReference_whenValidateCaseAndPin_shouldReturnBadRequest() {
+    void givenIncorrectReference_whenValidateCaseAndPin_shouldReturnUnauthorized() {
         when(caseByLegacyReferenceSearchService
                  .getCaseDataByLegacyReference(any())).thenThrow(new CaseNotFoundException());
 
@@ -49,7 +49,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
-    void givenIncorrectPin_whenValidateCaseAndPin_shouldReturnUnauthorised() {
+    void givenIncorrectPin_whenValidateCaseAndPin_shouldReturnBadRequest() {
         givenCaseIsFound();
         doThrow(new PinNotMatchException()).when(defendantPinToPostLRspecService).validatePin(
             any(CaseDetails.class),
