@@ -302,7 +302,6 @@ public class StateFlowEngine {
                 .transitionTo(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED).onlyIf(takenOfflineAfterClaimNotified)
                 .transitionTo(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA).onlyIf(pastClaimNotificationDeadline)
                 .transitionTo(CONTACT_DETAILS_CHANGE).onlyIf(contactDetailsChange)
-                    .set(flags -> {flags.put(FlowFlag.CONTACT_DETAILS_CHANGE.name(), true);})
                 .transitionTo(FULL_DEFENCE).onlyIf(fullDefenceSpec.and(not(contactDetailsChange)))
                 .transitionTo(PART_ADMISSION).onlyIf(partAdmissionSpec.and(not(contactDetailsChange)))
                 .transitionTo(FULL_ADMISSION).onlyIf(fullAdmissionSpec.and(not(contactDetailsChange)))
