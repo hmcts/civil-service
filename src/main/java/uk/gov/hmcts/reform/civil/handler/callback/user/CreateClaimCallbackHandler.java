@@ -54,6 +54,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
@@ -101,6 +102,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::setSuperClaimType)
+            .put(callbackKey(V_1, ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "start-claim"), this::startClaim)
             .put(callbackKey(MID, "applicant"), this::validateApplicant1DateOfBirth)
             .put(callbackKey(MID, "applicant2"), this::validateApplicant2DateOfBirth)
@@ -115,6 +117,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
+            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaimV1)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -285,6 +288,61 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        List<String> validationErrors = validateCaseData(caseData);
+        if (validationErrors.size() > 0) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(validationErrors)
+                .build();
+        }
+
+        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
+        CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
+        addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder);
+
+        if (caseData.getRespondent1OrgRegistered() == YES
+            && caseData.getRespondent1Represented() == YES
+            && caseData.getRespondent2SameLegalRepresentative() == YES) {
+            // Predicate: Def1 registered, Def 2 unregistered.
+            // This is required to ensure mutual exclusion in 1v2 same solicitor case.
+            dataBuilder.respondent2OrgRegistered(YES);
+        }
+
+        // moving statement of truth value to correct field, this was not possible in mid event.
+        // resetting statement of truth to make sure it's empty the next time it appears in the UI.
+        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
+        dataBuilder
+            .uiStatementOfTruth(StatementOfTruth.builder().build())
+            .applicantSolicitor1ClaimStatementOfTruth(statementOfTruth)
+            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+
+        // data for case list and unassigned list
+        dataBuilder
+            .allPartyNames(getAllPartyNames(caseData))
+            .unassignedCaseListDisplayOrganisationReferences(getAllOrganisationPolicyReferences(caseData))
+            .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData));
+
+        if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
+        }
+
+        dataBuilder.claimStarted(null);
+
+        if (toggleService.isNoticeOfChangeEnabled()) {
+            // LiP are not represented or registered
+            if (areAnyRespondentsLitigantInPerson(caseData) == true)  {
+                dataBuilder.addLegalRepDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(time.now()));
+            }
+            populateBlankOrgPolicies(dataBuilder, caseData);
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(dataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse submitClaimV1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         List<String> validationErrors = validateCaseData(caseData);
