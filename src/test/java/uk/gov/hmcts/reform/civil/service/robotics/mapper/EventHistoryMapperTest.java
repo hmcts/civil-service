@@ -5867,6 +5867,204 @@ class EventHistoryMapperTest {
         }
     }
 
+    private void assertEmptyEvents(EventHistory eventHistory, String... eventNames) {
+        Stream.of(eventNames).forEach(
+            eventName -> assertThat(eventHistory).extracting(eventName).asList().containsOnly(EMPTY_EVENT));
+    }
+
+    @Test
+    public void specCaseEvents() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued1v2UnrepresentedDefendant()
+            .build().toBuilder()
+            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .build();
+        when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(false);
+        Event expectedEvent = Event.builder()
+            .eventSequence(1)
+            .eventCode("999")
+            .dateReceived(caseData.getSubmittedDate())
+            .eventDetailsText("RPA Reason: [1 of 2 - 2020-08-01] Unrepresented defendant: Mr. Sole Trader")
+            .eventDetails(EventDetails.builder()
+                              .miscText("RPA Reason: [1 of 2 - 2020-08-01] Unrepresented defendant: Mr. Sole Trader")
+                              .build())
+            .build();
+
+        Event expectedEvent2 = Event.builder()
+            .eventSequence(2)
+            .eventCode("999")
+            .dateReceived(caseData.getSubmittedDate())
+            .eventDetailsText("RPA Reason: [2 of 2 - 2020-08-01] Unrepresented defendant: Mr. John Rambo")
+            .eventDetails(EventDetails.builder()
+                              .miscText("RPA Reason: [2 of 2 - 2020-08-01] Unrepresented defendant: Mr. John Rambo")
+                              .build())
+            .build();
+
+        var eventHistory = mapper.buildEvents(caseData);
+
+        assertThat(eventHistory).isNotNull();
+        assertThat(eventHistory)
+            .extracting("miscellaneous")
+            .asList()
+            .containsExactly(expectedEvent, expectedEvent2);
+        assertEmptyEvents(
+            eventHistory,
+            "acknowledgementOfServiceReceived",
+            "consentExtensionFilingDefence",
+            "defenceFiled",
+            "defenceAndCounterClaim",
+            "receiptOfPartAdmission",
+            "receiptOfAdmission",
+            "replyToDefence",
+            "directionsQuestionnaireFiled"
+        );
+    }
+
+    @Test
+    void specShouldPrepareMiscellaneousEvent_whenCaseNoteAdded() {
+        LocalDateTime noteCreatedOn = LocalDateTime.now().plusDays(3);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimNotified_1v1()
+            .caseNotes(CaseNote.builder()
+                           .createdOn(noteCreatedOn)
+                           .createdBy("createdBy")
+                           .note("my note")
+                           .build())
+            .build().toBuilder()
+            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .respondent1LitigationFriendCreatedDate(LocalDateTime.now())
+            .build();
+        when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+        Event claimIssuedEvent = Event.builder()
+            .eventSequence(1)
+            .eventCode("999")
+            .dateReceived(caseData.getIssueDate().atStartOfDay())
+            .eventDetailsText("Claim issued in CCD.")
+            .eventDetails(EventDetails.builder()
+                              .miscText("Claim issued in CCD.")
+                              .build())
+            .build();
+
+        String miscText = "Litigation friend added for respondent: " + caseData.getRespondent1().getPartyName();
+        Event respondent1LitigationFriendEvent = Event.builder()
+            .eventSequence(2)
+            .eventCode("999")
+            .dateReceived(caseData.getRespondent1LitigationFriendCreatedDate())
+            .eventDetailsText(miscText)
+            .eventDetails(EventDetails.builder()
+                              .miscText(miscText)
+                              .build())
+            .build();
+
+        Event caseNoteEvent = Event.builder()
+            .eventSequence(3)
+            .eventCode("999")
+            .dateReceived(noteCreatedOn)
+            .eventDetailsText("case note added: my note")
+            .eventDetails(EventDetails.builder()
+                              .miscText("case note added: my note")
+                              .build())
+            .build();
+
+        var eventHistory = mapper.buildEvents(caseData);
+
+        assertThat(eventHistory).isNotNull();
+        assertThat(eventHistory)
+            .extracting("miscellaneous")
+            .asList()
+            .containsExactly(claimIssuedEvent, respondent1LitigationFriendEvent, caseNoteEvent);
+        assertEmptyEvents(
+            eventHistory,
+            "acknowledgementOfServiceReceived",
+            "consentExtensionFilingDefence",
+            "defenceFiled",
+            "defenceAndCounterClaim",
+            "receiptOfPartAdmission",
+            "receiptOfAdmission",
+            "replyToDefence",
+            "directionsQuestionnaireFiled"
+        );
+    }
+
+    @Test
+    void specShouldPrepareFriendEvent_whenRespondent2Friend() {
+        LocalDateTime noteCreatedOn = LocalDateTime.now().plusDays(3);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimNotified_1v1()
+            .caseNotes(CaseNote.builder()
+                           .createdOn(noteCreatedOn)
+                           .createdBy("createdBy")
+                           .note("my note")
+                           .build())
+            .build().toBuilder()
+            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .respondent2(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .companyName("Company Name")
+                             .build())
+            .respondent2LitigationFriendCreatedDate(LocalDateTime.now())
+            .build();
+        if (caseData.getRespondent2OrgRegistered() != null
+            && caseData.getRespondent2Represented() == null) {
+            caseData = caseData.toBuilder()
+                .respondent2Represented(YES)
+                .build();
+        }
+        when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
+
+        Event claimIssuedEvent = Event.builder()
+            .eventSequence(1)
+            .eventCode("999")
+            .dateReceived(caseData.getIssueDate().atStartOfDay())
+            .eventDetailsText("Claim issued in CCD.")
+            .eventDetails(EventDetails.builder()
+                              .miscText("Claim issued in CCD.")
+                              .build())
+            .build();
+
+        String miscText = "Litigation friend added for respondent: " + caseData.getRespondent2().getPartyName();
+        Event respondent1LitigationFriendEvent = Event.builder()
+            .eventSequence(2)
+            .eventCode("999")
+            .dateReceived(caseData.getRespondent2LitigationFriendCreatedDate())
+            .eventDetailsText(miscText)
+            .eventDetails(EventDetails.builder()
+                              .miscText(miscText)
+                              .build())
+            .build();
+
+        Event caseNoteEvent = Event.builder()
+            .eventSequence(3)
+            .eventCode("999")
+            .dateReceived(noteCreatedOn)
+            .eventDetailsText("case note added: my note")
+            .eventDetails(EventDetails.builder()
+                              .miscText("case note added: my note")
+                              .build())
+            .build();
+
+        var eventHistory = mapper.buildEvents(caseData);
+
+        assertThat(eventHistory).isNotNull();
+        assertThat(eventHistory)
+            .extracting("miscellaneous")
+            .asList()
+            .containsExactly(claimIssuedEvent, respondent1LitigationFriendEvent, caseNoteEvent);
+        assertEmptyEvents(
+            eventHistory,
+            "acknowledgementOfServiceReceived",
+            "consentExtensionFilingDefence",
+            "defenceFiled",
+            "defenceAndCounterClaim",
+            "receiptOfPartAdmission",
+            "receiptOfAdmission",
+            "replyToDefence",
+            "directionsQuestionnaireFiled"
+        );
+    }
+
     @Nested
     class BreathingSpaceEvents {
 

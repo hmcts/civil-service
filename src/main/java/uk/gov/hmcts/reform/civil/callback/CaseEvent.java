@@ -149,6 +149,7 @@ public enum CaseEvent {
     NOTIFY_RPA_DJ_UNSPEC(CAMUNDA),
     NOTIFY_RPA_DJ_SPEC(CAMUNDA);
 
+
     private final UserType userType;
 
     public boolean isCamundaEvent() {
