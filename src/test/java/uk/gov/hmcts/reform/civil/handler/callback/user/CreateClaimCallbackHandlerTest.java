@@ -826,7 +826,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
-
     @Nested
     class AboutToSubmitCallbackV0 {
 
