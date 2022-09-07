@@ -11,6 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.assertion.CustomAssertions;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
+import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
@@ -303,5 +304,68 @@ class RoboticsDataMapperTest {
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
+    }
+
+    @Test
+    void shouldMapPersonalInjuryToRoboticsCaseDataWhenSelected() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .claimType(ClaimType.PERSONAL_INJURY)
+            .build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("PERSONAL INJURY");
+    }
+
+    @Test
+    void shouldMapClinicalNegligenceToRoboticsCaseDataWhenSelected() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .claimType(ClaimType.CLINICAL_NEGLIGENCE)
+            .build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("CLINICAL NEGLIGENCE");
+    }
+
+    @Test
+    void shouldMapProfessionalNegligenceToRoboticsCaseDataWhenSelected() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .claimType(ClaimType.PROFESSIONAL_NEGLIGENCE)
+            .build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("PROFESSIONAL NEGLIGENCE");
+    }
+
+    @Test
+    void shouldMapBreachOfContractToRoboticsCaseDataWhenSelected() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .claimType(ClaimType.BREACH_OF_CONTRACT)
+            .build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("BREACH OF CONTRACT");
+    }
+
+    @Test
+    void shouldConsumerToRoboticsCaseDataWhenSelected() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .claimType(ClaimType.CONSUMER)
+            .build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("CONSUMER");
+    }
+
+    @Test
+    void shouldConsumerCreditToRoboticsCaseDataWhenSelected() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .claimType(ClaimType.CONSUMER_CREDIT)
+            .build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("CONSUMER CREDIT");
+    }
+
+    @Test
+    void shouldOtherToRoboticsCaseDataWhenSelected() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .claimType(ClaimType.OTHER)
+            .build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("DAMAGES OTHER");
     }
 }
