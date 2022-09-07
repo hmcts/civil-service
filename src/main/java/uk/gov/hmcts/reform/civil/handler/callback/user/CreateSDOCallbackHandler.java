@@ -532,8 +532,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         SmallClaimsHearing tempSmallClaimsHearing = SmallClaimsHearing.builder()
             .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
                         + "The hearing will have a time estimate of")
-            .input2(featureToggleService.isHearingsAndListeningsEnabled() ? HEARING_TIME_TEXT_AFTER
-                        : HEARING_TIME_TEXT_AFTER_HNL)
+            .input2(featureToggleService.isHearingsAndListingsEnabled() ? HEARING_TIME_TEXT_AFTER_HNL
+                        : HEARING_TIME_TEXT_AFTER)
             .build();
 
         updatedData.smallClaimsHearing(tempSmallClaimsHearing).build();
