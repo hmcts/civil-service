@@ -4,10 +4,7 @@ tags:
 postgresql:
   enabled: true
   image:
-    registry: hmctspublic.azurecr.io
-    repository: imported/bitnami/postgresql
-    tag: '11.3.0'
-    pullPolicy: Always
+    tag: '11.6.0'
   resources:
     requests:
       cpu: 25m
@@ -65,7 +62,7 @@ java:
     POLLING_EVENT_EMITTER_ENABLED: false
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
     DOCUMENT_MANAGEMENT_SECURED: true
-    STITCHING_API_ENABLED: false
+    STITCHING_API_ENABLED: true
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
