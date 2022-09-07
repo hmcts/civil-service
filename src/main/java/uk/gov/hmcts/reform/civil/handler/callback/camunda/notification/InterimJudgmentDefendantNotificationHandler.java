@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_INTERIM_JUDGMENT_DEFENDANT;
 
@@ -132,12 +133,8 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
     }
 
     private String getLegalOrganizationNameDefendant2(final CaseData caseData) {
-        System.out.println(">>>>>>>>>"+caseData.getRespondent2OrganisationPolicy()
-            .getOrganisation().getOrganisationID());
         Optional<Organisation> organisation = organisationService
-            .findOrganisationById(caseData.getRespondent2OrganisationPolicy()
-                                      .getOrganisation().getOrganisationID());
-        System.out.println(">>>>>>>>>"+organisation);
+            .findOrganisationById(getOrganisationIdRespondent2(caseData));
         if (organisation.isPresent()) {
             return organisation.get().getName();
         }
@@ -146,6 +143,15 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
 
     private Boolean checkIfBothDefendants(CaseData caseData) {
         return BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel());
+    }
+
+    private String getOrganisationIdRespondent2(final CaseData caseData) {
+        if (isNull(caseData.getRespondent2OrganisationPolicy())
+            || isNull(caseData.getRespondent2OrganisationPolicy().getOrganisation())) {
+            return caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+        } else {
+            return caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+        }
     }
 }
 
