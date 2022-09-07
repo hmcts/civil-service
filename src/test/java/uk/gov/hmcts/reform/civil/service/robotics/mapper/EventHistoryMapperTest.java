@@ -2477,8 +2477,7 @@ class EventHistoryMapperTest {
                 .containsExactly(expectedReceiptOfPartAdmission.get(0), expectedReceiptOfPartAdmission.get(1));
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0),
-                                 expectedMiscellaneousEvents.get(1), expectedMiscellaneousEvents.get(2)
-                );
+                                 expectedMiscellaneousEvents.get(1), expectedMiscellaneousEvents.get(2));
 
             assertEmptyEvents(
                 eventHistory,
@@ -3022,10 +3021,8 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("defenceFiled").asList()
                 .containsExactly(expectedDefenceFiled.get(0), expectedDefenceFiled.get(1));
             assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
-                .containsExactly(
-                    expectedDirectionsQuestionnaireFiled.get(0),
-                    expectedDirectionsQuestionnaireFiled.get(1)
-                );
+                .containsExactly(expectedDirectionsQuestionnaireFiled.get(0),
+                                 expectedDirectionsQuestionnaireFiled.get(1));
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .containsExactly(expectedMiscellaneousEvents.get(0));
 
