@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.toStringValueForEmail;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -169,7 +170,8 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-                PARTY_REFERENCES, buildPartiesReferences(caseData)
+                PARTY_REFERENCES, buildPartiesReferences(caseData),
+                ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
             );
         } else {
             //if there are 2 respondents on the case, concatenate the names together for the template subject line
@@ -179,7 +181,8 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
                 getPartyNameBasedOnType(caseData.getRespondent1())
                     .concat(" and ")
                     .concat(getPartyNameBasedOnType(caseData.getRespondent2())),
-                PARTY_REFERENCES, buildPartiesReferences(caseData)
+                PARTY_REFERENCES, buildPartiesReferences(caseData),
+                ALLOCATED_TRACK, toStringValueForEmail(caseData.getAllocatedTrack())
             );
         }
     }
