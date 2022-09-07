@@ -68,6 +68,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_I
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
@@ -360,7 +361,8 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
-                        CREATE_SDO
+                        CREATE_SDO,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
@@ -374,7 +376,8 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
-                        CREATE_SDO
+                        CREATE_SDO,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
@@ -388,7 +391,14 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
-                        CREATE_SDO
+                        CREATE_SDO,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM
+                    }
+                ),
+                of(
+                    DIVERGENT_RESPOND_GO_OFFLINE,
+                    new CaseEvent[]{
+                        APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(

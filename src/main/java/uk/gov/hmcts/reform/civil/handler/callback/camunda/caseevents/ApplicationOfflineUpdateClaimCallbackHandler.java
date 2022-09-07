@@ -138,7 +138,7 @@ public class ApplicationOfflineUpdateClaimCallbackHandler extends CallbackHandle
         return generalApplicationMap != null
                 && generalApplicationMap.containsKey(caseId)
                 && APPLICATION_PROCEEDS_OFFLINE.equals(generalApplicationMap.get(caseId).getGeneralApplicationState())
-                && (generalApplicationMap.get(caseId).getApplicationClosedDate() != null);
+                && (generalApplicationMap.get(caseId).getApplicationTakenOfflineDate() != null);
     }
 
     private Map<Long, GeneralApplication> getLatestStatusOfGeneralApplication(CaseData caseData) {
