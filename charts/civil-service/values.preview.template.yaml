@@ -62,7 +62,7 @@ java:
     POLLING_EVENT_EMITTER_ENABLED: false
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
     DOCUMENT_MANAGEMENT_SECURED: true
-    STITCHING_API_ENABLED: true
+    STITCHING_API_ENABLED: false
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
