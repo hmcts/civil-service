@@ -52,6 +52,10 @@ public class FeatureToggleService {
         return isFeatureEnabled("specified-lr-journey");
     }
 
+    public boolean isSdoEnabled() {
+        return isFeatureEnabled("enableSDO");
+    }
+
     public boolean isGeneralApplicationsEnabled() {
         //return isFeatureEnabled("general_applications_enabled");
         return internalClient.boolVariation("general_applications_enabled", createLDUser().build(), false);
