@@ -16,14 +16,14 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDICIAL_REFERRAL;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 
 @Service
 @RequiredArgsConstructor
 public class JudicialReferralCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(JUDICIAL_REFERRAL);
-    private static final String TASK_ID = "JudicialReferral";
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(REFER_TO_JUDGE);
+    private static final String TASK_ID = "SmallClaimsTrackDirectionsReferral";
 
     private final ObjectMapper objectMapper;
 
