@@ -87,6 +87,15 @@ class FeatureToggleServiceTest {
     }
 
     @Test
+    void shouldCallBoolVariation_whenIsHearingAndListingSDOEnabledInvoked() {
+        var noticeOfChangeKey = "notice-of-change";
+        givenToggle(noticeOfChangeKey, true);
+
+        assertThat(featureToggleService.isNoticeOfChangeEnabled()).isTrue();
+        verifyBoolVariationCalled(noticeOfChangeKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
     void shouldCallBoolVariation_whenIsPinInPostEnabledInvoked() {
         var pinInPostKey = "pin-in-post";
         givenToggle(pinInPostKey, true);
