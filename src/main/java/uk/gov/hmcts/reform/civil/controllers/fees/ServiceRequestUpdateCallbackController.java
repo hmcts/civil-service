@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.citizenui.fees;
+package uk.gov.hmcts.reform.civil.controllers.fees;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
