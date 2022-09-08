@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_QUESTIONNAIRE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
@@ -38,6 +39,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
 
     private final DirectionsQuestionnaireGenerator directionsQuestionnaireGenerator;
     private final ObjectMapper objectMapper;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -66,7 +68,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
             caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
-        if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+        if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
             caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
         }
     }
@@ -85,7 +87,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
-        if (!SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+        if (!isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())
             || DirectionsQuestionnaireGenerator.isClaimantResponse(caseData)
             || scenario == MultiPartyScenario.ONE_V_ONE
             || scenario == MultiPartyScenario.TWO_V_ONE) {
@@ -192,7 +194,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
-        if (SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+        if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
             caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
         }
     }

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
@@ -53,6 +54,7 @@ public class RoboticsDataMapper {
     private final RoboticsAddressMapper addressMapper;
     private final EventHistoryMapper eventHistoryMapper;
     private final OrganisationService organisationService;
+    private final FeatureToggleService featureToggleService;
 
     public RoboticsCaseData toRoboticsCaseData(CaseData caseData) {
         requireNonNull(caseData);
@@ -216,7 +218,7 @@ public class RoboticsDataMapper {
             ? RESPONDENT_SOLICITOR_ID : null;
 
         /*LocalDateTime dateOfService = null;
-        if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
+        if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
             dateOfService = caseData.getIssueDate().atStartOfDay();
         } else {
             dateOfService = caseData.getClaimDetailsNotificationDate();
