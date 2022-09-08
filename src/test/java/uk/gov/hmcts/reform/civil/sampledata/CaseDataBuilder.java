@@ -199,6 +199,10 @@ public class CaseDataBuilder {
     protected YesOrNo addApplicant2;
     protected SuperClaimType superClaimType;
     protected YesOrNo addRespondent2;
+
+    protected YesOrNo specRespondent1Represented;
+    protected YesOrNo specRespondent2Represented;
+
     protected YesOrNo respondent2SameLegalRepresentative;
     protected LitigationFriend respondent1LitigationFriend;
     protected LitigationFriend respondent2LitigationFriend;
@@ -1353,7 +1357,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimSubmitted1v2AndSecondRespondentIsRepresented() {
+    public CaseDataBuilder atStateClaimSubmitted1v2AndOnlySecondRespondentIsRepresented() {
         atStateClaimSubmitted();
         addRespondent2 = YES;
         respondent2SameLegalRepresentative = NO;
@@ -2860,7 +2864,6 @@ public class CaseDataBuilder {
         LocalDateTime tomrrowsDateTime = LocalDateTime.now().plusDays(1);
         this.respondent1LitigationFriendDate = tomrrowsDateTime;
         this.respondent1LitigationFriendCreatedDate = tomrrowsDateTime;
-
         return this;
     }
 
@@ -2906,6 +2909,16 @@ public class CaseDataBuilder {
         this.addRespondent2 = YES;
         this.respondent2 = PartyBuilder.builder().individual().build();
         this.respondent2SameLegalRepresentative = YES;
+        return this;
+    }
+
+    public CaseDataBuilder multiPartyClaimTwoDefendantSolicitorsSpec() {
+        this.addRespondent2 = YES;
+        this.respondent2 = PartyBuilder.builder().individual().build();
+        this.respondent2SameLegalRepresentative = NO;
+        this.respondentSolicitor2Reference = "01234";
+        this.specRespondent1Represented = YES;
+        this.specRespondent2Represented = YES;
         return this;
     }
 
@@ -3268,6 +3281,8 @@ public class CaseDataBuilder {
             .applicant1ProceedWithClaimSpec2v1(applicant1ProceedWithClaimSpec2v1)
             .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
+            .specRespondent1Represented(specRespondent1Represented)
+            .specRespondent2Represented(specRespondent2Represented)
             .breathing(breathing)
             .caseManagementOrderSelection(caseManagementOrderSelection)
             .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
