@@ -162,7 +162,10 @@ public class RoboticsNotificationService {
             eventHistory.getBreathingSpaceEntered(),
             eventHistory.getBreathingSpaceLifted(),
             eventHistory.getBreathingSpaceMentalHealthEntered(),
-            eventHistory.getBreathingSpaceMentalHealthLifted()
+            eventHistory.getBreathingSpaceMentalHealthLifted(),
+            eventHistory.getClaimantRepresentationUpdated(),
+            eventHistory.getDefendantActingRepresentation(),
+            eventHistory.getDefendantNoLongerActingRepresentation()
         );
         return eventsList.stream()
             .filter(Objects::nonNull)
@@ -188,6 +191,9 @@ public class RoboticsNotificationService {
         triggerReason = updateTriggerReason(eventHistory.getBreathingSpaceMentalHealthEntered(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getBreathingSpaceMentalHealthLifted(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getDirectionsQuestionnaireFiled(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getClaimantRepresentationUpdated(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getDefendantActingRepresentation(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getDefendantNoLongerActingRepresentation(), triggerReason);
 
         return triggerReason;
     }

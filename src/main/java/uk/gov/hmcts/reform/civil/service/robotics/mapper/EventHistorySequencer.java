@@ -88,6 +88,15 @@ public class EventHistorySequencer {
                 case MENTAL_HEALTH_BREATHING_SPACE_LIFTED:
                     builder.breathingSpaceMentalHealthLifted(event);
                     break;
+                case CLAIMANT_REPRESENTATION_UPDATED_NOC:
+                    builder.claimantRepresentationUpdated(event);
+                    break;
+                case DEFENDANT_ACTING_REPRESENTATION_NOC:
+                    builder.defendantActingRepresentation(event);
+                    break;
+                case DEFENDANT_NO_LONGER_ACTING_REPRESENTATION_NOC:
+                    builder.defendantNoLongerActingRepresentation(event);
+                    break;
                 default:
                     throw new IllegalStateException("Unexpected event type: " + eventType);
             }
@@ -131,6 +140,15 @@ public class EventHistorySequencer {
         if (isEmpty(builder.build().getBreathingSpaceMentalHealthLifted())) {
             builder.breathingSpaceMentalHealthLifted(List.of(Event.builder().build()));
         }
+        if (isEmpty(builder.build().getClaimantRepresentationUpdated())) {
+            builder.claimantRepresentationUpdated(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getDefendantActingRepresentation())) {
+            builder.defendantActingRepresentation(List.of(Event.builder().build()));
+        }
+        if (isEmpty(builder.build().getDefendantNoLongerActingRepresentation())) {
+            builder.defendantNoLongerActingRepresentation(List.of(Event.builder().build()));
+        }
         return builder
             .build();
     }
@@ -161,7 +179,10 @@ public class EventHistorySequencer {
             eventHistory.getBreathingSpaceEntered(),
             eventHistory.getBreathingSpaceLifted(),
             eventHistory.getBreathingSpaceMentalHealthEntered(),
-            eventHistory.getBreathingSpaceMentalHealthLifted()
+            eventHistory.getBreathingSpaceMentalHealthLifted(),
+            eventHistory.getClaimantRepresentationUpdated(),
+            eventHistory.getDefendantActingRepresentation(),
+            eventHistory.getDefendantNoLongerActingRepresentation()
         );
         return eventsList.stream()
             .filter(Objects::nonNull)
