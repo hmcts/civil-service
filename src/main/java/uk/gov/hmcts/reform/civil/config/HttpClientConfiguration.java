@@ -46,7 +46,6 @@ public class HttpClientConfiguration {
             .build();
     }
 
-
     private CloseableHttpClient getHttpClient() {
         int timeout = 10000;
         RequestConfig config = RequestConfig.custom()
