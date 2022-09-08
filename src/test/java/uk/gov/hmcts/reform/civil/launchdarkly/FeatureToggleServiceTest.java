@@ -88,11 +88,11 @@ class FeatureToggleServiceTest {
 
     @Test
     void shouldCallBoolVariation_whenIsHearingAndListingSDOEnabledInvoked() {
-        var noticeOfChangeKey = "notice-of-change";
-        givenToggle(noticeOfChangeKey, true);
+        var hearingAndListingKey = "hearing-and-listing-sdo";
+        givenToggle(hearingAndListingKey, true);
 
-        assertThat(featureToggleService.isNoticeOfChangeEnabled()).isTrue();
-        verifyBoolVariationCalled(noticeOfChangeKey, List.of("timestamp", "environment"));
+        assertThat(featureToggleService.isHearingAndListingSDOEnabled()).isTrue();
+        verifyBoolVariationCalled(hearingAndListingKey, List.of("timestamp", "environment"));
     }
 
     @Test
