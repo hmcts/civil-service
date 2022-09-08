@@ -12,6 +12,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
 
 import javax.sql.DataSource;
 
@@ -51,5 +52,10 @@ public class DatabaseConfiguration {
     @Bean
     public SpecReferenceNumberRepository specReferenceNumberRepository(Jdbi dbi) {
         return dbi.onDemand(SpecReferenceNumberRepository.class);
+    }
+
+    @Bean
+    public HearingReferenceNumberRepository hearingReferenceNumberRepository(Jdbi dbi) {
+        return dbi.onDemand(HearingReferenceNumberRepository.class);
     }
 }
