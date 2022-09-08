@@ -11,23 +11,29 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.HearingDates;
-import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.bankholidays.PublicHolidaysCollection;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
@@ -41,9 +47,10 @@ public class HearingScheduledHandler extends CallbackHandler {
         "# Your reference number\n" + "# HNCXXXX";
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(HEARING_SCHEDULED);
-
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
+    private final PublicHolidaysCollection publicHolidaysCollection;
+
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
@@ -51,9 +58,8 @@ public class HearingScheduledHandler extends CallbackHandler {
             .put(callbackKey(MID, "locationName"), this::locationList)
             .put(callbackKey(MID, "checkPastDate"), this::checkPastDate)
             .put(callbackKey(MID, "checkFutureDate"), this::checkFutureDate)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::getDueDateAndFee)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
-//            .put(callbackKey(SUBMITTED), this::emptyCallbackResponse) TODO, delete this
             .build();
     }
 
@@ -142,6 +148,38 @@ public class HearingScheduledHandler extends CallbackHandler {
             .errors(errors)
             .build();
     }
+
+    private CallbackResponse getDueDateAndFee(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        if(caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
+            if(LocalDateTime.now().isBefore(caseData.getHearingDateTime().minusWeeks(4))) {
+                caseDataBuilder.hearingDueDate(
+                    HearingUtils.addBusinessDays(
+                        LocalDate.now(), 7, publicHolidaysCollection.getPublicHolidays()).toString());
+            } else {
+                caseDataBuilder.hearingDueDate(
+                    HearingUtils.addBusinessDays(
+                        LocalDate.now(), 20, publicHolidaysCollection.getPublicHolidays()).toString());
+            }
+            switch (caseData.getAllocatedTrack()) {
+                case SMALL_CLAIM:
+                    caseDataBuilder.hearingFee("£545");
+                    break;
+                case FAST_CLAIM:
+                    caseDataBuilder.hearingFee(
+                        HearingUtils.getFastTrackFee(caseData.getClaimFee().getCalculatedAmountInPence().intValue()));
+                    break;
+                case MULTI_CLAIM:
+                    caseDataBuilder.hearingFee("£1.175");
+            }
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
     private List<String> isFutureDate(LocalDateTime hearingDateTime) {
         List<String> errors = new ArrayList<>();
         if (!checkFutureDateValidation(hearingDateTime)) {
