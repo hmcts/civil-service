@@ -153,7 +153,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        return locationRefDataService.getCourtLocationsAsLocationRefData(authToken);
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 
     private CallbackResponse validateApplicant1DateOfBirth(CallbackParams callbackParams) {
