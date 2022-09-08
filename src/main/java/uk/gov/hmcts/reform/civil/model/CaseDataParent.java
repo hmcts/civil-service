@@ -273,7 +273,7 @@ public class CaseDataParent implements MappableObject {
     private final BigDecimal respondToAdmittedClaimOwingAmountPounds2;
 
     @JsonProperty("CaseAccessCategory")
-    private final CaseCategory CaseAccessCategory;
+    private final CaseCategory caseAccessCategory;
 
     /**
      * Adding for PiP to citizen UI.
