@@ -19,4 +19,9 @@ public class MockDatabaseConfiguration {
     public SpecReferenceNumberRepository specReferenceNumberRepository() {
         return () -> "000MC001";
     }
+
+    @Bean
+    public ReferenceNumberRepository hearingReferenceNumberRepository() {
+        return () -> "AAAA0000";
+    }
 }

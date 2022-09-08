@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -44,12 +45,13 @@ public class HearingScheduledHandler extends CallbackHandler {
     public static final String HEARING_TASKS = "%n%n You may need to complete other tasks for the hearing, for example, book an interpreter.";
 
     public static final String HEARING_CREATED_HEADER = "# Hearing notice created\n" +
-        "# Your reference number\n" + "# HNCXXXX";
+        "# Your reference number\n" + "# %s";
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(HEARING_SCHEDULED);
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final PublicHolidaysCollection publicHolidaysCollection;
+    private final HearingReferenceNumberRepository hearingReferenceNumberRepository;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -64,15 +66,11 @@ public class HearingScheduledHandler extends CallbackHandler {
     }
 
     private String getBody(CaseData caseData) {
-        //TODO Any validation needed?
-            return format(HEARING_TASKS, format(
-                "/cases/case-details/%s#Claim documents",
-                caseData.getCcdCaseReference()
-            ));
+            return format(HEARING_TASKS);
     }
 
     private String getHeader(CaseData caseData) {
-            return format(HEARING_CREATED_HEADER, caseData.getLegacyCaseReference());
+            return format(HEARING_CREATED_HEADER,hearingReferenceNumberRepository.getHearingReferenceNumber());
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
@@ -129,7 +127,7 @@ public class HearingScheduledHandler extends CallbackHandler {
             };
         return errors;
     }
-    private boolean checkPastDateValidation(LocalDate localDate) {  //TODO take from utils class
+    private boolean checkPastDateValidation(LocalDate localDate) {
         return localDate != null && localDate.isBefore(LocalDate.now());
     }
 
