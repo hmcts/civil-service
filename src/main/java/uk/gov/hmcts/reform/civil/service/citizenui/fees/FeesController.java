@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.controllers.fees;
+package uk.gov.hmcts.reform.civil.service.citizenui.fees;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
-
 @Api
 @Slf4j
 @RestController
