@@ -3632,7 +3632,7 @@ class StateFlowEngineTest {
     }
 
     @Nested
-    class contactDetailsChange {
+    class ContactDetailsChange {
         @Test
         void shouldReturnContactDetailsChange_whenCaseDataAtStateRespondentContactDetailsChange() {
             CaseData caseData = CaseDataBuilder.builder()
