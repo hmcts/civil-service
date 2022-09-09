@@ -521,11 +521,12 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
-                assertThat(stateFlow.getFlags()).hasSize(4).contains(
+                assertThat(stateFlow.getFlags()).hasSize(5).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.RPA_CONTINUOUS_FEED.name(), true),
                     entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false),
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
 
@@ -653,12 +654,13 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
-                assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                assertThat(stateFlow.getFlags()).hasSize(6).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
                     entry(FlowFlag.RPA_CONTINUOUS_FEED.name(), true),
                     entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false),
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
         }
@@ -745,10 +747,11 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT.fullName(),
                         TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
                     );
-                assertThat(stateFlow.getFlags()).hasSize(3).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("RPA_CONTINUOUS_FEED", true),
                     entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false),
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
 

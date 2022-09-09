@@ -35,16 +35,16 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UPDATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
-    ApplicationClosedUpdateClaimCallbackHandler.class, JacksonAutoConfiguration.class,
+    ApplicationOfflineUpdateClaimCallbackHandler.class, JacksonAutoConfiguration.class,
     CaseDetailsConverter.class
 })
-class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
+class ApplicationOfflineUpdateClaimCallbackHandlerTest  extends BaseCallbackHandlerTest {
     @Autowired
-    private ApplicationClosedUpdateClaimCallbackHandler handler;
+    private ApplicationOfflineUpdateClaimCallbackHandler handler;
 
     @Autowired
     private ObjectMapper mapper;
@@ -58,26 +58,27 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
     @MockBean
     private FeatureToggleService featureToggle;
 
-    private static final String APPLICATION_CLOSED = "Application Closed";
+    private static final String PROCEEDS_IN_HERITAGE = "Proceeds In Heritage";
 
     @BeforeEach
     void prepare() {
         ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper().registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
-        when(coreCaseDataService.getCase(1234L)).thenReturn(getCaseDetails(1234L, "APPLICATION_CLOSED", true));
+        when(coreCaseDataService.getCase(1234L)).thenReturn(getCaseDetails(1234L, "PROCEEDS_IN_HERITAGE", true));
         when(coreCaseDataService.getCase(2345L)).thenReturn(getCaseDetails(2345L, "ORDER_MADE", true));
-        when(coreCaseDataService.getCase(3456L)).thenReturn(getCaseDetails(3456L, "APPLICATION_CLOSED", true));
-        when(coreCaseDataService.getCase(4567L)).thenReturn(getCaseDetails(4567L, "APPLICATION_CLOSED", true));
-        when(coreCaseDataService.getCase(5678L)).thenReturn(getCaseDetails(5678L, "APPLICATION_CLOSED", true));
-        when(coreCaseDataService.getCase(6789L)).thenReturn(getCaseDetails(6789L, "APPLICATION_CLOSED", true));
+        when(coreCaseDataService.getCase(3456L)).thenReturn(getCaseDetails(3456L, "PROCEEDS_IN_HERITAGE", true));
+        when(coreCaseDataService.getCase(4567L)).thenReturn(getCaseDetails(4567L, "PROCEEDS_IN_HERITAGE", true));
+        when(coreCaseDataService.getCase(5678L)).thenReturn(getCaseDetails(5678L, "PROCEEDS_IN_HERITAGE", true));
+        when(coreCaseDataService.getCase(6789L)).thenReturn(getCaseDetails(6789L, "PROCEEDS_IN_HERITAGE", true));
         when(coreCaseDataService.getCase(7890L)).thenReturn(getCaseDetails(7890L, "APPLICATION_DISMISSED", true));
         when(coreCaseDataService.getCase(8910L)).thenReturn(getCaseDetails(8910L, "PROCEEDS_IN_HERITAGE", true));
         when(coreCaseDataService.getCase(1011L)).thenReturn(getCaseDetails(1011L, "LISTING_FOR_A_HEARING", true));
+        when(coreCaseDataService.getCase(1112L)).thenReturn(getCaseDetails(1011L, "APPLICATION_CLOSED", true));
     }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(APPLICATION_CLOSED_UPDATE_CLAIM);
+        assertThat(handler.handledEvents()).contains(APPLICATION_OFFLINE_UPDATE_CLAIM);
     }
 
     @Test
@@ -129,8 +130,9 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
         assertStatusChange(updatedData, "5678", true);
         assertStatusChange(updatedData, "6789", true);
         assertStatusChange(updatedData, "7890", false);
-        assertStatusChange(updatedData, "8910", false);
+        assertStatusChange(updatedData, "8910", true);
         assertStatusChange(updatedData, "1011", false);
+        assertStatusChange(updatedData, "1112", false);
     }
 
     @Test
@@ -155,7 +157,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
     }
 
     @Test
-    public void noUpdateToApplicationDetailsListsWhenApplicationClosedDateNotSet() {
+    public void noUpdateToApplicationDetailsListsWhenApplicationOfflineDateNotSet() {
         Map<String, String> applications = new HashMap<>();
         applications.put("9999", "Application Submitted - Awaiting Judicial Decision");
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
@@ -177,24 +179,24 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
     }
 
     private void assertStatusChange(CaseData updatedData, String childCaseRef,
-                                    boolean shouldApplicationBeInClosedState) {
+                                    boolean shouldApplicationBeInOfflineState) {
         assertThat(getGADetailsFromUpdatedCaseData(updatedData, childCaseRef)).isNotNull();
         assertThat(getGARespDetailsFromUpdatedCaseData(updatedData, childCaseRef)).isNotNull();
         assertThat(getGARespTwoDetailsFromUpdatedCaseData(updatedData, childCaseRef)).isNotNull();
-        if (shouldApplicationBeInClosedState) {
+        if (shouldApplicationBeInOfflineState) {
             assertThat(getGADetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                    .isEqualTo(APPLICATION_CLOSED);
+                    .isEqualTo(PROCEEDS_IN_HERITAGE);
             assertThat(getGARespDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                    .isEqualTo(APPLICATION_CLOSED);
+                    .isEqualTo(PROCEEDS_IN_HERITAGE);
             assertThat(getGARespTwoDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                    .isEqualTo(APPLICATION_CLOSED);
+                    .isEqualTo(PROCEEDS_IN_HERITAGE);
         } else {
             assertThat(getGADetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                    .isNotEqualTo(APPLICATION_CLOSED);
+                    .isNotEqualTo(PROCEEDS_IN_HERITAGE);
             assertThat(getGARespDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                    .isNotEqualTo(APPLICATION_CLOSED);
+                    .isNotEqualTo(PROCEEDS_IN_HERITAGE);
             assertThat(getGARespTwoDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                    .isNotEqualTo(APPLICATION_CLOSED);
+                    .isNotEqualTo(PROCEEDS_IN_HERITAGE);
         }
     }
 
@@ -230,6 +232,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
         latestStatus.put("7890", "Application Dismissed");
         latestStatus.put("8910", "Proceeds In Heritage");
         latestStatus.put("1011", "Listed for a Hearing");
+        latestStatus.put("1112", "Application Closed");
 
         return latestStatus;
     }
@@ -237,7 +240,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
     private CaseDetails getCaseDetails(long ccdRef, String caseState, boolean setDate) {
         CaseDetails.CaseDetailsBuilder builder = CaseDetails.builder();
         if (setDate) {
-            builder.data(Map.of("applicationClosedDate", "2022-08-31T22:50:11.2509019"));
+            builder.data(Map.of("applicationTakenOfflineDate", "2022-08-31T22:50:11.2509019"));
         } else {
             builder.data(Map.of("generalAppDetailsOfOrder", "Some Value"));
         }

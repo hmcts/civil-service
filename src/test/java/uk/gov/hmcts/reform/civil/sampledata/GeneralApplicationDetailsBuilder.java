@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.sampledata;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.jsonwebtoken.lang.Collections;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -30,7 +32,9 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.time.LocalDate.EPOCH;
@@ -137,7 +141,7 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataForApplicationFee(CaseData caseData, boolean isConsented,
                                                      boolean isWithNotice) {
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (!isConsented) {
             caseDataBuilder.generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                     .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice ? YES : NO)
@@ -279,27 +283,49 @@ public class GeneralApplicationDetailsBuilder {
                 .build();
     }
 
-    public CaseData getTestCaseDataWithDetails(CaseData caseData) {
+    public CaseData getTestCaseDataWithDetails(CaseData caseData,
+                                               boolean withGADetails,
+                                               boolean withGADetailsResp,
+                                               boolean withGADetailsResp2,
+                                               Map<String, String> applicationIdStatus) {
 
-        return caseData.toBuilder()
-            .ccdCaseReference(1234L)
-                .generalApplicationsDetails(wrapElements(
-                        getGADetails("1234", "Application Submitted - Awaiting Judicial Decision"),
-                        getGADetails("2345", "Order Made"),
-                        getGADetails("3456", "Awaiting Respondent Response"),
-                        getGADetails("4567", "Directions Order Made"),
-                        getGADetails("5678", "Awaiting Written Representations"),
-                        getGADetails("6789", "Additional Information Require"),
-                        getGADetails("7890", "Application Dismissed"),
-                        getGADetails("8910", "Proceeds In Heritage"),
-                        getGADetails("1011", "Listed for a Hearing")
-
-                ))
-                .build();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.ccdCaseReference(1L);
+        if (!Collections.isEmpty(applicationIdStatus)) {
+            List<GeneralApplication> genApps = new ArrayList<>();
+            applicationIdStatus.forEach((key, value) -> genApps.add(getGeneralApplication(key)));
+            caseDataBuilder.generalApplications(wrapElements(genApps.toArray(new GeneralApplication[0])));
+        }
+        if (withGADetails) {
+            List<GeneralApplicationsDetails> allGaDetails = new ArrayList<>();
+            applicationIdStatus.forEach((key, value) -> allGaDetails.add(getGADetails(key, value)));
+            caseDataBuilder.generalApplicationsDetails(
+                    wrapElements(allGaDetails.toArray(new GeneralApplicationsDetails[0])
+            ));
+        }
+        List<GADetailsRespondentSol> gaDetailsRespo = new ArrayList<>();
+        applicationIdStatus.forEach((key, value) -> gaDetailsRespo.add(getGADetailsRespondent(key, value)));
+        if (withGADetailsResp) {
+            caseDataBuilder.gaDetailsRespondentSol(wrapElements(gaDetailsRespo.toArray(new GADetailsRespondentSol[0])));
+        }
+        if (withGADetailsResp2) {
+            caseDataBuilder.gaDetailsRespondentSolTwo(wrapElements(gaDetailsRespo.toArray(new GADetailsRespondentSol[0])
+            ));
+        }
+        return caseDataBuilder.build();
     }
 
     private GeneralApplicationsDetails getGADetails(String applicationId, String caseState) {
         return GeneralApplicationsDetails.builder()
+                .generalApplicationType("Summary Judgement")
+                .generalAppSubmittedDateGAspec(now())
+                .caseLink(CaseLink.builder().caseReference(applicationId).build())
+                .caseState(caseState)
+                .build();
+    }
+
+    private GADetailsRespondentSol getGADetailsRespondent(String applicationId, String caseState) {
+        return GADetailsRespondentSol.builder()
                 .generalApplicationType("Summary Judgement")
                 .generalAppSubmittedDateGAspec(now())
                 .caseLink(CaseLink.builder().caseReference(applicationId).build())
@@ -718,6 +744,12 @@ public class GeneralApplicationDetailsBuilder {
                 .build();
     }
 
+    public GeneralApplication getGeneralApplication(String key) {
+        return getGeneralApplication().toBuilder()
+                .caseLink(CaseLink.builder().caseReference(key).build())
+                .build();
+    }
+
     public GeneralApplication getGeneralApplication() {
         GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
         return builder.generalAppType(GAApplicationType.builder()
@@ -840,6 +872,71 @@ public class GeneralApplicationDetailsBuilder {
             .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
             .directionOrderDocument(singletonList(Element.<CaseDocument>builder().value(pdfDocument).build()))
             .build();
+    }
+
+    public CaseData getTriggerGeneralApplicationTestData() {
+        return CaseData
+                .builder()
+                .ccdCaseReference(1L)
+                .generalAppType(GAApplicationType.builder()
+                        .types(singletonList(EXTEND_TIME))
+                        .build())
+                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
+                        .hasAgreed(NO)
+                        .build())
+                .generalAppPBADetails(GAPbaDetails.builder()
+                        .applicantsPbaAccounts(PBALIST)
+                        .pbaReference(STRING_CONSTANT)
+                        .build())
+                .generalAppDetailsOfOrder(STRING_CONSTANT)
+                .generalAppReasonsOfOrder(STRING_CONSTANT)
+                .generalAppInformOtherParty(GAInformOtherParty.builder()
+                        .isWithNotice(NO)
+                        .reasonsForWithoutNotice(STRING_CONSTANT)
+                        .build())
+                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
+                        .generalAppUrgency(YES)
+                        .reasonsForUrgency(STRING_CONSTANT)
+                        .urgentAppConsiderationDate(APP_DATE_EPOCH)
+                        .build())
+                .generalAppStatementOfTruth(GAStatementOfTruth.builder()
+                        .name(STRING_CONSTANT)
+                        .role(STRING_CONSTANT)
+                        .build())
+                .generalAppEvidenceDocument(wrapElements(Document.builder()
+                        .documentUrl(STRING_CONSTANT)
+                        .documentBinaryUrl(STRING_CONSTANT)
+                        .documentFileName(STRING_CONSTANT)
+                        .documentHash(STRING_CONSTANT)
+                        .build()))
+                .generalAppHearingDetails(GAHearingDetails.builder()
+                        .judgeName(STRING_CONSTANT)
+                        .hearingDate(APP_DATE_EPOCH)
+                        .trialDateFrom(APP_DATE_EPOCH)
+                        .trialDateTo(APP_DATE_EPOCH)
+                        .hearingYesorNo(YES)
+                        .hearingDuration(OTHER)
+                        .generalAppHearingDays("1")
+                        .generalAppHearingHours("2")
+                        .generalAppHearingMinutes("30")
+                        .supportRequirement(singletonList(OTHER_SUPPORT))
+                        .judgeRequiredYesOrNo(YES)
+                        .trialRequiredYesOrNo(YES)
+                        .hearingDetailsEmailID(STRING_CONSTANT)
+                        .generalAppUnavailableDates(wrapElements(GAUnavailabilityDates.builder()
+                                .unavailableTrialDateFrom(APP_DATE_EPOCH)
+                                .unavailableTrialDateTo(APP_DATE_EPOCH).build()))
+                        .supportRequirementOther(STRING_CONSTANT)
+                        .hearingPreferredLocation(getPreferredLoc())
+                        .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
+                        .reasonForPreferredHearingType(STRING_CONSTANT)
+                        .telephoneHearingPreferredType(STRING_CONSTANT)
+                        .supportRequirementSignLanguage(STRING_CONSTANT)
+                        .hearingPreferencesPreferredType(IN_PERSON)
+                        .unavailableTrialRequiredYesOrNo(YES)
+                        .supportRequirementLanguageInterpreter(STRING_CONSTANT)
+                        .build())
+                .build();
     }
 
     public final CaseDocument pdfDocument = CaseDocument.builder()

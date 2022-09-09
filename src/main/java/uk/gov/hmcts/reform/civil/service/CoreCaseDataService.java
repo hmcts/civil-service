@@ -71,13 +71,15 @@ public class CoreCaseDataService {
         return caseDetailsConverter.toCaseData(caseDetails);
     }
 
-    public void triggerGeneralApplicationEvent(Long caseId, CaseEvent eventName) {
-        triggerGeneralApplicationEvent(caseId, eventName, Map.of());
+    public CaseData triggerGeneralApplicationEvent(Long caseId, CaseEvent eventName) {
+        return triggerGeneralApplicationEvent(caseId, eventName, Map.of());
     }
 
-    public void triggerGeneralApplicationEvent(Long caseId, CaseEvent eventName, Map<String, Object> contentModified) {
+    public CaseData triggerGeneralApplicationEvent(Long caseId,
+                                                   CaseEvent eventName,
+                                                   Map<String, Object> contentModified) {
         StartEventResponse startEventResponse = startGeneralApplicationUpdate(caseId.toString(), eventName);
-        submitGeneralApplicationUpdate(caseId.toString(),
+        return submitGeneralApplicationUpdate(caseId.toString(),
                 caseDataContentFromStartEventResponse(startEventResponse, contentModified));
     }
 

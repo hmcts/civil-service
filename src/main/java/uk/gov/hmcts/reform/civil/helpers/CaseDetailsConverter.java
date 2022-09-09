@@ -46,7 +46,7 @@ public class CaseDetailsConverter {
         Map<String, Object> data = new HashMap<>(caseDetails.getData());
 
         Map<String, Object> caseReference = new HashMap<>();
-        caseReference.put("ccdCaseReference", caseDetails.getId());
+        caseReference.put("CaseReference", caseDetails.getId());
 
         data.put("caseLink", caseReference);
 

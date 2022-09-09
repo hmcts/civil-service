@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
@@ -42,21 +43,24 @@ public class TriggerApplicationClosureCallbackHandler extends CallbackHandler {
 
     private CallbackResponse triggerGeneralApplicationClosure(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
-            caseData.getGeneralApplications()
-                    .forEach(application ->
-                            triggerEvent(parseLong(application.getValue().getCaseLink().getCaseReference())));
+        try {
+            if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
+                caseData.getGeneralApplications()
+                        .forEach(application ->
+                                triggerEvent(parseLong(application.getValue().getCaseLink().getCaseReference())));
+            }
+        } catch (Exception e) {
+            String errorMessage = "Could not trigger event to close application under case: "
+                    + caseData.getCcdCaseReference();
+            log.error(errorMessage, e);
+            return AboutToStartOrSubmitCallbackResponse.builder().errors(List.of(errorMessage)).build();
         }
         return emptyCallbackResponse(callbackParams);
     }
 
     private void triggerEvent(Long caseId) {
-        try {
-            log.info("Triggering MAIN_CASE_CLOSED event to close the underlying general application: [{}]",
-                    caseId);
-            coreCaseDataService.triggerGeneralApplicationEvent(caseId, MAIN_CASE_CLOSED);
-        } catch (Exception e) {
-            log.error("Could not trigger event to close application [{}]", caseId, e);
-        }
+        log.info("Triggering MAIN_CASE_CLOSED event to close the underlying general application: [{}]",
+                caseId);
+        coreCaseDataService.triggerGeneralApplicationEvent(caseId, MAIN_CASE_CLOSED);
     }
 }

@@ -45,7 +45,7 @@ public class ApplicationOfflineUpdateClaimCallbackHandler extends CallbackHandle
             "Application Dismissed"
     );
     private static final String APPLICATION_PROCEEDS_OFFLINE = "PROCEEDS_IN_HERITAGE";
-    private static final String APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION = "Proceeds in Heritage";
+    private static final String APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION = "Proceeds In Heritage";
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
