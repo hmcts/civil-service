@@ -1536,10 +1536,24 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldSetMultiPartyResponseTypeFlags_2v1BothNonFullDefence() {
+        void shouldSetMultiPartyResponseTypeFlags_2v1PartAdmission() {
             CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
                 .respondent1ClaimResponseType(COUNTER_CLAIM)
                 .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags").isEqualTo("PART_ADMISSION");
+        }
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_2v1NonFullDefence() {
+            CaseData caseData = CaseDataBuilder.builder().multiPartyClaimTwoApplicants().build().toBuilder()
+                .respondent1ClaimResponseType(COUNTER_CLAIM)
+                .respondent1ClaimResponseTypeToApplicant2(COUNTER_CLAIM)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);

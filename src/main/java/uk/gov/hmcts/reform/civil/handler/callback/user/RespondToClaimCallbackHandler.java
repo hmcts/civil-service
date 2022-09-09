@@ -289,12 +289,10 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             isRespondent1 = NO;
         }
 
-        if (isSolicitor1AndRespondent1ResponseIsFullDefence(caseData, isRespondent1)
-            || isSolicitor2AndRespondent2ResponseIsFullDefence(caseData, isRespondent1)
-            || isSameSolicitorAndAnyRespondentResponseIsFullDefence(caseData)
-            || is2v1AndRespondent1ResponseIsFullDefenceToAnyApplicant(caseData)) {
-            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE)
-                .build();
+        if (isResponseMatchingType(caseData, isRespondent1, RespondentResponseType.FULL_DEFENCE)) {
+            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE).build();
+        } else if (isResponseMatchingType(caseData, isRespondent1, RespondentResponseType.PART_ADMISSION)) {
+            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.PART_ADMISSION).build();
         }
 
         List<String> errors = new ArrayList<>();
@@ -664,33 +662,45 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         return false;
     }
 
-    private boolean is2v1AndRespondent1ResponseIsFullDefenceToAnyApplicant(CaseData caseData) {
+    private boolean isResponseMatchingType(CaseData caseData, YesOrNo isRespondent1,
+                                           RespondentResponseType type) {
+        return isSolicitor1AndRespondent1ResponseIsMatchingType(caseData, isRespondent1, type)
+            || isSolicitor2AndRespondent2ResponseIsMatchingType(caseData, isRespondent1, type)
+            || isSameSolicitorAndAnyRespondentResponseIsMatchingType(caseData, type)
+            || is2v1AndRespondent1ResponseIsMatchingTypeToAnyApplicant(caseData, type);
+    }
+
+    private boolean is2v1AndRespondent1ResponseIsMatchingTypeToAnyApplicant(CaseData caseData,
+                                                                            RespondentResponseType type) {
         return TWO_V_ONE.equals(getMultiPartyScenario(caseData))
-            && (RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
-            || RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()));
+            && (type.equals(caseData.getRespondent1ClaimResponseType())
+            || type.equals(caseData.getRespondent1ClaimResponseTypeToApplicant2()));
     }
 
-    private boolean isSameSolicitorAndAnyRespondentResponseIsFullDefence(CaseData caseData) {
+    private boolean isSameSolicitorAndAnyRespondentResponseIsMatchingType(CaseData caseData,
+                                                                    RespondentResponseType type) {
         return respondent2HasSameLegalRep(caseData)
-            && (RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseType())
-            || RespondentResponseType.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseType()));
+            && (type.equals(caseData.getRespondent1ClaimResponseType())
+            || type.equals(caseData.getRespondent2ClaimResponseType()));
     }
 
-    private boolean isSolicitor2AndRespondent2ResponseIsFullDefence(CaseData caseData, YesOrNo isRespondent1) {
+    private boolean isSolicitor2AndRespondent2ResponseIsMatchingType(CaseData caseData, YesOrNo isRespondent1,
+                                                               RespondentResponseType type) {
         return caseData.getRespondent2ClaimResponseType() != null
-            && caseData.getRespondent2ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)
+            && caseData.getRespondent2ClaimResponseType().equals(type)
             && isRespondent1.equals(NO);
     }
 
-    private boolean isSolicitor1AndRespondent1ResponseIsFullDefence(CaseData caseData, YesOrNo isRespondent1) {
+    private boolean isSolicitor1AndRespondent1ResponseIsMatchingType(CaseData caseData, YesOrNo isRespondent1,
+                                                               RespondentResponseType type) {
         return caseData.getRespondent1ClaimResponseType() != null
-            && caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)
+            && caseData.getRespondent1ClaimResponseType().equals(type)
             && isRespondent1.equals(YES);
     }
 
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        return locationRefDataService.getCourtLocationsAsLocationRefData(authToken);
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 
     private void handleCourtLocationForRespondent1DQ(CaseData caseData, Respondent1DQ.Respondent1DQBuilder dq,
@@ -704,15 +714,13 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtLocations();
             LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
                 fetchLocationData(callbackParams), courtLocations);
-            if (courtLocation != null) {
-                dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().toBuilder()
-                                                   .responseCourtLocations(null)
-                                                   .caseLocation(CaseLocation.builder()
-                                                                     .region(courtLocation.getRegionId())
-                                                                     .baseLocation(courtLocation.getEpimmsId())
-                                                                     .build())
-                                                   .responseCourtCode(courtLocation.getCourtLocationCode()).build());
-            }
+            dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().toBuilder()
+                                               .responseCourtLocations(null)
+                                               .caseLocation(CaseLocation.builder()
+                                                                 .region(courtLocation.getRegionId())
+                                                                 .baseLocation(courtLocation.getEpimmsId())
+                                                                 .build())
+                                               .responseCourtCode(courtLocation.getCourtLocationCode()).build());
         }
 
     }
@@ -728,15 +736,13 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .getRespondent2DQ().getRespondent2DQRequestedCourt().getResponseCourtLocations();
             LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
                 fetchLocationData(callbackParams), courtLocations);
-            if (courtLocation != null) {
-                dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ().getRequestedCourt().toBuilder()
-                                                   .responseCourtLocations(null)
-                                                   .caseLocation(CaseLocation.builder()
-                                                                     .region(courtLocation.getRegionId())
-                                                                     .baseLocation(courtLocation.getEpimmsId())
-                                                                     .build())
-                                                   .responseCourtCode(courtLocation.getCourtLocationCode()).build());
-            }
+            dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ().getRequestedCourt().toBuilder()
+                                               .responseCourtLocations(null)
+                                               .caseLocation(CaseLocation.builder()
+                                                                 .region(courtLocation.getRegionId())
+                                                                 .baseLocation(courtLocation.getEpimmsId())
+                                                                 .build())
+                                               .responseCourtCode(courtLocation.getCourtLocationCode()).build());
         }
     }
 }

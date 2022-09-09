@@ -153,7 +153,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        return locationRefDataService.getCourtLocationsAsLocationRefData(authToken);
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 
     private CallbackResponse validateApplicant1DateOfBirth(CallbackParams callbackParams) {
@@ -314,11 +314,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        List<String> validationErrors = validateCaseData(caseData);
+        List<String> validationErrors;
+
+        if (V_1.equals(callbackParams.getVersion())) {
+            validationErrors = validateCaseData(caseData);
+        } else {
+            validationErrors = validateCaseDataOld(caseData);
+        }
+
         if (validationErrors.size() > 0) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(validationErrors)
-                .build();
+            return AboutToStartOrSubmitCallbackResponse.builder().errors(validationErrors).build();
         }
 
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
@@ -478,7 +483,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         List<String> errorsMessages = new ArrayList<>();
         // Tactical fix. We have an issue where null courtLocation is being submitted.
         // We are validating it exists on submission if not we return an error to the user.
-        if (caseData.getCourtLocation() == null || caseData.getCourtLocation().getApplicantPreferredCourt() == null) {
+        if (caseData.getCourtLocation() == null
+            || caseData.getCourtLocation().getApplicantPreferredCourtLocationList() == null
+            || caseData.getCourtLocation().getApplicantPreferredCourtLocationList().getValue() == null) {
             errorsMessages.add("Court location code is required");
         }
         return errorsMessages;
