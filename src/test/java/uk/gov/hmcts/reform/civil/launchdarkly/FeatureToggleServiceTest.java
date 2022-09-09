@@ -132,4 +132,15 @@ class FeatureToggleServiceTest {
             eq(false)
         );
     }
+
+    @Test
+    public void globalSearch_LDTagName() {
+        featureToggleService.isSpecGlobalSearchEnabled();
+
+        Mockito.verify(ldClient).boolVariation(
+            eq("global-search-specified"),
+            any(LDUser.class),
+            eq(false)
+        );
+    }
 }
