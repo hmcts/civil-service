@@ -25,9 +25,13 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -55,6 +59,27 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
     private CallbackParams params;
     private CaseData caseData;
+
+    @Nested
+    class AssignHmctsServiceId {
+
+        @BeforeEach
+        void setup() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
+
+            Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
+            });
+            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
+        }
+
+        @Test
+        void shouldReturnSupplementaryDataOnSubmitted() {
+            assignCaseToUserHandler.handle(params);
+            verify(coreCaseDataService).setSupplementaryData(any(), eq(supplementaryData()));
+        }
+
+    }
 
     @Nested
     class AssignRolesIn1v1CasesRegisteredAndRespresented {
@@ -241,5 +266,18 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
             "OrgId1"
         );
 
+    }
+
+    private Map<String, Map<String, Map<String, Object>>> supplementaryData() {
+        Map<String, Object> hmctsServiceIdMap = new HashMap<>();
+        hmctsServiceIdMap.put("HMCTSServiceId", "AAA7");
+
+        Map<String, Map<String, Object>> supplementaryDataRequestMap = new HashMap<>();
+        supplementaryDataRequestMap.put("$set", hmctsServiceIdMap);
+
+        Map<String, Map<String, Map<String, Object>>> supplementaryDataUpdates = new HashMap<>();
+        supplementaryDataUpdates.put("supplementary_data_updates", supplementaryDataRequestMap);
+
+        return supplementaryDataUpdates;
     }
 }

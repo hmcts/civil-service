@@ -48,6 +48,14 @@ public class FeatureToggleService {
         );
     }
 
+    public boolean isSpecGlobalSearchEnabled() {
+        return internalClient.boolVariation(
+            "global-search-specified",
+            createLDUser().build(),
+            false
+        );
+    }
+
     public boolean isLrSpecEnabled() {
         return isFeatureEnabled("specified-lr-journey");
     }
