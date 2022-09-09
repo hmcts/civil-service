@@ -70,6 +70,10 @@ public class FeatureToggleService {
         return internalClient.boolVariation("notice-of-change", createLDUser().build(), false);
     }
 
+    public boolean isHearingAndListingSDOEnabled() {
+        return internalClient.boolVariation("hearing-and-listing-sdo", createLDUser().build(), false);
+    }
+
     public boolean isPinInPostEnabled() {
         return internalClient.boolVariation("pin-in-post", createLDUser().build(), false);
     }
