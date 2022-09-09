@@ -79,4 +79,5 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
             caseData.getLegacyCaseReference()
         );
     }
+
 }
