@@ -3634,7 +3634,7 @@ class StateFlowEngineTest {
     @Nested
     class contactDetailsChange {
         @Test
-        void shouldReturnContactDetailsChange_whenCaseDataAtStateRespondentContactDetailschange() {
+        void shouldReturnContactDetailsChange_whenCaseDataAtStateRespondentContactDetailsChange() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                 .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
