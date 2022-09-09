@@ -60,6 +60,14 @@ public class DeadlinesCalculator {
         return date;
     }
 
+    public LocalDate plusWorkingDays(LocalDate date, int workingDays) {
+        LocalDate current = date;
+        for (int i = 0; i < workingDays; i++) {
+            current = workingDayIndicator.getNextWorkingDay(current);
+        }
+        return current;
+    }
+
     private boolean is4pmOrAfter(LocalDateTime dateOfService) {
         return dateOfService.getHour() >= 16;
     }
