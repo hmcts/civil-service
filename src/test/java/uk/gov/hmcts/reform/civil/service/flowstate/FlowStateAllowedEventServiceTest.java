@@ -231,6 +231,7 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL,
                         STANDARD_DIRECTION_ORDER_DJ
