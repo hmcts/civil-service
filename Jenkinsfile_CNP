@@ -44,6 +44,7 @@ def secrets = [
 
 // Vars for Kubernetes
 env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
+env.EM_CCD_ORCHESTRATOR_URL = 'http://em-ccd-orchestrator-aat.service.core-compute-aat.internal'
 
 def validateRpaContract() {
   sh """ ./gradlew contract """
@@ -99,7 +100,7 @@ withPipeline(type, product, component) {
       ./bin/add-roles.sh
       ./bin/pull-latest-release-asset.sh civil-ccd-definition civil-ccd-definition.zip
       ./bin/pull-latest-release-asset.sh civil-camunda-bpmn-definition civil-camunda-bpmn-definition.zip
-      ./bin/import-ccd-definition.sh "-e *DJspec.json,*DJ.json,*-prod.json,*DJ-SDO-nonprod.json,*DJ-nonprod.json,*GAspec.json"
+      ./bin/import-ccd-definition.sh "-e *-prod.json"
 
       ./bin/import-bpmn-diagram.sh .
     """
