@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
@@ -25,13 +24,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
@@ -93,7 +90,6 @@ class PaymentRequestUpdateCallbackServiceTest {
         verify(coreCaseDataService, times(1)).triggerEvent(any(), any());
     }
 
-
     @Test
     public void shouldProceed_WhenAdditionalPaymentExist_WithPaymentFail() {
 
@@ -150,7 +146,8 @@ class PaymentRequestUpdateCallbackServiceTest {
     private CaseDetails buildCaseDetails(CaseData caseData) {
         return CaseDetails.builder()
             .data(objectMapper.convertValue(caseData,
-                                            new TypeReference<Map<String, Object>>() {})).id(Long.valueOf(CASE_ID)).build();
+                                            new TypeReference<Map<String, Object>>() {}))
+                                                                .id(Long.valueOf(CASE_ID)).build();
     }
 
     private ServiceRequestUpdateDto buildServiceDto(String status) {
