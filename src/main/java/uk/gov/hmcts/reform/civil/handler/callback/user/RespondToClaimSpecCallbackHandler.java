@@ -174,7 +174,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(V_1, MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlagV1)
             .put(callbackKey(MID, "set-upload-timeline-type-flag"), this::setUploadTimelineTypeFlag)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
-            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadlineV1)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
