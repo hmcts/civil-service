@@ -104,7 +104,6 @@ class FeatureToggleServiceTest {
         verifyBoolVariationCalled(courtLocationDynamicListKey, List.of("timestamp", "environment"));
     }
 
-
     @Test
     void shouldCallBoolVariation_whenIsPinInPostEnabledInvoked() {
         var pinInPostKey = "pin-in-post";
