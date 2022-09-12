@@ -41,7 +41,6 @@ public class ApplicationClosedUpdateClaimCallbackHandler extends CallbackHandler
             "Application Closed",
             "Proceeds In Heritage",
             "Order Made",
-            "Listed for a Hearing",
             "Application Dismissed"
     );
     private static final String APPLICATION_CLOSED = "APPLICATION_CLOSED";

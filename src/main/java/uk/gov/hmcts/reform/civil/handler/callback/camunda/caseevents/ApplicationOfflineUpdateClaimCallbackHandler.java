@@ -41,7 +41,6 @@ public class ApplicationOfflineUpdateClaimCallbackHandler extends CallbackHandle
             "Application Closed",
             "Proceeds In Heritage",
             "Order Made",
-            "Listed for a Hearing",
             "Application Dismissed"
     );
     private static final String APPLICATION_PROCEEDS_OFFLINE = "PROCEEDS_IN_HERITAGE";

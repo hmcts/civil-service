@@ -72,7 +72,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
         when(coreCaseDataService.getCase(6789L)).thenReturn(getCaseDetails(6789L, "APPLICATION_CLOSED", true));
         when(coreCaseDataService.getCase(7890L)).thenReturn(getCaseDetails(7890L, "APPLICATION_DISMISSED", true));
         when(coreCaseDataService.getCase(8910L)).thenReturn(getCaseDetails(8910L, "PROCEEDS_IN_HERITAGE", true));
-        when(coreCaseDataService.getCase(1011L)).thenReturn(getCaseDetails(1011L, "LISTING_FOR_A_HEARING", true));
+        when(coreCaseDataService.getCase(1011L)).thenReturn(getCaseDetails(1011L, "APPLICATION_CLOSED", true));
     }
 
     @Test
@@ -130,7 +130,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
         assertStatusChange(updatedData, "6789", true);
         assertStatusChange(updatedData, "7890", false);
         assertStatusChange(updatedData, "8910", false);
-        assertStatusChange(updatedData, "1011", false);
+        assertStatusChange(updatedData, "1011", true);
     }
 
     @Test
