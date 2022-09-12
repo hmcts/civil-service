@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -26,8 +24,6 @@ import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataC
 @Service
 @RequiredArgsConstructor
 public class CoreCaseDataService {
-
-    Logger log = LoggerFactory.getLogger(CoreCaseDataService.class);
 
     private final CoreCaseDataApi coreCaseDataApi;
     private final SystemUpdateUserConfiguration userConfig;
@@ -79,9 +75,7 @@ public class CoreCaseDataService {
     }
 
     public SearchResult searchCases(Query query) {
-        log.info("before search");
         String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
-        log.info("user token {} {}", userConfig.getUserName(), userConfig.getPassword());
         return coreCaseDataApi.searchCases(userToken, authTokenGenerator.generate(), CASE_TYPE, query.toString());
     }
 
