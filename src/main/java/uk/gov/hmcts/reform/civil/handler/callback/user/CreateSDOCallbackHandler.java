@@ -12,13 +12,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
-import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
+import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
+import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
@@ -95,14 +96,16 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         + "<br/>%n%n<strong>Defendant 2</strong>%n"
         + "<br/>%s";
 
-    private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
+    private final ObjectMapper objectMapper;
+    private final SdoGeneratorService sdoGeneratorService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::prePopulateOrderDetailsPages)
             .put(callbackKey(MID, "order-details-navigation"), this::setOrderDetailsFlags)
+            .put(callbackKey(MID, "generate-sdo-order"), this::generateSdoOrder)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -127,6 +130,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.disposalHearingMethodInPerson(fromList(fetchLocationData(callbackParams)));
         updatedData.fastTrackMethodInPerson(fromList(fetchLocationData(callbackParams)));
+        updatedData.smallClaimsMethodInPerson(fromList(fetchLocationData(callbackParams)));
 
         List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
 
@@ -176,10 +180,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             DisposalHearingDisclosureOfDocuments.builder()
             .input1("The parties shall serve on each other copies of the documents upon which reliance is to be"
                        + " placed at the disposal hearing by 4pm on")
-            .date1(LocalDate.now().plusWeeks(4))
+            .date1(LocalDate.now().plusWeeks(10))
             .input2("The parties must upload to the Digital Portal copies of those documents which they wish the"
                        + "court to consider when deciding the amount of damages, by 4pm on")
-            .date2(LocalDate.now().plusWeeks(4))
+            .date2(LocalDate.now().plusWeeks(10))
             .build();
 
         updatedData.disposalHearingDisclosureOfDocuments(tempDisposalHearingDisclosureOfDocuments).build();
@@ -279,10 +283,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
             .input1("Documents will be disclosed by uploading to the Digital Portal a list with a disclosure "
-                        + "statement by 4pm on ")
+                        + "statement by 4pm on")
             .date1(LocalDate.now().plusWeeks(4))
             .input2("Any request to inspect a document, or for a copy of a document, shall be made directly to "
-                        + "the other party by 4pm on ")
+                        + "the other party by 4pm on")
             .date2(LocalDate.now().plusWeeks(6))
             .input3("Requests will be complied with within 7 days of the receipt of the request.")
             .input4("Each party must upload to the Digital Portal copies of those documents on which they wish to"
@@ -294,11 +298,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         FastTrackWitnessOfFact tempFastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
             .input1("Each party must upload to the Digital Portal copies of the statements of all witnesses of "
-                        + "fact on whom they intend to rely. This is limited to ")
+                        + "fact on whom they intend to rely. This is limited to")
             .input2("")
             .input3("")
             .input4("For this limitation, a party is counted as a witness.")
-            .input5("Each witness statement should be no more than ")
+            .input5("Each witness statement should be no more than")
             .input6("")
             .input7("A4 pages. Statements should be double spaced using a font size of 12.")
             .input8("Witness statements shall be uploaded to the Digital Portal by 4pm on")
@@ -312,10 +316,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         FastTrackSchedulesOfLoss tempFastTrackSchedulesOfLoss = FastTrackSchedulesOfLoss.builder()
             .input1("The claimant must upload to the Digital Portal an up-to-date schedule of loss to the "
-                        + "defendant by 4pm on ")
+                        + "defendant by 4pm on")
             .date1(LocalDate.now().plusWeeks(10))
             .input2("If the defendant wants to challenge this claim, upload to the Digital Portal "
-                        + "counter-schedule of loss by 4pm on ")
+                        + "counter-schedule of loss by 4pm on")
             .date2(LocalDate.now().plusWeeks(12))
             .input3("If there is a claim for future pecuniary loss and the parties have not already set out "
                         + "their case on periodical payments, they must do so in the respective schedule and "
@@ -323,21 +327,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input4("Upon it being noted that the schedule of loss contains no claim for continuing loss and is "
                         + "therefore final, no further schedule of loss shall be uploaded without permission to amend. "
                         + "The defendant shall upload to the Digital Portal an up-to-date counter schedule of loss by "
-                        + "4pm on ")
+                        + "4pm on")
             .date3(LocalDate.now().plusWeeks(12))
             .build();
 
         updatedData.fastTrackSchedulesOfLoss(tempFastTrackSchedulesOfLoss).build();
 
         FastTrackTrial tempFastTrackTrial = FastTrackTrial.builder()
-            .input1("The time provisionally allowed for this trial is ")
+            .input1("The time provisionally allowed for this trial is")
             .date1(LocalDate.now().plusWeeks(22))
             .date2(LocalDate.now().plusWeeks(30))
             .input2("If either party considers that the time estimate is insufficient, they must inform the court "
                         + "within 7 days of the date stated on this order.")
-            .input3("At least 7 days before the trial, the claimant must upload to the Digital Portal an indexed"
-                        + " bundle of documents, with each page clearly numbered / an electronic bundle of digital "
-                        + "documents / a case summary containing no more than 500 words.")
+            .input3("At least 7 days before the trial, the claimant must upload to the Digital Portal")
             .build();
 
         updatedData.fastTrackTrial(tempFastTrackTrial).build();
@@ -355,17 +357,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input1("The claimant must prepare a Scott Schedule of the defects, items of damage, "
                         + "or any other relevant matters")
             .input2("The columns should be headed:\n"
-                        + "•Item\n"
-                        + "•Alleged defect\n"
-                        + "•Claimant’s costing\n"
-                        + "•Defendant’s response\n"
-                        + "•Defendant’s costing\n"
-                        + "•Reserved for Judge’s use")
+                        + "  •  Item\n"
+                        + "  •  Alleged defect\n"
+                        + "  •  Claimant’s costing\n"
+                        + "  •  Defendant’s response\n"
+                        + "  •  Defendant’s costing\n"
+                        + "  •  Reserved for Judge’s use")
             .input3("The claimant must upload to the Digital Portal the Scott Schedule with the relevant columns"
-                        + " completed by 4pm on ")
+                        + " completed by 4pm on")
             .date1(LocalDate.now().plusWeeks(10))
             .input4("The defendant must upload to the Digital Portal an amended version of the Scott Schedule "
-                        + "with the relevant columns in response completed by 4pm on ")
+                        + "with the relevant columns in response completed by 4pm on")
             .date2(LocalDate.now().plusWeeks(12))
             .build();
 
@@ -424,17 +426,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         FastTrackHousingDisrepair tempFastTrackHousingDisrepair = FastTrackHousingDisrepair.builder()
             .input1("The claimant must prepare a Scott Schedule of the items in disrepair.")
-            .input2("38.The columns should be headed:\n"
-                        + "•Item\n"
-                        + "•Alleged disrepair\n"
-                        + "•Defendant’s response\n"
-                        + "•Reserved for Judge’s use")
+            .input2("The columns should be headed:\n"
+                        + "  •  Item\n"
+                        + "  •  Alleged disrepair\n"
+                        + "  •  Defendant’s response\n"
+                        + "  •  Reserved for Judge’s use")
             .input3("The claimant must uploaded to the Digital Portal the Scott Schedule with the relevant "
-                        + "columns completed by 4pm on ")
-            .date1(LocalDate.now().plusWeeks(7))
+                        + "columns completed by 4pm on")
+            .date1(LocalDate.now().plusWeeks(10))
             .input4("The defendant must uploaded to the Digital Portal the amended Scott Schedule with the "
-                        + "relevant columns in response completed by 4pm on ")
-            .date2(LocalDate.now().plusWeeks(9))
+                        + "relevant columns in response completed by 4pm on")
+            .date2(LocalDate.now().plusWeeks(12))
             .build();
 
         updatedData.fastTrackHousingDisrepair(tempFastTrackHousingDisrepair).build();
@@ -443,14 +445,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input1("The claimant has permission to rely upon the written expert evidence already uploaded to "
                         + "the Digital Portal with the particulars of claim and in addition has permission to rely upon"
                         + " any associated correspondence or updating report which is uploaded to the Digital Portal by"
-                        + " 4pm on ")
+                        + " 4pm on")
             .date1(LocalDate.now().plusWeeks(4))
             .input2("Any questions which are to be addressed to an expert must be sent to the expert directly "
-                        + "and uploaded to the Digital Portal by 4pm on ")
-            .date2(LocalDate.now().plusWeeks(8))
-            .input3("The answers to the questions shall be answered by the Expert by ")
+                        + "and uploaded to the Digital Portal by 4pm on")
+            .date2(LocalDate.now().plusWeeks(4))
+            .input3("The answers to the questions shall be answered by the Expert by")
             .date3(LocalDate.now().plusWeeks(8))
-            .input4("and uploaded to the Digital Portal by ")
+            .input4("and uploaded to the Digital Portal by")
             .date4(LocalDate.now().plusWeeks(8))
             .build();
 
@@ -458,7 +460,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         FastTrackRoadTrafficAccident tempFastTrackRoadTrafficAccident = FastTrackRoadTrafficAccident.builder()
             .input("Photographs and/or a place of the accident location shall be prepared and agreed by the "
-                       + "parties and uploaded to the Digital Portal by 4pm on ")
+                       + "parties and uploaded to the Digital Portal by 4pm on")
             .date(LocalDate.now().plusWeeks(8))
             .build();
 
@@ -598,29 +600,31 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
 
-        YesOrNo drawDirectionsOrderRequired = caseData.getDrawDirectionsOrderRequired();
-        YesOrNo drawDirectionsOrderSmallClaims = caseData.getDrawDirectionsOrderSmallClaims();
-        ClaimsTrack claimsTrack = caseData.getClaimsTrack();
-        OrderType orderType = caseData.getOrderType();
+        updatedData.setSmallClaimsFlag(YesOrNo.NO).build();
+        updatedData.setFastTrackFlag(YesOrNo.NO).build();
 
-        Boolean smallClaimsPath1 = (drawDirectionsOrderRequired == YesOrNo.NO)
-            && (claimsTrack == ClaimsTrack.smallClaimsTrack);
-        Boolean smallClaimsPath2 = (drawDirectionsOrderRequired == YesOrNo.YES)
-            && (drawDirectionsOrderSmallClaims == YesOrNo.YES);
-        Boolean fastTrackPath1 = (drawDirectionsOrderRequired == YesOrNo.NO)
-            && (claimsTrack == ClaimsTrack.fastTrack);
-        Boolean fastTrackPath2 = (drawDirectionsOrderRequired == YesOrNo.YES)
-            && (drawDirectionsOrderSmallClaims == YesOrNo.NO) && (orderType == OrderType.DECIDE_DAMAGES);
+        if (SdoHelper.isSmallClaimsTrack(caseData)) {
+            updatedData.setSmallClaimsFlag(YesOrNo.YES).build();
+        } else if (SdoHelper.isFastTrack(caseData)) {
+            updatedData.setFastTrackFlag(YesOrNo.YES).build();
+        }
 
-        updatedData.setSmallClaimsFlag(YesOrNo.NO);
-        updatedData.setFastTrackFlag(YesOrNo.NO);
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
+            .build();
+    }
 
-        if (smallClaimsPath1 || smallClaimsPath2) {
-            updatedData.setSmallClaimsFlag(YesOrNo.YES)
-                .build();
-        } else if (fastTrackPath1 || fastTrackPath2) {
-            updatedData.setFastTrackFlag(YesOrNo.YES)
-                .build();
+    private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+
+        CaseDocument document = sdoGeneratorService.generate(
+            caseData,
+            callbackParams.getParams().get(BEARER_TOKEN).toString()
+        );
+
+        if (document != null) {
+            updatedData.sdoOrderDocument(document.getDocumentLink());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
