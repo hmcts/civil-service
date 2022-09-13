@@ -69,6 +69,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -1108,9 +1109,10 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(time.now()).willReturn(submittedDate);
         }
 
-        //Move this test to AboutToSubmitCallbackV0 after CIV-3521 release and migration
+        // TODO: move this test case to AboutToSubmitCallbackV0 after release
         @Test
-        void shouldSetCaseCategoryToUnspec_whenInvoked() {
+        void shouldSetCaseCategoryToSpec_whenInvoked() {
+            when(toggleService.isAccessProfilesEnabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())

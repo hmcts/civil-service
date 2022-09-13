@@ -145,7 +145,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
-            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaimV1)
+            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(MID, "respondent1"), this::validateRespondent1Address)
             .put(callbackKey(MID, "respondent2"), this::validateRespondent2Address)
@@ -389,41 +389,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
         ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(dataBuilder.build().toMap(objectMapper))
-            .build();
-    }
-
-    private CallbackResponse submitClaimV1(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
-
-        // moving statement of truth value to correct field, this was not possible in mid event.
-        // resetting statement of truth to make sure it's empty the next time it appears in the UI.
-        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-        dataBuilder.uiStatementOfTruth(StatementOfTruth.builder().build());
-        dataBuilder.applicantSolicitor1ClaimStatementOfTruth(statementOfTruth);
-        if (callbackParams.getRequest().getEventId() != null) {
-            var respondent1Represented = caseData.getSpecRespondent1Represented();
-            dataBuilder.respondent1Represented(respondent1Represented);
-            var respondent2Represented = caseData.getSpecRespondent2Represented();
-            dataBuilder.respondent2Represented(respondent2Represented);
+        if (V_1.equals(callbackParams.getVersion())
+            && toggleService.isAccessProfilesEnabled()) {
+            dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
         }
-
-        if (isPinInPostCaseMatched(caseData)) {
-            LocalDate expiryDate = LocalDate.now().plusDays(180);
-            dataBuilder.respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
-                                                       .accessCode(AccessCodeGenerator.generateAccessCode())
-                                                       .respondentCaseRole(
-                                                           CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
-                                                       .expiryDate(expiryDate)
-                                                       .build());
-        }
-
-        dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
-        ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
-        dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))

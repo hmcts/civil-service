@@ -805,6 +805,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+    // TODO: move this test case to AboutToSubmitCallbackV0 after release
     @Nested
     class AboutToSubmitCallbackV1 {
 
