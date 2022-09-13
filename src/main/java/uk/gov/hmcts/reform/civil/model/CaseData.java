@@ -83,6 +83,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -474,7 +475,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     //Hearing Scheduled
     private DynamicList hearingLocation;
     private LocalDate dateOfApplication;
-    private LocalDateTime hearingDateTime;
+    private LocalDate hearingDate;
+    private String hearingTimeHourMinute;
     private String hearingReferenceNumber;
 
     //default judgement SDO fields for trial/fast track

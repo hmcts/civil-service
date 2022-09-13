@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -126,11 +127,21 @@ public class HearingScheduledHandler extends CallbackHandler {
     }
 
     private CallbackResponse checkFutureDate(CallbackParams callbackParams) {
+        List<String> errors = null;
+        LocalDateTime hearingDateTime = null;
         var caseData = callbackParams.getCaseData();
+        LocalDate date = caseData.getHearingDate();
+        String hourMinute = caseData.getHearingTimeHourMinute();
+        if(hourMinute != null){
+        int hours = Integer.parseInt(hourMinute.substring(0,2));
+        int minutes = Integer.parseInt(hourMinute.substring(2,4));
+        LocalTime time = LocalTime.of(hours,minutes,0);
+        hearingDateTime = LocalDateTime.of(date, time);}
+        else{
+            errors.add("Time is required");
+        }
 
-        LocalDateTime hearingDateTime = caseData.getHearingDateTime();
-
-        List<String> errors = (Objects.isNull(hearingDateTime)) ? null :
+        errors = (Objects.isNull(hearingDateTime)) ? null :
             isFutureDate(hearingDateTime);
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
