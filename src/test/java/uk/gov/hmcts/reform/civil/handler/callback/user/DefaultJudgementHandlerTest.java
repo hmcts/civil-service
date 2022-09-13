@@ -143,289 +143,289 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("bothDefendants")).isEqualTo("One");
         }
-    }
 
-    @Nested
-    class MidEventCheckLocationsCallback {
+        @Nested
+        class MidEventCheckLocationsCallback {
 
-        private static final String PAGE_ID = "checkPreferredLocations";
+            private static final String PAGE_ID = "checkPreferredLocations";
 
-        @Test
-        void shouldReturnLocationList_whenLocationsAreQueried() {
-            List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().courtName("Court Name").region("Region").build());
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("hearingSupportRequirementsDJ")).isNotNull();
-        }
-    }
-
-    @Nested
-    class MidEventShowCPRAcceptCallback {
-
-        private static final String PAGE_ID = "acceptCPR";
-
-        @Test
-        void shouldReturnError_whenCPRisNotAccepted() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors()).isNotNull();
-        }
-    }
-
-    @Nested
-    class MidEventHearingSupportCallback {
-
-        private static final String PAGE_ID = "HearingSupportRequirementsDJ";
-
-        @Test
-        void shouldReturnError_whenDateFromDateGreaterThanDateToProvided() {
-            HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
-                LocalDate.now().plusMonths(2)).hearingUnavailableUntil(
-                LocalDate.now().plusMonths(1)).build();
-            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
-                .hearingDates(
-                    wrapElements(hearingDates)).build();
-
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().get(0)).isEqualTo("Unavailable From Date should be less than To Date");
+            @Test
+            void shouldReturnLocationList_whenLocationsAreQueried() {
+                List<LocationRefData> locations = new ArrayList<>();
+                locations.add(LocationRefData.builder().courtName("Court Name").region("Region").build());
+                when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getData().get("hearingSupportRequirementsDJ")).isNotNull();
+            }
         }
 
-        @Test
-        void shouldReturnError_whenDateFromDateGreaterThreeMonthsProvided() {
-            HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
-                LocalDate.now().plusMonths(2)).hearingUnavailableUntil(
-                LocalDate.now().plusMonths(4)).build();
-            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ
-                .builder().hearingDates(
-                    wrapElements(hearingDates)).build();
+        @Nested
+        class MidEventShowCPRAcceptCallback {
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                .build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().get(0)).isEqualTo("Unavailable Dates must be within the next 3 months.");
+            private static final String PAGE_ID = "acceptCPR";
+
+            @Test
+            void shouldReturnError_whenCPRisNotAccepted() {
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getErrors()).isNotNull();
+            }
         }
 
-        @Test
-        void shouldReturnError_whenDateFromPastDatedProvided() {
-            HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
-                LocalDate.now().plusMonths(1)).hearingUnavailableUntil(
-                LocalDate.now().plusMonths(-4)).build();
-            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ
-                .builder().hearingDates(
-                    wrapElements(hearingDates)).build();
+        @Nested
+        class MidEventHearingSupportCallback {
 
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                .build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().get(0)).isEqualTo("Unavailable Date cannot be past date");
+            private static final String PAGE_ID = "HearingSupportRequirementsDJ";
+
+            @Test
+            void shouldReturnError_whenDateFromDateGreaterThanDateToProvided() {
+                HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
+                    LocalDate.now().plusMonths(2)).hearingUnavailableUntil(
+                    LocalDate.now().plusMonths(1)).build();
+                HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
+                    .hearingDates(
+                        wrapElements(hearingDates)).build();
+
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .addRespondent2(YES)
+                    .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
+                    .respondent2SameLegalRepresentative(YES)
+                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                    .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getErrors().get(0)).isEqualTo("Unavailable From Date should be less than To Date");
+            }
+
+            @Test
+            void shouldReturnError_whenDateFromDateGreaterThreeMonthsProvided() {
+                HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
+                    LocalDate.now().plusMonths(2)).hearingUnavailableUntil(
+                    LocalDate.now().plusMonths(4)).build();
+                HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ
+                    .builder().hearingDates(
+                        wrapElements(hearingDates)).build();
+
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                    .build().toBuilder()
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .addRespondent2(YES)
+                    .respondent2SameLegalRepresentative(YES)
+                    .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
+                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getErrors().get(0)).isEqualTo("Unavailable Dates must be within the next 3 months.");
+            }
+
+            @Test
+            void shouldReturnError_whenDateFromPastDatedProvided() {
+                HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
+                    LocalDate.now().plusMonths(1)).hearingUnavailableUntil(
+                    LocalDate.now().plusMonths(-4)).build();
+                HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ
+                    .builder().hearingDates(
+                        wrapElements(hearingDates)).build();
+
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                    .build().toBuilder()
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .addRespondent2(YES)
+                    .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
+                    .respondent2SameLegalRepresentative(YES)
+                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getErrors().get(0)).isEqualTo("Unavailable Date cannot be past date");
+            }
+
+            @Test
+            void shouldNotReturnError_whenValidDateRangeProvided() {
+                HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
+                    LocalDate.now().plusMonths(1)).hearingUnavailableUntil(
+                    LocalDate.now().plusMonths(2)).build();
+                HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ
+                    .builder().hearingDates(
+                        wrapElements(hearingDates)).build();
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .addRespondent2(YES)
+                    .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
+                    .respondent2SameLegalRepresentative(YES)
+                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getErrors()).isEmpty();
+            }
+
+            @Test
+            void shouldNotReturnError_whenNoDateRangeProvided() {
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .addRespondent2(YES)
+                    .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().hearingDates(
+                        null).build())
+                    .respondent2SameLegalRepresentative(YES)
+                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getErrors()).isNull();
+            }
+
+            @Test
+            void shouldNotReturnError_whenLocationsProvided() {
+                HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
+                    LocalDate.now().plusMonths(1)).hearingUnavailableUntil(
+                    LocalDate.now().plusMonths(2)).build();
+                HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ
+                    .builder().hearingDates(
+                        wrapElements(hearingDates)).build();
+                List<DynamicListElement> temporaryLocationList = List.of(
+                    DynamicListElement.builder().label("Loc 1").build());
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .addRespondent2(YES)
+                    .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
+                    .respondent2SameLegalRepresentative(YES)
+                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                    .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ
+                                                      .builder()
+                                                      .hearingTemporaryLocation(
+                                                          DynamicList.builder().listItems(temporaryLocationList)
+                                                              .value(DynamicListElement.builder().label("Loc - 1 - 1")
+                                                                         .build())
+                                                              .build()).build())
+                    .build();
+                List<LocationRefData> locations = new ArrayList<>();
+                locations.add(LocationRefData.builder().siteName("Loc").courtAddress("1").postcode("1")
+                                  .courtName("Court Name").region("Region").regionId("1").courtVenueId("000").build());
+                when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+                CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                assertThat(response.getErrors()).isNull();
+            }
         }
 
-        @Test
-        void shouldNotReturnError_whenValidDateRangeProvided() {
-            HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
-                LocalDate.now().plusMonths(1)).hearingUnavailableUntil(
-                LocalDate.now().plusMonths(2)).build();
-            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ
-                .builder().hearingDates(
-                    wrapElements(hearingDates)).build();
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors()).isEmpty();
+        @Nested
+        class AboutToSubmitCallback {
+
+            @Test
+            void shouldCallExternalTask_whenAboutToSubmit() {
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .addRespondent2(NO)
+                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo("DEFAULT_JUDGEMENT");
+            }
+
+            @Test
+            void shouldCallExternalTaskAndDeleteLocationList_whenAboutToSubmit() {
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .addRespondent2(NO)
+                    .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                    .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo("DEFAULT_JUDGEMENT");
+            }
         }
 
-        @Test
-        void shouldNotReturnError_whenNoDateRangeProvided() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().hearingDates(
-                    null).build())
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors()).isNull();
-        }
+        @Nested
+        class SubmittedCallback {
 
-        @Test
-        void shouldNotReturnError_whenLocationsProvided() {
-            HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
-                LocalDate.now().plusMonths(1)).hearingUnavailableUntil(
-                LocalDate.now().plusMonths(2)).build();
-            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ
-                .builder().hearingDates(
-                    wrapElements(hearingDates)).build();
-            List<DynamicListElement> temporaryLocationList = List.of(
-                DynamicListElement.builder().label("Loc 1").build());
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ
-                                                  .builder()
-                                                  .hearingTemporaryLocation(
-                                                      DynamicList.builder().listItems(temporaryLocationList)
-                                                          .value(DynamicListElement.builder().label("Loc - 1 - 1")
-                                                                     .build())
-                                                          .build()).build())
-                .build();
-            List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("Loc").courtAddress("1").postcode("1")
-                              .courtName("Court Name").region("Region").regionId("1").courtVenueId("000").build());
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors()).isNull();
-        }
-    }
+            @Test
+            void shouldReturnJudgementGrantedResponse_whenInvoked() {
+                String header = "# Judgment for damages to be decided "
+                    + "Granted ";
+                String body = "<br /><a href=\"/cases/case-details/1594901956117591#Claim documents\" target=\"_blank\">Download"
+                    + "  interim judgment</a> "
+                    + "%n%n Judgment has been entered and your case"
+                    + " will be referred to a judge for directions.";
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .legacyCaseReference("111111")
+                    .applicant1(PartyBuilder.builder().build())
+                    .respondent1(PartyBuilder.builder().individual().build())
+                    .build();
 
-    @Nested
-    class AboutToSubmitCallback {
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+                assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
+                                                                              .confirmationHeader(header)
+                                                                              .confirmationBody(String.format(body))
+                                                                              .build());
+            }
 
-        @Test
-        void shouldCallExternalTask_whenAboutToSubmit() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .addRespondent2(NO)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                          .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            @Test
+            void shouldReturnJudgementRequestedResponseOneDefendantSelected_whenInvokedAnd1v2() {
+                String header = "# Judgment for damages to be decided "
+                    + "requested ";
+                String body = "Your request will be referred"
+                    + " to a judge and we will contact you "
+                    + "and tell you what happens next.";
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .legacyCaseReference("111111")
+                    .respondent1(PartyBuilder.builder().build())
+                    .respondent2(PartyBuilder.builder().build())
+                    .addRespondent2(YesOrNo.YES)
+                    .respondent2SameLegalRepresentative(YesOrNo.YES)
+                    .applicant1(PartyBuilder.builder().build())
+                    .defendantDetails(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Test User")
+                                                     .build())
+                                          .build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+                assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
+                                                                              .confirmationHeader(header)
+                                                                              .confirmationBody(body)
+                                                                              .build());
+            }
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo("DEFAULT_JUDGEMENT");
-        }
-
-        @Test
-        void shouldCallExternalTaskAndDeleteLocationList_whenAboutToSubmit() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .addRespondent2(NO)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo("DEFAULT_JUDGEMENT");
-        }
-    }
-
-    @Nested
-    class SubmittedCallback {
-
-        @Test
-        void shouldReturnJudgementGrantedResponse_whenInvoked() {
-            String header = "# Judgment for damages to be decided "
-                + "Granted ";
-            String body = "<br /><a href=\"/cases/case-details/1594901956117591#Claim documents\" target=\"_blank\">Download"
-                + "  interim judgment</a> "
-                + "%n%n Judgment has been entered and your case"
-                + " will be referred to a judge for directions.";
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .legacyCaseReference("111111")
-                .applicant1(PartyBuilder.builder().build())
-                .respondent1(PartyBuilder.builder().individual().build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-            assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
-                                                                          .confirmationHeader(header)
-                                                                          .confirmationBody(String.format(body))
-                                                                          .build());
-        }
-
-        @Test
-        void shouldReturnJudgementRequestedResponseOneDefendantSelected_whenInvokedAnd1v2() {
-            String header = "# Judgment for damages to be decided "
-                                       + "requested ";
-            String body = "Your request will be referred"
-                + " to a judge and we will contact you "
-                + "and tell you what happens next.";
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .legacyCaseReference("111111")
-                .respondent1(PartyBuilder.builder().build())
-                .respondent2(PartyBuilder.builder().build())
-                .addRespondent2(YesOrNo.YES)
-                .respondent2SameLegalRepresentative(YesOrNo.YES)
-                .applicant1(PartyBuilder.builder().build())
-                .defendantDetails(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("Test User")
-                                                 .build())
-                                      .build())
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-            assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
-                                                                          .confirmationHeader(header)
-                                                                          .confirmationBody(body)
-                                                                          .build());
-        }
-
-        @Test
-        void shouldReturnJudgementGrantedResponseBothDefendantSelected_whenInvokedAnd1v2() {
-            String header = "# Judgment for damages to be decided "
-                                       + "Granted ";
-            String body = "<br /><a href=\"/cases/case-details/1594901956117591#Claim documents\" "
-                + "target=\"_blank\">Download  interim judgment</a> %n%n Judgment has been entered"
-                + " and your case will be referred to a judge for directions.";
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .legacyCaseReference("111111")
-                .respondent1(PartyBuilder.builder().build())
-                .respondent2(PartyBuilder.builder().build())
-                .addRespondent2(YesOrNo.YES)
-                .respondent2SameLegalRepresentative(YesOrNo.YES)
-                .applicant1(PartyBuilder.builder().build())
-                .defendantDetails(DynamicList.builder()
-                                      .value(DynamicListElement.builder()
-                                                 .label("Both")
-                                                 .build())
-                                      .build())
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-            assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
-                                                                          .confirmationHeader(header)
-                                                                          .confirmationBody(String.format(body))
-                                                                          .build());
+            @Test
+            void shouldReturnJudgementGrantedResponseBothDefendantSelected_whenInvokedAnd1v2() {
+                String header = "# Judgment for damages to be decided "
+                    + "Granted ";
+                String body = "<br /><a href=\"/cases/case-details/1594901956117591#Claim documents\" "
+                    + "target=\"_blank\">Download  interim judgment</a> %n%n Judgment has been entered"
+                    + " and your case will be referred to a judge for directions.";
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .legacyCaseReference("111111")
+                    .respondent1(PartyBuilder.builder().build())
+                    .respondent2(PartyBuilder.builder().build())
+                    .addRespondent2(YesOrNo.YES)
+                    .respondent2SameLegalRepresentative(YesOrNo.YES)
+                    .applicant1(PartyBuilder.builder().build())
+                    .defendantDetails(DynamicList.builder()
+                                          .value(DynamicListElement.builder()
+                                                     .label("Both")
+                                                     .build())
+                                          .build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+                assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
+                                                                              .confirmationHeader(header)
+                                                                              .confirmationBody(String.format(body))
+                                                                              .build());
+            }
         }
     }
 }
