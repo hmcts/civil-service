@@ -62,7 +62,8 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         if (caseData1 != null) {
             Optional<Document> stitchedDocument = caseData1.getCaseBundles().get(0).getValue().getStitchedDocument();
 
-            log.info("stitchedDocument.isPresent()----->" + stitchedDocument.isPresent() + " for " + caseData.getLegacyCaseReference());
+            log.info("stitchedDocument.isPresent()----->" + stitchedDocument.isPresent() + " for "
+                         + caseData.getLegacyCaseReference());
             if (stitchedDocument.isPresent()) {
                 Document document = stitchedDocument.get();
                 String documentUrl = document.getDocumentUrl();
