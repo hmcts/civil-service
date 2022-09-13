@@ -221,7 +221,8 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-                assertThat(response.getErrors().get(0)).isEqualTo("Unavailable Dates must be within the next 3 months.");
+                assertThat(response.getErrors().get(0))
+                    .isEqualTo("Unavailable Dates must be within the next 3 months.");
             }
 
             @Test
