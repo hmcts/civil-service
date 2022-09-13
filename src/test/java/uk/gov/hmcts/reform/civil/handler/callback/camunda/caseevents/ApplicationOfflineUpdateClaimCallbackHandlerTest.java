@@ -43,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_U
     CaseDetailsConverter.class
 })
 class ApplicationOfflineUpdateClaimCallbackHandlerTest  extends BaseCallbackHandlerTest {
+
     @Autowired
     private ApplicationOfflineUpdateClaimCallbackHandler handler;
 

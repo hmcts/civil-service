@@ -43,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UP
     CaseDetailsConverter.class
 })
 class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
+
     @Autowired
     private ApplicationClosedUpdateClaimCallbackHandler handler;
 

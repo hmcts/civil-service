@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_APPLICATION_P
     JacksonAutoConfiguration.class
 })
 class TriggerMoveApplicationOfflineCallbackHandlerTest extends BaseCallbackHandlerTest {
+
     @Autowired
     TriggerMoveApplicationOfflineCallbackHandler handler;
 

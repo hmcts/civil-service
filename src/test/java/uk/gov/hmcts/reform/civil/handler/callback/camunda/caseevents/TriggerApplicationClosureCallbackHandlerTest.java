@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_APPLICATION_C
     JacksonAutoConfiguration.class
 })
 class TriggerApplicationClosureCallbackHandlerTest extends BaseCallbackHandlerTest {
+
     @Autowired
     TriggerApplicationClosureCallbackHandler handler;
 
