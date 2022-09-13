@@ -15,15 +15,16 @@ import uk.gov.hmcts.reform.civil.enums.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.bankholidays.PublicHolidaysCollection;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -36,16 +37,16 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
-import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
 
 @Service
 @RequiredArgsConstructor
 public class HearingScheduledHandler extends CallbackHandler {
 
-    public static final String HEARING_TASKS = "%n%n You may need to complete other tasks for the hearing, for example, book an interpreter.";
+    public static final String HEARING_TASKS = "%n%n You may need to complete other tasks for the"
+        + " hearing, for example, book an interpreter.";
 
-    public static final String HEARING_CREATED_HEADER = "# Hearing notice created\n" +
-        "# Your reference number\n" + "# %s";
+    public static final String HEARING_CREATED_HEADER = "# Hearing notice created\n"
+        + "# Your reference number\n" + "# %s";
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(HEARING_SCHEDULED);
     private final LocationRefDataService locationRefDataService;
@@ -65,19 +66,19 @@ public class HearingScheduledHandler extends CallbackHandler {
             .build();
     }
 
-    private String getBody(CaseData caseData) {
-            return format(HEARING_TASKS);
+    private String getBody() {
+        return format(HEARING_TASKS);
     }
 
-    private String getHeader(CaseData caseData) {
-            return format(HEARING_CREATED_HEADER,hearingReferenceNumberRepository.getHearingReferenceNumber());
+    private String getHeader(String hearingReference) {
+        return format(HEARING_CREATED_HEADER, hearingReference);
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader(caseData))
-            .confirmationBody(getBody(caseData))
+            .confirmationHeader(getHeader(caseData.getHearingReferenceNumber()))
+            .confirmationBody(getBody())
             .build();
     }
 
@@ -92,7 +93,7 @@ public class HearingScheduledHandler extends CallbackHandler {
         caseDataBuilder.hearingLocation(getLocationsFromList(locations))
             .build();
 
-    return AboutToStartOrSubmitCallbackResponse.builder()
+        return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
@@ -120,25 +121,25 @@ public class HearingScheduledHandler extends CallbackHandler {
             .errors(errors)
             .build();
     }
+
     private List<String> isPastDate(LocalDate dateOfApplication) {
         List<String> errors = new ArrayList<>();
-            if (!checkPastDateValidation(dateOfApplication)) {
-                errors.add("The Date must be in the past");
-            };
+        if (!checkPastDateValidation(dateOfApplication)) {
+            errors.add("The Date must be in the past");
+        }
         return errors;
     }
+
     private boolean checkPastDateValidation(LocalDate localDate) {
         return localDate != null && localDate.isBefore(LocalDate.now());
     }
 
     private CallbackResponse checkFutureDate(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-
         LocalDateTime hearingDateTime = caseData.getHearingDateTime();
 
         List<String> errors = (Objects.isNull(hearingDateTime)) ? null :
             isFutureDate(hearingDateTime);
-
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -150,8 +151,8 @@ public class HearingScheduledHandler extends CallbackHandler {
     private CallbackResponse getDueDateAndFee(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        if(caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
-            if(LocalDateTime.now().isBefore(caseData.getHearingDateTime().minusWeeks(4))) {
+        if (caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
+            if (LocalDateTime.now().isBefore(caseData.getHearingDateTime().minusWeeks(4))) {
                 caseDataBuilder.hearingDueDate(
                     HearingUtils.addBusinessDays(
                         LocalDate.now(), 7, publicHolidaysCollection.getPublicHolidays()).toString());
@@ -170,9 +171,13 @@ public class HearingScheduledHandler extends CallbackHandler {
                     break;
                 case MULTI_CLAIM:
                     caseDataBuilder.hearingFee("£1.175");
+                    break;
+                default:
+                    caseDataBuilder.hearingFee("£0");
             }
         }
-
+        caseDataBuilder.hearingReferenceNumber(hearingReferenceNumberRepository.getHearingReferenceNumber());
+        caseDataBuilder.partyApplicantPayment(caseData.getApplicant1().getPartyName());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -182,9 +187,10 @@ public class HearingScheduledHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         if (!checkFutureDateValidation(hearingDateTime)) {
             errors.add("The Date must be in advance of todays date");
-        };
+        }
         return errors;
     }
+
     private boolean checkFutureDateValidation(LocalDateTime localDateTime) {
         return localDateTime != null && localDateTime.isAfter(LocalDateTime.now());
     }

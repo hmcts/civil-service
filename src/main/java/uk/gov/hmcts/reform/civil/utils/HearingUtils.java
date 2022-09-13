@@ -9,11 +9,15 @@ import java.util.function.Predicate;
 
 public class HearingUtils {
 
+    private HearingUtils() {
+
+    }
+
     public static LocalDate addBusinessDays(LocalDate localDate, int days, Set<LocalDate> holidaysSet) {
-        if(localDate == null || days <= 0 || holidaysSet.isEmpty())
-        {
+        if (localDate == null || days <= 0 || holidaysSet.isEmpty()) {
             throw new IllegalArgumentException("Invalid method argument(s) "
-                                                   + "to addBusinessDays("+localDate+","+days+","+holidaysSet+")");
+                                                   + "to addBusinessDays(" + localDate + "," + days + ","
+                                                   + holidaysSet + ")");
         }
 
         List<LocalDate> holidays = new ArrayList<>(holidaysSet);
@@ -35,9 +39,9 @@ public class HearingUtils {
     }
 
     public static String getFastTrackFee(int claimFee) {
-        if(claimFee == 0) {
+        if (claimFee == 0) {
             return "£0";
-        } else if(claimFee < 300_00) {
+        } else if (claimFee < 300_00) {
             return "£27";
         } else if (claimFee < 500_00) {
             return "£59";
