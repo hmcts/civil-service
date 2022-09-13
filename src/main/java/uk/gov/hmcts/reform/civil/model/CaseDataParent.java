@@ -203,6 +203,8 @@ public class CaseDataParent implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> smallClaimsDocumentsToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsWitnessStatementToggle;
 
+    private Document sdoOrderDocument;
+
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
     private final YesOrNo setFastTrackFlag;
