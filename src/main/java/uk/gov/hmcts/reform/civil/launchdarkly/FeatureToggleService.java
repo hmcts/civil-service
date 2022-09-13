@@ -48,7 +48,7 @@ public class FeatureToggleService {
         );
     }
 
-    public boolean isSpecGlobalSearchEnabled() {
+    public boolean isGlobalSearchEnabled() {
         return internalClient.boolVariation(
             "global-search-specified",
             createLDUser().build(),

@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -54,6 +55,9 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private PaymentsConfiguration paymentsConfiguration;
 
+    @MockBean
+    private FeatureToggleService toggleService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -75,6 +79,7 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnSupplementaryDataOnSubmitted() {
+            when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
             assignCaseToUserHandler.handle(params);
             verify(coreCaseDataService).setSupplementaryData(any(), eq(supplementaryData()));
         }
