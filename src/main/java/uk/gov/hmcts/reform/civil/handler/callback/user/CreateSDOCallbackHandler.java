@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -736,6 +737,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                          locationLabel)).findFirst();
 
         if (preferredLocation.isPresent()) {
+            caseData.toBuilder().caseManagementLocation(
+                CaseLocation.builder()
+                    .region(preferredLocation.get().getRegionId())
+                    .baseLocation(preferredLocation.get().getEpimmsId()).build()
+            );
+
             locations.remove(preferredLocation.get());
             locations.add(0, preferredLocation.get());
         }
