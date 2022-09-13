@@ -3637,7 +3637,7 @@ class StateFlowEngineTest {
         void shouldReturnContactDetailsChange_whenCaseDataAtStateRespondentContactDetailsChange() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
+                .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
                 .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.defaults().build())
                 .build().toBuilder()
                 .superClaimType(SuperClaimType.SPEC_CLAIM).build();

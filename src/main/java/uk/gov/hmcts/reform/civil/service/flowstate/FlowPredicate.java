@@ -805,5 +805,5 @@ public class FlowPredicate {
     };
 
     public static final Predicate<CaseData> contactDetailsChange = caseData ->
-        caseData.getSpecAoSApplicantCorrespondenceAddressdetails() != null;
+        NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());
 }
