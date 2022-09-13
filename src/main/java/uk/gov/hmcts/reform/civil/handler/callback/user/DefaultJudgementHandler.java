@@ -281,8 +281,4 @@ public class DefaultJudgementHandler extends CallbackHandler {
         return locationLabel.equals(locationTempLabel);
     }
 
-    private String fillCaseManagementCategory() {
-        return "";
-    }
-
 }
