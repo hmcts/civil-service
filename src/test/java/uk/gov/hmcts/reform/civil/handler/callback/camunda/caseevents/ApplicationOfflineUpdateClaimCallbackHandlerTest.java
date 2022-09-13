@@ -6,6 +6,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.verification.VerificationMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,34 +15,28 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
-import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
-    ApplicationOfflineUpdateClaimCallbackHandler.class, JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
+    ApplicationOfflineUpdateClaimCallbackHandler.class, JacksonAutoConfiguration.class
 })
 class ApplicationOfflineUpdateClaimCallbackHandlerTest  extends BaseCallbackHandlerTest {
 
@@ -51,30 +47,15 @@ class ApplicationOfflineUpdateClaimCallbackHandlerTest  extends BaseCallbackHand
     private ObjectMapper mapper;
 
     @MockBean
-    private CoreCaseDataService coreCaseDataService;
+    private GenAppStateHelperService helperService;
 
-    @Autowired
-    private CaseDetailsConverter caseDetailsConverter;
-
-    @MockBean
-    private FeatureToggleService featureToggle;
-
-    private static final String PROCEEDS_IN_HERITAGE = "Proceeds In Heritage";
+    private static final String APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION = "Proceeds In Heritage";
+    private static final VerificationMode ONCE = Mockito.times(1);
 
     @BeforeEach
     void prepare() {
         ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper().registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
-        when(coreCaseDataService.getCase(1234L)).thenReturn(getCaseDetails(1234L, "PROCEEDS_IN_HERITAGE", true));
-        when(coreCaseDataService.getCase(2345L)).thenReturn(getCaseDetails(2345L, "ORDER_MADE", true));
-        when(coreCaseDataService.getCase(3456L)).thenReturn(getCaseDetails(3456L, "PROCEEDS_IN_HERITAGE", true));
-        when(coreCaseDataService.getCase(4567L)).thenReturn(getCaseDetails(4567L, "PROCEEDS_IN_HERITAGE", true));
-        when(coreCaseDataService.getCase(5678L)).thenReturn(getCaseDetails(5678L, "PROCEEDS_IN_HERITAGE", true));
-        when(coreCaseDataService.getCase(6789L)).thenReturn(getCaseDetails(6789L, "PROCEEDS_IN_HERITAGE", true));
-        when(coreCaseDataService.getCase(7890L)).thenReturn(getCaseDetails(7890L, "APPLICATION_DISMISSED", true));
-        when(coreCaseDataService.getCase(8910L)).thenReturn(getCaseDetails(8910L, "PROCEEDS_IN_HERITAGE", true));
-        when(coreCaseDataService.getCase(1011L)).thenReturn(getCaseDetails(1011L, "PROCEEDS_IN_HERITAGE", true));
-        when(coreCaseDataService.getCase(1112L)).thenReturn(getCaseDetails(1011L, "APPLICATION_CLOSED", true));
     }
 
     @Test
@@ -83,34 +64,7 @@ class ApplicationOfflineUpdateClaimCallbackHandlerTest  extends BaseCallbackHand
     }
 
     @Test
-    void shouldReturnError_whenGeneralApplicationToggledOff() {
-        CaseData caseData = CaseDataBuilder.builder()
-                .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-        when(featureToggle.isGeneralApplicationsEnabled()).thenReturn(false);
-
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        assertThat(response.getErrors())
-                .containsOnly("Invalid request since the general application feature is toggled off");
-    }
-
-    @Test
-    void shouldNotReturnError_whenGeneralApplicationToggledOn() {
-        CaseData caseData = CaseDataBuilder.builder()
-                .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-        when(featureToggle.isGeneralApplicationsEnabled()).thenReturn(true);
-
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        assertThat(response.getErrors()).isNull();
-    }
-
-    @Test
-    public void updateApplicationDetailsListsToReflectLatestApplicationStatusChange() {
+    public void callHelperServiceToUpdateApplicationDetailsInClaimWhenGeneralApplicationsPresent() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseDataWithDetails(CaseData.builder().build(),
                         true,
@@ -119,25 +73,24 @@ class ApplicationOfflineUpdateClaimCallbackHandlerTest  extends BaseCallbackHand
                         getOriginalStatusOfGeneralApplication_test1());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+        when(helperService.updateApplicationDetailsInClaim(
+                any(),
+                eq(APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION),
+                eq(GenAppStateHelperService.RequiredState.APPLICATION_PROCEEDS_OFFLINE)))
+                .thenReturn(caseData);
+
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         assertThat(response.getErrors()).isNull();
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-
-        assertStatusChange(updatedData, "1234", true);
-        assertStatusChange(updatedData, "2345", false);
-        assertStatusChange(updatedData, "3456", true);
-        assertStatusChange(updatedData, "4567", true);
-        assertStatusChange(updatedData, "5678", true);
-        assertStatusChange(updatedData, "6789", true);
-        assertStatusChange(updatedData, "7890", false);
-        assertStatusChange(updatedData, "8910", true);
-        assertStatusChange(updatedData, "1011", true);
-        assertStatusChange(updatedData, "1112", false);
+        verify(helperService, ONCE).updateApplicationDetailsInClaim(
+                caseData,
+                APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION,
+                GenAppStateHelperService.RequiredState.APPLICATION_PROCEEDS_OFFLINE);
+        verifyNoMoreInteractions(helperService);
     }
 
     @Test
-    public void noUpdatesToCaseDataIfThereAreNoGeneralApplications() {
+    public void noCallToHelperServiceToUpdateApplicationDetailsInClaimWhenNoGeneralApplicationsPresent() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseDataWithDetails(CaseData.builder().build(),
                         false,
@@ -148,78 +101,34 @@ class ApplicationOfflineUpdateClaimCallbackHandlerTest  extends BaseCallbackHand
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(response.getErrors()).isNull();
-        assertThat(updatedData.getGeneralApplications()).isEmpty();
-        assertThat(updatedData.getGeneralApplicationsDetails()).isNull();
-        assertThat(updatedData.getGaDetailsRespondentSol()).isNull();
-        assertThat(updatedData.getGaDetailsRespondentSolTwo()).isNull();
-        verifyNoMoreInteractions(coreCaseDataService);
+
+        verifyNoInteractions(helperService);
     }
 
     @Test
-    public void noUpdateToApplicationDetailsListsWhenApplicationOfflineDateNotSet() {
-        Map<String, String> applications = new HashMap<>();
-        applications.put("9999", "Application Submitted - Awaiting Judicial Decision");
+    public void returnErrorIfHelperServiceThrowsErrors() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseDataWithDetails(CaseData.builder().build(),
                         true,
                         true,
                         true,
-                        applications);
+                        getOriginalStatusOfGeneralApplication_test1());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-        when(coreCaseDataService.getCase(9999L)).thenReturn(getCaseDetails(1234L, "PROCEEDS_IN_HERITAGE", false));
+        when(helperService.updateApplicationDetailsInClaim(any(), any(), any()))
+                .thenThrow(new RuntimeException("Some Error"));
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        assertThat(response.getErrors()).isNull();
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-
-        assertStatusChange(updatedData, "9999", false);
-    }
-
-    private void assertStatusChange(CaseData updatedData, String childCaseRef,
-                                    boolean shouldApplicationBeInOfflineState) {
-        assertThat(getGADetailsFromUpdatedCaseData(updatedData, childCaseRef)).isNotNull();
-        assertThat(getGARespDetailsFromUpdatedCaseData(updatedData, childCaseRef)).isNotNull();
-        assertThat(getGARespTwoDetailsFromUpdatedCaseData(updatedData, childCaseRef)).isNotNull();
-        if (shouldApplicationBeInOfflineState) {
-            assertThat(getGADetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                    .isEqualTo(PROCEEDS_IN_HERITAGE);
-            assertThat(getGARespDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                    .isEqualTo(PROCEEDS_IN_HERITAGE);
-            assertThat(getGARespTwoDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                    .isEqualTo(PROCEEDS_IN_HERITAGE);
-        } else {
-            assertThat(getGADetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                    .isNotEqualTo(PROCEEDS_IN_HERITAGE);
-            assertThat(getGARespDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                    .isNotEqualTo(PROCEEDS_IN_HERITAGE);
-            assertThat(getGARespTwoDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                    .isNotEqualTo(PROCEEDS_IN_HERITAGE);
-        }
-    }
-
-    private GeneralApplicationsDetails getGADetailsFromUpdatedCaseData(CaseData caseData,
-                                                                       String gaCaseRef) {
-        Optional<Element<GeneralApplicationsDetails>> first = caseData.getGeneralApplicationsDetails().stream()
-                .filter(ga -> gaCaseRef.equals(ga.getValue().getCaseLink().getCaseReference())).findFirst();
-        return first.map(Element::getValue).orElse(null);
-    }
-
-    private GADetailsRespondentSol getGARespDetailsFromUpdatedCaseData(CaseData caseData,
-                                                                       String gaCaseRef) {
-        Optional<Element<GADetailsRespondentSol>> first = caseData.getGaDetailsRespondentSol().stream()
-                .filter(ga -> gaCaseRef.equals(ga.getValue().getCaseLink().getCaseReference())).findFirst();
-        return first.map(Element::getValue).orElse(null);
-    }
-
-    private GADetailsRespondentSol getGARespTwoDetailsFromUpdatedCaseData(CaseData caseData,
-                                                                          String gaCaseRef) {
-        Optional<Element<GADetailsRespondentSol>> first = caseData.getGaDetailsRespondentSolTwo().stream()
-                .filter(ga -> gaCaseRef.equals(ga.getValue().getCaseLink().getCaseReference())).findFirst();
-        return first.map(Element::getValue).orElse(null);
+        assertThat(response.getErrors()).isNotNull();
+        assertThat(response.getErrors())
+                .contains("Error occurred while updating claim with application status: " + "Some Error");
+        verify(helperService, ONCE).updateApplicationDetailsInClaim(
+                caseData,
+                APPLICATION_PROCEEDS_OFFLINE_DESCRIPTION,
+                GenAppStateHelperService.RequiredState.APPLICATION_PROCEEDS_OFFLINE);
+        verifyNoMoreInteractions(helperService);
     }
 
     private Map<String, String> getOriginalStatusOfGeneralApplication_test1() {
@@ -236,17 +145,6 @@ class ApplicationOfflineUpdateClaimCallbackHandlerTest  extends BaseCallbackHand
         latestStatus.put("1112", "Application Closed");
 
         return latestStatus;
-    }
-
-    private CaseDetails getCaseDetails(long ccdRef, String caseState, boolean setDate) {
-        CaseDetails.CaseDetailsBuilder builder = CaseDetails.builder();
-        if (setDate) {
-            builder.data(Map.of("applicationTakenOfflineDate", "2022-08-31T22:50:11.2509019"));
-        } else {
-            builder.data(Map.of("generalAppDetailsOfOrder", "Some Value"));
-        }
-        builder.id(ccdRef).state(caseState).build();
-        return builder.build();
     }
 }
 

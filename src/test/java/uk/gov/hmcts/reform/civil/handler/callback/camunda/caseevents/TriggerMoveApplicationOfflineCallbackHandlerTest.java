@@ -13,13 +13,13 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -41,7 +41,7 @@ class TriggerMoveApplicationOfflineCallbackHandlerTest extends BaseCallbackHandl
     TriggerMoveApplicationOfflineCallbackHandler handler;
 
     @MockBean
-    private CoreCaseDataService coreCaseDataService;
+    private GenAppStateHelperService helperService;
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -61,9 +61,9 @@ class TriggerMoveApplicationOfflineCallbackHandlerTest extends BaseCallbackHandl
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         assertThat(response.getErrors()).isNull();
-        verify(coreCaseDataService, times(1)).triggerGeneralApplicationEvent(1234L, APPLICATION_PROCEEDS_IN_HERITAGE);
-        verify(coreCaseDataService, times(1)).triggerGeneralApplicationEvent(2345L, APPLICATION_PROCEEDS_IN_HERITAGE);
-        verifyNoMoreInteractions(coreCaseDataService);
+        verify(helperService, times(1)).triggerEvent(caseData, APPLICATION_PROCEEDS_IN_HERITAGE);
+        verify(helperService, times(1)).triggerEvent(caseData, APPLICATION_PROCEEDS_IN_HERITAGE);
+        verifyNoMoreInteractions(helperService);
     }
 
     @Test
@@ -73,7 +73,7 @@ class TriggerMoveApplicationOfflineCallbackHandlerTest extends BaseCallbackHandl
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        verifyNoInteractions(coreCaseDataService);
+        verifyNoInteractions(helperService);
         assertThat(response.getErrors()).isNull();
     }
 
@@ -87,7 +87,7 @@ class TriggerMoveApplicationOfflineCallbackHandlerTest extends BaseCallbackHandl
                         getOriginalStatusOfGeneralApplication());
         String expectedErrorMessage = "Could not trigger event to take application offline under the case: "
                 + caseData.getCcdCaseReference();
-        when(coreCaseDataService.triggerGeneralApplicationEvent(anyLong(), eq(APPLICATION_PROCEEDS_IN_HERITAGE)))
+        when(helperService.triggerEvent(any(CaseData.class), eq(APPLICATION_PROCEEDS_IN_HERITAGE)))
                 .thenThrow(new RuntimeException());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

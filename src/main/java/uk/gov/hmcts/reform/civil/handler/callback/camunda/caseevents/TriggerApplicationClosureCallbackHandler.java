@@ -10,12 +10,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.Long.parseLong;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAIN_CASE_CLOSED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_APPLICATION_CLOSURE;
@@ -27,7 +26,7 @@ public class TriggerApplicationClosureCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(TRIGGER_APPLICATION_CLOSURE);
 
-    private final CoreCaseDataService coreCaseDataService;
+    private final GenAppStateHelperService helperService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -45,9 +44,7 @@ public class TriggerApplicationClosureCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         try {
             if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
-                caseData.getGeneralApplications()
-                        .forEach(application ->
-                                triggerEvent(parseLong(application.getValue().getCaseLink().getCaseReference())));
+                helperService.triggerEvent(caseData, MAIN_CASE_CLOSED);
             }
         } catch (Exception e) {
             String errorMessage = "Could not trigger event to close application under case: "
@@ -56,11 +53,5 @@ public class TriggerApplicationClosureCallbackHandler extends CallbackHandler {
             return AboutToStartOrSubmitCallbackResponse.builder().errors(List.of(errorMessage)).build();
         }
         return emptyCallbackResponse(callbackParams);
-    }
-
-    private void triggerEvent(Long caseId) {
-        log.info("Triggering MAIN_CASE_CLOSED event to close the underlying general application: [{}]",
-                caseId);
-        coreCaseDataService.triggerGeneralApplicationEvent(caseId, MAIN_CASE_CLOSED);
     }
 }
