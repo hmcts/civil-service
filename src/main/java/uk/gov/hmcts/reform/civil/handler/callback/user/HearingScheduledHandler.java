@@ -154,12 +154,12 @@ public class HearingScheduledHandler extends CallbackHandler {
     private List<String> isFutureDate(LocalDateTime hearingDateTime) {
         List<String> errors = new ArrayList<>();
         if (!checkFutureDateValidation(hearingDateTime)) {
-            errors.add("The Date must be in advance of todays date");
+            errors.add("The Date & Time must be 24hs in advance from now");
         };
         return errors;
     }
     private boolean checkFutureDateValidation(LocalDateTime localDateTime) {
-        return localDateTime != null && localDateTime.isAfter(LocalDateTime.now());
+        return localDateTime != null && localDateTime.isAfter(LocalDateTime.now().plusHours(24));
     }
 
     @Override
