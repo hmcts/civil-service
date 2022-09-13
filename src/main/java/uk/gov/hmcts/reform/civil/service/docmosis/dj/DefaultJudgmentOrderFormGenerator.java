@@ -2,12 +2,10 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
-import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
-import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
-import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
-import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
+import uk.gov.hmcts.reform.civil.enums.dj.*;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingAddNewDirectionsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
@@ -38,6 +36,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     private final DocumentGeneratorService documentGeneratorService;
     private static final String BOTH_DEFENDANTS = "Both Defendants";
     public static final String DISPOSAL_HEARING = "DISPOSAL_HEARING";
+    private DisposalHearingAddNewDirectionsDJ disposalHearingAddNewDirectionsDJ;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         DefaultJudgmentSDOOrderForm templateData = getDefaultJudgmentForms(caseData);
@@ -73,6 +72,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormHearing(CaseData caseData) {
         return DefaultJudgmentSDOOrderForm.builder()
+            .courtLocation(getCourt(caseData))
+            .telephoneOrganisedBy(getDisposalHearingMethodTelephoneHearingLabel(caseData))
             .judgeNameTitle(caseData.getDisposalHearingJudgesRecitalDJ().getJudgeNameTitle())
             .caseNumber(caseData.getLegacyCaseReference())
             .disposalHearingBundleDJ(caseData.getDisposalHearingBundleDJ())
@@ -94,6 +95,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .disposalHearingMedicalEvidenceDJ(caseData.getDisposalHearingMedicalEvidenceDJ())
             .disposalHearingMedicalEvidenceDJAddSection(nonNull(caseData.getDisposalHearingMedicalEvidenceDJ()))
             .disposalHearingNotesDJ(caseData.getDisposalHearingNotesDJ())
+            .hasNewDirections(addAdditionalDirection(caseData))
             .disposalHearingAddNewDirectionsDJ(caseData.getDisposalHearingAddNewDirectionsDJ())
             .disposalHearingQuestionsToExpertsDJ(caseData.getDisposalHearingQuestionsToExpertsDJ())
             .disposalHearingQuestionsToExpertsDJAddSection(nonNull(caseData.getDisposalHearingQuestionsToExpertsDJ()))
@@ -101,7 +103,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .disposalHearingSchedulesOfLossDJAddSection(nonNull(caseData.getDisposalHearingSchedulesOfLossDJ()))
             .disposalHearingClaimSettlingAddSection(getToggleValue(caseData.getDisposalHearingClaimSettlingDJToggle()))
             .disposalHearingCostsAddSection(getToggleValue(caseData.getDisposalHearingCostsDJToggle()))
-            .disposalHearingMethod(fillDisposalHearingMethod(caseData.getDisposalHearingMethodDJ()))
+            .disposalHearingMethodDJ(caseData.getDisposalHearingMethodDJ())
+            .disposalHearingAttendance(fillDisposalHearingMethod(caseData.getDisposalHearingMethodDJ()))
             .applicant(caseData.getApplicant1().getPartyName().toUpperCase())
             .respondent(checkDefendantRequested(caseData).toUpperCase()).build();
     }
@@ -194,6 +197,31 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
     private boolean getToggleValue(List<DisposalAndTrialHearingDJToggle> toggle) {
         return nonNull(toggle) && toggle.get(0).equals(SHOW);
+    }
+
+    private boolean addAdditionalDirection(CaseData caseData) {
+        if (caseData.getDisposalHearingAddNewDirectionsDJ() != null) {
+            return true;
+        }
+        return false;
+    }
+
+    private String getCourt(CaseData caseData) {
+        if (caseData.getDisposalHearingMethodInPersonDJ() != null) {
+            return caseData.getDisposalHearingMethodInPersonDJ().getValue().getLabel();
+        }
+        return null;
+    }
+
+    public static String getDisposalHearingMethodTelephoneHearingLabel(CaseData caseData) {
+        DisposalHearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ =
+            caseData.getDisposalHearingMethodTelephoneHearingDJ();
+
+        if (disposalHearingMethodTelephoneHearingDJ != null) {
+            return disposalHearingMethodTelephoneHearingDJ.getLabel();
+        }
+
+        return null;
     }
 
     private String fillDisposalHearingMethod(DisposalHearingMethodDJ method) {

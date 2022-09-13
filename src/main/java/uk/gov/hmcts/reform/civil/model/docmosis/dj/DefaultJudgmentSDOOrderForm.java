@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.*;
@@ -33,6 +35,7 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private final DisposalHearingBundleDJ disposalHearingBundleDJ;
     private final DisposalHearingNotesDJ disposalHearingNotesDJ;
     private final List<Element<DisposalHearingAddNewDirectionsDJ>> disposalHearingAddNewDirectionsDJ;
+    private final boolean hasNewDirections;
 
     //default judgement SDO fields for trial
     private final TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
@@ -61,7 +64,10 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
 
     private final String typeBundleInfo;
     private final String disposalHearingTime;
-    private final String disposalHearingMethod;
+    private final DisposalHearingMethodDJ disposalHearingMethodDJ;
+    private final String disposalHearingAttendance;
+    private final String courtLocation;
+    private final String telephoneOrganisedBy;
 
     //additional data for trial
     private final boolean trialHearingDisputeAddSection;
