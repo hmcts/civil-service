@@ -85,7 +85,8 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
             if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
                 && !RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                 && !RespondentResponseTypeSpec.COUNTER_CLAIM
-                .equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+                .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+                && SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 templateID = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
             } else {
                 templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
