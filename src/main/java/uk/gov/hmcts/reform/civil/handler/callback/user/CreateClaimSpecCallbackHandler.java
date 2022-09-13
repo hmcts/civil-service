@@ -564,10 +564,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         caseDataBuilder.claimAmountBreakupSummaryObject(totalAmount);
 
-        if (toggleService.isGlobalSearchEnabled()) {
-            caseDataBuilder.caseNameHmctsInternal(caseParticipants(caseData));
-        }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();

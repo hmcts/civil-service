@@ -949,9 +949,10 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAssignCaseName1v2_whenCaseIs1v2GlobalSearchEnabled() {
             when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+
             assertThat(response.getData().get("caseNameHmctsInternal"))
                 .isEqualTo("Mr. John Rambo v Mr. Sole Trader and Mr. John Rambo");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
@@ -961,12 +962,13 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssignCaseName2v1_whenCaseIs2v1GlobalSearchEnabled() {
             when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
 
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("Mr. John Rambo v Mr. Sole Trader and Mr. John Rambo");
+                .isEqualTo("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -975,8 +977,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAssignCaseName1v1_whenCaseIs1v1GlobalSearchEnabled() {
             when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData().get("caseNameHmctsInternal"))
                 .isEqualTo("Mr. John Rambo v Mr. Sole Trader");
