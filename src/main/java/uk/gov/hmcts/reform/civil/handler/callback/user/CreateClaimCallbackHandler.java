@@ -140,7 +140,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
         caseDataBuilder.claimStarted(YES);
 
-        if (V_1.equals(callbackParams.getVersion())) {
+        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);
 
             caseDataBuilder
@@ -318,10 +318,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         List<String> validationErrors;
 
-        if (V_1.equals(callbackParams.getVersion())) {
-            validationErrors = validateCaseData(caseData);
+        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
+            validationErrors = validateCourtChoice(caseData);
         } else {
-            validationErrors = validateCaseDataOld(caseData);
+            validationErrors = validateCourtTextOld(caseData);
         }
 
         if (validationErrors.size() > 0) {
@@ -360,7 +360,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         dataBuilder.claimStarted(null);
 
-        if (V_1.equals(callbackParams.getVersion())) {
+        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
             handleCourtLocationData(caseData, dataBuilder, callbackParams);
         }
 
@@ -475,7 +475,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         ) + exitSurveyContentService.applicantSurvey();
     }
 
-    private List<String> validateCaseData(CaseData caseData) {
+    private List<String> validateCourtChoice(CaseData caseData) {
         List<String> errorsMessages = new ArrayList<>();
         // Tactical fix. We have an issue where null courtLocation is being submitted.
         // We are validating it exists on submission if not we return an error to the user.
@@ -487,7 +487,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return errorsMessages;
     }
 
-    private List<String> validateCaseDataOld(CaseData caseData) {
+    // will remove when court location dynamic list flag is turned on for prod
+    private List<String> validateCourtTextOld(CaseData caseData) {
         List<String> errorsMessages = new ArrayList<>();
         // Tactical fix. We have an issue where null courtLocation is being submitted.
         // We are validating it exists on submission if not we return an error to the user.

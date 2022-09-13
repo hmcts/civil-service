@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
-import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -36,9 +35,9 @@ import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
-import uk.gov.hmcts.reform.civil.utils.AccessCodeGenerator;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -117,6 +116,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final DateOfBirthValidator dateOfBirthValidator;
     private final FeesService feesService;
     private final OrganisationService organisationService;
+    private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final IdamClient idamClient;
     private final OrgPolicyValidator orgPolicyValidator;
     private final ObjectMapper objectMapper;
@@ -377,13 +377,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
 
         if (isPinInPostCaseMatched(caseData)) {
-            LocalDate expiryDate = LocalDate.now().plusDays(180);
-            dataBuilder.respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
-                                                        .accessCode(AccessCodeGenerator.generateAccessCode())
-                                                        .respondentCaseRole(
-                                                            CaseRole.RESPONDENTSOLICITORONESPEC.getFormattedName())
-                                                        .expiryDate(expiryDate)
-                                                        .build());
+            dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         }
 
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
