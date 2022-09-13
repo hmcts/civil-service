@@ -3,7 +3,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -15,10 +17,13 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
@@ -52,11 +57,15 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.prd.client.CommonReferenceDataApi;
+import uk.gov.hmcts.reform.prd.model.HearingChannel;
+import uk.gov.hmcts.reform.prd.model.HearingChannelLov;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -97,6 +106,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
+    private final CommonReferenceDataApi commonReferenceDataApi;
+    private final AuthTokenGenerator authTokenGenerator;
+    @Value("${rd_common.api.service}")
+    private String hearingChannelServiceId;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -113,6 +127,25 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
+    private DynamicList getHearingMethodOptions(CallbackParams callbackParams) {
+        HearingChannelLov hearingChannels = commonReferenceDataApi.findHearingChannels(
+            callbackParams.getParams().get(BEARER_TOKEN).toString(),
+            authTokenGenerator.generate(),
+            hearingChannelServiceId
+        );
+//        hearingChannels.getValues().stream().map(channel ->
+//                                                     DynamicListElement.builder()
+//                                                         // TODO how can we save the key? .code(channel.getKey())
+//                                                         .label(channel.getValueEn())
+//                                                         .build());
+        List<String> labels = hearingChannels.getValues().stream()
+            // TODO once we use service AAA6 or AAA7, this filtering should not be needed
+            .filter(channel -> !"NA".equals(channel.getKey()) && !"ONPPRS".equals(channel.getKey()))
+            .map(HearingChannel::getValueEn)
+            .collect(Collectors.toList());
+        return DynamicList.fromList(labels);
+    }
+
     // This is currently a mid event but once pre states are defined it should be moved to an about to start event.
     // Once it has been moved to an about to start event the following file will need to be updated:
     //  FlowStateAllowedEventService.java.
@@ -125,6 +158,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
+//        if (featureToggleService.isHearingsAndListingsEnabled()) {
+            updatedData.hearingMethod(getHearingMethodOptions(callbackParams));
+//        }
         updatedData.disposalHearingMethodInPerson(fromList(fetchLocationData(callbackParams)));
         updatedData.fastTrackMethodInPerson(fromList(fetchLocationData(callbackParams)));
 

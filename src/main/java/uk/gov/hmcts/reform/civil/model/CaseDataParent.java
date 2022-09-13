@@ -174,6 +174,7 @@ public class CaseDataParent implements MappableObject {
     private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
     private final List<SmallTrack> smallClaims;
     private final SmallClaimsMethod smallClaimsMethod;
+    private final DynamicList hearingMethod;
     private final SmallClaimsMethodTelephoneHearing smallClaimsMethodTelephoneHearing;
     private final SmallClaimsMethodVideoConferenceHearing smallClaimsMethodVideoConferenceHearing;
     private final List<Element<SmallClaimsAddNewDirections>> smallClaimsAddNewDirections;
