@@ -58,13 +58,13 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.prd.client.CommonReferenceDataApi;
-import uk.gov.hmcts.reform.prd.model.HearingChannel;
 import uk.gov.hmcts.reform.prd.model.HearingChannelLov;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -133,17 +133,18 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             authTokenGenerator.generate(),
             hearingChannelServiceId
         );
-//        hearingChannels.getValues().stream().map(channel ->
-//                                                     DynamicListElement.builder()
-//                                                         // TODO how can we save the key? .code(channel.getKey())
-//                                                         .label(channel.getValueEn())
-//                                                         .build());
-        List<String> labels = hearingChannels.getValues().stream()
+        List<DynamicListElement> options = hearingChannels.getValues().stream()
             // TODO once we use service AAA6 or AAA7, this filtering should not be needed
             .filter(channel -> !"NA".equals(channel.getKey()) && !"ONPPRS".equals(channel.getKey()))
-            .map(HearingChannel::getValueEn)
+            .map(channel ->
+                     DynamicListElement.builder()
+                         .code(UUID.fromString(channel.getKey()))
+                         .label(channel.getValueEn())
+                         .build())
             .collect(Collectors.toList());
-        return DynamicList.fromList(labels);
+        return DynamicList.builder()
+            .listItems(options)
+            .build();
     }
 
     // This is currently a mid event but once pre states are defined it should be moved to an about to start event.
@@ -158,9 +159,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
-//        if (featureToggleService.isHearingsAndListingsEnabled()) {
+        if (featureToggleService.isHearingsAndListingsEnabled()) {
             updatedData.hearingMethod(getHearingMethodOptions(callbackParams));
-//        }
+        }
         updatedData.disposalHearingMethodInPerson(fromList(fetchLocationData(callbackParams)));
         updatedData.fastTrackMethodInPerson(fromList(fetchLocationData(callbackParams)));
 
@@ -210,13 +211,13 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         DisposalHearingDisclosureOfDocuments tempDisposalHearingDisclosureOfDocuments =
             DisposalHearingDisclosureOfDocuments.builder()
-            .input1("The parties shall serve on each other copies of the documents upon which reliance is to be"
-                       + " placed at the disposal hearing by 4pm on")
-            .date1(LocalDate.now().plusWeeks(4))
-            .input2("The parties must upload to the Digital Portal copies of those documents which they wish the"
-                       + "court to consider when deciding the amount of damages, by 4pm on")
-            .date2(LocalDate.now().plusWeeks(4))
-            .build();
+                .input1("The parties shall serve on each other copies of the documents upon which reliance is to be"
+                            + " placed at the disposal hearing by 4pm on")
+                .date1(LocalDate.now().plusWeeks(4))
+                .input2("The parties must upload to the Digital Portal copies of those documents which they wish the"
+                            + "court to consider when deciding the amount of damages, by 4pm on")
+                .date2(LocalDate.now().plusWeeks(4))
+                .build();
 
         updatedData.disposalHearingDisclosureOfDocuments(tempDisposalHearingDisclosureOfDocuments).build();
 
@@ -241,9 +242,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         DisposalHearingMedicalEvidence tempDisposalHearingMedicalEvidence = DisposalHearingMedicalEvidence.builder()
             .input("The claimant has permission to rely upon the written expert evidence already uploaded to the"
-                        + " Digital Portal with the particulars of claim and in addition has permission to rely upon"
-                        + " any associated correspondence or updating report which is uploaded to the Digital Portal"
-                        + " by 4pm on")
+                       + " Digital Portal with the particulars of claim and in addition has permission to rely upon"
+                       + " any associated correspondence or updating report which is uploaded to the Digital Portal"
+                       + " by 4pm on")
             .date(LocalDate.now().plusWeeks(4))
             .build();
 
@@ -380,8 +381,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         FastTrackNotes tempFastTrackNotes = FastTrackNotes.builder()
             .input("This Order has been made without a hearing. Each party has the right to apply to have this Order "
-                        + "set aside or varied. Any application must be received by the Court, "
-                        + "together with the appropriate fee by 4pm on")
+                       + "set aside or varied. Any application must be received by the Court, "
+                       + "together with the appropriate fee by 4pm on")
             .date(LocalDate.now().plusWeeks(1))
             .build();
 
@@ -509,8 +510,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (judgementSum != null) {
             SmallClaimsJudgementDeductionValue tempSmallClaimsJudgementDeductionValue =
                 SmallClaimsJudgementDeductionValue.builder()
-                .value(judgementSum.getJudgementSum().toString() + "%")
-                .build();
+                    .value(judgementSum.getJudgementSum().toString() + "%")
+                    .build();
 
             updatedData.smallClaimsJudgementDeductionValue(tempSmallClaimsJudgementDeductionValue).build();
         }
@@ -605,10 +606,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input7("and the claimant's evidence is reply if so advised to be uploaded by 4pm on")
             .date4(LocalDate.now().plusWeeks(10))
             .input8("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
-                + "paragraph above, each party may rely upon the written evidence by way of witness statement "
-                + "of one witness to provide evidence of basic hire rates available within the claimant's "
-                + "geographical location from a mainstream supplier, or a local reputable supplier if none is "
-                + "available.")
+                        + "paragraph above, each party may rely upon the written evidence by way of witness statement "
+                        + "of one witness to provide evidence of basic hire rates available within the claimant's "
+                        + "geographical location from a mainstream supplier, or a local reputable supplier if none is "
+                        + "available.")
             .input9("The defendant’s evidence is to be uploaded to the Digital Portal by 4pm on")
             .date5(LocalDate.now().plusWeeks(8))
             .input10(", and the claimant’s evidence in reply if so advised is to be uploaded by 4pm on")
@@ -666,10 +667,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
-
+        if (featureToggleService.isHearingsAndListingsEnabled()) {
+            cleanHearingMethodOptions(callbackParams, dataBuilder);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void cleanHearingMethodOptions(CallbackParams params, CaseData.CaseDataBuilder builder) {
+        builder.hearingMethod(DynamicList.builder()
+                                  .value(params.getCaseData().getHearingMethod().getValue())
+                                  .listItems(Collections.emptyList())
+                                  .build());
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {

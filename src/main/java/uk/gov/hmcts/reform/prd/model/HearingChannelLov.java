@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class HearingChannelLov {
+
     @JsonProperty("list_of_values")
     private List<HearingChannel> values;
 }

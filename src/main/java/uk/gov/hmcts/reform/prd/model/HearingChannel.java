@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.prd.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 
 @Data
 public class HearingChannel {
+
     @JsonProperty("category_key")
     private String categoryKey;
     private String key;
@@ -23,4 +23,5 @@ public class HearingChannel {
     private Integer parentKey;
     @JsonProperty("active_flag")
     private String activeFlag;
+
 }
