@@ -74,6 +74,10 @@ public class FeatureToggleService {
         return internalClient.boolVariation("hearing-and-listing-sdo", createLDUser().build(), false);
     }
 
+    public boolean isCourtLocationDynamicListEnabled() {
+        return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), false);
+    }
+
     public boolean isPinInPostEnabled() {
         return internalClient.boolVariation("pin-in-post", createLDUser().build(), false);
     }
