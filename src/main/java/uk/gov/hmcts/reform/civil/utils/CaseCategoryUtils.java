@@ -10,8 +10,8 @@ public class CaseCategoryUtils {
         //NO-OP
     }
 
-    public static boolean isSpecCaseCategory(CaseData caseData, boolean nocEnabled) {
-        if (nocEnabled) {
+    public static boolean isSpecCaseCategory(CaseData caseData, boolean isAccessProfilesEnabled) {
+        if (isAccessProfilesEnabled) {
             return CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
         } else {
             return SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType());

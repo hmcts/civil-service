@@ -68,7 +68,7 @@ public class RoboticsNotificationService {
             String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
             String triggerEvent;
 
-            if (isSpecCaseCategory(caseData, toggleService.isNoticeOfChangeEnabled())) {
+            if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
                 if (canSendEmailSpec()) {
                     RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
                     triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseData.getEvents());
@@ -85,7 +85,7 @@ public class RoboticsNotificationService {
                 .message(getMessage(caseData, isMultiParty))
                 .subject(getSubject(caseData, triggerEvent, isMultiParty))
                 .to(getRoboticsEmailRecipient(isMultiParty,
-                                              isSpecCaseCategory(caseData, toggleService.isNoticeOfChangeEnabled())))
+                                              isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())))
                 .attachments(of(json(roboticsJsonData, fileName)))
                 .build());
         } catch (JsonProcessingException e) {
@@ -104,7 +104,7 @@ public class RoboticsNotificationService {
 
     private String getSubject(CaseData caseData, String triggerEvent, boolean isMultiParty) {
         String subject = null;
-        if (isSpecCaseCategory(caseData, toggleService.isNoticeOfChangeEnabled())) {
+        if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
             subject = isMultiParty ? String.format("Multiparty LR v LR Case Data for %s - %s - %s",
                                                 caseData.getLegacyCaseReference(),
                                                 caseData.getCcdState(), triggerEvent

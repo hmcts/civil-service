@@ -127,7 +127,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
-            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaimV1)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -365,61 +364,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             handleCourtLocationData(caseData, dataBuilder, callbackParams);
         }
 
-        if (toggleService.isNoticeOfChangeEnabled()) {
-            // LiP are not represented or registered
-            if (areAnyRespondentsLitigantInPerson(caseData) == true)  {
-                dataBuilder.addLegalRepDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(time.now()));
-            }
-            populateBlankOrgPolicies(dataBuilder, caseData);
+        if (V_1.equals(callbackParams.getVersion())
+            && toggleService.isAccessProfilesEnabled()) {
+            dataBuilder.caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
         }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(dataBuilder.build().toMap(objectMapper))
-            .build();
-    }
-
-    private CallbackResponse submitClaimV1(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        List<String> validationErrors = validateCaseData(caseData);
-        if (validationErrors.size() > 0) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(validationErrors)
-                .build();
-        }
-
-        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
-        addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder);
-
-        if (caseData.getRespondent1OrgRegistered() == YES
-            && caseData.getRespondent1Represented() == YES
-            && caseData.getRespondent2SameLegalRepresentative() == YES) {
-            // Predicate: Def1 registered, Def 2 unregistered.
-            // This is required to ensure mutual exclusion in 1v2 same solicitor case.
-            dataBuilder.respondent2OrgRegistered(YES);
-        }
-
-        // moving statement of truth value to correct field, this was not possible in mid event.
-        // resetting statement of truth to make sure it's empty the next time it appears in the UI.
-        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-        dataBuilder
-            .uiStatementOfTruth(StatementOfTruth.builder().build())
-            .applicantSolicitor1ClaimStatementOfTruth(statementOfTruth)
-            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
-
-        // data for case list and unassigned list
-        dataBuilder
-            .allPartyNames(getAllPartyNames(caseData))
-            .unassignedCaseListDisplayOrganisationReferences(getAllOrganisationPolicyReferences(caseData))
-            .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData));
-
-        if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
-        }
-
-        dataBuilder.claimStarted(null);
-
-        dataBuilder.caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
 
         if (toggleService.isNoticeOfChangeEnabled()) {
             // LiP are not represented or registered

@@ -151,8 +151,8 @@ public class PartyUtils {
         .getRespondentSolicitor2Reference() != null;
 
     public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent,
-                                                                      boolean nocEnabled) {
-        if (isSpecCaseCategory(caseData, nocEnabled)) {
+                                                                      boolean isAccessProfilesEnabled) {
+        if (isSpecCaseCategory(caseData, isAccessProfilesEnabled)) {
             if (caseData.getRespondent1().equals(respondent)) {
                 return Optional.ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())
                     .map(RespondentResponseTypeSpec::translate).orElse(null);

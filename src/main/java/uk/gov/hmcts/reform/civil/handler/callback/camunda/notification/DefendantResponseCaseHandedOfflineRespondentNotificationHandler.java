@@ -88,7 +88,7 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
                 && !RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                 && !RespondentResponseTypeSpec.COUNTER_CLAIM
                 .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-                && isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+                && isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
                 templateID = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
             } else {
                 templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
@@ -104,7 +104,7 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
             }
         }
 
-        if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
             if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                 && (caseData.getRespondent2() == null || YES.equals(caseData.getRespondentResponseIsSame()))) {
                 sendNotificationToSolicitorSpecCounterClaim(caseData, recipient, caseEvent);

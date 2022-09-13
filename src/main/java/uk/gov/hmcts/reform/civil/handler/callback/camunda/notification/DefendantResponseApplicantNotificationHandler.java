@@ -115,7 +115,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
                 throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
         }
 
-        if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
             sendNotificationToSolicitorSpec(caseData, recipient, caseEvent);
         } else {
             sendNotificationToSolicitor(caseData, recipient);

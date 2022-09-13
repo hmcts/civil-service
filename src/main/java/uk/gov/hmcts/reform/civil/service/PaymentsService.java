@@ -41,7 +41,7 @@ public class PaymentsService {
             .orElse(caseData.getPaymentReference());
         CreditAccountPaymentRequest creditAccountPaymentRequest = null;
 
-        if (!isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled()))  {
+        if (!isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled()))  {
             creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
                 .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
                 .amount(claimFee.getCalculatedAmount())
@@ -54,7 +54,7 @@ public class PaymentsService {
                 .siteId(paymentsConfiguration.getSiteId())
                 .fees(new FeeDto[]{claimFee})
                 .build();
-        } else if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+        } else if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
             creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
                 .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
                 .amount(claimFee.getCalculatedAmount())

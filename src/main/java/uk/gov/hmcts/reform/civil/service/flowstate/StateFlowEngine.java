@@ -479,7 +479,7 @@ public class StateFlowEngine {
     }
 
     public StateFlow evaluate(CaseData caseData) {
-        if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())
+        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
             && featureToggleService.isLrSpecEnabled()) {
             return build(SPEC_DRAFT).evaluate(caseData);
         }

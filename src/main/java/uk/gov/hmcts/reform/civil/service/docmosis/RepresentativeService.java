@@ -40,7 +40,7 @@ public class RepresentativeService {
 
             Optional.ofNullable(caseData.getRespondentSolicitor1ServiceAddress())
                 .ifPresent(representativeBuilder::serviceAddress);
-            if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())
+            if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
                 && caseData.getSpecRespondentCorrespondenceAddressdetails() != null) {
                 representativeBuilder.serviceAddress(caseData.getSpecRespondentCorrespondenceAddressdetails());
             }
@@ -83,7 +83,7 @@ public class RepresentativeService {
         var representativeBuilder = representative.toBuilder();
         Optional.ofNullable(caseData.getApplicantSolicitor1ServiceAddress())
             .ifPresent(representativeBuilder::serviceAddress);
-        if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())
+        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
             && caseData.getSpecApplicantCorrespondenceAddressdetails() != null) {
             representativeBuilder.serviceAddress(caseData.getSpecApplicantCorrespondenceAddressdetails());
         }

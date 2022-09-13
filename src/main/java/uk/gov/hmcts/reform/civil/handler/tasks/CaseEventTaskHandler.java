@@ -186,7 +186,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                                                               caseData), " and "
                                         ));
                 case FULL_DEFENCE_PROCEED:
-                    return !isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())
+                    return !isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
                         ? getDescriptionFullDefenceProceed(caseData) : null;
                 default:
                     break;

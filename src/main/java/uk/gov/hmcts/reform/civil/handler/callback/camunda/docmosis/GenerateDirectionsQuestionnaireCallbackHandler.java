@@ -68,7 +68,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
             caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
-        if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
             caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
         }
     }
@@ -87,7 +87,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
-        if (!isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())
+        if (!isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
             || DirectionsQuestionnaireGenerator.isClaimantResponse(caseData)
             || scenario == MultiPartyScenario.ONE_V_ONE
             || scenario == MultiPartyScenario.TWO_V_ONE) {
@@ -194,7 +194,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
-        if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
             caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
         }
     }

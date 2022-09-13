@@ -353,7 +353,7 @@ public class EventHistoryMapper {
         String miscText;
 
         if (defendant1ResponseExists.test(caseData)) {
-            if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+            if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
                 RespondentResponseTypeSpec respondent1SpecResponseType =
                     MultiPartyScenario.TWO_V_ONE.equals(getMultiPartyScenario(caseData))
                         ? caseData.getClaimant1ClaimResponseTypeForSpec()
@@ -369,7 +369,7 @@ public class EventHistoryMapper {
             }
 
             boolean addMiscEvent;
-            if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+            if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
                 addMiscEvent = goingOffline && !RespondentResponseTypeSpec.FULL_DEFENCE
                     .equals(caseData.getRespondent1ClaimResponseTypeForSpec());
             } else {
@@ -390,7 +390,7 @@ public class EventHistoryMapper {
         }
 
         if (defendant2DivergentResponseExists.test(caseData)) {
-            if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+            if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
                 buildRespondentResponseEventForSpec(builder, caseData,
                                                     caseData.getRespondent2ClaimResponseTypeForSpec(),
                                                     respondent2ResponseDate, RESPONDENT2_ID
@@ -402,7 +402,7 @@ public class EventHistoryMapper {
             }
 
             boolean addMiscEvent;
-            if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+            if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
                 addMiscEvent = goingOffline && !RespondentResponseTypeSpec.FULL_DEFENCE
                     .equals(caseData.getRespondent2ClaimResponseTypeForSpec());
             } else {
@@ -628,7 +628,7 @@ public class EventHistoryMapper {
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
         String defaultText = "";
         if (scenario.equals(ONE_V_ONE) || scenario.equals(TWO_V_ONE)) {
-            if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+            if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
                 switch (scenario.equals(TWO_V_ONE)
                     ? YES.equals(caseData.getDefendantSingleResponseToBothClaimants())
                     ? caseData.getRespondent1ClaimResponseTypeForSpec()
@@ -670,7 +670,7 @@ public class EventHistoryMapper {
                 "RPA Reason: %sDefendant: %s has responded: %s",
                 paginatedMessage,
                 respondent.getPartyName(),
-                isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())
+                isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
                     ? getResponseTypeForRespondentSpec(caseData, respondent)
                     : getResponseTypeForRespondent(caseData, respondent, featureToggleService.isNoticeOfChangeEnabled())
             ));
@@ -679,7 +679,7 @@ public class EventHistoryMapper {
     }
 
     private void buildCaseNotesEvents(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
             if (featureToggleService.isSpecRpaContinuousFeedEnabled() && isNotEmpty(caseData.getCaseNotes())) {
                 buildMiscellaneousCaseNotesEvent(builder, caseData);
             }
@@ -709,7 +709,7 @@ public class EventHistoryMapper {
     }
 
     private void buildRespondent1LitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
             if (featureToggleService.isSpecRpaContinuousFeedEnabled()
                 && caseData.getRespondent1LitigationFriendCreatedDate() != null) {
                 buildMiscellaneousRespondent1LitigationFriendEvent(builder, caseData);
@@ -738,7 +738,7 @@ public class EventHistoryMapper {
     }
 
     private void buildRespondent2LitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
             if (featureToggleService.isSpecRpaContinuousFeedEnabled()
                 && caseData.getRespondent2LitigationFriendCreatedDate() != null) {
                 buildMiscellaneousRespondent2LitigationFriendEvent(builder, caseData);
@@ -783,7 +783,7 @@ public class EventHistoryMapper {
     }
 
     private boolean rpaEnabledForClaim(CaseData caseData) {
-        if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
             return featureToggleService.isSpecRpaContinuousFeedEnabled();
         } else {
             return featureToggleService.isRpaContinuousFeedEnabled();
@@ -973,7 +973,7 @@ public class EventHistoryMapper {
             .collect(Collectors.toList());
         builder.replyToDefence(replyDefenceForProceedingApplicants);
 
-        if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
             List<Event> dqForProceedingApplicantsSpec = IntStream.range(0, applicantDetails.size())
                 .mapToObj(index ->
                               Event.builder()
@@ -1050,7 +1050,7 @@ public class EventHistoryMapper {
                                           .litigiousPartyID(APPLICANT2_ID)
                                           .responseDate(
                                               isSpecCaseCategory(caseData,
-                                                                 featureToggleService.isNoticeOfChangeEnabled())
+                                                                 featureToggleService.isAccessProfilesEnabled())
                                                   ? caseData.getApplicant1ResponseDate()
                                                   : caseData.getApplicant2ResponseDate())
                                           .build());
@@ -1093,7 +1093,7 @@ public class EventHistoryMapper {
             case TWO_V_ONE: {
                 YesOrNo app1Proceeds;
                 YesOrNo app2Proceeds;
-                if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+                if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
                     app1Proceeds = caseData.getApplicant1ProceedWithClaimSpec2v1();
                     app2Proceeds = app1Proceeds;
                 } else {
@@ -1511,7 +1511,7 @@ public class EventHistoryMapper {
                 break;
             }
             default: {
-                if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+                if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
                     buildAcknowledgementOfServiceSpec(builder, caseData.getRespondent1AcknowledgeNotificationDate());
                     return;
                 }
@@ -1524,7 +1524,7 @@ public class EventHistoryMapper {
                 builder
                     .acknowledgementOfServiceReceived(
                         List.of(
-                            isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())
+                            isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
                                 ?
                                 Event.builder()
                                     .eventSequence(prepareEventSequence(builder.build()))
@@ -1794,7 +1794,7 @@ public class EventHistoryMapper {
     }
 
     private void buildInformAgreedExtensionDateForSpec(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())
+        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
             && (caseData.getRespondentSolicitor1AgreedDeadlineExtension() != null
             || caseData.getRespondentSolicitor2AgreedDeadlineExtension() != null)) {
             buildConsentExtensionFilingDefence(builder, caseData);

@@ -93,7 +93,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             );
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
-        if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
             template = isCcNotification(callbackParams)
                 ? notificationsProperties.getClaimantSolicitorConfirmsToProceedSpec()
                 : notificationsProperties.getRespondentSolicitorNotifyToProceedSpec();
@@ -106,7 +106,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
         notificationService.sendMail(
             recipient,
             template,
-            isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())
+            isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
                 ? addPropertiesSpec(caseData, caseEvent)
                 : addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())

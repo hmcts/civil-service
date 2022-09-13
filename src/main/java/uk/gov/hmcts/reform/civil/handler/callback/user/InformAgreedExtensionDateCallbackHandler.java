@@ -124,7 +124,8 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             currentResponseDeadline = caseData.getRespondent2ResponseDeadline();
         }
         //TODO: update to get correct deadline as a part of CMC-1346
-        if (isSpecCaseCategory(caseData, toggleService.isNoticeOfChangeEnabled()) && toggleService.isLrSpecEnabled()) {
+        if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())
+            && toggleService.isLrSpecEnabled()) {
             var isAoSApplied = SPEC_ACKNOWLEDGEMENT_OF_SERVICE.equals(caseData.getBusinessProcess().getCamundaEvent());
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline, isAoSApplied))
@@ -181,7 +182,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         String body;
         LocalDateTime responseDeadline = !solicitorRepresentsOnlyRespondent2(callbackParams)
             ? caseData.getRespondent1ResponseDeadline() : caseData.getRespondent2ResponseDeadline();
-        if (isSpecCaseCategory(caseData, toggleService.isNoticeOfChangeEnabled()) && toggleService.isLrSpecEnabled()) {
+        if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled()) && toggleService.isLrSpecEnabled()) {
             body = format(
                 "<h2 class=\"govuk-heading-m\">What happens next</h2>You need to respond before %s",
                 formatLocalDateTime(responseDeadline, DATE_TIME_AT)

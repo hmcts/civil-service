@@ -734,7 +734,7 @@ public class FlowStateAllowedEventService {
     public boolean isAllowed(CaseDetails caseDetails, CaseEvent caseEvent) {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
 
-        if (isSpecCaseCategory(caseData, toggleService.isNoticeOfChangeEnabled())
+        if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())
             || CREATE_CLAIM_SPEC.equals(caseEvent)) {
             if (toggleService.isLrSpecEnabled()) {
                 StateFlow stateFlow = stateFlowEngine.evaluateSpec(caseDetails);

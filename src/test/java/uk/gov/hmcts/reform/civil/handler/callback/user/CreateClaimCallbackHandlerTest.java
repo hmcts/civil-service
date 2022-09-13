@@ -831,6 +831,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         //Move this test to AboutToSubmitCallbackV0 after CIV-3521 release and migration
         @Test
         void shouldSetCaseCategoryToUnspec_whenInvoked() {
+            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())

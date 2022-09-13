@@ -42,7 +42,7 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
         try {
 
-            if (isSpecCaseCategory(caseData, toggleService.isNoticeOfChangeEnabled())) {
+            if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
                 if (toggleService.isLrSpecEnabled()) {
                     roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
                     errors = jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString());

@@ -117,7 +117,7 @@ public class InitiateGeneralApplicationService {
         if (YES.equals(caseData.getAddRespondent2())) {
             applicationBuilder.defendant2PartyName(caseData.getRespondent2().getPartyName());
         }
-        if (isSpecCaseCategory(caseData, featureToggleService.isNoticeOfChangeEnabled())) {
+        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
             caseType = "SPEC_CLAIM";
         } else {
             caseType = "UNSPEC_CLAIM";
