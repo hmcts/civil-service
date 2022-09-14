@@ -51,7 +51,6 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
                 bundleFilename,
                 caseData
             );
-        log.info("---------------------------------------------------------------------");
         log.info("calling stitching api end point for ", caseData.getLegacyCaseReference());
         CaseData caseData1 =
             bundleRequestExecutor.post(
