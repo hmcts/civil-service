@@ -512,12 +512,14 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             fetchLocationData(callbackParams), courtLocations);
         if (Objects.nonNull(courtLocation)) {
             CourtLocation.CourtLocationBuilder courtLocationBuilder = caseData.getCourtLocation().toBuilder();
+            CaseLocation caseLocation = CaseLocation.builder()
+                .region(courtLocation.getRegionId())
+                .baseLocation(courtLocation.getEpimmsId()).build();
             dataBuilder
+                .caseManagementLocation(caseLocation)
                 .courtLocation(courtLocationBuilder
                                    .applicantPreferredCourt(courtLocation.getCourtLocationCode())
-                                   .caseLocation(CaseLocation.builder()
-                                                     .region(courtLocation.getRegionId())
-                                                     .baseLocation(courtLocation.getEpimmsId()).build())
+                                   .caseLocation(caseLocation)
                                    //to clear list of court locations from caseData
                                    .applicantPreferredCourtLocationList(null)
                                    .build());
