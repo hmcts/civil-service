@@ -67,7 +67,6 @@ public class CoreCaseDataService {
             true,
             caseDataContent
         );
-        System.out.println("-------------------");
         return caseDetailsConverter.toCaseData(caseDetails);
     }
 
