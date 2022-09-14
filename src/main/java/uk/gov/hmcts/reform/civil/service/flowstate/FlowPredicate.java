@@ -446,9 +446,9 @@ public class FlowPredicate {
             && caseData.getRespondent1ResponseDate() == null;
 
     public static final Predicate<CaseData> takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension = caseData ->
-        getPredicateTakenOfflineByStaffAfterNotificationAcknowledgedTimeExtension(caseData);
+        getPredicateTakenOfflineByStaffAfterNotificationAckTimeExt(caseData);
 
-    public static final boolean getPredicateTakenOfflineByStaffAfterNotificationAcknowledgedTimeExtension(CaseData caseData) {
+    public static final boolean getPredicateTakenOfflineByStaffAfterNotificationAckTimeExt(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
             case ONE_V_TWO_ONE_LEGAL_REP:
@@ -466,7 +466,6 @@ public class FlowPredicate {
                     && caseData.getRespondent1ResponseDate() == null);
         }
     }
-
 
     public static final Predicate<CaseData> takenOfflineByStaffAfterNotificationAcknowledged = caseData ->
         caseData.getTakenOfflineByStaffDate() != null
