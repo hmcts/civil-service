@@ -13,10 +13,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.ClaimFormService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService;
+
+import javax.validation.constraints.NotNull;
 
 @Api
 @Slf4j
@@ -30,6 +35,7 @@ public class CaseAssignmentController {
 
     private final CaseLegacyReferenceSearchService caseByLegacyReferenceSearchService;
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
+    private final ClaimFormService claimFormService;
 
     @PostMapping(path = {
         "/reference/{caseReference}"
@@ -46,4 +52,12 @@ public class CaseAssignmentController {
         defendantPinToPostLRspecService.validatePin(caseDetails, pin);
         return new ResponseEntity<>(caseDetails, HttpStatus.OK);
     }
+
+    @ApiOperation("Download document")
+    @PostMapping(path = "/downloadSealedDoc", produces = MediaType.APPLICATION_PDF_VALUE)
+    public @ResponseBody
+    byte[] downloadSealedDocument(@NotNull @RequestBody CaseDocument caseDocument){
+        return claimFormService.downloadSealedDocument(caseDocument);
+    }
+
 }
