@@ -481,6 +481,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private HearingNoticeList hearingNoticeList;
     private String hearingDueDate;
     private String hearingFee;
+    private LocalDate hearingDate;
+    private String hearingTimeHourMinute;
     private String hearingReferenceNumber;
     private String partyApplicantPayment;
 

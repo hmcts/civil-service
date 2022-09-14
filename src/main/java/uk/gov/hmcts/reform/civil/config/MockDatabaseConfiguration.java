@@ -22,6 +22,6 @@ public class MockDatabaseConfiguration {
 
     @Bean
     public ReferenceNumberRepository hearingReferenceNumberRepository() {
-        return () -> "AAAA0000";
+        return () -> "000HN001";
     }
 }
