@@ -17,9 +17,8 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
@@ -32,7 +31,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -51,12 +50,8 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     private HearingScheduledHandler handler;
     @MockBean
     private LocationRefDataService locationRefDataService;
-
-//        .put(callbackKey(MID, "locationName"), this::locationList) DONE
-//        .put(callbackKey(MID, "checkPastDate"), this::checkPastDate) & not left blank
-//        .put(callbackKey(MID, "checkFutureDate"), this::checkFutureDate) & not left blank
-//        .put(callbackKey(SUBMITTED), this::buildConfirmation)
-// Check that when "What hearing notice do you want to create? and "Other" is selected, the textField is not empty
+    @MockBean
+    private HearingReferenceNumberRepository hearingReferenceNumberRepository;
 
     @Nested
     class MidEventCheckLocationListCallback {
@@ -82,12 +77,11 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenDateFromDateGreaterThanPresentDateProvided() {
-            HearingDates hearingDates = HearingDates.builder().hearingUnavailableFrom(
-                LocalDate.now().plusMonths(2)).hearingUnavailableUntil(
-                LocalDate.now().plusMonths(1)).build();
+            HearingDates hearingDates = HearingDates.builder()
+                .hearingUnavailableFrom(LocalDate.now().plusMonths(2))
+                .hearingUnavailableUntil(LocalDate.now().plusMonths(1)).build();
             HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
-                .hearingDates(
-                    wrapElements(hearingDates)).build();
+                .hearingDates(wrapElements(hearingDates)).build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -96,10 +90,33 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2SameLegalRepresentative(YES)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
+                .dateOfApplication(LocalDate.now().plusDays(1))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().get(0)).isEqualTo("Unavailable From Date should be less than To Date");
+            assertThat(response.getErrors().get(0)).isEqualTo("The Date must be in the past");
+        }
+
+        @Test
+        void shouldReturnOk_whenDateFromDateNotGreaterThanPresentDateProvided() {
+            HearingDates hearingDates = HearingDates.builder()
+                .hearingUnavailableFrom(LocalDate.now().plusMonths(2))
+                .hearingUnavailableUntil(LocalDate.now().plusMonths(1)).build();
+            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
+                .hearingDates(wrapElements(hearingDates)).build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
+                .respondent2SameLegalRepresentative(YES)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
+                .dateOfApplication(LocalDate.now().minusDays(1))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
         }
 
     }
@@ -108,8 +125,25 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     class MidEventCheckFutureDateCallback {
 
         private static final String PAGE_ID = "checkFutureDate";
+
         @Test
         void shouldReturnError_whenDateFromDateEarlierThanPresentDateProvided() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                .build().toBuilder().hearingTimeHourMinute("123456").hearingDate(LocalDate.now()).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0)).isEqualTo("The Date & Time must be 24hs in advance from now");
+        }
+
+        @Test
+        void shouldNotReturnError_whenAFutureDateIsProvided() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                .build().toBuilder().hearingTimeHourMinute("123456").hearingDate(LocalDate.now().plusDays(3)).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
         }
     }
 
