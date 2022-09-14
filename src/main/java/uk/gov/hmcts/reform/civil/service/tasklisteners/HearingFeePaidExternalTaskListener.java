@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.handler.tasks.HearingFeePaidHandler;
 @Component
 public class HearingFeePaidExternalTaskListener {
 
-    private static final String TOPIC = "Hearing_Readiness_Check";
+    private static final String TOPIC = "HEARING_READINESS_CHECK";
 
     @Autowired
     private HearingFeePaidExternalTaskListener(HearingFeePaidHandler handler, ExternalTaskClient client) {

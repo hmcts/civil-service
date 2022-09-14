@@ -11,7 +11,8 @@ import java.util.List;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
+//import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 
 @Service
 public class CaseHearingFeePaidSearchService extends ElasticSearchService {
@@ -22,11 +23,7 @@ public class CaseHearingFeePaidSearchService extends ElasticSearchService {
 
     public Query query(int startIndex) {
         return new Query(
-            boolQuery()
-                .minimumShouldMatch(1)
-                .should(boolQuery()
-                            .must(rangeQuery("data.hearingFeePaidDeadline").lt("now.AddDays(-1)"))
-                            .must(beState(HEARING_READINESS))),
+            boolQuery(),
             List.of("reference"),
             startIndex
         );

@@ -27,13 +27,7 @@ public class HearingFeePaidHandler implements BaseExternalTaskHandler {
 
         cases.forEach(caseDetails -> {
             try {
-                if (caseDetails.getHearingFeePaymentDetails().getStatus() == PaymentStatus.SUCCESS) {
-                    log.info("Current case status '{}'", caseDetails.getState());
-                    applicationEventPublisher.publishEvent(new TakeCaseOfflineEvent(caseDetails.getId()));
-                } else if (caseDetails.getHearingFeePaymentDetails().getStatus() == PaymentStatus.FAILED) {
-                    log.info("Current case status '{}'", caseDetails.getState());
-                    applicationEventPublisher.publishEvent(new TakeCaseOfflineEvent(caseDetails.getId()));
-                }
+
             } catch (Exception e) {
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }
