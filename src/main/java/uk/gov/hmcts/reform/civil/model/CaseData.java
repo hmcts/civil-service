@@ -113,6 +113,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final GAHearingDetails generalAppHearingDetails;
     private final GASolicitorDetailsGAspec generalAppApplnSolicitor;
 
+    private final HearingFeeServiceRequestDetails hearingFeeServiceRequestDetails;
+
     @Builder.Default
     private final List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors = new ArrayList<>();
 
