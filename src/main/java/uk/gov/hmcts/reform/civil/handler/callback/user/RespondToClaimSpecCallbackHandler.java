@@ -77,7 +77,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONESPEC;
@@ -1106,7 +1105,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .respondent2DetailsForClaimDetailsTab(r2)
             );
 
-        if (V_2.equals(callbackParams.getVersion())) {
+        if (toggleService.isCourtLocationDynamicListEnabled()) {
             DynamicList courtLocationList = courtLocationUtils.getLocationsFromList(fetchLocationData(callbackParams));
             if (initialShowTags.contains(CAN_ANSWER_RESPONDENT_1)) {
                 updatedCaseData.respondent1DQ(Respondent1DQ.builder()
@@ -1339,7 +1338,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Respondent2DQ.Respondent2DQBuilder dq = caseData.getRespondent2DQ().toBuilder()
                 .respondent2DQStatementOfTruth(statementOfTruth);
-            if (V_2.equals(callbackParams.getVersion())) {
+            if (toggleService.isCourtLocationDynamicListEnabled()) {
                 handleCourtLocationForRespondent2DQ(caseData, updatedData, dq, callbackParams);
             }
             updatedData.respondent2DQ(dq.build());
@@ -1376,7 +1375,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                             .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
                                             .details(caseData.getRespondent1DQWitnessesDetailsSpec())
                                             .build());
-            if (V_2.equals(callbackParams.getVersion())) {
+            if (toggleService.isCourtLocationDynamicListEnabled()) {
                 handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
             }
             updatedData.respondent1DQ(dq.build());

@@ -535,7 +535,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .listItems(locationValues.getListItems())
                 .value(locationValues.getListItems().get(0))
                 .build();
-
+            when(toggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
             Party defendant1 = Party.builder()
                 .type(Party.Type.COMPANY)
                 .companyName("company")
@@ -1164,12 +1164,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void populate() {
             CaseData caseData = CaseData.builder().build();
-            CallbackParams params = callbackParamsOf(CallbackVersion.V_2, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             List<LocationRefData> locations = List.of(LocationRefData.builder()
                                                           .build());
             when(locationRefDataService.getCourtLocationsAsLocationRefData(any()))
                 .thenReturn(locations);
+            when(toggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
             DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
             when(courtLocationUtils.getLocationsFromList(locations))
                 .thenReturn(locationValues);
