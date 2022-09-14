@@ -10,9 +10,6 @@ import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
-import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
-//import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 
 @Service
 public class CaseHearingFeePaidSearchService extends ElasticSearchService {
