@@ -6,9 +6,7 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.event.TakeCaseOfflineEvent;
 import uk.gov.hmcts.reform.civil.service.search.CaseHearingFeePaidSearchService;
-import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 
 import java.util.List;
 
@@ -24,13 +22,6 @@ public class HearingFeePaidHandler implements BaseExternalTaskHandler {
     public void handleTask(ExternalTask externalTask) {
         List<CaseDetails> cases = caseSearchService.getCases();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
-
-        cases.forEach(caseDetails -> {
-            try {
-
-            } catch (Exception e) {
-                log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
-            }
-        });
+        
     }
 }
