@@ -72,8 +72,6 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormHearing(CaseData caseData) {
         return DefaultJudgmentSDOOrderForm.builder()
-            .courtLocation(getCourt(caseData))
-            .telephoneOrganisedBy(getDisposalHearingMethodTelephoneHearingLabel(caseData))
             .judgeNameTitle(caseData.getDisposalHearingJudgesRecitalDJ().getJudgeNameTitle())
             .caseNumber(caseData.getLegacyCaseReference())
             .disposalHearingBundleDJ(caseData.getDisposalHearingBundleDJ())
@@ -88,6 +86,9 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .disposalHearingFinalDisposalHearingDJ(caseData.getDisposalHearingFinalDisposalHearingDJ())
             .disposalHearingFinalDisposalHearingDJAddSection(nonNull(
                 caseData.getDisposalHearingFinalDisposalHearingDJ()))
+            .courtLocation(getCourt(caseData))
+            .telephoneOrganisedBy(getDisposalHearingMethodTelephoneHearingLabel(caseData))
+            .videoConferenceOrganisedBy(getDisposalHearingMethodVideoConferenceLabel(caseData))
             .disposalHearingTime(nonNull(caseData.getDisposalHearingFinalDisposalHearingDJ())
                                      ? fillDisposalHearingTime(
                                          caseData.getDisposalHearingFinalDisposalHearingDJ().getTime()) : null)
@@ -176,9 +177,11 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     private String fillTypeBundleInfo(DisposalHearingBundleType type) {
         switch (type) {
             case DOCUMENTS :
-                return "an indexed bundle of documents, with each page clearly numbered";
+                return "an indexed bundle of documents, with each page clearly numbered.";
             case ELECTRONIC:
-                return "an electronic bundle of digital documents ";
+                return "an electronic bundle of digital documents.";
+            case SUMMARY:
+                return "a case summary containing no more than 500 words.";
             default:
                 return null;
         }
@@ -219,6 +222,17 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
         if (disposalHearingMethodTelephoneHearingDJ != null) {
             return disposalHearingMethodTelephoneHearingDJ.getLabel();
+        }
+
+        return null;
+    }
+
+    public static String getDisposalHearingMethodVideoConferenceLabel(CaseData caseData) {
+        DisposalHearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceDJ =
+            caseData.getDisposalHearingMethodVideoConferenceHearingDJ();
+
+        if (disposalHearingMethodVideoConferenceDJ != null) {
+            return disposalHearingMethodVideoConferenceDJ.getLabel();
         }
 
         return null;

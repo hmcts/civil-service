@@ -68,6 +68,7 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private final String disposalHearingAttendance;
     private final String courtLocation;
     private final String telephoneOrganisedBy;
+    private final String videoConferenceOrganisedBy;
 
     //additional data for trial
     private final boolean trialHearingDisputeAddSection;

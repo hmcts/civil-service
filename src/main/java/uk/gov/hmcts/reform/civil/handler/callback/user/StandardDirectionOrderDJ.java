@@ -545,7 +545,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.disposalHearingBundleDJToggle(checkList);
         caseDataBuilder.disposalHearingClaimSettlingDJToggle(checkList);
         caseDataBuilder.disposalHearingCostsDJToggle(checkList);
-        caseDataBuilder.disposalHearingApplicationsDJToggle(checkList);
         return caseDataBuilder.build();
     }
 
