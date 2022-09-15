@@ -63,7 +63,7 @@ public class DeadlinesCalculator {
     public LocalDate plusWorkingDays(LocalDate date, int workingDays) {
         LocalDate current = date;
         for (int i = 0; i < workingDays; i++) {
-            current = workingDayIndicator.getNextWorkingDay(current);
+            current = workingDayIndicator.getNextWorkingDay(current.plusDays(1));
         }
         return current;
     }

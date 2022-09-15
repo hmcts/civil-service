@@ -39,6 +39,13 @@ public class WorkingDayIndicator {
         return nonWorkingDaysCollection.contains(date);
     }
 
+    /**
+     * Calculates the date of the next working day if the parameter is not.
+     *
+     * @param date start date
+     * @return date if it is a working day. Otherwise, the first date after
+     *     the parameter that is a working day
+     */
     public LocalDate getNextWorkingDay(LocalDate date) {
         requireNonNull(date);
 
