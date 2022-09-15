@@ -11,29 +11,27 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.HearingDates;
-import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -61,12 +59,14 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnLocationList_whenLocationsAreQueried() {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().courtName("Court Name").region("Region").build());
+            locations.add(LocationRefData.builder().siteName("Site Name").courtAddress("Address").postcode("28000")
+                              .build());
             when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData().get("hearingLocation")).isNotNull();
+            assertThat(((Map)((ArrayList)((Map)(response.getData().get("hearingLocation"))).get("list_items")).get(0))
+                           .get("label")).isEqualTo("Site Name - Address - 28000");
         }
     }
 
@@ -76,21 +76,9 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         private static final String PAGE_ID = "checkPastDate";
 
         @Test
-        void shouldReturnError_whenDateFromDateGreaterThanPresentDateProvided() {
-            HearingDates hearingDates = HearingDates.builder()
-                .hearingUnavailableFrom(LocalDate.now().plusMonths(2))
-                .hearingUnavailableUntil(LocalDate.now().plusMonths(1)).build();
-            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
-                .hearingDates(wrapElements(hearingDates)).build();
-
+        void shouldReturnError_whenDateFromDateEqualToPresentDateProvided() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
-                .dateOfApplication(LocalDate.now().plusDays(1))
+                .dateOfApplication(LocalDate.now())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -99,19 +87,7 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnOk_whenDateFromDateNotGreaterThanPresentDateProvided() {
-            HearingDates hearingDates = HearingDates.builder()
-                .hearingUnavailableFrom(LocalDate.now().plusMonths(2))
-                .hearingUnavailableUntil(LocalDate.now().plusMonths(1)).build();
-            HearingSupportRequirementsDJ hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
-                .hearingDates(wrapElements(hearingDates)).build();
-
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
-                .respondent2SameLegalRepresentative(YES)
-                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
                 .dateOfApplication(LocalDate.now().minusDays(1))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -127,9 +103,15 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         private static final String PAGE_ID = "checkFutureDate";
 
         @Test
-        void shouldReturnError_whenDateFromDateEarlierThanPresentDateProvided() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                .build().toBuilder().hearingTimeHourMinute("123456").hearingDate(LocalDate.now()).build();
+        void shouldReturnError_whenDateFromDateNotTwentyFourHoursAfterPresentDateProvided() {
+            LocalDateTime localDateTime = LocalDateTime.now();
+            String hours = "0" + (localDateTime.getHour());
+            String minutes = "0" + localDateTime.getMinute();
+            hours = hours.substring(hours.length() - 2);
+            minutes = minutes.substring(minutes.length() - 2);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .hearingDate(LocalDate.from(localDateTime)).hearingTimeHourMinute(hours + minutes).build();
+
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -137,9 +119,14 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotReturnError_whenAFutureDateIsProvided() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                .build().toBuilder().hearingTimeHourMinute("123456").hearingDate(LocalDate.now().plusDays(3)).build();
+        void shouldNotReturnError_whenDateFromDateIsTwentyFourHoursAfterOfPresentDateProvided() {
+            LocalDateTime localDateTime = LocalDateTime.now().plusHours(24).plusMinutes(1);
+            String hours = "0" + (localDateTime.getHour());
+            String minutes = "0" + String.valueOf(localDateTime.getMinute());
+            hours = hours.substring(hours.length() - 2);
+            minutes = minutes.substring(minutes.length() - 2);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .hearingDate(LocalDate.from(localDateTime)).hearingTimeHourMinute(hours + minutes).build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -151,8 +138,24 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     class SubmittedCallback {
 
         @Test
-        void shouldReturnHearingNoticeCreated() {
+        void shouldReturnHearingNoticeCreated_WhenSubmitted() {
+            when(hearingReferenceNumberRepository.getHearingReferenceNumber()).thenReturn("000HN001");
 
+            String header = "# Hearing notice created\n"
+                + "# Your reference number\n" + "# 000HN001";
+
+            String body = "%n%n You may need to complete other tasks for the hearing"
+                + ", for example, book an interpreter.";
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
+                                                                          .confirmationHeader(header)
+                                                                          .confirmationBody(String.format(body))
+                                                                          .build());
         }
     }
 }
