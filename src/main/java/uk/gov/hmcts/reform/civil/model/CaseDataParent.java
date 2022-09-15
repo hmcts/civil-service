@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
@@ -201,6 +203,10 @@ public class CaseDataParent implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> smallClaimsMethodToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsDocumentsToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsWitnessStatementToggle;
+
+    @JsonProperty("sdoHearingNotes")
+    // alias so that it can be deserialized from the fast track field too
+    @JsonAlias("fastTrackSdoHearingNotes")
     private final SDOHearingNotes sdoHearingNotes;
 
     // sdo ui flags
@@ -277,4 +283,9 @@ public class CaseDataParent implements MappableObject {
     private final DefendantPinToPostLRspec respondent1PinToPostLRspec;
 
     private final ScheduledHearing nextHearingDetails;
+
+    // getter so we can deserialize to the fast track field too
+    public SDOHearingNotes getFastTrackSdoHearingNotes() {
+        return sdoHearingNotes;
+    }
 }
