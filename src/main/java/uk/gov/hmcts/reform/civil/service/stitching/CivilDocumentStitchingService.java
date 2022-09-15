@@ -51,18 +51,18 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
                 bundleFilename,
                 caseData
             );
-        log.info("calling stitching api end point for ", caseData.getLegacyCaseReference());
+        log.info("calling stitching api end point for {}", caseData.getLegacyCaseReference());
         CaseData caseData1 =
             bundleRequestExecutor.post(
                 BundleRequest.builder().caseDetails(payload).build(),
                 stitchingConfiguration.getStitchingUrl(),
                 authorisation
             );
-        log.info("called stitching api end point for ", caseData.getLegacyCaseReference());
+        log.info("called stitching api end point for {}", caseData.getLegacyCaseReference());
         if (caseData1 != null) {
             Optional<Document> stitchedDocument = caseData1.getCaseBundles().get(0).getValue().getStitchedDocument();
 
-            log.info("stitchedDocument.isPresent()----->",  stitchedDocument.isPresent() + " for ",
+            log.info("stitchedDocument.isPresent()-----> {}, legacy case reference {}",  stitchedDocument.isPresent() ,
                          caseData.getLegacyCaseReference());
             if (stitchedDocument.isPresent()) {
                 Document document = stitchedDocument.get();
