@@ -2,11 +2,14 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.enums.dj.*;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodTelephoneHearing;
+import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
+import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
+import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingAddNewDirectionsDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
@@ -20,7 +23,6 @@ import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementSe
 import java.io.IOException;
 import java.util.List;
 
-import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional.OrderTypeTrialAdditionalDirectionsEmployersLiability;
 import static uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle.SHOW;
@@ -36,7 +38,6 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     private final DocumentGeneratorService documentGeneratorService;
     private static final String BOTH_DEFENDANTS = "Both Defendants";
     public static final String DISPOSAL_HEARING = "DISPOSAL_HEARING";
-    private DisposalHearingAddNewDirectionsDJ disposalHearingAddNewDirectionsDJ;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         DefaultJudgmentSDOOrderForm templateData = getDefaultJudgmentForms(caseData);
@@ -87,8 +88,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .disposalHearingFinalDisposalHearingDJAddSection(nonNull(
                 caseData.getDisposalHearingFinalDisposalHearingDJ()))
             .courtLocation(getCourt(caseData))
-            .telephoneOrganisedBy(getDisposalHearingMethodTelephoneHearingLabel(caseData))
-            .videoConferenceOrganisedBy(getDisposalHearingMethodVideoConferenceLabel(caseData))
+            .telephoneOrganisedBy(getHearingMethodTelephoneHearingLabel(caseData))
+            .videoConferenceOrganisedBy(getHearingMethodVideoConferenceLabel(caseData))
             .disposalHearingTime(nonNull(caseData.getDisposalHearingFinalDisposalHearingDJ())
                                      ? fillDisposalHearingTime(
                                          caseData.getDisposalHearingFinalDisposalHearingDJ().getTime()) : null)
@@ -104,7 +105,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .disposalHearingSchedulesOfLossDJAddSection(nonNull(caseData.getDisposalHearingSchedulesOfLossDJ()))
             .disposalHearingClaimSettlingAddSection(getToggleValue(caseData.getDisposalHearingClaimSettlingDJToggle()))
             .disposalHearingCostsAddSection(getToggleValue(caseData.getDisposalHearingCostsDJToggle()))
-            .disposalHearingMethodDJ(caseData.getDisposalHearingMethodDJ())
+            .trialHearingMethodDJ(caseData.getDisposalHearingMethodDJ())
             .disposalHearingAttendance(fillDisposalHearingMethod(caseData.getDisposalHearingMethodDJ()))
             .applicant(caseData.getApplicant1().getPartyName().toUpperCase())
             .respondent(checkDefendantRequested(caseData).toUpperCase()).build();
@@ -126,8 +127,9 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
                                 ? fillTypeBundleInfo(caseData.getTrialHearingTrialDJ().getType()) : null)
             .trialHearingTrialDJAddSection(
                 getToggleValue(caseData.getTrialHearingTrialDJToggle()))
-            .trialDays(getTrialDays(caseData.getTrialHearingTrialDJ()))
             .trialHearingNotesDJ(caseData.getTrialHearingNotesDJ())
+            .hasNewDirections(addAdditionalDirection(caseData))
+            .trialHearingAddNewDirectionsDJ(caseData.getTrialHearingAddNewDirectionsDJ())
             .trialHearingDisclosureOfDocumentsDJ(caseData.getTrialHearingDisclosureOfDocumentsDJ())
             .trialHearingDisclosureOfDocumentsDJAddSection(
                 getToggleValue(caseData.getTrialHearingDisclosureOfDocumentsDJToggle()))
@@ -146,7 +148,9 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialHearingSettlementAddSection(getToggleValue(caseData.getTrialHearingSettlementDJToggle()))
             .trialHearingCostsAddSection(getToggleValue(caseData.getTrialHearingCostsToggle()))
             .trialEmployerLiabilityAddSection(getLiabilityValue(caseData.getCaseManagementOrderAdditional()))
-            .trialHearingMethod(fillDisposalHearingMethod(caseData.getTrialHearingMethodDJ()))
+            .trialHearingMethodDJ(caseData.getTrialHearingMethodDJ())
+            .telephoneOrganisedBy(getHearingMethodTelephoneHearingLabel(caseData))
+            .videoConferenceOrganisedBy(getHearingMethodVideoConferenceLabel(caseData))
             .trialHousingDisrepair(caseData.getTrialHousingDisrepair())
             .trialHousingDisrepairAddSection(nonNull(caseData.getTrialHousingDisrepair()))
             .trialHearingMethodInPersonAddSection(checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ()))
@@ -206,7 +210,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     private boolean addAdditionalDirection(CaseData caseData) {
-        if (caseData.getDisposalHearingAddNewDirectionsDJ() != null) {
+        if (caseData.getDisposalHearingAddNewDirectionsDJ() != null
+            || caseData.getTrialHearingAddNewDirectionsDJ() != null) {
             return true;
         }
         return false;
@@ -219,23 +224,34 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         return null;
     }
 
-    public static String getDisposalHearingMethodTelephoneHearingLabel(CaseData caseData) {
-        DisposalHearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ =
+    public static String getHearingMethodTelephoneHearingLabel(CaseData caseData) {
+        HearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ =
             caseData.getDisposalHearingMethodTelephoneHearingDJ();
+        HearingMethodTelephoneHearingDJ trialHearingMethodTelephoneHearingDJ =
+            caseData.getTrialHearingMethodTelephoneHearingDJ();
 
         if (disposalHearingMethodTelephoneHearingDJ != null) {
             return disposalHearingMethodTelephoneHearingDJ.getLabel();
+        }
+        if (trialHearingMethodTelephoneHearingDJ != null) {
+            return trialHearingMethodTelephoneHearingDJ.getLabel();
         }
 
         return null;
     }
 
-    public static String getDisposalHearingMethodVideoConferenceLabel(CaseData caseData) {
-        DisposalHearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceDJ =
+    public static String getHearingMethodVideoConferenceLabel(CaseData caseData) {
+        HearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceDJ =
             caseData.getDisposalHearingMethodVideoConferenceHearingDJ();
+
+        HearingMethodVideoConferenceDJ trialHearingMethodVideoConferenceDJ =
+            caseData.getTrialHearingMethodVideoConferenceHearingDJ();
 
         if (disposalHearingMethodVideoConferenceDJ != null) {
             return disposalHearingMethodVideoConferenceDJ.getLabel();
+        }
+        if (trialHearingMethodVideoConferenceDJ != null) {
+            return trialHearingMethodVideoConferenceDJ.getLabel();
         }
 
         return null;
@@ -256,14 +272,6 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
     private boolean checkDisposalHearingMethod(DisposalHearingMethodDJ method) {
         return method.equals(disposalHearingMethodInPerson);
-    }
-
-    private String getTrialDays(TrialHearingTrial trial) {
-        if (nonNull(trial)) {
-            long daysBetween = DAYS.between(trial.getDate1(), trial.getDate2());
-            return String.valueOf(daysBetween);
-        }
-        return null;
     }
 
     private boolean getLiabilityValue(List<CaseManagementOrderAdditional> list) {

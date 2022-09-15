@@ -283,7 +283,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                              .builder()
                                              .judgeNameTitle(judgeNameTitle)
                                              .input(judgeNameTitle
-                                                        + " has considered the statements of "
+                                                        + ", has considered the statements of "
                                                         + "the case and the information provided "
                                                         + "by the parties, \n\n "
                                                         + "IT IS ORDERED THAT:").build());
@@ -411,7 +411,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
         caseDataBuilder.trialCreditHire(TrialCreditHire
                                             .builder()
-                                            .input1("1. If impecuniosity is alleged by the claimant and not admitted "
+                                            .input1("If impecuniosity is alleged by the claimant and not admitted "
                                                         + "by the defendant, the claimant's "
                                                         + "disclosure as ordered earlier in this order must "
                                                         + "include:\n"
@@ -436,11 +436,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                         + "debarred from asserting need or relying on impecuniosity "
                                                         + "as the case may be at the final hearing, unless they "
                                                         + "have the permission of the trial Judge.")
-                                            .input5("4. The parties are to liaise and use reasonable endeavours to"
+                                            .input5("The parties are to liaise and use reasonable endeavours to"
                                                         + " agree the basic hire rate no "
                                                         + "later than 4pm on.")
                                             .date2(LocalDate.now().plusWeeks(10))
-                                            .input6("5. If the parties fail to agree rates subject to liability and/or"
+                                            .input6("If the parties fail to agree rates subject to liability and/or"
                                                         + " other issues pursuant to the "
                                                         + "paragraph above, each party may rely upon written evidence "
                                                         + "by way of witness statement of "
@@ -468,9 +468,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                 .date1(LocalDate.now().plusWeeks(4))
                                                 .input2("which must be answered by 4pm on")
                                                 .date2(LocalDate.now().plusWeeks(8))
-                                                .input3("Any questions which are to be addressed to an expert" +
-                                                    " must be sent to the expert directly and uploaded to " +
-                                                        "the Digital Portal by 4pm on")
+                                                .input3("Any questions which are to be addressed to an expert"
+                                                            + " must be sent to the expert directly and uploaded to "
+                                                            + "the Digital Portal by 4pm on")
                                                 .date3(LocalDate.now().plusWeeks(4))
                                                 .build());
 

@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 
 import java.time.LocalDate;
-import java.util.List;
 import javax.validation.constraints.Future;
 
 @Data

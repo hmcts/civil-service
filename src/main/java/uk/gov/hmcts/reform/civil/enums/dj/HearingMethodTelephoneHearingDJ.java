@@ -3,14 +3,15 @@ package uk.gov.hmcts.reform.civil.enums.dj;
 import lombok.Getter;
 
 @Getter
-public enum DisposalHearingMethodTelephoneHearingDJ {
+public enum HearingMethodTelephoneHearingDJ {
     telephoneTheClaimant("the claimant"),
     telephoneTheDefendant("the defendant"),
     telephoneTheCourt("the court");
 
     private String label;
 
-    DisposalHearingMethodTelephoneHearingDJ(String value) { this.label = value;
+    HearingMethodTelephoneHearingDJ(String value) {
+        this.label = value;
     }
 
 }

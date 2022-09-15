@@ -225,7 +225,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
             //trialHearingJudgesRecitalDJ
             assertThat(response.getData()).extracting("trialHearingJudgesRecitalDJ").extracting("input")
-                .isEqualTo("[Title] [your name] has considered the statements of "
+                .isEqualTo("test judge, has considered the statements of "
                                + "the case and the information provided "
                                + "by the parties, \n\n "
                                + "IT IS ORDERED THAT:");
@@ -357,7 +357,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "made by reference to the pages in that bundle.");
 
             assertThat(response.getData()).extracting("trialCreditHire").extracting("input1")
-                .isEqualTo("1. If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
+                .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
                                + "claimant's disclosure as ordered earlier in this order must include:\n"
                                + "a. Evidence of all income from all sources for a period of 3 months prior to the "
                                + "commencement of hire until the earlier of i) 3 months after cessation of hire or ii) "
@@ -381,12 +381,12 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "as the case may be at the final hearing, unless they "
                                + "have the permission of the trial Judge.");
             assertThat(response.getData()).extracting("trialCreditHire").extracting("input5")
-                .isEqualTo("4. The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
+                .isEqualTo("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
                                + "later than 4pm on.");
             assertThat(response.getData()).extracting("trialCreditHire").extracting("date2")
                 .isEqualTo(LocalDate.now().plusWeeks(10).toString());
             assertThat(response.getData()).extracting("trialCreditHire").extracting("input6")
-                .isEqualTo("5. If the parties fail to agree rates subject to liability and/or other issues pursuant to "
+                .isEqualTo("If the parties fail to agree rates subject to liability and/or other issues pursuant to "
                                + "the paragraph above, each party may rely upon written evidence by way of witness "
                                + "statement of one witness to provide evidence of basic hire rates available within "
                                + "the claimant's geographical location, from a mainstream (or, if none available, a "

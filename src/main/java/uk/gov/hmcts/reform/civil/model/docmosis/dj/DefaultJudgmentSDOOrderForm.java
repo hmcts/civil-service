@@ -5,11 +5,31 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
-import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.*;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingAddNewDirectionsDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingMedicalEvidenceDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingNotesDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingQuestionsToExpertsDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingSchedulesOfLossDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingWitnessOfFactDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingAddNewDirectionsDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingSchedulesOfLoss;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 
 import java.util.List;
 
@@ -50,6 +70,7 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private final TrialPersonalInjury trialPersonalInjury;
     private final TrialRoadTrafficAccident trialRoadTrafficAccident;
     private final TrialHousingDisrepair trialHousingDisrepair;
+    private final List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
 
     //additional data for hearings
     private final boolean disposalHearingDisclosureOfDocumentsDJAddSection;
@@ -87,8 +108,6 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private final boolean trialRoadTrafficAccidentAddSection;
     private final boolean trialHousingDisrepairAddSection;
     private final boolean trialHearingMethodInPersonAddSection;
-
-    private final String trialDays;
-    private final String trialHearingMethod;
+    private final DisposalHearingMethodDJ trialHearingMethodDJ;
     private final String trialHearingLocation;
 }
