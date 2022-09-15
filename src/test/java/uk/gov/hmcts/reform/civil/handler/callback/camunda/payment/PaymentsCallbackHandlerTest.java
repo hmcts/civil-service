@@ -105,7 +105,7 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
-            assertThat(response.getData()).extracting("claimIssuedPaymentDetails").extracting("reference").isNull();
+            assertThat(response.getData()).extracting("claimIssuedPaymentDetails").doesNotHaveToString("reference");
             assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
                 .extracting("errorMessage", "errorCode", "status", "customerReference")
                 .containsExactly(PAYMENT_ERROR_MESSAGE, PAYMENT_ERROR_CODE, FAILED.toString(), "12345");
@@ -122,8 +122,8 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
             verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
             assertThat(response.getErrors()).isEmpty();
             assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
-                .extracting("errorMessage", "errorCode", "status", "customerReference")
-                .containsExactly(DUPLICATE_PAYMENT_MESSAGE, null, FAILED.toString(), "12345");
+                .extracting("errorMessage", "status", "customerReference")
+                .containsExactly(DUPLICATE_PAYMENT_MESSAGE, FAILED.toString(), "12345");
         }
 
         @ParameterizedTest
@@ -134,10 +134,11 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
-            assertThat(response.getData()).extracting("paymentReference").isNull();
+            assertThat(response.getData()).doesNotHaveToString("paymentReference");
             assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
-                .extracting("paymentErrorMessage", "paymentErrorCode")
-                .containsExactly(null, null);
+                .doesNotHaveToString("paymentErrorMessage");
+            assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
+                .doesNotHaveToString("paymentErrorCode");
             assertThat(response.getErrors()).containsOnly("Technical error occurred");
         }
 

@@ -199,6 +199,10 @@ class RpaConsumerTest extends BaseRpaTest {
 
     @Nested
     class UnrepresentedAndUnregisteredDefendant {
+        @BeforeEach
+        public void setup() {
+            when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+        }
 
         @Test
         @SneakyThrows
@@ -215,6 +219,30 @@ class RpaConsumerTest extends BaseRpaTest {
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
             assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+
+        @Nested
+        class ToBeRemovedAfterNoc {
+            @Test
+            @SneakyThrows
+            void shouldGeneratePact_whenClaimAgainstUnrepresentedAndUnregisteredDefendant() {
+                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(false);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atState(FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT)
+                    .respondent1OrganisationPolicy(null)
+                    .respondent2OrganisationPolicy(null)
+                    .legacyCaseReference("000DC047")
+                    .build();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+
+                assertThat(payload, validateJson());
+
+                String description = "Robotics case data for claim against unrepresented and unregistered defendant";
+                PactVerificationResult result = getPactVerificationResult(payload, description);
+
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+            }
         }
     }
 
@@ -504,6 +532,7 @@ class RpaConsumerTest extends BaseRpaTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
                     .legacyCaseReference("000DC019")
+                    .courtLocation_old()
                     .build();
                 String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -624,6 +653,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     .multiPartyClaimTwoApplicants()
                     .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
                     .legacyCaseReference("000DC042")
+                    .courtLocation_old()
                     .build();
                 String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -643,6 +673,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     .multiPartyClaimTwoApplicants()
                     .atStateApplicant1RespondToDefenceAndProceed_2v1()
                     .legacyCaseReference("000DC043")
+                    .courtLocation_old()
                     .build();
                 String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 
@@ -662,6 +693,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     .multiPartyClaimTwoApplicants()
                     .atStateApplicant2RespondToDefenceAndProceed_2v1()
                     .legacyCaseReference("000DC044")
+                    .courtLocation_old()
                     .build();
                 String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
 

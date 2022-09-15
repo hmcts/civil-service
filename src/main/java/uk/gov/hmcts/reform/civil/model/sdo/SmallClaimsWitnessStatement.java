@@ -9,7 +9,11 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class FastTrackPreferredEmail {
+public class SmallClaimsWitnessStatement {
 
-    private String email;
+    private String input1;
+    private String input2;
+    private String input3;
+    private String input4;
+    private String text;
 }

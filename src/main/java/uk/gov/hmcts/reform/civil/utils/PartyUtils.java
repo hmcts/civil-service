@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -13,6 +15,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
 
@@ -148,10 +151,116 @@ public class PartyUtils {
         .getRespondentSolicitor2Reference() != null;
 
     public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent) {
-        if (caseData.getRespondent1().equals(respondent)) {
-            return caseData.getRespondent1ClaimResponseType();
+        if (SuperClaimType.SPEC_CLAIM == caseData.getSuperClaimType()) {
+            if (caseData.getRespondent1().equals(respondent)) {
+                return Optional.ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())
+                    .map(RespondentResponseTypeSpec::translate).orElse(null);
+            } else {
+                return Optional.ofNullable(caseData.getRespondent2ClaimResponseTypeForSpec())
+                    .map(RespondentResponseTypeSpec::translate).orElse(null);
+            }
         } else {
-            return caseData.getRespondent2ClaimResponseType();
+            if (caseData.getRespondent1().equals(respondent)) {
+                return caseData.getRespondent1ClaimResponseType();
+            } else {
+                return caseData.getRespondent2ClaimResponseType();
+            }
         }
     }
+
+    public static RespondentResponseTypeSpec getResponseTypeForRespondentSpec(CaseData caseData, Party respondent) {
+        if (caseData.getRespondent1().equals(respondent)) {
+            return caseData.getRespondent1ClaimResponseTypeForSpec();
+        } else {
+            return caseData.getRespondent2ClaimResponseTypeForSpec();
+        }
+    }
+
+    public static String getResponseIntentionForEmail(CaseData caseData) {
+        StringBuilder responseIntentions = new StringBuilder();
+        responseIntentions.append("The acknowledgement response selected: ");
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                if ((caseData.getRespondent1AcknowledgeNotificationDate() == null)
+                    && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
+                    //case where respondent 2 acknowledges first
+                    responseIntentions.append(caseData.getRespondent2ClaimResponseIntentionType().getLabel());
+                } else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null)
+                    && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
+                    if (caseData.getRespondent2AcknowledgeNotificationDate()
+                        .isAfter(caseData.getRespondent1AcknowledgeNotificationDate())) {
+                        //case where respondent 2 acknowledges 2nd
+                        responseIntentions.append(caseData.getRespondent2ClaimResponseIntentionType().getLabel());
+                    } else {
+                        //case where respondent 1 acknowledges 2nd
+                        responseIntentions.append(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+                    }
+                } else {
+                    //case where respondent 1 acknowledges first
+                    responseIntentions.append(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+                }
+                break;
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                responseIntentions.append("\nDefendant 1: ")
+                    .append(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+                responseIntentions.append("\n");
+                responseIntentions.append("Defendant 2: ")
+                    .append(caseData.getRespondent2ClaimResponseIntentionType().getLabel());
+                break;
+            case TWO_V_ONE:
+                responseIntentions.append("\nAgainst Claimant 1: ")
+                    .append(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+                responseIntentions.append("\n");
+                responseIntentions.append("Against Claimant 2: ")
+                    .append(caseData.getRespondent1ClaimResponseIntentionTypeApplicant2().getLabel());
+                break;
+            default:
+                responseIntentions.append(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+        }
+
+        return responseIntentions.toString();
+    }
+
+    public static String fetchDefendantName(CaseData caseData) {
+        StringBuilder defendantNames = new StringBuilder();
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                if ((caseData.getRespondent1TimeExtensionDate() == null)
+                    && (caseData.getRespondent2TimeExtensionDate() != null)) {
+                    //case where respondent 2 extends first
+                    defendantNames.append("\nDefendant : ")
+                        .append(caseData.getRespondent2().getPartyName());
+                } else if ((caseData.getRespondent1TimeExtensionDate() != null)
+                    && (caseData.getRespondent2TimeExtensionDate() != null)) {
+                    if (caseData.getRespondent2TimeExtensionDate()
+                        .isAfter(caseData.getRespondent1TimeExtensionDate())) {
+                        //case where respondent 2 extends 2nd
+                        defendantNames.append("\nDefendant : ")
+                            .append(caseData.getRespondent2().getPartyName());
+                    } else {
+                        //case where respondent 1 extends 2nd
+                        defendantNames.append("\nDefendant : ")
+                            .append(caseData.getRespondent1().getPartyName());
+                    }
+                } else {
+                    //case where respondent 1 extends first
+                    defendantNames.append("\nDefendant : ")
+                        .append(caseData.getRespondent1().getPartyName());
+                }
+                break;
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                defendantNames.append("\nDefendant 1: ")
+                    .append(caseData.getRespondent1().getPartyName());
+                defendantNames.append("\n");
+                defendantNames.append("Defendant 2: ")
+                    .append(caseData.getRespondent2().getPartyName());
+                break;
+            default:
+                defendantNames.append("\nDefendant : ")
+                    .append(caseData.getRespondent1().getPartyName());
+                break;
+        }
+        return defendantNames.toString();
+    }
+
 }

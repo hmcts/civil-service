@@ -103,20 +103,34 @@ public class RoboticsNotificationService {
     }
 
     private String getSubject(CaseData caseData, String triggerEvent, boolean isMultiParty) {
-        return isMultiParty ? String.format("Multiparty claim data for %s - %s - %s", caseData.getLegacyCaseReference(),
-                                            caseData.getCcdState(), triggerEvent
-        ) : String.format(
-            "Robotics case data for %s",
-            caseData.getLegacyCaseReference()
-        );
+        String subject = null;
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            subject = isMultiParty ? String.format("Multiparty LR v LR Case Data for %s - %s - %s",
+                                                caseData.getLegacyCaseReference(),
+                                                caseData.getCcdState(), triggerEvent
+            ) : String.format(
+                "LR v LR Case Data for %s",
+                caseData.getLegacyCaseReference()
+            );
+            log.info("Subject--------" + subject);
+            return subject;
+        } else {
+            return isMultiParty ? String.format("Multiparty claim data for %s - %s - %s",
+                                                caseData.getLegacyCaseReference(),
+                                                caseData.getCcdState(), triggerEvent
+            ) : String.format(
+                "Robotics case data for %s",
+                caseData.getLegacyCaseReference()
+            );
+        }
     }
 
     private String getRoboticsEmailRecipient(boolean isMultiParty, SuperClaimType superClaimType) {
         if (SPEC_CLAIM.equals(superClaimType)) {
-            return isMultiParty && !toggleService.isSpecRpaContinuousFeedEnabled() ? roboticsEmailConfiguration
-                .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
+            log.info("EMAIl:---------" + roboticsEmailConfiguration.getSpecRecipient());
+            return roboticsEmailConfiguration.getSpecRecipient();
         }
-        return isMultiParty && !toggleService.isRpaContinuousFeedEnabled() ? roboticsEmailConfiguration
+        return isMultiParty ? roboticsEmailConfiguration
             .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
     }
 
@@ -144,7 +158,11 @@ public class RoboticsNotificationService {
             eventHistory.getReceiptOfPartAdmission(),
             eventHistory.getReceiptOfAdmission(),
             eventHistory.getReplyToDefence(),
-            eventHistory.getDirectionsQuestionnaireFiled()
+            eventHistory.getDirectionsQuestionnaireFiled(),
+            eventHistory.getBreathingSpaceEntered(),
+            eventHistory.getBreathingSpaceLifted(),
+            eventHistory.getBreathingSpaceMentalHealthEntered(),
+            eventHistory.getBreathingSpaceMentalHealthLifted()
         );
         return eventsList.stream()
             .filter(Objects::nonNull)
@@ -165,6 +183,10 @@ public class RoboticsNotificationService {
         triggerReason = updateTriggerReason(eventHistory.getReceiptOfPartAdmission(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getReceiptOfAdmission(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getReplyToDefence(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getBreathingSpaceEntered(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getBreathingSpaceLifted(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getBreathingSpaceMentalHealthEntered(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getBreathingSpaceMentalHealthLifted(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getDirectionsQuestionnaireFiled(), triggerReason);
 
         return triggerReason;

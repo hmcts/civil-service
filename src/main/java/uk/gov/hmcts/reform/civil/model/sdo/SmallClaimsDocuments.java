@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class FastTrackPreferredTelephone {
 
-    private String telephone;
+public class SmallClaimsDocuments {
+
+    private String input1;
+    private String input2;
 }

@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
@@ -27,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -48,7 +51,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(INITIATE_GENERAL_APPLICATION);
     private static final String RESP_NOT_ASSIGNED_ERROR = "Application cannot be created until all the required "
             + "respondent solicitor are assigned to the case.";
-
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
     private final ObjectMapper objectMapper;
     private final OrganisationService organisationService;
@@ -85,10 +87,10 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         caseDataBuilder
                 .generalAppHearingDetails(
-                        GAHearingDetails
-                                .builder()
-                                .hearingPreferredLocation(fromList(locationRefDataService.getCourtLocations(authToken)))
-                                .build());
+                    GAHearingDetails
+                        .builder()
+                        .hearingPreferredLocation(fromList(locationRefDataService.getCourtLocations(authToken)))
+                        .build());
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
                 .data(caseDataBuilder.build().toMap(objectMapper))
@@ -150,6 +152,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private CallbackResponse submitApplication(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
@@ -160,6 +163,25 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             GAPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails().toBuilder().fee(feeForGA).build();
             CaseData newCaseData = caseData.toBuilder().generalAppPBADetails(generalAppPBADetails).build();
             caseData = newCaseData;
+        }
+
+        if ((caseData.getGeneralAppHearingDetails().getHearingPreferredLocation() != null)) {
+            List<String> applicationLocationList = List.of(caseData.getGeneralAppHearingDetails()
+                                                               .getHearingPreferredLocation()
+                                                               .getValue().getLabel());
+            DynamicList dynamicLocationList = fromList(applicationLocationList);
+            Optional<DynamicListElement> first = dynamicLocationList.getListItems().stream()
+                .filter(l -> l.getLabel().equals(applicationLocationList.get(0))).findFirst();
+            first.ifPresent(dynamicLocationList::setValue);
+            GAHearingDetails generalAppHearingDetails = caseData.getGeneralAppHearingDetails().toBuilder()
+                .hearingPreferredLocation(dynamicLocationList).build();
+            CaseData updatedCaseData = caseData.toBuilder().generalAppHearingDetails(generalAppHearingDetails).build();
+            caseData = updatedCaseData;
+        } else {
+            GAHearingDetails generalAppHearingDetails = caseData.getGeneralAppHearingDetails().toBuilder()
+                .hearingPreferredLocation(DynamicList.builder().build()).build();
+            CaseData updatedCaseData = caseData.toBuilder().generalAppHearingDetails(generalAppHearingDetails).build();
+            caseData = updatedCaseData;
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

@@ -56,7 +56,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -112,7 +111,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotifyClaimDetails()
                 .build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -128,7 +127,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateRespondentFullDefenceAfterNotifyClaimDetails()
                 .multiPartyClaimTwoApplicants()
                 .build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -144,7 +143,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateRespondentFullDefenceAfterNotifyClaimDetails()
                 .multiPartyClaimOneDefendantSolicitor()
                 .build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -160,7 +159,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateRespondentFullDefenceAfterNotifyClaimDetails()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -179,7 +178,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .atStateRespondentFullDefenceAfterNotifyClaimDetails()
                     .multiPartyClaimOneDefendantSolicitor()
                     .build();
-                CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
@@ -195,7 +194,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .atStateRespondentFullDefenceAfterNotifyClaimDetails()
                     .multiPartyClaimTwoDefendantSolicitors()
                     .build();
-                CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
@@ -426,8 +425,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("uiStatementOfTruth")
-                .extracting("name", "role")
-                .containsExactly(null, null);
+                .doesNotHaveToString("name")
+                .doesNotHaveToString("role");
         }
     }
 
@@ -531,8 +530,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .extracting("uiStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly(null, null);
+                    .doesNotHaveToString("name")
+                    .doesNotHaveToString("role");
             }
         }
 

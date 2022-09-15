@@ -22,12 +22,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
+import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -45,6 +47,8 @@ import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
+import uk.gov.hmcts.reform.civil.utils.AccessCodeGenerator;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
@@ -55,6 +59,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -97,7 +102,8 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     PostcodeValidator.class,
     InterestCalculator.class,
     StateFlowEngine.class,
-    ValidateEmailService.class},
+    ValidateEmailService.class,
+    },
     properties = {"reference.database.enabled=false"})
 class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -114,10 +120,10 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private Time time;
-
+    @MockBean
+    private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     @MockBean
     private FeesService feesService;
-
     @MockBean
     private OrganisationService organisationService;
 
@@ -388,12 +394,11 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("claimFee")
-                .extracting("calculatedAmountInPence", "code", "version")
+                .extracting("calculatedAmountInPence", "code")
                 .containsExactly(
                     String.valueOf(feeData.getCalculatedAmountInPence()),
-                    feeData.getCode(),
-                    feeData.getVersion()
-                );
+                    feeData.getCode()
+                ).doesNotHaveToString("version");
 
             assertThat(response.getData())
                 .extracting("claimIssuedPaymentDetails")
@@ -421,12 +426,11 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("claimFee")
-                .extracting("calculatedAmountInPence", "code", "version")
+                .extracting("calculatedAmountInPence", "code")
                 .containsExactly(
                     String.valueOf(feeData.getCalculatedAmountInPence()),
-                    feeData.getCode(),
-                    feeData.getVersion()
-                );
+                    feeData.getCode()
+                ).doesNotHaveToString("version");
 
             assertThat(response.getData())
                 .extracting("claimIssuedPaymentDetails")
@@ -486,9 +490,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("email")
                 .isEqualTo(email);
             assertThat(response.getData())
-                .extracting("applicantSolicitor1UserDetails")
-                .extracting("email")
-                .isNull();
+                .doesNotHaveToString("applicantSolicitor1UserDetails")
+                .doesNotHaveToString("email");
         }
     }
 
@@ -719,8 +722,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
-                .extracting("uiStatementOfTruth")
-                .isNull();
+                .doesNotHaveToString("uiStatementOfTruth");
         }
     }
 
@@ -1108,6 +1110,16 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
+
+            given(defendantPinToPostLRspecService.buildDefendantPinToPost())
+                .willReturn(DefendantPinToPostLRspec.builder()
+                                .accessCode(
+                                    AccessCodeGenerator.generateAccessCode())
+                                .respondentCaseRole(
+                                    CaseRole.RESPONDENTSOLICITORONESPEC.getFormattedName())
+                                .expiryDate(LocalDate.now().plusDays(
+                                    180))
+                                .build());
         }
 
         @Test
@@ -1169,9 +1181,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
-                    .extracting("applicantSolicitor1CheckEmail")
-                    .extracting("email")
-                    .isNull();
+                    .doesNotHaveToString("applicantSolicitor1CheckEmail")
+                    .doesNotHaveToString("email");
 
                 assertThat(response.getData())
                     .extracting("applicantSolicitor1UserDetails")
@@ -1199,9 +1210,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
-                    .extracting("applicantSolicitor1CheckEmail")
-                    .extracting("email")
-                    .isNull();
+                    .doesNotHaveToString("applicantSolicitor1CheckEmail")
+                    .doesNotHaveToString("email");
 
                 assertThat(response.getData())
                     .extracting("applicantSolicitor1UserDetails")
@@ -1235,8 +1245,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .extracting("uiStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly(null, null);
+                    .doesNotHaveToString("name")
+                    .doesNotHaveToString("role");
             }
         }
     }
