@@ -52,6 +52,10 @@ public class FeatureToggleService {
         return isFeatureEnabled("specified-lr-journey");
     }
 
+    public boolean isSdoEnabled() {
+        return isFeatureEnabled("enableSDO");
+    }
+
     public LDUser.Builder createLDUser() {
         return new LDUser.Builder("civil-service")
             .custom("timestamp", String.valueOf(System.currentTimeMillis()))
@@ -60,6 +64,14 @@ public class FeatureToggleService {
 
     public boolean isNoticeOfChangeEnabled() {
         return internalClient.boolVariation("notice-of-change", createLDUser().build(), false);
+    }
+
+    public boolean isHearingAndListingSDOEnabled() {
+        return internalClient.boolVariation("hearing-and-listing-sdo", createLDUser().build(), false);
+    }
+
+    public boolean isCourtLocationDynamicListEnabled() {
+        return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), false);
     }
 
     public boolean isPinInPostEnabled() {
