@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 
 import java.time.LocalDate;
@@ -24,4 +25,7 @@ public class FastTrackTrial {
     private String input2;
     private String input3;
     private List<FastTrackTrialBundleType> type;
+    private FastTrackTimeEstimate hearingDuration;
+    private Integer otherHours;
+    private Integer otherMinutes;
 }

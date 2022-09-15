@@ -345,16 +345,27 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.fastTrackSchedulesOfLoss(tempFastTrackSchedulesOfLoss).build();
 
-        FastTrackTrial tempFastTrackTrial = FastTrackTrial.builder()
+        FastTrackTrial.FastTrackTrialBuilder tempFastTrackTrial = FastTrackTrial.builder()
             .input1("The time provisionally allowed for this trial is")
             .date1(LocalDate.now().plusWeeks(22))
             .date2(LocalDate.now().plusWeeks(30))
             .input2("If either party considers that the time estimate is insufficient, they must inform the court "
-                        + "within 7 days of the date stated on this order.")
-            .input3("At least 7 days before the trial, the claimant must upload to the Digital Portal")
-            .build();
+                        + "within 7 days of the date stated on this order.");
 
-        updatedData.fastTrackTrial(tempFastTrackTrial).build();
+        if (featureToggleService.isHearingsAndListingsEnabled()) {
+            tempFastTrackTrial
+                .input3("Not more than seven nor less than three clear days before the trial, " +
+                            "the claimant must file at court and serve an indexed and paginated bundle of documents " +
+                            "which complies with the requirements of Rule 39.5 Civil Procedure Rules and which " +
+                            "complies with requirements of PD32. The parties must endeavour to agree the contents " +
+                            "of the bundle before it is filed. " +
+                            "The bundle will include a case summary and a chronology.");
+        } else {
+            tempFastTrackTrial
+                .input3("At least 7 days before the trial, the claimant must upload to the Digital Portal");
+        }
+
+        updatedData.fastTrackTrial(tempFastTrackTrial.build()).build();
 
         FastTrackNotes tempFastTrackNotes = FastTrackNotes.builder()
             .input("This Order has been made without a hearing. Each party has the right to apply to have this Order "
