@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
@@ -32,6 +33,8 @@ class PiPLetterGeneratorTest {
 
     @Mock
     private DocumentGeneratorService documentGeneratorService;
+    @Mock
+    private PinInPostConfiguration pipInPostConfiguration;
     @InjectMocks
     private PiPLetterGenerator piPLetterGenerator;
 
@@ -50,6 +53,8 @@ class PiPLetterGeneratorTest {
         .build();
     private static final BigDecimal TOTAL_CLAIM_AMOUNT = new BigDecimal("1000");
     private static final String PIN = "1234789";
+
+    private static final String CUI_URL = "CUI response url";
     private static final PiPLetter LETTER_TEMPLATE_DATA = PiPLetter.builder()
         .pin(PIN)
         .claimantFullName(CLAIMANT_FULL_NAME)
@@ -58,6 +63,7 @@ class PiPLetterGeneratorTest {
         .defendant(DEFENDANT)
         .responseDeadline(RESPONSE_DEADLINE)
         .totalAmountOfClaim(TOTAL_CLAIM_AMOUNT)
+        .respondToClaimUrl(CUI_URL)
         .build();
     private static final CaseData CASE_DATA = CaseData.builder()
         .legacyCaseReference(CLAIM_REFERENCE)
@@ -77,6 +83,7 @@ class PiPLetterGeneratorTest {
 
     @Test
     void shouldGenerateAndDownloadLetterSuccessfully() {
+        given(pipInPostConfiguration.getRespondToClaimUrl()).willReturn(CUI_URL);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
             .willReturn(LETTER);
 
