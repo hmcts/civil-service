@@ -11,6 +11,8 @@ public enum DocumentType {
     CLAIMANT_DEFENCE,
     CLAIMANT_DRAFT_DIRECTIONS,
     DEFAULT_JUDGMENT_SDO_ORDER,
+    LITIGANT_IN_PERSON_CLAIM_FORM,
+    SDO_ORDER,
     PIP_LETTER,
 
     //General Application Document Type

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -20,6 +22,10 @@ import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -62,6 +68,8 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_R
 public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
+    private DeadlinesCalculator deadlinesCalculator;
+    @MockBean
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
@@ -72,6 +80,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
     @MockBean
     private Time time;
     @MockBean
+    private PinInPostConfiguration pinInPostConfiguration;
     private BulkPrintService bulkPrintService;
     @MockBean
     private PiPLetterGenerator pipLetterGenerator;
@@ -93,13 +102,18 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
 
     @Nested
     class AboutToSubmitCallback {
+        private LocalDateTime responseDeadline;
 
         @BeforeEach
         void setup() {
+            responseDeadline = LocalDateTime.now().plusDays(14);
             when(notificationsProperties.getRespondentDefendantResponseForSpec())
                 .thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("test solicatior").build()));
+                .thenReturn(Optional.of(Organisation.builder().name("test solicitor").build()));
+            when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
+            when(pinInPostConfiguration.getMoneyClaimUrl()).thenReturn("dummy_respond_to_claim_url");
+            when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
         }
 
         @Test
@@ -141,11 +155,13 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
                 RESPONDENT_NAME, "Mr. Sole Trader",
                 CLAIMANT_NAME, "Mr. John Rambo",
                 ISSUED_ON, formatLocalDate(LocalDate.now(), DATE),
-                RESPOND_URL, respondToClaimUrl,
+                RESPOND_URL, "dummy_respond_to_claim_url",
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 PIN, "TEST1234",
-                RESPONSE_DEADLINE, formatLocalDate(LocalDate.now().plusDays(180), DATE),
-                FRONTEND_URL, frontendBaseUrl
+                RESPONSE_DEADLINE, formatLocalDate(
+                    caseData.getRespondent1ResponseDeadline()
+                        .toLocalDate(), DATE),
+                FRONTEND_URL, "dummy_cui_front_end_url"
             );
         }
     }
