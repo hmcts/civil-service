@@ -145,8 +145,8 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                NotSuitable_SDO,
-                HEARING_SCHEDULED
+                HEARING_SCHEDULED,
+                NotSuitable_SDO
             )
         ),
 
@@ -528,8 +528,8 @@ public class FlowStateAllowedEventService {
                 DEFAULT_JUDGEMENT_SPEC,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                NotSuitable_SDO,
-                HEARING_SCHEDULED
+                HEARING_SCHEDULED,
+                NotSuitable_SDO
             )
         ),
         entry(
