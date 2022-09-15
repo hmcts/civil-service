@@ -77,7 +77,7 @@ genApp:
     endpoint: /refdata/judicial/users/search
 
 pin-in-post:
-  money-claims:
+  cui-respond-to-claim:
     url: ${CUI_URL_RESPOND_TO_CLAIM:http://localhost:3001/first-contact/start}
   cui-front-end:
     url: ${CUI_URL:http://localhost:3001}

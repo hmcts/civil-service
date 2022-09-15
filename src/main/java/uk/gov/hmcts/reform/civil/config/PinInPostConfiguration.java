@@ -12,7 +12,7 @@ public class PinInPostConfiguration {
     private final String cuiFrontEndUrl;
 
     public PinInPostConfiguration(
-        @Value("${pin-in-post.money-claims.url}") String respondToClaimUrl,
+        @Value("${pin-in-post.cui-respond-to-claim.url}") String respondToClaimUrl,
         @Value("${pin-in-post.cui-front-end.url}") String cuiFrontEndUrl
     ) {
         this.respondToClaimUrl = respondToClaimUrl;
