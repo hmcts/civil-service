@@ -78,9 +78,9 @@ genApp:
 
 pin-in-post:
   money-claims:
-    url: https://moneyclaims.aat.platform.hmcts.net/first-contact/start
+    url: ${CUI_URL_RESPOND_TO_CLAIM:http://localhost:3001/first-contact/start}
   cui-front-end:
-    url: https://cmc-citizen-frontend-staging.service.core-compute-aat.internal
+    url: ${CUI_URL:http://localhost:3001}
 
 payments:
   api:
@@ -253,10 +253,6 @@ genApp:
     url: http://localhost:8765
 
 payments:
-  api:
-    url: http://localhost:8765
-
-send-letter:
   api:
     url: http://localhost:8765
 

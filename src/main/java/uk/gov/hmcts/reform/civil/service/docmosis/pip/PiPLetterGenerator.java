@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.pip;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.pip.PiPLetter;
@@ -16,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.PIN_I
 @Service
 public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
     private final DocumentGeneratorService documentGeneratorService;
+    private final PinInPostConfiguration pipInPostConfiguration;
 
     private DocmosisDocument generate(CaseData caseData){
        return documentGeneratorService.generateDocmosisDocument(
@@ -39,6 +41,7 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
             .defendant(caseData.getRespondent1())
             .responseDeadline(caseData.getRespondent1ResponseDeadline())
             .totalAmountOfClaim(caseData.getTotalClaimAmount())
+            .respondToClaimUrl(pipInPostConfiguration.getRespondToClaimUrl())
             .issueDate(LocalDate.now())
             .build();
     }

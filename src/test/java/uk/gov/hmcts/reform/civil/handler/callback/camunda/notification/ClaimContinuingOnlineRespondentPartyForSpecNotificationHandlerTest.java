@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,9 +22,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.NotificationService;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -112,7 +108,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("test solicitor").build()));
             when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
-            when(pinInPostConfiguration.getMoneyClaimUrl()).thenReturn("dummy_respond_to_claim_url");
+            when(pinInPostConfiguration.getRespondToClaimUrl()).thenReturn("dummy_respond_to_claim_url");
             when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
         }
 
