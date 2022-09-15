@@ -49,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
@@ -159,6 +160,7 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         REFER_TO_JUDGE
                     }
                 ),
@@ -172,6 +174,7 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         REFER_TO_JUDGE
                     }
                 ),
@@ -181,6 +184,7 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         REFER_TO_JUDGE
                     }
                 ),
@@ -199,6 +203,7 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         REFER_TO_JUDGE
                     }
                 ),
@@ -216,6 +221,7 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL,
                         REFER_TO_JUDGE
@@ -236,6 +242,7 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL,
                         STANDARD_DIRECTION_ORDER_DJ,
@@ -258,6 +265,7 @@ class FlowStateAllowedEventServiceTest {
                         INFORM_AGREED_EXTENSION_DATE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL,
                         REFER_TO_JUDGE
@@ -281,6 +289,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         DEFAULT_JUDGEMENT,
+                        NotSuitable_SDO,
                         REFER_TO_JUDGE
                     }
                 ),
@@ -301,6 +310,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         DEFAULT_JUDGEMENT,
+                        NotSuitable_SDO,
                         REFER_TO_JUDGE
                     }
                 ),
@@ -320,6 +330,7 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         REFER_TO_JUDGE
                     }
                 ),
@@ -339,6 +350,7 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         REFER_TO_JUDGE
                     }
                 ),
@@ -356,6 +368,7 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         REFER_TO_JUDGE
                     }
                 ),
@@ -371,6 +384,7 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         REFER_TO_JUDGE
                     }
                 ),
@@ -386,6 +400,7 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         REFER_TO_JUDGE
                     }
                 ),
@@ -401,6 +416,7 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         REFER_TO_JUDGE
                     }
                 ),
@@ -416,6 +432,7 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         REFER_TO_JUDGE
                     }
                 ),
@@ -431,6 +448,7 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         REFER_TO_JUDGE
                     }
                 ),
@@ -441,6 +459,7 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         REFER_TO_JUDGE
                     }
                 ),
@@ -451,6 +470,7 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         REFER_TO_JUDGE
                     }
                 ),
@@ -467,6 +487,7 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         REFER_TO_JUDGE
                     }
                 ),
@@ -477,6 +498,7 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
+                        NotSuitable_SDO,
                         REFER_TO_JUDGE
                     }
                 ),
