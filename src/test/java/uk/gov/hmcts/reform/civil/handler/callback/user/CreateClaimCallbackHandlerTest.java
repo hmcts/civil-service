@@ -70,6 +70,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -936,11 +937,13 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("org1");
         }
 
+        //TO DO remove V_1 when CIV-3278 is released
         @Test
         void shouldSetRespondent2OrgPolicyReferenceFor1v2SSCases() {
             caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative().build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(
+                    V_1,
                     caseData,
                     ABOUT_TO_SUBMIT
                 ));
@@ -952,6 +955,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("respondent2OrgRegistered", "Yes");
         }
 
+        //TO DO remove V_1 when CIV-3278 is released
         @Test
         void shouldSetRespondent2OrgPolicyReferenceFor1v2DSCases() {
             caseData = CaseDataBuilder.builder().atStateClaimIssued()
@@ -960,6 +964,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(
+                    V_1,
                     caseData,
                     ABOUT_TO_SUBMIT
                 ));
