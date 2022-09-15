@@ -107,6 +107,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                     return "RPA Reason: Defendant partial admission.";
                 case COUNTER_CLAIM:
                     return "RPA Reason: Defendant rejects and counter claims.";
+                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC:
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
                     return "RPA Reason: Unrepresented defendant(s).";
                 case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
@@ -161,6 +162,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             }
 
             switch (flowState) {
+                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC:
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
                     return format("Unrepresented defendant: %s",
                                       StringUtils.join(
