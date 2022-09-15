@@ -6,6 +6,6 @@ public enum SmallClaimsTimeEstimate {
     ONE_HOUR,
     ONE_AND_HALF_HOUR,
     TWO_HOURS,
-    TWO_HALF_HOURS,
+    TWO_AND_HALF_HOURS,
     OTHER
 }
