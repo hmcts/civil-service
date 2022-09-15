@@ -48,10 +48,12 @@ public class LocationRefDataService {
     public LocationRefData getCcmccLocation(String authToken) {
         try {
             ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
-                    buildURIforCcmcc(),
-                    HttpMethod.GET,
-                    getHeaders(authToken),
-                    new ParameterizedTypeReference<List<LocationRefData>>() {});
+                buildURIforCcmcc(),
+                HttpMethod.GET,
+                getHeaders(authToken),
+                new ParameterizedTypeReference<List<LocationRefData>>() {
+                }
+            );
             List<LocationRefData> ccmccLocations = responseEntity.getBody();
             if (ccmccLocations == null || ccmccLocations.isEmpty()) {
                 log.warn("Location Reference Data Lookup did not return any CCMCC location");
@@ -66,6 +68,20 @@ public class LocationRefDataService {
             log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
         }
         return LocationRefData.builder().build();
+    }
+
+    public List<LocationRefData> getCourtLocationsAsLocationRefData(String authToken) {
+        try {
+            ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
+                buildURI(),
+                HttpMethod.GET,
+                getHeaders(authToken),
+                new ParameterizedTypeReference<List<LocationRefData>>() {});
+            return responseEntity.getBody();
+        } catch (Exception e) {
+            log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
+        }
+        return new ArrayList<>();
     }
 
     public List<LocationRefData> getCourtLocationsForDefaultJudgments(String authToken) {

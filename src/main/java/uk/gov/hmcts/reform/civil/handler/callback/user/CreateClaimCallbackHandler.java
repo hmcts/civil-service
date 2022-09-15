@@ -484,7 +484,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         List<String> errorsMessages = new ArrayList<>();
         // Tactical fix. We have an issue where null courtLocation is being submitted.
         // We are validating it exists on submission if not we return an error to the user.
-        if (caseData.getCourtLocation() == null || caseData.getCourtLocation().getApplicantPreferredCourt() == null) {
+        if (caseData.getCourtLocation() == null
+            || caseData.getCourtLocation().getApplicantPreferredCourtLocationList() == null
+            || caseData.getCourtLocation().getApplicantPreferredCourtLocationList().getValue() == null) {
             errorsMessages.add("Court location code is required");
         }
         return errorsMessages;

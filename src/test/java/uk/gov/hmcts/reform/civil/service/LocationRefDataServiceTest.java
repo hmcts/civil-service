@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,9 +24,12 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -277,15 +281,39 @@ class LocationRefDataServiceTest {
 
     @Nested
     class CourtLocationsForDefaultJudgementTest {
-        @Test
-        void shouldReturnLocations_whenLRDReturnsAllLocationsForDefaultJudgments() {
-            when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(restTemplate.exchange(
-                    uriCaptor.capture(),
-                    httpMethodCaptor.capture(),
-                    httpEntityCaptor.capture(),
-                    ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
-                    .thenReturn(getAllLocationsRefDataResponse());
+
+    @Test
+    void shouldReturnLocations_whenLRDReturnsAllLocationsAsLocationRefDataWithNoFilter() {
+        when(authTokenGenerator.generate()).thenReturn("service_token");
+        when(restTemplate.exchange(
+            uriCaptor.capture(),
+            httpMethodCaptor.capture(),
+            httpEntityCaptor.capture(),
+            ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
+            .thenReturn(getAllLocationsRefDataResponse());
+
+        List<LocationRefData> courtLocations = refDataService.getCourtLocationsAsLocationRefData("user_token");
+
+        assertThat(courtLocations.size()).isEqualTo(12);
+        verify(lrdConfiguration, times(1)).getUrl();
+        verify(lrdConfiguration, times(1)).getEndpoint();
+        assertThat(uriCaptor.getValue().toString())
+            .isEqualTo("dummy_url/fees-register/fees/lookup?is_hearing_location=Y&location_type=Court");
+        assertThat(httpMethodCaptor.getValue()).isEqualTo(HttpMethod.GET);
+        assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("Authorization")).isEqualTo("user_token");
+        assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("ServiceAuthorization"))
+            .isEqualTo("service_token");
+    }
+
+    @Test
+    void shouldReturnLocations_whenLRDReturnsAllLocationsForDefaultJudgments() {
+        when(authTokenGenerator.generate()).thenReturn("service_token");
+        when(restTemplate.exchange(
+            uriCaptor.capture(),
+            httpMethodCaptor.capture(),
+            httpEntityCaptor.capture(),
+            ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
+            .thenReturn(getAllLocationsRefDataResponse());
 
             List<LocationRefData> courtLocations = refDataService
                     .getCourtLocationsForDefaultJudgments("user_token");
@@ -409,5 +437,27 @@ class LocationRefDataServiceTest {
             assertThat(courtLocations.getEpimmsId()).isNull();
         }
 
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void quietEmptyList_whenException() {
+        when(restTemplate.exchange(any(URI.class), eq(HttpMethod.GET),
+                                   any(HttpEntity.class),
+                                   any(ParameterizedTypeReference.class)))
+            .thenThrow(RestClientException.class);
+        Assertions.assertEquals(Collections.emptyList(),
+                                refDataService.getCourtLocationsAsLocationRefData("token"));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void quietEmptyListDefaultJudgement_whenException() {
+        when(restTemplate.exchange(any(URI.class), eq(HttpMethod.GET),
+                                   any(HttpEntity.class),
+                                   any(ParameterizedTypeReference.class)))
+            .thenThrow(RestClientException.class);
+        Assertions.assertEquals(Collections.emptyList(),
+                                refDataService.getCourtLocationsForDefaultJudgments("token"));
     }
 }

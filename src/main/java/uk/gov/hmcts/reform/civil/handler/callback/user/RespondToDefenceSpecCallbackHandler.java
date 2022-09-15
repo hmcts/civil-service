@@ -15,13 +15,20 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
@@ -29,8 +36,10 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -52,6 +61,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final UnavailableDateValidator unavailableDateValidator;
     private final List<RespondToResponseConfirmationHeaderGenerator> confirmationHeaderGenerators;
     private final List<RespondToResponseConfirmationTextGenerator> confirmationTextGenerators;
+    private final LocationRefDataService locationRefDataService;
+    private final CourtLocationUtils courtLocationUtils;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -133,11 +145,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             || caseData.getApplicant1ProceedWithClaimSpec2v1() == YES) {
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-            Applicant1DQ dq = caseData.getApplicant1DQ().toBuilder()
-                .applicant1DQStatementOfTruth(statementOfTruth)
-                .build();
+            Applicant1DQ.Applicant1DQBuilder dq = caseData.getApplicant1DQ().toBuilder()
+                .applicant1DQStatementOfTruth(statementOfTruth);
+            if (featureToggleService.isCourtLocationDynamicListEnabled()) {
+                handleCourtLocationData(caseData, builder, dq, callbackParams);
+            }
 
-            builder.applicant1DQ(dq);
+            builder.applicant1DQ(dq.build());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             builder.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
@@ -147,17 +161,65 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
+    private void handleCourtLocationData(CaseData caseData, CaseData.CaseDataBuilder dataBuilder,
+                                         Applicant1DQ.Applicant1DQBuilder dq,
+                                         CallbackParams callbackParams) {
+        RequestedCourt requestedCourt = caseData.getApplicant1DQ().getApplicant1DQRequestedCourt();
+        if (requestedCourt != null && requestedCourt.getRequestHearingAtSpecificCourt() == YES) {
+            LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
+                fetchLocationData(callbackParams), requestedCourt.getResponseCourtLocations());
+            if (Objects.nonNull(courtLocation)) {
+                dataBuilder
+                    .courtLocation(CourtLocation.builder()
+                                       .applicantPreferredCourt(courtLocation.getCourtLocationCode())
+                                       .caseLocation(CaseLocation.builder()
+                                                         .region(courtLocation.getRegionId())
+                                                         .baseLocation(courtLocation.getEpimmsId()).build())
+                                       .applicantPreferredCourtLocationList(null)
+                                       .build())
+                    .applicant1DQ(dq
+                                      .applicant1DQRequestedCourt(
+                                          caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().toBuilder()
+                                              .responseCourtLocations(null)
+                                              .caseLocation(CaseLocation.builder()
+                                                                .region(courtLocation.getRegionId())
+                                                                .baseLocation(courtLocation.getEpimmsId())
+                                                                .build())
+                                              .responseCourtCode(courtLocation.getCourtLocationCode()).build()
+                                      )
+                                      .build());
+            }
+        }
+    }
+
     private CallbackResponse populateCaseData(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
 
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
             .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-            .superClaimType(SPEC_CLAIM)
-            .build();
+            .superClaimType(SPEC_CLAIM);
+
+        if (featureToggleService.isCourtLocationDynamicListEnabled()) {
+            List<LocationRefData> locations = fetchLocationData(callbackParams);
+            updatedCaseData.applicant1DQ(caseData.getApplicant1DQ().toBuilder()
+                                             .applicant1DQRequestedCourt(
+                                                 RequestedCourt.builder()
+                                                     .responseCourtLocations(
+                                                         courtLocationUtils.getLocationsFromList(locations))
+                                                     .build()
+                                             )
+                                             .build());
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(updatedCaseData.build().toMap(objectMapper))
             .build();
+    }
+
+    private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        return locationRefDataService.getCourtLocationsAsLocationRefData(authToken);
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
