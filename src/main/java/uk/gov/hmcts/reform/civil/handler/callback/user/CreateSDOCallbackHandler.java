@@ -133,15 +133,35 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             authTokenGenerator.generate(),
             hearingChannelServiceId
         );
-        List<DynamicListElement> options = hearingChannels.getValues().stream()
-            // TODO once we use service AAA6 or AAA7, this filtering should not be needed
-            .filter(channel -> !"NA".equals(channel.getKey()) && !"ONPPRS".equals(channel.getKey()))
-            .map(channel ->
-                     DynamicListElement.builder()
-                         .code(UUID.fromString(channel.getKey()))
-                         .label(channel.getValueEn())
-                         .build())
-            .collect(Collectors.toList());
+        List<DynamicListElement> options;
+        if (hearingChannels.getValues().isEmpty()) {
+            // while we can't access PRD, this should satisfy the current requirement
+            options = List.of(
+                DynamicListElement.builder()
+                    .label("In person")
+                    .code(UUID.fromString("INTER"))
+                    .build(),
+                DynamicListElement.builder()
+                    .label("Telephone")
+                    .code(UUID.fromString("TEL"))
+                    .build(),
+                DynamicListElement.builder()
+                    .label("Video")
+                    .code(UUID.fromString("VID"))
+                    .build()
+            );
+        } else {
+            options = hearingChannels.getValues().stream()
+                // TODO once we use service AAA6 or AAA7, this filtering should not be needed
+                .filter(channel -> !"NA".equals(channel.getKey()) && !"ONPPRS".equals(channel.getKey()))
+                .map(channel ->
+                         DynamicListElement.builder()
+                             .code(UUID.fromString(channel.getKey()))
+                             .label(channel.getValueEn())
+                             .build())
+                .collect(Collectors.toList());
+        }
+
         return DynamicList.builder()
             .listItems(options)
             .build();
