@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.bankholidays.PublicHolidaysCollection;
-import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
@@ -32,6 +31,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -71,14 +71,14 @@ public class HearingScheduledHandler extends CallbackHandler {
         return format(HEARING_TASKS);
     }
 
-    private String getHeader(String hearingReference) {
-        return format(HEARING_CREATED_HEADER, hearingReference);
+    private String getHeader() {
+        return format(HEARING_CREATED_HEADER, hearingReferenceNumberRepository.getHearingReferenceNumber());
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader(caseData.getHearingReferenceNumber()))
+            .confirmationHeader(getHeader())
             .confirmationBody(getBody())
             .build();
     }
@@ -129,6 +129,7 @@ public class HearingScheduledHandler extends CallbackHandler {
         }
         return errors;
     }
+
     private boolean checkPastDateValidation(LocalDate localDate) {
         return localDate != null && localDate.isBefore(LocalDate.now());
     }
@@ -157,12 +158,11 @@ public class HearingScheduledHandler extends CallbackHandler {
             .build();
     }
 
-
     private CallbackResponse getDueDateAndFee(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
-            if (LocalDateTime.now().isBefore(caseData.getHearingDateTime().minusWeeks(4))) {
+            if (LocalDate.now().isBefore(caseData.getHearingDate().minusWeeks(4))) {
                 caseDataBuilder.hearingDueDate(
                     HearingUtils.addBusinessDays(
                         LocalDate.now(), 7, publicHolidaysCollection.getPublicHolidays()).toString());
@@ -186,8 +186,11 @@ public class HearingScheduledHandler extends CallbackHandler {
                     caseDataBuilder.hearingFee("£0");
             }
         }
-        caseDataBuilder.hearingReferenceNumber(hearingReferenceNumberRepository.getHearingReferenceNumber());
-        caseDataBuilder.partyApplicantPayment(caseData.getApplicant1().getPartyName());
+        if (nonNull(caseData.getHearingLocation())) {
+            DynamicList locationList = caseData.getHearingLocation();
+            locationList.setListItems(null);
+            caseDataBuilder.hearingLocation(locationList);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
