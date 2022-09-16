@@ -8,5 +8,6 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Data
 public class SDOHearingNotes {
+
     private final String input;
 }
