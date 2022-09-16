@@ -53,7 +53,6 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -79,7 +78,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
     private final IdamClient idamClient;
-    public String judgeNameTitle;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -169,10 +167,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.disposalHearingMethodInPersonDJ(locationsList);
 
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
-        if (ofNullable(userDetails.getForename() + " " + userDetails.getSurname().get()).isPresent()) {
-            judgeNameTitle = userDetails.getForename() + " " + userDetails.getSurname().get();
-        }
+        String judgeNameTitle = userDetails.getFullName();
 
         //populates the disposal screen
         caseDataBuilder
