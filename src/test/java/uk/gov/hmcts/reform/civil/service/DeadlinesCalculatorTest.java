@@ -188,7 +188,7 @@ public class DeadlinesCalculatorTest {
             LocalDateTime claimIssueDate,
             LocalDateTime expectedResponseDeadline
         ) {
-            LocalDateTime responseDeadline = calculator.plus14DaysAt4pmDeadline(claimIssueDate);
+            LocalDateTime responseDeadline = calculator.plus28DaysAt4pmDeadline(claimIssueDate);
 
             assertThat(responseDeadline)
                 .isWeekday()

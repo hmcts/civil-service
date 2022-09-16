@@ -280,7 +280,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldReturnNoError_whenValuesAreValid() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
-                .extensionDate(RESPONSE_DEADLINE.toLocalDate().plusDays(14))
+                .extensionDate(RESPONSE_DEADLINE.toLocalDate().plusDays(28))
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
