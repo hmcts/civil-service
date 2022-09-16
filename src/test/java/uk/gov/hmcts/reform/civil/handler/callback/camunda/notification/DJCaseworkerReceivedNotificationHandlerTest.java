@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.config.properties.defaultjudgments.DefaultJudgmentSpecEmailConfiguration;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
@@ -58,6 +59,8 @@ public class DJCaseworkerReceivedNotificationHandlerTest {
     private InterestCalculator interestCalculator;
     @MockBean
     private FeesService feesService;
+    @MockBean
+    private DefaultJudgmentSpecEmailConfiguration defaultJudgmentSpecEmailConfiguration;
 
     @Nested
     class AboutToSubmitCallback {
@@ -66,7 +69,7 @@ public class DJCaseworkerReceivedNotificationHandlerTest {
         void setup() {
             when(notificationsProperties.getCaseworkerDefaultJudgmentRequested())
                 .thenReturn("test-template-received-id");
-            when(notificationsProperties.getCaseworkerEmailDefaultJudgmentRequested())
+            when(defaultJudgmentSpecEmailConfiguration.getReceiver())
                 .thenReturn("caseworker@hmcts.net");
 
         }

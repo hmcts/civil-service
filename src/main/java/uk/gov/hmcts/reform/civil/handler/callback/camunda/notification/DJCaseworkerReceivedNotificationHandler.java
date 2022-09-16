@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.properties.defaultjudgments.DefaultJudgmentSpecEmailConfiguration;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -35,6 +36,7 @@ public class DJCaseworkerReceivedNotificationHandler extends CallbackHandler imp
     private final ObjectMapper objectMapper;
     private final InterestCalculator interestCalculator;
     private final FeesService feesService;
+    private final DefaultJudgmentSpecEmailConfiguration defaultJudgmentSpecEmailConfiguration;
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CASEWORKER_DJ_RECEIVED);
     private static final String REFERENCE_TEMPLATE_CASEWORKER = "default-judgment-caseworker-received-notification-%s";
     public static final String TASK_ID = "NotifyCaseworkerDJReceived";
@@ -53,7 +55,7 @@ public class DJCaseworkerReceivedNotificationHandler extends CallbackHandler imp
 
     private CallbackResponse notifyDJApprovedCaseworker(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        notificationService.sendMail(notificationsProperties.getCaseworkerEmailDefaultJudgmentRequested(),
+        notificationService.sendMail(defaultJudgmentSpecEmailConfiguration.getReceiver(),
                                      notificationsProperties.getCaseworkerDefaultJudgmentRequested(),
                                              addProperties(caseData),
                                              String.format(REFERENCE_TEMPLATE_CASEWORKER,

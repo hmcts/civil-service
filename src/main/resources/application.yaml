@@ -179,7 +179,6 @@ notifications:
   interimJudgmentRequestedDefendant: "d9e33565-ecdc-4475-a77b-e50cd4c07b61"
   interimJudgmentApprovalDefendant: "2e98fa16-ba9e-4229-b99f-fc72d40303f8"
   caseworkerDefaultJudgmentRequested: "b20f34f4-39c3-4488-9961-f6d4ae7247f4"
-  caseworkerEmailDefaultJudgmentRequested: "ocmcnton@justice.gov.uk"
 
 
 sendgrid:

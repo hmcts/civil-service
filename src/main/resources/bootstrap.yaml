@@ -24,4 +24,5 @@ spring:
         robotics-notification-recipient-spec: robotics.notification.specRecipient
         launch-darkly-sdk-key: LAUNCH_DARKLY_SDK_KEY
         ordnance-survey-api-key: OS_POSTCODE_LOOKUP_API_KEY
+        notification-caseworker-spec-receiver: caseworker.notification.spec.receiver
 
