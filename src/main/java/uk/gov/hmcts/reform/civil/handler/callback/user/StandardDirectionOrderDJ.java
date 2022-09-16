@@ -49,13 +49,11 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Optional.ofNullable;
-import static org.flywaydb.core.internal.util.ClassUtils.isPresent;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -172,9 +170,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
-        if(ofNullable(userDetails.getForename() + " " + userDetails.getSurname().get()).isPresent()) {
+        if (ofNullable(userDetails.getForename() + " " + userDetails.getSurname().get()).isPresent()) {
             judgeNameTitle = userDetails.getForename() + " " + userDetails.getSurname().get();
-        };
+        }
 
         //populates the disposal screen
         caseDataBuilder
