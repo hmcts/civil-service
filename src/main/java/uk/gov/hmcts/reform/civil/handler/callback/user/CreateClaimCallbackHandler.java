@@ -369,6 +369,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             }
             populateBlankOrgPolicies(dataBuilder, caseData);
         }
+
+        // temporarily default to yes for CIV-2659
+        if (YES.equals(caseData.getRespondent1Represented())) {
+            dataBuilder.respondent1OrgRegistered(YES);
+        }
+
+        if (YES.equals(caseData.getRespondent2Represented())) {
+            dataBuilder.respondent2OrgRegistered(YES);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
