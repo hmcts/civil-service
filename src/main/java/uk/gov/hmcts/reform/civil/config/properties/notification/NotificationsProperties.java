@@ -154,6 +154,6 @@ public class NotificationsProperties {
     private String standardDirectionOrderDJTemplate;
 
     @NotEmpty
-    private String respondentChangeOfAddressForCui;
+    private String respondentChangeOfAddressNotificationTemplate;
 
 }

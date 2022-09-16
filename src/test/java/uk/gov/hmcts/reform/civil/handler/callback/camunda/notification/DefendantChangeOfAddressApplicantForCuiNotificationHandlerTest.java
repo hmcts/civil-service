@@ -53,7 +53,7 @@ class DefendantChangeOfAddressApplicantForCuiNotificationHandlerTest extends Bas
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getRespondentChangeOfAddressForCui()).thenReturn("template-id");
+            when(notificationsProperties.getRespondentChangeOfAddressNotificationTemplate()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
         }

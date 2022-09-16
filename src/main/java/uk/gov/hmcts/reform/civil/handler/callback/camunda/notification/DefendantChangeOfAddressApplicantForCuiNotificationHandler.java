@@ -60,7 +60,7 @@ public class DefendantChangeOfAddressApplicantForCuiNotificationHandler
 
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getRespondentChangeOfAddressForCui(),
+            notificationsProperties.getRespondentChangeOfAddressNotificationTemplate(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
