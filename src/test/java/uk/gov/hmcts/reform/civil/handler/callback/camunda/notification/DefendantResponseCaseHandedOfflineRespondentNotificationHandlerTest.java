@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -132,6 +133,34 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
             }
 
             @Test
+            void shouldNotifyDefendantSolicitor1_when1v2CaseUnspec() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
+                    .respondent1ClaimResponseType(RespondentResponseType.PART_ADMISSION)
+                    .respondent2ClaimResponseType(RespondentResponseType.COUNTER_CLAIM)
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .build();
+                when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
+                    .thenReturn("template-id-multiparty");
+
+                CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                                 .eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE")
+                                 .build())
+                    .build();
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor@example.com",
+                    "template-id-multiparty",
+                    getNotificationDataMap(caseData),
+                    "defendant-response-case-handed-offline-respondent-notification-000DC001"
+                );
+            }
+
+            @Test
             void shouldNotifyDefendantSolicitor2_when1v2Case() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
@@ -148,6 +177,35 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .build();
 
                 when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
+                    .thenReturn("template-id-multiparty");
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor2@example.com",
+                    "template-id-multiparty",
+                    getNotificationDataMap(caseData),
+                    "defendant-response-case-handed-offline-respondent-notification-000DC001"
+                );
+            }
+
+            @Test
+            void shouldNotifyDefendantSolicitor2_when1v2CaseUnspec() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_Resp1FullDefenceAndResp2CounterClaim()
+                    .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+                    .respondent2ClaimResponseType(RespondentResponseType.COUNTER_CLAIM)
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .build();
+
+                CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                                 .eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE")
+                                 .build())
+                    .build();
+
+                when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
                     .thenReturn("template-id-multiparty");
 
                 handler.handle(params);
