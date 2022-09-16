@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
@@ -174,6 +175,7 @@ public class CaseDataParent implements MappableObject {
     private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
     private final List<SmallTrack> smallClaims;
     private final SmallClaimsMethod smallClaimsMethod;
+    @JsonAlias("fastTrackHearingMethod")
     private final DynamicList hearingMethod;
     private final SmallClaimsMethodTelephoneHearing smallClaimsMethodTelephoneHearing;
     private final SmallClaimsMethodVideoConferenceHearing smallClaimsMethodVideoConferenceHearing;
@@ -277,4 +279,9 @@ public class CaseDataParent implements MappableObject {
     private final DefendantPinToPostLRspec respondent1PinToPostLRspec;
 
     private final ScheduledHearing nextHearingDetails;
+
+    // here so that we can serialize to a field used by ccd
+    public DynamicList getFastTrackHearingMethod() {
+        return hearingMethod;
+    }
 }
