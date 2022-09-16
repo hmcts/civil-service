@@ -371,7 +371,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
 
         // temporarily default to yes for CIV-2659
-        if (YES.equals(caseData.getRespondent1Represented())) {
+        if (YES.equals(caseData.getRespondent1Represented()) && caseData.getRespondent1OrgRegistered() == null) {
             dataBuilder.respondent1OrgRegistered(YES);
         }
 
