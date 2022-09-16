@@ -81,7 +81,6 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -109,6 +108,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
 import static uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator.DISPOSAL_HEARING;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class CaseDataBuilder {
 
@@ -289,7 +289,7 @@ public class CaseDataBuilder {
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private TrialHearingTrial trialHearingTrialDJ;
 
-    private ChangeOfRepresentation changeOfRepresentation;
+    private List<Element<ChangeOfRepresentation>> changeOfRepresentation;
     private ChangeOrganisationRequest changeOrganisationRequest;
 
     //update pdf document from general applications
@@ -415,7 +415,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder caseNotes(CaseNote caseNote) {
-        this.caseNotes = ElementUtils.wrapElements(caseNote);
+        this.caseNotes = wrapElements(caseNote);
         return this;
     }
 
@@ -1613,12 +1613,13 @@ public class CaseDataBuilder {
         String caseRole = isApplicant ? CaseRole.APPLICANTSOLICITORONE.getFormattedName() :
             isRespondent2Replaced ? CaseRole.RESPONDENTSOLICITORTWO.getFormattedName() :
                 CaseRole.RESPONDENTSOLICITORONE.getFormattedName();
-        changeOfRepresentation = ChangeOfRepresentation.builder()
+        ChangeOfRepresentation newChange = ChangeOfRepresentation.builder()
             .caseRole(caseRole)
             .organisationToAddID(newOrgID)
             .organisationToRemoveID(oldOrgId)
             .timestamp(LocalDateTime.now())
             .build();
+        changeOfRepresentation = wrapElements(newChange);
         return this;
     }
 

@@ -261,8 +261,8 @@ public class CaseDataParent implements MappableObject {
     private final BigDecimal respondToAdmittedClaimOwingAmountPounds2;
 
     private final ChangeOrganisationRequest changeOrganisationRequestField;
-    private final ChangeOfRepresentation changeOfRepresentation;
-    
+    private final List<Element<ChangeOfRepresentation>> changeOfRepresentation;
+
     /**
      * Adding for PiP to citizen UI.
      */

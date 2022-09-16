@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.ContactInformation;
@@ -33,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DETAILS_A
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Address.fromContactInformation;
+import static uk.gov.hmcts.reform.civil.utils.ChangeOfRepresentationUtils.getLatestChangeOfRepresentation;
 
 @Slf4j
 @Service
@@ -76,7 +78,13 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         // nullify this field since it was persisted to auto approve noc
         caseDataBuilder.changeOrganisationRequestField(null);
 
-        ChangeOfRepresentation changeOfRepresentation = caseData.getChangeOfRepresentation();
+        List<Element<ChangeOfRepresentation>> changeOfRepresentationHistory = caseData.getChangeOfRepresentation();
+        if (changeOfRepresentationHistory == null || changeOfRepresentationHistory.isEmpty()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of("No Notice of Change events recorded"))
+                .build();
+        }
+        ChangeOfRepresentation changeOfRepresentation = getLatestChangeOfRepresentation(changeOfRepresentationHistory);
 
         uk.gov.hmcts.reform.prd.model.Organisation addedOrganisation = organisationService.findOrganisationById(
             changeOfRepresentation.getOrganisationToAddID()).orElse(null);

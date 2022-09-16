@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.noc.DecisionRequest;
 
@@ -30,6 +31,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
 @RequiredArgsConstructor
@@ -56,7 +59,6 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     private CallbackResponse applyNoticeOfChangeDecision(CallbackParams callbackParams) {
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        ChangeOrganisationRequest corFieldBeforeNoC = callbackParams.getCaseData().getChangeOrganisationRequestField();
 
         updateOrgPoliciesForLiP(callbackParams.getRequest().getCaseDetails());
 
@@ -71,11 +73,31 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
 
         updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(updatedCaseData, updatedCaseDataBuilder);
 
-        updatedCaseDataBuilder.businessProcess(BusinessProcess.ready(APPLY_NOC_DECISION))
-            .changeOfRepresentation(getChangeOfRepresentation(corFieldBeforeNoC, updatedCaseData));
+        updatedCaseDataBuilder.businessProcess(BusinessProcess.ready(APPLY_NOC_DECISION));
+
+        updateChangeOfRepresentationHistory(callbackParams.getCaseData().getChangeOrganisationRequestField(),
+                                            updatedCaseData, updatedCaseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseDataBuilder.build().toMap(objectMapper)).build();
+    }
+
+    private void updateChangeOfRepresentationHistory(ChangeOrganisationRequest corFieldBeforeNoC,
+                                                     CaseData updatedCaseData,
+                                                     CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder) {
+        List<Element<ChangeOfRepresentation>> changeOfRepresentationHistory =
+            updatedCaseData.getChangeOfRepresentation();
+
+        ChangeOfRepresentation newChangeOfRepresentation =
+            getChangeOfRepresentation(corFieldBeforeNoC, updatedCaseData);
+
+        if (changeOfRepresentationHistory != null
+            && !changeOfRepresentationHistory.isEmpty()) {
+            changeOfRepresentationHistory.add(element(newChangeOfRepresentation));
+            updatedCaseDataBuilder.changeOfRepresentation(changeOfRepresentationHistory);
+        } else {
+            updatedCaseDataBuilder.changeOfRepresentation(wrapElements(newChangeOfRepresentation));
+        }
     }
 
     private ChangeOfRepresentation getChangeOfRepresentation(ChangeOrganisationRequest corFieldBeforeNoC,
