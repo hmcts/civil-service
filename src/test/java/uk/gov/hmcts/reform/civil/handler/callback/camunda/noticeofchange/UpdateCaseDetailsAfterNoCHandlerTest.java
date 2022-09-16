@@ -146,7 +146,6 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondent1OrganisationIDCopy()).isEqualTo("1234");
             assertThat(updatedCaseData.getRespondent1Represented()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondent1OrgRegistered()).isEqualTo(YES);
-            assertThat(updatedCaseData.getAddLegalRepDeadline()).isNull();
             //TODO update this after CCD-3538
             assertThat(updatedCaseData.getRespondentSolicitor1EmailAddress()).isNull();
         }
@@ -269,7 +268,6 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
-            assertThat(updatedCaseData.getAddLegalRepDeadline()).isNull();
             assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isEqualTo(getNewOrgDetails());
             assertThat(updatedCaseData.getRespondentSolicitor2ServiceAddress())
                 .isEqualTo(getNewOrgDetails().getAddress());
@@ -303,7 +301,6 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
-            assertThat(updatedCaseData.getAddLegalRepDeadline()).isEqualTo(caseData.getAddLegalRepDeadline());
             assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isEqualTo(getNewOrgDetails());
             assertThat(updatedCaseData.getRespondentSolicitor2ServiceAddress())
                 .isEqualTo(getNewOrgDetails().getAddress());

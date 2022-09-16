@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.ContactInformation;
@@ -33,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DETAILS_A
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Address.fromContactInformation;
+import static uk.gov.hmcts.reform.civil.utils.ChangeOfRepresentationUtils.getLatestChangeOfRepresentation;
 
 @Slf4j
 @Service
@@ -76,7 +78,13 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         // nullify this field since it was persisted to auto approve noc
         caseDataBuilder.changeOrganisationRequestField(null);
 
-        ChangeOfRepresentation changeOfRepresentation = caseData.getChangeOfRepresentation();
+        List<Element<ChangeOfRepresentation>> changeOfRepresentationHistory = caseData.getChangeOfRepresentation();
+        if (changeOfRepresentationHistory == null || changeOfRepresentationHistory.isEmpty()) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of("No Notice of Change events recorded"))
+                .build();
+        }
+        ChangeOfRepresentation changeOfRepresentation = getLatestChangeOfRepresentation(changeOfRepresentationHistory);
 
         uk.gov.hmcts.reform.prd.model.Organisation addedOrganisation = organisationService.findOrganisationById(
             changeOfRepresentation.getOrganisationToAddID()).orElse(null);
@@ -103,12 +111,10 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
                 && addedOrganisation != null) {
                 updateRespondentSolicitor1Details(caseDataBuilder, addedOrganisation, addedSolicitorDetails);
-                updateAddLegalRepDeadlineIfRespondent1Replaced(caseData, caseDataBuilder);
             } else {
                 if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
                     && addedOrganisation != null) {
                     updateRespondentSolicitor2Details(caseDataBuilder, addedOrganisation, addedSolicitorDetails);
-                    updateAddLegalRepDeadlineIfRespondent2Replaced(caseData, caseDataBuilder);
                 }
             }
         }
@@ -118,29 +124,6 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
-    }
-
-    private void updateAddLegalRepDeadlineIfRespondent1Replaced(
-        CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        if (caseData.getAddLegalRepDeadline() != null) {
-            if (YES.equals(caseData.getAddRespondent2())
-                && NO.equals(caseData.getRespondent2Represented())) {
-                caseDataBuilder.addLegalRepDeadline(caseData.getAddLegalRepDeadline());
-            } else {
-                caseDataBuilder.addLegalRepDeadline(null);
-            }
-        }
-    }
-
-    private void updateAddLegalRepDeadlineIfRespondent2Replaced(
-        CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        if (caseData.getAddLegalRepDeadline() != null) {
-            if (NO.equals(caseData.getRespondent1Represented())) {
-                caseDataBuilder.addLegalRepDeadline(caseData.getAddLegalRepDeadline());
-            } else {
-                caseDataBuilder.addLegalRepDeadline(null);
-            }
-        }
     }
 
     private void updateRespondentSolicitor2Details(
