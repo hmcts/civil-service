@@ -28,7 +28,10 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static java.time.LocalTime.MIDNIGHT;
-import static java.time.Month.*;
+import static java.time.Month.DECEMBER;
+import static java.time.Month.JANUARY;
+import static java.time.Month.AUGUST;
+import static java.time.Month.NOVEMBER;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.assertion.DayAssert.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
