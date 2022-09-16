@@ -433,9 +433,9 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("date2")
                 .isEqualTo(LocalDate.now().plusWeeks(8).toString());
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("input3")
-                .isEqualTo("Any questions which are to be addressed to an expert" +
-                               " must be sent to the expert directly and uploaded to " +
-                               "the Digital Portal by 4pm on");
+                .isEqualTo("Any questions which are to be addressed to an expert"
+                               + " must be sent to the expert directly and uploaded to "
+                               + "the Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("trialPersonalInjury").extracting("date3")
                 .isEqualTo(LocalDate.now().plusWeeks(4).toString());
 
