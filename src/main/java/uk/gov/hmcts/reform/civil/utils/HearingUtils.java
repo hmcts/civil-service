@@ -15,9 +15,7 @@ public class HearingUtils {
 
     public static LocalDate addBusinessDays(LocalDate localDate, int days, Set<LocalDate> holidaysSet) {
         if (localDate == null || days <= 0 || holidaysSet.isEmpty()) {
-            throw new IllegalArgumentException("Invalid method argument(s) "
-                                                   + "to addBusinessDays(" + localDate + "," + days + ","
-                                                   + holidaysSet + ")");
+            throw new IllegalArgumentException("Invalid method argument(s)");
         }
 
         List<LocalDate> holidays = new ArrayList<>(holidaysSet);
