@@ -94,8 +94,7 @@ public class HearingScheduledHandler extends CallbackHandler {
     }
 
     private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
-        StringBuilder stringBuilder = new StringBuilder();
-        return fromList(locations.stream().map(location -> stringBuilder.append(location.getSiteName())
+        return fromList(locations.stream().map(location -> new StringBuilder().append(location.getSiteName())
                                  .append(" - ").append(location.getCourtAddress())
                                 .append(" - ").append(location.getPostcode()).toString())
                             .collect(Collectors.toList()));
