@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class NocNotificationUtilsTest {
 
@@ -33,7 +34,7 @@ public class NocNotificationUtilsTest {
 
     @Test
     void testGetPreviousSolicitorEmail() {
-        caseData = CaseData.builder().changeOfRepresentation(change).build();
+        caseData = CaseData.builder().changeOfRepresentation(wrapElements(change)).build();
         assertEquals(TEST_EMAIL, NocNotificationUtils.getPreviousSolicitorEmail(caseData));
     }
 
@@ -46,7 +47,7 @@ public class NocNotificationUtilsTest {
             .build();
         caseData = CaseData.builder()
             .applicantSolicitor1UserDetails(userDetails)
-            .changeOfRepresentation(change)
+            .changeOfRepresentation(wrapElements(change))
             .applicant1OrganisationPolicy(organisationPolicy)
             .build();
 
@@ -62,7 +63,7 @@ public class NocNotificationUtilsTest {
             .build();
         caseData = CaseData.builder()
             .respondentSolicitor1EmailAddress(TEST_EMAIL)
-            .changeOfRepresentation(change)
+            .changeOfRepresentation(wrapElements(change))
             .respondent1OrganisationPolicy(organisationPolicy)
             .build();
 
@@ -79,7 +80,7 @@ public class NocNotificationUtilsTest {
             .build();
         caseData = CaseData.builder()
             .applicantSolicitor1UserDetails(userDetails)
-            .changeOfRepresentation(change)
+            .changeOfRepresentation(wrapElements(change))
             .applicant1OrganisationPolicy(organisationPolicy)
             .build();
 
@@ -91,7 +92,7 @@ public class NocNotificationUtilsTest {
     void testisOtherParty1LipReturnsTrue() {
         change.setCaseRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
         caseData = CaseData.builder()
-            .changeOfRepresentation(change)
+            .changeOfRepresentation(wrapElements(change))
             .build();
 
         assertTrue(NocNotificationUtils.isOtherParty1Lip(caseData), TRUE_LIP_MESSAGE);
@@ -105,7 +106,7 @@ public class NocNotificationUtilsTest {
             .build();
         caseData = CaseData.builder()
             .respondentSolicitor1EmailAddress(TEST_EMAIL)
-            .changeOfRepresentation(change)
+            .changeOfRepresentation(wrapElements(change))
             .respondent1OrganisationPolicy(organisationPolicy)
             .build();
 
@@ -122,7 +123,7 @@ public class NocNotificationUtilsTest {
             .build();
         caseData = CaseData.builder()
             .applicantSolicitor1UserDetails(userDetails)
-            .changeOfRepresentation(change)
+            .changeOfRepresentation(wrapElements(change))
             .addApplicant2(YesOrNo.YES)
             .applicant1OrganisationPolicy(organisationPolicy)
             .build();
@@ -139,7 +140,7 @@ public class NocNotificationUtilsTest {
             .build();
         caseData = CaseData.builder()
             .respondentSolicitor2EmailAddress(TEST_EMAIL)
-            .changeOfRepresentation(change)
+            .changeOfRepresentation(wrapElements(change))
             .respondent2OrganisationPolicy(organisationPolicy)
             .build();
 
@@ -151,7 +152,7 @@ public class NocNotificationUtilsTest {
     void testIsOtherSolicitor2Lip_RespondentSolicitor1() {
         change.setCaseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
         caseData = CaseData.builder()
-            .changeOfRepresentation(change)
+            .changeOfRepresentation(wrapElements(change))
             .build();
 
         assertTrue(NocNotificationUtils.isOtherParty2Lip(caseData), TRUE_LIP_MESSAGE);
@@ -161,7 +162,7 @@ public class NocNotificationUtilsTest {
     void testIsOtherSolicitor2Lip_RespondentSolicitor2() {
         change.setCaseRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
         caseData = CaseData.builder()
-            .changeOfRepresentation(change)
+            .changeOfRepresentation(wrapElements(change))
             .build();
 
         assertTrue(NocNotificationUtils.isOtherParty2Lip(caseData), TRUE_LIP_MESSAGE);

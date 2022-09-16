@@ -63,7 +63,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
         void shouldUpdateSolicitorDetails_afterNoCSubmittedByApplicantSolicitor1v1() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
-                .changeOfRepresentation(true, false, "1234", "QWERTY A")
+                .changeOfRepresentation(true, false, "1234", "QWERTY A", null)
                 .updateOrgPolicyAfterNoC(true, false)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -94,7 +94,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
         void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor1v1() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
-                .changeOfRepresentation(false, false, "1234", "QWERTY R")
+                .changeOfRepresentation(false, false, "1234", "QWERTY R", null)
                 .updateOrgPolicyAfterNoC(true, false)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -124,7 +124,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
         void shouldUpdateSolicitorDetails_afterNoCSubmittedByRespondentSolicitor1v1LiP() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v1LiP()
-                .changeOfRepresentation(false, false, "1234", null)
+                .changeOfRepresentation(false, false, "1234", null, null)
                 .updateOrgPolicyAfterNoC(true, false)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -155,7 +155,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .changeOfRepresentation(false, true, "1234", "QWERTY R2")
+                .changeOfRepresentation(false, true, "1234", "QWERTY R2", null)
                 .updateOrgPolicyAfterNoC(false, true)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -187,7 +187,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .changeOfRepresentation(false, true, "QWERTY R", "QWERTY R2")
+                .changeOfRepresentation(false, true, "QWERTY R", "QWERTY R2", null)
                 .updateOrgPolicyAfterNoC(false, true)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -220,7 +220,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .multiPartyClaimOneDefendantSolicitor()
-                .changeOfRepresentation(false, true, "1234", "QWERTY R")
+                .changeOfRepresentation(false, true, "1234", "QWERTY R", null)
                 .updateOrgPolicyAfterNoC(false, true)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -253,7 +253,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData caseData = CaseDataBuilder.builder()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateClaimIssued1v2Respondent2LiP()
-                .changeOfRepresentation(false, true, "1234", null)
+                .changeOfRepresentation(false, true, "1234", null, null)
                 .updateOrgPolicyAfterNoC(false, true)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -286,7 +286,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateClaimIssued1v2Respondent2LiP()
                 .atStateClaimIssued1v1LiP()
-                .changeOfRepresentation(false, true, "1234", null)
+                .changeOfRepresentation(false, true, "1234", null, null)
                 .updateOrgPolicyAfterNoC(false, true)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

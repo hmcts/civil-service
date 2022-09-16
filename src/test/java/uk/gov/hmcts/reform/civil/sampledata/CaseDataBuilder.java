@@ -1335,28 +1335,26 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1() {
         atStateClaimDetailsNotified();
-        changeOfRepresentation(false, false, "New-sol-id", "Previous-sol-id");
-        changeOfRepresentation.setFormerRepresentationEmailAddress("previous-solicitor@example.com");
+        changeOfRepresentation(false, false, "New-sol-id", "Previous-sol-id", "previous-solicitor@example.com");
         return this;
     }
 
     public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeLip() {
         atStateClaimDetailsNotified();
-        changeOfRepresentation(false, false, "New-sol-id", "Lip");
-        changeOfRepresentation.setOrganisationToRemoveID(null);
+        changeOfRepresentation(false, false, "New-sol-id", null, null);
         return this;
     }
 
     public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeOtherSol1Lip() {
         atStateClaimDetailsNotified();
-        changeOfRepresentation(true, false, "New-sol-id", "Lip");
+        changeOfRepresentation(true, false, "New-sol-id", null, null);
         respondent1OrganisationPolicy = null;
         return this;
     }
 
     public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeOtherSol2Lip() {
         atStateClaimDetailsNotified();
-        changeOfRepresentation(true, false, "New-sol-id", "Lip");
+        changeOfRepresentation(true, false, "New-sol-id", null, null);
         respondent2OrganisationPolicy = null;
         return this;
     }
@@ -1637,16 +1635,21 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder changeOfRepresentation(boolean isApplicant, boolean isRespondent2Replaced,
-                                                  String newOrgID, String oldOrgId) {
+                                                  String newOrgID, String oldOrgId, String formerSolicitorEmail) {
         String caseRole = isApplicant ? CaseRole.APPLICANTSOLICITORONE.getFormattedName() :
             isRespondent2Replaced ? CaseRole.RESPONDENTSOLICITORTWO.getFormattedName() :
                 CaseRole.RESPONDENTSOLICITORONE.getFormattedName();
-        ChangeOfRepresentation newChange = ChangeOfRepresentation.builder()
+        ChangeOfRepresentation.ChangeOfRepresentationBuilder newChangeBuilder = ChangeOfRepresentation.builder()
             .caseRole(caseRole)
             .organisationToAddID(newOrgID)
-            .organisationToRemoveID(oldOrgId)
-            .timestamp(LocalDateTime.now())
-            .build();
+            .timestamp(LocalDateTime.now());
+        if (oldOrgId != null) {
+            newChangeBuilder.organisationToRemoveID(oldOrgId);
+        }
+        if (formerSolicitorEmail != null) {
+            newChangeBuilder.formerRepresentationEmailAddress(formerSolicitorEmail);
+        }
+        ChangeOfRepresentation newChange = newChangeBuilder.build();
         changeOfRepresentation = wrapElements(newChange);
         return this;
     }
