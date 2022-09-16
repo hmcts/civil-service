@@ -28,13 +28,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static java.time.LocalTime.MIDNIGHT;
-import static java.time.Month.AUGUST;
-import static java.time.Month.DECEMBER;
-import static java.time.Month.FEBRUARY;
-import static java.time.Month.JULY;
-import static java.time.Month.JUNE;
-import static java.time.Month.NOVEMBER;
-import static java.time.Month.OCTOBER;
+import static java.time.Month.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.assertion.DayAssert.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
@@ -69,7 +63,7 @@ public class DeadlinesCalculatorTest {
         private static final LocalDate MONDAY_DATE = LocalDate.of(2020, AUGUST, 7);
         private static final LocalDateTime EXPECTED_DEADLINE = LocalDate.of(2020, DECEMBER, 7).atTime(MIDNIGHT);
         private static final LocalDate CHRISTMAS_DAY = LocalDate.of(2020, DECEMBER, 25).minusMonths(4);
-        private static final LocalDateTime EXPECTED_CHRISTMAS = LocalDate.of(2020, DECEMBER, 29).atTime(MIDNIGHT);
+        private static final LocalDateTime EXPECTED_JANUARY_NEW_NEXT = LocalDate.of(2021, JANUARY, 8).atTime(MIDNIGHT);
         private static final LocalDate AUGUST_25_2017 = LocalDate.of(2017, AUGUST, 25);
         private static final LocalDateTime CHRISTMAS_27TH_WEDNESDAY = LocalDate.of(2017, DECEMBER, 27)
             .atTime(MIDNIGHT);
@@ -84,6 +78,7 @@ public class DeadlinesCalculatorTest {
 
         private static final LocalDate FEBRUARY_28TH = LocalDate.of(2018, FEBRUARY, 28);
         private static final LocalDateTime JUNE_28TH = LocalDate.of(2018, JUNE, 28).atTime(MIDNIGHT);
+        private static final LocalDateTime DECEMBER_29TH = LocalDate.of(2020, DECEMBER, 29).atTime(MIDNIGHT);
 
         @Override
         public Stream<Arguments> provideArguments(ExtensionContext context) {
@@ -91,7 +86,7 @@ public class DeadlinesCalculatorTest {
                 Arguments.of(SATURDAY_DATE, EXPECTED_DEADLINE),
                 Arguments.of(SUNDAY_DATE, EXPECTED_DEADLINE),
                 Arguments.of(MONDAY_DATE, EXPECTED_DEADLINE),
-                Arguments.of(CHRISTMAS_DAY, EXPECTED_CHRISTMAS),
+                Arguments.of(CHRISTMAS_DAY, DECEMBER_29TH),
                 Arguments.of(AUGUST_25_2017, CHRISTMAS_27TH_WEDNESDAY),
                 Arguments.of(DATE_31ST, EXPECTED_DATE_30TH),
                 Arguments.of(OCTOBER_DATE_2018, FEBRUARY_28_2019_NON_LEAP_YEAR),
@@ -152,7 +147,7 @@ public class DeadlinesCalculatorTest {
         private static final LocalDateTime MONDAY = LocalDate.of(2020, AUGUST, 3).atTime(12, 0);
         private static final LocalDateTime MONDAY_AFTER_4PM = LocalDate.of(2020, AUGUST, 3).atTime(17, 0);
         private static final LocalDateTime MONDAY_AT_4PM = LocalDate.of(2020, AUGUST, 3).atTime(16, 0);
-        private static final LocalDateTime MONDAY_AS_DEADLINE = LocalDateTime.of(2020, AUGUST, 17, 16, 0);
+        private static final LocalDateTime THURSDAY_AS_DEADLINE = LocalDateTime.of(2020, SEPTEMBER, 1, 16, 0);
 
         private static final LocalDateTime CHRISTMAS_DAY = LocalDate.of(2020, DECEMBER, 25).minusDays(14)
             .atTime(12, 0);
@@ -161,20 +156,23 @@ public class DeadlinesCalculatorTest {
         private static final LocalDateTime CHRISTMAS_DAY_AFTER_4PM = LocalDate.of(2020, DECEMBER, 25).minusDays(14)
             .atTime(17, 0);
         private static final LocalDateTime NEXT_WORKING_DAY = LocalDateTime.of(2020, DECEMBER, 29, 16, 0);
+        private static final LocalDateTime NEXT_YEAR_JANUARY_8 = LocalDateTime.of(2021, JANUARY, 8, 16, 0);
+        private static final LocalDateTime NEXT_YEAR_JANUARY_11 = LocalDateTime.of(2021, JANUARY, 11, 16, 0);
+        private static final LocalDateTime FRIDAY_AS_DEADLINE = THURSDAY_AS_DEADLINE.plusDays(1);
 
         @Override
         public Stream<Arguments> provideArguments(ExtensionContext context) {
             return Stream.of(
-                Arguments.of(SATURDAY, MONDAY_AS_DEADLINE),
-                Arguments.of(SATURDAY_AFTER_4PM, MONDAY_AS_DEADLINE),
-                Arguments.of(SATURDAY_AT_4PM, MONDAY_AS_DEADLINE),
-                Arguments.of(SUNDAY, MONDAY_AS_DEADLINE),
-                Arguments.of(MONDAY, MONDAY_AS_DEADLINE),
-                Arguments.of(CHRISTMAS_DAY, NEXT_WORKING_DAY),
-                Arguments.of(CHRISTMAS_DAY_AT_4PM, NEXT_WORKING_DAY),
-                Arguments.of(CHRISTMAS_DAY_AFTER_4PM, NEXT_WORKING_DAY),
-                Arguments.of(MONDAY_AFTER_4PM, MONDAY_AS_DEADLINE.plusDays(1)),
-                Arguments.of(MONDAY_AT_4PM, MONDAY_AS_DEADLINE.plusDays(1))
+                Arguments.of(SATURDAY, THURSDAY_AS_DEADLINE),
+                Arguments.of(SATURDAY_AFTER_4PM, THURSDAY_AS_DEADLINE),
+                Arguments.of(SATURDAY_AT_4PM, THURSDAY_AS_DEADLINE),
+                Arguments.of(SUNDAY, THURSDAY_AS_DEADLINE),
+                Arguments.of(MONDAY, THURSDAY_AS_DEADLINE),
+                Arguments.of(CHRISTMAS_DAY, NEXT_YEAR_JANUARY_8),
+                Arguments.of(CHRISTMAS_DAY_AT_4PM, NEXT_YEAR_JANUARY_11),
+                Arguments.of(CHRISTMAS_DAY_AFTER_4PM, NEXT_YEAR_JANUARY_11),
+                Arguments.of(MONDAY_AFTER_4PM, THURSDAY_AS_DEADLINE),
+                Arguments.of(MONDAY_AT_4PM, THURSDAY_AS_DEADLINE)
             );
         }
     }
