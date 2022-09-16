@@ -375,7 +375,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             dataBuilder.respondent1OrgRegistered(YES);
         }
 
-        if (YES.equals(caseData.getRespondent2Represented())) {
+        if (YES.equals(caseData.getRespondent2Represented()) && caseData.getRespondent2OrgRegistered() == null) {
             dataBuilder.respondent2OrgRegistered(YES);
         }
 
