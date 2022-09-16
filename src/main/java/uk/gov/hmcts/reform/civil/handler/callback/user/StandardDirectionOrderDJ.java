@@ -49,10 +49,12 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -78,7 +80,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
     private final IdamClient idamClient;
-    public String judgeNameTitle;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -168,14 +169,14 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.disposalHearingMethodInPersonDJ(locationsList);
 
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        judgeNameTitle = userDetails.getForename() + " " + userDetails.getSurname().get();
+        Optional<String> judgeNameTitle = ofNullable(userDetails.getForename() + " " + userDetails.getSurname().get());
 
         //populates the disposal screen
         caseDataBuilder
             .disposalHearingJudgesRecitalDJ(DisposalHearingJudgesRecitalDJ
                                                             .builder()
-                                                            .judgeNameTitle(judgeNameTitle)
-                                                            .input(judgeNameTitle
+                                                            .judgeNameTitle(judgeNameTitle.get())
+                                                            .input(judgeNameTitle.get()
                                                                       + ", Upon considering the claim form and "
                                                                       + "Particulars of Claim/statements of case"
                                                                       + " [and the directions questionnaires] "
@@ -281,8 +282,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder
             .trialHearingJudgesRecitalDJ(TrialHearingJudgesRecital
                                              .builder()
-                                             .judgeNameTitle(judgeNameTitle)
-                                             .input(judgeNameTitle
+                                             .judgeNameTitle(judgeNameTitle.get())
+                                             .input(judgeNameTitle.get()
                                                         + ", has considered the statements of "
                                                         + "the case and the information provided "
                                                         + "by the parties, \n\n "
