@@ -87,6 +87,24 @@ class FeatureToggleServiceTest {
     }
 
     @Test
+    void shouldCallBoolVariation_whenIsHearingAndListingSDOEnabledInvoked() {
+        var hearingAndListingKey = "hearing-and-listing-sdo";
+        givenToggle(hearingAndListingKey, true);
+
+        assertThat(featureToggleService.isHearingAndListingSDOEnabled()).isTrue();
+        verifyBoolVariationCalled(hearingAndListingKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
+    void shouldCallBoolVariation_whenisCourtLocationDynamicListEnabledInvoked() {
+        var courtLocationDynamicListKey = "court-location-dynamic-list";
+        givenToggle(courtLocationDynamicListKey, true);
+
+        assertThat(featureToggleService.isCourtLocationDynamicListEnabled()).isTrue();
+        verifyBoolVariationCalled(courtLocationDynamicListKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
     void shouldCallBoolVariation_whenIsPinInPostEnabledInvoked() {
         var pinInPostKey = "pin-in-post";
         givenToggle(pinInPostKey, true);

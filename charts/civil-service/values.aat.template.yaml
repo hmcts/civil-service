@@ -6,8 +6,7 @@ postgresql:
   image:
     registry: hmctspublic.azurecr.io
     repository: imported/bitnami/postgresql
-    tag: '11.3.0'
-    pullPolicy: Always
+    tag: '11.6.0'
     debug: true
   resources:
     requests:
@@ -150,7 +149,7 @@ ccd:
         CCD_MULTIPARTY_CASE_TYPES: CIVIL
         CCD_MULTIPARTY_EVENTS: DEFENDANT_RESPONSE,ACKNOWLEDGE_CLAIM,CLAIMANT_RESPONSE
       keyVaults: []
-      ingressHost: http://civil-service-data-store-staging-aat.service.core-compute-aat.internal
+      ingressHost: civil-service-data-store-staging-aat.service.core-compute-aat.internal
   am-role-assignment-service:
     java:
       keyVaults:

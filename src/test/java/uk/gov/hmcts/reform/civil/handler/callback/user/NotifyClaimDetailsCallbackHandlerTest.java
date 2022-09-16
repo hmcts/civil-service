@@ -33,7 +33,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -75,7 +74,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
                 .build();
 
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -113,7 +112,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrors_whenNoDocuments() {
             CaseData caseData = caseDataBuilder.build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, MID, pageId);
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -133,7 +132,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrors_whenParticularsOfClaimFieldsAreInErrorState() {
             CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().build()).build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, MID, pageId);
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -155,7 +154,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder()
                                                                         .particularsOfClaimText("Some string")
                                                                         .build()).build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, MID, pageId);
+            CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -267,7 +266,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
                 .build();
 
-            CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             String formattedDeadline = formatLocalDateTime(DEADLINE, DATE_TIME_AT);
@@ -288,7 +287,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor()
                 .build();
 
-            CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             String formattedDeadline = formatLocalDateTime(DEADLINE, DATE_TIME_AT);
