@@ -100,6 +100,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWOSPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -570,7 +571,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2
                 ))
                 .build();
-            CallbackParams params = callbackParamsOf(CallbackVersion.V_2, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
 
             List<LocationRefData> locations = List.of(LocationRefData.builder().build());
             when(locationRefDataService.getCourtLocationsAsLocationRefData(any()))
@@ -1164,7 +1165,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void populate() {
             CaseData caseData = CaseData.builder().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
 
             List<LocationRefData> locations = List.of(LocationRefData.builder()
                                                           .build());

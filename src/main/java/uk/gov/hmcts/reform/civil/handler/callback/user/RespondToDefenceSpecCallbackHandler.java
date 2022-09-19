@@ -44,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -79,7 +80,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
+            callbackKey(V_1, ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(ABOUT_TO_START), this::populateCaseData,
+            callbackKey(V_1, ABOUT_TO_START), this::populateCaseData,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -147,7 +150,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Applicant1DQ.Applicant1DQBuilder dq = caseData.getApplicant1DQ().toBuilder()
                 .applicant1DQStatementOfTruth(statementOfTruth);
-            if (featureToggleService.isCourtLocationDynamicListEnabled()) {
+            if (V_1.equals(callbackParams.getVersion()) && featureToggleService.isCourtLocationDynamicListEnabled()) {
                 handleCourtLocationData(caseData, builder, dq, callbackParams);
             }
 
@@ -200,7 +203,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
             .superClaimType(SPEC_CLAIM);
 
-        if (featureToggleService.isCourtLocationDynamicListEnabled()) {
+        if (V_1.equals(callbackParams.getVersion()) && featureToggleService.isCourtLocationDynamicListEnabled()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);
             updatedCaseData.applicant1DQ(caseData.getApplicant1DQ().toBuilder()
                                              .applicant1DQRequestedCourt(
