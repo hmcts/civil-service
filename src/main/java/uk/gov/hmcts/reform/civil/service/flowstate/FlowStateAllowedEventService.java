@@ -194,7 +194,8 @@ public class FlowStateAllowedEventService {
                 STANDARD_DIRECTION_ORDER_DJ,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                REFER_TO_JUDGE
+                REFER_TO_JUDGE,
+                TAKE_CASE_OFFLINE
             )
         ),
         entry(

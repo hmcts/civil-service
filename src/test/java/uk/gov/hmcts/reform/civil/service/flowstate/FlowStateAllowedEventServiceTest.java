@@ -246,7 +246,8 @@ class FlowStateAllowedEventServiceTest {
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL,
                         STANDARD_DIRECTION_ORDER_DJ,
-                        REFER_TO_JUDGE
+                        REFER_TO_JUDGE,
+                        TAKE_CASE_OFFLINE
 
                     }
                 ),
