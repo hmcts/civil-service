@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.apache.logging.log4j.util.Strings.concat;
 
@@ -32,17 +33,26 @@ public class LocationRefDataService {
     private final AuthTokenGenerator authTokenGenerator;
 
     public List<String> getCourtLocations(String authToken) {
+        return innerGetCourtLocations(authToken)
+            .map(this::getDisplayEntry).collect(Collectors.toList());
+    }
+
+    public List<LocationRefData> getCourtLocationsFullData(String authToken) {
+        return innerGetCourtLocations(authToken).collect(Collectors.toList());
+    }
+
+    private Stream<LocationRefData> innerGetCourtLocations(String authToken) {
         try {
             ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
-                    buildURI(),
-                    HttpMethod.GET,
-                    getHeaders(authToken),
-                    new ParameterizedTypeReference<List<LocationRefData>>() {});
+                buildURI(),
+                HttpMethod.GET,
+                getHeaders(authToken),
+                new ParameterizedTypeReference<List<LocationRefData>>() {});
             return onlyEnglandAndWalesLocations(responseEntity.getBody());
         } catch (Exception e) {
             log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
         }
-        return new ArrayList<>();
+        return Stream.empty();
     }
 
     public List<LocationRefData> getCourtLocationsForDefaultJudgments(String authToken) {
@@ -84,14 +94,13 @@ public class LocationRefDataService {
         return new HttpEntity<>(headers);
     }
 
-    private List<String> onlyEnglandAndWalesLocations(List<LocationRefData> locationRefData) {
+    private Stream<LocationRefData> onlyEnglandAndWalesLocations(List<LocationRefData> locationRefData) {
         return locationRefData == null
-                ? new ArrayList<>()
-                : locationRefData.stream().filter(location -> !"Scotland".equals(location.getRegion()))
-                .map(this::getDisplayEntry).collect(Collectors.toList());
+            ? Stream.empty()
+            : locationRefData.stream().filter(location -> !"Scotland".equals(location.getRegion()));
     }
 
-    private String getDisplayEntry(LocationRefData location) {
+    public String getDisplayEntry(LocationRefData location) {
         return concat(concat(concat(location.getSiteName(), " - "), concat(location.getCourtAddress(), " - ")),
                       location.getPostcode());
     }

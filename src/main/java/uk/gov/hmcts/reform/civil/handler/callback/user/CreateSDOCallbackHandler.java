@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -12,13 +13,20 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
@@ -58,6 +66,8 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -128,9 +138,13 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
-        updatedData.disposalHearingMethodInPerson(fromList(fetchLocationData(callbackParams)));
-        updatedData.fastTrackMethodInPerson(fromList(fetchLocationData(callbackParams)));
-        updatedData.smallClaimsMethodInPerson(fromList(fetchLocationData(callbackParams)));
+        List<String> locationStrings = fetchLocationData(callbackParams);
+        // TODO CIV-3178 does disposal also need to pre-select preferred court location?
+        updatedData.disposalHearingMethodInPerson(fromList(locationStrings));
+        updatedData.fastTrackMethodInPerson(getDefaultedLocationDataOptions(callbackParams));
+        updatedData.smallClaimsMethodInPerson(getDefaultedLocationDataOptions(callbackParams));
+        updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson);
+        updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
 
         List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
 
@@ -698,5 +712,62 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
         return locationRefDataService.getCourtLocations(authToken);
+    }
+
+    private DynamicList getDefaultedLocationDataOptions(CallbackParams callbackParams) {
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        List<LocationRefData> options = locationRefDataService
+            .getCourtLocationsFullData(authToken);
+        CaseData caseData = callbackParams.getCaseData();
+
+        DynamicList.DynamicListBuilder builder = DynamicList.builder();
+        List<String> labels = options.stream()
+            .map(locationRefDataService::getDisplayEntry)
+            .collect(Collectors.toList());
+
+        List<DynamicListElement> listItems = labels.stream()
+            .map(DynamicListElement::dynamicElement)
+            .collect(Collectors.toList());
+        builder.listItems(listItems);
+
+        // TODO CIV-3178 might be worth to make some kind of sorted choice,
+        //  like claimant 1 first, else claimant 2, else...
+        RequestedCourt preferred = caseData.getRespondent1DQ().getRespondent1DQRequestedCourt();
+        LocationRefData preferredLocation = null;
+        if (preferred != null) {
+            if (preferred.getCaseLocation() != null) {
+                Optional<LocationRefData> selected = options.stream()
+                    .filter(listItem -> matchLocation(listItem, preferred.getCaseLocation()))
+                    .findFirst();
+                if (selected.isPresent()) {
+                    preferredLocation = selected.get();
+                }
+            }
+            if (preferredLocation == null && preferred.getResponseCourtCode() != null) {
+                Optional<LocationRefData> selected = options.stream()
+                    .filter(listItem -> matchLocationCourtCode(listItem, preferred.getResponseCourtCode()))
+                    .findFirst();
+                if (selected.isPresent()) {
+                    preferredLocation = selected.get();
+                }
+            }
+            if (preferredLocation != null) {
+                String label = locationRefDataService.getDisplayEntry(preferredLocation);
+                listItems.stream().filter(item -> StringUtils.equals(item.getLabel(), label))
+                    .findFirst()
+                    .ifPresent(builder::value);
+            }
+        }
+
+        return builder.build();
+    }
+
+    private boolean matchLocation(LocationRefData locationRefData, CaseLocation caseLocation) {
+        return StringUtils.equals(locationRefData.getRegionId(), caseLocation.getRegion())
+            && StringUtils.equals(locationRefData.getEpimmsId(), caseLocation.getBaseLocation());
+    }
+
+    private boolean matchLocationCourtCode(LocationRefData locationRefData, String courtCode) {
+        return StringUtils.equals(courtCode, locationRefData.getCourtLocationCode());
     }
 }

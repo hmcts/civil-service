@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,8 +22,12 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
@@ -34,11 +39,13 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -125,7 +132,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPrePopulateDisposalHearingPage() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
             given(locationRefDataService.getCourtLocations(any())).willReturn(getSampleCourLocations());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -140,6 +147,85 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(locationsFromDynamicList(dynamicList))
                 .containsOnly("ABCD - RG0 0 AL", "PQRS - GU0 0EE", "WXYZ - EW0 0HE", "LMNO - NE0 0BH");
         }
+
+        @Test
+        void shouldPrePopulateLocationIfSelected() {
+            List<LocationRefData> locations = List.of(
+                LocationRefData.builder()
+                    .regionId("region1")
+                    .epimmsId("epimms1")
+                    .build(),
+                LocationRefData.builder()
+                    .regionId("region2")
+                    .epimmsId("epimms2")
+                    .build()
+            );
+
+            when(locationRefDataService.getDisplayEntry(locations.get(0))).thenReturn("item1");
+            when(locationRefDataService.getDisplayEntry(locations.get(1))).thenReturn("item2");
+            when(locationRefDataService.getCourtLocationsFullData(anyString())).thenReturn(locations);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            caseData = caseData.toBuilder()
+                .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                   .respondent1DQRequestedCourt(RequestedCourt.builder()
+                                                                    .requestHearingAtSpecificCourt(YesOrNo.YES)
+                                                                    .caseLocation(CaseLocation.builder()
+                                                                                      .region("region2")
+                                                                                      .baseLocation("epimms2")
+                                                                                      .build())
+                                                                    .build())
+                                   .build())
+                    .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            Assertions.assertNotNull(data.getFastTrackMethodInPerson().getValue());
+            Assertions.assertEquals("item2", data.getFastTrackMethodInPerson().getValue().getLabel());
+            Assertions.assertNotNull(data.getSmallClaimsMethodInPerson().getValue());
+            Assertions.assertEquals("item2", data.getSmallClaimsMethodInPerson().getValue().getLabel());
+        }
+
+        @Test
+        void shouldPrePopulateLocationIfCourtSelected() {
+            List<LocationRefData> locations = List.of(
+                LocationRefData.builder()
+                    .courtLocationCode("123")
+                    .build(),
+                LocationRefData.builder()
+                    .courtLocationCode("234")
+                    .build()
+            );
+
+            when(locationRefDataService.getDisplayEntry(locations.get(0))).thenReturn("item1");
+            when(locationRefDataService.getDisplayEntry(locations.get(1))).thenReturn("item2");
+            when(locationRefDataService.getCourtLocationsFullData(anyString())).thenReturn(locations);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            caseData = caseData.toBuilder()
+                .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                   .respondent1DQRequestedCourt(RequestedCourt.builder()
+                                                                    .requestHearingAtSpecificCourt(YesOrNo.YES)
+                                                                    .responseCourtCode("234")
+                                                                    .build())
+                                   .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            Assertions.assertNotNull(data.getFastTrackMethodInPerson().getValue());
+            Assertions.assertEquals("item2", data.getFastTrackMethodInPerson().getValue().getLabel());
+            Assertions.assertNotNull(data.getSmallClaimsMethodInPerson().getValue());
+            Assertions.assertEquals("item2", data.getSmallClaimsMethodInPerson().getValue().getLabel());
+        }
     }
 
     @Nested
@@ -147,7 +233,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPrePopulateOrderDetailsPages() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -614,6 +700,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build()
                 .toBuilder()
                 .drawDirectionsOrder(tempJudgementSum)
+                .respondent1DQ(Respondent1DQ.builder().build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
