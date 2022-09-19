@@ -106,7 +106,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
-                CREATE_SDO
+                CREATE_SDO,
+                NotSuitable_SDO
             )
         ),
 
@@ -119,13 +120,14 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
-                CREATE_SDO
+                CREATE_SDO,
+                NotSuitable_SDO
             )
         ),
 
         entry(
             CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-            List.of(ADD_CASE_NOTE, INITIATE_GENERAL_APPLICATION, CREATE_SDO)
+            List.of(ADD_CASE_NOTE, INITIATE_GENERAL_APPLICATION, CREATE_SDO, NotSuitable_SDO)
         ),
 
         entry(
@@ -145,7 +147,6 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 HEARING_SCHEDULED,
                 NotSuitable_SDO
-
             )
         ),
 
@@ -167,7 +168,8 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
 
                 INITIATE_GENERAL_APPLICATION,
-                CREATE_SDO
+                CREATE_SDO,
+                NotSuitable_SDO
             )
         ),
 
@@ -210,7 +212,8 @@ public class FlowStateAllowedEventService {
                 INFORM_AGREED_EXTENSION_DATE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
-                CREATE_SDO
+                CREATE_SDO,
+                NotSuitable_SDO
             )
         ),
 
@@ -230,7 +233,8 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 DEFAULT_JUDGEMENT,
-                CREATE_SDO
+                CREATE_SDO,
+                NotSuitable_SDO
             )
         ),
 
@@ -250,7 +254,8 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 DEFAULT_JUDGEMENT,
-                CREATE_SDO
+                CREATE_SDO,
+                NotSuitable_SDO
             )
         ),
 
@@ -269,7 +274,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
-                CREATE_SDO
+                CREATE_SDO,
+                NotSuitable_SDO
             )
         ),
 
@@ -288,7 +294,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
-                CREATE_SDO
+                CREATE_SDO,
+                NotSuitable_SDO
             )
         ),
 
@@ -305,7 +312,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
-                CREATE_SDO
+                CREATE_SDO,
+                NotSuitable_SDO
             )
         ),
 
@@ -320,7 +328,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
-                CREATE_SDO
+                CREATE_SDO,
+                NotSuitable_SDO
             )
         ),
 
@@ -335,7 +344,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
-                CREATE_SDO
+                CREATE_SDO,
+                NotSuitable_SDO
             )
         ),
 
@@ -350,7 +360,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
-                CREATE_SDO
+                CREATE_SDO,
+                NotSuitable_SDO
             )
         ),
 
@@ -391,7 +402,8 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
-                CREATE_SDO
+                CREATE_SDO,
+                NotSuitable_SDO
             )
         ),
         entry(
@@ -400,7 +412,8 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
-                CREATE_SDO
+                CREATE_SDO,
+                NotSuitable_SDO
             )
         ),
         entry(
@@ -417,7 +430,8 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
-                CREATE_SDO
+                CREATE_SDO,
+                NotSuitable_SDO
             )
         ),
         entry(
@@ -425,7 +439,9 @@ public class FlowStateAllowedEventService {
             List.of(
                 DISMISS_CLAIM,
                 ADD_CASE_NOTE,
-                INITIATE_GENERAL_APPLICATION
+                INITIATE_GENERAL_APPLICATION,
+                CREATE_SDO,
+                NotSuitable_SDO
             )
         ),
         entry(
