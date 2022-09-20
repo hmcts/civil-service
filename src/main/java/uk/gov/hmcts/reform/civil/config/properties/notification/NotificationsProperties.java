@@ -156,7 +156,4 @@ public class NotificationsProperties {
     @NotEmpty
     private String caseworkerDefaultJudgmentRequested;
 
-    @NotEmpty
-    private String caseworkerEmailDefaultJudgmentRequested;
-
 }
