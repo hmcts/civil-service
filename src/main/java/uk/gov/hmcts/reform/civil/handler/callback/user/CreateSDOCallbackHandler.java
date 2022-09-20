@@ -747,19 +747,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             );
         }
 
-        if (SPEC_CLAIM.equals(caseData.getSuperClaimType()) ||
-            (caseData.getAllocatedTrack() == AllocatedTrack.MULTI_CLAIM &&
-                SPEC_CLAIM.equals(caseData.getSuperClaimType()))) {
-            if (caseData.getApplicant1().getType() == Party.Type.INDIVIDUAL ||
-                caseData.getApplicant1().getType() == Party.Type.SOLE_TRADER) {
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())
+            || (caseData.getAllocatedTrack() == AllocatedTrack.MULTI_CLAIM
+            && SPEC_CLAIM.equals(caseData.getSuperClaimType()))) {
+            if (caseData.getApplicant1().getType() == Party.Type.INDIVIDUAL
+                || caseData.getApplicant1().getType() == Party.Type.SOLE_TRADER) {
                 caseData.toBuilder().caseManagementLocation(
                     CaseLocation.builder()
                         .region(caseData.getApplicant1DQ().getRequestedCourt().getCaseLocation().getRegion())
                         .baseLocation(caseData.getApplicant1DQ().getRequestedCourt().getCaseLocation()
                                           .getBaseLocation()).build()
                 );
-            } else if (caseData.getApplicant1().getType() == Party.Type.COMPANY ||
-                caseData.getApplicant1().getType() == Party.Type.ORGANISATION) {
+            } else if (caseData.getApplicant1().getType() == Party.Type.COMPANY
+                || caseData.getApplicant1().getType() == Party.Type.ORGANISATION) {
                 caseData.toBuilder().caseManagementLocation(
                     CaseLocation.builder()
                         .region(caseData.getRespondent1DQ().getRequestedCourt().getCaseLocation().getRegion())
