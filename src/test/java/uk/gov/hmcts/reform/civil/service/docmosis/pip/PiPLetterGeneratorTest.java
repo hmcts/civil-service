@@ -57,7 +57,7 @@ class PiPLetterGeneratorTest {
     private static final String CUI_URL = "CUI response url";
     private static final PiPLetter LETTER_TEMPLATE_DATA = PiPLetter.builder()
         .pin(PIN)
-        .claimantFullName(CLAIMANT_FULL_NAME)
+        .claimantName(CLAIMANT_FULL_NAME)
         .claimReferenceNumber(CLAIM_REFERENCE)
         .issueDate(LocalDate.now())
         .defendant(DEFENDANT)

@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Getter
 @Builder
@@ -21,15 +20,15 @@ import java.time.LocalDateTime;
 public class PiPLetter implements MappableObject {
 
     private final Party defendant;
-    private final String claimantFullName;
+    private final String claimantName;
     private final String respondToClaimUrl;
     private final BigDecimal totalAmountOfClaim;
     private final String claimReferenceNumber;
     private final String pin;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDateTime responseDeadline;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    private final LocalDate responseDeadline;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate issueDate;
 
