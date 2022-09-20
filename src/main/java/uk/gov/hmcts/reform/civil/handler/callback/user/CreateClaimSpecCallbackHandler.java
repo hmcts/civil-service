@@ -129,7 +129,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final InterestCalculator interestCalculator;
     private final FeatureToggleService toggleService;
     private final StateFlowEngine stateFlowEngine;
-    private String participantString;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -387,7 +386,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         //assign case management category to the case
         if (toggleService.isGlobalSearchEnabled()) {
-            dataBuilder.caseNameHmctsInternal(caseParticipants(caseData));
+            dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
 
             CaseManagementCategoryElement civil =
                 CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
@@ -702,21 +701,25 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             || caseData.getRespondent2OrgRegistered() == NO);
     }
 
-    public String caseParticipants(CaseData caseData) {
+    public StringBuilder caseParticipants(CaseData caseData) {
+        StringBuilder participantString = new StringBuilder();
         MultiPartyScenario multiPartyScenario  = getMultiPartyScenario(caseData);
         if (multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
             || multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)) {
-            participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
-                .getPartyName() + " and " + caseData.getRespondent2().getPartyName());
+            participantString.append(caseData.getApplicant1().getPartyName())
+                .append(" v ").append(caseData.getRespondent1().getPartyName())
+                .append(" and ").append(caseData.getRespondent2().getPartyName());
 
         } else if (multiPartyScenario.equals(MultiPartyScenario.TWO_V_ONE)) {
-            participantString = (caseData.getApplicant1().getPartyName() + " and "
-                + caseData.getApplicant2().getPartyName() + " v " + caseData.getRespondent1()
-                .getPartyName());
+            participantString.append(caseData.getApplicant1().getPartyName())
+                .append(" and ").append(caseData.getApplicant2().getPartyName()).append(" v ")
+                .append(caseData.getRespondent1()
+                            .getPartyName());
 
         } else {
-            participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
-                .getPartyName());
+            participantString.append(caseData.getApplicant1().getPartyName()).append(" v ")
+                .append(caseData.getRespondent1()
+                            .getPartyName());
         }
         return participantString;
 
