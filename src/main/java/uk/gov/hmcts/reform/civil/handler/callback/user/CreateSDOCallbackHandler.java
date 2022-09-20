@@ -11,9 +11,11 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -74,6 +76,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
 @Service
@@ -737,15 +740,40 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 .filter(locationRefData -> checkLocation(locationRefData,
                                                          locationLabel)).findFirst();
 
-        if (preferredLocation.isPresent()) {
+        if (caseData.getOrderType() == OrderType.DECIDE_DAMAGES && preferredLocation.isPresent()) {
             caseData.toBuilder().caseManagementLocation(
                 CaseLocation.builder()
                     .region(preferredLocation.get().getRegionId())
                     .baseLocation(preferredLocation.get().getEpimmsId()).build()
             );
+        }
 
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType()) || (caseData.getAllocatedTrack() == AllocatedTrack.MULTI_CLAIM && SPEC_CLAIM.equals(caseData.getSuperClaimType()))) {
+            if (caseData.getApplicant1().getType() == Party.Type.INDIVIDUAL ||
+                caseData.getApplicant1().getType() == Party.Type.SOLE_TRADER) {
+                caseData.toBuilder().caseManagementLocation(
+                    CaseLocation.builder()
+                        .region(caseData.getApplicant1DQ().getRequestedCourt().getCaseLocation().getRegion())
+                        .baseLocation(caseData.getApplicant1DQ().getRequestedCourt().getCaseLocation().getBaseLocation()).build()
+                );
+            } else if (caseData.getApplicant1().getType() == Party.Type.COMPANY ||
+                caseData.getApplicant1().getType() == Party.Type.ORGANISATION) {
+                caseData.toBuilder().caseManagementLocation(
+                    CaseLocation.builder()
+                        .region(caseData.getRespondent1DQ().getRequestedCourt().getCaseLocation().getRegion())
+                        .baseLocation(caseData.getRespondent1DQ().getRequestedCourt().getCaseLocation().getBaseLocation()).build()
+                );
+            }
+        }
+
+        if (preferredLocation.isPresent()) {
             locations.remove(preferredLocation.get());
             locations.add(0, preferredLocation.get());
+            caseData.toBuilder().caseManagementLocation(
+                CaseLocation.builder()
+                    .region(preferredLocation.get().getRegionId())
+                    .baseLocation(preferredLocation.get().getEpimmsId()).build()
+            );
         }
 
         return getLocationsFromList(locations);
