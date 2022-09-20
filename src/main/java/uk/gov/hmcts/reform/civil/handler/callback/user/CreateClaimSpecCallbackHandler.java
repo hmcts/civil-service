@@ -13,14 +13,15 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
+import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
-import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -35,9 +37,9 @@ import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
-import uk.gov.hmcts.reform.civil.utils.AccessCodeGenerator;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -68,11 +70,13 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -115,6 +119,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final DateOfBirthValidator dateOfBirthValidator;
     private final FeesService feesService;
     private final OrganisationService organisationService;
+    private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final IdamClient idamClient;
     private final OrgPolicyValidator orgPolicyValidator;
     private final ObjectMapper objectMapper;
@@ -372,22 +377,24 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder.respondent2Represented(respondent2Represented);
         }
 
-        if (caseData.getRespondent1Represented() == NO
-            && caseData.getAddRespondent2() == NO
-            && caseData.getAddApplicant2() == NO
-            && toggleService.isPinInPostEnabled()) {
-            LocalDate expiryDate = LocalDate.now().plusDays(180);
-            dataBuilder.respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
-                                                        .accessCode(AccessCodeGenerator.generateAccessCode())
-                                                        .respondentCaseRole(
-                                                            CaseRole.RESPONDENTSOLICITORONESPEC.getFormattedName())
-                                                        .expiryDate(expiryDate)
-                                                        .pinUsed(NO)
-                                                        .build());
+        if (isPinInPostCaseMatched(caseData)) {
+            dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         }
 
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
         ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
+
+        //assign case management category to the case
+        if (toggleService.isGlobalSearchEnabled()) {
+            dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
+
+            CaseManagementCategoryElement civil =
+                CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
+            List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
+            itemList.add(element(civil));
+            dataBuilder.caseManagementCategory(
+                CaseManagementCategory.builder().value(civil).list_items(itemList).build());
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
@@ -438,13 +445,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private String getHeader(CaseData caseData) {
-        if (caseData.getRespondent1Represented() == NO || caseData.getRespondent1OrgRegistered() == NO) {
-            return format(
-                "# Your claim has been received and will progress offline%n## Claim number: %s",
-                caseData.getLegacyCaseReference()
-            );
+        if (areRespondentsRepresentedAndRegistered(caseData)
+            || isPinInPostCaseMatched(caseData)) {
+            return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
         }
-        return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
+        return format(
+            "# Your claim has been received and will progress offline%n## Claim number: %s",
+            caseData.getLegacyCaseReference()
+        );
     }
 
     private String getBody(CaseData caseData) {
@@ -452,9 +460,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
 
         return format(
-            caseData.getRespondent1Represented() == NO || caseData.getRespondent1OrgRegistered() == NO
-                ? LIP_CONFIRMATION_BODY
-                : CONFIRMATION_SUMMARY,
+            (areRespondentsRepresentedAndRegistered(caseData)
+                || isPinInPostCaseMatched(caseData))
+                ? CONFIRMATION_SUMMARY
+                : LIP_CONFIRMATION_BODY,
             format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
             claimIssueConfiguration.getResponsePackLink(),
             formattedServiceDeadline
@@ -615,13 +624,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private String getSpecHeader(CaseData caseData) {
-        if (caseData.getRespondent1Represented() == NO || caseData.getRespondent1OrgRegistered() == NO) {
-            return format(
-                "# Your claim has been received and will progress offline%n## Claim number: %s",
-                caseData.getLegacyCaseReference()
-            );
+        if (areRespondentsRepresentedAndRegistered(caseData)
+            || isPinInPostCaseMatched(caseData)) {
+            return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
         }
-        return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
+        return format(
+            "# Your claim has been received and will progress offline%n## Claim number: %s",
+            caseData.getLegacyCaseReference()
+        );
     }
 
     private String getSpecBody(CaseData caseData) {
@@ -629,9 +639,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
 
         return format(
-            caseData.getRespondent1Represented() == NO || caseData.getRespondent1OrgRegistered() == NO
-                ? SPEC_LIP_CONFIRMATION_BODY
-                : SPEC_CONFIRMATION_SUMMARY,
+            (areRespondentsRepresentedAndRegistered(caseData)
+                || isPinInPostCaseMatched(caseData))
+                ? SPEC_CONFIRMATION_SUMMARY
+                : SPEC_LIP_CONFIRMATION_BODY,
             format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
             claimIssueConfiguration.getResponsePackLink(),
             formattedServiceDeadline
@@ -674,5 +685,43 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private boolean isPinInPostCaseMatched(CaseData caseData) {
+        return (caseData.getRespondent1Represented() == NO
+            && caseData.getAddRespondent2() == NO
+            && caseData.getAddApplicant2() == NO
+            && toggleService.isPinInPostEnabled());
+    }
+
+    private boolean areRespondentsRepresentedAndRegistered(CaseData caseData) {
+        return !(caseData.getRespondent1Represented() == NO
+            || caseData.getRespondent1OrgRegistered() == NO
+            || caseData.getRespondent2Represented() == NO
+            || caseData.getRespondent2OrgRegistered() == NO);
+    }
+
+    public StringBuilder caseParticipants(CaseData caseData) {
+        StringBuilder participantString = new StringBuilder();
+        MultiPartyScenario multiPartyScenario  = getMultiPartyScenario(caseData);
+        if (multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+            || multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)) {
+            participantString.append(caseData.getApplicant1().getPartyName())
+                .append(" v ").append(caseData.getRespondent1().getPartyName())
+                .append(" and ").append(caseData.getRespondent2().getPartyName());
+
+        } else if (multiPartyScenario.equals(MultiPartyScenario.TWO_V_ONE)) {
+            participantString.append(caseData.getApplicant1().getPartyName())
+                .append(" and ").append(caseData.getApplicant2().getPartyName()).append(" v ")
+                .append(caseData.getRespondent1()
+                            .getPartyName());
+
+        } else {
+            participantString.append(caseData.getApplicant1().getPartyName()).append(" v ")
+                .append(caseData.getRespondent1()
+                            .getPartyName());
+        }
+        return participantString;
+
     }
 }

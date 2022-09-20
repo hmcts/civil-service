@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class DisposalHearingPreferredEmail {
+public class ReasonNotSuitableSDO {
 
-    private String email;
+    private String input;
 }

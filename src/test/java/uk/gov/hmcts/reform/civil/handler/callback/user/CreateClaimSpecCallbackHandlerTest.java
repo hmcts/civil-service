@@ -22,12 +22,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
+import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -45,6 +47,8 @@ import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
+import uk.gov.hmcts.reform.civil.utils.AccessCodeGenerator;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
@@ -55,6 +59,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -68,6 +73,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -97,7 +103,8 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     PostcodeValidator.class,
     InterestCalculator.class,
     StateFlowEngine.class,
-    ValidateEmailService.class},
+    ValidateEmailService.class,
+    },
     properties = {"reference.database.enabled=false"})
 class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -114,10 +121,10 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private Time time;
-
+    @MockBean
+    private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     @MockBean
     private FeesService feesService;
-
     @MockBean
     private OrganisationService organisationService;
 
@@ -1104,6 +1111,16 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
+
+            given(defendantPinToPostLRspecService.buildDefendantPinToPost())
+                .willReturn(DefendantPinToPostLRspec.builder()
+                                .accessCode(
+                                    AccessCodeGenerator.generateAccessCode())
+                                .respondentCaseRole(
+                                    CaseRole.RESPONDENTSOLICITORONESPEC.getFormattedName())
+                                .expiryDate(LocalDate.now().plusDays(
+                                    180))
+                                .build());
         }
 
         @Test
@@ -1135,6 +1152,45 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("applicant1")
                 .extracting("partyName", "partyTypeDisplayValue")
                 .containsExactly(getPartyNameBasedOnType(applicant1), applicant1.getType().getDisplayValue());
+        }
+
+        @Test
+        void shouldAssignCaseName1v2_whenCaseIs1v2GlobalSearchEnabled() {
+            when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData().get("caseNameHmctsInternal"))
+                .isEqualTo("Mr. John Rambo v Mr. Sole Trader and Mr. John Rambo");
+            assertThat(response.getData().get("caseManagementCategory")).extracting("value")
+                .extracting("code").isEqualTo("Civil");
+        }
+
+        @Test
+        void shouldAssignCaseName2v1_whenCaseIs2v1GlobalSearchEnabled() {
+            when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData().get("caseNameHmctsInternal"))
+                .isEqualTo("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader");
+            assertThat(response.getData().get("caseManagementCategory")).extracting("value")
+                .extracting("code").isEqualTo("Civil");
+        }
+
+        @Test
+        void shouldAssignCaseName1v1_whenCaseIs1v1GlobalSearchEnabled() {
+            when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData().get("caseNameHmctsInternal"))
+                .isEqualTo("Mr. John Rambo v Mr. Sole Trader");
+            assertThat(response.getData().get("caseManagementCategory")).extracting("value")
+                .extracting("code").isEqualTo("Civil");
         }
 
         @Nested
