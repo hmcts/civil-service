@@ -755,16 +755,18 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 || caseData.getApplicant1().getType() == Party.Type.SOLE_TRADER) {
                 caseData.toBuilder().caseManagementLocation(
                     CaseLocation.builder()
-                        .region(caseData.getApplicant1DQ().getRequestedCourt().getCaseLocation().getRegion())
-                        .baseLocation(caseData.getApplicant1DQ().getRequestedCourt().getCaseLocation()
+                        .region(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt()
+                                    .getCaseLocation().getRegion())
+                        .baseLocation(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getCaseLocation()
                                           .getBaseLocation()).build()
                 );
             } else if (caseData.getApplicant1().getType() == Party.Type.COMPANY
                 || caseData.getApplicant1().getType() == Party.Type.ORGANISATION) {
                 caseData.toBuilder().caseManagementLocation(
                     CaseLocation.builder()
-                        .region(caseData.getRespondent1DQ().getRequestedCourt().getCaseLocation().getRegion())
-                        .baseLocation(caseData.getRespondent1DQ().getRequestedCourt().getCaseLocation()
+                        .region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
+                                    .getCaseLocation().getRegion())
+                        .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getCaseLocation()
                                           .getBaseLocation()).build()
                 );
             }

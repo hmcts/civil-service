@@ -249,15 +249,29 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class MidEventPrePopulateOrderDetailsPagesCallback {
+    class MidEventPrePopulateOrderDetailsPagesCallback extends LocationRefSampleDataBuilder {
 
         @Test
         void shouldPrePopulateOrderDetailsPages() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CaseData caseData = CaseDataBuilder.builder().setSuperClaimTypeToSpecClaim().atStateClaimDraft()
+                .applicant1DQWithLocation().build();
+            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                .willReturn(getSampleCourLocationsRefObjectToSort());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+            DynamicList dynamicList = getLocationDynamicListInPersonHearing(data);
+
+            assertThat(dynamicList).isNotNull();
+            assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
+                "A Site 3 - Adr 3 - AAA 111",
+                "Site 3 - Adr 3 - CCC 333",
+                "Site 1 - Adr 1 - AAA 111",
+                "Site 2 - Adr 2 - BBB 222"
+            );
 
             assertThat(response.getData()).extracting("fastTrackAltDisputeResolutionToggle").isNotNull();
             assertThat(response.getData()).extracting("fastTrackVariationOfDirectionsToggle").isNotNull();
