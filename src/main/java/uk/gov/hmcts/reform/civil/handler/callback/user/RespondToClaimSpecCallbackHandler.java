@@ -71,7 +71,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONESPEC;
@@ -88,7 +87,6 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.COUNTER
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag.BOTH_RESPONDENTS_DISPUTE;
@@ -147,8 +145,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::setSuperClaimType)
-            .put(callbackKey(V_1, ABOUT_TO_START), this::populateRespondent1Copy)
+            .put(callbackKey(ABOUT_TO_START), this::populateRespondent1Copy)
             .put(callbackKey(MID, "confirm-details"), this::validateDateOfBirth)
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
             .put(callbackKey(MID, "experts"), this::validateRespondentExperts)
@@ -167,17 +164,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlag)
             .put(callbackKey(MID, "set-upload-timeline-type-flag"), this::setUploadTimelineTypeFlag)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
-            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadlineV1)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
-            .build();
-    }
-
-    private CallbackResponse setSuperClaimType(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.superClaimType(SPEC_CLAIM);
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
@@ -1407,35 +1394,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             && FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec()))
             || (!FULL_DEFENCE.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
             && FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec()));
-    }
-
-    private CallbackResponse setApplicantResponseDeadlineV1(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime responseDate = time.now();
-        AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
-
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
-            .respondent1ResponseDate(responseDate)
-            .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
-            .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
-
-        // moving statement of truth value to correct field, this was not possible in mid event.
-        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-        Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
-            .respondent1DQStatementOfTruth(statementOfTruth)
-            .respondent1DQWitnesses(Witnesses.builder()
-                                        .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
-                                        .details(caseData.getRespondent1DQWitnessesDetailsSpec())
-                                        .build())
-            .build();
-
-        updatedData.respondent1DQ(dq);
-        // resetting statement of truth to make sure it's empty the next time it appears in the UI.
-        updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
-            .build();
     }
 
     private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
