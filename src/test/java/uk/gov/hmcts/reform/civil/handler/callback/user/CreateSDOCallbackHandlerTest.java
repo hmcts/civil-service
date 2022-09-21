@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -224,10 +225,15 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                       RequestedCourt.builder()
                                           .requestHearingAtSpecificCourt(YesOrNo.YES)
                                           .responseCourtCode("333")
-                                          .build()
-                                  )
-                                  .build())
-                .build();
+                                          .caseLocation(
+                                              CaseLocation.builder()
+                                                  .baseLocation("dummy base")
+                                                  .region("dummy region")
+                                                  .build()
+                                          ).build()
+                                  ).build()
+                ).build();
+
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObject());
 
