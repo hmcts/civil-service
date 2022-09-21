@@ -70,4 +70,12 @@ public class DeadlinesCalculator {
             .min(LocalDateTime::compareTo)
             .orElse(null);
     }
+
+    public LocalDate plusWorkingDays(LocalDate date, int workingDaysForward) {
+        LocalDate currentDate = date;
+        for (int i =0; i < workingDaysForward; i++) {
+            currentDate = workingDayIndicator.getNextWorkingDay(currentDate.plusDays(1));
+        }
+        return currentDate;
+    }
 }

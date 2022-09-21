@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -31,12 +32,17 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.UUID;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -73,6 +79,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     protected LocationRefDataService locationRefDataService;
+
+    @MockBean
+    private DeadlinesCalculator deadlinesCalculator;
 
     @Nested
     class AboutToStartCallback {
@@ -137,6 +146,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class MidEventPrePopulateOrderDetailsPagesCallback {
+
+        private final LocalDate DATE = LocalDate.of(2022, 1, 5);
+
+        @BeforeEach
+        void setup() {
+            when(deadlinesCalculator.plusWorkingDays(any(), anyInt())).thenReturn(DATE);
+        }
 
         @Test
         void shouldPrePopulateOrderDetailsPages() {
@@ -596,6 +612,16 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("Photographs and/or a place of the accident location shall be prepared and agreed by the "
                                + "parties and uploaded to the Digital Portal no later than 14 days before the "
                                + "hearing.");
+            assertThat(response.getData()).extracting("disposalHearingHearingTime").extracting("input")
+                .isEqualTo("This claim will be listed for final disposal before a judge on the first available date "
+                               + "after");
+            assertThat(response.getData()).extracting("disposalHearingHearingTime").extracting("dateTo")
+                .isEqualTo(LocalDate.now().plusWeeks(16).toString());
+            assertThat(response.getData()).extracting("disposalOrderWithoutHearing").extracting("input")
+                .isEqualTo(String.format("Each party has the right to apply to have this Order set aside or varied. "
+                                             + "Any such application must be received by the Court (together with the "
+                                             + "appropriate fee) by 4pm on %s.",
+                                         DATE.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))));
         }
 
         @Test
