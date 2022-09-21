@@ -48,6 +48,14 @@ public class FeatureToggleService {
         );
     }
 
+    public boolean isGlobalSearchEnabled() {
+        return internalClient.boolVariation(
+            "global-search-specified",
+            createLDUser().build(),
+            false
+        );
+    }
+
     public boolean isLrSpecEnabled() {
         return isFeatureEnabled("specified-lr-journey");
     }
@@ -64,6 +72,14 @@ public class FeatureToggleService {
 
     public boolean isNoticeOfChangeEnabled() {
         return internalClient.boolVariation("notice-of-change", createLDUser().build(), false);
+    }
+
+    public boolean isHearingAndListingSDOEnabled() {
+        return internalClient.boolVariation("hearing-and-listing-sdo", createLDUser().build(), false);
+    }
+
+    public boolean isCourtLocationDynamicListEnabled() {
+        return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), false);
     }
 
     public boolean isPinInPostEnabled() {
