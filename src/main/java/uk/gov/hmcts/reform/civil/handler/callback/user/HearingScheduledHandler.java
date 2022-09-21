@@ -165,11 +165,11 @@ public class HearingScheduledHandler extends CallbackHandler {
             if (LocalDate.now().isBefore(caseData.getHearingDate().minusWeeks(4))) {
                 caseDataBuilder.hearingDueDate(
                     HearingUtils.addBusinessDays(
-                        LocalDate.now(), 7, publicHolidaysCollection.getPublicHolidays()).toString());
+                        LocalDate.now(), 7, publicHolidaysCollection.getPublicHolidays()));
             } else {
                 caseDataBuilder.hearingDueDate(
                     HearingUtils.addBusinessDays(
-                        LocalDate.now(), 20, publicHolidaysCollection.getPublicHolidays()).toString());
+                        LocalDate.now(), 20, publicHolidaysCollection.getPublicHolidays()));
             }
             switch (caseData.getAllocatedTrack()) {
                 case SMALL_CLAIM:
