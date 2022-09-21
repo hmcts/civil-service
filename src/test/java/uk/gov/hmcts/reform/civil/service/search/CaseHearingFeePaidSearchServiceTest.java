@@ -25,7 +25,7 @@ class CaseHearingFeePaidSearchServiceTest extends ElasticSearchServiceTest {
                         .must(rangeQuery("data.hearingDueDate").lt("now"))
                         .must(boolQuery().must(matchQuery("state", "HEARING_READINESS"))))
             .should(boolQuery()
-                        .must(rangeQuery("data.hearingFee").lt("0"))
+                        .must(rangeQuery("data.hearingFee").lte("0"))
                         .must(boolQuery().must(matchQuery("state", "HEARING_READINESS"))));
 
         return new Query(query, List.of("reference"), fromValue);
