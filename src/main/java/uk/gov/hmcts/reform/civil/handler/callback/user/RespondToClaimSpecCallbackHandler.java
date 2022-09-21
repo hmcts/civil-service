@@ -1435,26 +1435,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             && FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec()));
     }
 
-    private CallbackResponse setApplicantResponseDeadlineV1(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime responseDate = time.now();
-        AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
-
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
-            .respondent1ResponseDate(responseDate)
-            .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
-            .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
-
-        // moving statement of truth value to correct field, this was not possible in mid event.
-        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-        // resetting statement of truth to make sure it's empty the next time it appears in the UI.
-        updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
-            .build();
-    }
-
     private void handleCourtLocationForRespondent1DQ(CaseData caseData,
                                                      Respondent1DQ.Respondent1DQBuilder dq,
                                                      CallbackParams callbackParams) {
