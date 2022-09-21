@@ -60,5 +60,7 @@
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/cases/caseId/citizen/submitterId/event_POST": "ignore",
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/feature-toggle/noc_GET": "ignore",
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/feature-toggle/toggle_GET": "ignore",
-  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/cases/response/deadline_POST": "ignore"
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/cases/response/deadline_POST": "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/feature-toggle/court-locations_GET": "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/assignment/reference/caseReference_POST": "ignore"
 }
