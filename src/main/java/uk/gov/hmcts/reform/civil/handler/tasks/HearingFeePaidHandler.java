@@ -35,7 +35,7 @@ public class HearingFeePaidHandler implements BaseExternalTaskHandler {
 
                 if (caseData.getHearingFeePaymentDetails().getStatus() == PaymentStatus.SUCCESS) {
                     log.info("Current case status '{}'", caseDetails.getState());
-                    applicationEventPublisher.publishEvent(new PrepareConductHearingEvent(caseDetails.getId()));
+                    applicationEventPublisher.publishEvent(new StrikeOutEvent(caseDetails.getId()));
                 } else if (caseData.getHearingFeePaymentDetails().getStatus() == PaymentStatus.FAILED) {
                     log.info("Current case status '{}'", caseDetails.getState());
                     applicationEventPublisher.publishEvent(new StrikeOutEvent(caseDetails.getId()));
