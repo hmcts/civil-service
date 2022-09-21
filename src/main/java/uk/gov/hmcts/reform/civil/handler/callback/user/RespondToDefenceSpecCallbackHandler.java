@@ -222,7 +222,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        return locationRefDataService.getCourtLocationsAsLocationRefData(authToken);
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
