@@ -745,7 +745,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 CaseLocation.builder()
                     .region(preferredLocation.get().getRegionId())
                     .baseLocation(preferredLocation.get().getEpimmsId()).build()
-            );
+            ).locationName(preferredLocation.get().getSiteName());
         }
 
         if (SPEC_CLAIM.equals(caseData.getSuperClaimType())
@@ -779,7 +779,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 CaseLocation.builder()
                     .region(preferredLocation.get().getRegionId())
                     .baseLocation(preferredLocation.get().getEpimmsId()).build()
-            );
+            ).locationName(preferredLocation.get().getSiteName());
         }
 
         return getLocationsFromList(locations);
