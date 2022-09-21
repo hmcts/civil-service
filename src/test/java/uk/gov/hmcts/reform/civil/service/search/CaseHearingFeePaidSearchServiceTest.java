@@ -19,7 +19,7 @@ class CaseHearingFeePaidSearchServiceTest extends ElasticSearchServiceTest {
 
     @Override
     protected Query buildQuery(int fromValue) {
-        BoolQueryBuilder query =boolQuery()
+        BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
                         .must(rangeQuery("data.hearingDueDate").lt("now"))
