@@ -268,9 +268,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(dynamicList).isNotNull();
             assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
                 "A Site 3 - Adr 3 - AAA 111",
-                "Site 3 - Adr 3 - CCC 333",
-                "Site 1 - Adr 1 - AAA 111",
-                "Site 2 - Adr 2 - BBB 222"
+                "Site 1 - Adr 1 - VVV 111",
+                "Site 2 - Adr 2 - BBB 222",
+                "Site 3 - Adr 3 - CCC 333"
             );
 
             assertThat(response.getData()).extracting("fastTrackAltDisputeResolutionToggle").isNotNull();
