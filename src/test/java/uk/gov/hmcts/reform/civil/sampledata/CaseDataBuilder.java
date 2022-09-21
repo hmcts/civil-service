@@ -528,6 +528,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder applicant1DQ(Applicant1DQ applicant1DQ) {
+        this.applicant1DQ = applicant1DQ;
+        return this;
+    }
+
     public CaseDataBuilder applicant1DQWithLocation() {
         applicant1DQ = Applicant1DQ.builder()
             .applicant1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
@@ -557,15 +562,6 @@ public class CaseDataBuilder {
                                                     .vulnerabilityAdjustmentsRequired(NO).build())
             .applicant1DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build())
             .build();
-        return this;
-    }
-
-//    private CaseLocation caseLocation() {
-//        return CaseLocation.builder().baseLocation("test").region("test t").build();
-//    }
-
-    public CaseDataBuilder applicant1DQ(Applicant1DQ applicant1DQ) {
-        this.applicant1DQ = applicant1DQ;
         return this;
     }
 
