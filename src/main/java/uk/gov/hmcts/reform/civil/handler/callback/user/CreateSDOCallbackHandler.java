@@ -711,7 +711,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.disposalHearingBundleToggle(checkList);
         updatedData.disposalHearingClaimSettlingToggle(checkList);
         updatedData.disposalHearingCostsToggle(checkList);
-        updatedData.disposalHearingApplicationsOrderToggle(checkList);
         updatedData.smallClaimsHearingToggle(checkList);
         updatedData.smallClaimsMethodToggle(checkList);
         updatedData.smallClaimsDocumentsToggle(checkList);
