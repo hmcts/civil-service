@@ -6,7 +6,7 @@
 ./bin/utils/ccd-add-role.sh "caseworker-approver"
 ./bin/utils/ccd-add-role.sh "prd-admin"
 ./bin/utils/ccd-add-role.sh "judge-profile"
-./bin/utils/ccd-add-role.sh "basic-access" #remove after GS_profile is added
+./bin/utils/ccd-add-role.sh "basic-access" #remove after GS_profile is added.
 ./bin/utils/ccd-add-role.sh "GS_profile"
 ./bin/utils/ccd-add-role.sh "legal-adviser"
 ./bin/utils/ccd-add-role.sh "caseworker-ras-validation"
