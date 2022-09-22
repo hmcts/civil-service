@@ -30,7 +30,6 @@ public class HearingFeePaidHandler implements BaseExternalTaskHandler {
 
         cases.forEach(caseDetails -> {
             try {
-                Long caseId = caseDetails.getId();
                 CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
 
                 if (caseData.getHearingDueDate() == null
