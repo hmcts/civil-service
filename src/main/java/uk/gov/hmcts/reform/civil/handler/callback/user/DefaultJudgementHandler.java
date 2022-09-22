@@ -173,7 +173,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
         if (caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
             caseDataBuilder.bothDefendants(caseData.getDefendantDetails().getValue().getLabel());
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -244,7 +243,12 @@ public class DefaultJudgementHandler extends CallbackHandler {
         }
         caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT));
 
-        var state = "JUDICIAL_REFERRAL";
+        var state = "PROCEEDS_IN_HERITAGE_SYSTEM";
+        if (caseData.getRespondent2() == null || caseData.getRespondent2() != null
+            && caseData.getDefendantDetails().getValue()
+            .getLabel().startsWith("Both")) {
+            state = "JUDICIAL_REFERRAL";
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(state)
