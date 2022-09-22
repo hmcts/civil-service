@@ -11,8 +11,9 @@ import org.mockito.Mock;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.event.StrikeOutEvent;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.search.CaseHearingFeePaidSearchService;
 
@@ -43,10 +44,10 @@ class HearingFeePaidHandlerTest {
     private CaseHearingFeePaidSearchService searchService;
 
     @Mock
-    private ApplicationEventPublisher applicationEventPublisher;
+    private CaseDetailsConverter caseDetailsConverter;
 
     @Mock
-    private PaymentDetails paymentDetails;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
     private HearingFeePaidHandler handler;
@@ -65,9 +66,11 @@ class HearingFeePaidHandlerTest {
         List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails.get(0))).thenReturn(caseData);
 
         handler.execute(mockTask, externalTaskService);
 
+        verify(applicationEventPublisher).publishEvent(new StrikeOutEvent(caseId));
         verify(externalTaskService).complete(mockTask);
     }
 
@@ -79,9 +82,11 @@ class HearingFeePaidHandlerTest {
         List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails.get(0))).thenReturn(caseData);
 
         handler.execute(mockTask, externalTaskService);
 
+        verify(applicationEventPublisher).publishEvent(new StrikeOutEvent(caseId));
         verify(externalTaskService).complete(mockTask);
     }
 
