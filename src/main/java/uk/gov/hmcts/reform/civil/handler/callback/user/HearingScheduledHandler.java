@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.ListingOrRelisting;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
@@ -165,11 +165,11 @@ public class HearingScheduledHandler extends CallbackHandler {
             if (LocalDate.now().isBefore(caseData.getHearingDate().minusWeeks(4))) {
                 caseDataBuilder.hearingDueDate(
                     HearingUtils.addBusinessDays(
-                        LocalDate.now(), 7, publicHolidaysCollection.getPublicHolidays()).toString());
+                        LocalDate.now(), 7, publicHolidaysCollection.getPublicHolidays()));
             } else {
                 caseDataBuilder.hearingDueDate(
                     HearingUtils.addBusinessDays(
-                        LocalDate.now(), 20, publicHolidaysCollection.getPublicHolidays()).toString());
+                        LocalDate.now(), 20, publicHolidaysCollection.getPublicHolidays()));
             }
             switch (caseData.getAllocatedTrack()) {
                 case SMALL_CLAIM:
