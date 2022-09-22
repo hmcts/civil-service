@@ -1113,12 +1113,12 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
+            when(toggleService.isAccessProfilesEnabled()).thenReturn(true);
         }
 
         // TODO: move this test case to AboutToSubmitCallbackV0 after release
         @Test
         void shouldSetCaseCategoryToSpec_whenInvoked() {
-            when(toggleService.isAccessProfilesEnabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())

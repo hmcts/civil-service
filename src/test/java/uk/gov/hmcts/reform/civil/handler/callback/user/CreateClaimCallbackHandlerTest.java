@@ -863,12 +863,13 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
+            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
+            when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
         }
 
         //Move this test to AboutToSubmitCallbackV0 after CIV-3521 release and migration
         @Test
         void shouldSetCaseCategoryToUnspec_whenInvoked() {
-            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
