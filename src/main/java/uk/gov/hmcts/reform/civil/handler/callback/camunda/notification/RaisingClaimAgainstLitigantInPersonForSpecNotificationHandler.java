@@ -60,7 +60,7 @@ public class RaisingClaimAgainstLitigantInPersonForSpecNotificationHandler exten
 
     private CallbackResponse notifyApplicantSolicitorCaseHandedOffline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        System.out.println("hi");
+
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
             notificationsProperties.getClaimantSolicitorCaseWillProgressOffline(),
