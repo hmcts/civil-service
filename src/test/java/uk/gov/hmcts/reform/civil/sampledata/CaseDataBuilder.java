@@ -93,6 +93,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NO
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
@@ -292,7 +293,6 @@ public class CaseDataBuilder {
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private TrialHearingTrial trialHearingTrialDJ;
     private LocalDate hearingDueDate;
-
 
     //update pdf document from general applications
     private List<Element<CaseDocument>> generalOrderDocument;
@@ -2843,6 +2843,7 @@ public class CaseDataBuilder {
         atStateApplicantRespondToDefenceAndProceed();
         hearingDueDate = LocalDate.now().minusDays(1);
         hearingFeePaymentDetails = PaymentDetails.builder().status(FAILED).build();
+        ccdState = HEARING_READINESS;
         return this;
     }
 
@@ -2850,6 +2851,7 @@ public class CaseDataBuilder {
         atStateApplicantRespondToDefenceAndProceed();
         hearingDueDate = now().minusDays(1);
         hearingFeePaymentDetails = PaymentDetails.builder().status(SUCCESS).build();
+        ccdState = HEARING_READINESS;
         return this;
     }
 
