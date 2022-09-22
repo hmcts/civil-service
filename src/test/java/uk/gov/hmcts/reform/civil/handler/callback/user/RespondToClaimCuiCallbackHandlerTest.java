@@ -59,13 +59,19 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
         LocalDateTime now;
-        private final LocalDateTime RESPONSE_DEADLINE = LocalDateTime.of(2023, 1, 1, 0, 0, 0);
+        private final LocalDateTime respondToDeadline = LocalDateTime.of(
+            2023,
+            1,
+            1,
+            0,
+            0,
+            0);
 
         @BeforeEach
         void setup() {
             now = LocalDateTime.now();
             given(time.now()).willReturn(now);
-            given(deadlinesCalculator.calculateApplicantResponseDeadline(any(), any())).willReturn(RESPONSE_DEADLINE);
+            given(deadlinesCalculator.calculateApplicantResponseDeadline(any(), any())).willReturn(respondToDeadline);
         }
 
         @Test
