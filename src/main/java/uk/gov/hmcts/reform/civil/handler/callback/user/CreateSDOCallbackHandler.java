@@ -25,7 +25,11 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
@@ -68,6 +72,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -192,13 +197,13 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         DisposalHearingDisclosureOfDocuments tempDisposalHearingDisclosureOfDocuments =
             DisposalHearingDisclosureOfDocuments.builder()
-            .input1("The parties shall serve on each other copies of the documents upon which reliance is to be"
-                       + " placed at the disposal hearing by 4pm on")
-            .date1(LocalDate.now().plusWeeks(10))
-            .input2("The parties must upload to the Digital Portal copies of those documents which they wish the"
-                       + "court to consider when deciding the amount of damages, by 4pm on")
-            .date2(LocalDate.now().plusWeeks(10))
-            .build();
+                .input1("The parties shall serve on each other copies of the documents upon which reliance is to be"
+                            + " placed at the disposal hearing by 4pm on")
+                .date1(LocalDate.now().plusWeeks(10))
+                .input2("The parties must upload to the Digital Portal copies of those documents which they wish the"
+                            + "court to consider when deciding the amount of damages, by 4pm on")
+                .date2(LocalDate.now().plusWeeks(10))
+                .build();
 
         updatedData.disposalHearingDisclosureOfDocuments(tempDisposalHearingDisclosureOfDocuments).build();
 
@@ -223,9 +228,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         DisposalHearingMedicalEvidence tempDisposalHearingMedicalEvidence = DisposalHearingMedicalEvidence.builder()
             .input("The claimant has permission to rely upon the written expert evidence already uploaded to the"
-                        + " Digital Portal with the particulars of claim and in addition has permission to rely upon"
-                        + " any associated correspondence or updating report which is uploaded to the Digital Portal"
-                        + " by 4pm on")
+                       + " Digital Portal with the particulars of claim and in addition has permission to rely upon"
+                       + " any associated correspondence or updating report which is uploaded to the Digital Portal"
+                       + " by 4pm on")
             .date(LocalDate.now().plusWeeks(4))
             .build();
 
@@ -360,8 +365,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         FastTrackNotes tempFastTrackNotes = FastTrackNotes.builder()
             .input("This Order has been made without a hearing. Each party has the right to apply to have this Order "
-                        + "set aside or varied. Any application must be received by the Court, "
-                        + "together with the appropriate fee by 4pm on")
+                       + "set aside or varied. Any application must be received by the Court, "
+                       + "together with the appropriate fee by 4pm on")
             .date(LocalDate.now().plusWeeks(1))
             .build();
 
@@ -489,8 +494,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (judgementSum != null) {
             SmallClaimsJudgementDeductionValue tempSmallClaimsJudgementDeductionValue =
                 SmallClaimsJudgementDeductionValue.builder()
-                .value(judgementSum.getJudgementSum().toString() + "%")
-                .build();
+                    .value(judgementSum.getJudgementSum().toString() + "%")
+                    .build();
 
             updatedData.smallClaimsJudgementDeductionValue(tempSmallClaimsJudgementDeductionValue).build();
         }
@@ -585,10 +590,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input7("and the claimant's evidence is reply if so advised to be uploaded by 4pm on")
             .date4(LocalDate.now().plusWeeks(10))
             .input8("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
-                + "paragraph above, each party may rely upon the written evidence by way of witness statement "
-                + "of one witness to provide evidence of basic hire rates available within the claimant's "
-                + "geographical location from a mainstream supplier, or a local reputable supplier if none is "
-                + "available.")
+                        + "paragraph above, each party may rely upon the written evidence by way of witness statement "
+                        + "of one witness to provide evidence of basic hire rates available within the claimant's "
+                        + "geographical location from a mainstream supplier, or a local reputable supplier if none is "
+                        + "available.")
             .input9("The defendant’s evidence is to be uploaded to the Digital Portal by 4pm on")
             .date5(LocalDate.now().plusWeeks(8))
             .input10(", and the claimant’s evidence in reply if so advised is to be uploaded by 4pm on")
@@ -730,22 +735,22 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .collect(Collectors.toList());
         builder.listItems(listItems);
 
-        // TODO CIV-3178 might be worth to make some kind of sorted choice,
-        //  like claimant 1 first, else claimant 2, else...
-        RequestedCourt preferred = caseData.getRespondent1DQ().getRespondent1DQRequestedCourt();
+        Optional<RequestedCourt> optRequestedCourt = getFirstRequestedCourt(caseData);
         LocationRefData preferredLocation = null;
-        if (preferred != null) {
-            if (preferred.getCaseLocation() != null) {
+        if (optRequestedCourt.isPresent()) {
+            CaseLocation location;
+            if (null != (location = optRequestedCourt.get().getCaseLocation())) {
                 Optional<LocationRefData> selected = options.stream()
-                    .filter(listItem -> matchLocation(listItem, preferred.getCaseLocation()))
+                    .filter(listItem -> matchLocation(listItem, location))
                     .findFirst();
                 if (selected.isPresent()) {
                     preferredLocation = selected.get();
                 }
             }
-            if (preferredLocation == null && preferred.getResponseCourtCode() != null) {
+            if (preferredLocation == null && StringUtils.isNotBlank(optRequestedCourt.get().getResponseCourtCode())) {
+                String courtCode = optRequestedCourt.get().getResponseCourtCode();
                 Optional<LocationRefData> selected = options.stream()
-                    .filter(listItem -> matchLocationCourtCode(listItem, preferred.getResponseCourtCode()))
+                    .filter(listItem -> matchLocationCourtCode(listItem, courtCode))
                     .findFirst();
                 if (selected.isPresent()) {
                     preferredLocation = selected.get();
@@ -760,6 +765,32 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
 
         return builder.build();
+    }
+
+    /**
+     * Requested court may be selected in several places or in none, depending on the type of claim and the options
+     * chosen by the claimants and defendants. This method prefers first the claimants', second the defendants'.
+     *
+     * @param caseData case data
+     * @return first requested court (only with case location and court code) with at least one of the two fields
+     *     filled in.
+     */
+    private Optional<RequestedCourt> getFirstRequestedCourt(CaseData caseData) {
+        return Stream.of(
+                Optional.ofNullable(caseData.getCourtLocation())
+                    .map(courtLocation -> RequestedCourt.builder()
+                        .responseCourtCode(courtLocation.getApplicantPreferredCourt())
+                        .caseLocation(courtLocation.getCaseLocation())
+                        .build()),
+                Optional.ofNullable(caseData.getApplicant1DQ()).map(Applicant1DQ::getApplicant1DQRequestedCourt),
+                Optional.ofNullable(caseData.getApplicant2DQ()).map(Applicant2DQ::getApplicant2DQRequestedCourt),
+                Optional.ofNullable(caseData.getRespondent1DQ()).map(Respondent1DQ::getRequestedCourt),
+                Optional.ofNullable(caseData.getRespondent2DQ()).map(Respondent2DQ::getRequestedCourt)
+            ).filter(Optional::isPresent)
+            .map(Optional::get)
+            .filter(requestedCourt -> requestedCourt.getCaseLocation() != null
+                || StringUtils.isNotBlank(requestedCourt.getResponseCourtCode()))
+            .findFirst();
     }
 
     private boolean matchLocation(LocationRefData locationRefData, CaseLocation caseLocation) {
