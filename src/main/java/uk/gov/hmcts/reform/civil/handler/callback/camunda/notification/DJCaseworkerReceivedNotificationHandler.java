@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CASEWORKER_DJ_RECEIVED;
 import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixedCosts;
@@ -88,6 +89,9 @@ public class DJCaseworkerReceivedNotificationHandler extends CallbackHandler imp
     }
 
     private String getPaymentTypeField(CaseData caseData, BigDecimal total) {
+        if (isNull(caseData.getPaymentTypeSelection())) {
+            return "No payment type selected";
+        }
         switch (caseData.getPaymentTypeSelection()) {
             case IMMEDIATELY:
                 return "Immediately £" + total;

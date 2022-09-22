@@ -78,4 +78,5 @@ java:
         - robotics-notification-multipartyrecipient
         - robotics-notification-recipient-spec
         - ordnance-survey-api-key
+        - notification-caseworker-spec-receiver
 
