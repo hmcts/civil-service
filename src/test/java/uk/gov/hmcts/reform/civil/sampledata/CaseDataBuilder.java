@@ -52,6 +52,7 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
@@ -1228,6 +1229,17 @@ public class CaseDataBuilder {
     public CaseDataBuilder courtLocation_old() {
         this.courtLocation = CourtLocation.builder()
             .applicantPreferredCourt("127").build();
+        return this;
+    }
+
+    public CaseDataBuilder courtLocation() {
+        this.courtLocation = CourtLocation.builder()
+            .applicantPreferredCourt("127")
+            .caseLocation(CaseLocation.builder()
+                              .region("regionId1")
+                              .baseLocation("epimmsId1")
+                              .build())
+            .build();
         return this;
     }
 

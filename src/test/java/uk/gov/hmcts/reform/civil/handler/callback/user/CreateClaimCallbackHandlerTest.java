@@ -1150,6 +1150,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(response.getData())
                     .extracting("courtLocation")
                     .extracting("applicantPreferredCourt").isEqualTo("312");
+
+                assertThat(response.getData())
+                    .extracting("caseManagementLocation")
+                    .extracting("region", "baseLocation")
+                    .containsExactly("4", "192280");
             }
         }
 

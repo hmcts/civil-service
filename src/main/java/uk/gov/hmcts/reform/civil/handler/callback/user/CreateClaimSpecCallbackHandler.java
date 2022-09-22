@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -123,6 +125,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final InterestCalculator interestCalculator;
     private final FeatureToggleService toggleService;
     private final StateFlowEngine stateFlowEngine;
+
+    @Value("${court-location.specified-claim.region-id}")
+    private String regionId;
+    @Value("${court-location.specified-claim.epimms-id}")
+    private String epimmsId;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -373,6 +380,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         if (isPinInPostCaseMatched(caseData)) {
             dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
+        }
+
+        if (toggleService.isCourtLocationDynamicListEnabled()) {
+            dataBuilder.caseManagementLocation(CaseLocation.builder().region(regionId).baseLocation(epimmsId).build());
         }
 
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());

@@ -73,6 +73,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -1151,6 +1152,17 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("applicant1")
                 .extracting("partyName", "partyTypeDisplayValue")
                 .containsExactly(getPartyNameBasedOnType(applicant1), applicant1.getType().getDisplayValue());
+        }
+
+        @Test
+        void shouldUpdateCaseManagementLocation_whenInvoked(){
+            when(toggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsExactly("2", "420219");
         }
 
         @Nested

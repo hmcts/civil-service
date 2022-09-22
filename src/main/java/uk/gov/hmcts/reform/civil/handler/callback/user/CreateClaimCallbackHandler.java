@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -104,6 +105,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final FeatureToggleService toggleService;
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
+
+    @Value("${court-location.unspecified-claim.region-id}")
+    private String regionId;
+    @Value("${court-location.unspecified-claim.epimms-id}")
+    private String epimmsId;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -513,6 +519,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         if (Objects.nonNull(courtLocation)) {
             CourtLocation.CourtLocationBuilder courtLocationBuilder = caseData.getCourtLocation().toBuilder();
             dataBuilder
+                .caseManagementLocation(CaseLocation.builder().region(regionId).baseLocation(epimmsId).build())
                 .courtLocation(courtLocationBuilder
                                    .applicantPreferredCourt(courtLocation.getCourtLocationCode())
                                    .caseLocation(CaseLocation.builder()
