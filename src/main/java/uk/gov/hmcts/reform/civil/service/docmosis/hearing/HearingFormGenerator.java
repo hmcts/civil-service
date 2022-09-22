@@ -58,6 +58,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
             .caseNumber(caseData.getLegacyCaseReference())
             .creationDate(LocalDate.now())
             .claimant(caseData.getApplicant1().getPartyName())
+            .nthClaimant("1st Claimant")
             .claimantReference("TBC")
             .defendant(caseData.getRespondent1().getPartyName())
             .defendantReference("TBC")

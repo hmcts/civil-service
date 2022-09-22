@@ -36,5 +36,9 @@ public class HearingForm implements MappableObject {
     private final LocalDate applicationDate;
     private final String nthClaimant;
     private final String nthDefendant;
+    private final String nthClaimant2;
+    private final String nthDefendant2;
+    private final boolean claimant2exists;
+    private final boolean defendant2exists;
 
 }
