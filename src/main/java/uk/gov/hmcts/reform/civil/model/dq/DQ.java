@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 
