@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakupDetails;
@@ -169,7 +170,8 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .descriptionOfClaim(caseData.getDetailsOfClaim())
             .applicantRepresentativeOrganisationName(representativeService.getApplicantRepresentative(caseData)
                                                          .getOrganisationName())
-            .defendantResponseDeadlineDate(getResponseDedline(caseData))
+            .defendantResponseDeadlineDate(YesOrNo.YES.equals(caseData.getRespondent1Represented())
+                                               ? getResponseDedline(caseData) : "")
             .build();
     }
 
