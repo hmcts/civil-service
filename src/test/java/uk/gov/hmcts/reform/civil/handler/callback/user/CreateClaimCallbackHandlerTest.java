@@ -78,6 +78,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbac
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -103,6 +104,9 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String REFERENCE_NUMBER = "000DC001";
+
+    @Autowired
+    private ObjectMapper objMapper;
 
     @MockBean
     private Time time;
@@ -435,6 +439,39 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("claimStarted")
                 .isEqualTo("Yes");
+        }
+
+        @Nested
+        class CourtLocation {
+
+            @Test
+            void shouldHandleCourtLocationData() {
+                when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
+
+                when(courtLocationUtility.getLocationsFromList(any()))
+                    .thenReturn(fromList(List.of("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124")));
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified()
+                    .build();
+
+                CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+
+                DynamicList dynamicList = getDynamicList(response);
+
+                List<String> courtlist = dynamicList.getListItems().stream()
+                    .map(DynamicListElement::getLabel)
+                    .collect(Collectors.toList());
+
+                assertThat(courtlist).containsOnly("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124");
+            }
+
+            private DynamicList getDynamicList(AboutToStartOrSubmitCallbackResponse response) {
+                CaseData responseCaseData = objMapper.convertValue(response.getData(), CaseData.class);
+                System.out.println(responseCaseData);
+                return responseCaseData.getCourtLocation().getApplicantPreferredCourtLocationList();
+            }
         }
     }
 
@@ -824,6 +861,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
+            when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
         }
 
         @Test
@@ -905,6 +943,48 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(respondent2OrgPolicy).doesNotHaveToString("OrgPolicyReference");
             assertThat(respondent2OrgPolicy).doesNotHaveToString("Organisation");
+        }
+
+        @Test
+        void shouldAssignCaseName1v2_whenCaseIs1v2GlobalSearchEnabled() {
+            when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+
+            assertThat(response.getData().get("caseNameHmctsInternal"))
+                .isEqualTo("Mr. John Rambo v Mr. Sole Trader and Mr. John Rambo");
+            assertThat(response.getData().get("caseManagementCategory")).extracting("value")
+                .extracting("code").isEqualTo("Civil");
+        }
+
+        @Test
+        void shouldAssignCaseName2v1_whenCaseIs2v1GlobalSearchEnabled() {
+            when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+
+            assertThat(response.getData().get("caseNameHmctsInternal"))
+                .isEqualTo("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader");
+            assertThat(response.getData().get("caseManagementCategory")).extracting("value")
+                .extracting("code").isEqualTo("Civil");
+        }
+
+        @Test
+        void shouldAssignCaseName1v1_whenCaseIs1v1GlobalSearchEnabled() {
+            when(featureToggleService.isGlobalSearchEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+
+            assertThat(response.getData().get("caseNameHmctsInternal"))
+                .isEqualTo("Mr. John Rambo v Mr. Sole Trader");
+            assertThat(response.getData().get("caseManagementCategory")).extracting("value")
+                .extracting("code").isEqualTo("Civil");
         }
 
         @Nested
