@@ -11,8 +11,10 @@ import org.mockito.Mock;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.search.CaseHearingFeePaidSearchService;
-
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +28,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 
 @ExtendWith(SpringExtension.class)
 class HearingFeePaidHandlerTest {
@@ -42,6 +45,9 @@ class HearingFeePaidHandlerTest {
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
+    @Mock
+    private PaymentDetails paymentDetails;
+
     @InjectMocks
     private HearingFeePaidHandler handler;
 
@@ -52,9 +58,24 @@ class HearingFeePaidHandlerTest {
     }
 
     @Test
-    void shouldEmitHearingFeePaidEvent_whenCasesFound() {
+    void shouldEmitHearingFeePaidEvent_whenCasesFoundPaid() {
         long caseId = 1L;
-        Map<String, Object> data = Map.of("data", "some data");
+        CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDuePaid().build();
+        Map<String, Object> data = Map.of("data", caseData);
+        List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
+
+        when(searchService.getCases()).thenReturn(caseDetails);
+
+        handler.execute(mockTask, externalTaskService);
+
+        verify(externalTaskService).complete(mockTask);
+    }
+
+    @Test
+    void shouldEmitHearingFeePaidEvent_whenCasesFoundUnpaid() {
+        long caseId = 1L;
+        CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDueUnpaid().build();
+        Map<String, Object> data = Map.of("data", caseData);
         List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);

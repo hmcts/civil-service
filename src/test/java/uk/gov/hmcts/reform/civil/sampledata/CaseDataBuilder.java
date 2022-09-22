@@ -295,6 +295,7 @@ public class CaseDataBuilder {
     private TrialHearingTrial trialHearingTrialDJ;
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
+    private LocalDate hearingDueDate;
 
     //update pdf document from general applications
     private List<Element<CaseDocument>> generalOrderDocument;
@@ -2852,6 +2853,20 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateHearingFeeDueUnpaid() {
+        atStateApplicantRespondToDefenceAndProceed();
+        hearingDueDate = LocalDate.now().minusDays(1);
+        hearingFeePaymentDetails = PaymentDetails.builder().status(FAILED).build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateHearingFeeDuePaid() {
+        atStateApplicantRespondToDefenceAndProceed();
+        hearingDueDate = now().minusDays(1);
+        hearingFeePaymentDetails = PaymentDetails.builder().status(SUCCESS).build();
+        return this;
+    }
+
     public CaseDataBuilder businessProcess(BusinessProcess businessProcess) {
         this.businessProcess = businessProcess;
         return this;
@@ -3172,6 +3187,7 @@ public class CaseDataBuilder {
             .applicantSolicitor1ClaimStatementOfTruth(applicantSolicitor1ClaimStatementOfTruth)
             .claimIssuedPaymentDetails(claimIssuedPaymentDetails)
             .claimFee(claimFee)
+            .hearingFeePaymentDetails(hearingFeePaymentDetails)
             .paymentReference(paymentReference)
             .applicantSolicitor1CheckEmail(applicantSolicitor1CheckEmail)
             .applicantSolicitor1UserDetails(applicantSolicitor1UserDetails)
@@ -3267,6 +3283,7 @@ public class CaseDataBuilder {
             .defendantSolicitorNotifyClaimDetailsOptions(defendantSolicitorNotifyClaimDetailsOptions)
             .selectLitigationFriend(selectLitigationFriend)
             .caseNotes(caseNotes)
+            .hearingDueDate(hearingDueDate)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)
             .superClaimType(superClaimType == null ? UNSPEC_CLAIM : superClaimType)
@@ -3325,4 +3342,5 @@ public class CaseDataBuilder {
             .trialHearingJudgesRecitalDJ(trialHearingJudgesRecitalDJ)
             .build();
     }
+
 }
