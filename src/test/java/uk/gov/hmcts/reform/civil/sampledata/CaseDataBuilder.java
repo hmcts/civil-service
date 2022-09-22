@@ -2,18 +2,7 @@ package uk.gov.hmcts.reform.civil.sampledata;
 
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.ClaimType;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
-import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
-import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
@@ -150,6 +139,7 @@ public class CaseDataBuilder {
     protected CaseState ccdState;
     protected List<Element<CaseDocument>> systemGeneratedCaseDocuments;
     protected PaymentDetails claimIssuedPaymentDetails;
+    protected PaymentDetails hearingFeePaymentDetails;
     protected CorrectEmail applicantSolicitor1CheckEmail;
     protected IdamUserDetails applicantSolicitor1UserDetails;
     //Deadline extension
@@ -288,6 +278,8 @@ public class CaseDataBuilder {
     private DisposalHearingBundleDJ disposalHearingBundleDJ;
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private TrialHearingTrial trialHearingTrialDJ;
+    private LocalDate hearingDueDate;
+
 
     //update pdf document from general applications
     private List<Element<CaseDocument>> generalOrderDocument;
@@ -2834,6 +2826,20 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateHearingFeeDueUnpaid() {
+        atStateApplicantRespondToDefenceAndProceed();
+        hearingDueDate = LocalDate.now().minusDays(1);
+        hearingFeePaymentDetails = PaymentDetails.builder().status(FAILED).build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateHearingFeeDuePaid() {
+        atStateApplicantRespondToDefenceAndProceed();
+        hearingDueDate = now().minusDays(1);
+        hearingFeePaymentDetails = PaymentDetails.builder().status(SUCCESS).build();
+        return this;
+    }
+
     public CaseDataBuilder businessProcess(BusinessProcess businessProcess) {
         this.businessProcess = businessProcess;
         return this;
@@ -3145,6 +3151,7 @@ public class CaseDataBuilder {
             .applicantSolicitor1ClaimStatementOfTruth(applicantSolicitor1ClaimStatementOfTruth)
             .claimIssuedPaymentDetails(claimIssuedPaymentDetails)
             .claimFee(claimFee)
+            .hearingFeePaymentDetails(hearingFeePaymentDetails)
             .paymentReference(paymentReference)
             .applicantSolicitor1CheckEmail(applicantSolicitor1CheckEmail)
             .applicantSolicitor1UserDetails(applicantSolicitor1UserDetails)
@@ -3240,6 +3247,7 @@ public class CaseDataBuilder {
             .defendantSolicitorNotifyClaimDetailsOptions(defendantSolicitorNotifyClaimDetailsOptions)
             .selectLitigationFriend(selectLitigationFriend)
             .caseNotes(caseNotes)
+            .hearingDueDate(hearingDueDate)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)
             .superClaimType(superClaimType == null ? UNSPEC_CLAIM : superClaimType)
@@ -3294,4 +3302,5 @@ public class CaseDataBuilder {
             .trialHearingTrialDJ(trialHearingTrialDJ)
             .build();
     }
+
 }
