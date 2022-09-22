@@ -456,6 +456,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent1DQ(Respondent1DQ respondent1DQ) {
+        this.respondent1DQ = respondent1DQ;
+        return this;
+    }
+
     public CaseDataBuilder respondent1DQWithLocation() {
         respondent1DQ = Respondent1DQ.builder()
             .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
@@ -486,11 +491,6 @@ public class CaseDataBuilder {
             .respondent1DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
             .respondent1DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build())
             .build();
-        return this;
-    }
-
-    public CaseDataBuilder respondent1DQ(Respondent1DQ respondent1DQ) {
-        this.respondent1DQ = respondent1DQ;
         return this;
     }
 
