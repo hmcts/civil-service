@@ -143,9 +143,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
-        List<String> locationStrings = fetchLocationData(callbackParams);
-        // TODO CIV-3178 does disposal also need to pre-select preferred court location?
-        updatedData.disposalHearingMethodInPerson(fromList(locationStrings));
+        updatedData.disposalHearingMethodInPerson(getDefaultedLocationDataOptions(callbackParams));
         updatedData.fastTrackMethodInPerson(getDefaultedLocationDataOptions(callbackParams));
         updatedData.smallClaimsMethodInPerson(getDefaultedLocationDataOptions(callbackParams));
         updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson);
@@ -719,6 +717,13 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return locationRefDataService.getCourtLocations(authToken);
     }
 
+    /**
+     * The location list may have a pre-populated value if the parties requested a particular court.
+     *
+     * @param callbackParams params
+     * @return dynamic list with the location options. If possible, pre-selects a location
+     *     according with the preferred courts.
+     */
     private DynamicList getDefaultedLocationDataOptions(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> options = locationRefDataService
