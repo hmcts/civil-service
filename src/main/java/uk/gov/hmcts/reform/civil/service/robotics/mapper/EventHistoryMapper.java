@@ -333,7 +333,7 @@ public class EventHistoryMapper {
                                   ? caseData.getPaymentSetDate().atStartOfDay() : null)
                               .installmentAmount((caseData.getPaymentTypeSelection()
                                   .equals(DJPaymentTypeSelection.REPAYMENT_PLAN))
-                                                     ? new BigDecimal(caseData.getRepaymentSuggestion())
+                                                     ? getInstallmentAmount(caseData.getRepaymentSuggestion())
                                                      : BigDecimal.ZERO)
                               .installmentPeriod(getInstallmentPeriod(caseData))
                               .firstInstallmentDate(caseData.getRepaymentDate())
@@ -343,6 +343,11 @@ public class EventHistoryMapper {
                               .build())
             .build());
 
+    }
+
+    private BigDecimal getInstallmentAmount(String amount) {
+        var regularRepaymentAmountPennies = new BigDecimal(amount);
+        return MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies);
     }
 
     private void buildBreathingSpaceEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
