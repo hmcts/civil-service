@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
@@ -70,6 +69,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -455,7 +455,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .atStateClaimDetailsNotified()
                     .build();
 
-                CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+                CallbackParams callbackParams = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
                 DynamicList dynamicList = getDynamicList(response);
@@ -854,7 +854,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
 
             given(idamClient.getUserDetails(any()))
@@ -905,7 +905,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldClearClaimStartedFlag_whenInvoked() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(CallbackVersion.V_1, caseData.toBuilder().claimStarted(YES).build(), ABOUT_TO_SUBMIT));
+                callbackParamsOf(V_1, caseData.toBuilder().claimStarted(YES).build(), ABOUT_TO_SUBMIT));
 
             assertThat(response.getData())
                 .doesNotContainEntry("claimStarted", YES);
@@ -916,7 +916,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative().build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(
-                    CallbackVersion.V_1,
+                    V_1,
                     caseData,
                     ABOUT_TO_SUBMIT
                 ));
@@ -929,12 +929,58 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldUpdateRespondentOrgRegistered_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .containsEntry("respondent1OrgRegistered", "Yes");
+        }
+
+        //TO DO remove V_1 when CIV-3278 is released
+        @Test
+        void shouldSetRespondent2OrgPolicyReferenceFor1v2SSCases() {
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative().build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(
+                    V_1,
+                    caseData,
+                    ABOUT_TO_SUBMIT
+                ));
+
+            assertThat(response.getData())
+                .containsEntry("respondent1OrgRegistered", "Yes");
+
+            assertThat(response.getData())
+                .containsEntry("respondent2OrgRegistered", "Yes");
+        }
+
+        //TO DO remove V_1 when CIV-3278 is released
+        @Test
+        void shouldSetRespondent2OrgPolicyReferenceFor1v2DSCases() {
+            caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .respondent2Represented(YES)
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(
+                    V_1,
+                    caseData,
+                    ABOUT_TO_SUBMIT
+                ));
+            assertThat(response.getData())
+                .containsEntry("respondent1OrgRegistered", "Yes");
+
+            assertThat(response.getData())
+                .containsEntry("respondent2OrgRegistered", "Yes");
+        }
+
+        @Test
         void shouldNotCopyRespondent1OrgPolicyDetailsFor1v2SameUnregisteredSolicitorScenario_whenInvoked() {
             caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameUnregisteredRepresentative().build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(
-                    CallbackVersion.V_1,
+                    V_1,
                     caseData,
                     ABOUT_TO_SUBMIT
                 ));
@@ -951,7 +997,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+                callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData().get("caseNameHmctsInternal"))
                 .isEqualTo("Mr. John Rambo v Mr. Sole Trader and Mr. John Rambo");
@@ -965,7 +1011,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+                callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData().get("caseNameHmctsInternal"))
                 .isEqualTo("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader");
@@ -979,7 +1025,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+                callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData().get("caseNameHmctsInternal"))
                 .isEqualTo("Mr. John Rambo v Mr. Sole Trader");
@@ -996,7 +1042,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant().build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData()).extracting("addLegalRepDeadline")
                     .isEqualTo(submittedDate.format(ISO_DATE_TIME));
@@ -1009,7 +1055,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData()).extracting("addLegalRepDeadline")
                     .isEqualTo(submittedDate.format(ISO_DATE_TIME));
@@ -1022,7 +1068,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData()).extracting("addLegalRepDeadline")
                     .isEqualTo(submittedDate.format(ISO_DATE_TIME));
@@ -1054,7 +1100,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                         .build())
                     .build();
 
-                params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
@@ -1083,7 +1129,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                         .build())
                     .build();
 
-                CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
@@ -1111,7 +1157,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(
-                        CallbackVersion.V_1,
+                        V_1,
                         data,
                         ABOUT_TO_SUBMIT
                     ));
@@ -1146,7 +1192,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData())
                     .containsEntry("allPartyNames", "Mr. John Rambo V Mr. Sole Trader, Mr. John Rambo");
@@ -1160,7 +1206,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData())
                     .containsEntry("allPartyNames", "Mr. John Rambo, Mr. Jason Rambo V Mr. Sole Trader");
@@ -1212,7 +1258,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+                callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData())
                 .containsEntry("unassignedCaseListDisplayOrganisationReferences",
@@ -1228,7 +1274,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(CallbackVersion.V_1, data, ABOUT_TO_SUBMIT));
+                callbackParamsOf(V_1, data, ABOUT_TO_SUBMIT));
 
             assertThat(response.getErrors()).containsOnly("Court location code is required");
         }
@@ -1240,7 +1286,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(CallbackVersion.V_1, data, ABOUT_TO_SUBMIT));
+                callbackParamsOf(V_1, data, ABOUT_TO_SUBMIT));
 
             assertThat(response.getErrors()).containsOnly("Court location code is required");
         }
@@ -1260,7 +1306,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData())
                     .extracting("respondent2OrganisationPolicy")
@@ -1282,7 +1328,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT));
+                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData())
                     .extracting("respondent1OrganisationPolicy")
