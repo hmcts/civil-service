@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
@@ -727,6 +728,67 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("Photographs and/or a place of the accident location shall be prepared and agreed by the "
                                + "parties and uploaded to the Digital Portal no later than 14 days before the "
                                + "hearing.");
+        }
+
+        @Test
+        void testSDOSortsLocationListThroughOrganisationPartyType() {
+            CaseData caseData = CaseDataBuilder.builder().setSuperClaimTypeToSpecClaim().atStateClaimDraft()
+                .respondent1DQWithLocation().applicant1DQWithLocation().applicant1(Party.builder()
+                                                           .type(Party.Type.ORGANISATION)
+                                                           .individualTitle("Mr.")
+                                                           .individualFirstName("Alex")
+                                                           .individualLastName("Richards")
+                                                           .partyName("Mr. Alex Richards")
+                                                           .build()).build();
+            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                .willReturn(getSampleCourLocationsRefObjectToSort());
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+            DynamicList dynamicList = getLocationDynamicListInPersonHearing(data);
+
+            assertThat(dynamicList).isNotNull();
+            assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
+                "A Site 3 - Adr 3 - AAA 111",
+                "Site 1 - Adr 1 - VVV 111",
+                "Site 2 - Adr 2 - BBB 222",
+                "Site 3 - Adr 3 - CCC 333"
+            );
+        }
+
+        @Test
+        void testSDOSortsLocationListThroughDecideDamagesOrderType() {
+            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                .willReturn(getSampleCourLocationsRefObjectToSort());
+            CaseData caseData = CaseDataBuilder.builder().respondent1DQWithLocation().applicant1DQWithLocation()
+                .setSuperClaimTypeToSpecClaim().atStateClaimDraft()
+                .build().toBuilder().orderType(OrderType.DECIDE_DAMAGES).applicant1(Party.builder()
+                                                                                       .type(Party.Type.ORGANISATION)
+                                                                                       .individualTitle("Mr.")
+                                                                                       .individualFirstName("Alex")
+                                                                                       .individualLastName("Richards")
+                                                                                       .partyName("Mr. Alex Richards")
+                                                                                       .build()).build();
+
+            // .respondent1DQWithLocation().applicant1DQWithLocation()
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+            DynamicList dynamicList = getLocationDynamicListInPersonHearing(data);
+
+            assertThat(dynamicList).isNotNull();
+            assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
+                "A Site 3 - Adr 3 - AAA 111",
+                "Site 1 - Adr 1 - VVV 111",
+                "Site 2 - Adr 2 - BBB 222",
+                "Site 3 - Adr 3 - CCC 333"
+            );
         }
 
         @Test
