@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.search.CaseHearingFeePaidSearchService;
+
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +29,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 
 @ExtendWith(SpringExtension.class)
 class HearingFeePaidHandlerTest {
