@@ -6065,7 +6065,7 @@ class EventHistoryMapperTest {
             when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData);
             assertThat(eventHistory).extracting("interlocutoryJudgment").asList()
-                .extracting("eventCode").asString().contains("[252, 252]");
+                .extracting("eventCode").asString().contains("[]");
         }
 
         @Test
@@ -6127,7 +6127,7 @@ class EventHistoryMapperTest {
             when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData);
             assertThat(eventHistory).extracting("defaultJudgment").asList()
-                .extracting("eventCode").asString().contains("[230, 230]");
+                .extracting("eventCode").asString().contains("[]");
         }
 
         @Test
