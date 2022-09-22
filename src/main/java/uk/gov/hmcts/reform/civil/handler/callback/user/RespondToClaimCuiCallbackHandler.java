@@ -68,7 +68,10 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
         CaseData updatedData = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI))
             .respondent1ResponseDate(responseDate)
-            .applicant1ResponseDeadline(deadlinesCalculator.calculateApplicantResponseDeadline(responseDate, allocatedTrack))
+            .applicant1ResponseDeadline(deadlinesCalculator.calculateApplicantResponseDeadline(
+                responseDate,
+                allocatedTrack
+            ))
             .build();
         return updatedData;
     }
