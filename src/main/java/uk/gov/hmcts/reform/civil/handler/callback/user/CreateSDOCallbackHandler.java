@@ -25,11 +25,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
@@ -72,7 +68,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -81,7 +76,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
-import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
 @Service
 @RequiredArgsConstructor
@@ -114,6 +108,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final SdoGeneratorService sdoGeneratorService;
+    private final RequestedCourtSelector requestedCourtSelector;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -150,30 +145,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
 
         List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
-
-        updatedData.fastTrackAltDisputeResolutionToggle(checkList);
-        updatedData.fastTrackVariationOfDirectionsToggle(checkList);
-        updatedData.fastTrackSettlementToggle(checkList);
-        updatedData.fastTrackDisclosureOfDocumentsToggle(checkList);
-        updatedData.fastTrackWitnessOfFactToggle(checkList);
-        updatedData.fastTrackSchedulesOfLossToggle(checkList);
-        updatedData.fastTrackCostsToggle(checkList);
-        updatedData.fastTrackTrialToggle(checkList);
-        updatedData.fastTrackMethodToggle(checkList);
-        updatedData.disposalHearingDisclosureOfDocumentsToggle(checkList);
-        updatedData.disposalHearingWitnessOfFactToggle(checkList);
-        updatedData.disposalHearingMedicalEvidenceToggle(checkList);
-        updatedData.disposalHearingQuestionsToExpertsToggle(checkList);
-        updatedData.disposalHearingSchedulesOfLossToggle(checkList);
-        updatedData.disposalHearingFinalDisposalHearingToggle(checkList);
-        updatedData.disposalHearingMethodToggle(checkList);
-        updatedData.disposalHearingBundleToggle(checkList);
-        updatedData.disposalHearingClaimSettlingToggle(checkList);
-        updatedData.disposalHearingCostsToggle(checkList);
-        updatedData.smallClaimsHearingToggle(checkList);
-        updatedData.smallClaimsMethodToggle(checkList);
-        updatedData.smallClaimsDocumentsToggle(checkList);
-        updatedData.smallClaimsWitnessStatementToggle(checkList);
+        setCheckList(updatedData, checkList);
 
         DisposalHearingJudgesRecital tempDisposalHearingJudgesRecital = DisposalHearingJudgesRecital.builder()
             .input("Upon considering the claim form, particulars of claim, statements of case"
@@ -711,10 +683,31 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
     }
 
-    private List<String> fetchLocationData(CallbackParams callbackParams) {
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-
-        return locationRefDataService.getCourtLocations(authToken);
+    private void setCheckList(CaseData.CaseDataBuilder<?, ?> updatedData,
+                              List<OrderDetailsPagesSectionsToggle> checkList) {
+        updatedData.fastTrackAltDisputeResolutionToggle(checkList);
+        updatedData.fastTrackVariationOfDirectionsToggle(checkList);
+        updatedData.fastTrackSettlementToggle(checkList);
+        updatedData.fastTrackDisclosureOfDocumentsToggle(checkList);
+        updatedData.fastTrackWitnessOfFactToggle(checkList);
+        updatedData.fastTrackSchedulesOfLossToggle(checkList);
+        updatedData.fastTrackCostsToggle(checkList);
+        updatedData.fastTrackTrialToggle(checkList);
+        updatedData.fastTrackMethodToggle(checkList);
+        updatedData.disposalHearingDisclosureOfDocumentsToggle(checkList);
+        updatedData.disposalHearingWitnessOfFactToggle(checkList);
+        updatedData.disposalHearingMedicalEvidenceToggle(checkList);
+        updatedData.disposalHearingQuestionsToExpertsToggle(checkList);
+        updatedData.disposalHearingSchedulesOfLossToggle(checkList);
+        updatedData.disposalHearingFinalDisposalHearingToggle(checkList);
+        updatedData.disposalHearingMethodToggle(checkList);
+        updatedData.disposalHearingBundleToggle(checkList);
+        updatedData.disposalHearingClaimSettlingToggle(checkList);
+        updatedData.disposalHearingCostsToggle(checkList);
+        updatedData.smallClaimsHearingToggle(checkList);
+        updatedData.smallClaimsMethodToggle(checkList);
+        updatedData.smallClaimsDocumentsToggle(checkList);
+        updatedData.smallClaimsWitnessStatementToggle(checkList);
     }
 
     /**
@@ -740,62 +733,46 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .collect(Collectors.toList());
         builder.listItems(listItems);
 
-        Optional<RequestedCourt> optRequestedCourt = getFirstRequestedCourt(caseData);
-        LocationRefData preferredLocation = null;
-        if (optRequestedCourt.isPresent()) {
-            CaseLocation location;
-            if (null != (location = optRequestedCourt.get().getCaseLocation())) {
-                Optional<LocationRefData> selected = options.stream()
-                    .filter(listItem -> matchLocation(listItem, location))
-                    .findFirst();
-                if (selected.isPresent()) {
-                    preferredLocation = selected.get();
-                }
-            }
-            if (preferredLocation == null && StringUtils.isNotBlank(optRequestedCourt.get().getResponseCourtCode())) {
-                String courtCode = optRequestedCourt.get().getResponseCourtCode();
-                Optional<LocationRefData> selected = options.stream()
-                    .filter(listItem -> matchLocationCourtCode(listItem, courtCode))
-                    .findFirst();
-                if (selected.isPresent()) {
-                    preferredLocation = selected.get();
-                }
-            }
-            if (preferredLocation != null) {
+        Optional<RequestedCourt> optRequestedCourt = requestedCourtSelector.getPreferredRequestedCourt(caseData);
+        optRequestedCourt.flatMap(requestedCourt -> getMatchingLocation(options, requestedCourt))
+            .ifPresent(preferredLocation -> {
                 String label = locationRefDataService.getDisplayEntry(preferredLocation);
                 listItems.stream().filter(item -> StringUtils.equals(item.getLabel(), label))
                     .findFirst()
                     .ifPresent(builder::value);
-            }
-        }
+            });
 
         return builder.build();
     }
 
     /**
-     * Requested court may be selected in several places or in none, depending on the type of claim and the options
-     * chosen by the claimants and defendants. This method prefers first the claimants', second the defendants'.
+     * Gets a location contained in options that matches preferred court.
      *
-     * @param caseData case data
-     * @return first requested court (only with case location and court code) with at least one of the two fields
-     *     filled in.
+     * @param options        list of options we can choose from.
+     * @param preferredCourt either caseLocation or courtCode must be not empty
+     * @return the matching location if any
      */
-    private Optional<RequestedCourt> getFirstRequestedCourt(CaseData caseData) {
-        return Stream.of(
-                Optional.ofNullable(caseData.getCourtLocation())
-                    .map(courtLocation -> RequestedCourt.builder()
-                        .responseCourtCode(courtLocation.getApplicantPreferredCourt())
-                        .caseLocation(courtLocation.getCaseLocation())
-                        .build()),
-                Optional.ofNullable(caseData.getApplicant1DQ()).map(Applicant1DQ::getApplicant1DQRequestedCourt),
-                Optional.ofNullable(caseData.getApplicant2DQ()).map(Applicant2DQ::getApplicant2DQRequestedCourt),
-                Optional.ofNullable(caseData.getRespondent1DQ()).map(Respondent1DQ::getRequestedCourt),
-                Optional.ofNullable(caseData.getRespondent2DQ()).map(Respondent2DQ::getRequestedCourt)
-            ).filter(Optional::isPresent)
-            .map(Optional::get)
-            .filter(requestedCourt -> requestedCourt.getCaseLocation() != null
-                || StringUtils.isNotBlank(requestedCourt.getResponseCourtCode()))
-            .findFirst();
+    private Optional<LocationRefData> getMatchingLocation(List<LocationRefData> options,
+                                                          RequestedCourt preferredCourt) {
+        CaseLocation location;
+        if (null != (location = preferredCourt.getCaseLocation())) {
+            Optional<LocationRefData> selected = options.stream()
+                .filter(listItem -> matchLocation(listItem, location))
+                .findFirst();
+            if (selected.isPresent()) {
+                return selected;
+            }
+        }
+        if (StringUtils.isNotBlank(preferredCourt.getResponseCourtCode())) {
+            String courtCode = preferredCourt.getResponseCourtCode();
+            Optional<LocationRefData> selected = options.stream()
+                .filter(listItem -> matchLocationCourtCode(listItem, courtCode))
+                .findFirst();
+            if (selected.isPresent()) {
+                return selected;
+            }
+        }
+        return Optional.empty();
     }
 
     private boolean matchLocation(LocationRefData locationRefData, CaseLocation caseLocation) {

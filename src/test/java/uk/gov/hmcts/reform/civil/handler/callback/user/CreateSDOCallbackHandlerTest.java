@@ -41,6 +41,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,7 +65,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     CaseDetailsConverter.class,
     ClaimIssueConfiguration.class,
     MockDatabaseConfiguration.class,
-    ValidationAutoConfiguration.class},
+    ValidationAutoConfiguration.class,
+    RequestedCourtSelector.class},
     properties = {"reference.database.enabled=false"})
 public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -133,7 +135,26 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPrePopulateDisposalHearingPage() {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
-            given(locationRefDataService.getCourtLocations(any())).willReturn(getSampleCourLocations());
+            List<LocationRefData> items = List.of(
+                LocationRefData.builder()
+                    .siteName("site 1")
+                    .courtAddress("address 1")
+                    .postcode("post 1")
+                    .build(),
+                LocationRefData.builder()
+                    .siteName("site 2")
+                    .courtAddress("address 2")
+                    .postcode("post 2")
+                    .build()
+            );
+            items.forEach(item ->
+                              when(locationRefDataService.getDisplayEntry(item)).thenCallRealMethod()
+            );
+
+            given(locationRefDataService.getCourtLocationsFullData(any())).willReturn(items);
+            String[] labels = items.stream()
+                .map(locationRefDataService::getDisplayEntry)
+                .collect(Collectors.toList()).toArray(String[]::new);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -145,7 +166,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(dynamicList).isNotNull();
             assertThat(locationsFromDynamicList(dynamicList))
-                .containsOnly("ABCD - RG0 0 AL", "PQRS - GU0 0EE", "WXYZ - EW0 0HE", "LMNO - NE0 0BH");
+                .containsOnly(labels);
         }
 
         @Test
@@ -176,7 +197,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                                       .build())
                                                                     .build())
                                    .build())
-                    .build();
+                .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -345,7 +366,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("disposalHearingBundle").extracting("input")
                 .isEqualTo("At least 7 days before the disposal hearing, "
-                                + "the claimant must upload to the Digital Portal");
+                               + "the claimant must upload to the Digital Portal");
 
             assertThat(response.getData()).extracting("disposalHearingNotes").extracting("input")
                 .isEqualTo("This Order has been made without a hearing. Each party has the right to apply to have"
