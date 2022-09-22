@@ -424,6 +424,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
     private final CaseLocation caseManagementLocation;
+    private final CaseManagementCategory caseManagementCategory;
     private final String locationName;
     private final DynamicList defendantDetailsSpec;
     private final DynamicList defendantDetails;
@@ -438,6 +439,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String repaymentSuggestion;
     private final String currentDatebox;
     private final LocalDate repaymentDate;
+    private final String caseNameHmctsInternal;
 
     @Builder.Default
     private final List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
