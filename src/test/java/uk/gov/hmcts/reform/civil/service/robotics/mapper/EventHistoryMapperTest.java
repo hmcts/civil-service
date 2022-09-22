@@ -24,8 +24,6 @@ import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
@@ -6046,11 +6044,6 @@ class EventHistoryMapperTest {
     @Nested
     class InterlocutoryJudgment {
 
-        @BeforeEach
-        public void setup() {
-            when(featureToggleService.isDJEnabled()).thenReturn(true);
-        }
-
         @Test
         public void shouldgenerateRPAfeedfor_IJNoDivergent() {
 
@@ -6099,11 +6092,6 @@ class EventHistoryMapperTest {
 
     @Nested
     class DefaultJudgment {
-
-        @BeforeEach
-        public void setup() {
-            when(featureToggleService.isDJEnabled()).thenReturn(true);
-        }
 
         @Test
         public void shouldgenerateRPAfeedfor_DJNoDivergent() {

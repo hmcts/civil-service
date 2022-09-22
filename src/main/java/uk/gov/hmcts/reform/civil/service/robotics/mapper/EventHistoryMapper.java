@@ -55,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED_NOTICE_OF_CHANGE;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
@@ -81,7 +82,6 @@ import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapp
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT_ID;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseTypeForRespondent;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseTypeForRespondentSpec;
@@ -244,12 +244,10 @@ public class EventHistoryMapper {
             }
         }
 
-        if (featureToggleService.isDJEnabled()) {
-            buildInterlocutoryJudgment(builder, caseData);
-            buildMiscellaneousIJEvent(builder, caseData);
-            buildDefaultJudgment(builder, caseData);
-            buildMiscellaneousDJEvent(builder, caseData);
-        }
+        buildInterlocutoryJudgment(builder, caseData);
+        buildMiscellaneousIJEvent(builder, caseData);
+        buildDefaultJudgment(builder, caseData);
+        buildMiscellaneousDJEvent(builder, caseData);
         buildInformAgreedExtensionDateForSpec(builder, caseData);
         return eventHistorySequencer.sortEvents(builder.build());
     }
@@ -313,6 +311,7 @@ public class EventHistoryMapper {
             ? new BigDecimal(caseData.getPartialPaymentAmount()) : null;
         var partialPaymentPounds = isNotEmpty(partialPaymentPennies)
             ? MonetaryConversions.penniesToPounds(partialPaymentPennies) : null;
+
         return (Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(DEFAULT_JUDGMENT_GRANTED.getCode())
@@ -320,7 +319,7 @@ public class EventHistoryMapper {
             .litigiousPartyID(litigiousPartyID)
             .eventDetailsText("")
             .eventDetails(EventDetails.builder().miscText("")
-                              .amountOfJudgment(amountClaimedWithInterest.setScale(2))
+                              .amountOfJudgment(amountClaimedWithInterest)
                               .amountOfCosts(getCostOfJudgment(caseData))
                               .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES)
                                                             ? partialPaymentPounds : BigDecimal.ZERO)
@@ -334,8 +333,7 @@ public class EventHistoryMapper {
                                   ? caseData.getPaymentSetDate().atStartOfDay() : null)
                               .installmentAmount((caseData.getPaymentTypeSelection()
                                   .equals(DJPaymentTypeSelection.REPAYMENT_PLAN))
-                                                     ? getInstallmentAmount(caseData.getRepaymentSuggestion())
-                                                       .setScale(2)
+                                                     ? new BigDecimal(caseData.getRepaymentSuggestion())
                                                      : BigDecimal.ZERO)
                               .installmentPeriod(getInstallmentPeriod(caseData))
                               .firstInstallmentDate(caseData.getRepaymentDate())
@@ -345,11 +343,6 @@ public class EventHistoryMapper {
                               .build())
             .build());
 
-    }
-
-    private BigDecimal getInstallmentAmount(String amount) {
-        var regularRepaymentAmountPennies = new BigDecimal(amount);
-        return MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies);
     }
 
     private void buildBreathingSpaceEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
@@ -461,7 +454,7 @@ public class EventHistoryMapper {
         String miscText;
 
         if (defendant1ResponseExists.test(caseData)) {
-            if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 RespondentResponseTypeSpec respondent1SpecResponseType =
                     MultiPartyScenario.TWO_V_ONE.equals(getMultiPartyScenario(caseData))
                         ? caseData.getClaimant1ClaimResponseTypeForSpec()
@@ -477,7 +470,7 @@ public class EventHistoryMapper {
             }
 
             boolean addMiscEvent;
-            if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+            if (caseData.getSuperClaimType() == SPEC_CLAIM) {
                 addMiscEvent = goingOffline && !RespondentResponseTypeSpec.FULL_DEFENCE
                     .equals(caseData.getRespondent1ClaimResponseTypeForSpec());
             } else {
@@ -498,7 +491,7 @@ public class EventHistoryMapper {
         }
 
         if (defendant2DivergentResponseExists.test(caseData)) {
-            if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 buildRespondentResponseEventForSpec(builder, caseData,
                                                     caseData.getRespondent2ClaimResponseTypeForSpec(),
                                                     respondent2ResponseDate, RESPONDENT2_ID
@@ -510,7 +503,7 @@ public class EventHistoryMapper {
             }
 
             boolean addMiscEvent;
-            if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+            if (caseData.getSuperClaimType() == SPEC_CLAIM) {
                 addMiscEvent = goingOffline && !RespondentResponseTypeSpec.FULL_DEFENCE
                     .equals(caseData.getRespondent2ClaimResponseTypeForSpec());
             } else {
@@ -736,7 +729,7 @@ public class EventHistoryMapper {
         MultiPartyScenario scenario = getMultiPartyScenario(caseData);
         String defaultText = "";
         if (scenario.equals(ONE_V_ONE) || scenario.equals(TWO_V_ONE)) {
-            if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 switch (scenario.equals(TWO_V_ONE)
                     ? YES.equals(caseData.getDefendantSingleResponseToBothClaimants())
                     ? caseData.getRespondent1ClaimResponseTypeForSpec()
@@ -778,16 +771,16 @@ public class EventHistoryMapper {
                 "RPA Reason: %sDefendant: %s has responded: %s",
                 paginatedMessage,
                 respondent.getPartyName(),
-                isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
+                SPEC_CLAIM.equals(caseData.getSuperClaimType())
                     ? getResponseTypeForRespondentSpec(caseData, respondent)
-                    : getResponseTypeForRespondent(caseData, respondent, featureToggleService.isNoticeOfChangeEnabled())
+                    : getResponseTypeForRespondent(caseData, respondent)
             ));
         }
         return defaultText;
     }
 
     private void buildCaseNotesEvents(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
             if (featureToggleService.isSpecRpaContinuousFeedEnabled() && isNotEmpty(caseData.getCaseNotes())) {
                 buildMiscellaneousCaseNotesEvent(builder, caseData);
             }
@@ -817,7 +810,7 @@ public class EventHistoryMapper {
     }
 
     private void buildRespondent1LitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
             if (featureToggleService.isSpecRpaContinuousFeedEnabled()
                 && caseData.getRespondent1LitigationFriendCreatedDate() != null) {
                 buildMiscellaneousRespondent1LitigationFriendEvent(builder, caseData);
@@ -846,7 +839,7 @@ public class EventHistoryMapper {
     }
 
     private void buildRespondent2LitigationFriendEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
             if (featureToggleService.isSpecRpaContinuousFeedEnabled()
                 && caseData.getRespondent2LitigationFriendCreatedDate() != null) {
                 buildMiscellaneousRespondent2LitigationFriendEvent(builder, caseData);
@@ -891,7 +884,7 @@ public class EventHistoryMapper {
     }
 
     private boolean rpaEnabledForClaim(CaseData caseData) {
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
             return featureToggleService.isSpecRpaContinuousFeedEnabled();
         } else {
             return featureToggleService.isRpaContinuousFeedEnabled();
@@ -1083,7 +1076,7 @@ public class EventHistoryMapper {
             .collect(Collectors.toList());
         builder.replyToDefence(replyDefenceForProceedingApplicants);
 
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
             List<Event> dqForProceedingApplicantsSpec = IntStream.range(0, applicantDetails.size())
                 .mapToObj(index ->
                               Event.builder()
@@ -1159,8 +1152,7 @@ public class EventHistoryMapper {
                                           .dq(caseData.getApplicant2DQ())
                                           .litigiousPartyID(APPLICANT2_ID)
                                           .responseDate(
-                                              isSpecCaseCategory(caseData,
-                                                                 featureToggleService.isAccessProfilesEnabled())
+                                              SPEC_CLAIM.equals(caseData.getSuperClaimType())
                                                   ? caseData.getApplicant1ResponseDate()
                                                   : caseData.getApplicant2ResponseDate())
                                           .build());
@@ -1203,7 +1195,7 @@ public class EventHistoryMapper {
             case TWO_V_ONE: {
                 YesOrNo app1Proceeds;
                 YesOrNo app2Proceeds;
-                if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+                if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                     app1Proceeds = caseData.getApplicant1ProceedWithClaimSpec2v1();
                     app2Proceeds = app1Proceeds;
                 } else {
@@ -1424,7 +1416,7 @@ public class EventHistoryMapper {
                 + "preferredCourtCode: %s; stayClaim: %s",
             paginatedMessage,
             respondent.getPartyName(),
-            getResponseTypeForRespondent(caseData, respondent, featureToggleService.isNoticeOfChangeEnabled()),
+            getResponseTypeForRespondent(caseData, respondent),
             getPreferredCourtCode(dq),
             isStayClaim(dq)
         ));
@@ -1621,7 +1613,7 @@ public class EventHistoryMapper {
                 break;
             }
             default: {
-                if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+                if (caseData.getSuperClaimType() != null && caseData.getSuperClaimType().equals(SPEC_CLAIM)) {
                     buildAcknowledgementOfServiceSpec(builder, caseData.getRespondent1AcknowledgeNotificationDate());
                     return;
                 }
@@ -1634,7 +1626,7 @@ public class EventHistoryMapper {
                 builder
                     .acknowledgementOfServiceReceived(
                         List.of(
-                            isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
+                            SPEC_CLAIM.equals(caseData.getSuperClaimType())
                                 ?
                                 Event.builder()
                                     .eventSequence(prepareEventSequence(builder.build()))
@@ -1904,7 +1896,7 @@ public class EventHistoryMapper {
     }
 
     private void buildInformAgreedExtensionDateForSpec(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())
             && (caseData.getRespondentSolicitor1AgreedDeadlineExtension() != null
             || caseData.getRespondentSolicitor2AgreedDeadlineExtension() != null)) {
             buildConsentExtensionFilingDefence(builder, caseData);
@@ -2018,8 +2010,7 @@ public class EventHistoryMapper {
             ));
         }
 
-        return fixedCost != null && claimCost != null ? fixedCost.add(claimCost).setScale(2)
-            : claimCost != null  ? claimCost.setScale(2) : BigDecimal.ZERO;
+        return fixedCost != null && claimCost != null ? fixedCost.add(claimCost) : claimCost;
 
     }
 
