@@ -74,6 +74,11 @@ public class AssignCaseToUserForSpecHandler extends CallbackHandler {
         coreCaseUserService.assignCase(caseId, submitterId, organisationId, CaseRole.APPLICANTSOLICITORONESPEC);
         coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, submitterId, organisationId);
 
+        // This sets the "supplementary_data" value "HmctsServiceId to the Unspec service ID AAA6
+        if (toggleService.isGlobalSearchEnabled()) {
+            setSupplementaryData(caseData.getCcdCaseReference());
+        }
+
         CaseData updated = caseData.toBuilder()
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(userDetails.getEmail()).build())
             .build();
