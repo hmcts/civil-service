@@ -86,7 +86,6 @@ public class TestingSupportController {
         return new ResponseEntity<>(featureToggleInfo, HttpStatus.OK);
     }
 
-
     @Data
     private static class BusinessProcessInfo {
         private BusinessProcess businessProcess;
