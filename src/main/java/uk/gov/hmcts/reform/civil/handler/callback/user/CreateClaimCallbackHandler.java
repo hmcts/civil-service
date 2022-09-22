@@ -383,21 +383,21 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         if (YES.equals(caseData.getRespondent2Represented()) && caseData.getRespondent2OrgRegistered() == null) {
             dataBuilder.respondent2OrgRegistered(YES);
-
-            //assign casemanagementcategory to the case and assign casenamehmctsinternal
-            if (toggleService.isGlobalSearchEnabled()) {
-                //casename
-                dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
-
-                //case management category
-                CaseManagementCategoryElement civil =
-                    CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
-                List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
-                itemList.add(element(civil));
-                dataBuilder.caseManagementCategory(
-                    CaseManagementCategory.builder().value(civil).list_items(itemList).build());
-            }
         }
+        //assign casemanagementcategory to the case and assign casenamehmctsinternal
+        if (toggleService.isGlobalSearchEnabled()) {
+            //casename
+            dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
+
+            //case management category
+            CaseManagementCategoryElement civil =
+                CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
+            List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
+            itemList.add(element(civil));
+            dataBuilder.caseManagementCategory(
+                CaseManagementCategory.builder().value(civil).list_items(itemList).build());
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
