@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -80,10 +81,20 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     private static final LocalDateTime weekdayDate = LocalDate.of(2022, 2, 15).atTime(12, 0);
     private static final Applicant1DQ applicant1DQ =
             Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
-                    .responseCourtCode("applicant1DQRequestedCourt").build()).build();
+                    .responseCourtCode("applicant1DQRequestedCourt")
+                                                                  .caseLocation(CaseLocation.builder()
+                                                                                    .region("2")
+                                                                                    .baseLocation("00000")
+                                                                                    .build())
+                                                                  .build()).build();
     private static final Respondent1DQ respondent1DQ =
             Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
-                    .responseCourtCode("respondent1DQRequestedCourt").build()).build();
+                    .responseCourtCode("respondent1DQRequestedCourt")
+                                                                    .caseLocation(CaseLocation.builder()
+                                                                                      .region("2")
+                                                                                      .baseLocation("11111")
+                                                                                      .build())
+                                                                    .build()).build();
 
     @Autowired
     private InitiateGeneralApplicationService service;
@@ -822,7 +833,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
-                .isEqualTo("applicant1DQRequestedCourt");
+                .isEqualTo("00000");
     }
 
     @Test
@@ -832,7 +843,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
-                .isEqualTo("applicant1DQRequestedCourt");
+                .isEqualTo("00000");
     }
 
     @Test
@@ -842,7 +853,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
-                .isEqualTo("applicant1DQRequestedCourt");
+                .isEqualTo("00000");
     }
 
     @Test
@@ -852,7 +863,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
-                .isEqualTo("respondent1DQRequestedCourt");
+                .isEqualTo("11111");
     }
 
     @Test
@@ -862,7 +873,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
-                .isEqualTo("respondent1DQRequestedCourt");
+                .isEqualTo("11111");
     }
 
     @Test
@@ -873,7 +884,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
-                .isNull();
+                .isEqualTo("00000");
     }
 
     @Test
@@ -885,7 +896,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
-                .isNull();
+            .isEqualTo("00000");
     }
 
     @Test
@@ -897,7 +908,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
-                .isNull();
+                .isEqualTo("00000");
     }
 
     @Test

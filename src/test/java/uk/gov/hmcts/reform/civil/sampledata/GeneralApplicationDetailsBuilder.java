@@ -9,12 +9,14 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -363,19 +365,27 @@ public class GeneralApplicationDetailsBuilder {
         return caseData.toBuilder()
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                               .organisation(Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
                                                .orgPolicyReference(STRING_CONSTANT).build())
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
                 .applicant1DQ(Applicant1DQ.builder()
                         .applicant1DQRequestedCourt(RequestedCourt.builder()
                                 .responseCourtCode("applicant1DQRequestedCourt")
+                                                        .caseLocation(CaseLocation.builder()
+                                                                          .region("2")
+                                                                          .baseLocation("00000")
+                                                                          .build())
                                 .build())
                         .build())
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
                 .respondent1DQ(Respondent1DQ.builder()
                         .respondent1DQRequestedCourt(RequestedCourt.builder()
                                 .responseCourtCode("respondent1DQRequestedCourt")
+                                                         .caseLocation(CaseLocation.builder()
+                                                                           .region("2")
+                                                                           .baseLocation("11111")
+                                                                           .build())
                                 .build())
                         .build())
                 .addApplicant2(YES)
@@ -396,11 +406,11 @@ public class GeneralApplicationDetailsBuilder {
                         .id(STRING_CONSTANT)
                         .email(APPLICANT_EMAIL_ID_CONSTANT).build())
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                        .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                        .organisation(Organisation.builder()
                                 .organisationID(STRING_CONSTANT).build())
                         .orgPolicyReference(STRING_CONSTANT).build())
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                        .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                        .organisation(Organisation.builder()
                                 .organisationID(STRING_CONSTANT).build())
                         .orgPolicyReference(STRING_CONSTANT).build())
                 .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
@@ -459,7 +469,7 @@ public class GeneralApplicationDetailsBuilder {
         return CaseData.builder()
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                    .organisation(Organisation.builder()
                             .organisationID(STRING_CONSTANT).build())
                     .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
                     .orgPolicyReference(STRING_CONSTANT).build())
@@ -467,12 +477,20 @@ public class GeneralApplicationDetailsBuilder {
             .applicant1DQ(Applicant1DQ.builder()
                         .applicant1DQRequestedCourt(RequestedCourt.builder()
                                 .responseCourtCode("applicant1DQRequestedCourt")
+                                                        .caseLocation(CaseLocation.builder()
+                                                                          .region("2")
+                                                                          .baseLocation("11111")
+                                                                          .build())
                                 .build())
                         .build())
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
                 .respondent1DQ(Respondent1DQ.builder()
                         .respondent1DQRequestedCourt(RequestedCourt.builder()
                                 .responseCourtCode("respondent1DQRequestedCourt")
+                                                         .caseLocation(CaseLocation.builder()
+                                                                           .region("2")
+                                                                           .baseLocation("00000")
+                                                                           .build())
                                 .build())
                         .build())
                 .addApplicant2(YES)
@@ -556,8 +574,14 @@ public class GeneralApplicationDetailsBuilder {
         return CaseData.builder()
             .ccdCaseReference(1234L)
             .superClaimType(claimType)
+            .courtLocation(CourtLocation.builder()
+                               .caseLocation(CaseLocation.builder()
+                                                 .region("2")
+                                                 .baseLocation("00000")
+                                                 .build())
+                               .build())
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                               .organisation(Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())
                                                .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO
                                                                               .getFormattedName())
@@ -652,6 +676,10 @@ public class GeneralApplicationDetailsBuilder {
                                                  Respondent1DQ respondent1DQ) {
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
                 .ccdCaseReference(1234L)
+                .courtLocation(CourtLocation.builder().caseLocation(CaseLocation.builder()
+                                                                        .region("2")
+                                                                        .baseLocation("00000")
+                                                                        .build()).build())
                 .respondent2OrganisationPolicy(OrganisationPolicy.builder()
                         .organisation(Organisation.builder()
                                 .organisationID(STRING_CONSTANT).build())
