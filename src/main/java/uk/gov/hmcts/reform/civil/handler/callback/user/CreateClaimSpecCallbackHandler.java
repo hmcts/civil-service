@@ -386,7 +386,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
         ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
 
-        //assign case management category to the case
+        //assign case management category to the case and caseNameHMCTSinternal
         if (V_1.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {
             dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
 

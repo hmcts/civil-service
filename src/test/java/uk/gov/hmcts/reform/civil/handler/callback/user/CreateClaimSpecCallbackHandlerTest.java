@@ -1186,8 +1186,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+           
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
             assertThat(response.getData().get("caseNameHmctsInternal"))
                 .isEqualTo("Mr. John Rambo v Mr. Sole Trader");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
