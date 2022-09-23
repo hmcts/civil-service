@@ -193,7 +193,9 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 HEARING_SCHEDULED,
-                TAKE_CASE_OFFLINE
+                TAKE_CASE_OFFLINE,
+                EVIDENCE_UPLOAD
+
             )
         ),
         entry(
