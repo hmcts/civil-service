@@ -294,6 +294,11 @@ robotics:
     recipient: hmcts.civil.multiparty.robotics@gmail.com
     multipartyrecipient: hmcts.civil.multiparty.robotics@gmail.com
     specRecipient: hmcts.civil.multiparty.robotics@gmail.com
+
+notification:
+  caseworker:
+    spec:
+      receiver: civilmoneyclaimsdemo@gmail.com
 ---
 
 spring:
