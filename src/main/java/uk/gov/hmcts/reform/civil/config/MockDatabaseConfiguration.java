@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.config;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 
@@ -21,7 +22,7 @@ public class MockDatabaseConfiguration {
     }
 
     @Bean
-    public ReferenceNumberRepository hearingReferenceNumberRepository() {
+    public HearingReferenceNumberRepository hearingReferenceNumberRepository() {
         return () -> "000HN001";
     }
 }
