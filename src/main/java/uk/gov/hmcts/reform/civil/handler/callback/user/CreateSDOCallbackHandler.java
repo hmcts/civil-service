@@ -139,7 +139,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
-        DynamicList locationsList = fromList(setPreferredLocationFirst(locations, caseData));
+        DynamicList locationsList = fromList(setPreferredLocationFirst(locations, caseData, updatedData));
 
         updatedData.disposalHearingMethodInPerson(locationsList);
         updatedData.fastTrackMethodInPerson(locationsList);
@@ -713,7 +713,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsWitnessStatementToggle(checkList);
     }
 
-    private List<String> setPreferredLocationFirst(List<LocationRefData> locations, CaseData caseData) {
+    private List<String> setPreferredLocationFirst(List<LocationRefData> locations,
+                                                   CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         LocationHelper locationHelper = new LocationHelper();
         String locationLabel;
         if (caseData.getSuperClaimType() == SuperClaimType.SPEC_CLAIM) {
@@ -735,7 +736,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 .filter(locationRefData -> locationHelper.checkLocation(locationRefData,
                                                          locationLabel)).findFirst();
 
-        locationHelper.setCaseManagementLocationData(caseData, preferredLocation, locations);
+        locationHelper.setCaseManagementLocationData(caseData, updatedData, preferredLocation, locations);
 
         return locationHelper.getLocationsFromList(locations);
     }
