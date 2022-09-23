@@ -10,7 +10,7 @@ public enum DocmosisTemplates {
     N2_1V2_DIFFERENT_SOL("CV-SPC-CLM-ENG-01075.docx", "sealed_claim_form_spec%s.pdf"),
     N2_2V1("CV-SPC-CLM-ENG-01077.docx", "sealed_claim_form_spec%s.pdf"),
     N181("CV-UNS-HRN-ENG-01175.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    N181_MULTIPARTY_SAME_SOL("CV-UNS-HRN-ENG-01176.docx", "%s_directions_questionnaire_form_%s.pdf"),
+    N181_MULTIPARTY_SAME_SOL("CV-UNS-HRN-ENG-01178.docx", "%s_directions_questionnaire_form_%s.pdf"),
     N10("CV-SPEC-ACK-ENG-00001-v01.docx", "acknowledgement_of_service_form_spec_%s.pdf"),
     N9("CV-UNS-ACK-ENG-00653.docx", "acknowledgement_of_claim_form_%s.pdf"),
     N9_MULTIPARTY_SAME_SOL("CV-UNS-ACK-ENG-00789.docx", "acknowledgement_of_claim_form_%s.pdf"),
