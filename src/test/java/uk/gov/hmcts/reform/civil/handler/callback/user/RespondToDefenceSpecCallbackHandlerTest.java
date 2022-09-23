@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
 import java.time.LocalDateTime;
@@ -85,6 +86,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private FeatureToggleService featureToggleService;
+
+    @MockBean
+    private LocationRefDataService locationRefDataService;
 
     @Nested
     class ValidateUnavailableDates {
