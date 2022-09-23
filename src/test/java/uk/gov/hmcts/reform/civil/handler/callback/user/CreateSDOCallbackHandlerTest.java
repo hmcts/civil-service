@@ -303,6 +303,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("smallClaimsMethodToggle").isNotNull();
             assertThat(response.getData()).extracting("smallClaimsDocumentsToggle").isNotNull();
             assertThat(response.getData()).extracting("smallClaimsWitnessStatementToggle").isNotNull();
+            assertThat(response.getData()).extracting("caseManagementLocation").isNotNull();
 
             assertThat(response.getData()).extracting("disposalHearingJudgesRecital").extracting("input")
                 .isEqualTo("Upon considering the claim form, particulars of claim, statements of case"
