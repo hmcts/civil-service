@@ -21,7 +21,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 
 public class LocationHelper {
-    
+
     public void setLocationAndCaseManagementLocation(CallbackParams callbackParams,
                                                              LocationRefDataService locationRefDataService) {
         CaseData caseData = callbackParams.getCaseData();
