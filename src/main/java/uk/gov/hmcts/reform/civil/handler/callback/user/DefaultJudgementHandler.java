@@ -10,8 +10,11 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
+import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -36,9 +39,11 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -235,6 +240,15 @@ public class DefaultJudgementHandler extends CallbackHandler {
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
+
+        CaseManagementCategoryElement civil =
+            CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
+        List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
+        itemList.add(element(civil));
+        caseDataBuilder.caseManagementCategory(
+            CaseManagementCategory.builder().value(civil).list_items(itemList).build());
+
         if (Objects.nonNull(caseData.getHearingSupportRequirementsDJ())) {
             HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ()
                 .toBuilder().hearingTemporaryLocation(null).build();
@@ -243,12 +257,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         }
         caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT));
 
-        var state = "PROCEEDS_IN_HERITAGE_SYSTEM";
-        if (caseData.getRespondent2() == null || caseData.getRespondent2() != null
-            && caseData.getDefendantDetails().getValue()
-            .getLabel().startsWith("Both")) {
-            state = "JUDICIAL_REFERRAL";
-        }
+        var state = "JUDICIAL_REFERRAL";
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(state)
@@ -283,6 +292,30 @@ public class DefaultJudgementHandler extends CallbackHandler {
             + " - " + location.getCourtAddress()
             + " - " + location.getPostcode();
         return locationLabel.equals(locationTempLabel);
+    }
+
+    public StringBuilder caseParticipants(CaseData caseData) {
+        StringBuilder participantString = new StringBuilder();
+        MultiPartyScenario multiPartyScenario  = getMultiPartyScenario(caseData);
+        if (multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+            || multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)) {
+            participantString.append(caseData.getApplicant1().getPartyName())
+                .append(" v ").append(caseData.getRespondent1().getPartyName())
+                .append(" and ").append(caseData.getRespondent2().getPartyName());
+
+        } else if (multiPartyScenario.equals(MultiPartyScenario.TWO_V_ONE)) {
+            participantString.append(caseData.getApplicant1().getPartyName())
+                .append(" and ").append(caseData.getApplicant2().getPartyName()).append(" v ")
+                .append(caseData.getRespondent1()
+                            .getPartyName());
+
+        } else {
+            participantString.append(caseData.getApplicant1().getPartyName()).append(" v ")
+                .append(caseData.getRespondent1()
+                            .getPartyName());
+        }
+        return participantString;
+
     }
 
 }

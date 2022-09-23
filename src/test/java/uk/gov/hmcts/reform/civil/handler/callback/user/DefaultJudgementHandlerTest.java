@@ -320,6 +320,46 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
 
         @Test
+        void shouldAssignCaseName1v2_whenCaseIs1v2GlobalSearchEnabled() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData().get("caseNameHmctsInternal"))
+                .isEqualTo("Mr. John Rambo v Mr. Sole Trader and Mr. John Rambo");
+            assertThat(response.getData().get("caseManagementCategory")).extracting("value")
+                .extracting("code").isEqualTo("Civil");
+        }
+
+        @Test
+        void shouldAssignCaseName2v1_whenCaseIs2v1GlobalSearchEnabled() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData().get("caseNameHmctsInternal"))
+                .isEqualTo("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader");
+            assertThat(response.getData().get("caseManagementCategory")).extracting("value")
+                .extracting("code").isEqualTo("Civil");
+        }
+
+        @Test
+        void shouldAssignCaseName1v1_whenCaseIs1v1GlobalSearchEnabled() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData().get("caseNameHmctsInternal"))
+                .isEqualTo("Mr. John Rambo v Mr. Sole Trader");
+            assertThat(response.getData().get("caseManagementCategory")).extracting("value")
+                .extracting("code").isEqualTo("Civil");
+        }
+
+        @Test
         void shouldCallExternalTask_whenAboutToSubmit() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .addRespondent2(NO)

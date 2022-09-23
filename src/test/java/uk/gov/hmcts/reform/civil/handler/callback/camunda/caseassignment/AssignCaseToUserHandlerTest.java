@@ -13,19 +13,26 @@ import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -42,11 +49,41 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private CoreCaseUserService coreCaseUserService;
 
+    @MockBean
+    private CoreCaseDataService coreCaseDataService;
+
+    @MockBean
+    private PaymentsConfiguration paymentsConfiguration;
+
+    @MockBean
+    private FeatureToggleService toggleService;
+
     @Autowired
     private ObjectMapper objectMapper;
 
     private CallbackParams params;
     private CaseData caseData;
+
+    @Nested
+    class AssignHmctsServiceId {
+
+        @BeforeEach
+        void setup() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
+
+            Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
+            });
+            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
+        }
+
+        @Test
+        void shouldReturnSupplementaryDataOnSubmitted() {
+            assignCaseToUserHandler.handle(params);
+            verify(coreCaseDataService).setSupplementaryData(any(), eq(supplementaryData()));
+        }
+
+    }
 
     @Nested
     class AssignRolesIn1v1CasesRegisteredAndRespresented {
@@ -233,5 +270,18 @@ class AssignCaseToUserHandlerTest extends BaseCallbackHandlerTest {
             "OrgId1"
         );
 
+    }
+
+    private Map<String, Map<String, Map<String, Object>>> supplementaryData() {
+        Map<String, Object> hmctsServiceIdMap = new HashMap<>();
+        hmctsServiceIdMap.put("HMCTSServiceId", "AAA7");
+
+        Map<String, Map<String, Object>> supplementaryDataRequestMap = new HashMap<>();
+        supplementaryDataRequestMap.put("$set", hmctsServiceIdMap);
+
+        Map<String, Map<String, Map<String, Object>>> supplementaryDataUpdates = new HashMap<>();
+        supplementaryDataUpdates.put("supplementary_data_updates", supplementaryDataRequestMap);
+
+        return supplementaryDataUpdates;
     }
 }
