@@ -370,12 +370,20 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         if (toggleService.isNoticeOfChangeEnabled()) {
             // LiP are not represented or registered
-            if (areAnyRespondentsLitigantInPerson(caseData) == true)  {
+            if (areAnyRespondentsLitigantInPerson(caseData) == true) {
                 dataBuilder.addLegalRepDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(time.now()));
             }
             populateBlankOrgPolicies(dataBuilder, caseData);
         }
 
+        // temporarily default to yes for CIV-2659
+        if (YES.equals(caseData.getRespondent1Represented()) && caseData.getRespondent1OrgRegistered() == null) {
+            dataBuilder.respondent1OrgRegistered(YES);
+        }
+
+        if (YES.equals(caseData.getRespondent2Represented()) && caseData.getRespondent2OrgRegistered() == null) {
+            dataBuilder.respondent2OrgRegistered(YES);
+        }
         //assign casemanagementcategory to the case and assign casenamehmctsinternal
         if (toggleService.isGlobalSearchEnabled()) {
             //casename
