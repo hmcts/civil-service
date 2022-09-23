@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategoryElement;
@@ -26,6 +28,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.prd.model.Organisation;
@@ -60,6 +64,7 @@ public class InitiateGeneralApplicationService {
 
     private final OrganisationApi organisationApi;
     private final AuthTokenGenerator authTokenGenerator;
+    private final LocationRefDataService locationRefDataService;
 
     private static final int NUMBER_OF_DEADLINE_DAYS = 5;
     public static final String URGENCY_DATE_REQUIRED = "Details of urgency consideration date required.";
@@ -153,6 +158,11 @@ public class InitiateGeneralApplicationService {
         applicationBuilder.caseManagementCategory(
             GACaseManagementCategory.builder().value(civil).list_items(itemList).build());
 
+        Pair<CaseLocation, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
+        //Setting Work Allocation location and location name
+        applicationBuilder.caseManagementLocation(caseLocation.getLeft());
+        applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
+
         LocalDateTime deadline = deadlinesCalculator
             .calculateApplicantResponseDeadline(
                 LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS);
@@ -204,6 +214,15 @@ public class InitiateGeneralApplicationService {
             }
         }
         return errors;
+    }
+
+    private Pair<CaseLocation, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
+        LocationRefData ccmccLocation = locationRefDataService.getCcmccLocation(authToken);
+        CaseLocation courtLocation = CaseLocation.builder()
+            .region(ccmccLocation.getRegionId())
+            .baseLocation(ccmccLocation.getEpimmsId())
+            .build();
+        return Pair.of(courtLocation, true);
     }
 
     public List<String> validateHearingScreen(GAHearingDetails hearingDetails) {
