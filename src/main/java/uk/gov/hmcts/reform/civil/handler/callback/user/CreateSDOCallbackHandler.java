@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
+import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -718,6 +719,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private List<String> setPreferredLocationFirst(List<LocationRefData> locations, CaseData caseData) {
+        LocationHelper locationHelper = new LocationHelper();
         String locationLabel;
         if (caseData.getSuperClaimType() == SuperClaimType.SPEC_CLAIM) {
             RequestedCourt courtRequest = Optional.ofNullable(caseData.getApplicant1DQ())
@@ -725,7 +727,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             if (courtRequest != null && courtRequest.getRequestHearingAtSpecificCourt() == YesOrNo.YES) {
                 locationLabel = courtRequest.getResponseCourtCode();
             } else {
-                return getLocationsFromList(locations);
+                return locationHelper.getLocationsFromList(locations);
             }
         } else {
             // assume unspec
@@ -735,63 +737,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         var preferredLocation =
             locations
                 .stream()
-                .filter(locationRefData -> checkLocation(locationRefData,
+                .filter(locationRefData -> locationHelper.checkLocation(locationRefData,
                                                          locationLabel)).findFirst();
 
-        if (caseData.getOrderType() == OrderType.DECIDE_DAMAGES && preferredLocation.isPresent()) {
-            caseData.toBuilder().caseManagementLocation(
-                CaseLocation.builder()
-                    .region(preferredLocation.get().getRegionId())
-                    .baseLocation(preferredLocation.get().getEpimmsId()).build()
-            ).locationName(preferredLocation.get().getSiteName());
-        }
+        locationHelper.setCaseManagementLocationData(caseData, preferredLocation, locations);
 
-        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())
-            || (caseData.getAllocatedTrack() == AllocatedTrack.MULTI_CLAIM
-            && SPEC_CLAIM.equals(caseData.getSuperClaimType()))) {
-            if (caseData.getApplicant1().getType() == Party.Type.INDIVIDUAL
-                || caseData.getApplicant1().getType() == Party.Type.SOLE_TRADER) {
-                caseData.toBuilder().caseManagementLocation(
-                    CaseLocation.builder()
-                        .region(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt()
-                                    .getCaseLocation().getRegion())
-                        .baseLocation(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getCaseLocation()
-                                          .getBaseLocation()).build()
-                );
-            } else if (caseData.getApplicant1().getType() == Party.Type.COMPANY
-                || caseData.getApplicant1().getType() == Party.Type.ORGANISATION) {
-                caseData.toBuilder().caseManagementLocation(
-                    CaseLocation.builder()
-                        .region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
-                                    .getCaseLocation().getRegion())
-                        .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getCaseLocation()
-                                          .getBaseLocation()).build()
-                );
-            }
-        }
-
-        if (preferredLocation.isPresent()) {
-            locations.remove(preferredLocation.get());
-            locations.add(0, preferredLocation.get());
-            caseData.toBuilder().caseManagementLocation(
-                CaseLocation.builder()
-                    .region(preferredLocation.get().getRegionId())
-                    .baseLocation(preferredLocation.get().getEpimmsId()).build()
-            ).locationName(preferredLocation.get().getSiteName());
-        }
-
-        return getLocationsFromList(locations);
-    }
-
-    private Boolean checkLocation(final LocationRefData location, String locationTempLabel) {
-        return location.getEpimmsId().equals(locationTempLabel);
-    }
-
-    private List<String> getLocationsFromList(final List<LocationRefData> locations) {
-        return locations.stream()
-            .map(location -> location.getSiteName()
-                + " - " + location.getCourtAddress()
-                + " - " + location.getPostcode())
-            .collect(Collectors.toList());
+        return locationHelper.getLocationsFromList(locations);
     }
 }
