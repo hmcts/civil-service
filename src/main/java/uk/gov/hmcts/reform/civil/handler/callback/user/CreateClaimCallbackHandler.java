@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -75,6 +76,7 @@ import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.ge
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CreateClaimCallbackHandler extends CallbackHandler implements ParticularsOfClaimValidator {
@@ -384,7 +386,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         if (YES.equals(caseData.getRespondent2Represented()) && caseData.getRespondent2OrgRegistered() == null) {
             dataBuilder.respondent2OrgRegistered(YES);
         }
-        
+
         //assign casemanagementcategory to the case and assign casenamehmctsinternal
         if (V_1.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {
 
@@ -398,6 +400,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             itemList.add(element(civil));
             dataBuilder.caseManagementCategory(
                 CaseManagementCategory.builder().value(civil).list_items(itemList).build());
+            log.info("Case management equals: " + caseData.getCaseManagementCategory());
+            log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
