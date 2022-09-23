@@ -377,7 +377,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
 
         //assign casemanagementcategory to the case and assign casenamehmctsinternal
-        if (toggleService.isGlobalSearchEnabled()) {
+        if (V_1.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {
             //casename
             dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
 
