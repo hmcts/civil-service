@@ -186,13 +186,17 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        new LocationHelper().setLocationAndCaseManagementLocation(callbackParams, locationRefDataService);
+
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         LocalDateTime currentTime = time.now();
 
         CaseData.CaseDataBuilder builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
             .applicant1ResponseDate(currentTime);
+        new LocationHelper().setLocationAndCaseManagementLocation(callbackParams,
+                                                                  caseData,
+                                                                  builder,
+                                                                  locationRefDataService);
 
         if (multiPartyScenario == TWO_V_ONE) {
             builder.applicant2ResponseDate(currentTime);

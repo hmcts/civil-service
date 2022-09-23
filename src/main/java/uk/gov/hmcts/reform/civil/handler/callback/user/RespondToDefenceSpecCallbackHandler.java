@@ -134,10 +134,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        new LocationHelper().setLocationAndCaseManagementLocation(callbackParams, locationRefDataService);
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC))
             .applicant1ResponseDate(time.now());
+        new LocationHelper().setLocationAndCaseManagementLocation(callbackParams,
+                                                                  caseData, builder, locationRefDataService);
+
         if (caseData.getApplicant1ProceedWithClaim() == YES
             || caseData.getApplicant1ProceedWithClaimSpec2v1() == YES) {
             // moving statement of truth value to correct field, this was not possible in mid event.

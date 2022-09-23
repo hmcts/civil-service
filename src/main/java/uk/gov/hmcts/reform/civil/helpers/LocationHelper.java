@@ -23,9 +23,9 @@ import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 public class LocationHelper {
 
     public void setLocationAndCaseManagementLocation(CallbackParams callbackParams,
-                                                             LocationRefDataService locationRefDataService) {
-        CaseData caseData = callbackParams.getCaseData();
-
+                                                     CaseData caseData,
+                                                     CaseData.CaseDataBuilder<?, ?> updatedData,
+                                                     LocationRefDataService locationRefDataService) {
         List<LocationRefData> locations = locationRefDataService.getCourtLocationsForDefaultJudgments(
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
@@ -46,14 +46,16 @@ public class LocationHelper {
 
         var preferredLocation = preferredLocation(locationLabel, locations);
 
-        setCaseManagementLocationData(caseData, preferredLocation, locations);
+        setCaseManagementLocationData(caseData, updatedData, preferredLocation, locations);
     }
 
     public Optional<LocationRefData> preferredLocation(String locationLabel, List<LocationRefData> locations) {
         return locations
-                .stream()
-                .filter(locationRefData -> checkLocation(locationRefData,
-                                                         locationLabel)).findFirst();
+            .stream()
+            .filter(locationRefData -> checkLocation(
+                locationRefData,
+                locationLabel
+            )).findFirst();
     }
 
     public List<String> getLocationsFromList(final List<LocationRefData> locations) {
@@ -70,48 +72,48 @@ public class LocationHelper {
     }
 
     public void setCaseManagementLocationData(CaseData caseData,
+                                              CaseData.CaseDataBuilder<?, ?> updatedData,
                                               Optional<LocationRefData> preferredLocation,
                                               List<LocationRefData> locations) {
         if (caseData.getOrderType() == OrderType.DECIDE_DAMAGES && preferredLocation.isPresent()) {
-            caseData.toBuilder().caseManagementLocation(
+            updatedData.caseManagementLocation(
                 CaseLocation.builder()
                     .region(preferredLocation.get().getRegionId())
                     .baseLocation(preferredLocation.get().getEpimmsId()).build()
-            ).build().toBuilder().locationName(preferredLocation.get().getSiteName()).build();
-        }
-
-        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())
+            ).locationName(preferredLocation.get().getSiteName());
+        } else if (SPEC_CLAIM.equals(caseData.getSuperClaimType())
             || (caseData.getAllocatedTrack() == AllocatedTrack.MULTI_CLAIM
             && SPEC_CLAIM.equals(caseData.getSuperClaimType()))) {
             if (caseData.getApplicant1().getType() == Party.Type.INDIVIDUAL
                 || caseData.getApplicant1().getType() == Party.Type.SOLE_TRADER) {
-                caseData.toBuilder().caseManagementLocation(
+                updatedData.caseManagementLocation(
                     CaseLocation.builder()
                         .region(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt()
                                     .getCaseLocation().getRegion())
                         .baseLocation(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getCaseLocation()
                                           .getBaseLocation()).build()
-                ).build();
+                );
             } else if (caseData.getApplicant1().getType() == Party.Type.COMPANY
                 || caseData.getApplicant1().getType() == Party.Type.ORGANISATION) {
-                caseData.toBuilder().caseManagementLocation(
+                updatedData.caseManagementLocation(
                     CaseLocation.builder()
                         .region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
                                     .getCaseLocation().getRegion())
                         .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getCaseLocation()
                                           .getBaseLocation()).build()
-                ).build();
+                );
             }
+        } else if (preferredLocation.isPresent()) {
+            updatedData.caseManagementLocation(
+                CaseLocation.builder()
+                    .region(preferredLocation.get().getRegionId())
+                    .baseLocation(preferredLocation.get().getEpimmsId()).build()
+            ).locationName(preferredLocation.get().getSiteName());
         }
 
         if (preferredLocation.isPresent()) {
             locations.remove(preferredLocation.get());
             locations.add(0, preferredLocation.get());
-            caseData.toBuilder().caseManagementLocation(
-                CaseLocation.builder()
-                    .region(preferredLocation.get().getRegionId())
-                    .baseLocation(preferredLocation.get().getEpimmsId()).build()
-            ).build().toBuilder().locationName(preferredLocation.get().getSiteName()).build();
         }
     }
 }
