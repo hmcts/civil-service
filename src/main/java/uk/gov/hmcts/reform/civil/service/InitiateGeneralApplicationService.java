@@ -358,15 +358,17 @@ public class InitiateGeneralApplicationService {
         if (caseData.getApplicant1DQ() == null
                 || caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() == null
                 || caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode() == null) {
-            return CaseLocation.builder().build();
+            return CaseLocation.builder()
+                .region(caseData.getCourtLocation().getCaseLocation().getRegion())
+                .baseLocation(caseData.getCourtLocation().getCaseLocation().getBaseLocation())
+                .build();
         }
         return CaseLocation.builder()
-                //.region(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getHearingPreferredRegionId())
-                .region(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode())
-                //.baseLocation(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt()
-                //.getHearingPreferredCourtVenueId())
-                .baseLocation(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode())
-                .build();
+            .region(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt()
+                        .getCaseLocation().getRegion())
+            .baseLocation(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt()
+                              .getCaseLocation().getBaseLocation())
+            .build();
     }
 
     private CaseLocation getDefendant1PreferredLocation(CaseData caseData) {
@@ -377,11 +379,10 @@ public class InitiateGeneralApplicationService {
         }
         //return caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode();
         return CaseLocation.builder()
-                //.region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getHearingPreferredRegionId())
-                .region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode())
-                //.baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
-                //.getHearingPreferredCourtVenueId())
-                .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode())
-                .build();
+            .region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
+                        .getCaseLocation().getRegion())
+            .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
+                              .getCaseLocation().getBaseLocation())
+            .build();
     }
 }
