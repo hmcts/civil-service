@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.assertj.core.api.AbstractObjectAssert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -20,11 +21,14 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
@@ -40,16 +44,22 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmatio
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.SpecResponse1v2DivergentText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse1v2DivergentHeaderText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse2v1DifferentHeaderText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -58,8 +68,11 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
@@ -72,6 +85,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -80,10 +94,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWOSPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -121,6 +138,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private StateFlowEngine stateFlowEngine;
     @Mock
     private DateOfBirthValidator dateOfBirthValidator;
+    @Mock
+    private LocationRefDataService locationRefDataService;
+    @Mock
+    private CourtLocationUtils courtLocationUtils;
 
     @Spy
     private List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextGenerators = List.of(
@@ -507,6 +528,86 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("respondent2").extracting("primaryAddress")
                 .extracting("AddressLine3").isEqualTo("address line 3");
         }
+
+        @Test
+        void handleLocations() {
+            DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
+            DynamicList preferredCourt = DynamicList.builder()
+                .listItems(locationValues.getListItems())
+                .value(locationValues.getListItems().get(0))
+                .build();
+            when(toggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
+            Party defendant1 = Party.builder()
+                .type(Party.Type.COMPANY)
+                .companyName("company")
+                .build();
+            CaseData caseData = CaseData.builder()
+                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .ccdCaseReference(354L)
+                .respondent1(defendant1)
+                .respondent1Copy(defendant1)
+                .respondent1DQ(
+                    Respondent1DQ.builder()
+                        .respondent1DQRequestedCourt(
+                            RequestedCourt.builder()
+                                .requestHearingAtSpecificCourt(YES)
+                                .responseCourtLocations(preferredCourt)
+                                .build()
+                        )
+                        .build()
+                )
+                .respondent2DQ(
+                    Respondent2DQ.builder()
+                        .respondent2DQRequestedCourt(
+                            RequestedCourt.builder()
+                                .requestHearingAtSpecificCourt(YES)
+                                .responseCourtLocations(preferredCourt)
+                                .build()
+                        )
+                        .build()
+                )
+                .showConditionFlags(EnumSet.of(
+                    DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1,
+                    DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2
+                ))
+                .build();
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+
+            List<LocationRefData> locations = List.of(LocationRefData.builder().build());
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                .thenReturn(locations);
+            LocationRefData completePreferredLocation = LocationRefData.builder()
+                .regionId("regionId")
+                .epimmsId("epimms")
+                .courtLocationCode("code")
+                .build();
+            when(courtLocationUtils.findPreferredLocationData(
+                locations, preferredCourt
+            )).thenReturn(completePreferredLocation);
+            StateFlow flow = mock(StateFlow.class);
+            when(flow.isFlagSet(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(false);
+            when(stateFlowEngine.evaluate(caseData))
+                .thenReturn(flow);
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
+                .thenReturn(true);
+            UserInfo userInfo = UserInfo.builder().uid("798").build();
+            when(userService.getUserInfo(anyString())).thenReturn(userInfo);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            AbstractObjectAssert<?, ?> sent1 = assertThat(response.getData())
+                .extracting("respondent1DQRequestedCourt");
+            sent1.extracting("caseLocation")
+                .extracting("region")
+                .isEqualTo(completePreferredLocation.getRegionId());
+            sent1.extracting("caseLocation")
+                .extracting("baseLocation")
+                .isEqualTo(completePreferredLocation.getEpimmsId());
+            sent1.extracting("responseCourtCode")
+                .isEqualTo(completePreferredLocation.getCourtLocationCode());
+        }
+
     }
 
     @Nested
@@ -1057,4 +1158,34 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .doesNotHaveToString("sameSolicitorSameResponse");
         }
     }
+
+    @Nested
+    class AboutToStart {
+
+        @Test
+        void populate() {
+            CaseData caseData = CaseData.builder().build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+
+            List<LocationRefData> locations = List.of(LocationRefData.builder()
+                                                          .build());
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                .thenReturn(locations);
+            when(toggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
+            DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
+            when(courtLocationUtils.getLocationsFromList(locations))
+                .thenReturn(locationValues);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData())
+                .extracting("respondent1DQRequestedCourt")
+                .extracting("responseCourtLocations")
+                .extracting("list_items").asList()
+                .extracting("label")
+                .containsExactly(locationValues.getListItems().get(0).getLabel());
+        }
+    }
+
 }
