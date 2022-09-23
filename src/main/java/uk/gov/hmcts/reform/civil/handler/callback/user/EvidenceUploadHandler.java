@@ -24,7 +24,6 @@ public class EvidenceUploadHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(EVIDENCE_UPLOAD);
     private final ObjectMapper objectMapper;
 
-
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
@@ -38,6 +37,5 @@ public class EvidenceUploadHandler extends CallbackHandler {
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
-
 
 }
