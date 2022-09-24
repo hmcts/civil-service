@@ -58,6 +58,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final List<RespondToResponseConfirmationTextGenerator> confirmationTextGenerators;
     private final FeatureToggleService featureToggleService;
     private final LocationRefDataService locationRefDataService;
+    private final LocationHelper locationHelper = new LocationHelper();
 
 
     @Override
@@ -137,8 +138,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC))
             .applicant1ResponseDate(time.now());
-        new LocationHelper().setLocationAndCaseManagementLocation(callbackParams,
-                                                                  caseData, builder, locationRefDataService);
+        locationHelper.getCaseManagementLocation(caseData)
+            .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
+                builder,
+                requestedCourt,
+                () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
+                    CallbackParams.Params.BEARER_TOKEN).toString())
+            ));
 
         if (caseData.getApplicant1ProceedWithClaim() == YES
             || caseData.getApplicant1ProceedWithClaimSpec2v1() == YES) {
