@@ -11,18 +11,17 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
@@ -73,7 +72,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
-import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
 @Service
 @RequiredArgsConstructor
@@ -108,6 +106,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final SdoGeneratorService sdoGeneratorService;
+    private final LocationHelper locationHelper = new LocationHelper();
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -137,12 +136,15 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
-        List<LocationRefData> locations = locationRefDataService.getCourtLocationsForDefaultJudgments(
-            callbackParams.getParams().get(BEARER_TOKEN).toString()
-        );
+        updatedData
+            .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
+            .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
 
-        DynamicList locationsList = fromList(setPreferredLocationFirst(locations, caseData, updatedData));
+        Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
+        preferredCourt.map(RequestedCourt::getCaseLocation)
+            .ifPresent(updatedData::caseManagementLocation);
 
+        DynamicList locationsList = getLocationList(callbackParams, updatedData, preferredCourt.orElse(null));
         updatedData.disposalHearingMethodInPerson(locationsList);
         updatedData.fastTrackMethodInPerson(locationsList);
         updatedData.smallClaimsMethodInPerson(locationsList);
@@ -239,8 +241,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 .build();
 
         updatedData.disposalHearingFinalDisposalHearing(tempDisposalHearingFinalDisposalHearing).build();
-
-        HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ();
 
         DisposalHearingBundle tempDisposalHearingBundle = DisposalHearingBundle.builder()
             .input("At least 7 days before the disposal hearing, the claimant must upload to the Digital Portal")
@@ -587,6 +587,39 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    /**
+     * Creates the dynamic list for the hearing location, pre-selecting the preferred court if possible.
+     *
+     * @param callbackParams callback params
+     * @param updatedData    updated case data
+     * @param preferredCourt (optional) preferred court if any
+     * @return dynamic list, with a value selected if appropriate and possible
+     */
+    private DynamicList getLocationList(CallbackParams callbackParams,
+                                        CaseData.CaseDataBuilder<?, ?> updatedData,
+                                        RequestedCourt preferredCourt) {
+        List<LocationRefData> locations = locationRefDataService.getCourtLocationsForDefaultJudgments(
+            callbackParams.getParams().get(BEARER_TOKEN).toString()
+        );
+        Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
+            .flatMap(requestedCourt -> locationHelper.updateCaseManagementLocation(
+                updatedData,
+                requestedCourt,
+                () -> locations
+            ));
+        DynamicList locationsList;
+        if (matchingLocation.isPresent()) {
+            locationsList = DynamicList.fromList(locations, LocationRefDataService::getDisplayEntry,
+                                                 matchingLocation.get(), true
+            );
+        } else {
+            locationsList = DynamicList.fromList(locations, LocationRefDataService::getDisplayEntry,
+                                                 null, true
+            );
+        }
+        return locationsList;
+    }
+
     private CallbackResponse setOrderDetailsFlags(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
@@ -712,35 +745,5 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsMethodToggle(checkList);
         updatedData.smallClaimsDocumentsToggle(checkList);
         updatedData.smallClaimsWitnessStatementToggle(checkList);
-    }
-
-    private List<String> setPreferredLocationFirst(List<LocationRefData> locations,
-                                                   CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
-        LocationHelper locationHelper = new LocationHelper();
-        String locationLabel;
-        if (caseData.getSuperClaimType() == SuperClaimType.SPEC_CLAIM) {
-            RequestedCourt courtRequest = Optional.ofNullable(caseData.getApplicant1DQ())
-                .map(Applicant1DQ::getRequestedCourt).orElse(null);
-            if (courtRequest != null && courtRequest.getRequestHearingAtSpecificCourt() == YesOrNo.YES) {
-                locationLabel = courtRequest.getResponseCourtCode();
-            } else {
-                return locationHelper.getLocationsFromList(locations);
-            }
-        } else {
-            // assume unspec
-            locationLabel = caseData.getCourtLocation().getApplicantPreferredCourt();
-        }
-
-        var preferredLocation =
-            locations
-                .stream()
-                .filter(locationRefData -> locationHelper.checkLocation(
-                    locationRefData,
-                    locationLabel
-                )).findFirst();
-
-        locationHelper.setCaseManagementLocationData(caseData, updatedData, preferredLocation, locations);
-
-        return locationHelper.getLocationsFromList(locations);
     }
 }

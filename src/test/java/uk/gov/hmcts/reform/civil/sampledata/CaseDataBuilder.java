@@ -577,7 +577,7 @@ public class CaseDataBuilder {
             .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .applicant1DQRequestedCourt(RequestedCourt.builder()
                                             .requestHearingAtSpecificCourt(YES)
-                                            .responseCourtCode("444")
+                                            .responseCourtCode("court4")
                                             .caseLocation(CaseLocation.builder()
                                                               .baseLocation("dummy base").region("dummy region")
                                                               .build()).build())

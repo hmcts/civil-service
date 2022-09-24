@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
@@ -467,6 +468,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAssembleClaimantResponseDocuments() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
                                                            "claimant-response-def1.pdf").build())
