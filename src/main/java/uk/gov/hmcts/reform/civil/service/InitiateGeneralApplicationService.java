@@ -135,9 +135,6 @@ public class InitiateGeneralApplicationService {
         }
 
         Pair<CaseLocation, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
-        //caseManagementCategory
-        applicationBuilder.caseManagementCategory(getCaseManagementCategory()).build();
-
         //Setting Work Allocation location and location name
         applicationBuilder.caseManagementLocation(caseLocation.getLeft());
         applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
@@ -207,15 +204,6 @@ public class InitiateGeneralApplicationService {
             .build();
 
         return helper.setRespondentDetailsIfPresent(generalApplication, caseData, userDetails);
-    }
-
-    private DynamicList getCaseManagementCategory() {
-        List<String> civilCategory = List.of("Civil");
-        DynamicList cmcCivil = fromList(civilCategory);
-        Optional<DynamicListElement> first = cmcCivil.getListItems().stream()
-                .filter(l -> l.getLabel().equals(civilCategory.get(0))).findFirst();
-        first.ifPresent(cmcCivil::setValue);
-        return cmcCivil;
     }
 
     private List<Element<GeneralApplication>> addApplication(GeneralApplication application,
