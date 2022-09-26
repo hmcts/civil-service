@@ -46,7 +46,8 @@ public class GeneralApplication implements MappableObject {
     private final String generalAppSuperClaimType;
     private final CaseLocation caseManagementLocation;
     private final YesOrNo isCcmccLocation;
-    private final DynamicList caseManagementCategory;
+    private final GACaseManagementCategory caseManagementCategory;
+
 
     @JsonCreator
     GeneralApplication(@JsonProperty("generalAppType") GAApplicationType generalAppType,
@@ -78,8 +79,8 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("generalAppSuperClaimType") String generalAppSuperClaimType,
                        @JsonProperty("caseManagementLocation") CaseLocation caseManagementLocation,
                        @JsonProperty("isCcmccLocation") YesOrNo isCcmccLocation,
-                       @JsonProperty("caseManagementCategory") DynamicList caseManagementCategory
-                       ) {
+                       @JsonProperty("caseManagementCategory") GACaseManagementCategory caseManagementCategory) {
+
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
         this.businessProcess = businessProcess;
