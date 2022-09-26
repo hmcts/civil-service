@@ -119,6 +119,7 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader(header)
+                    .confirmationBody("<p>&nbsp;</p>")
                     .build());
         }
     }
