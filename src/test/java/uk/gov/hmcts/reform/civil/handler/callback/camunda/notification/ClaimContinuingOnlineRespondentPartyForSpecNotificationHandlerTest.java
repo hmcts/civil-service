@@ -74,9 +74,8 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
     @MockBean
     private FeatureToggleService toggleService;
     @MockBean
-    private Time time;
-    @MockBean
     private PinInPostConfiguration pinInPostConfiguration;
+    @MockBean
     private BulkPrintService bulkPrintService;
     @MockBean
     private PiPLetterGenerator pipLetterGenerator;
@@ -84,8 +83,6 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
     @Autowired
     private ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler handler;
 
-    private static final String respondToClaimUrl = "https://moneyclaims.aat.platform.hmcts.net/first-contact/start";
-    private static final String frontendBaseUrl = "https://cmc-citizen-frontend-staging.service.core-compute-aat.internal";
     public static final String TASK_ID_Respondent1 = "CreateClaimContinuingOnlineNotifyRespondent1ForSpec";
     private static final byte[] LETTER_CONTENT = new byte[]{1, 2, 3, 4};
 
