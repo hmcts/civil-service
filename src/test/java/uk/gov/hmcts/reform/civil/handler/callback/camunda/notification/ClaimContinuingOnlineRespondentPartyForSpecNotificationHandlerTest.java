@@ -84,16 +84,16 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
     @Autowired
     private ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler handler;
 
-    private static final String respondToClaimUrl =  "https://moneyclaims.aat.platform.hmcts.net/first-contact/start";
-    private static final String frontendBaseUrl =  "https://cmc-citizen-frontend-staging.service.core-compute-aat.internal";
+    private static final String respondToClaimUrl = "https://moneyclaims.aat.platform.hmcts.net/first-contact/start";
+    private static final String frontendBaseUrl = "https://cmc-citizen-frontend-staging.service.core-compute-aat.internal";
     public static final String TASK_ID_Respondent1 = "CreateClaimContinuingOnlineNotifyRespondent1ForSpec";
-    private static final byte[] LETTER_CONTENT = new byte[] {1, 2, 3, 4};
+    private static final byte[] LETTER_CONTENT = new byte[]{1, 2, 3, 4};
 
     @org.junit.Test
     public void ldBlock() {
-       when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-       assertTrue(handler.handledEvents().isEmpty());
-       assertFalse(handler.handledEvents().isEmpty());
+        when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
+        assertTrue(handler.handledEvents().isEmpty());
+        assertFalse(handler.handledEvents().isEmpty());
     }
 
     @Nested
@@ -137,7 +137,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
         }
 
         @Test
-        void shouldGenerateAndPrintLetterSuccessfully(){
+        void shouldGenerateAndPrintLetterSuccessfully() {
             given(pipLetterGenerator.downloadLetter(any())).willReturn(LETTER_CONTENT);
             CaseData caseData = getCaseData("testorg@email.com");
             CallbackParams params = getCallbackParams(caseData);
