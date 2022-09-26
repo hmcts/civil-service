@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
@@ -346,6 +347,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         assertCollectionPopulated(result);
         assertCaseDateEntries(result);
+        result.getGeneralApplications().forEach(generalApplicationElement -> {
+            assertCaseManagementCategoryPopulated(generalApplicationElement.getValue().getCaseManagementCategory());
+        });
     }
 
     @Test
@@ -812,6 +816,17 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         assertThat(generalAppHearingDetails.getHearingPreferencesPreferredType()).isNull();
         assertThat(generalAppHearingDetails.getUnavailableTrialRequiredYesOrNo()).isNull();
         assertThat(generalAppHearingDetails.getSupportRequirementLanguageInterpreter()).isNull();
+    }
+
+    private void assertCaseManagementCategoryPopulated(GACaseManagementCategory gaCaseManagementCategory) {
+        assertThat(gaCaseManagementCategory.getValue().getCode())
+            .isEqualTo(CASE_MANAGEMENT_CATEGORY);
+        assertThat(gaCaseManagementCategory.getValue().getLabel())
+            .isEqualTo(CASE_MANAGEMENT_CATEGORY);
+        assertThat(gaCaseManagementCategory.getList_items().get(0).getValue().getLabel())
+            .isEqualTo(CASE_MANAGEMENT_CATEGORY);
+        assertThat(gaCaseManagementCategory.getList_items().get(0).getValue().getCode())
+            .isEqualTo(CASE_MANAGEMENT_CATEGORY);
     }
 
     private void assertCollectionPopulated(CaseData caseData) {

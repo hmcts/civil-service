@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategory;
+import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -120,9 +122,7 @@ public class InitiateGeneralApplicationService {
         } else {
             caseType = "UNSPEC_CLAIM";
         }
-        LocalDateTime deadline = deadlinesCalculator
-            .calculateApplicantResponseDeadline(
-                LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS);
+
         if (caseData.getGeneralAppRespondentAgreement() != null
             && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())) {
             applicationBuilder
@@ -145,6 +145,17 @@ public class InitiateGeneralApplicationService {
                                              .surname(userDetails.getSurname())
                                              .organisationIdentifier(org.get().getOrganisationIdentifier()).build());
         }
+
+        GACaseManagementCategoryElement civil =
+            GACaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
+        List<Element<GACaseManagementCategoryElement>> itemList = new ArrayList<>();
+        itemList.add(element(civil));
+        applicationBuilder.caseManagementCategory(
+            GACaseManagementCategory.builder().value(civil).list_items(itemList).build());
+
+        LocalDateTime deadline = deadlinesCalculator
+            .calculateApplicantResponseDeadline(
+                LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS);
 
         GeneralApplication generalApplication = applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
