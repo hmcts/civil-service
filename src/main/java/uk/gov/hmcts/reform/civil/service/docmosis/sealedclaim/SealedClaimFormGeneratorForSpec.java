@@ -89,26 +89,19 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     @NotNull
     private DocmosisTemplates getSealedDocmosisTemplate(CaseData caseData) {
         DocmosisTemplates sealedTemplate;
-        System.out.println(" inside SealedDocmosisTemplate method ");
         if (caseData.getApplicant2() != null) {
-            System.out.println(" ---------- 11 -------------- ");
             sealedTemplate = N2_2V1;
         } else if (caseData.getRespondent2() != null) {
             if (caseData.getRespondent2SameLegalRepresentative() != null
                 && caseData.getRespondent2SameLegalRepresentative() == YES) {
-                System.out.println(" ---------- 12 -------------- ");
                 sealedTemplate = N2_1V2_SAME_SOL;
             } else {
-                System.out.println(" ---------- 13 -------------- ");
                 sealedTemplate = N2_1V2_DIFFERENT_SOL;
             }
         } else {
-            System.out.println(" ---------- 14 -------------- ");
             if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
-                System.out.println(" ---------- 14 Lip 1 -------------- ");
                 sealedTemplate = N2_LIP;
             } else {
-                System.out.println(" ---------- 14 Lip 2-------------- ");
                 sealedTemplate = N2;
             }
         }
