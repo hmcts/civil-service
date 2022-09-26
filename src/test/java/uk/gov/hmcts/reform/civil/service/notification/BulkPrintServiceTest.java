@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.notification;
 
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,6 +21,7 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(SpringExtension.class)
 class BulkPrintServiceTest {
+
     @Mock
     private SendLetterApi sendLetterApi;
     @Mock
