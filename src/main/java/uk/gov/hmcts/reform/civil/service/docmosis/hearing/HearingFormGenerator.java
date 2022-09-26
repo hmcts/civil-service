@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_FAST_TRACK;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER;
@@ -53,12 +54,11 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     @Override
     public HearingForm getTemplateData(CaseData caseData) throws IOException {
 
-        return HearingForm.builder()
+        HearingForm form = HearingForm.builder()
             .court(caseData.getHearingLocation().getValue().getLabel())
             .caseNumber(caseData.getLegacyCaseReference())
             .creationDate(LocalDate.now())
             .claimant(caseData.getApplicant1().getPartyName())
-            .nthClaimant("1st Claimant")
             .claimantReference("TBC")
             .defendant(caseData.getRespondent1().getPartyName())
             .defendantReference("TBC")
@@ -69,8 +69,15 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
             .additionalInfo(caseData.getHearingAdditionalInformation())
             .feeAmount(caseData.getHearingFee())
             .hearingDueDate(caseData.getHearingDueDate())
-            .additionalText(caseData.getHearingNoticeListOther()).build();
+            .additionalText(caseData.getHearingNoticeListOther())
+            .claimant2exists(nonNull(caseData.getApplicant2()))
+            .defendant2exists(nonNull(caseData.getApplicant2()))
+            .claimant2(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
+            .defendant2(nonNull(caseData.getApplicant2()) ? caseData.getRespondent2().getPartyName() : null)
+            .claimant2Reference("TBC")
+            .defendant2Reference("TBC").build();
 
+        return form;
     }
 
     private String getFileName(CaseData caseData, DocmosisTemplates template) {
