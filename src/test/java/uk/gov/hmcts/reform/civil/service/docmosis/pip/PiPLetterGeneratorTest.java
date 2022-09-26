@@ -61,7 +61,7 @@ class PiPLetterGeneratorTest {
         .claimReferenceNumber(CLAIM_REFERENCE)
         .issueDate(LocalDate.now())
         .defendant(DEFENDANT)
-        .responseDeadline(RESPONSE_DEADLINE)
+        .responseDeadline(RESPONSE_DEADLINE.toLocalDate())
         .totalAmountOfClaim(TOTAL_CLAIM_AMOUNT)
         .respondToClaimUrl(CUI_URL)
         .build();
