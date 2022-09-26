@@ -132,7 +132,8 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return NotificationUtils.caseOfflineNotificationAddProperties(caseData);
+        return NotificationUtils.caseOfflineNotificationAddProperties(
+            caseData, featureToggleService.isAccessProfilesEnabled());
     }
 
     private void sendNotificationToSolicitorSpecCounterClaim(CaseData caseData,
