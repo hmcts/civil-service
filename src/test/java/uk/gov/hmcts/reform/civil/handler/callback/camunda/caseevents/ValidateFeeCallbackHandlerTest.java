@@ -69,4 +69,13 @@ class ValidateFeeCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         assertThat(response.getErrors()).isEmpty();
     }
+
+    @Test
+    void shouldReturnCorrectActivityId_whenRequested() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        assertThat(handler.camundaActivityId(params)).isEqualTo("ValidateClaimFee");
+    }
 }

@@ -8,7 +8,7 @@ public enum AllocatedTrack {
     MULTI_CLAIM;
 
     public static AllocatedTrack getAllocatedTrack(BigDecimal statementOfValueInPounds, ClaimType claimType) {
-        if (claimType.isLowerFeeType()) {
+        if (claimType != null && claimType.isLowerFeeType()) {
             if (isValueSmallerThan(statementOfValueInPounds, 1000)) {
                 return SMALL_CLAIM;
             } else if (isValueWithinRange(statementOfValueInPounds, 1000, 25000)) {
@@ -38,5 +38,18 @@ public enum AllocatedTrack {
 
     private static boolean isValueWithinRange(BigDecimal value, int lower, int higher) {
         return value.compareTo(BigDecimal.valueOf(lower)) >= 0 &&  value.compareTo(BigDecimal.valueOf(higher)) <= 0;
+    }
+
+    public static String toStringValueForEmail(AllocatedTrack allocatedTrack) {
+        switch (allocatedTrack) {
+            case FAST_CLAIM:
+                return "Fast Track";
+            case MULTI_CLAIM:
+                return "Multi Track";
+            case SMALL_CLAIM:
+                return "Small Claim Track";
+            default:
+                throw new IllegalArgumentException("Invalid track type in " + allocatedTrack);
+        }
     }
 }

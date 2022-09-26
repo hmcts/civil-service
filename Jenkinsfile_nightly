@@ -1,8 +1,9 @@
 #!groovy
 
 properties([
-  pipelineTriggers([cron('H 05 * * *')]),
+  pipelineTriggers([cron('H 19 * * *')]),
   parameters([
+    string(name: 'ENVIRONMENT', defaultValue: 'aat', description: 'Environment to test'),
     string(name: 'FRONTEND_URL', defaultValue: 'https://manage-case.aat.platform.hmcts.net',
       description: 'The URL you want to run the full functional tests against'),
     string(name: 'IDAM_API_URL', defaultValue: 'https://idam-api.aat.platform.hmcts.net',
@@ -20,10 +21,7 @@ properties([
       description: 'Functional tests waitForTimeout value'),
     string(name: 'SECURITY_RULES',
       defaultValue: 'https://raw.githubusercontent.com/hmcts/security-test-rules/master/conf/security-rules.conf',
-      description: 'The security rules to use'),
-    string(name: 'FUNCTIONAL_TESTS_WORKERS',
-      defaultValue: '1',
-      description: 'Number of workers running functional tests'),
+      description: 'The security rules to use')
   ])
 ])
 
@@ -56,17 +54,33 @@ withNightlyPipeline(type, product, component) {
   env.CIVIL_SERVICE_URL = params.CIVIL_SERVICE_URL
   env.WAIT_FOR_TIMEOUT_MS = params.WAIT_FOR_TIMEOUT_MS
   env.URL_FOR_SECURITY_SCAN = params.CIVIL_SERVICE_URL
+  env.TESTS_FOR_ACCESSIBILITY = true
+  overrideVaultEnvironments([
+  'aat': params.ENVIRONMENT
+  ])
   loadVaultSecrets(secrets)
 
   //enableMutationTest()
-
+  enableFortifyScan()
   enableSecurityScan()
 
   enableFullFunctionalTest(200)
 
   after('fullFunctionalTest') {
-    sh """ ./gradlew runRpaHandOffTests """
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'output/**/*'
+    //sh """ ./gradlew runRpaHandOffTests """  -- TO DO CMC-1986
+    sh """ ./gradlew runEndToEndUnspecTests """
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
+    env.TESTS_FOR_ACCESSIBILITY = false
+  }
+
+  enableCrossBrowserTest()
+
+  after('crossBrowserTest') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
+  }
+
+  after('fortify-scan') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
   }
 }
 

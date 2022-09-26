@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.stateflow;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,13 +17,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.ONE_RESPONDENT_REPRESENTATIVE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_CASE_KEY;
+import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_FLAGS_KEY;
 import static uk.gov.hmcts.reform.civil.stateflow.StateFlowContext.EXTENDED_STATE_HISTORY_KEY;
 
 @ExtendWith(SpringExtension.class)
@@ -140,6 +145,51 @@ class StateFlowTest {
                 .hasSize(2)
                 .extracting(State::getName)
                 .containsExactly("FLOW.STATE_1", "FLOW.STATE_2");
+        }
+    }
+
+    @Nested
+    class GetFlags {
+
+        @Test
+        void shouldGetFlags() {
+            Map<String, Boolean> flags = Map.of("flag", true);
+
+            ExtendedState mockedExtendedState = createMockedExtendedState();
+            when(mockedStateMachine.getExtendedState()).thenReturn(mockedExtendedState);
+            when(mockedExtendedState.get(EXTENDED_STATE_FLAGS_KEY, Map.class)).thenReturn(flags);
+
+            StateFlow stateFlow = new StateFlow(mockedStateMachine);
+
+            assertThat(stateFlow.getFlags())
+                .contains(entry("flag", true));
+        }
+    }
+
+    @Nested
+    class IsFlagSet {
+
+        StateFlow stateFlow;
+
+        @BeforeEach
+        void setup() {
+            Map<String, Boolean> flags = Map.of(ONE_RESPONDENT_REPRESENTATIVE.name(), true);
+
+            ExtendedState mockedExtendedState = createMockedExtendedState();
+            when(mockedStateMachine.getExtendedState()).thenReturn(mockedExtendedState);
+            when(mockedExtendedState.get(EXTENDED_STATE_FLAGS_KEY, Map.class)).thenReturn(flags);
+
+            stateFlow = new StateFlow(mockedStateMachine);
+        }
+
+        @Test
+        void shouldReturnTrue_whenFlagIsSet() {
+            assertThat(stateFlow.isFlagSet(ONE_RESPONDENT_REPRESENTATIVE)).isTrue();
+        }
+
+        @Test
+        void shouldReturnFalse_whenFlagIsNotSet() {
+            assertThat(stateFlow.isFlagSet(TWO_RESPONDENT_REPRESENTATIVES)).isFalse();
         }
     }
 }

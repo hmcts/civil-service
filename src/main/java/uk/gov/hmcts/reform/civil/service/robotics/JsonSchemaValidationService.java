@@ -20,9 +20,11 @@ import static java.lang.String.format;
 public class JsonSchemaValidationService {
 
     private String jsonSchemaFile;
+    private String jsonSchemaFileForSpec;
 
     public JsonSchemaValidationService() {
         this.jsonSchemaFile = "schema/rpa-json-schema.json";
+        this.jsonSchemaFileForSpec = "schema/rpa-json-schema-spec.json";
     }
 
     public JsonSchemaValidationService(String jsonSchemaFile) {
@@ -41,6 +43,10 @@ public class JsonSchemaValidationService {
             return false;
         }
         return true;
+    }
+
+    public Set<ValidationMessage> validateWithSpecSchema(String payload) {
+        return validate(payload, jsonSchemaFileForSpec);
     }
 
     public Set<ValidationMessage> validate(String payload) {

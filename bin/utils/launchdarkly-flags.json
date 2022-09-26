@@ -1,0 +1,134 @@
+{
+  "segments": {},
+  "flags": {
+    "isOrganisationOnboarded": {
+      "key": "isOrganisationOnboarded",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "rules": [
+        {
+          "variation": 0,
+          "id": "3a32f614-29fc-4d6f-b40b-13b4e34bcf46",
+          "clauses": [
+            {
+              "attribute": "orgId",
+              "op": "in",
+              "values": [
+                "79ZRSOU",
+                "Q1KOKP2",
+                "B04IXE4",
+                "DAWY9LJ",
+                "H2156A0",
+                "MLZ3HE3",
+                "I95FBIJ",
+                "A3Q3FTD",
+                "R0OXF88",
+                "6BLCXED"
+              ],
+              "negate": false
+            }
+          ],
+          "trackEvents": false
+        }
+      ],
+      "fallthrough": {
+        "variation": 1
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": true,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "f9515daf93ea499cb5734f736d5e3423",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 8,
+      "deleted": false
+    },
+    "multiparty": {
+      "key": "multiparty",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": true,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "cb64ab8d483e47999884b82d31a44362",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
+    "rpaContinuousFeed": {
+      "key": "rpaContinuousFeed",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": true,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "e130739960324947bf3b364905f57611",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 11,
+      "deleted": false
+    },
+    "specified-lr-journey": {
+      "key": "specified-lr-journey",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": true,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "d1a9d794232b464aa9648385517260cb",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    }
+  }
+}

@@ -11,9 +11,10 @@ import lombok.Getter;
 import lombok.ToString;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.docmosis.common.Respondent;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Builder
@@ -33,5 +34,6 @@ public class AcknowledgementOfClaimForm implements MappableObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate responseDeadline;
-    private final Respondent respondent;
+    private final List<Party> respondent;
+    private final List<String> responseIntentions;
 }

@@ -24,7 +24,12 @@ public class ClaimDismissedHandler implements BaseExternalTaskHandler {
         List<CaseDetails> cases = caseSearchService.getCases();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
-        cases.forEach(caseDetails -> applicationEventPublisher.publishEvent(
-            new DismissClaimEvent(caseDetails.getId())));
+        cases.forEach(caseDetails -> {
+            try {
+                applicationEventPublisher.publishEvent(new DismissClaimEvent(caseDetails.getId()));
+            } catch (Exception e) {
+                log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
+            }
+        });
     }
 }

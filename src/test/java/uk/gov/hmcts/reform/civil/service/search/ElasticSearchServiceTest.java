@@ -39,7 +39,7 @@ abstract class ElasticSearchServiceTest {
 
         assertThat(searchService.getCases()).isEqualTo(searchResult.getCases());
         verify(coreCaseDataService).searchCases(queryCaptor.capture());
-        assertThat(queryCaptor.getValue()).isEqualToComparingFieldByField(buildQuery(0));
+        assertThat(queryCaptor.getValue()).usingRecursiveComparison().isEqualTo(buildQuery(0));
     }
 
     @Test
@@ -50,7 +50,7 @@ abstract class ElasticSearchServiceTest {
 
         assertThat(searchService.getCases()).isEmpty();
         verify(coreCaseDataService).searchCases(queryCaptor.capture());
-        assertThat(queryCaptor.getValue()).isEqualToComparingFieldByField(buildQuery(0));
+        assertThat(queryCaptor.getValue()).usingRecursiveComparison().isEqualTo(buildQuery(0));
     }
 
     @Test
@@ -61,7 +61,7 @@ abstract class ElasticSearchServiceTest {
 
         assertThat(searchService.getCases()).hasSize(1);
         verify(coreCaseDataService).searchCases(queryCaptor.capture());
-        assertThat(queryCaptor.getValue()).isEqualToComparingFieldByField(buildQuery(0));
+        assertThat(queryCaptor.getValue()).usingRecursiveComparison().isEqualTo(buildQuery(0));
     }
 
     @Test
@@ -74,8 +74,8 @@ abstract class ElasticSearchServiceTest {
         verify(coreCaseDataService, times(2)).searchCases(queryCaptor.capture());
 
         List<Query> capturedQueries = queryCaptor.getAllValues();
-        assertThat(capturedQueries.get(0)).isEqualToComparingFieldByField(buildQuery(0));
-        assertThat(capturedQueries.get(1)).isEqualToComparingFieldByField(buildQuery(10));
+        assertThat(capturedQueries.get(0)).usingRecursiveComparison().isEqualTo(buildQuery(0));
+        assertThat(capturedQueries.get(1)).usingRecursiveComparison().isEqualTo(buildQuery(10));
     }
 
     private SearchResult buildSearchResultWithTotalCases(int i) {

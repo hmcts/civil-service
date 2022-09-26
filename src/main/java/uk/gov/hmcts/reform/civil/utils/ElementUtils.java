@@ -1,7 +1,11 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -41,7 +45,20 @@ public class ElementUtils {
             .build();
     }
 
+    public static Element<CaseDocument> buildElemCaseDocument(Document document, String createdBy,
+                                                        LocalDateTime createdAt, DocumentType type) {
+        return ElementUtils.element(uk.gov.hmcts.reform.civil.model.documents.CaseDocument.builder()
+                                        .documentLink(document)
+                                        .documentName(document.getDocumentFileName())
+                                        .documentType(type)
+                                        .createdDatetime(createdAt)
+                                        .createdBy(createdBy)
+                                        .build()
+        );
+    }
+
     private static <T> Collection<T> nullSafeCollection(Collection<T> collection) {
         return collection == null ? Collections.emptyList() : collection;
     }
+
 }

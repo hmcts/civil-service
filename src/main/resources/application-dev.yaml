@@ -1,0 +1,4 @@
+# we set launchdarkly to use files instead of their server.
+launchdarkly:
+  # The last file in the list of files must be one with the latest status from launchdarkly; the ones before are to override those values
+  file: bin/utils/launchdarkly-flag-lrspec.json, bin/utils/launchdarkly-flags.json

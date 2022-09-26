@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -10,11 +11,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.ccd.model.Organisation;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -25,10 +29,14 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import java.time.LocalDateTime;
 
 import static java.lang.String.format;
+import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -52,6 +60,12 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private Time time;
 
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
+    @Autowired
+    private final ObjectMapper mapper = new ObjectMapper();
+
     @Autowired
     private NotifyClaimCallbackHandler handler;
 
@@ -60,6 +74,56 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private final LocalDateTime notificationDate = LocalDateTime.now();
     private final LocalDateTime deadline = notificationDate.toLocalDate().atTime(END_OF_BUSINESS_DAY);
+
+    @Nested
+    class AboutToStartCallback {
+
+        @Test
+        void shouldPrepopulateDynamicListWithOptions_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified_1v2_andNotifyBothSolicitors()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertTrue(response.getData().containsKey("defendantSolicitorNotifyClaimOptions"));
+        }
+    }
+
+    @Nested
+    class MidEventValidateOptionsCallback {
+
+        private static final String PAGE_ID = "validateNotificationOption";
+        public static final String WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR =
+            "Your claim will progress offline if you only notify one Defendant of the claim details.";
+
+        @Test
+        void shouldThrowWarning_whenNotifyingOnlyOneRespondentSolicitorAndMultipartyToggleOn() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getWarnings()).contains(WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
+        }
+
+        @Test
+        void shouldNotThrowWarning_whenNotifyingBothRespondentSolicitors() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified_1v2_andNotifyBothSolicitors()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getWarnings()).isEmpty();
+        }
+    }
 
     @Nested
     class AboutToSubmit {
@@ -76,7 +140,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldUpdateBusinessProcessAndAddNotificationDeadline_when14DaysIsBeforeThe4MonthDeadline() {
                 LocalDateTime claimNotificationDeadline = notificationDate.plusMonths(4);
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
                     .claimNotificationDeadline(claimNotificationDeadline)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
@@ -92,13 +156,14 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .containsEntry("claimNotificationDate", notificationDate.format(ISO_DATE_TIME))
-                    .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME));
+                    .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME))
+                    .containsEntry("nextDeadline", deadline.format(ISO_DATE));
             }
 
             @Test
             void shouldSetClaimDetailsNotificationAsNotificationDeadlineAt_when14DaysIsAfterThe4MonthDeadline() {
                 LocalDateTime claimNotificationDeadline = notificationDate.minusDays(5);
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
                     .claimNotificationDeadline(claimNotificationDeadline)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
@@ -110,12 +175,13 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDateTime expectedTime = claimNotificationDeadline.toLocalDate().atTime(END_OF_BUSINESS_DAY);
 
                 assertThat(response.getData())
-                    .containsEntry("claimDetailsNotificationDeadline", expectedTime.format(ISO_DATE_TIME));
+                    .containsEntry("claimDetailsNotificationDeadline", expectedTime.format(ISO_DATE_TIME))
+                    .containsEntry("nextDeadline", expectedTime.format(ISO_DATE));
             }
 
             @Test
             void shouldSetClaimDetailsNotificationAsClaimNotificationDeadline_when14DaysIsSameDayAs4MonthDeadline() {
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
                     .claimNotificationDeadline(deadline)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
@@ -125,7 +191,8 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
-                    .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME));
+                    .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME))
+                    .containsEntry("nextDeadline", deadline.format(ISO_DATE));
             }
         }
 
@@ -147,7 +214,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDateTime notifyClaimDateTime = LocalDateTime.of(2021, 4, 5, 10, 0);
                 when(time.now()).thenReturn(notifyClaimDateTime);
 
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
                     .claimNotificationDeadline(claimNotificationDeadline)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
@@ -165,7 +232,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDateTime notifyClaimDateTime = LocalDateTime.of(2021, 4, 5, 17, 0);
                 when(time.now()).thenReturn(notifyClaimDateTime);
 
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
                     .claimNotificationDeadline(claimNotificationDeadline)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
@@ -178,6 +245,103 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .containsEntry("claimDetailsNotificationDeadline", expectedDeadline.format(ISO_DATE_TIME));
             }
         }
+
+        @Nested
+        class SetOrganisationPolicy {
+            OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
+                .organisation(Organisation.builder()
+                                  .organisationID(null)
+                                  .build())
+                .orgPolicyReference("orgreference")
+                .orgPolicyCaseAssignedRole("orgassignedrole")
+                .build();
+
+            @BeforeEach
+            void setup() {
+                when(time.now()).thenReturn(notificationDate);
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any(LocalDateTime.class))).thenReturn(deadline);
+            }
+
+            @Test
+            void shouldSetOrganisationPolicy_1v1() {
+                LocalDateTime claimNotificationDeadline = notificationDate.plusMonths(4);
+                OrganisationPolicy expectedOrganisationPolicy = OrganisationPolicy.builder()
+                    .organisation(Organisation.builder()
+                                      .organisationID("QWERTY R")
+                                      .build())
+                    .orgPolicyReference("orgreference")
+                    .orgPolicyCaseAssignedRole("orgassignedrole")
+                    .build();
+
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
+                    .respondent1OrganisationIDCopy("QWERTY R")
+                    .respondent1OrganisationPolicy(organisationPolicy)
+                    .claimNotificationDeadline(claimNotificationDeadline)
+                    .build();
+
+                CallbackParams params = CallbackParamsBuilder.builder().of(
+                    CallbackType.ABOUT_TO_SUBMIT,
+                    caseData
+                ).build();
+
+                assertThat(caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
+                    .isEqualTo(null);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(updatedData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
+                    .isEqualTo("QWERTY R");
+                assertThat(updatedData.getRespondent1OrganisationPolicy()).isEqualTo(expectedOrganisationPolicy);
+            }
+
+            @Test
+            void shouldSetOrganisationPolicy_1v2() {
+                OrganisationPolicy expectedOrganisationPolicy1 = OrganisationPolicy.builder()
+                    .organisation(Organisation.builder()
+                                      .organisationID("QWERTY R")
+                                      .build())
+                    .orgPolicyReference("orgreference")
+                    .orgPolicyCaseAssignedRole("orgassignedrole")
+                    .build();
+                OrganisationPolicy expectedOrganisationPolicy2 = OrganisationPolicy.builder()
+                    .organisation(Organisation.builder()
+                                      .organisationID("QWERTY R2")
+                                      .build())
+                    .orgPolicyReference("orgreference")
+                    .orgPolicyCaseAssignedRole("orgassignedrole")
+                    .build();
+                LocalDateTime claimNotificationDeadline = notificationDate.plusMonths(4);
+
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors()
+                    .respondent1OrganisationIDCopy("QWERTY R")
+                    .respondent1OrganisationPolicy(organisationPolicy)
+                    .respondent2OrganisationIDCopy("QWERTY R2")
+                    .respondent2OrganisationPolicy(organisationPolicy)
+                    .claimNotificationDeadline(claimNotificationDeadline)
+                    .build();
+
+                CallbackParams params = CallbackParamsBuilder.builder().of(
+                    CallbackType.ABOUT_TO_SUBMIT,
+                    caseData
+                ).build();
+
+                assertThat(caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
+                    .isEqualTo(null);
+                assertThat(caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID())
+                    .isEqualTo(null);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(updatedData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
+                    .isEqualTo("QWERTY R");
+                assertThat(updatedData.getRespondent1OrganisationPolicy()).isEqualTo(expectedOrganisationPolicy1);
+                assertThat(updatedData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID())
+                    .isEqualTo("QWERTY R2");
+                assertThat(updatedData.getRespondent2OrganisationPolicy()).isEqualTo(expectedOrganisationPolicy2);
+            }
+        }
     }
 
     @Nested
@@ -186,16 +350,63 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         private static final String CONFIRMATION_BODY = "<br />The defendant legal representative's organisation has "
             + "been notified and granted access to this claim.%n%n"
             + "You must notify the defendant with the claim details by %s";
+        public static final String CONFIRMATION_NOTIFICATION_ONE_PARTY_SUMMARY = "<br />Notification of claim sent to "
+            + "1 Defendant legal representative only.%n%n"
+            + "Your claim will proceed offline.";
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             String formattedDeadline = formatLocalDateTime(DEADLINE, DATE_TIME_AT);
             String confirmationBody = String.format(CONFIRMATION_BODY, formattedDeadline)
                 + exitSurveyContentService.applicantSurvey();
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# Notification of claim sent%n## Claim number: 000DC001"))
+                    .confirmationBody(confirmationBody)
+                    .build());
+        }
+
+        @Test
+        void shouldReturnExpectedSubmittedCallbackResponse_whenNotifyingBothParties_whenInvoked() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified_1v2_andNotifyBothSolicitors()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String formattedDeadline = formatLocalDateTime(DEADLINE, DATE_TIME_AT);
+            String confirmationBody = String.format(CONFIRMATION_BODY, formattedDeadline)
+                + exitSurveyContentService.applicantSurvey();
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# Notification of claim sent%n## Claim number: 000DC001"))
+                    .confirmationBody(confirmationBody)
+                    .build());
+        }
+
+        @Test
+        void shouldReturnExpectedSubmittedCallbackResponse_whenNotifyingOneParty_whenInvoked() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String formattedDeadline = formatLocalDateTime(DEADLINE, DATE_TIME_AT);
+            String confirmationBody = String.format(
+                CONFIRMATION_NOTIFICATION_ONE_PARTY_SUMMARY,
+                formattedDeadline
+            ) + exitSurveyContentService.applicantSurvey();
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()

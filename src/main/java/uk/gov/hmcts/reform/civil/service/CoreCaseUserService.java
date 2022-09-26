@@ -12,9 +12,9 @@ import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.CREATOR;
 
@@ -25,14 +25,21 @@ public class CoreCaseUserService {
     Logger log = LoggerFactory.getLogger(CoreCaseUserService.class);
 
     private final CaseAccessDataStoreApi caseAccessDataStoreApi;
-    private final IdamClient idamClient;
+    private final UserService userService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
     private final AuthTokenGenerator authTokenGenerator;
+
+    public List<String> getUserCaseRoles(String caseId, String userId) {
+        return caseAccessDataStoreApi.getUserRoles(getCaaAccessToken(), authTokenGenerator.generate(), List.of(caseId))
+            .getCaseAssignedUserRoles().stream()
+            .filter(c -> c.getUserId().equals(userId)).distinct()
+            .map(c -> c.getCaseRole()).collect(Collectors.toList());
+    }
 
     public void assignCase(String caseId, String userId, String organisationId, CaseRole caseRole) {
         String caaAccessToken = getCaaAccessToken();
 
-        if (!userHasCaseRole(caseId, caaAccessToken, caseRole)) {
+        if (!userWithCaseRoleExistsOnCase(caseId, caaAccessToken, caseRole)) {
             assignUserToCaseForRole(caseId, userId, organisationId, caseRole, caaAccessToken);
         } else {
             log.info("Case already have the user with {} role", caseRole.getFormattedName());
@@ -43,15 +50,20 @@ public class CoreCaseUserService {
 
         String caaAccessToken = getCaaAccessToken();
 
-        if (userHasCaseRole(caseId, caaAccessToken, CREATOR)) {
+        if (userWithCaseRoleExistsOnCase(caseId, caaAccessToken, CREATOR)) {
             removeCreatorAccess(caseId, userId, organisationId, caaAccessToken);
         } else {
             log.info("User doesn't have {} role", CREATOR.getFormattedName());
         }
     }
 
+    public boolean userHasCaseRole(String caseId, String userId, CaseRole caseRole) {
+        return getUserCaseRoles(caseId, userId).stream()
+            .anyMatch(c -> c.equals(caseRole.getFormattedName()));
+    }
+
     private String getCaaAccessToken() {
-        return idamClient.getAccessToken(
+        return userService.getAccessToken(
             crossAccessUserConfiguration.getUserName(),
             crossAccessUserConfiguration.getPassword()
         );
@@ -94,7 +106,7 @@ public class CoreCaseUserService {
         );
     }
 
-    private boolean userHasCaseRole(String caseId, String accessToken, CaseRole caseRole) {
+    private boolean userWithCaseRoleExistsOnCase(String caseId, String accessToken, CaseRole caseRole) {
         CaseAssignedUserRolesResource userRoles = caseAccessDataStoreApi.getUserRoles(
             accessToken,
             authTokenGenerator.generate(),

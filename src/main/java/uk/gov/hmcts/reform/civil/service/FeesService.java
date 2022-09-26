@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.config.FeesConfiguration;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.fees.client.FeesClient;
+import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
 import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
 
 import java.math.BigDecimal;
@@ -34,6 +35,8 @@ public class FeesService {
         );
     }
 
+    // WARNING! the following function buildFeeDto is being used by both damages and specified claims,
+    // any changes to the below code may break the code, please check with respective teams before making changes
     private Fee buildFeeDto(FeeLookupResponseDto feeLookupResponseDto) {
         BigDecimal calculatedAmount = feeLookupResponseDto.getFeeAmount()
             .multiply(PENCE_PER_POUND)
@@ -45,4 +48,30 @@ public class FeesService {
             .version(feeLookupResponseDto.getVersion().toString())
             .build();
     }
+
+    //calculate fee for specified claim total amount
+    public Fee getFeeDataByTotalClaimAmount(BigDecimal totalClaimAmount) {
+        FeeLookupResponseDto feeLookupResponseDto = specLookupFee(totalClaimAmount);
+
+        return buildFeeDto(feeLookupResponseDto);
+    }
+
+    //lookup fee for specified claim total amount
+    private FeeLookupResponseDto specLookupFee(BigDecimal totalClaimAmount) {
+        return feesClient.lookupFee(
+            feesConfiguration.getChannel(),
+            feesConfiguration.getEvent(),
+            totalClaimAmount.setScale(2)
+        );
+    }
+
+    /**
+     * Get a range of fees for the configured channel and event.
+     *
+     * @return an array containing a range of claim amounts with a fee for that range.
+     */
+    public Fee2Dto[] getFeeRange() {
+        return feesClient.findRangeGroup(feesConfiguration.getChannel(), feesConfiguration.getEvent());
+    }
+
 }

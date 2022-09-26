@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddress;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
@@ -13,11 +14,15 @@ import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.civil.model.Address.fromContactInformation;
 
-@Component
+@Service
+@RequiredArgsConstructor
 public class RoboticsAddressMapper {
 
-    public RoboticsAddress toRoboticsAddress(Address address) {
-        requireNonNull(address);
+    private final AddressLinesMapper addressLinesMapper;
+
+    public RoboticsAddress toRoboticsAddress(Address originalAddress) {
+        requireNonNull(originalAddress);
+        Address address = addressLinesMapper.splitLongerLines(originalAddress);
         return RoboticsAddress.builder()
             .addressLine1(address.firstNonNull())
             .addressLine2(Optional.ofNullable(address.secondNonNull()).orElse("-"))

@@ -10,8 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.docmosis.common.Applicant;
-import uk.gov.hmcts.reform.civil.model.docmosis.common.Respondent;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,12 +23,12 @@ public class SealedClaimForm implements MappableObject {
 
     @JsonProperty("courtseal")
     private final String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
-    private final List<Applicant> applicants;
-    private final Representative applicantRepresentative;
-    private final List<Respondent> respondents;
+    private final List<Party> applicants;
+    private final List<Party> respondents;
     private final String referenceNumber;
     private final String applicantExternalReference;
-    private final String respondentExternalReference;
+    private final String respondent1ExternalReference;
+    private final String respondent2ExternalReference;
     private final String caseName;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)

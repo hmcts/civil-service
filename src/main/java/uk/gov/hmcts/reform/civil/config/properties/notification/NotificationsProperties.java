@@ -13,7 +13,7 @@ public class NotificationsProperties {
     private String govNotifyApiKey;
 
     @NotEmpty
-    private String respondentSolicitorClaimIssueEmailTemplate;
+    private String respondentSolicitorClaimIssueMultipartyEmailTemplate;
 
     @NotEmpty
     private String respondentSolicitorClaimDetailsEmailTemplate;
@@ -22,13 +22,25 @@ public class NotificationsProperties {
     private String solicitorDefendantResponseCaseTakenOffline;
 
     @NotEmpty
+    private String solicitorDefendantResponseCaseTakenOfflineMultiparty;
+
+    @NotEmpty
     private String claimantSolicitorDefendantResponseFullDefence;
 
     @NotEmpty
     private String respondentSolicitorAcknowledgeClaim;
 
     @NotEmpty
+    private String respondentSolicitorAcknowledgeClaimForSpec;
+
+    @NotEmpty
+    private String applicantSolicitorAcknowledgeClaimForSpec;
+
+    @NotEmpty
     private String failedPayment;
+
+    @NotEmpty
+    private String failedPaymentForSpec;
 
     @NotEmpty
     private String solicitorClaimDismissed;
@@ -40,6 +52,12 @@ public class NotificationsProperties {
     private String claimantSolicitorAgreedExtensionDate;
 
     @NotEmpty
+    private String claimantSolicitorAgreedExtensionDateForSpec;
+
+    @NotEmpty
+    private String respondentSolicitorAgreedExtensionDateForSpec;
+
+    @NotEmpty
     private String claimantSolicitorConfirmsToProceed;
 
     @NotEmpty
@@ -49,8 +67,90 @@ public class NotificationsProperties {
     private String claimantSolicitorClaimContinuingOnline;
 
     @NotEmpty
+    private String claimantSolicitorClaimContinuingOnlineForSpec;
+
+    @NotEmpty
+    private String claimantSolicitorClaimContinuingOnline1v2ForSpec;
+
+    @NotEmpty
+    private String respondentSolicitorClaimContinuingOnlineForSpec;
+
+    @NotEmpty
     private String solicitorCaseTakenOffline;
 
     @NotEmpty
+    private String solicitorCaseTakenOfflineForSpec;
+
+    @NotEmpty
     private String solicitorLitigationFriendAdded;
+
+    @NotEmpty
+    private String claimantSolicitorDefendantResponseForSpec;
+
+    @NotEmpty
+    private String respondentSolicitorDefendantResponseForSpec;
+
+    @NotEmpty
+    private String respondentDefendantResponseForSpec;
+
+    @NotEmpty
+    private String sdoOrdered;
+
+    @NotEmpty
+    private String claimantSolicitorConfirmsNotToProceedSpec;
+
+    @NotEmpty
+    private String respondentSolicitorNotifyNotToProceedSpec;
+
+    @NotEmpty
+    private String claimantSolicitorConfirmsToProceedSpec;
+
+    @NotEmpty
+    private String respondentSolicitorNotifyToProceedSpec;
+
+    @NotEmpty
+    private String applicantSolicitor1DefaultJudgmentReceived;
+
+    @NotEmpty
+    private String respondentSolicitor1DefaultJudgmentReceived;
+
+    @NotEmpty
+    private String breathingSpaceEnterDefendantEmailTemplate;
+
+    @NotEmpty
+    private String breathingSpaceEnterApplicantEmailTemplate;
+
+    @NotEmpty
+    private String breathingSpaceLiftedApplicantEmailTemplate;
+
+    @NotEmpty
+    private String breathingSpaceLiftedRespondentEmailTemplate;
+
+    @NotEmpty
+    private String claimantSolicitorCounterClaimForSpec;
+
+    @NotEmpty
+    private String respondentSolicitorCounterClaimForSpec;
+
+    @NotEmpty
+    private String respondentSolicitor1DefaultJudgmentRequested;
+
+    @NotEmpty
+    private String applicantSolicitor1DefaultJudgmentRequested;
+
+    @NotEmpty
+    private String interimJudgmentRequestedClaimant;
+
+    @NotEmpty
+    private String interimJudgmentApprovalClaimant;
+
+    @NotEmpty
+    private String interimJudgmentRequestedDefendant;
+
+    @NotEmpty
+    private String interimJudgmentApprovalDefendant;
+
+    @NotEmpty
+    private String standardDirectionOrderDJTemplate;
+
 }
