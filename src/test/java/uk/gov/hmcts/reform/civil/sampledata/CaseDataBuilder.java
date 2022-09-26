@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.sampledata;
 
+import org.apache.tomcat.jni.Time;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -83,6 +84,7 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -240,6 +242,7 @@ public class CaseDataBuilder {
     protected LocalDateTime takenOfflineDate;
     protected LocalDateTime takenOfflineByStaffDate;
     protected LocalDateTime claimDismissedDate;
+    protected LocalDateTime caseDismissedHearingFeeDueDate;
     private InterestClaimOptions interestClaimOptions;
     private YesOrNo claimInterest;
     private SameRateInterestSelection sameRateInterestSelection;
@@ -905,6 +908,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimDismissedPastHearingFeeDueDeadline() {
+        atStateHearingFeeDueUnpaid();
+        ccdState = CASE_DISMISSED;
+        caseDismissedHearingFeeDueDate = hearingDueDate.plusDays(1).atTime(LocalTime.now());
+        return this;
+    }
     public CaseDataBuilder atStateClaimIssuedUnrepresentedDefendants() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
         respondent2 = PartyBuilder.builder().individual().build();
@@ -3253,6 +3262,7 @@ public class CaseDataBuilder {
             .takenOfflineDate(takenOfflineDate)
             .takenOfflineByStaffDate(takenOfflineByStaffDate)
             .claimDismissedDate(claimDismissedDate)
+            .caseDismissedHearingFeeDueDate(caseDismissedHearingFeeDueDate)
             .addLegalRepDeadline(addLegalRepDeadline)
             .applicantSolicitor1ServiceAddress(applicantSolicitor1ServiceAddress)
             .respondentSolicitor1ServiceAddress(respondentSolicitor1ServiceAddress)

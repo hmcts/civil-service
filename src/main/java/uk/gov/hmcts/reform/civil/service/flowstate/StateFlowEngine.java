@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDism
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotifiedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissedByCamunda;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissedHearingFeeDue;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedBothRespondentUnrepresented;
@@ -84,6 +85,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITIN
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
@@ -456,6 +458,7 @@ public class StateFlowEngine {
             .state(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
             .state(COUNTER_CLAIM)
             .state(FULL_DEFENCE_PROCEED)
+            .transitionTo(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE).onlyIf(claimDismissedHearingFeeDue)
             .state(FULL_DEFENCE_NOT_PROCEED)
             .state(TAKEN_OFFLINE_BY_STAFF)
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)

@@ -51,6 +51,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITIN
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED;
@@ -412,6 +413,12 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO
+            )
+        ),
+        entry(
+            CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName(),
+            List.of(
+                CASE_PROCEEDS_IN_CASEMAN
             )
         ),
         entry(
