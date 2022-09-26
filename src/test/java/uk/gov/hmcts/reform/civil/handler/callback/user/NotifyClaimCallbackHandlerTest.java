@@ -38,7 +38,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
@@ -379,7 +378,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimNotified_1v2_andNotifyBothSolicitors()
                 .build();
 
-            CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             String formattedDeadline = formatLocalDateTime(DEADLINE, DATE_TIME_AT);
@@ -400,7 +399,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimNotified_1v2_andNotifyOnlyOneSolicitor()
                 .build();
 
-            CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             String formattedDeadline = formatLocalDateTime(DEADLINE, DATE_TIME_AT);
