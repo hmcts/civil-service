@@ -30,8 +30,11 @@ class BulkPrintServiceTest {
     private BulkPrintService bulkPrintService;
 
     private final String authentication = "Authentication";
-    private final byte[] letterTemplate = new byte[] {1, 2, 3};
-    private final Letter letter = new Letter(List.of(new Document(Base64.getEncoder().encodeToString(letterTemplate), Map.of())), BulkPrintService.XEROX_TYPE_PARAMETER);
+    private final byte[] letterTemplate = new byte[]{1, 2, 3};
+    private final Letter letter = new Letter(List.of(new Document(
+        Base64.getEncoder().encodeToString(letterTemplate),
+        Map.of()
+    )), BulkPrintService.XEROX_TYPE_PARAMETER);
 
     @Test
     void shouldSendLetterToBulkPrintSuccessfully() {
