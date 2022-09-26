@@ -311,7 +311,6 @@ public class EventHistoryMapper {
             ? new BigDecimal(caseData.getPartialPaymentAmount()) : null;
         var partialPaymentPounds = isNotEmpty(partialPaymentPennies)
             ? MonetaryConversions.penniesToPounds(partialPaymentPennies) : null;
-
         return (Event.builder()
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(DEFAULT_JUDGMENT_GRANTED.getCode())
@@ -319,8 +318,8 @@ public class EventHistoryMapper {
             .litigiousPartyID(litigiousPartyID)
             .eventDetailsText("")
             .eventDetails(EventDetails.builder().miscText("")
-                              .amountOfJudgment(amountClaimedWithInterest)
-                              .amountOfCosts(getCostOfJudgment(caseData))
+                              .amountOfJudgment(amountClaimedWithInterest.setScale(2))
+                              .amountOfCosts(getCostOfJudgment(caseData).setScale(2))
                               .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES)
                                                             ? partialPaymentPounds : BigDecimal.ZERO)
                               .isJudgmentForthwith((caseData.getPaymentTypeSelection()
@@ -334,6 +333,7 @@ public class EventHistoryMapper {
                               .installmentAmount((caseData.getPaymentTypeSelection()
                                   .equals(DJPaymentTypeSelection.REPAYMENT_PLAN))
                                                      ? getInstallmentAmount(caseData.getRepaymentSuggestion())
+                                                       .setScale(2)
                                                      : BigDecimal.ZERO)
                               .installmentPeriod(getInstallmentPeriod(caseData))
                               .firstInstallmentDate(caseData.getRepaymentDate())
