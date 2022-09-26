@@ -29,9 +29,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(REFER_TO_JUDGE);
-    public static final String CONFIRMATION_HEADER = "# Your order has been referred to Judge"
-        + "<br/>%n%nClaim number"
-        + "<br/><strong>%s</strong>";
+    public static final String CONFIRMATION_HEADER = "# Your order has been referred to Judge%n## Claim number: %s";
 
     private final ObjectMapper objectMapper;
 
@@ -70,6 +68,7 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(getHeader(caseData))
+            .confirmationBody("<p>&nbsp;</p>")
             .build();
     }
 
