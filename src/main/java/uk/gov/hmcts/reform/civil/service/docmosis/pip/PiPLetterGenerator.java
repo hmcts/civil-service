@@ -19,20 +19,20 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
     private final DocumentGeneratorService documentGeneratorService;
     private final PinInPostConfiguration pipInPostConfiguration;
 
-    private DocmosisDocument generate(CaseData caseData){
-       return documentGeneratorService.generateDocmosisDocument(
+    private DocmosisDocument generate(CaseData caseData) {
+        return documentGeneratorService.generateDocmosisDocument(
             getTemplateData(caseData),
             PIN_IN_THE_POST_LETTER
         );
     }
 
-    public byte[] downloadLetter(CaseData caseData){
+    public byte[] downloadLetter(CaseData caseData) {
         DocmosisDocument pipLetter = generate(caseData);
         return pipLetter.getBytes();
     }
 
     @Override
-    public PiPLetter getTemplateData(CaseData caseData){
+    public PiPLetter getTemplateData(CaseData caseData) {
         return PiPLetter
             .builder()
             .pin(caseData.getRespondent1PinToPostLRspec().getAccessCode())
