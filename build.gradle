@@ -90,9 +90,16 @@ allprojects {
       // solves CVE-2022-25857
       dependencySet(
         group: 'org.yaml',
-        version: '1.31'
+        version: '1.33'
       ) {
         entry 'snakeyaml'
+      }
+
+      dependencySet(
+        group: 'org.camunda.bpm',
+        version: '7.17.0'
+      ) {
+        entry 'camunda-engine'
       }
     }
     imports {
