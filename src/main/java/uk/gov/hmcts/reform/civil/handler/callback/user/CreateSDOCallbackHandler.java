@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
@@ -95,10 +96,21 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         + "<br/>%s"
         + "<br/>%n%n<strong>Defendant 2</strong>%n"
         + "<br/>%s";
+    public static final String HEARING_TIME_TEXT_AFTER =
+        "The claimant must by no later than 14 days before the hearing date, pay the court the "
+            + "required hearing fee or submit a fully completed application for Help with Fees. If the "
+            + "claimant fails to pay the fee or obtain a fee exemption by that time the claim will be "
+            + "struck without further order.";
+    public static final String HEARING_TIME_TEXT_AFTER_HNL =
+        "The claimant must by no later than 4 weeks before the hearing date, pay the court the "
+            + "required hearing fee or submit a fully completed application for Help with Fees. If the "
+            + "claimant fails to pay the fee or obtain a fee exemption by that time the claim will be "
+            + "struck without further order.";
 
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final SdoGeneratorService sdoGeneratorService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -209,9 +221,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         DisposalHearingMedicalEvidence tempDisposalHearingMedicalEvidence = DisposalHearingMedicalEvidence.builder()
             .input("The claimant has permission to rely upon the written expert evidence already uploaded to the"
-                        + " Digital Portal with the particulars of claim and in addition has permission to rely upon"
-                        + " any associated correspondence or updating report which is uploaded to the Digital Portal"
-                        + " by 4pm on")
+                       + " Digital Portal with the particulars of claim and in addition has permission to rely upon"
+                       + " any associated correspondence or updating report which is uploaded to the Digital Portal"
+                       + " by 4pm on")
             .date(LocalDate.now().plusWeeks(4))
             .build();
 
@@ -346,8 +358,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         FastTrackNotes tempFastTrackNotes = FastTrackNotes.builder()
             .input("This Order has been made without a hearing. Each party has the right to apply to have this Order "
-                        + "set aside or varied. Any application must be received by the Court, "
-                        + "together with the appropriate fee by 4pm on")
+                       + "set aside or varied. Any application must be received by the Court, "
+                       + "together with the appropriate fee by 4pm on")
             .date(LocalDate.now().plusWeeks(1))
             .build();
 
@@ -475,8 +487,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (judgementSum != null) {
             SmallClaimsJudgementDeductionValue tempSmallClaimsJudgementDeductionValue =
                 SmallClaimsJudgementDeductionValue.builder()
-                .value(judgementSum.getJudgementSum().toString() + "%")
-                .build();
+                    .value(judgementSum.getJudgementSum().toString() + "%")
+                    .build();
 
             updatedData.smallClaimsJudgementDeductionValue(tempSmallClaimsJudgementDeductionValue).build();
         }
@@ -522,10 +534,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         SmallClaimsHearing tempSmallClaimsHearing = SmallClaimsHearing.builder()
             .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
                         + "The hearing will have a time estimate of")
-            .input2("The claimant must by no later than 14 days before the hearing date, pay the court the "
-                        + "required hearing fee or submit a fully completed application for Help with Fees. If the "
-                        + "claimant fails to pay the fee or obtain a fee exemption by that time the claim will be "
-                        + "struck without further order.")
+            .input2(featureToggleService.isHearingsAndListingsEnabled() ? HEARING_TIME_TEXT_AFTER_HNL
+                        : HEARING_TIME_TEXT_AFTER)
             .build();
 
         updatedData.smallClaimsHearing(tempSmallClaimsHearing).build();
@@ -571,10 +581,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input7("and the claimant's evidence is reply if so advised to be uploaded by 4pm on")
             .date4(LocalDate.now().plusWeeks(10))
             .input8("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
-                + "paragraph above, each party may rely upon the written evidence by way of witness statement "
-                + "of one witness to provide evidence of basic hire rates available within the claimant's "
-                + "geographical location from a mainstream supplier, or a local reputable supplier if none is "
-                + "available.")
+                        + "paragraph above, each party may rely upon the written evidence by way of witness statement "
+                        + "of one witness to provide evidence of basic hire rates available within the claimant's "
+                        + "geographical location from a mainstream supplier, or a local reputable supplier if none is "
+                        + "available.")
             .input9("The defendant’s evidence is to be uploaded to the Digital Portal by 4pm on")
             .date5(LocalDate.now().plusWeeks(8))
             .input10(", and the claimant’s evidence in reply if so advised is to be uploaded by 4pm on")
