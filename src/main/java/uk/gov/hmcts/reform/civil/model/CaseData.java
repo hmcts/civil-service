@@ -486,7 +486,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String hearingTimeHourMinute;
     private String hearingReferenceNumber;
 
-    LocalDate hearingDueDate;
+    private LocalDate hearingDueDate;
+    private LocalDateTime caseDismissedHearingFeeDueDate;
+
 
     //default judgement SDO fields for trial/fast track
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
