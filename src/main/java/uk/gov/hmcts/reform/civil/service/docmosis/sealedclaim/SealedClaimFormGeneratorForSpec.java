@@ -47,10 +47,10 @@ import static uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions.
 import static uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions.SAME_RATE_INTEREST;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_LIP;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_DIFFERENT_SOL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_LIP;
 
 @Service
 @RequiredArgsConstructor
@@ -89,7 +89,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     @NotNull
     private DocmosisTemplates getSealedDocmosisTemplate(CaseData caseData) {
         DocmosisTemplates sealedTemplate;
-        System.out.println(" inside getSealedDocmosisTemplate method ");
+        System.out.println(" inside SealedDocmosisTemplate method ");
         if (caseData.getApplicant2() != null) {
             System.out.println(" ---------- 11 -------------- ");
             sealedTemplate = N2_2V1;
@@ -104,15 +104,13 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             }
         } else {
             System.out.println(" ---------- 14 -------------- ");
-            if(YesOrNo.NO.equals(caseData.getSpecRespondent1Represented()))
-            {
+            if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
                 System.out.println(" ---------- 14 Lip 1 -------------- ");
                 sealedTemplate = N2_LIP;
             } else {
                 System.out.println(" ---------- 14 Lip 2-------------- ");
                 sealedTemplate = N2;
             }
-
         }
         return sealedTemplate;
     }
