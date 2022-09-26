@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.PIN_I
 @AllArgsConstructor
 @Service
 public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
+
     private final DocumentGeneratorService documentGeneratorService;
     private final PinInPostConfiguration pipInPostConfiguration;
 

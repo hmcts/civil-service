@@ -51,7 +51,7 @@ public class CaseAssignmentController {
         return new ResponseEntity<>(caseDetails, HttpStatus.OK);
     }
 
-    @PostMapping(value= "/pipLetter", produces = MediaType.APPLICATION_PDF_VALUE)
+    @PostMapping(value = "/pipLetter", produces = MediaType.APPLICATION_PDF_VALUE)
     public @ResponseBody
     byte[] downloadLetter(@RequestBody CaseData caseData) {
         return piPLetterGenerator.downloadLetter(caseData);
