@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
@@ -19,6 +21,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -27,7 +30,9 @@ import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.bankholidays.NonWorkingDaysCollection;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -52,6 +57,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_2v1;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 
 @SpringBootTest(classes = {
     CreateSDOCallbackHandler.class,
@@ -86,9 +92,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private SdoGeneratorService sdoGeneratorService;
 
+    @Mock
+    private NonWorkingDaysCollection nonWorkingDaysCollection;
 
     @MockBean
     private CommonReferenceDataApi commonReferenceDataApi;
+
+    @MockBean
+    private DeadlinesCalculator deadlinesCalculator;
 
     @Nested
     class AboutToStartCallback {
@@ -136,6 +147,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPrePopulateDisposalHearingPage() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             given(locationRefDataService.getCourtLocations(any())).willReturn(getSampleCourLocations());
+            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
+                .thenReturn(LocalDate.now().plusDays(5));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -159,6 +172,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
+                .thenReturn(LocalDate.now().plusDays(5));
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -543,9 +558,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + " much reliance, if any, to place on their evidence.");
 
             assertThat(response.getData()).extracting("smallClaimsNotes").extracting("input")
-                .isEqualTo("This Order has been made without a hearing. Each party has the right to apply to have "
-                               + "this Order set aside or varied. Any such application must be received by the Court, "
-                               + "together with the appropriate fee by 4pm on");
+                .isEqualTo("The order has been made without a hearing. "
+                               + "Each party has the right to apply to have this Order set aside or varied. "
+                               + "Any such application must be received by the Court "
+                               + "(together with the appropriate fee) by 4pm on "
+                               + DateFormatHelper.formatLocalDate(
+                    deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5), DATE));
 
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input1")
                 .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
@@ -626,6 +644,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
+                .thenReturn(LocalDate.now().plusDays(5));
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 

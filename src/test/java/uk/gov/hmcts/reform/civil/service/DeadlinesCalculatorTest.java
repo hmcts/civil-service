@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -313,6 +314,17 @@ public class DeadlinesCalculatorTest {
             assertThat(responseDeadline)
                 .isWeekday()
                 .isTheSame(expectedDeadline);
+        }
+    }
+
+    @Nested
+    class PluWorkingsDays {
+        @Test
+        void plusWorkingDays() {
+            LocalDate start = LocalDate.of(2022, 9, 12);
+            when(nonWorkingDaysCollection.contains(start.plusDays(7))).thenReturn(true);
+            int days = 10;
+            Assertions.assertEquals(start.plusDays(15), calculator.plusWorkingDays(start, days));
         }
     }
 

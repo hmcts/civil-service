@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
+import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -56,10 +57,12 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.prd.client.CommonReferenceDataApi;
 import uk.gov.hmcts.reform.prd.model.HearingChannelLov;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -118,6 +121,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final SdoGeneratorService sdoGeneratorService;
+    private final DeadlinesCalculator deadlinesCalculator;
     private final CommonReferenceDataApi commonReferenceDataApi;
     private final AuthTokenGenerator authTokenGenerator;
     @Value("${rd_common.api.service}")
@@ -553,14 +557,25 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.smallClaimsHearing(tempSmallClaimsHearing).build();
 
-        SmallClaimsNotes tempSmallClaimsNotes = SmallClaimsNotes.builder()
-            .input("This Order has been made without a hearing. Each party has the right to apply to have this Order "
-                       + "set aside or varied. Any such application must be received by the Court, "
-                       + "together with the appropriate fee by 4pm on")
-            .date(LocalDate.now().plusWeeks(1))
-            .build();
+        SmallClaimsNotes.SmallClaimsNotesBuilder tempSmallClaimsNotes = SmallClaimsNotes.builder();
+        if (featureToggleService.isHearingsAndListingsEnabled()) {
+            tempSmallClaimsNotes.input(
+                "The order has been made without a hearing. "
+                    + "Each party has the right to apply to have this Order set aside or varied. "
+                    + "Any such application must be received by the Court "
+                    + "(together with the appropriate fee) by 4pm on "
+                    + DateFormatHelper.formatLocalDate(
+                    deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5), DATE)
+            );
+        } else {
+            tempSmallClaimsNotes.input(
+                    "This Order has been made without a hearing. Each party has the right to apply to have this Order "
+                        + "set aside or varied. Any such application must be received by the Court, "
+                        + "together with the appropriate fee by 4pm on")
+                .date(LocalDate.now().plusWeeks(1));
+        }
 
-        updatedData.smallClaimsNotes(tempSmallClaimsNotes).build();
+        updatedData.smallClaimsNotes(tempSmallClaimsNotes.build()).build();
 
         SmallClaimsCreditHire tempSmallClaimsCreditHire = SmallClaimsCreditHire.builder()
             .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
