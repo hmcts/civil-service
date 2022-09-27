@@ -111,7 +111,6 @@ public class HearingScheduledHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
 
         LocalDate dateOfApplication = caseData.getDateOfApplication();
-
         List<String> errors = (Objects.isNull(dateOfApplication)) ? null :
             isPastDate(dateOfApplication);
 
