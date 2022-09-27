@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsTimeEstimate;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
@@ -15,5 +17,7 @@ public class SmallClaimsHearing {
 
     private String input1;
     private SmallClaimsTimeEstimate time;
+    private BigDecimal otherHours;
+    private BigDecimal otherMinutes;
     private String input2;
 }

@@ -86,6 +86,10 @@ public class FeatureToggleService {
         return internalClient.boolVariation("pin-in-post", createLDUser().build(), false);
     }
 
+    public boolean isHearingsAndListingsEnabled() {
+        return isFeatureEnabled("enableHNL");
+    }
+
     private void close() {
         try {
             internalClient.close();
