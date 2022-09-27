@@ -86,6 +86,7 @@ public class LocationHelper {
         } else {
             return Optional.ofNullable(caseData.getCourtLocation())
                 .map(courtLocation -> RequestedCourt.builder()
+                    .requestHearingAtSpecificCourt(YesOrNo.YES)
                     .responseCourtCode(courtLocation.getApplicantPreferredCourt())
                     .caseLocation(courtLocation.getCaseLocation())
                     .build());
