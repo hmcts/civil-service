@@ -16,6 +16,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 
@@ -129,11 +130,25 @@ public class LocationHelper {
     public Optional<LocationRefData> updateCaseManagementLocation(CaseData.CaseDataBuilder<?, ?> updatedData,
                                                                   RequestedCourt requestedCourt,
                                                                   Supplier<List<LocationRefData>> getLocations) {
-        updatedData
-            .caseManagementLocation(Optional.ofNullable(requestedCourt.getCaseLocation())
-                                        .orElseGet(CaseLocation::new));
         Optional<LocationRefData> matchingLocation = getMatching(getLocations.get(), requestedCourt);
+        updatedData
+            .caseManagementLocation(Stream.of(
+                    requestedCourt.getCaseLocation(),
+                    matchingLocation.map(location ->
+                                             CaseLocation.builder()
+                                                 .region(location.getRegionId())
+                                                 .baseLocation(location.getEpimmsId())
+                                                 .build()
+                    ).orElse(null)
+                )
+                                        .filter(this::isValidCaseLocation)
+                                        .findFirst().orElseGet(CaseLocation::new));
         matchingLocation.map(LocationRefData::getSiteName).ifPresent(updatedData::locationName);
         return matchingLocation;
+    }
+
+    private boolean isValidCaseLocation(CaseLocation caseLocation) {
+        return caseLocation != null && StringUtils.isNotBlank(caseLocation.getBaseLocation())
+            && StringUtils.isNotBlank(caseLocation.getRegion());
     }
 }
