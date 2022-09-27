@@ -105,7 +105,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .disposalHearingSchedulesOfLossDJAddSection(nonNull(caseData.getDisposalHearingSchedulesOfLossDJ()))
             .disposalHearingClaimSettlingAddSection(getToggleValue(caseData.getDisposalHearingClaimSettlingDJToggle()))
             .disposalHearingCostsAddSection(getToggleValue(caseData.getDisposalHearingCostsDJToggle()))
-            .trialHearingMethodDJ(caseData.getDisposalHearingMethodDJ())
+            .disposalHearingMethodDJ(caseData.getDisposalHearingMethodDJ())
             .disposalHearingAttendance(fillDisposalHearingMethod(caseData.getDisposalHearingMethodDJ()))
             .applicant(caseData.getApplicant1().getPartyName().toUpperCase())
             .respondent(checkDefendantRequested(caseData).toUpperCase()).build();
