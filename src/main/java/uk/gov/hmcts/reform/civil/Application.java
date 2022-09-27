@@ -9,11 +9,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableCamundaRestClient
 @EnableFeignClients(basePackages = {
     "uk.gov.hmcts.reform.idam.client",
-    "uk.gov.hmcts.reform.civil",
-    "uk.gov.hmcts.reform.prd",
-    "uk.gov.hmcts.reform.ccd.document.am",
-    "uk.gov.hmcts.reform.ras",
-    "uk.gov.hmcts.reform.cmc"
+        "uk.gov.hmcts.reform.civil",
+    "uk.gov.hmcts.reform.prd"
 })
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 public class Application {

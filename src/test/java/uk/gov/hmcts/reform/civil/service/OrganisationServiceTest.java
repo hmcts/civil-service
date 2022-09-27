@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
@@ -48,7 +49,7 @@ class OrganisationServiceTest {
     private AuthTokenGenerator authTokenGenerator;
 
     @Mock
-    private UserService userService;
+    private IdamClient idamClient;
 
     @Mock
     private PrdAdminUserConfiguration userConfig;
@@ -61,7 +62,7 @@ class OrganisationServiceTest {
         given(organisationApi.findUserOrganisation(any(), any())).willReturn(expectedOrganisation);
         given(organisationApi.findOrganisationById(any(), any(), any())).willReturn(expectedOrganisation);
         given(authTokenGenerator.generate()).willReturn(SERVICE_AUTH_TOKEN);
-        when(userService.getAccessToken(userConfig.getUsername(), userConfig.getPassword())).thenReturn(
+        when(idamClient.getAccessToken(userConfig.getUsername(), userConfig.getPassword())).thenReturn(
             PRD_ADMIN_AUTH_TOKEN);
     }
 
@@ -93,7 +94,7 @@ class OrganisationServiceTest {
         void shouldReturnOrganisation_whenInvoked() {
             var organisation = organisationService.findOrganisationById(ORG_ID);
 
-            verify(userService).getAccessToken(userConfig.getUsername(), userConfig.getPassword());
+            verify(idamClient).getAccessToken(userConfig.getUsername(), userConfig.getPassword());
             verify(organisationApi).findOrganisationById(PRD_ADMIN_AUTH_TOKEN, SERVICE_AUTH_TOKEN, ORG_ID);
             assertThat(organisation).isEqualTo(Optional.of(expectedOrganisation));
         }
@@ -103,7 +104,7 @@ class OrganisationServiceTest {
             given(organisationApi.findOrganisationById(any(), any(), any())).willThrow(notFoundFeignException);
             var organisation = organisationService.findOrganisationById(ORG_ID);
 
-            verify(userService).getAccessToken(userConfig.getUsername(), userConfig.getPassword());
+            verify(idamClient).getAccessToken(userConfig.getUsername(), userConfig.getPassword());
             verify(organisationApi).findOrganisationById(PRD_ADMIN_AUTH_TOKEN, SERVICE_AUTH_TOKEN, ORG_ID);
             assertThat(organisation).isEmpty();
         }

@@ -37,8 +37,6 @@ public class Party {
     private final String partyName;
     private final String partyTypeDisplayValue;
 
-    private final String partyEmail;
-
     public enum Type {
         INDIVIDUAL,
         COMPANY,
@@ -51,7 +49,10 @@ public class Party {
     }
 
     public String getPartyName() {
-        return getPartyNameBasedOnType(this);
+        if (partyName == null) {
+            return getPartyNameBasedOnType(this);
+        }
+        return partyName;
     }
 
     public String getPartyTypeDisplayValue() {

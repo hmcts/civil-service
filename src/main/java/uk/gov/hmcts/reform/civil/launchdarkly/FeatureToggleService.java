@@ -36,54 +36,10 @@ public class FeatureToggleService {
         return internalClient.boolVariation("isOrganisationOnboarded", ldUser, false);
     }
 
-    public boolean isRpaContinuousFeedEnabled() {
-        return internalClient.boolVariation("rpaContinuousFeed", createLDUser().build(), false);
-    }
-
-    public boolean isSpecRpaContinuousFeedEnabled() {
-        return internalClient.boolVariation(
-            "specified-rpa-continuous-feed",
-            createLDUser().build(),
-            false
-        );
-    }
-
-    public boolean isGlobalSearchEnabled() {
-        return internalClient.boolVariation(
-            "global-search-specified",
-            createLDUser().build(),
-            false
-        );
-    }
-
-    public boolean isLrSpecEnabled() {
-        return isFeatureEnabled("specified-lr-journey");
-    }
-
-    public boolean isSdoEnabled() {
-        return isFeatureEnabled("enableSDO");
-    }
-
     public LDUser.Builder createLDUser() {
         return new LDUser.Builder("civil-service")
             .custom("timestamp", String.valueOf(System.currentTimeMillis()))
             .custom("environment", environment);
-    }
-
-    public boolean isNoticeOfChangeEnabled() {
-        return internalClient.boolVariation("notice-of-change", createLDUser().build(), false);
-    }
-
-    public boolean isHearingAndListingSDOEnabled() {
-        return internalClient.boolVariation("hearing-and-listing-sdo", createLDUser().build(), false);
-    }
-
-    public boolean isCourtLocationDynamicListEnabled() {
-        return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), false);
-    }
-
-    public boolean isPinInPostEnabled() {
-        return internalClient.boolVariation("pin-in-post", createLDUser().build(), false);
     }
 
     private void close() {

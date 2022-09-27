@@ -16,8 +16,6 @@ public interface DQ {
 
     DisclosureReport getDisclosureReport();
 
-    ExpertDetails getSmallClaimExperts();
-
     Experts getExperts();
 
     default Experts getExperts(Experts experts) {
@@ -45,18 +43,6 @@ public interface DQ {
         return hearing;
     }
 
-    SmallClaimHearing getSmallClaimHearing();
-
-    default SmallClaimHearing getSmallClaimHearing(SmallClaimHearing smallClaimHearing) {
-        if (ofNullable(smallClaimHearing)
-            .map(SmallClaimHearing::getUnavailableDatesRequired)
-            .map(NO::equals).orElse(false)) {
-            return smallClaimHearing.toBuilder()
-                .smallClaimUnavailableDate(null).build();
-        }
-        return smallClaimHearing;
-    }
-
     Document getDraftDirections();
 
     RequestedCourt getRequestedCourt();
@@ -67,9 +53,5 @@ public interface DQ {
 
     WelshLanguageRequirements getWelshLanguageRequirements();
 
-    WelshLanguageRequirements getWelshLanguageRequirementsLRspec();
-
     StatementOfTruth getStatementOfTruth();
-
-    VulnerabilityQuestions getVulnerabilityQuestions();
 }

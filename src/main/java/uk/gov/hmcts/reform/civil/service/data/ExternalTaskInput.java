@@ -10,5 +10,4 @@ public class ExternalTaskInput {
 
     String caseId;
     CaseEvent caseEvent;
-    String generalAppParentCaseLink;
 }

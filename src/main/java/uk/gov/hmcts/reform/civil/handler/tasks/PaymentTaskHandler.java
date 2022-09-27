@@ -24,6 +24,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PaymentTaskHandler implements BaseExternalTaskHandler {
 
+    public static final String FLOW_STATE = "flowState";
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper objectMapper;
@@ -46,15 +47,13 @@ public class PaymentTaskHandler implements BaseExternalTaskHandler {
     @Override
     public VariableMap getVariableMap() {
         VariableMap variables = Variables.createVariables();
-        var stateFlow = stateFlowEngine.evaluate(data);
-        variables.putValue(FLOW_STATE, stateFlow.getState().getName());
-        variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
+        variables.putValue(FLOW_STATE, stateFlowEngine.evaluate(data).getState().getName());
         return variables;
     }
 
     @Override
     public int getMaxAttempts() {
-        return 1;
+        return 3;
     }
 
     private CaseDataContent caseDataContent(StartEventResponse startEventResponse, BusinessProcess businessProcess) {

@@ -16,10 +16,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
@@ -50,8 +47,6 @@ class EventAllowedAspectTest {
     EventAllowedAspect eventAllowedAspect;
     @MockBean
     ProceedingJoinPoint proceedingJoinPoint;
-    @MockBean
-    FeatureToggleService featureToggleService;
 
     @ParameterizedTest
     @EnumSource(value = CallbackType.class, mode = EnumSource.Mode.EXCLUDE, names = {"ABOUT_TO_START"})
@@ -77,10 +72,8 @@ class EventAllowedAspectTest {
             .build();
         when(proceedingJoinPoint.proceed()).thenReturn(response);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
-
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_START, caseData)
+            .type(ABOUT_TO_START)
             .request(CallbackRequest.builder()
                          .eventId(DEFENDANT_RESPONSE.name())
                          .caseDetails(CaseDetailsBuilder.builder().atStatePendingClaimIssued().build())
@@ -98,10 +91,8 @@ class EventAllowedAspectTest {
         AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
         when(proceedingJoinPoint.proceed()).thenReturn(response);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
-
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
-            .of(ABOUT_TO_START, caseData)
+            .type(ABOUT_TO_START)
             .request(CallbackRequest.builder()
                          .eventId(CLAIMANT_RESPONSE.name())
                          .caseDetails(CaseDetailsBuilder.builder().atStateRespondedToClaim().build())

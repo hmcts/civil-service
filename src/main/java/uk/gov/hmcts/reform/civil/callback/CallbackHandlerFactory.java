@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.callback;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -19,7 +18,6 @@ import java.util.Optional;
 import static java.util.Optional.ofNullable;
 
 @Service
-@Slf4j
 public class CallbackHandlerFactory {
 
     private final HashMap<String, CallbackHandler> eventHandlers = new HashMap<>();
@@ -52,11 +50,8 @@ public class CallbackHandlerFactory {
     }
 
     private CallbackResponse eventAlreadyProcessedResponse(String eventId) {
-        String errorMessage = String.format("Event %s is already processed", eventId);
-        log.error(errorMessage);
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(List.of(errorMessage))
+            .errors(List.of(String.format("Event %s is already processed", eventId)))
             .build();
     }
 }

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.stateflow;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -10,7 +9,6 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class StateFlowBuilderTest {
@@ -197,27 +195,21 @@ class StateFlowBuilderTest {
         }
 
         @Test
-        @Disabled("Subflow currently allows only one final state to transition back to main flow")
         void shouldBuildStateFlow_whenInitialStateHasSubflow() {
             Consumer<StateFlowContext> subflow = stateFlowContext ->
                 StateFlowBuilder.<SubflowState>subflow("SUBFLOW", stateFlowContext)
-                        .transitionTo(SubflowState.STATE_1).onlyIf(caseData -> true)
-                        .transitionTo(SubflowState.STATE_2).onlyIf(caseData -> false)
+                    .transitionTo(SubflowState.STATE_1)
                     .state(SubflowState.STATE_1)
+                    .transitionTo(SubflowState.STATE_2)
                     .state(SubflowState.STATE_2);
 
             StateFlow stateFlow = StateFlowBuilder.<FlowState>flow("FLOW")
                 .initial(FlowState.STATE_1)
                 .subflow(subflow)
-                .transitionTo(FlowState.STATE_2).onlyIf(caseData -> true)
                 .state(FlowState.STATE_2)
                 .build();
 
-            StateFlowAssert.assertThat(stateFlow).enteredStates(
-                "FLOW.STATE_1",
-                "SUBFLOW.STATE_1",
-                "FLOW.STATE_2"
-            );
+            StateFlowAssert.assertThat(stateFlow).enteredStates("FLOW.STATE_1", "SUBFLOW.STATE_1", "SUBFLOW.STATE_2");
             assertThat(stateFlow.asStateMachine().hasStateMachineError()).isFalse();
         }
 
@@ -342,47 +334,6 @@ class StateFlowBuilderTest {
                 .hasSize(2)
                 .extracting(State::getName)
                 .containsExactly("FLOW.STATE_1", "FLOW.STATE_2");
-        }
-
-        @Test
-        void shouldEvaluateStateAndFlags() {
-            CaseData caseData = CaseData.builder().build();
-
-            Predicate<CaseData> firstPredicate = c -> {
-                assertThat(c).isSameAs(caseData);
-                return true;
-            };
-
-            Predicate<CaseData> secondPredicate = c -> {
-                assertThat(c).isSameAs(caseData);
-                return false;
-            };
-
-            StateFlow stateFlow = StateFlowBuilder.<FlowState>flow("FLOW")
-                .initial(FlowState.STATE_1)
-                    .transitionTo(FlowState.STATE_2)
-                    .onlyIf(firstPredicate)
-                    .set(flags -> flags.put("FIRST_FLAG", true))
-                .state(FlowState.STATE_2)
-                    .transitionTo(FlowState.STATE_3)
-                    .onlyIf(secondPredicate)
-                    .set(flags -> flags.put("SECOND_FLAG", true))
-                .state(FlowState.STATE_3)
-                .build();
-
-            stateFlow.evaluate(caseData);
-
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isEqualTo("FLOW.STATE_2");
-
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(2)
-                .extracting(State::getName)
-                .containsExactly("FLOW.STATE_1", "FLOW.STATE_2");
-
-            assertThat(stateFlow.getFlags())
-                .contains(entry("FIRST_FLAG", true));
         }
 
         @Test

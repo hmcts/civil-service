@@ -24,6 +24,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class StartBusinessProcessTaskHandler implements BaseExternalTaskHandler {
 
+    public static final String FLOW_STATE = "flowState";
     public static final String BUSINESS_PROCESS = "businessProcess";
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -36,9 +37,7 @@ public class StartBusinessProcessTaskHandler implements BaseExternalTaskHandler 
     public void handleTask(ExternalTask externalTask) {
         CaseData caseData = startBusinessProcess(externalTask);
         variables = Variables.createVariables();
-        var stateFlow = stateFlowEngine.evaluate(caseData);
-        variables.putValue(FLOW_STATE, stateFlow.getState().getName());
-        variables.putValue(FLOW_FLAGS, stateFlow.getFlags());
+        variables.putValue(FLOW_STATE, stateFlowEngine.evaluate(caseData).getState().getName());
     }
 
     @Override
@@ -64,13 +63,6 @@ public class StartBusinessProcessTaskHandler implements BaseExternalTaskHandler 
                 }
                 return data;
             default:
-                log.error("----------------CAMUNDAERROR -START------------------");
-                log.error("CAMUNDAERROR CaseId ({})", caseId);
-                log.error("CAMUNDAERROR CaseEvent ({})", caseEvent);
-                log.error("CAMUNDAERROR LegacyCaseReference ({})", data.getLegacyCaseReference());
-                log.error("CAMUNDAERROR AllocatedTrack ({})", data.getAllocatedTrack());
-                log.error("CAMUNDAERROR BusinessProcessStatus ({})", businessProcess.getStatusOrDefault());
-                log.error("----------------CAMUNDAERROR -END------------------");
                 throw new BpmnError("ABORT");
         }
     }

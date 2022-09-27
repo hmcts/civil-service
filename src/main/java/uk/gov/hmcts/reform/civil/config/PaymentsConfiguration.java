@@ -10,16 +10,10 @@ public class PaymentsConfiguration {
 
     private final String siteId;
     private final String service;
-    private final String specSiteId;
-    private final String specService;
 
     public PaymentsConfiguration(@Value("${payments.api.site_id}") String siteId,
-                                 @Value("${payments.api.service}") String service,
-                                 @Value("${payments.api.spec_site_id}") String specSiteId,
-                                 @Value("${payments.api.spec_service}") String specService) {
+                                 @Value("${payments.api.service}") String service) {
         this.siteId = siteId;
         this.service = service;
-        this.specSiteId = specSiteId;
-        this.specService = specService;
     }
 }

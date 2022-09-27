@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
@@ -63,64 +62,6 @@ class ClaimIssueCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getClaimNotificationDeadline()).isEqualTo(deadline);
-        assertThat(updatedData.getNextDeadline()).isEqualTo(deadline.toLocalDate());
     }
 
-    @Test
-    void shouldClearOrganisationId_whenClaimIsIssued() {
-        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued()
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
-            .isEqualTo(null);
-        assertThat(updatedData.getRespondent1OrganisationIDCopy()).isEqualTo("QWERTY R");
-        assertThat(updatedData.getRespondent2OrganisationIDCopy()).isEqualTo("QWERTY R2");
-
-    }
-
-    @Test
-    void shouldClearOrganisationIdTwoDefendants_whenClaimIsIssued() {
-        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued()
-            .multiPartyClaimTwoDefendantSolicitors()
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
-            .isEqualTo(null);
-        assertThat(updatedData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID())
-            .isEqualTo(null);
-        assertThat(updatedData.getRespondent1OrganisationIDCopy()).isEqualTo("QWERTY R");
-        assertThat(updatedData.getRespondent2OrganisationIDCopy()).isEqualTo("QWERTY R2");
-    }
-
-    @Test
-    void shouldRemoveSubmitterIdOnly() {
-        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().applicantSolicitor1UserDetails(
-            IdamUserDetails.builder().id("submitter-id").email("applicantsolicitor@example.com").build()).build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(updatedData.getApplicantSolicitor1UserDetails().getId()).isNull();
-        assertThat(updatedData.getApplicantSolicitor1UserDetails().getEmail())
-            .isEqualTo("applicantsolicitor@example.com");
-    }
-
-    @Test
-    void shouldReturnCorrectActivityId_whenRequested() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-        assertThat(handler.camundaActivityId(params)).isEqualTo("IssueClaim");
-    }
 }

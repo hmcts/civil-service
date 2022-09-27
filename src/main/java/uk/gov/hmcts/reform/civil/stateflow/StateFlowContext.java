@@ -10,7 +10,6 @@ public class StateFlowContext {
 
     protected static final String EXTENDED_STATE_CASE_KEY = "case";
     protected static final String EXTENDED_STATE_HISTORY_KEY = "history";
-    protected static final String EXTENDED_STATE_FLAGS_KEY = "flags";
 
     private final List<String> states = new ArrayList<>();
 

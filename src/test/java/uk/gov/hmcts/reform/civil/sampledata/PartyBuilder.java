@@ -5,16 +5,14 @@ import uk.gov.hmcts.reform.civil.model.Party;
 
 import java.time.LocalDate;
 
-import static com.google.common.base.Strings.repeat;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
-import static uk.gov.hmcts.reform.civil.sampledata.CaseDataMaxEdgeCasesBuilder.MAX_ALLOWED;
 
 public class PartyBuilder {
 
-    public static final LocalDate DATE_OF_BIRTH = LocalDate.now().minusYears(20);
+    public  static final LocalDate DATE_OF_BIRTH = LocalDate.now().minusYears(20);
 
     private Party.Type type;
     private String individualTitle;
@@ -78,14 +76,6 @@ public class PartyBuilder {
         return this;
     }
 
-    public PartyBuilder companyWithMaxData() {
-        type = COMPANY;
-        companyName = repeat("C", MAX_ALLOWED);
-        partyName = companyName;
-        primaryAddress = AddressBuilder.maximal().build();
-        return this;
-    }
-
     public PartyBuilder organisation() {
         type = ORGANISATION;
         organisationName = "The Organisation";
@@ -95,13 +85,9 @@ public class PartyBuilder {
     }
 
     public PartyBuilder individual() {
-        return individual("John");
-    }
-
-    public PartyBuilder individual(String firstName) {
         type = INDIVIDUAL;
         individualTitle = "Mr.";
-        individualFirstName = firstName;
+        individualFirstName = "John";
         individualLastName = "Rambo";
         individualDateOfBirth = DATE_OF_BIRTH;
         partyName = individualTitle + " " + individualFirstName + " " + individualLastName;

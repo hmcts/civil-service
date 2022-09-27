@@ -19,17 +19,9 @@ public class Fee {
 
     public FeeDto toFeeDto() {
         return FeeDto.builder()
-            .calculatedAmount(toPounds())
+            .calculatedAmount(MonetaryConversions.penniesToPounds(calculatedAmountInPence))
             .code(code)
             .version(version)
             .build();
-    }
-
-    public BigDecimal toPounds() {
-        return MonetaryConversions.penniesToPounds(this.calculatedAmountInPence);
-    }
-
-    public String formData() {
-        return "£" + this.toPounds();
     }
 }

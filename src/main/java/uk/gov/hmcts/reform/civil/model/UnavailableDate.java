@@ -14,6 +14,4 @@ public class UnavailableDate {
 
     private final String who;
     private final LocalDate date;
-    private final LocalDate fromDate;
-    private final LocalDate toDate;
 }

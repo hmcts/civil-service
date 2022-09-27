@@ -76,8 +76,8 @@ class DispatchBusinessProcessCallbackHandlerTest extends BaseCallbackHandlerTest
 
             assertThat(response.getData())
                 .extracting("businessProcess")
-                .extracting("status", "camundaEvent")
-                .containsExactly(DISPATCHED.name(), "testCamundaEvent");
+                .extracting("status", "camundaEvent", "activityId", "processInstanceId")
+                .containsExactly(DISPATCHED.name(), "testCamundaEvent", null, null);
         }
 
         @ParameterizedTest

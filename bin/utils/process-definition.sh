@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -ex
+set -eu
 
 definition_processor_version=latest
 
@@ -13,8 +13,6 @@ definition_input_dir=${definition_dir}
 if [[ ! -e ${definition_output_file} ]]; then
    touch ${definition_output_file}
 fi
-
-echo "Uploading definition to CCD_DEF_CASE_SERVICE_BASE_URL ${CCD_DEF_CASE_SERVICE_BASE_URL}"
 
 docker run --rm --name json2xlsx \
   -v ${definition_input_dir}:/tmp/ccd-definition \

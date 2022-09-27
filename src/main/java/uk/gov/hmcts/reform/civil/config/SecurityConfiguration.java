@@ -28,8 +28,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final String[] AUTHORITIES = {
         "caseworker-civil",
         "caseworker-civil-solicitor",
-        "caseworker",
-        "citizen"
+        "caseworker"
     };
 
     private static final String[] AUTH_WHITELIST = {
@@ -45,8 +44,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/health/readiness",
         "/status/health",
         "/",
-        "/loggers/**",
-        "/assignment/**"
+        "/loggers/**"
     };
 
     @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")

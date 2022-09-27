@@ -5,11 +5,10 @@ import lombok.Data;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 @Data
-@Builder(toBuilder = true)
+@Builder
 public class FurtherInformation {
 
     private final YesOrNo futureApplications;
-    private final YesOrNo intentionToMakeFutureApplications;
     private final String reasonForFutureApplications;
     private final String otherInformationForJudge;
 }

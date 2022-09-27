@@ -11,5 +11,4 @@ public class SolicitorReferences {
 
     private final String applicantSolicitor1Reference;
     private final String respondentSolicitor1Reference;
-    private final String respondentSolicitor2Reference;
 }
