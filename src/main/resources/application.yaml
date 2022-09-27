@@ -178,6 +178,7 @@ notifications:
   standardDirectionOrderDJTemplate: "1518a883-d035-46c8-9dc0-a52538ca4545"
   interimJudgmentRequestedDefendant: "d9e33565-ecdc-4475-a77b-e50cd4c07b61"
   interimJudgmentApprovalDefendant: "2e98fa16-ba9e-4229-b99f-fc72d40303f8"
+  respondentLipResponseSubmissionTemplate: "1f6f1053-02f5-4b44-a1f8-90e78930c10a"
 
 
 sendgrid:
