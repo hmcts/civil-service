@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.sampledata;
 
-import org.apache.tomcat.jni.Time;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -914,6 +913,7 @@ public class CaseDataBuilder {
         caseDismissedHearingFeeDueDate = hearingDueDate.plusDays(1).atTime(LocalTime.now());
         return this;
     }
+
     public CaseDataBuilder atStateClaimIssuedUnrepresentedDefendants() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
         respondent2 = PartyBuilder.builder().individual().build();

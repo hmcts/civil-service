@@ -6,6 +6,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.event.DismissClaimEvent;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 
 @Slf4j

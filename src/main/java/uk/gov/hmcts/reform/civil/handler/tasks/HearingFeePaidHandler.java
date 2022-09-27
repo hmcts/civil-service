@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
-import uk.gov.hmcts.reform.civil.event.DismissClaimEvent;
+import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.StrikeOutEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -36,10 +36,11 @@ public class HearingFeePaidHandler implements BaseExternalTaskHandler {
                 if (caseData.getHearingDueDate() == null
                     || caseData.getHearingFeePaymentDetails().getStatus() == PaymentStatus.SUCCESS) {
                     log.info("Current case status '{}'", caseDetails.getState());
-                    applicationEventPublisher.publishEvent(new DismissClaimEvent(caseDetails.getId()));
-                } else if (caseData.getHearingFeePaymentDetails().getStatus() == PaymentStatus.FAILED) {
-                    log.info("Current case status '{}'", caseDetails.getState());
                     applicationEventPublisher.publishEvent(new StrikeOutEvent(caseDetails.getId()));
+                } else if (caseData.getHearingFeePaymentDetails().getStatus() == null
+                            || caseData.getHearingFeePaymentDetails().getStatus() == PaymentStatus.FAILED) {
+                    log.info("Current case status '{}'", caseDetails.getState());
+                    applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
                 }
             } catch (Exception e) {
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
