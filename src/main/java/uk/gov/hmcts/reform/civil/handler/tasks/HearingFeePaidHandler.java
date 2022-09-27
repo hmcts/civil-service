@@ -2,10 +2,12 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Case;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.event.StrikeOutEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -35,7 +37,7 @@ public class HearingFeePaidHandler implements BaseExternalTaskHandler {
                 if (caseData.getHearingDueDate() == null
                     || caseData.getHearingFeePaymentDetails().getStatus() == PaymentStatus.SUCCESS) {
                     log.info("Current case status '{}'", caseDetails.getState());
-                    applicationEventPublisher.publishEvent(new StrikeOutEvent(caseDetails.getId()));
+                    caseDetails.setState(String.valueOf(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING));
                 } else if (caseData.getHearingFeePaymentDetails().getStatus() == PaymentStatus.FAILED) {
                     log.info("Current case status '{}'", caseDetails.getState());
                     applicationEventPublisher.publishEvent(new StrikeOutEvent(caseDetails.getId()));
@@ -44,5 +46,10 @@ public class HearingFeePaidHandler implements BaseExternalTaskHandler {
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }
         });
+    }
+
+    public void hearingFeeCheck(){
+        List<CaseDetails> cases = caseSearchService.getCases();
+
     }
 }
