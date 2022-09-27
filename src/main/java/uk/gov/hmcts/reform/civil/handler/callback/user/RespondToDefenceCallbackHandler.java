@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
@@ -200,11 +201,18 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
             if (caseData.getApplicant1DQ() != null
                 && caseData.getApplicant1DQ().getApplicant1DQFileDirectionsQuestionnaire() != null) {
-                Applicant1DQ dq = caseData.getApplicant1DQ().toBuilder()
-                    .applicant1DQStatementOfTruth(statementOfTruth)
-                    .build();
+                Applicant1DQ.Applicant1DQBuilder applicant1DQBuilder = caseData.getApplicant1DQ().toBuilder();
+                applicant1DQBuilder.applicant1DQStatementOfTruth(statementOfTruth);
 
-                builder.applicant1DQ(dq);
+                if (featureToggleService.isCourtLocationDynamicListEnabled()) {
+                    applicant1DQBuilder.applicant1DQRequestedCourt(
+                            RequestedCourt.builder()
+                                .caseLocation(caseData.getCourtLocation().getCaseLocation())
+                                .responseCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                .build());
+                }
+
+                builder.applicant1DQ(applicant1DQBuilder.build());
             }
 
             if (caseData.getApplicant2DQ() != null

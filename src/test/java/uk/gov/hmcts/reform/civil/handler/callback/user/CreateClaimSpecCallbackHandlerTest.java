@@ -1193,6 +1193,17 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("code").isEqualTo("Civil");
         }
 
+        @Test
+        void shouldUpdateCaseManagementLocation_whenInvoked(){
+            when(toggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsExactly("2", "420219");
+        }
+
         @Nested
         class IdamEmail {
 
