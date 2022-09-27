@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
@@ -108,6 +109,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     @Autowired
     private final DeadlinesCalculator deadlinesCalculator;
     private final SdoGeneratorService sdoGeneratorService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -258,24 +260,29 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.disposalHearingFinalDisposalHearing(tempDisposalHearingFinalDisposalHearing).build();
 
-        // updated Hearing time field copy of the above field, leaving above field in as requested to not break
-        // existing cases
-        DisposalHearingHearingTime tempDisposalHearingHearingTime =
-            DisposalHearingHearingTime.builder()
-                .input("This claim will be listed for final disposal before a judge on the first available date after")
-                .dateTo(LocalDate.now().plusWeeks(16))
-                .build();
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            // updated Hearing time field copy of the above field, leaving above field in as requested to not break
+            // existing cases
+            DisposalHearingHearingTime tempDisposalHearingHearingTime =
+                DisposalHearingHearingTime.builder()
+                    .input(
+                        "This claim will be listed for final disposal before a judge on the first available date after")
+                    .dateTo(LocalDate.now().plusWeeks(16))
+                    .build();
 
-        updatedData.disposalHearingHearingTime(tempDisposalHearingHearingTime).build();
+            updatedData.disposalHearingHearingTime(tempDisposalHearingHearingTime).build();
 
-        DisposalOrderWithoutHearing disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
-            .input(String.format("Each party has the right to apply to have this Order set "
-                                     + "aside or varied. Any such application must be received "
-                                     + "by the Court (together with the appropriate fee) "
-                                     + "by 4pm on %s.",
-                                 deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
-                                     .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)))).build();
-        updatedData.disposalOrderWithoutHearing(disposalOrderWithoutHearing).build();
+            DisposalOrderWithoutHearing disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
+                .input(String.format(
+                    "Each party has the right to apply to have this Order set "
+                        + "aside or varied. Any such application must be received "
+                        + "by the Court (together with the appropriate fee) "
+                        + "by 4pm on %s.",
+                    deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
+                        .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
+                )).build();
+            updatedData.disposalOrderWithoutHearing(disposalOrderWithoutHearing).build();
+        }
 
 
         HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ();

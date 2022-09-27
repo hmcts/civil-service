@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
@@ -87,6 +88,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private SdoGeneratorService sdoGeneratorService;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToStartCallback {
@@ -157,6 +161,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             when(deadlinesCalculator.plusWorkingDays(any(), anyInt())).thenReturn(DATE);
+            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
         }
 
         @Test
@@ -650,6 +655,19 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("12.0%");
             assertThat(response.getData()).extracting("smallClaimsJudgementDeductionValue").extracting("value")
                 .isEqualTo("12.0%");
+        }
+
+        @Test
+        void shouldNotSetValuesForHnLIfToggleDisabled() {
+            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("disposalHearingHearingTime").isNull();
+            assertThat(response.getData()).extracting("disposalOrderWithoutHearing").isNull();
         }
     }
 
