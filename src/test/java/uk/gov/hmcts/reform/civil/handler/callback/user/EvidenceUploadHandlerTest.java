@@ -46,7 +46,7 @@ public class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
 
         @Test
-        void AboutToSubmitCallback_placeholder() {
+        void aboutToSubmitCallback_placeholder() {
             CaseData caseData = CaseDataBuilder.builder().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -59,7 +59,7 @@ public class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
     class SubmittedCallback {
 
         @Test
-        void SubmittedCallback_placeholder() {
+        void submittedCallback_placeholder() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.SUBMITTED);
 
