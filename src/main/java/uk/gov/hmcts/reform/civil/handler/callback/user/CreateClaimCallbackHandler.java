@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -115,6 +116,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::setSuperClaimType)
+            .put(callbackKey(V_1, ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "start-claim"), this::startClaim)
             .put(callbackKey(V_1, MID, "start-claim"), this::startClaim)
             .put(callbackKey(MID, "applicant"), this::validateApplicant1DateOfBirth)
@@ -366,6 +368,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
             handleCourtLocationData(caseData, dataBuilder, callbackParams);
+        }
+
+        if (V_1.equals(callbackParams.getVersion())
+            && toggleService.isAccessProfilesEnabled()) {
+            dataBuilder.caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
         }
 
         if (toggleService.isNoticeOfChangeEnabled()) {

@@ -291,21 +291,6 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnExpectedSubmittedCallbackResponse_WhenInvokedByUserWith_Applicant2Role() {
-            List<String> caseRoles = new ArrayList<>();
-            caseRoles.add("[APPLICANTSOLICITORTWO]");
-
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
-
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            assertEquals("# You have updated a claimant's legal representative's email address",
-                         response.getConfirmationHeader(), "confirmationHeader");
-            assertEquals("<br />",
-                         response.getConfirmationBody(), "confirmationBody");
-        }
-
-        @Test
         void shouldReturnExpectedSubmittedCallbackResponse_WhenInvokedByUserWith_Respondent1Role() {
             List<String> caseRoles = new ArrayList<>();
             caseRoles.add("[RESPONDENTSOLICITORONE]");
