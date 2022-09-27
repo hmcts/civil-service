@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.civil.service.bankholidays.PublicHolidaysCollection;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -172,17 +174,18 @@ public class HearingScheduledHandler extends CallbackHandler {
             }
             switch (caseData.getAllocatedTrack()) {
                 case SMALL_CLAIM:
-                    caseDataBuilder.hearingFee("£545");
+                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(545)).build());
                     break;
                 case FAST_CLAIM:
-                    caseDataBuilder.hearingFee(
-                        HearingUtils.getFastTrackFee(caseData.getClaimFee().getCalculatedAmountInPence().intValue()));
+                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(
+                        HearingUtils.getFastTrackFee(
+                            caseData.getClaimFee().getCalculatedAmountInPence().intValue())).build());
                     break;
                 case MULTI_CLAIM:
-                    caseDataBuilder.hearingFee("£1.175");
+                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(1175)).build());
                     break;
                 default:
-                    caseDataBuilder.hearingFee("£0");
+                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(0)).build());
             }
         }
         if (nonNull(caseData.getHearingLocation())) {
