@@ -48,6 +48,14 @@ public class FeatureToggleService {
         );
     }
 
+    public boolean isGlobalSearchEnabled() {
+        return internalClient.boolVariation(
+            "global-search-specified",
+            createLDUser().build(),
+            false
+        );
+    }
+
     public boolean isLrSpecEnabled() {
         return isFeatureEnabled("specified-lr-journey");
     }
@@ -76,6 +84,10 @@ public class FeatureToggleService {
 
     public boolean isPinInPostEnabled() {
         return internalClient.boolVariation("pin-in-post", createLDUser().build(), false);
+    }
+
+    public boolean isAccessProfilesEnabled() {
+        return internalClient.boolVariation("access-profiles", createLDUser().build(), false);
     }
 
     private void close() {

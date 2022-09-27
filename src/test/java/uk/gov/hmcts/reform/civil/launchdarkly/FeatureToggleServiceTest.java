@@ -114,6 +114,15 @@ class FeatureToggleServiceTest {
     }
 
     @Test
+    void shouldCallBoolVariation_whenIsAccessProfilesEnabledInvoked() {
+        var accessProfilesKey = "access-profiles";
+        givenToggle(accessProfilesKey, true);
+
+        assertThat(featureToggleService.isAccessProfilesEnabled()).isTrue();
+        verifyBoolVariationCalled(accessProfilesKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
     void shouldCallBoolVariation_whenIsOrganisationOnboardedInvoked() {
         var organisationOnboardedFeatureKey = "isOrganisationOnboarded";
         givenToggle(organisationOnboardedFeatureKey, true);
@@ -146,6 +155,17 @@ class FeatureToggleServiceTest {
 
         Mockito.verify(ldClient).boolVariation(
             eq("specified-rpa-continuous-feed"),
+            any(LDUser.class),
+            eq(false)
+        );
+    }
+
+    @Test
+    public void globalSearch_LDTagName() {
+        featureToggleService.isGlobalSearchEnabled();
+
+        Mockito.verify(ldClient).boolVariation(
+            eq("global-search-specified"),
             any(LDUser.class),
             eq(false)
         );
