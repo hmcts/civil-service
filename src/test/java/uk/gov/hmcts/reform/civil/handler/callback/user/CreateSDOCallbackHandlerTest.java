@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.prd.client.CommonReferenceDataApi;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -84,6 +85,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private SdoGeneratorService sdoGeneratorService;
+
+
+    @MockBean
+    private CommonReferenceDataApi commonReferenceDataApi;
 
     @Nested
     class AboutToStartCallback {

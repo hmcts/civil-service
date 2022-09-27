@@ -287,6 +287,11 @@ rd_professional:
   api:
     url: http://localhost:8765
 
+rd_common:
+  api:
+    url: http://localhost:8765
+    service: BBA3
+
 robotics:
   notification:
     sender: hmcts.civil@gmail.com

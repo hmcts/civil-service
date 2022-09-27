@@ -3,7 +3,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -19,6 +21,8 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
@@ -54,11 +58,15 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.prd.client.CommonReferenceDataApi;
+import uk.gov.hmcts.reform.prd.model.HearingChannelLov;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -110,7 +118,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final SdoGeneratorService sdoGeneratorService;
+    private final CommonReferenceDataApi commonReferenceDataApi;
+    private final AuthTokenGenerator authTokenGenerator;
+    @Value("${rd_common.api.service}")
+    private String hearingChannelServiceId;
     private final FeatureToggleService featureToggleService;
+
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -644,10 +657,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
-
+        if (featureToggleService.isHearingsAndListingsEnabled()) {
+            cleanHearingMethodOptions(callbackParams, dataBuilder);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void cleanHearingMethodOptions(CallbackParams params, CaseData.CaseDataBuilder builder) {
+        builder.hearingMethod(DynamicList.builder()
+                                  .value(params.getCaseData().getHearingMethod().getValue())
+                                  .listItems(Collections.emptyList())
+                                  .build());
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
@@ -708,5 +730,45 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
         return locationRefDataService.getCourtLocations(authToken);
+    }
+
+    private DynamicList getHearingMethodOptions(CallbackParams callbackParams) {
+        HearingChannelLov hearingChannels = commonReferenceDataApi.findHearingChannels(
+            callbackParams.getParams().get(BEARER_TOKEN).toString(),
+            authTokenGenerator.generate(),
+            hearingChannelServiceId
+        );
+        List<DynamicListElement> options;
+        if (hearingChannels.getValues().isEmpty()) {
+            // while we can't access PRD, this should satisfy the current requirement
+            options = List.of(
+                DynamicListElement.builder()
+                    .label("In person")
+                    .code(UUID.fromString("INTER"))
+                    .build(),
+                DynamicListElement.builder()
+                    .label("Telephone")
+                    .code(UUID.fromString("TEL"))
+                    .build(),
+                DynamicListElement.builder()
+                    .label("Video")
+                    .code(UUID.fromString("VID"))
+                    .build()
+            );
+        } else {
+            options = hearingChannels.getValues().stream()
+                // TODO once we use service AAA6 or AAA7, this filtering should not be needed
+                .filter(channel -> !"NA".equals(channel.getKey()) && !"ONPPRS".equals(channel.getKey()))
+                .map(channel ->
+                         DynamicListElement.builder()
+                             .code(UUID.fromString(channel.getKey()))
+                             .label(channel.getValueEn())
+                             .build())
+                .collect(Collectors.toList());
+        }
+
+        return DynamicList.builder()
+            .listItems(options)
+            .build();
     }
 }
