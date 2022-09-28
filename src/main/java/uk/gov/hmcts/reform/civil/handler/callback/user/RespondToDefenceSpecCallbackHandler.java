@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -36,7 +35,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -54,7 +52,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final UnavailableDateValidator unavailableDateValidator;
     private final List<RespondToResponseConfirmationHeaderGenerator> confirmationHeaderGenerators;
     private final List<RespondToResponseConfirmationTextGenerator> confirmationTextGenerators;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -71,7 +68,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
             callbackKey(ABOUT_TO_START), this::populateCaseData,
-            callbackKey(V_1, ABOUT_TO_START), this::populateCaseData,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -154,22 +150,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private CallbackResponse populateCaseData(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
 
-        CaseData updatedCaseData;
-
-        if (V_1.equals(callbackParams.getVersion())
-            && featureToggleService.isAccessProfilesEnabled()) {
-            updatedCaseData = caseData.toBuilder()
-                .respondent1Copy(caseData.getRespondent1())
-                .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-                .build();
-        } else {
-            updatedCaseData = caseData.toBuilder()
-                .respondent1Copy(caseData.getRespondent1())
-                .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-                .superClaimType(SPEC_CLAIM)
-                .build();
-        }
-
+        var updatedCaseData = caseData.toBuilder()
+            .respondent1Copy(caseData.getRespondent1())
+            .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
+            .superClaimType(SPEC_CLAIM)
+            .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
             .build();

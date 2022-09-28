@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
@@ -29,9 +30,9 @@ import javax.validation.constraints.NotNull;
 
 import static java.util.List.of;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment.json;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Slf4j
 @Service
@@ -68,7 +69,7 @@ public class RoboticsNotificationService {
             String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
             String triggerEvent;
 
-            if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
+            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
                 if (canSendEmailSpec()) {
                     RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
                     triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseData.getEvents());
@@ -84,8 +85,7 @@ public class RoboticsNotificationService {
             return Optional.of(EmailData.builder()
                 .message(getMessage(caseData, isMultiParty))
                 .subject(getSubject(caseData, triggerEvent, isMultiParty))
-                .to(getRoboticsEmailRecipient(isMultiParty,
-                                              isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())))
+                .to(getRoboticsEmailRecipient(isMultiParty, caseData.getSuperClaimType()))
                 .attachments(of(json(roboticsJsonData, fileName)))
                 .build());
         } catch (JsonProcessingException e) {
@@ -104,7 +104,7 @@ public class RoboticsNotificationService {
 
     private String getSubject(CaseData caseData, String triggerEvent, boolean isMultiParty) {
         String subject = null;
-        if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
             subject = isMultiParty ? String.format("Multiparty LR v LR Case Data for %s - %s - %s",
                                                 caseData.getLegacyCaseReference(),
                                                 caseData.getCcdState(), triggerEvent
@@ -125,8 +125,8 @@ public class RoboticsNotificationService {
         }
     }
 
-    private String getRoboticsEmailRecipient(boolean isMultiParty, boolean isSpecClaim) {
-        if (isSpecClaim) {
+    private String getRoboticsEmailRecipient(boolean isMultiParty, SuperClaimType superClaimType) {
+        if (SPEC_CLAIM.equals(superClaimType)) {
             log.info("EMAIl:---------" + roboticsEmailConfiguration.getSpecRecipient());
             return roboticsEmailConfiguration.getSpecRecipient();
         }

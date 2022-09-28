@@ -26,7 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 
 @Slf4j
 @Service
@@ -56,7 +56,7 @@ public class ResubmitClaimCallbackHandler extends CallbackHandler {
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if ("CREATE_CLAIM_SPEC".equals(callbackParams.getRequest().getEventId())
-            || isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
+            || SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
             if (toggleService.isLrSpecEnabled()) {
                 caseData = caseData.toBuilder()
                     .businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC))

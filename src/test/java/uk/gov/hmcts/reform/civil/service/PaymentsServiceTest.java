@@ -11,7 +11,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
@@ -60,9 +59,6 @@ class PaymentsServiceTest {
 
     @Autowired
     private PaymentsService paymentsService;
-
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @Nested
     class Unspecified {

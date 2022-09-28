@@ -90,10 +90,6 @@ public class FeatureToggleService {
         return internalClient.boolVariation("pin-in-post", createLDUser().build(), false);
     }
 
-    public boolean isAccessProfilesEnabled() {
-        return internalClient.boolVariation("access-profiles", createLDUser().build(), false);
-    }
-
     private void close() {
         try {
             internalClient.close();

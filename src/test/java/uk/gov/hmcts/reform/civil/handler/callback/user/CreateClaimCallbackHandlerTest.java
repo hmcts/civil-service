@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -149,7 +148,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     private String responsePackLink;
 
     @Nested
-    class AboutToStartCallbackV0 {
+    class AboutToStartCallback {
 
         private static final String SUPER_CLAIM_KEY = "superClaimType";
 
@@ -841,44 +840,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
-    // TODO: move this test case to AboutToSubmitCallbackV0 after release
     @Nested
-    class AboutToSubmitCallbackV1 {
-
-        private CallbackParams params;
-        private CaseData caseData;
-        private String userId;
-
-        private static final String EMAIL = "example@email.com";
-        private static final String DIFFERENT_EMAIL = "other_example@email.com";
-        private final LocalDateTime submittedDate = LocalDateTime.now();
-
-        @BeforeEach
-        void setup() {
-            caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
-            userId = UUID.randomUUID().toString();
-
-            given(idamClient.getUserDetails(any()))
-                .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
-
-            given(time.now()).willReturn(submittedDate);
-            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
-            when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
-        }
-
-        //Move this test to AboutToSubmitCallbackV0 after CIV-3521 release and migration
-        @Test
-        void shouldSetCaseCategoryToUnspec_whenInvoked() {
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .containsEntry("CaseAccessCategory", CaseCategory.UNSPEC_CLAIM.toString());
-        }
-    }
-
-    @Nested
-    class AboutToSubmitCallbackV0 {
+    class AboutToSubmitCallback {
 
         private CallbackParams params;
         private CaseData caseData;

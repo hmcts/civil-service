@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -138,7 +137,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::setSuperClaimType)
-            .put(callbackKey(V_1, ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck)
             .put(callbackKey(MID, "applicant"), this::validateClaimant1Details)
             .put(callbackKey(MID, "applicant2"), this::validateClaimant2Details)
@@ -389,11 +387,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
         ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
-
-        if (V_1.equals(callbackParams.getVersion())
-            && toggleService.isAccessProfilesEnabled()) {
-            dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
-        }
 
         //assign case management category to the case and caseNameHMCTSinternal
         if (V_1.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {

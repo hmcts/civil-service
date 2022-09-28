@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -56,8 +55,6 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
     private NotificationsProperties notificationsProperties;
     @Autowired
     private ClaimantResponseConfirmsToProceedRespondentNotificationHandler handler;
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToSubmitCallback {

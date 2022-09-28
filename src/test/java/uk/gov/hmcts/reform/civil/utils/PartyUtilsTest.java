@@ -254,7 +254,7 @@ class PartyUtilsTest {
     }
 
     @Nested
-    class PartyResponseTypeV0 {
+    class PartyResponseType {
 
         @Test
         void shouldReturnCorrectResponseTypeFor1v1Cases() {
@@ -262,16 +262,14 @@ class PartyUtilsTest {
 
             assertEquals(PartyUtils.getResponseTypeForRespondent(
                 caseData,
-                caseData.getRespondent1(),
-                false
+                caseData.getRespondent1()
             ), FULL_DEFENCE);
 
             CaseData partAdmissionCaseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build();
 
             assertEquals(PartyUtils.getResponseTypeForRespondent(
                 partAdmissionCaseData,
-                partAdmissionCaseData.getRespondent1(),
-                false
+                partAdmissionCaseData.getRespondent1()
             ), PART_ADMISSION);
         }
 
@@ -285,14 +283,12 @@ class PartyUtilsTest {
 
             assertEquals(PartyUtils.getResponseTypeForRespondent(
                 caseData,
-                caseData.getRespondent1(),
-                false
+                caseData.getRespondent1()
             ), FULL_DEFENCE);
 
             assertEquals(PartyUtils.getResponseTypeForRespondent(
                 caseData,
-                caseData.getRespondent2(),
-                false
+                caseData.getRespondent2()
             ), FULL_DEFENCE);
 
             CaseData partAdmissionCaseData = CaseDataBuilder.builder()
@@ -304,159 +300,12 @@ class PartyUtilsTest {
 
             assertEquals(PartyUtils.getResponseTypeForRespondent(
                 partAdmissionCaseData,
-                partAdmissionCaseData.getRespondent1(),
-                false
+                partAdmissionCaseData.getRespondent1()
             ), FULL_ADMISSION);
 
             assertEquals(PartyUtils.getResponseTypeForRespondent(
                 partAdmissionCaseData,
-                partAdmissionCaseData.getRespondent2(),
-                false
-            ), PART_ADMISSION);
-        }
-
-        @Test
-        void shouldReturnCorrectResponseTypeFor1v1CasesSpec() {
-            CaseData fullDefenceCaseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build();
-
-            assertEquals(RespondentResponseTypeSpec.FULL_DEFENCE,
-                         PartyUtils.getResponseTypeForRespondentSpec(
-                             fullDefenceCaseData,
-                             fullDefenceCaseData.getRespondent1()
-                         )
-            );
-
-            CaseData partAdmissionCaseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build();
-
-            assertEquals(RespondentResponseTypeSpec.PART_ADMISSION,
-                         PartyUtils.getResponseTypeForRespondentSpec(
-                             partAdmissionCaseData,
-                             partAdmissionCaseData.getRespondent1()
-                         )
-            );
-
-            CaseData fullAdmissionCaseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
-
-            assertEquals(RespondentResponseTypeSpec.FULL_ADMISSION,
-                         PartyUtils.getResponseTypeForRespondentSpec(
-                             fullAdmissionCaseData,
-                             fullAdmissionCaseData.getRespondent1()
-                         )
-            );
-
-            CaseData counterClaimCaseData = CaseDataBuilder.builder().atStateRespondentCounterClaimSpec().build();
-
-            assertEquals(RespondentResponseTypeSpec.COUNTER_CLAIM,
-                         PartyUtils.getResponseTypeForRespondentSpec(
-                             counterClaimCaseData,
-                             counterClaimCaseData.getRespondent1()
-                         )
-            );
-        }
-
-        @Test
-        void shouldReturnCorrectResponseTypeFor1v2CasesSpec() {
-            CaseData divergentResponseCaseData = CaseDataBuilder.builder()
-                .multiPartyClaimTwoDefendantSolicitors()
-                .atStateRespondentFullAdmissionSpec()
-                .respondent2RespondsSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .build();
-
-            assertEquals(RespondentResponseTypeSpec.FULL_ADMISSION,
-                         PartyUtils.getResponseTypeForRespondentSpec(
-                             divergentResponseCaseData,
-                             divergentResponseCaseData.getRespondent1()
-                         )
-            );
-
-            assertEquals(RespondentResponseTypeSpec.PART_ADMISSION,
-                         PartyUtils.getResponseTypeForRespondentSpec(
-                             divergentResponseCaseData,
-                             divergentResponseCaseData.getRespondent2()
-                         )
-            );
-
-            CaseData counterClaimCaseData = CaseDataBuilder.builder()
-                .multiPartyClaimTwoDefendantSolicitors()
-                .atStateRespondentCounterClaimSpec()
-                .respondent2RespondsSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
-                .build();
-
-            assertEquals(RespondentResponseTypeSpec.COUNTER_CLAIM,
-                         PartyUtils.getResponseTypeForRespondentSpec(
-                             counterClaimCaseData,
-                             counterClaimCaseData.getRespondent1()
-                         )
-            );
-
-            assertEquals(RespondentResponseTypeSpec.COUNTER_CLAIM,
-                         PartyUtils.getResponseTypeForRespondentSpec(
-                             counterClaimCaseData,
-                             counterClaimCaseData.getRespondent2()
-                         )
-            );
-        }
-    }
-
-    @Nested
-    class PartyResponseTypeV1 {
-
-        @Test
-        void shouldReturnCorrectResponseTypeFor1v1Cases() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
-
-            assertEquals(PartyUtils.getResponseTypeForRespondent(
-                caseData,
-                caseData.getRespondent1(),
-                true
-            ), FULL_DEFENCE);
-
-            CaseData partAdmissionCaseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build();
-
-            assertEquals(PartyUtils.getResponseTypeForRespondent(
-                partAdmissionCaseData,
-                partAdmissionCaseData.getRespondent1(),
-                true
-            ), PART_ADMISSION);
-        }
-
-        @Test
-        void shouldReturnCorrectResponseTypeFor1v2Cases() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefence()
-                .multiPartyClaimTwoDefendantSolicitors()
-                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
-                .build();
-
-            assertEquals(PartyUtils.getResponseTypeForRespondent(
-                caseData,
-                caseData.getRespondent1(),
-                true
-            ), FULL_DEFENCE);
-
-            assertEquals(PartyUtils.getResponseTypeForRespondent(
-                caseData,
-                caseData.getRespondent2(),
-                true
-            ), FULL_DEFENCE);
-
-            CaseData partAdmissionCaseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefence()
-                .multiPartyClaimTwoDefendantSolicitors()
-                .atStateRespondentFullAdmission()
-                .respondent2Responds(PART_ADMISSION)
-                .build();
-
-            assertEquals(PartyUtils.getResponseTypeForRespondent(
-                partAdmissionCaseData,
-                partAdmissionCaseData.getRespondent1(),
-                true
-            ), FULL_ADMISSION);
-
-            assertEquals(PartyUtils.getResponseTypeForRespondent(
-                partAdmissionCaseData,
-                partAdmissionCaseData.getRespondent2(),
-                true
+                partAdmissionCaseData.getRespondent2()
             ), PART_ADMISSION);
         }
 

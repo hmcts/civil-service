@@ -9,7 +9,6 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -196,7 +195,6 @@ class RepresentativeServiceTest {
                 .applicantSolicitor1ServiceAddress(applicantSolicitorServiceAddress)
                 .build().toBuilder()
                 .superClaimType(SuperClaimType.SPEC_CLAIM)
-                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .specRespondentCorrespondenceAddressdetails(respondentSolicitorServiceAddress)
                 .build();
 
