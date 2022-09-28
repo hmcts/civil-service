@@ -85,8 +85,14 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .disposalHearingWitnessOfFactDJ(caseData.getDisposalHearingWitnessOfFactDJ())
             .disposalHearingWitnessOfFactDJAddSection(nonNull(caseData.getDisposalHearingWitnessOfFactDJ()))
             .disposalHearingFinalDisposalHearingDJ(caseData.getDisposalHearingFinalDisposalHearingDJ())
+            .disposalHearingMethodDJ(caseData.getDisposalHearingMethodDJ())
+            .disposalHearingAttendance(fillDisposalHearingMethod(caseData.getDisposalHearingMethodDJ()))
             .disposalHearingFinalDisposalHearingDJAddSection(nonNull(
                 caseData.getDisposalHearingFinalDisposalHearingDJ()))
+            .disposalHearingFinalDisposalHearingDJAddSection(nonNull(
+                caseData.getDisposalHearingMethodDJ()))
+            .disposalHearingFinalDisposalHearingDJAddSection(nonNull(fillDisposalHearingMethod(caseData
+                                                                       .getDisposalHearingMethodDJ())))
             .courtLocation(getCourt(caseData))
             .telephoneOrganisedBy(getHearingMethodTelephoneHearingLabel(caseData))
             .videoConferenceOrganisedBy(getHearingMethodVideoConferenceLabel(caseData))
@@ -105,8 +111,6 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .disposalHearingSchedulesOfLossDJAddSection(nonNull(caseData.getDisposalHearingSchedulesOfLossDJ()))
             .disposalHearingClaimSettlingAddSection(getToggleValue(caseData.getDisposalHearingClaimSettlingDJToggle()))
             .disposalHearingCostsAddSection(getToggleValue(caseData.getDisposalHearingCostsDJToggle()))
-            .disposalHearingMethodDJ(caseData.getDisposalHearingMethodDJ())
-            .disposalHearingAttendance(fillDisposalHearingMethod(caseData.getDisposalHearingMethodDJ()))
             .applicant(caseData.getApplicant1().getPartyName().toUpperCase())
             .respondent(checkDefendantRequested(caseData).toUpperCase()).build();
     }
@@ -258,16 +262,19 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     private String fillDisposalHearingMethod(DisposalHearingMethodDJ method) {
-        switch (method) {
-            case disposalHearingMethodTelephoneHearing:
-                return "by telephone";
-            case disposalHearingMethodInPerson:
-                return "in person";
-            case disposalHearingMethodVideoConferenceHearing:
-                return "by video conference";
-            default:
-                return null;
+        if (method != null) {
+            switch (method) {
+                case disposalHearingMethodTelephoneHearing:
+                    return "by telephone";
+                case disposalHearingMethodInPerson:
+                    return "in person";
+                case disposalHearingMethodVideoConferenceHearing:
+                    return "by video conference";
+                default:
+                    return null;
+            }
         }
+        return null;
     }
 
     private boolean checkDisposalHearingMethod(DisposalHearingMethodDJ method) {
