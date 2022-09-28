@@ -134,6 +134,7 @@ public class InitiateGeneralApplicationService {
         //Setting Work Allocation location and location name
         applicationBuilder.caseManagementLocation(caseLocation.getLeft());
         applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
+        applicationBuilder.locationName(caseLocation.getLeft().getSiteName());
 
         applicationBuilder.claimant1PartyName(caseData.getApplicant1().getPartyName());
         applicationBuilder.defendant1PartyName(caseData.getRespondent1().getPartyName());
@@ -338,9 +339,11 @@ public class InitiateGeneralApplicationService {
         } else {
             LocationRefData ccmccLocation = locationRefDataService.getCcmccLocation(authToken);
             CaseLocation courtLocation = CaseLocation.builder()
-                    .region(ccmccLocation.getRegionId())
-                    .baseLocation(ccmccLocation.getEpimmsId())
-                    .build();
+                .region(ccmccLocation.getRegionId())
+                .baseLocation(ccmccLocation.getEpimmsId())
+                .siteName(ccmccLocation.getSiteName())
+                .build();
+
             return Pair.of(courtLocation, true);
         }
     }
@@ -356,6 +359,7 @@ public class InitiateGeneralApplicationService {
             return CaseLocation.builder()
                 .region(caseData.getCourtLocation().getCaseLocation().getRegion())
                 .baseLocation(caseData.getCourtLocation().getCaseLocation().getBaseLocation())
+                .siteName(caseData.getCourtLocation().getCaseLocation().getBaseLocation())
                 .build();
         }
         return CaseLocation.builder()
@@ -378,6 +382,8 @@ public class InitiateGeneralApplicationService {
                         .getCaseLocation().getRegion())
             .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
                               .getCaseLocation().getBaseLocation())
+            .siteName(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
+                          .getCaseLocation().getBaseLocation())
             .build();
     }
 }
