@@ -15,3 +15,4 @@ public class CaseLocation {
 
     private String baseLocation;
 }
+
