@@ -87,7 +87,7 @@ public class FeatureToggleService {
     }
 
     public boolean isHearingsAndListingsEnabled() {
-        return isFeatureEnabled("enableHNL");
+        return true;
     }
 
     private void close() {

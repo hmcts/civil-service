@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -156,6 +157,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private CallbackResponse prePopulateOrderDetailsPages(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+
+        if (featureToggleService.isHearingsAndListingsEnabled()) {
+            updatedData.hearingMethod(getHearingMethodOptions(callbackParams));
+        }
 
         updatedData.disposalHearingMethodInPerson(fromList(fetchLocationData(callbackParams)));
         updatedData.fastTrackMethodInPerson(fromList(fetchLocationData(callbackParams)));
@@ -753,37 +758,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             authTokenGenerator.generate(),
             hearingChannelServiceId
         );
-        List<DynamicListElement> options;
-        if (hearingChannels.getValues().isEmpty()) {
-            // while we can't access PRD, this should satisfy the current requirement
-            options = List.of(
-                DynamicListElement.builder()
-                    .label("In person")
-                    .code(UUID.fromString("INTER"))
-                    .build(),
-                DynamicListElement.builder()
-                    .label("Telephone")
-                    .code(UUID.fromString("TEL"))
-                    .build(),
-                DynamicListElement.builder()
-                    .label("Video")
-                    .code(UUID.fromString("VID"))
-                    .build()
-            );
-        } else {
-            options = hearingChannels.getValues().stream()
-                // TODO once we use service AAA6 or AAA7, this filtering should not be needed
+        return DynamicList.fromList(
+            hearingChannels.getValues().stream()
                 .filter(channel -> !"NA".equals(channel.getKey()) && !"ONPPRS".equals(channel.getKey()))
-                .map(channel ->
-                         DynamicListElement.builder()
-                             .code(UUID.fromString(channel.getKey()))
-                             .label(channel.getValueEn())
-                             .build())
-                .collect(Collectors.toList());
-        }
-
-        return DynamicList.builder()
-            .listItems(options)
-            .build();
+                .map(channel -> channel.getValueEn()).collect(Collectors.toList()));
     }
 }
