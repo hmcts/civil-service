@@ -234,7 +234,8 @@ class FlowStateAllowedEventServiceTest {
                         NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL,
-                        EVIDENCE_UPLOAD_JUDGE
+                        EVIDENCE_UPLOAD_JUDGE,
+                        EVIDENCE_UPLOAD
                     }
                 ),
                 of(
