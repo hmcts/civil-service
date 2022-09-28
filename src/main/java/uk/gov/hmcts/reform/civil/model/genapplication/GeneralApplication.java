@@ -48,6 +48,9 @@ public class GeneralApplication implements MappableObject {
     private final String generalAppSuperClaimType;
     private final LocalDateTime applicationClosedDate;
     private final LocalDateTime applicationTakenOfflineDate;
+    private final CaseLocation caseManagementLocation;
+    private final YesOrNo isCcmccLocation;
+    private final GACaseManagementCategory caseManagementCategory;
 
     @JsonCreator
     GeneralApplication(@JsonProperty("generalApplicationState") String generalApplicationState,
@@ -79,8 +82,11 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("defendant2PartyName") String defendant2PartyName,
                        @JsonProperty("generalAppSuperClaimType") String generalAppSuperClaimType,
                        @JsonProperty("applicationClosedDate") LocalDateTime applicationClosedDate,
-                       @JsonProperty("applicationTakenOfflineDate") LocalDateTime applicationTakenOfflineDate
-                       ) {
+                       @JsonProperty("applicationTakenOfflineDate") LocalDateTime applicationTakenOfflineDate,
+                       @JsonProperty("caseManagementLocation") CaseLocation caseManagementLocation,
+                       @JsonProperty("isCcmccLocation") YesOrNo isCcmccLocation,
+                       @JsonProperty("caseManagementCategory") GACaseManagementCategory caseManagementCategory) {
+
         this.generalApplicationState = generalApplicationState;
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
@@ -109,5 +115,8 @@ public class GeneralApplication implements MappableObject {
         this.generalAppSuperClaimType = generalAppSuperClaimType;
         this.applicationClosedDate = applicationClosedDate;
         this.applicationTakenOfflineDate = applicationTakenOfflineDate;
+        this.caseManagementLocation = caseManagementLocation;
+        this.isCcmccLocation = isCcmccLocation;
+        this.caseManagementCategory = caseManagementCategory;
     }
 }
