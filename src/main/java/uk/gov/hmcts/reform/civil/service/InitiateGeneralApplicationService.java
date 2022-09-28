@@ -179,11 +179,6 @@ public class InitiateGeneralApplicationService {
         applicationBuilder.caseManagementCategory(
             GACaseManagementCategory.builder().value(civil).list_items(itemList).build());
 
-        Pair<CaseLocation, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
-        //Setting Work Allocation location and location name
-        applicationBuilder.caseManagementLocation(caseLocation.getLeft());
-        applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
-
         LocalDateTime deadline = deadlinesCalculator
             .calculateApplicantResponseDeadline(
                 LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS);
@@ -235,15 +230,6 @@ public class InitiateGeneralApplicationService {
             }
         }
         return errors;
-    }
-
-    private Pair<CaseLocation, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
-        LocationRefData ccmccLocation = locationRefDataService.getCcmccLocation(authToken);
-        CaseLocation courtLocation = CaseLocation.builder()
-            .region(ccmccLocation.getRegionId())
-            .baseLocation(ccmccLocation.getEpimmsId())
-            .build();
-        return Pair.of(courtLocation, true);
     }
 
     public List<String> validateHearingScreen(GAHearingDetails hearingDetails) {

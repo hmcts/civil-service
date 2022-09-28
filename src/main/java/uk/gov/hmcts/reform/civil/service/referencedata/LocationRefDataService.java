@@ -94,7 +94,6 @@ public class LocationRefDataService {
         String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
                 .queryParam("court_venue_name", "County Court Money Claims Centre");
-
         return builder.buildAndExpand(new HashMap<>()).toUri();
     }
 
