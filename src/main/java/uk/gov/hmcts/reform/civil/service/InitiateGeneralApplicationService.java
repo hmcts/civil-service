@@ -335,8 +335,8 @@ public class InitiateGeneralApplicationService {
             } else {
                 if (INDIVIDUAL.equals(caseData.getRespondent1().getType())
                     || SOLE_TRADER.equals(caseData.getRespondent1().getType())
-                    || INDIVIDUAL.equals(caseData.getRespondent1().getType())
-                    || SOLE_TRADER.equals(caseData.getRespondent1().getType())) {
+                    || INDIVIDUAL.equals(caseData.getRespondent2().getType())
+                    || SOLE_TRADER.equals(caseData.getRespondent2().getType())) {
 
                     return Pair.of(getDefendantPreferredLocation(caseData), false);
                 } else {
