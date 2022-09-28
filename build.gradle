@@ -94,13 +94,6 @@ allprojects {
       ) {
         entry 'snakeyaml'
       }
-
-      dependencySet(
-        group: 'org.camunda.bpm',
-        version: '7.17.0'
-      ) {
-        entry 'camunda-engine'
-      }
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2020.0.4'
@@ -388,7 +381,7 @@ dependencies {
 
 
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.63'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.0-M16'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.0'
 
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.15.2'
 
