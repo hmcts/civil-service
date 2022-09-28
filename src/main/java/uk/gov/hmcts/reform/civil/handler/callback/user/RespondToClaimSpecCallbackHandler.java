@@ -1112,7 +1112,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             DynamicList courtLocationList = courtLocationUtils.getLocationsFromList(fetchLocationData(callbackParams));
             if (initialShowTags.contains(CAN_ANSWER_RESPONDENT_1)) {
                 updatedCaseData.respondent1DQ(Respondent1DQ.builder()
-                                                  .respondent1DQRequestedCourt(
+                                                  .respondToCourtLocation(
                                                       RequestedCourt.builder()
                                                           .responseCourtLocations(courtLocationList)
                                                           .build())
@@ -1120,7 +1120,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             }
             if (initialShowTags.contains(CAN_ANSWER_RESPONDENT_2)) {
                 updatedCaseData.respondent2DQ(Respondent2DQ.builder()
-                                                  .respondent2DQRequestedCourt(
+                                                  .respondToCourtLocation2(
                                                       RequestedCourt.builder()
                                                           .responseCourtLocations(courtLocationList)
                                                           .build())
@@ -1443,7 +1443,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (optCourtLocation.isPresent()) {
             LocationRefData courtLocation = optCourtLocation.get();
 
-            dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().toBuilder()
+            dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ()
+                                           .getRespondToCourtLocation().toBuilder()
+                                               .requestHearingAtSpecificCourt(YES)
+                                               .reasonForHearingAtSpecificCourt(
+                                                   caseData.getRespondent1DQ()
+                                                       .getRespondToCourtLocation()
+                                                       .getReasonForHearingAtSpecificCourt())
                                                .responseCourtLocations(null)
                                                .caseLocation(CaseLocation.builder()
                                                                  .region(courtLocation.getRegionId())
@@ -1451,10 +1457,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                                                  .build())
                                                .responseCourtCode(courtLocation.getCourtLocationCode()).build());
             dq.respondToCourtLocation(RequestedCourt.builder()
+                                          .responseCourtLocations(null)
                                           .responseCourtCode(courtLocation.getCourtLocationCode())
-                                          .reasonForHearingAtSpecificCourt(caseData.getRespondent1DQ()
-                                                                               .getRespondent1DQRequestedCourt()
-                                                                               .getReasonForHearingAtSpecificCourt())
+
                                           .build())
                 .responseClaimCourtLocationRequired(YES);
         } else {
@@ -1464,11 +1469,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     private Optional<LocationRefData> getCourtLocationDefendant1(CaseData caseData, CallbackParams callbackParams) {
         if (caseData.getRespondent1DQ() != null
-            && caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() != null
-            && YES.equals(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
-                              .getRequestHearingAtSpecificCourt())) {
+            && caseData.getRespondent1DQ().getRespondToCourtLocation() != null) {
             DynamicList courtLocations = caseData
-                .getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtLocations();
+                .getRespondent1DQ().getRespondToCourtLocation().getResponseCourtLocations();
             LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
                 fetchLocationData(callbackParams), courtLocations);
             return Optional.ofNullable(courtLocation);
@@ -1485,15 +1488,17 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             LocationRefData courtLocation = optCourtLocation.get();
             dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ().getRequestedCourt().toBuilder()
                                                .responseCourtLocations(null)
+                                               .requestHearingAtSpecificCourt(YES)
                                                .caseLocation(CaseLocation.builder()
                                                                  .region(courtLocation.getRegionId())
                                                                  .baseLocation(courtLocation.getEpimmsId())
                                                                  .build())
                                                .responseCourtCode(courtLocation.getCourtLocationCode()).build())
                 .respondToCourtLocation2(RequestedCourt.builder()
+                                             .responseCourtLocations(null)
                                              .responseCourtCode(courtLocation.getCourtLocationCode())
                                              .reasonForHearingAtSpecificCourt(
-                                                 caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
+                                                 caseData.getRespondent2DQ().getRespondToCourtLocation2()
                                                      .getReasonForHearingAtSpecificCourt()
                                              )
                                              .build());
@@ -1505,11 +1510,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     private Optional<LocationRefData> getCourtLocationDefendant2(CaseData caseData, CallbackParams callbackParams) {
         if (caseData.getRespondent2DQ() != null
-            && caseData.getRespondent2DQ().getRespondent2DQRequestedCourt() != null
-            && YES.equals(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
-                              .getRequestHearingAtSpecificCourt())) {
+            && caseData.getRespondent2DQ().getRespondToCourtLocation2() != null) {
             DynamicList courtLocations = caseData
-                .getRespondent2DQ().getRespondent2DQRequestedCourt().getResponseCourtLocations();
+                .getRespondent2DQ().getRespondToCourtLocation2().getResponseCourtLocations();
             LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
                 fetchLocationData(callbackParams), courtLocations);
             return Optional.ofNullable(courtLocation);

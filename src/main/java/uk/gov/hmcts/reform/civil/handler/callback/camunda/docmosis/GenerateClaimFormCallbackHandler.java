@@ -76,7 +76,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
             caseDataBuilder.build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-//
+
         if (featureToggleService.isNoticeOfChangeEnabled() && stitchEnabled
             && (YesOrNo.NO.equals(caseData.getRespondent1Represented())
             || YesOrNo.NO.equals(caseData.getRespondent2Represented()))) {

@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseCon
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -168,29 +167,21 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                                          Applicant1DQ.Applicant1DQBuilder dq,
                                          CallbackParams callbackParams) {
         RequestedCourt requestedCourt = caseData.getApplicant1DQ().getApplicant1DQRequestedCourt();
-        if (requestedCourt != null && requestedCourt.getRequestHearingAtSpecificCourt() == YES) {
+        if (requestedCourt != null) {
             LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
                 fetchLocationData(callbackParams), requestedCourt.getResponseCourtLocations());
             if (Objects.nonNull(courtLocation)) {
                 dataBuilder
-                    .courtLocation(CourtLocation.builder()
-                                       .applicantPreferredCourt(courtLocation.getCourtLocationCode())
-                                       .caseLocation(CaseLocation.builder()
-                                                         .region(courtLocation.getRegionId())
-                                                         .baseLocation(courtLocation.getEpimmsId()).build())
-                                       .applicantPreferredCourtLocationList(null)
-                                       .build())
-                    .applicant1DQ(dq
-                                      .applicant1DQRequestedCourt(
+                    .applicant1DQ(dq.applicant1DQRequestedCourt(
                                           caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().toBuilder()
                                               .responseCourtLocations(null)
+                                              .requestHearingAtSpecificCourt(YES)
                                               .caseLocation(CaseLocation.builder()
                                                                 .region(courtLocation.getRegionId())
                                                                 .baseLocation(courtLocation.getEpimmsId())
                                                                 .build())
                                               .responseCourtCode(courtLocation.getCourtLocationCode()).build()
-                                      )
-                                      .build());
+                                      ).build());
             }
         }
     }
@@ -205,7 +196,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         if (V_1.equals(callbackParams.getVersion()) && featureToggleService.isCourtLocationDynamicListEnabled()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);
-            updatedCaseData.applicant1DQ(caseData.getApplicant1DQ().toBuilder()
+            updatedCaseData.applicant1DQ(Applicant1DQ.builder()
                                              .applicant1DQRequestedCourt(
                                                  RequestedCourt.builder()
                                                      .responseCourtLocations(

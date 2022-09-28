@@ -548,17 +548,18 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1Copy(defendant1)
                 .respondent1DQ(
                     Respondent1DQ.builder()
-                        .respondent1DQRequestedCourt(
+                        .respondToCourtLocation(
                             RequestedCourt.builder()
                                 .requestHearingAtSpecificCourt(YES)
                                 .responseCourtLocations(preferredCourt)
+                                .reasonForHearingAtSpecificCourt("Reason")
                                 .build()
                         )
                         .build()
                 )
                 .respondent2DQ(
                     Respondent2DQ.builder()
-                        .respondent2DQRequestedCourt(
+                        .respondToCourtLocation2(
                             RequestedCourt.builder()
                                 .requestHearingAtSpecificCourt(YES)
                                 .responseCourtLocations(preferredCourt)
@@ -606,6 +607,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(completePreferredLocation.getEpimmsId());
             sent1.extracting("responseCourtCode")
                 .isEqualTo(completePreferredLocation.getCourtLocationCode());
+            sent1.extracting("requestHearingAtSpecificCourt")
+                .isEqualTo("Yes");
+            sent1.extracting("reasonForHearingAtSpecificCourt")
+                .isEqualTo("Reason");
         }
 
     }
@@ -1163,7 +1168,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToStart {
 
         @Test
-        void populate() {
+        void shouldPopulateCourtLocations() {
             CaseData caseData = CaseData.builder().build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
 
@@ -1179,8 +1184,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            System.out.println(response.getData());
+
             assertThat(response.getData())
-                .extracting("respondent1DQRequestedCourt")
+                .extracting("respondToCourtLocation")
                 .extracting("responseCourtLocations")
                 .extracting("list_items").asList()
                 .extracting("label")

@@ -1194,7 +1194,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldUpdateCaseManagementLocation_whenInvoked(){
+        void shouldUpdateCaseManagementLocation_whenInvoked() {
             when(toggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
