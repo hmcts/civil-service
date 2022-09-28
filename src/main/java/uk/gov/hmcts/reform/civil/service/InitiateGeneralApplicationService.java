@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -98,7 +99,7 @@ public class InitiateGeneralApplicationService {
     }
 
     private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails, String authToken) {
-        String caseType = "";
+        CaseCategory caseType;
 
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
         if (caseData.getGeneralAppEvidenceDocument() != null) {
@@ -118,9 +119,9 @@ public class InitiateGeneralApplicationService {
             applicationBuilder.defendant2PartyName(caseData.getRespondent2().getPartyName());
         }
         if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
-            caseType = "SPEC_CLAIM";
+            caseType = CaseCategory.SPEC_CLAIM;
         } else {
-            caseType = "UNSPEC_CLAIM";
+            caseType = CaseCategory.UNSPEC_CLAIM;
         }
         LocalDateTime deadline = deadlinesCalculator
             .calculateApplicantResponseDeadline(
@@ -159,7 +160,8 @@ public class InitiateGeneralApplicationService {
             .generalAppPBADetails(caseData.getGeneralAppPBADetails())
             .generalAppDateDeadline(deadline)
             .generalAppSubmittedDateGAspec(LocalDateTime.now())
-            .generalAppSuperClaimType(caseType)
+            .generalAppSuperClaimType(caseType.name())
+            .caseAccessCategory(caseType)
             .civilServiceUserRoles(IdamUserDetails.builder().id(userDetails.getId()).email(userDetails.getEmail())
                                        .build())
             .build();
