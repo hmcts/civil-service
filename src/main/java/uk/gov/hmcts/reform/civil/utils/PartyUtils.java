@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.utils;
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -18,6 +17,7 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
+import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 public class PartyUtils {
 
@@ -150,8 +150,9 @@ public class PartyUtils {
     private static Predicate<CaseData> defendantSolicitor2Reference = caseData -> caseData
         .getRespondentSolicitor2Reference() != null;
 
-    public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent) {
-        if (SuperClaimType.SPEC_CLAIM == caseData.getSuperClaimType()) {
+    public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent,
+                                                                      boolean isAccessProfilesEnabled) {
+        if (isSpecCaseCategory(caseData, isAccessProfilesEnabled)) {
             if (caseData.getRespondent1().equals(respondent)) {
                 return Optional.ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())
                     .map(RespondentResponseTypeSpec::translate).orElse(null);
