@@ -325,15 +325,23 @@ public class InitiateGeneralApplicationService {
 
     private Pair<CaseLocation, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
         if (hasSDOBeenMade(caseData.getCcdState())) {
-            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
-                if (INDIVIDUAL.equals(caseData.getApplicant1().getType())
-                        || SOLE_TRADER.equals(caseData.getApplicant1().getType())) {
-                    return Pair.of(getClaimant1PreferredLocation(caseData), false);
-                } else {
+            if (!(MultiPartyScenario.isMultiPartyScenario(caseData))) {
+                if (INDIVIDUAL.equals(caseData.getRespondent1().getType())
+                    || SOLE_TRADER.equals(caseData.getRespondent1().getType())) {
                     return Pair.of(getDefendant1PreferredLocation(caseData), false);
+                } else {
+                    return Pair.of(getClaimant1PreferredLocation(caseData), false);
                 }
             } else {
-                return Pair.of(getClaimant1PreferredLocation(caseData), false);
+                if (INDIVIDUAL.equals(caseData.getRespondent1().getType())
+                    || SOLE_TRADER.equals(caseData.getRespondent1().getType())
+                    || INDIVIDUAL.equals(caseData.getRespondent1().getType())
+                    || SOLE_TRADER.equals(caseData.getRespondent1().getType())) {
+
+                    return Pair.of(getDefendantPreferredLocation(caseData), false);
+                } else {
+                    return Pair.of(getClaimant1PreferredLocation(caseData), false);
+                }
             }
         } else {
             LocationRefData ccmccLocation = locationRefDataService.getCcmccLocation(authToken);
@@ -366,6 +374,12 @@ public class InitiateGeneralApplicationService {
             .build();
     }
 
+    private boolean isDefendant1RespondedFirst(CaseData caseData) {
+        return caseData.getRespondent2ResponseDate() == null
+                || (caseData.getRespondent1ResponseDate() != null
+                && !caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate()));
+    }
+
     private CaseLocation getDefendant1PreferredLocation(CaseData caseData) {
         if (caseData.getRespondent1DQ() == null
                 || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() == null
@@ -379,5 +393,28 @@ public class InitiateGeneralApplicationService {
             .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
                               .getCaseLocation().getBaseLocation())
             .build();
+    }
+
+    private CaseLocation getDefendantPreferredLocation(CaseData caseData) {
+        if (isDefendant1RespondedFirst(caseData) & !(caseData.getRespondent1DQ() == null
+            || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() == null)) {
+
+            return CaseLocation.builder()
+                .region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
+                            .getCaseLocation().getRegion())
+                .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
+                                  .getCaseLocation().getBaseLocation())
+                .build();
+        } else if (!(isDefendant1RespondedFirst(caseData)) || !(caseData.getRespondent2DQ() == null
+            || caseData.getRespondent2DQ().getRespondent2DQRequestedCourt() == null)) {
+            return CaseLocation.builder()
+                .region(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
+                            .getCaseLocation().getRegion())
+                .baseLocation(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
+                                  .getCaseLocation().getBaseLocation())
+                .build();
+        } else {
+            return CaseLocation.builder().build();
+        }
     }
 }
