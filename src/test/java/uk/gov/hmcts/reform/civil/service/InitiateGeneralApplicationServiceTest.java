@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
@@ -91,6 +92,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     public void setUp() throws IOException {
