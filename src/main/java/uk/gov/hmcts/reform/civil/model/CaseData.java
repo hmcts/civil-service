@@ -462,17 +462,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String applicantVRespondentText;
 
     //default judgement SDO fields for disposal
-    private DisposalHearingJudgesRecital disposalHearingJudgesRecitalDJ;
-    private DisposalHearingDisclosureOfDocuments disposalHearingDisclosureOfDocumentsDJ;
-    private DisposalHearingWitnessOfFact disposalHearingWitnessOfFactDJ;
-    private DisposalHearingMedicalEvidence disposalHearingMedicalEvidenceDJ;
-    private DisposalHearingQuestionsToExperts disposalHearingQuestionsToExpertsDJ;
-    private DisposalHearingSchedulesOfLoss disposalHearingSchedulesOfLossDJ;
-    private DisposalHearingStandardDisposalOrder disposalHearingStandardDisposalOrderDJ;
-    private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearingDJ;
+    private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
+    private DisposalHearingDisclosureOfDocumentsDJ disposalHearingDisclosureOfDocumentsDJ;
+    private DisposalHearingWitnessOfFactDJ disposalHearingWitnessOfFactDJ;
+    private DisposalHearingMedicalEvidenceDJ disposalHearingMedicalEvidenceDJ;
+    private DisposalHearingQuestionsToExpertsDJ disposalHearingQuestionsToExpertsDJ;
+    private DisposalHearingSchedulesOfLossDJ disposalHearingSchedulesOfLossDJ;
+    private DisposalHearingStandardDisposalOrderDJ disposalHearingStandardDisposalOrderDJ;
+    private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
-    private DisposalHearingBundle disposalHearingBundleDJ;
-    private DisposalHearingNotes disposalHearingNotesDJ;
+    private DisposalHearingBundleDJ disposalHearingBundleDJ;
+    private DisposalHearingNotesDJ disposalHearingNotesDJ;
     private DisposalHearingHearingNotesDJ disposalHearingHearingNotesDJ;
     private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
     private DisposalHearingMethodDJ disposalHearingMethodDJ;
