@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -42,11 +43,11 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
-import uk.gov.hmcts.reform.civil.model.sdo.*;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -256,12 +257,13 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                   .date(LocalDate.now().plusWeeks(16))
                                                                   .build());
 
-// copy of the above field to update the Hearing time field while not breaking existing cases
+        // copy of the above field to update the Hearing time field while not breaking existing cases
         if (featureToggleService.isHearingAndListingSDOEnabled()) {
-            caseDataBuilder.disposalHearingFinalDisposalHearingTimeDJ(DisposalHearingFinalDisposalHearingTimeDJ.builder()
+            caseDataBuilder.disposalHearingFinalDisposalHearingTimeDJ(DisposalHearingFinalDisposalHearingTimeDJ
+                                                                          .builder()
                                                                           .input("This claim be listed for final "
-                                                                                     + "disposal before a Judge on the first "
-                                                                                     + "available date after")
+                                                                                     + "disposal before a Judge on the "
+                                                                                     + "first available date after")
                                                                           .date(LocalDate.now().plusWeeks(16))
                                                                           .build());
         }
@@ -284,16 +286,17 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
         // copy of disposalHearingNotesDJ field to update order made without hearing field without breaking
         // existing cases
-       if (featureToggleService.isHearingAndListingSDOEnabled()) {
-        caseDataBuilder.disposalHearingOrderMadeWithoutHearingDJ(DisposalHearingOrderMadeWithoutHearingDJ
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            caseDataBuilder.disposalHearingOrderMadeWithoutHearingDJ(DisposalHearingOrderMadeWithoutHearingDJ
                                                    .builder()
-                                                   .input(String.format("This Order has been made without a hearing. Each party "
-                                                              + "has the right to apply to have this Order "
+                                                   .input(String.format("This Order has been made without a hearing. "
+                                                              + "Each party has the right to apply to have this Order "
                                                               + "set aside or varied. Any such application must be "
                                                               + "received by the Court "
                                                               + "(together with the appropriate fee) by 4pm on %s.",
                                                           deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
-                                                              .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))))
+                                                              .format(DateTimeFormatter
+                                                                          .ofLocalizedDate(FormatStyle.LONG))))
                                                    .build());
         }
         // populates the trial screen

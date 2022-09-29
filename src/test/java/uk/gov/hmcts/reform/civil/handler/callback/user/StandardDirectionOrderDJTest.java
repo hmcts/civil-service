@@ -35,7 +35,6 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
@@ -116,11 +115,12 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     class MidEventPrePopulateDisposalHearingPageCallback {
 
         private static final String PAGE_ID = "trial-disposal-screen";
-        private final LocalDate DATE = LocalDate.of(2022, 3, 29);
+        private final LocalDate date = LocalDate.of(2022, 3, 29);
+
         @BeforeEach
         void setup() {
             when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
-            when(deadlinesCalculator.plusWorkingDays(any(),anyInt())).thenReturn(DATE);
+            when(deadlinesCalculator.plusWorkingDays(any(), anyInt())).thenReturn(date);
         }
 
         @Test
@@ -406,7 +406,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                              + "set aside or varied. Any such application must be "
                                              + "received by the Court "
                                              + "(together with the appropriate fee) by 4pm on %s.",
-                                         DATE.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))));
+                                         date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))));
 
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingTimeDJ").extracting("input")
                 .isEqualTo("This claim be listed for final "
@@ -429,7 +429,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNotPopulateOrderMadeWithoutHearingWithHNLSDODisabled() {
+        void shouldNotPopulateOrderMadeWithoutHearingWhenHnlSdoDisabled() {
             when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
