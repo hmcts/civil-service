@@ -31,7 +31,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -56,11 +55,9 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(V_1, ABOUT_TO_START), this::populateRespondent1Copy,
+            callbackKey(ABOUT_TO_START), this::populateRespondent1Copy,
             callbackKey(MID, "confirm-details"), this::validateDateOfBirth,
             callbackKey(ABOUT_TO_SUBMIT), this::setNewResponseDeadline,
-            callbackKey(V_1, ABOUT_TO_SUBMIT), this::setNewResponseDeadlineV1,
             callbackKey(SUBMITTED), this::buildConfirmation,
             callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress
         );
@@ -112,26 +109,6 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
     }
 
     private CallbackResponse setNewResponseDeadline(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
-        LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
-
-        CaseData caseDataUpdated = caseData.toBuilder()
-            .respondent1AcknowledgeNotificationDate(time.now())
-            .respondent1ResponseDeadline(newResponseDate)
-            .businessProcess(BusinessProcess.ready(ACKNOWLEDGEMENT_OF_SERVICE))
-            .specRespondentCorrespondenceAddressRequired(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())
-            .specRespondentCorrespondenceAddressdetails(caseData.getSpecAoSApplicantCorrespondenceAddressdetails())
-            .respondentSolicitor1ServiceAddressRequired(caseData.getSpecAoSRespondentCorrespondenceAddressRequired())
-            .respondentSolicitor1ServiceAddress(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
-            .build();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataUpdated.toMap(objectMapper))
-            .build();
-    }
-
-    private CallbackResponse setNewResponseDeadlineV1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
         LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);

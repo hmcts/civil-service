@@ -39,6 +39,11 @@ public class DeadlinesCalculator {
         return calculateFirstWorkingDay(notificationDeadline).atTime(END_OF_BUSINESS_DAY);
     }
 
+    public LocalDateTime plus14DaysDeadline(LocalDateTime startDate) {
+        LocalDate notificationDeadline = startDate.plusDays(14).toLocalDate();
+        return calculateFirstWorkingDay(notificationDeadline).atTime(END_OF_BUSINESS_DAY);
+    }
+
     public LocalDateTime calculateApplicantResponseDeadline(LocalDateTime responseDate, AllocatedTrack track) {
         LocalDateTime dateTime = responseDate;
         if (is4pmOrAfter(responseDate)) {

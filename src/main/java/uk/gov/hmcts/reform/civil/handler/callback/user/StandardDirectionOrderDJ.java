@@ -18,6 +18,16 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingMedicalEvidenceDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingNotesDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingQuestionsToExpertsDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingSchedulesOfLossDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingStandardDisposalOrderDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingWitnessOfFactDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
@@ -165,14 +175,14 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.disposalHearingMethodInPersonDJ(locationsList);
         //populates the disposal screen
         caseDataBuilder
-            .disposalHearingJudgesRecitalDJ(DisposalHearingJudgesRecital
+            .disposalHearingJudgesRecitalDJ(DisposalHearingJudgesRecitalDJ
                                                            .builder()
                                                            .input("Upon considering the claim Form and "
                                                                       + "Particulars of Claim/statements of case"
                                                                       + " [and the directions questionnaires] "
                                                                       + "\n\nIT IS ORDERED that:-").build());
         caseDataBuilder
-            .disposalHearingDisclosureOfDocumentsDJ(DisposalHearingDisclosureOfDocuments
+            .disposalHearingDisclosureOfDocumentsDJ(DisposalHearingDisclosureOfDocumentsDJ
                                                                    .builder()
                                                                    .input("The parties shall serve on each other "
                                                                               + "copies of the documents upon which "
@@ -183,7 +193,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                         .build());
 
         caseDataBuilder
-            .disposalHearingWitnessOfFactDJ(DisposalHearingWitnessOfFact
+            .disposalHearingWitnessOfFactDJ(DisposalHearingWitnessOfFactDJ
                                                 .builder()
                                                 .input1("The claimant shall serve on every other party the witness "
                                                             + "statements of all witnesses of fact"
@@ -200,7 +210,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                             + " for a disposal hearing")
                                                 .build());
 
-        caseDataBuilder.disposalHearingMedicalEvidenceDJ(DisposalHearingMedicalEvidence
+        caseDataBuilder.disposalHearingMedicalEvidenceDJ(DisposalHearingMedicalEvidenceDJ
                                                              .builder()
                                                              .input1("The claimant has permission to rely upon the"
                                                                          + " written expert evidence served with the"
@@ -213,12 +223,12 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                              .date2(LocalDate.now().plusWeeks(4))
                                                              .build());
 
-        caseDataBuilder.disposalHearingQuestionsToExpertsDJ(DisposalHearingQuestionsToExperts
+        caseDataBuilder.disposalHearingQuestionsToExpertsDJ(DisposalHearingQuestionsToExpertsDJ
                                                                 .builder()
                                                                 .date(LocalDate.now().plusWeeks(6))
                                                                 .build());
 
-        caseDataBuilder.disposalHearingSchedulesOfLossDJ(DisposalHearingSchedulesOfLoss
+        caseDataBuilder.disposalHearingSchedulesOfLossDJ(DisposalHearingSchedulesOfLossDJ
                                                              .builder()
                                                              .input1("If there is a claim for ongoing/future loss "
                                                                          + "in the original schedule of losses then"
@@ -233,12 +243,12 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                              .date2(LocalDate.now().plusWeeks(12))
                                                              .build());
 
-        caseDataBuilder.disposalHearingStandardDisposalOrderDJ(DisposalHearingStandardDisposalOrder
+        caseDataBuilder.disposalHearingStandardDisposalOrderDJ(DisposalHearingStandardDisposalOrderDJ
                                                                    .builder()
                                                                    .input("input")
                                                                    .build());
 
-        caseDataBuilder.disposalHearingFinalDisposalHearingDJ(DisposalHearingFinalDisposalHearing
+        caseDataBuilder.disposalHearingFinalDisposalHearingDJ(DisposalHearingFinalDisposalHearingDJ
                                                                   .builder()
                                                                   .input("This claim be listed for final "
                                                                              + "disposal before a Judge on the first "
@@ -256,13 +266,13 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                           .build());
         }
 
-        caseDataBuilder.disposalHearingBundleDJ(DisposalHearingBundle
+        caseDataBuilder.disposalHearingBundleDJ(DisposalHearingBundleDJ
                                                     .builder()
                                                     .input("The claimant must lodge at court at least 7 "
                                                                + "days before the disposal")
                                                     .build());
 
-        caseDataBuilder.disposalHearingNotesDJ(DisposalHearingNotes
+        caseDataBuilder.disposalHearingNotesDJ(DisposalHearingNotesDJ
                                                  .builder()
                                                  .input("This Order has been made without a hearing. Each party "
                                                             + "has the right to apply to have this Order"
@@ -511,9 +521,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
+        var state = "CASE_PROGRESSION";
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
+            .state(state)
             .build();
     }
 

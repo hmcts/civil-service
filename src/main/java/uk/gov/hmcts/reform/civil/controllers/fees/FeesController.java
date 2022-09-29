@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
     path = "/fees",
     produces = MediaType.APPLICATION_JSON_VALUE
 )
+
 public class FeesController {
 
     private final FeesService feesService;
