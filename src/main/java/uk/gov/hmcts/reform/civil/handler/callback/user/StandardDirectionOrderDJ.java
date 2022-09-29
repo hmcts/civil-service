@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -31,20 +32,15 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgesRecital;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.*;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +65,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     private final LocationRefDataService locationRefDataService;
+    private final FeatureToggleService featureToggleService;
     String participantString;
     public static final String DISPOSAL_HEARING = "DISPOSAL_HEARING";
     public static final String ORDER_1_CLAI = "The directions order has been sent to: "
@@ -76,6 +73,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public static final String ORDER_1_DEF = "%n%n ## Defendant 1 %n%n %s";
     public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
+
+    @Autowired
+    private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -246,6 +246,16 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                   .date(LocalDate.now().plusWeeks(16))
                                                                   .build());
 
+// copy of the above field to update the Hearing time field while not breaking existing cases
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            caseDataBuilder.disposalHearingFinalDisposalHearingTimeDJ(DisposalHearingFinalDisposalHearingTimeDJ.builder()
+                                                                          .input("This claim be listed for final "
+                                                                                     + "disposal before a Judge on the first "
+                                                                                     + "available date after")
+                                                                          .date(LocalDate.now().plusWeeks(16))
+                                                                          .build());
+        }
+
         caseDataBuilder.disposalHearingBundleDJ(DisposalHearingBundle
                                                     .builder()
                                                     .input("The claimant must lodge at court at least 7 "
@@ -262,6 +272,20 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                  .date(LocalDate.now().plusWeeks(1))
                                                  .build());
 
+        // copy of disposalHearingNotesDJ field to update order made without hearing field without breaking
+        // existing cases
+       if (featureToggleService.isHearingAndListingSDOEnabled()) {
+        caseDataBuilder.disposalHearingOrderMadeWithoutHearingDJ(DisposalHearingOrderMadeWithoutHearingDJ
+                                                   .builder()
+                                                   .input(String.format("This Order has been made without a hearing. Each party "
+                                                              + "has the right to apply to have this Order "
+                                                              + "set aside or varied. Any such application must be "
+                                                              + "received by the Court "
+                                                              + "(together with the appropriate fee) by 4pm on %s.",
+                                                          deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
+                                                              .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))))
+                                                   .build());
+        }
         // populates the trial screen
         caseDataBuilder
             .trialHearingJudgesRecitalDJ(TrialHearingJudgesRecital
