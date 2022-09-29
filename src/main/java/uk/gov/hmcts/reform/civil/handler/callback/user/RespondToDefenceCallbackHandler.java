@@ -191,7 +191,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         LocalDateTime currentTime = time.now();
 
         CaseData.CaseDataBuilder builder = caseData.toBuilder()
@@ -213,6 +212,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                           + " is " + builder.build().getCaseManagementLocation());
         }
 
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         if (multiPartyScenario == TWO_V_ONE) {
             builder.applicant2ResponseDate(currentTime);
         }
