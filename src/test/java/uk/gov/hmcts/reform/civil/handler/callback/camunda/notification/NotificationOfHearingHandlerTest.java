@@ -55,7 +55,7 @@ public class NotificationOfHearingHandlerTest {
     @MockBean
     private FeesService feesService;
     @MockBean
-    private HearingNotificationEmailConfiguration defaultJudgmentSpecEmailConfiguration;
+    private HearingNotificationEmailConfiguration hearingNotificationEmailConfiguration;
 
     @Nested
     class AboutToSubmitCallback {
@@ -64,28 +64,16 @@ public class NotificationOfHearingHandlerTest {
         void setup() {
             when(notificationsProperties.getNotificationOfHearing())
                 .thenReturn("test-template-received-id");
-            when(defaultJudgmentSpecEmailConfiguration.getReceiver())
+            when(hearingNotificationEmailConfiguration.getReceiver())
                 .thenReturn("caseworker@hmcts.net");
 
         }
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedAnd1v1() {
-            when(interestCalculator.calculateInterest(any()))
-                .thenReturn(BigDecimal.valueOf(100)
-                );
-            when(feesService.getFeeDataByTotalClaimAmount(any()))
-                .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
             //send Received email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .addRespondent2(YesOrNo.NO)
-                .totalClaimAmount(new BigDecimal(1000))
-                .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
-                .paymentConfirmationDecisionSpec(YesOrNo.YES)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -150,6 +138,6 @@ public class NotificationOfHearingHandlerTest {
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest
                                                                                          .builder().eventId(
-                "NOTIFY_CASEWORKER_DJ_RECEIVED").build()).build())).isEqualTo(TASK_ID);
+                "NOTIFY_CLAIMANT_HEARING").build()).build())).isEqualTo(TASK_ID);
     }
 }

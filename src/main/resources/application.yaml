@@ -178,10 +178,9 @@ notifications:
   standardDirectionOrderDJTemplate: "1518a883-d035-46c8-9dc0-a52538ca4545"
   interimJudgmentRequestedDefendant: "d9e33565-ecdc-4475-a77b-e50cd4c07b61"
   interimJudgmentApprovalDefendant: "2e98fa16-ba9e-4229-b99f-fc72d40303f8"
-  hearingListedFeeClaimantLegalRep: "7a1d9e5b-4b1d-4765-b5de-d191d6c91a11"
-  hearingListedNoFeeClaimantLegalRep: "7a1d9e5b-4b1d-4765-b5de-d191d6c91a11"
-  hearingListedNoFeeDefendantLegalRep: "7a1d9e5b-4b1d-4765-b5de-d191d6c91a11"
-  hearingListedFeeClaimantLip: "7a1d9e5b-4b1d-4765-b5de-d191d6c91a11"
+  hearingListedFeeClaimantLegalRep: "193b245b-63fd-4a02-93b6-1acfb6e99fe5"
+  hearingListedNoFeeClaimantLegalRep: "03763ce1-de17-4a9a-b1c6-d2e9ccffe9d7"
+  hearingListedNoFeeDefendantLegalRep: "81216268-36e6-4e0e-b510-24067ad32f24"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}

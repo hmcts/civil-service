@@ -36,7 +36,7 @@ public class NotificationOfHearingHandler extends CallbackHandler implements Not
     private final HearingNotificationEmailConfiguration hearingNotificationEmailConfiguration;
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_HEARING);
     private static final String REFERENCE_TEMPLATE_CASEWORKER = "default-judgment-caseworker-received-notification-%s";
-    public static final String TASK_ID = "NotifyCaseworkerDJReceived";
+    public static final String TASK_ID = "NotifyClaimantHearing";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -70,65 +70,9 @@ public class NotificationOfHearingHandler extends CallbackHandler implements Not
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
-        final BigDecimal amountClaimed = getAmountClaimed(caseData);
-        final BigDecimal amountOfCosts =  getAmountOfCosts(caseData);
-        final BigDecimal partialPayment = getPartialPayment(caseData);
-        final BigDecimal total = amountClaimed.add(amountOfCosts).subtract(partialPayment);
         return new HashMap<>(Map.of(
             CLAIM_NUMBER, caseData.getLegacyCaseReference()
         ));
-    }
-
-    private String getPaymentTypeField(CaseData caseData, BigDecimal total) {
-        switch (caseData.getPaymentTypeSelection()) {
-            case IMMEDIATELY:
-                return "Immediately £" + total;
-            case SET_DATE:
-                return "In full by " + caseData.getPaymentSetDate();
-            case REPAYMENT_PLAN:
-                return "By installments of £" + getRepaymentAmount(caseData)
-                    + " per " + getRepaymentFrequency(caseData);
-            default:
-                return "No payment type selected";
-        }
-    }
-
-    private BigDecimal getAmountClaimed(CaseData caseData) {
-        BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        return caseData.getTotalClaimAmount().add(interest);
-    }
-
-    private BigDecimal getAmountOfCosts(CaseData caseData) {
-        var claimFee = feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount());
-        var claimFeePounds = MonetaryConversions.penniesToPounds(claimFee.getCalculatedAmountInPence());
-        var subTotal = claimFeePounds;
-        return subTotal;
-    }
-
-    private BigDecimal getPartialPayment(CaseData caseData) {
-        if (caseData.getPartialPayment() == YesOrNo.YES) {
-            var partialPaymentPennies = new BigDecimal(caseData.getPartialPaymentAmount());
-            return MonetaryConversions.penniesToPounds(partialPaymentPennies);
-        }
-        return BigDecimal.ZERO;
-    }
-
-    private BigDecimal getRepaymentAmount(CaseData caseData) {
-        var repaymentAmountInPennies = new BigDecimal(caseData.getRepaymentSuggestion());
-        return MonetaryConversions.penniesToPounds(repaymentAmountInPennies);
-    }
-
-    private String getRepaymentFrequency(CaseData caseData) {
-        switch (caseData.getRepaymentFrequency()) {
-            case ONCE_ONE_WEEK:
-                return "week";
-            case ONCE_TWO_WEEKS:
-                return "two weeks";
-            case ONCE_ONE_MONTH:
-                return "month";
-            default:
-                return "";
-        }
     }
 
 }
