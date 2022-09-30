@@ -101,6 +101,13 @@ public class LocationRefDataService {
         return builder.buildAndExpand(new HashMap<>()).toUri();
     }
 
+    private URI buildURIforCcmcc() {
+        String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
+            .queryParam("court_venue_name", "County Court Money Claims Centre");
+        return builder.buildAndExpand(new HashMap<>()).toUri();
+    }
+
     private URI buildURIForDefaultJudgments() {
         String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
