@@ -51,7 +51,7 @@ public class RaisingClaimAgainstLitigantInPersonForSpecNotificationHandler exten
 
     @Override
     public List<CaseEvent> handledEvents() {
-        if (toggleService.isLrSpecEnabled()) {
+        if (toggleService.isLrSpecEnabled()){
             return EVENTS;
         } else {
             return Collections.emptyList();

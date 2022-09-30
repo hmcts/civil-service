@@ -91,6 +91,7 @@ public class PartyUtils {
     }
 
     public static String buildPartiesReferences(CaseData caseData) {
+        // one of the references are missing for some reason.
         SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
         StringBuilder stringBuilder = new StringBuilder();
         boolean hasRespondent2Reference = defendantSolicitor2Reference.test(caseData);
