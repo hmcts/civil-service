@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.helpers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -25,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 
 @Slf4j
+@Component
 public class LocationHelper {
 
     private final BigDecimal ccmccAmount;
@@ -39,7 +41,6 @@ public class LocationHelper {
         this.ccmccRegionId = ccmccRegionId;
         this.ccmccEpimsId = ccmccEpimsId;
     }
-
 
     /**
      * If the defendant is individual or sole trader, their preferred court is the case's court.
@@ -99,13 +100,23 @@ public class LocationHelper {
             });
         }
 
+        Optional<RequestedCourt> byParties = prioritized.stream().findFirst();
         if ((caseData.getSuperClaimType() == SPEC_CLAIM
             && ccmccAmount.compareTo(caseData.getTotalClaimAmount()) > 0)
             || (caseData.getSuperClaimType() == UNSPEC_CLAIM
-            && ccmccAmount.compareTo(caseData.getClaimValue().toPounds()) > 0)){
-            // TODO use ccmcc as CaseLocation
+            && ccmccAmount.compareTo(caseData.getClaimValue().toPounds()) > 0)) {
+            return Optional.of(byParties.map(requestedCourt -> requestedCourt.toBuilder()
+                    .caseLocation(getCcmccCaseLocation()).build())
+                                   .orElseGet(() -> RequestedCourt.builder()
+                                       .caseLocation(getCcmccCaseLocation())
+                                       .build()));
+        } else {
+            return byParties;
         }
-        return prioritized.stream().findFirst();
+    }
+
+    private CaseLocation getCcmccCaseLocation() {
+        return CaseLocation.builder().baseLocation(ccmccEpimsId).region(ccmccRegionId).build();
     }
 
     /**

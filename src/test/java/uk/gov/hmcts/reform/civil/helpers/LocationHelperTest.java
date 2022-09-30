@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
@@ -13,12 +14,17 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 public class LocationHelperTest {
 
-    private final LocationHelper helper = new LocationHelper(ccmccAmount, ccmccRegionId, ccmccEpimsId);
+    private static final BigDecimal CCMCC_AMOUNT = BigDecimal.valueOf(1000);
+    private static final String CCMCC_REGION_ID = "ccmccRegionId";
+    private static final String CCMCC_EPIMS = "ccmccEpims";
+    private final LocationHelper helper = new LocationHelper(
+        CCMCC_AMOUNT, CCMCC_REGION_ID, CCMCC_EPIMS);
 
     @Test
     public void thereIsAMatchingLocation() {
@@ -46,6 +52,7 @@ public class LocationHelperTest {
     public void whenSpecDefendantIsPerson_courtIsDefendants() {
         CaseData caseData = CaseData.builder()
             .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .totalClaimAmount(BigDecimal.valueOf(10000))
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
                             .build())
@@ -80,6 +87,9 @@ public class LocationHelperTest {
     public void whenDefendantIsPerson_courtIsDefendants() {
         CaseData caseData = CaseData.builder()
             .superClaimType(SuperClaimType.UNSPEC_CLAIM)
+            .claimValue(ClaimValue.builder()
+                            .statementOfValueInPennies(BigDecimal.valueOf(10000_00))
+                            .build())
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
                             .build())
@@ -109,6 +119,7 @@ public class LocationHelperTest {
     public void whenSpecDefendantIsGroup_courtIsClaimants() {
         CaseData caseData = CaseData.builder()
             .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .totalClaimAmount(BigDecimal.valueOf(10000))
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
                             .build())
@@ -144,6 +155,9 @@ public class LocationHelperTest {
     public void whenDefendantIsGroup_courtIsClaimants() {
         CaseData caseData = CaseData.builder()
             .superClaimType(SuperClaimType.UNSPEC_CLAIM)
+            .claimValue(ClaimValue.builder()
+                            .statementOfValueInPennies(BigDecimal.valueOf(10000_00))
+                            .build())
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
                             .build())
