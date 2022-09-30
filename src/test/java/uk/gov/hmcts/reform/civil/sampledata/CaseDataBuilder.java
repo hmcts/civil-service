@@ -244,6 +244,7 @@ public class CaseDataBuilder {
     protected LocalDateTime takenOfflineByStaffDate;
     protected LocalDateTime claimDismissedDate;
     protected LocalDateTime caseDismissedHearingFeeDueDate;
+    protected LocalDate hearingDate;
     private InterestClaimOptions interestClaimOptions;
     private YesOrNo claimInterest;
     private SameRateInterestSelection sameRateInterestSelection;
@@ -915,6 +916,8 @@ public class CaseDataBuilder {
         atStateHearingFeeDueUnpaid();
         ccdState = CASE_DISMISSED;
         caseDismissedHearingFeeDueDate = hearingDueDate.plusDays(1).atTime(LocalTime.now());
+        //Not yet present in Case Data Builder, but present here.
+        hearingDate = hearingDueDate.plusWeeks(2);
         return this;
     }
 
@@ -3297,6 +3300,7 @@ public class CaseDataBuilder {
             .selectLitigationFriend(selectLitigationFriend)
             .caseNotes(caseNotes)
             .hearingDueDate(hearingDueDate)
+            .hearingDate(hearingDate)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)
             .superClaimType(superClaimType == null ? UNSPEC_CLAIM : superClaimType)
