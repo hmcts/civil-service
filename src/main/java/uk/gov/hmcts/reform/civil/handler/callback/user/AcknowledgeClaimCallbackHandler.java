@@ -167,7 +167,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime respondent1ResponseDeadline = caseData.getRespondent1ResponseDeadline();
         LocalDateTime respondent2ResponseDeadline = caseData.getRespondent2ResponseDeadline();
-        LocalDateTime newDeadlineRespondent1 = deadlinesCalculator.plus14DaysDeadline(respondent1ResponseDeadline);
+        LocalDateTime newDeadlineRespondent1 = deadlinesCalculator.plus28DaysDeadlineh(respondent1ResponseDeadline);
         LocalDateTime newDeadlineRespondent2 = null;
 
         var updatedRespondent1 = caseData.getRespondent1().toBuilder()
@@ -178,7 +178,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         var respondent1Check = YES;
         if (solicitorRepresentsOnlyOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
             respondent1Check = NO;
-            newDeadlineRespondent2 = deadlinesCalculator.plus14DaysDeadline(respondent2ResponseDeadline);
+            newDeadlineRespondent2 = deadlinesCalculator.plus28DaysDeadlineh(respondent2ResponseDeadline);
         }
 
         /* for 1v1 */
