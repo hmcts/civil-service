@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -48,6 +49,9 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
     private final CivilDocumentStitchingService civilDocumentStitchingService;
     private final LitigantInPersonFormGenerator litigantInPersonFormGenerator;
     private final FeatureToggleService toggleService;
+
+    @Value("${stitching.enabled}")
+    private boolean stitchEnabled;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -109,6 +113,26 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         documentMetaDataList.add(new DocumentMetaData(caseDocument.getDocumentLink(),
                                                       "Sealed Claim form",
                                                       LocalDate.now().toString()));
+
+        //LiP Claim form guidance needs be sent as the 2nd doc to go on the back of the claim form
+        if (toggleService.isNoticeOfChangeEnabled() && stitchEnabled) {
+            if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())
+                || YesOrNo.NO.equals(caseData.getSpecRespondent2Represented())) {
+
+                CaseDocument lipForm = litigantInPersonFormGenerator.generate(
+                    caseDataBuilder.build(),
+                    callbackParams.getParams().get(BEARER_TOKEN).toString()
+                );
+
+                documentMetaDataList.add(new DocumentMetaData(
+                    lipForm.getDocumentLink(),
+                    "Litigant in person claim form",
+                    LocalDate.now().toString()
+                ));
+
+            }
+        }
+
         if (caseData.getSpecClaimTemplateDocumentFiles() != null) {
             documentMetaDataList.add(new DocumentMetaData(
                 caseData.getSpecClaimTemplateDocumentFiles(),
@@ -124,21 +148,6 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
             ));
         }
 
-        if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())
-            || YesOrNo.NO.equals(caseData.getSpecRespondent2Represented())) {
-
-            CaseDocument lipForm = litigantInPersonFormGenerator.generate(
-                caseDataBuilder.build(),
-                callbackParams.getParams().get(BEARER_TOKEN).toString()
-            );
-
-            documentMetaDataList.add(new DocumentMetaData(
-                lipForm.getDocumentLink(),
-                "Litigant in person claim form",
-                LocalDate.now().toString()
-            ));
-
-        }
         return documentMetaDataList;
     }
 }
