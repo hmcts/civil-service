@@ -37,7 +37,6 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
     private final Time time;
-
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
@@ -75,5 +74,4 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             .build();
         return updatedData;
     }
-
 }
