@@ -256,21 +256,26 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
             //trialHearingWitnessOfFactDJ
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input1")
-                .isEqualTo("Each party must upload to the Digital Portal"
-                               + " copies of the statements of all witnesses of fact on whom they intend to rely.");
-            assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input2")
-                .isEqualTo("All statements to be no more than");
+                .isEqualTo("Each party must upload to the Digital Portal copies of the "
+                               + "statements of all witnesses of fact on whom they "
+                               + "intend to rely.");
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input4")
-                .isEqualTo("pages long, A4, double spaced and in font size 12.");
+                .isEqualTo("For this limitation, a party is counted as witness.");
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input5")
-                .isEqualTo("Witness statements shall be uploaded to the Digital Portal by 4pm on");
+                .isEqualTo("Each witness statement should be no more than");
+            assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input7")
+                .isEqualTo("A4 pages. Statements should be double spaced "
+                               + "using a font size of 12.");
+            assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input8")
+                .isEqualTo("Witness statements shall be uploaded to the "
+                               + "Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(8).toString());
-            assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input6")
+            assertThat(response.getData()).extracting("trialHearingWitnessOfFactDJ").extracting("input9")
                 .isEqualTo("Oral evidence will only be permitted at trial with permission from the Court "
                                + "from witnesses whose statements have not been uploaded to the Digital "
                                + "Portal in accordance with this order, or whose statements that "
-                               + "have been served late.");
+                               + "have been served late");
 
             //trialHearingSchedulesOfLossDJ
             assertThat(response.getData()).extracting("trialHearingSchedulesOfLossDJ").extracting("input1")

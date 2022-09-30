@@ -313,16 +313,18 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                              .input1("Each party must upload to the Digital Portal copies of the "
                                                          + "statements of all witnesses of fact on whom they "
                                                          + "intend to rely.")
-                                             .input2("All statements to be no more than")
-                                             .input4("pages long, A4, double spaced and in font size 12.")
-                                             .input5("Witness statements shall be uploaded to the Digital Portal"
-                                                         + " by 4pm on")
+                                             .input4("For this limitation, a party is counted as witness.")
+                                             .input5("Each witness statement should be no more than")
+                                             .input7("A4 pages. Statements should be double spaced "
+                                                         + "using a font size of 12.")
+                                             .input8("Witness statements shall be uploaded to the "
+                                                         + "Digital Portal by 4pm on")
                                              .date1(LocalDate.now().plusWeeks(8))
-                                             .input6("Oral evidence will only be permitted at trial with permission "
+                                             .input9("Oral evidence will only be permitted at trial with permission "
                                                          + "from the Court from witnesses whose statements have not"
                                                          + " been uploaded to the Digital Portal in accordance with "
                                                          + "this order, or whose statements that have"
-                                                         + " been served late.")
+                                                         + " been served late")
                                              .build());
 
         caseDataBuilder
