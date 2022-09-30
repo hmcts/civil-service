@@ -151,6 +151,7 @@ public class CaseDataBuilder {
     protected CaseState ccdState;
     protected List<Element<CaseDocument>> systemGeneratedCaseDocuments;
     protected PaymentDetails claimIssuedPaymentDetails;
+    protected PaymentDetails hearingFeePaymentDetails;
     protected CorrectEmail applicantSolicitor1CheckEmail;
     protected IdamUserDetails applicantSolicitor1UserDetails;
     //Deadline extension
@@ -3073,6 +3074,15 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder receiveUpdatePaymentRequest() {
+        atStateRespondentFullDefence();
+        this.hearingFeePaymentDetails = PaymentDetails.builder()
+            .customerReference("RC-1604-0739-2145-4711")
+        .build();
+
+        return this;
+    }
+
     public CaseDataBuilder atSpecAoSApplicantCorrespondenceAddressRequired(
         YesOrNo specAoSApplicantCorrespondenceAddressRequired) {
         this.specAoSApplicantCorrespondenceAddressRequired = specAoSApplicantCorrespondenceAddressRequired;
@@ -3251,6 +3261,8 @@ public class CaseDataBuilder {
             .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
             .respondToAdmittedClaim(respondToClaim)
             .responseClaimAdmitPartEmployer(responseClaimAdmitPartEmployer)
+            //case progression
+            .hearingFeePaymentDetails(hearingFeePaymentDetails)
             //workaround fields
             .respondent1Copy(respondent1Copy)
             .respondent2Copy(respondent2Copy)
