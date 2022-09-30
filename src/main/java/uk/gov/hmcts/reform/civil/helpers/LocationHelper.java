@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.helpers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -20,9 +22,24 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 
 @Slf4j
 public class LocationHelper {
+
+    private final BigDecimal ccmccAmount;
+    private final String ccmccRegionId;
+    private final String ccmccEpimsId;
+
+    public LocationHelper(
+        @Value("${genApp.lrd.ccmcc.amountPounds}") BigDecimal ccmccAmount,
+        @Value("${genApp.lrd.ccmcc.epimsId}") String ccmccRegionId,
+        @Value("${genApp.lrd.ccmcc.regionId}") String ccmccEpimsId) {
+        this.ccmccAmount = ccmccAmount;
+        this.ccmccRegionId = ccmccRegionId;
+        this.ccmccEpimsId = ccmccEpimsId;
+    }
+
 
     /**
      * If the defendant is individual or sole trader, their preferred court is the case's court.
@@ -82,6 +99,12 @@ public class LocationHelper {
             });
         }
 
+        if ((caseData.getSuperClaimType() == SPEC_CLAIM
+            && ccmccAmount.compareTo(caseData.getTotalClaimAmount()) > 0)
+            || (caseData.getSuperClaimType() == UNSPEC_CLAIM
+            && ccmccAmount.compareTo(caseData.getClaimValue().toPounds()) > 0)){
+            // TODO use ccmcc as CaseLocation
+        }
         return prioritized.stream().findFirst();
     }
 

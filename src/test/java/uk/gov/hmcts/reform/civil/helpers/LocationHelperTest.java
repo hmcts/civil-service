@@ -18,7 +18,7 @@ import java.util.Optional;
 
 public class LocationHelperTest {
 
-    private final LocationHelper helper = new LocationHelper();
+    private final LocationHelper helper = new LocationHelper(ccmccAmount, ccmccRegionId, ccmccEpimsId);
 
     @Test
     public void thereIsAMatchingLocation() {
