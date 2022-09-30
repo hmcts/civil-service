@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
@@ -123,12 +125,17 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPrePopulateDJDisposalAndTrialHearingPage() {
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
+                              .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
+                              .epimmsId("123").build());
+            locations.add(LocationRefData.builder().siteName("Loc").courtAddress("1").postcode("1")
+                              .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
+                              .epimmsId("123").build());
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearing().build();
-            List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().courtName("Court Name").region("Region").build());
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -478,10 +485,51 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         @Test
         void shouldFinishBusinessProcess() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
+        }
+
+        @Test
+        void shouldReturnCaseManagementListFromTrialHearing() {
+            List<DynamicListElement> temporaryLocationList = List.of(
+                DynamicListElement.builder().label("Loc 1").build());
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
+                .toBuilder().trialHearingMethodInPersonDJ(DynamicList.builder().listItems(temporaryLocationList)
+                                                              .value(DynamicListElement.builder().label("Loc - 1 - 1")
+                                                                         .build()).build()).build();
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().siteName("Loc").courtAddress("1").postcode("1")
+                              .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
+                              .epimmsId("123").build());
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("caseManagementLocation").extracting("region")
+                .isEqualTo(locations.get(0).getRegionId());
+            assertThat(response.getData()).extracting("caseManagementLocation").extracting("baseLocation")
+                .isEqualTo(locations.get(0).getEpimmsId());
+        }
+
+        @Test
+        void shouldReturnCaseManagementListFromDisposalHearing() {
+            List<DynamicListElement> temporaryLocationList = List.of(
+                DynamicListElement.builder().label("Loc 1").build());
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
+                .toBuilder().disposalHearingMethodInPersonDJ(DynamicList.builder().listItems(temporaryLocationList)
+                                                              .value(DynamicListElement.builder().label("Loc - 1 - 1")
+                                                                         .build()).build()).build();
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().siteName("Loc").courtAddress("1").postcode("1")
+                              .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
+                              .epimmsId("123").build());
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("caseManagementLocation").extracting("region")
+                .isEqualTo(locations.get(0).getRegionId());
+            assertThat(response.getData()).extracting("caseManagementLocation").extracting("baseLocation")
+                .isEqualTo(locations.get(0).getEpimmsId());
         }
     }
 

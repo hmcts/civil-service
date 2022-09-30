@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
@@ -49,10 +50,12 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -507,6 +510,18 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
         var state = "CASE_PROGRESSION";
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        List<LocationRefData> locations = (locationRefDataService
+            .getCourtLocationsForDefaultJudgments(authToken));
+        LocationRefData location = null;
+        if (nonNull(locations)) {
+            location = fillPreferredLocationData(locations, getLocationListFromCaseData(
+                caseData.getDisposalHearingMethodInPersonDJ(), caseData.getTrialHearingMethodInPersonDJ()));
+        }
+        if (Objects.nonNull(location)) {
+            caseDataBuilder.caseManagementLocation(CaseLocation.builder().region(location.getRegionId()).baseLocation(
+                    location.getEpimmsId()).build());
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -573,6 +588,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                             .map(location -> location.getSiteName()
                                 + " - " + location.getCourtAddress()
                                 + " - " + location.getPostcode())
+                            .sorted()
                             .collect(Collectors.toList()));
     }
 
@@ -583,4 +599,34 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         return DynamicList.builder().value(list.getValue()).build();
     }
 
+    private LocationRefData fillPreferredLocationData(final List<LocationRefData> locations,
+                                                      DynamicList caseDataList) {
+        if (Objects.isNull(caseDataList) || Objects.isNull(locations)) {
+            return null;
+        }
+        String locationLabel = caseDataList.getValue().getLabel();
+        var preferredLocation =
+            locations
+                .stream()
+                .filter(locationRefData -> checkLocation(locationRefData,
+                                                         locationLabel)).findFirst();
+        return preferredLocation.orElse(null);
+    }
+
+    private Boolean checkLocation(final LocationRefData location, String locationTempLabel) {
+        String locationLabel = location.getSiteName()
+            + " - " + location.getCourtAddress()
+            + " - " + location.getPostcode();
+        return locationLabel.equals(locationTempLabel);
+    }
+
+    private DynamicList getLocationListFromCaseData(DynamicList hearingList, DynamicList trialList) {
+        if (nonNull(hearingList) && nonNull(hearingList.getValue())) {
+            return hearingList;
+        } else if (nonNull(trialList) && nonNull(trialList.getValue())) {
+            return trialList;
+        } else {
+            return null;
+        }
+    }
 }
