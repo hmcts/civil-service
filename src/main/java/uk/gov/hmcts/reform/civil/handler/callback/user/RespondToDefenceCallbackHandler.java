@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -294,6 +295,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         String claimNumber = caseData.getLegacyCaseReference();
         String title;
         String body = format("<br />We will review the case and contact you to tell you what to do next.%n%n");
+
+        if (featureToggleService.isSdoEnabled()) {
+            caseData.toBuilder().ccdState(CaseState.JUDICIAL_REFERRAL).build();
+        }
 
         switch (multiPartyScenario) {
             case TWO_V_ONE:
