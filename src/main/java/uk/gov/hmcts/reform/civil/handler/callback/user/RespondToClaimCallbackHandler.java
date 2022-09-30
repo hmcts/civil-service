@@ -510,7 +510,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
-            .state("JUDICIAL_REFERRAL")
+            .state("AWAITING_APPLICANT_INTENTION")
             .build();
     }
 

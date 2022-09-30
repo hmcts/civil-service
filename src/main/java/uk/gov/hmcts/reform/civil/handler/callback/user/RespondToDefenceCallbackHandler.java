@@ -252,10 +252,20 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         //Set to null because there are no more deadlines
         builder.nextDeadline(null);
+        AboutToStartOrSubmitCallbackResponse response = null;
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
-            .build();
+        if (featureToggleService.isSdoEnabled()) {
+            AboutToStartOrSubmitCallbackResponse.builder()
+                .data(builder.build().toMap(objectMapper))
+                .state(CaseState.JUDICIAL_REFERRAL.name())
+                .build();
+        } else {
+            AboutToStartOrSubmitCallbackResponse.builder()
+                .data(builder.build().toMap(objectMapper))
+                .build();
+        }
+
+        return response;
     }
 
     private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder updatedCaseData) {
@@ -295,10 +305,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         String claimNumber = caseData.getLegacyCaseReference();
         String title;
         String body = format("<br />We will review the case and contact you to tell you what to do next.%n%n");
-
-        if (featureToggleService.isSdoEnabled()) {
-            caseData.toBuilder().ccdState(CaseState.JUDICIAL_REFERRAL).build();
-        }
 
         switch (multiPartyScenario) {
             case TWO_V_ONE:
