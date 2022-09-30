@@ -204,14 +204,15 @@ public class LocationHelper {
         }
         updatedData
             .caseManagementLocation(Stream.of(
-                    requestedCourt.getCaseLocation(),
+                    Optional.ofNullable(requestedCourt).map(RequestedCourt::getCaseLocation),
                     matchingLocation.map(location ->
                                              CaseLocation.builder()
                                                  .region(location.getRegionId())
                                                  .baseLocation(location.getEpimmsId())
                                                  .build()
-                    ).orElse(null)
-                )
+                    )
+                ).filter(Optional::isPresent)
+                                        .map(Optional::get)
                                         .filter(this::isValidCaseLocation)
                                         .findFirst().orElseGet(CaseLocation::new));
         matchingLocation.map(LocationRefData::getSiteName).ifPresent(updatedData::locationName);
