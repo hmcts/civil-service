@@ -255,12 +255,12 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         AboutToStartOrSubmitCallbackResponse response = null;
 
         if (featureToggleService.isSdoEnabled()) {
-            AboutToStartOrSubmitCallbackResponse.builder()
+            response = AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder.build().toMap(objectMapper))
                 .state(CaseState.JUDICIAL_REFERRAL.name())
                 .build();
         } else {
-            AboutToStartOrSubmitCallbackResponse.builder()
+            response = AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder.build().toMap(objectMapper))
                 .build();
         }
