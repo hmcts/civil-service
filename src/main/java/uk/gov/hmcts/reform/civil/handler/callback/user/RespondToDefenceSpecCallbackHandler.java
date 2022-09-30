@@ -197,8 +197,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (featureToggleService.isSdoEnabled())
+        if (featureToggleService.isSdoEnabled()) {
             caseData.toBuilder().ccdState(CaseState.JUDICIAL_REFERRAL).build();
+        }
 
         SubmittedCallbackResponse.SubmittedCallbackResponseBuilder responseBuilder =
             SubmittedCallbackResponse.builder();

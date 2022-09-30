@@ -296,8 +296,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         String title;
         String body = format("<br />We will review the case and contact you to tell you what to do next.%n%n");
 
-        if (featureToggleService.isSdoEnabled())
+        if (featureToggleService.isSdoEnabled()) {
             caseData.toBuilder().ccdState(CaseState.JUDICIAL_REFERRAL).build();
+        }
 
         switch (multiPartyScenario) {
             case TWO_V_ONE:
