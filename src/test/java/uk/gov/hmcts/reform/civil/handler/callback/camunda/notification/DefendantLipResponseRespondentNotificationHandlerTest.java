@@ -49,12 +49,12 @@ class DefendantLipResponseRespondentNotificationHandlerTest extends BaseCallback
         private final String legacyReference = "000MC001";
 
         @BeforeEach
-        void setUp(){
+        void setUp() {
             given(notificationsProperties.getRespondentLipResponseSubmissionTemplate()).willReturn(emailTemplate);
         }
 
         @Test
-        void shouldSendEmailToLipDefendant(){
+        void shouldSendEmailToLipDefendant() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .build()
@@ -80,7 +80,7 @@ class DefendantLipResponseRespondentNotificationHandlerTest extends BaseCallback
                 defendantEmail,
                 emailTemplate,
                 getNotificationDataMap(caseData),
-                "defendant-lip-response-respondent-notification-"+legacyReference
+                "defendant-lip-response-respondent-notification-" + legacyReference
             );
         }
 
