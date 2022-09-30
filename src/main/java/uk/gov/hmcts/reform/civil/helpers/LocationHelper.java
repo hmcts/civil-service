@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.helpers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -20,6 +21,7 @@ import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 
+@Slf4j
 public class LocationHelper {
 
     /**
@@ -37,25 +39,47 @@ public class LocationHelper {
         Supplier<Party.Type> getDefendantType;
         Supplier<Optional<RequestedCourt>> getDefendantCourt;
         if (leadDefendantIs1) {
+            log.debug("Case {}, lead defendant is 1", caseData.getLegacyCaseReference());
             getDefendantType = caseData.getRespondent1()::getType;
             getDefendantCourt = () -> Optional.ofNullable(caseData.getRespondent1DQ())
                 .map(Respondent1DQ::getRespondent1DQRequestedCourt);
         } else {
+            log.debug("Case {}, lead defendant is 2", caseData.getLegacyCaseReference());
             getDefendantType = caseData.getRespondent2()::getType;
             getDefendantCourt = () -> Optional.ofNullable(caseData.getRespondent2DQ())
                 .map(Respondent2DQ::getRespondent2DQRequestedCourt);
         }
 
         if (EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER).contains(getDefendantType.get())) {
+            log.debug(
+                "Case {}, defendant is a person, so their court request has priority",
+                caseData.getLegacyCaseReference()
+            );
             getDefendantCourt.get()
                 .filter(requestedCourt -> requestedCourt.getRequestHearingAtSpecificCourt() == YesOrNo.YES)
-                .ifPresent(prioritized::add);
-            getClaimantRequestedCourt(caseData).ifPresent(prioritized::add);
+                .ifPresent(requestedCourt -> {
+                    log.debug("Case {}, Defendant has requested a court", caseData.getLegacyCaseReference());
+                    prioritized.add(requestedCourt);
+                });
+            getClaimantRequestedCourt(caseData).ifPresent(requestedCourt -> {
+                log.debug("Case {}, Claimant has requested a court", caseData.getLegacyCaseReference());
+                prioritized.add(requestedCourt);
+            });
         } else {
+            log.debug(
+                "Case {}, defendant is a group, so claimant's court request has priority",
+                caseData.getLegacyCaseReference()
+            );
             getClaimantRequestedCourt(caseData)
                 .filter(requestedCourt -> requestedCourt.getRequestHearingAtSpecificCourt() == YesOrNo.YES)
-                .ifPresent(prioritized::add);
-            getDefendantCourt.get().ifPresent(prioritized::add);
+                .ifPresent(requestedCourt -> {
+                    log.debug("Case {}, Claimant has requested a court", caseData.getLegacyCaseReference());
+                    prioritized.add(requestedCourt);
+                });
+            getDefendantCourt.get().ifPresent(requestedCourt -> {
+                log.debug("Case {}, Defendant has requested a court", caseData.getLegacyCaseReference());
+                prioritized.add(requestedCourt);
+            });
         }
 
         return prioritized.stream().findFirst();
@@ -103,6 +127,9 @@ public class LocationHelper {
      * @return first matching location
      */
     private Optional<LocationRefData> getMatching(List<LocationRefData> locations, RequestedCourt preferredCourt) {
+        if (preferredCourt == null) {
+            return Optional.empty();
+        }
         return locations.stream().filter(locationRefData -> matches(locationRefData, preferredCourt))
             .findFirst();
     }
@@ -132,6 +159,15 @@ public class LocationHelper {
                                                                   RequestedCourt requestedCourt,
                                                                   Supplier<List<LocationRefData>> getLocations) {
         Optional<LocationRefData> matchingLocation = getMatching(getLocations.get(), requestedCourt);
+        if (log.isDebugEnabled()) {
+            String reference = updatedData.build().getLegacyCaseReference();
+            log.debug("Case {}, requested court is {}", reference, requestedCourt != null ? "defined" : "undefined");
+            log.debug(
+                "Case {}, there {} a location matching to requested court",
+                reference,
+                matchingLocation.isPresent() ? "is" : "is not"
+            );
+        }
         updatedData
             .caseManagementLocation(Stream.of(
                     requestedCourt.getCaseLocation(),

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -48,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     implements ExpertsValidator, WitnessesValidator {
 
@@ -145,6 +147,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
                     CallbackParams.Params.BEARER_TOKEN).toString())
             ));
+        if (log.isDebugEnabled()) {
+            log.debug("Case management location for " + caseData.getLegacyCaseReference()
+                          + " is " + builder.build().getCaseManagementLocation());
+        }
 
         if (caseData.getApplicant1ProceedWithClaim() == YES
             || caseData.getApplicant1ProceedWithClaimSpec2v1() == YES) {
