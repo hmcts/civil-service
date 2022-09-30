@@ -156,11 +156,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MidEventPrePopulateOrderDetailsPagesCallback {
 
-        private final LocalDate DATE = LocalDate.of(2022, 1, 5);
+        private final LocalDate date = LocalDate.of(2022, 1, 5);
 
         @BeforeEach
         void setup() {
-            when(deadlinesCalculator.plusWorkingDays(any(), anyInt())).thenReturn(DATE);
+            when(deadlinesCalculator.plusWorkingDays(any(), anyInt())).thenReturn(date);
             when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
         }
 
@@ -636,7 +636,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                              + "to have this Order set aside or varied. Any such application must be "
                                              + "received by the Court (together with the appropriate fee) by 4pm "
                                              + "on %s.",
-                                         DATE.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))));
+                                         date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))));
         }
 
         @Test
