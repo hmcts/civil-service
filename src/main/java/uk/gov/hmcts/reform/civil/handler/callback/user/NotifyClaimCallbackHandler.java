@@ -166,7 +166,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     }
 
     private LocalDateTime getDeadline(LocalDateTime claimNotificationDate) {
-        return deadlinesCalculator.plus28DaysAt4pmDeadline(claimNotificationDate);
+        return deadlinesCalculator.plus14DaysAt4pmDeadline(claimNotificationDate);
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

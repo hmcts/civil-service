@@ -134,7 +134,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @BeforeEach
             void setup() {
                 when(time.now()).thenReturn(notificationDate);
-                when(deadlinesCalculator.plus28DaysAt4pmDeadline(any(LocalDateTime.class))).thenReturn(deadline);
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any(LocalDateTime.class))).thenReturn(deadline);
             }
 
             @Test
@@ -205,7 +205,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @BeforeEach
             void setup() {
-                when(deadlinesCalculator.plus28DaysAt4pmDeadline(any(LocalDateTime.class)))
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any(LocalDateTime.class)))
                     .thenReturn(claimDetailsNotificationDeadline);
             }
 
@@ -259,7 +259,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @BeforeEach
             void setup() {
                 when(time.now()).thenReturn(notificationDate);
-                when(deadlinesCalculator.plus28DaysAt4pmDeadline(any(LocalDateTime.class))).thenReturn(deadline);
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any(LocalDateTime.class))).thenReturn(deadline);
             }
 
             @Test

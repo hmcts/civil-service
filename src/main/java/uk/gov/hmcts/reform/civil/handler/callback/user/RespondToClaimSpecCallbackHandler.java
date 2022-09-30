@@ -1420,7 +1420,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private LocalDateTime getApplicant1ResponseDeadline(LocalDateTime responseDate, AllocatedTrack allocatedTrack) {
-        return deadlinesCalculator.calculateApplicantResponseDeadline(responseDate, allocatedTrack);
+        return deadlinesCalculator.calculateApplicantResponseDeadlineSpec(responseDate, allocatedTrack);
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {

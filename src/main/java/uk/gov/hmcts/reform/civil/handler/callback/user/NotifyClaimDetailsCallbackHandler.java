@@ -88,9 +88,9 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             updatedCaseData = caseData.toBuilder()
                 .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS))
                 .claimDetailsNotificationDate(notificationDateTime)
-                .respondent1ResponseDeadline(deadlinesCalculator.plus28DaysAt4pmDeadline(notificationDateTime))
-                .respondent2ResponseDeadline(deadlinesCalculator.plus28DaysAt4pmDeadline(notificationDateTime))
-                .nextDeadline(deadlinesCalculator.plus28DaysAt4pmDeadline(notificationDateTime).toLocalDate())
+                .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
+                .respondent2ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
+                .nextDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime).toLocalDate())
                 .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
                     6,
                     notificationDate
@@ -100,8 +100,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             updatedCaseData = caseData.toBuilder()
                 .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS))
                 .claimDetailsNotificationDate(notificationDateTime)
-                .respondent1ResponseDeadline(deadlinesCalculator.plus28DaysAt4pmDeadline(notificationDateTime))
-                .nextDeadline(deadlinesCalculator.plus28DaysAt4pmDeadline(notificationDateTime).toLocalDate())
+                .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
+                .nextDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime).toLocalDate())
                 .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
                     6,
                     notificationDate

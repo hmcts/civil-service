@@ -371,7 +371,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         if (toggleService.isNoticeOfChangeEnabled()) {
             // LiP are not represented or registered
             if (areAnyRespondentsLitigantInPerson(caseData) == true)  {
-                dataBuilder.addLegalRepDeadline(deadlinesCalculator.plus28DaysAt4pmDeadline(time.now()));
+                dataBuilder.addLegalRepDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(time.now()));
             }
             populateBlankOrgPolicies(dataBuilder, caseData);
         }

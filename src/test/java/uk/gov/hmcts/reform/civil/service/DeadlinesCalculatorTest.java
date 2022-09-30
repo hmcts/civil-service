@@ -36,7 +36,6 @@ import static java.time.Month.JULY;
 import static java.time.Month.JUNE;
 import static java.time.Month.NOVEMBER;
 import static java.time.Month.OCTOBER;
-import static java.time.Month.SEPTEMBER;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.assertion.DayAssert.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
@@ -155,7 +154,7 @@ public class DeadlinesCalculatorTest {
         private static final LocalDateTime MONDAY = LocalDate.of(2020, AUGUST, 3).atTime(12, 0);
         private static final LocalDateTime MONDAY_AFTER_4PM = LocalDate.of(2020, AUGUST, 3).atTime(17, 0);
         private static final LocalDateTime MONDAY_AT_4PM = LocalDate.of(2020, AUGUST, 3).atTime(16, 0);
-        private static final LocalDateTime THURSDAY_AS_DEADLINE = LocalDateTime.of(2020, SEPTEMBER, 1, 16, 0);
+        private static final LocalDateTime MONDAY_AS_DEADLINE = LocalDateTime.of(2020, AUGUST, 17, 16, 0);
 
         private static final LocalDateTime CHRISTMAS_DAY = LocalDate.of(2020, DECEMBER, 25).minusDays(14)
             .atTime(12, 0);
@@ -166,21 +165,20 @@ public class DeadlinesCalculatorTest {
         private static final LocalDateTime NEXT_WORKING_DAY = LocalDateTime.of(2020, DECEMBER, 29, 16, 0);
         private static final LocalDateTime NEXT_YEAR_JANUARY_8 = LocalDateTime.of(2021, JANUARY, 8, 16, 0);
         private static final LocalDateTime NEXT_YEAR_JANUARY_11 = LocalDateTime.of(2021, JANUARY, 11, 16, 0);
-        private static final LocalDateTime FRIDAY_AS_DEADLINE = THURSDAY_AS_DEADLINE.plusDays(1);
 
         @Override
         public Stream<Arguments> provideArguments(ExtensionContext context) {
             return Stream.of(
-                Arguments.of(SATURDAY, THURSDAY_AS_DEADLINE),
-                Arguments.of(SATURDAY_AFTER_4PM, THURSDAY_AS_DEADLINE),
-                Arguments.of(SATURDAY_AT_4PM, THURSDAY_AS_DEADLINE),
-                Arguments.of(SUNDAY, THURSDAY_AS_DEADLINE),
-                Arguments.of(MONDAY, THURSDAY_AS_DEADLINE),
-                Arguments.of(CHRISTMAS_DAY, NEXT_YEAR_JANUARY_8),
-                Arguments.of(CHRISTMAS_DAY_AT_4PM, NEXT_YEAR_JANUARY_11),
-                Arguments.of(CHRISTMAS_DAY_AFTER_4PM, NEXT_YEAR_JANUARY_11),
-                Arguments.of(MONDAY_AFTER_4PM, THURSDAY_AS_DEADLINE),
-                Arguments.of(MONDAY_AT_4PM, THURSDAY_AS_DEADLINE)
+                Arguments.of(SATURDAY, MONDAY_AS_DEADLINE),
+                Arguments.of(SATURDAY_AFTER_4PM, MONDAY_AS_DEADLINE),
+                Arguments.of(SATURDAY_AT_4PM, MONDAY_AS_DEADLINE),
+                Arguments.of(SUNDAY, MONDAY_AS_DEADLINE),
+                Arguments.of(MONDAY, MONDAY_AS_DEADLINE),
+                Arguments.of(CHRISTMAS_DAY, NEXT_WORKING_DAY),
+                Arguments.of(CHRISTMAS_DAY_AT_4PM, NEXT_WORKING_DAY),
+                Arguments.of(CHRISTMAS_DAY_AFTER_4PM, NEXT_WORKING_DAY),
+                Arguments.of(MONDAY_AFTER_4PM, MONDAY_AS_DEADLINE.plusDays(1)),
+                Arguments.of(MONDAY_AT_4PM, MONDAY_AS_DEADLINE.plusDays(1))
             );
         }
     }
@@ -194,7 +192,7 @@ public class DeadlinesCalculatorTest {
             LocalDateTime claimIssueDate,
             LocalDateTime expectedResponseDeadline
         ) {
-            LocalDateTime responseDeadline = calculator.plus28DaysAt4pmDeadline(claimIssueDate);
+            LocalDateTime responseDeadline = calculator.plus14DaysAt4pmDeadline(claimIssueDate);
 
             assertThat(responseDeadline)
                 .isWeekday()
@@ -208,7 +206,7 @@ public class DeadlinesCalculatorTest {
         @Test
         void shouldReturnDeadlinePlus14Days_whenResponseDateIsWeekdayAndTrackIsSmallClaim() {
             LocalDateTime weekdayDate = LocalDate.of(2021, 2, 4).atTime(12, 0);
-            LocalDateTime expectedDeadline = weekdayDate.toLocalDate().plusDays(28).atTime(END_OF_BUSINESS_DAY);
+            LocalDateTime expectedDeadline = weekdayDate.toLocalDate().plusDays(14).atTime(END_OF_BUSINESS_DAY);
             LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadline(weekdayDate, SMALL_CLAIM);
 
             assertThat(responseDeadline)
@@ -219,7 +217,7 @@ public class DeadlinesCalculatorTest {
         @Test
         void shouldReturnDeadlinePlus14Days_whenResponseDateIsWeekendAndTrackIsSmallClaim() {
             LocalDateTime weekendDate = LocalDate.of(2021, 2, 6).atTime(12, 0);
-            LocalDateTime expectedDeadline = LocalDate.of(2021, 3, 8).atTime(END_OF_BUSINESS_DAY);
+            LocalDateTime expectedDeadline = LocalDate.of(2021, 2, 22).atTime(END_OF_BUSINESS_DAY);
             LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadline(weekendDate, SMALL_CLAIM);
 
             assertThat(responseDeadline)
@@ -228,9 +226,9 @@ public class DeadlinesCalculatorTest {
         }
 
         @Test
-        void shouldReturnDeadlinePlus28DaysWithAnExtraDay_whenResponseDateIsWeekdayAfter4pmAndTrackIsSmallClaim() {
+        void shouldReturnDeadlinePlus14DaysWithAnExtraDay_whenResponseDateIsWeekdayAfter4pmAndTrackIsSmallClaim() {
             LocalDateTime weekdayDate = LocalDate.of(2021, 2, 4).atTime(17, 0);
-            LocalDateTime expectedDeadline = weekdayDate.toLocalDate().plusDays(28).atTime(END_OF_BUSINESS_DAY);
+            LocalDateTime expectedDeadline = weekdayDate.toLocalDate().plusDays(14).atTime(END_OF_BUSINESS_DAY);
             LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadline(weekdayDate, SMALL_CLAIM);
 
             assertThat(responseDeadline)
@@ -239,9 +237,9 @@ public class DeadlinesCalculatorTest {
         }
 
         @Test
-        void shouldReturnDeadlinePlus28DaysWithAnExtraDay_whenResponseDateIsWeekdayAt4pmAndTrackIsSmallClaim() {
+        void shouldReturnDeadlinePlus14DaysWithAnExtraDay_whenResponseDateIsWeekdayAt4pmAndTrackIsSmallClaim() {
             LocalDateTime weekdayDate = LocalDate.of(2021, 2, 4).atTime(16, 0);
-            LocalDateTime expectedDeadline = weekdayDate.toLocalDate().plusDays(28).atTime(END_OF_BUSINESS_DAY);
+            LocalDateTime expectedDeadline = weekdayDate.toLocalDate().plusDays(14).atTime(END_OF_BUSINESS_DAY);
             LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadline(weekdayDate, SMALL_CLAIM);
 
             assertThat(responseDeadline)
@@ -251,7 +249,7 @@ public class DeadlinesCalculatorTest {
 
         @ParameterizedTest
         @EnumSource(value = AllocatedTrack.class, mode = EnumSource.Mode.EXCLUDE, names = "SMALL_CLAIM")
-        void shouldReturnDeadlinePlus28Days_whenResponseDateIsWeekdayAndTrackIsNotSmallClaim(AllocatedTrack track) {
+        void shouldReturnDeadlinePlus14Days_whenResponseDateIsWeekdayAndTrackIsNotSmallClaim(AllocatedTrack track) {
             LocalDateTime weekdayDate = LocalDate.of(2021, 2, 4).atTime(12, 0);
             LocalDateTime expectedDeadline = weekdayDate.toLocalDate().plusDays(28).atTime(END_OF_BUSINESS_DAY);
             LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadline(weekdayDate, track);
@@ -263,7 +261,7 @@ public class DeadlinesCalculatorTest {
 
         @ParameterizedTest
         @EnumSource(value = AllocatedTrack.class, mode = EnumSource.Mode.EXCLUDE, names = "SMALL_CLAIM")
-        void shouldReturnDeadlinePlus28Days_whenResponseDateIsWeekendAndTrackIsNotSmallClaim(AllocatedTrack track) {
+        void shouldReturnDeadlinePlus14Days_whenResponseDateIsWeekendAndTrackIsNotSmallClaim(AllocatedTrack track) {
             LocalDateTime weekendDate = LocalDate.of(2021, 2, 6).atTime(12, 0);
             LocalDateTime expectedDeadline = LocalDate.of(2021, 3, 8).atTime(END_OF_BUSINESS_DAY);
             LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadline(weekendDate, track);
@@ -313,8 +311,8 @@ public class DeadlinesCalculatorTest {
         @Test
         void shouldReturnDeadlinePlus14Days_whenNotifyClaimDetails() {
             LocalDateTime startDate = LocalDate.of(2022, 8, 19).atTime(12, 0);
-            LocalDateTime expectedDeadline = LocalDate.of(2022, 9, 16).atTime(END_OF_BUSINESS_DAY);
-            LocalDateTime responseDeadline = calculator.plus28DaysDeadlineh(startDate);
+            LocalDateTime expectedDeadline = LocalDate.of(2022, 9, 2).atTime(END_OF_BUSINESS_DAY);
+            LocalDateTime responseDeadline = calculator.plus14DaysDeadline(startDate);
 
             assertThat(responseDeadline)
                 .isWeekday()

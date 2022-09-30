@@ -1038,7 +1038,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldSetAddLegalRepDeadline_whenInvoked() {
                 when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-                when(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).thenReturn(submittedDate);
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
                 caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant().build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
@@ -1051,7 +1051,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldSetAddLegalRepDeadline_1v2_2LiPs_whenInvoked() {
                 when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-                when(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).thenReturn(submittedDate);
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
                 caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
@@ -1064,7 +1064,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldSetAddLegalRepDeadline_1v2_1LiP_whenInvoked() {
                 when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-                when(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).thenReturn(submittedDate);
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
                 caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(

@@ -112,7 +112,7 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
 
-        LocalDateTime newResponseDate = deadlinesCalculator.plus28DaysAt4pmDeadline(responseDeadline);
+        LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
 
         CaseData caseDataUpdated = caseData.toBuilder()
             .respondent1AcknowledgeNotificationDate(time.now())
@@ -132,7 +132,7 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
     private CallbackResponse setNewResponseDeadlineV1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
-        LocalDateTime newResponseDate = deadlinesCalculator.plus28DaysAt4pmDeadline(responseDeadline);
+        LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
         var updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
             .build();

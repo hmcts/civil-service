@@ -26,6 +26,13 @@ public enum AllocatedTrack {
     }
 
     public static int getDaysToAddToDeadline(AllocatedTrack track) {
+        if (track == SMALL_CLAIM) {
+            return 14;
+        }
+        return 28;
+    }
+
+    public static int getDaysToAddToDeadlineSpec(AllocatedTrack track) {
         return 28;
     }
 

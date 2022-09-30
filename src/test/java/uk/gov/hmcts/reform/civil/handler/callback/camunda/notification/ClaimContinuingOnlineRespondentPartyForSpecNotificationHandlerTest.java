@@ -97,7 +97,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
                 .thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("test solicitor").build()));
-            when(deadlinesCalculator.plus28DaysDeadlineh(any())).thenReturn(responseDeadline);
+            when(deadlinesCalculator.plus28DaysDeadline(any())).thenReturn(responseDeadline);
             when(pinInPostConfiguration.getMoneyClaimUrl()).thenReturn("dummy_respond_to_claim_url");
             when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
         }

@@ -68,7 +68,7 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
             responseDeadline = LocalDateTime.now().plusDays(14);
             when(notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate())
                 .thenReturn(templateId);
-            when(deadlinesCalculator.plus28DaysDeadlineh(any())).thenReturn(responseDeadline);
+            when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
         }
 
         @Test
@@ -110,7 +110,7 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONSE_DEADLINE, formatLocalDate(caseData.getClaimDetailsNotificationDeadline().toLocalDate(), DATE),
                 RESPONSE_DEADLINE_PLUS_28, formatLocalDate(
-                    deadlinesCalculator.plus28DaysDeadlineh(caseData.getRespondent1ResponseDeadline())
+                    deadlinesCalculator.plus14DaysDeadline(caseData.getRespondent1ResponseDeadline())
                          .toLocalDate(), DATE),
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
