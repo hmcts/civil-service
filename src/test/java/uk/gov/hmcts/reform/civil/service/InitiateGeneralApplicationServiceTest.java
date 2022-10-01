@@ -815,7 +815,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     @Test
     void shouldPopulateWorkAllocationLocationOnAboutToSubmit_beforeSDOHasBeenMade() {
         when(locationRefDataService.getCcmccLocation(any()))
-                .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
+                .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").siteName("site name").build());
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getCaseDataForWorkAllocation(CASE_ISSUED, null, INDIVIDUAL, applicant1DQ, respondent1DQ);
 
@@ -828,6 +828,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         assertThat(result.getGeneralApplications().get(0).getValue().getIsCcmccLocation()).isEqualTo(YES);
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementCategory().getValue().getLabel())
                 .isEqualTo("Civil");
+        assertThat(result.getGeneralApplications().get(0).getValue().getLocationName())
+            .isEqualTo("site name");
     }
 
     @Test
