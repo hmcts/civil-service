@@ -74,6 +74,10 @@ public class FeatureToggleService {
         return internalClient.boolVariation("notice-of-change", createLDUser().build(), false);
     }
 
+    public boolean isDJEnabled() {
+        return internalClient.boolVariation("dj-rpa", createLDUser().build(), false);
+    }
+
     public boolean isHearingAndListingSDOEnabled() {
         return internalClient.boolVariation("hearing-and-listing-sdo", createLDUser().build(), false);
     }
