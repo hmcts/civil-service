@@ -4,6 +4,7 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
@@ -13,7 +14,7 @@ import uk.gov.hmcts.reform.payments.request.CreditAccountPaymentRequest;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class PaymentsService {
     private final PaymentsClient paymentsClient;
     private final PaymentsConfiguration paymentsConfiguration;
     private final OrganisationService organisationService;
+    private final FeatureToggleService featureToggleService;
 
     public PaymentDto createCreditAccountPayment(CaseData caseData, String authToken) throws FeignException {
         return paymentsClient.createCreditAccountPayment(authToken, buildRequest(caseData));
@@ -39,7 +41,7 @@ public class PaymentsService {
             .orElse(caseData.getPaymentReference());
         CreditAccountPaymentRequest creditAccountPaymentRequest = null;
 
-        if (!SPEC_CLAIM.equals(caseData.getSuperClaimType()))  {
+        if (!isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled()))  {
             creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
                 .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
                 .amount(claimFee.getCalculatedAmount())
@@ -52,7 +54,7 @@ public class PaymentsService {
                 .siteId(paymentsConfiguration.getSiteId())
                 .fees(new FeeDto[]{claimFee})
                 .build();
-        } else if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+        } else if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
             creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
                 .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
                 .amount(claimFee.getCalculatedAmount())

@@ -122,7 +122,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final List<Element<GeneralApplicationsDetails>> generalApplicationsDetails;
     private final List<Element<GADetailsRespondentSol>> gaDetailsRespondentSol;
-    private final List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolTwo;
     private final SolicitorReferences solicitorReferences;
     private final SolicitorReferences solicitorReferencesCopy;
     private final String respondentSolicitor2Reference;
@@ -163,6 +162,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final AllocatedTrack allocatedTrack;
     private final PaymentDetails paymentDetails;
     private final PaymentDetails claimIssuedPaymentDetails;
+    private final PaymentDetails hearingFeePaymentDetails;
     private final OrganisationPolicy applicant1OrganisationPolicy;
     private final OrganisationPolicy applicant2OrganisationPolicy;
     private final OrganisationPolicy respondent1OrganisationPolicy;
