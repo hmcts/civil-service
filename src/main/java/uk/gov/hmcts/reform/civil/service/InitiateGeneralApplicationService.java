@@ -3,11 +3,13 @@ package uk.gov.hmcts.reform.civil.service;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -15,7 +17,10 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategory;
+import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -25,6 +30,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.prd.model.Organisation;
@@ -59,6 +66,7 @@ public class InitiateGeneralApplicationService {
 
     private final OrganisationApi organisationApi;
     private final AuthTokenGenerator authTokenGenerator;
+    private final LocationRefDataService locationRefDataService;
     private final FeatureToggleService featureToggleService;
 
     private static final int NUMBER_OF_DEADLINE_DAYS = 5;
@@ -98,7 +106,7 @@ public class InitiateGeneralApplicationService {
     }
 
     private GeneralApplication buildApplication(CaseData caseData, UserDetails userDetails, String authToken) {
-        String caseType = "";
+        CaseCategory caseType;
 
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = GeneralApplication.builder();
         if (caseData.getGeneralAppEvidenceDocument() != null) {
@@ -118,13 +126,11 @@ public class InitiateGeneralApplicationService {
             applicationBuilder.defendant2PartyName(caseData.getRespondent2().getPartyName());
         }
         if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
-            caseType = "SPEC_CLAIM";
+            caseType = CaseCategory.SPEC_CLAIM;
         } else {
-            caseType = "UNSPEC_CLAIM";
+            caseType = CaseCategory.UNSPEC_CLAIM;
         }
-        LocalDateTime deadline = deadlinesCalculator
-            .calculateApplicantResponseDeadline(
-                LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS);
+
         if (caseData.getGeneralAppRespondentAgreement() != null
             && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())) {
             applicationBuilder
@@ -148,6 +154,22 @@ public class InitiateGeneralApplicationService {
                                              .organisationIdentifier(org.get().getOrganisationIdentifier()).build());
         }
 
+        GACaseManagementCategoryElement civil =
+            GACaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
+        List<Element<GACaseManagementCategoryElement>> itemList = new ArrayList<>();
+        itemList.add(element(civil));
+        applicationBuilder.caseManagementCategory(
+            GACaseManagementCategory.builder().value(civil).list_items(itemList).build());
+
+        Pair<CaseLocation, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
+        //Setting Work Allocation location and location name
+        applicationBuilder.caseManagementLocation(caseLocation.getLeft());
+        applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
+
+        LocalDateTime deadline = deadlinesCalculator
+            .calculateApplicantResponseDeadline(
+                LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS);
+
         GeneralApplication generalApplication = applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
             .generalAppType(caseData.getGeneralAppType())
@@ -159,7 +181,8 @@ public class InitiateGeneralApplicationService {
             .generalAppPBADetails(caseData.getGeneralAppPBADetails())
             .generalAppDateDeadline(deadline)
             .generalAppSubmittedDateGAspec(LocalDateTime.now())
-            .generalAppSuperClaimType(caseType)
+            .generalAppSuperClaimType(caseType.name())
+            .caseAccessCategory(caseType)
             .civilServiceUserRoles(IdamUserDetails.builder().id(userDetails.getId()).email(userDetails.getEmail())
                                        .build())
             .build();
@@ -195,6 +218,15 @@ public class InitiateGeneralApplicationService {
             }
         }
         return errors;
+    }
+
+    private Pair<CaseLocation, Boolean> getWorkAllocationLocation(CaseData caseData, String authToken) {
+        LocationRefData ccmccLocation = locationRefDataService.getCcmccLocation(authToken);
+        CaseLocation courtLocation = CaseLocation.builder()
+            .region(ccmccLocation.getRegionId())
+            .baseLocation(ccmccLocation.getEpimmsId())
+            .build();
+        return Pair.of(courtLocation, true);
     }
 
     public List<String> validateHearingScreen(GAHearingDetails hearingDetails) {
