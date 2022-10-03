@@ -2018,7 +2018,8 @@ public class EventHistoryMapper {
             ));
         }
 
-        return fixedCost != null && claimCost != null ? fixedCost.add(claimCost).setScale(2) : claimCost.setScale(2);
+        return fixedCost != null && claimCost != null ? fixedCost.add(claimCost).setScale(2)
+            : claimCost != null  ? claimCost.setScale(2) : BigDecimal.ZERO;
 
     }
 
