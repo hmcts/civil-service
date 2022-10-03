@@ -535,6 +535,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitTestsV1 {
 
+        @BeforeEach
+        void setup() {
+            when(toggleService.isAccessProfilesEnabled()).thenReturn(true);
+        }
+
         @Test
         void updateRespondent1AddressWhenUpdated() {
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
