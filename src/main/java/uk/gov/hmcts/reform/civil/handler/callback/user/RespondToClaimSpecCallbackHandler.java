@@ -1682,7 +1682,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
         }
 
-        if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWOSPEC)) {
+        CaseRole respondentTwoCaseRoleToCheck;
+
+        if (V_1.equals(callbackParams.getVersion()) && toggleService.isAccessProfilesEnabled()) {
+            respondentTwoCaseRoleToCheck = RESPONDENTSOLICITORTWO;
+        } else {
+            respondentTwoCaseRoleToCheck = RESPONDENTSOLICITORTWOSPEC;
+        }
+
+        if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, respondentTwoCaseRoleToCheck)) {
             updatedData.respondent2ResponseDate(responseDate)
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
 
@@ -1742,133 +1750,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
-        if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWOSPEC)
-            && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
-            updatedData.defenceAdmitPartPaymentTimeRouteRequired(null);
-        }
-
-        if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
-            && isAwaitingAnotherDefendantResponse(caseData)) {
-
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedData.build().toMap(objectMapper))
-                .build();
-        } else if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
-            && !isAwaitingAnotherDefendantResponse(caseData)) {
-            if (!FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                || !FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .data(updatedData.build().toMap(objectMapper))
-                    .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
-                    .build();
-            }
-        } else if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP && twoVsOneDivergent(caseData)) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedData.build().toMap(objectMapper))
-                .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
-                .build();
-        } else if (getMultiPartyScenario(caseData) == TWO_V_ONE && twoVsOneDivergent(caseData)) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedData.build().toMap(objectMapper))
-                .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
-                .build();
-        }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
-            .state(CaseState.AWAITING_APPLICANT_INTENTION.name())
-            .build();
-    }
-
-    private CallbackResponse setApplicantResponseDeadlineV1(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime responseDate = time.now();
-        AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
-        Party updatedRespondent1;
-
-        if (NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired())) {
-            updatedRespondent1 = caseData.getRespondent1().toBuilder()
-                .primaryAddress(caseData.getSpecAoSApplicantCorrespondenceAddressdetails()).build();
-        } else {
-            updatedRespondent1 = caseData.getRespondent1().toBuilder()
-                .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress()).build();
-        }
-
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
-            .respondent1(updatedRespondent1)
-            .respondent1Copy(null);
-
-        updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
-
-        // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
-        if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
-            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
-                .build();
-            updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
-            updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
-        }
-
-        if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
-            updatedData.respondent2ResponseDate(responseDate)
-                .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
-
-            if (caseData.getRespondent1ResponseDate() != null) {
-                updatedData
-                    .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
-            }
-
-            // 1v1, 2v1
-            // represents 1st respondent - need to set deadline if only 1 respondent,
-            // or wait for 2nd respondent response before setting deadline
-            // moving statement of truth value to correct field, this was not possible in mid event.
-            StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-            Respondent2DQ dq = caseData.getRespondent2DQ().toBuilder()
-                .respondent2DQStatementOfTruth(statementOfTruth)
-                .build();
-
-            updatedData.respondent2DQ(dq);
-            // resetting statement of truth to make sure it's empty the next time it appears in the UI.
-            updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
-        } else {
-            updatedData
-                .respondent1ResponseDate(responseDate)
-                .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack))
-                .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
-
-            updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
-
-            if (caseData.getRespondent2() != null && caseData.getRespondent2Copy() != null) {
-                Party updatedRespondent2;
-
-                if (NO.equals(caseData.getSpecAoSRespondent2HomeAddressRequired())) {
-                    updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                        .primaryAddress(caseData.getSpecAoSRespondent2HomeAddressDetails()).build();
-                } else {
-                    updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                        .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress()).build();
-                }
-
-                updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
-                updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
-            }
-
-            // moving statement of truth value to correct field, this was not possible in mid event.
-            StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-            Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
-                .respondent1DQStatementOfTruth(statementOfTruth)
-                .respondent1DQWitnesses(Witnesses.builder()
-                                            .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
-                                            .details(caseData.getRespondent1DQWitnessesDetailsSpec())
-                                            .build())
-                .build();
-
-            updatedData.respondent1DQ(dq);
-            // resetting statement of truth to make sure it's empty the next time it appears in the UI.
-            updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
-        }
-        if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWO)
+        if (solicitorHasCaseRole(callbackParams, respondentTwoCaseRoleToCheck)
             && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
             updatedData.defenceAdmitPartPaymentTimeRouteRequired(null);
         }

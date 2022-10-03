@@ -394,7 +394,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         }
 
-        if (toggleService.isCourtLocationDynamicListEnabled()) {
+        if (V_1.equals(callbackParams.getVersion())
+            && toggleService.isCourtLocationDynamicListEnabled()) {
             dataBuilder.caseManagementLocation(CaseLocation.builder().region(regionId).baseLocation(epimmsId).build());
         }
 
