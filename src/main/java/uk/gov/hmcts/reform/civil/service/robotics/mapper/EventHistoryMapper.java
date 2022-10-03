@@ -243,12 +243,13 @@ public class EventHistoryMapper {
                 }
             }
         }
-       if(featureToggleService.isDJEnabled()) {
-           buildInterlocutoryJudgment(builder, caseData);
-           buildMiscellaneousIJEvent(builder, caseData);
-           buildDefaultJudgment(builder, caseData);
-           buildMiscellaneousDJEvent(builder, caseData);
-       }
+
+        if (featureToggleService.isDJEnabled()) {
+            buildInterlocutoryJudgment(builder, caseData);
+            buildMiscellaneousIJEvent(builder, caseData);
+            buildDefaultJudgment(builder, caseData);
+            buildMiscellaneousDJEvent(builder, caseData);
+        }
         buildInformAgreedExtensionDateForSpec(builder, caseData);
         return eventHistorySequencer.sortEvents(builder.build());
     }
