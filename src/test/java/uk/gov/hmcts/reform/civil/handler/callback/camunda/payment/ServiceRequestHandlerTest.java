@@ -11,7 +11,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+<<<<<<< HEAD
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+=======
+>>>>>>> b4cb4b8464a2692c2999abcae0ea22943c1fea41
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -35,17 +38,26 @@ import static feign.Request.HttpMethod.GET;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+<<<<<<< HEAD
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+=======
+import static org.mockito.Mockito.*;
+>>>>>>> b4cb4b8464a2692c2999abcae0ea22943c1fea41
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
+<<<<<<< HEAD
 @AutoConfigureMockMvc
 @SpringBootTest(classes = {
     ServiceRequestHandler.class,
+=======
+@SpringBootTest(classes = {
+    PaymentsCallbackHandler.class,
+>>>>>>> b4cb4b8464a2692c2999abcae0ea22943c1fea41
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class
 })
@@ -64,7 +76,11 @@ class ServiceRequestHandlerTest extends BaseCallbackHandlerTest {
     private Time time;
 
     @Autowired
+<<<<<<< HEAD
     private ServiceRequestHandlerTest handler;
+=======
+    private PaymentsCallbackHandler handler;
+>>>>>>> b4cb4b8464a2692c2999abcae0ea22943c1fea41
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -90,8 +106,12 @@ class ServiceRequestHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCreateServiceRequest_whenInvoked() throws Exception {
             when(serviceRequestService.createPaymentServiceRequest(any(), any()))
+<<<<<<< HEAD
                 .thenReturn(PaymentServiceResponse.builder().serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE)
                                 .build());
+=======
+                .thenReturn(PaymentServiceResponse.builder().serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
+>>>>>>> b4cb4b8464a2692c2999abcae0ea22943c1fea41
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -175,8 +195,12 @@ class ServiceRequestHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+<<<<<<< HEAD
     private HearingFeeServiceRequestDetails
         extractPaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
+=======
+    private HearingFeeServiceRequestDetails extractPaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
+>>>>>>> b4cb4b8464a2692c2999abcae0ea22943c1fea41
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
         return responseCaseData.getHearingFeeServiceRequestDetails();
     }

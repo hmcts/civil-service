@@ -99,8 +99,13 @@ public class HearingServiceCallbackHandler extends CallbackHandler {
 
         } catch (FeignException e) {
             log.info(String.format("Http Status %s ", e.status()), e);
+<<<<<<< HEAD
             if (e.status() == 403 || e.status() == 404 || e.status() == 422
                 || e.status() == 500 || e.status() == 504) {
+=======
+            if (e.status() == 403 || e.status() == 404 || e.status() == 422 ||
+                e.status() == 500 || e.status() == 504) {
+>>>>>>> b4cb4b8464a2692c2999abcae0ea22943c1fea41
                 caseData = updateWithBusinessError(caseData, e);
             } else {
                 errors.add(ERROR_MESSAGE);
