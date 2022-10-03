@@ -6046,6 +6046,11 @@ class EventHistoryMapperTest {
     @Nested
     class InterlocutoryJudgment {
 
+        @BeforeEach
+        public void setup() {
+            when(featureToggleService.isDJEnabled()).thenReturn(true);
+        }
+
         @Test
         public void shouldgenerateRPAfeedfor_IJNoDivergent() {
 
@@ -6094,6 +6099,11 @@ class EventHistoryMapperTest {
 
     @Nested
     class DefaultJudgment {
+
+        @BeforeEach
+        public void setup() {
+            when(featureToggleService.isDJEnabled()).thenReturn(true);
+        }
 
         @Test
         public void shouldgenerateRPAfeedfor_DJNoDivergent() {
