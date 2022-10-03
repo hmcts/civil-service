@@ -100,11 +100,7 @@ class HearingFeePaidHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-<<<<<<< HEAD
         verify(applicationEventPublisher).publishEvent(new HearingFeeUnpaidEvent(caseId));
-=======
-        verify(applicationEventPublisher).publishEvent(new StrikeOutEvent(caseId));
->>>>>>> ee6a51022efd2d1e608f8db6cf13466197d00ba8
         verify(externalTaskService).complete(mockTask);
     }
 
