@@ -45,12 +45,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions.BREAK_DOWN_INTEREST;
 import static uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions.SAME_RATE_INTEREST;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_DIFFERENT_SOL;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_SAME_SOL;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_LIP;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.*;
 
 @Service
 @RequiredArgsConstructor
@@ -90,13 +85,21 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     private DocmosisTemplates getSealedDocmosisTemplate(CaseData caseData) {
         DocmosisTemplates sealedTemplate;
         if (caseData.getApplicant2() != null) {
-            sealedTemplate = N2_2V1;
+            if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
+                sealedTemplate = N2_LIP;
+            } else {
+                sealedTemplate = N2_2V1;
+            }
         } else if (caseData.getRespondent2() != null) {
             if (caseData.getRespondent2SameLegalRepresentative() != null
                 && caseData.getRespondent2SameLegalRepresentative() == YES) {
                 sealedTemplate = N2_1V2_SAME_SOL;
             } else {
-                sealedTemplate = N2_1V2_DIFFERENT_SOL;
+                if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
+                    sealedTemplate = N2_LIP;
+                } else {
+                    sealedTemplate = N2_1V2_DIFFERENT_SOL;
+                }
             }
         } else {
             if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
