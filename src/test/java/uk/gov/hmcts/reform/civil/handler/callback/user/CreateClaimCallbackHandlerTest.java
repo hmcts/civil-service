@@ -360,7 +360,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            given(feesService.getFeeDataByClaimValue(any())).willReturn(feeData);
+            given(feesService.getFeeDataByClaimValue(any(), any(Boolean.class))).willReturn(feeData);
         }
 
         @Test

@@ -44,7 +44,7 @@ class FeesServiceTest {
 
     @BeforeEach
     void setUp() {
-        given(feesClient.lookupFee(any(), any(), eq(new BigDecimal("50.00"))))
+        given(feesClient.lookupFee(any(), any(), eq(new BigDecimal("50.00")),  any(Boolean.class)))
             .willReturn(FeeLookupResponseDto.builder()
                             .feeAmount(TEST_FEE_AMOUNT_POUNDS)
                             .code("test_fee_code")
@@ -67,9 +67,9 @@ class FeesServiceTest {
             .version("1")
             .build();
 
-        Fee feeDto = feesService.getFeeDataByClaimValue(claimValue);
+        Fee feeDto = feesService.getFeeDataByClaimValue(claimValue, true);
 
-        verify(feesClient).lookupFee(CHANNEL, EVENT, new BigDecimal("50.00"));
+        verify(feesClient).lookupFee(CHANNEL, EVENT, new BigDecimal("50.00"), true);
         assertThat(feeDto).isEqualTo(expectedFeeDto);
     }
 

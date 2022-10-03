@@ -79,6 +79,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Slf4j
@@ -133,6 +134,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final InterestCalculator interestCalculator;
     private final FeatureToggleService toggleService;
     private final StateFlowEngine stateFlowEngine;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -297,7 +299,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
-        caseDataBuilder.claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()))
+        caseDataBuilder.claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue(),
+                                                                    isSpecCaseCategory(caseData,
+                                                                    featureToggleService.isAccessProfilesEnabled())))
             .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
             .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
 

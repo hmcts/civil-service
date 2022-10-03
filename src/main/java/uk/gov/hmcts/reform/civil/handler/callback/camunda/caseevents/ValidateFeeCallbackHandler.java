@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_FEE;
+import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +27,7 @@ public class ValidateFeeCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(VALIDATE_FEE);
     private static final String ERROR_MESSAGE = "Fee has changed since claim submitted. It needs to be validated again";
     private static final String TASK_ID = "ValidateClaimFee";
-
+    private final FeatureToggleService featureToggleService;
     private final FeesService feesService;
 
     @Override
@@ -47,7 +49,9 @@ public class ValidateFeeCallbackHandler extends CallbackHandler {
     private CallbackResponse validateFee(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
-        var fee = feesService.getFeeDataByClaimValue(caseData.getClaimValue());
+        var fee = feesService.getFeeDataByClaimValue(caseData.getClaimValue(),
+                                                         isSpecCaseCategory(caseData,
+                                                         featureToggleService.isAccessProfilesEnabled()));
         if (!caseData.getClaimFee().equals(fee)) {
             errors.add(ERROR_MESSAGE);
         }

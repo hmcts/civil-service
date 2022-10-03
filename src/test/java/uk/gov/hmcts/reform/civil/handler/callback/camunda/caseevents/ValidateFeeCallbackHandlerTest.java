@@ -8,6 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -35,10 +36,12 @@ class ValidateFeeCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private FeesService feesService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Test
     void shouldReturnErrors_whenInitialFeeSsDifferentAfterReCalculation() {
-        when(feesService.getFeeDataByClaimValue(any(ClaimValue.class)))
+        when(feesService.getFeeDataByClaimValue(any(ClaimValue.class),  any(Boolean.class)))
             .thenReturn(Fee.builder()
                             .calculatedAmountInPence(BigDecimal.valueOf(25))
                             .version("3")
@@ -55,7 +58,7 @@ class ValidateFeeCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldNotReturnErrors_whenInitialFeeIsSameAfterReCalculation() {
-        when(feesService.getFeeDataByClaimValue(any(ClaimValue.class)))
+        when(feesService.getFeeDataByClaimValue(any(ClaimValue.class), any(Boolean.class)))
             .thenReturn(Fee.builder()
                             .calculatedAmountInPence(BigDecimal.valueOf(100))
                             .version("1")
