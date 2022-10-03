@@ -48,10 +48,10 @@ public class LocationRefDataService {
     public LocationRefData getCcmccLocation(String authToken) {
         try {
             ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
-                    buildURIforCcmcc(),
-                    HttpMethod.GET,
-                    getHeaders(authToken),
-                    new ParameterizedTypeReference<List<LocationRefData>>() {});
+                buildURIforCcmcc(),
+                HttpMethod.GET,
+                getHeaders(authToken),
+                new ParameterizedTypeReference<List<LocationRefData>>() {});
             List<LocationRefData> ccmccLocations = responseEntity.getBody();
             if (ccmccLocations == null || ccmccLocations.isEmpty()) {
                 log.warn("Location Reference Data Lookup did not return any CCMCC location");
@@ -93,7 +93,7 @@ public class LocationRefDataService {
     private URI buildURIforCcmcc() {
         String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
-                .queryParam("court_venue_name", "County Court Money Claims Centre");
+            .queryParam("court_venue_name", "County Court Money Claims Centre");
         return builder.buildAndExpand(new HashMap<>()).toUri();
     }
 
