@@ -724,6 +724,7 @@ public class FlowStateAllowedEventService {
             AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
             List.of(
                 DEFENDANT_RESPONSE_SPEC,
+                DEFENDANT_RESPONSE_CUI,
                 ACKNOWLEDGE_CLAIM,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
@@ -744,7 +745,8 @@ public class FlowStateAllowedEventService {
         entry(
             AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
             List.of(
-                DEFENDANT_RESPONSE_SPEC
+                DEFENDANT_RESPONSE_SPEC,
+                DEFENDANT_RESPONSE_CUI
             )
         )
     );
