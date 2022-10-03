@@ -1409,26 +1409,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-    private CallbackResponse populateRespondent1CopyV1(CallbackParams callbackParams) {
-        var caseData = callbackParams.getCaseData();
-        var updatedCaseData = caseData.toBuilder()
-            .respondent1Copy(caseData.getRespondent1())
-            .respondent1ClaimResponseTestForSpec(caseData.getRespondent1ClaimResponseTypeForSpec())
-            .respondent2ClaimResponseTestForSpec(caseData.getRespondent2ClaimResponseTypeForSpec())
-            .showConditionFlags(getInitialShowTagsV1(callbackParams));
-
-        updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
-
-        ofNullable(caseData.getRespondent2())
-            .ifPresent(r2 -> updatedCaseData.respondent2Copy(r2)
-                .respondent2DetailsForClaimDetailsTab(r2)
-            );
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(objectMapper))
-            .build();
-    }
-
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
@@ -1453,43 +1433,21 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     callbackParams.getCaseData().getCcdCaseReference().toString(),
                     userInfo.getUid()
                 );
-                if (roles.contains(RESPONDENTSOLICITORONESPEC.getFormattedName())) {
-                    set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
-                }
-                if (roles.contains(RESPONDENTSOLICITORTWOSPEC.getFormattedName())) {
-                    set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2);
-                }
-                break;
-            default:
-                throw new UnsupportedOperationException("Unknown mp scenario");
-        }
-        return set;
-    }
-
-    private Set<DefendantResponseShowTag> getInitialShowTagsV1(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        MultiPartyScenario mpScenario = getMultiPartyScenario(caseData);
-        Set<DefendantResponseShowTag> set = EnumSet.noneOf(DefendantResponseShowTag.class);
-        switch (mpScenario) {
-            case ONE_V_ONE:
-            case TWO_V_ONE:
-                set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
-                break;
-            case ONE_V_TWO_ONE_LEGAL_REP:
-                set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
-                set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2);
-                break;
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-                List<String> roles = coreCaseUserService.getUserCaseRoles(
-                    callbackParams.getCaseData().getCcdCaseReference().toString(),
-                    userInfo.getUid()
-                );
-                if (roles.contains(RESPONDENTSOLICITORONE.getFormattedName())) {
-                    set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
-                }
-                if (roles.contains(RESPONDENTSOLICITORTWO.getFormattedName())) {
-                    set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2);
+                if (V_1.equals(callbackParams.getVersion())
+                    && toggleService.isAccessProfilesEnabled()) {
+                    if (roles.contains(RESPONDENTSOLICITORONE.getFormattedName())) {
+                        set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
+                    }
+                    if (roles.contains(RESPONDENTSOLICITORTWO.getFormattedName())) {
+                        set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2);
+                    }
+                } else {
+                    if (roles.contains(RESPONDENTSOLICITORONESPEC.getFormattedName())) {
+                        set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
+                    }
+                    if (roles.contains(RESPONDENTSOLICITORTWOSPEC.getFormattedName())) {
+                        set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2);
+                    }
                 }
                 break;
             default:
