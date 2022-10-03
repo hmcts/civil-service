@@ -6,8 +6,8 @@ import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import uk.gov.hmcts.reform.fees.client.FeesApi;
 
-
 public class FeesHealthIndicator implements HealthIndicator {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(FeesHealthIndicator.class);
 
     private final FeesApi feesApi;
