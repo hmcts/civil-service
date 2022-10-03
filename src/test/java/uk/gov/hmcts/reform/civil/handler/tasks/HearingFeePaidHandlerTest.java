@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.StrikeOutEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.search.CaseHearingFeePaidSearchService;
 
@@ -49,6 +50,9 @@ class HearingFeePaidHandlerTest {
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+
+    @Mock
+    private PaymentDetails paymentDetails;
 
     @InjectMocks
     private HearingFeePaidHandler handler;
