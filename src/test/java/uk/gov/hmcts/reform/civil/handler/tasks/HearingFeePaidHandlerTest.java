@@ -11,17 +11,11 @@ import org.mockito.Mock;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-<<<<<<< HEAD
 import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.StrikeOutEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-=======
-import uk.gov.hmcts.reform.civil.event.StrikeOutEvent;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.CaseData;
->>>>>>> ee6a51022efd2d1e608f8db6cf13466197d00ba8
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.search.CaseHearingFeePaidSearchService;
 
@@ -57,12 +51,9 @@ class HearingFeePaidHandlerTest {
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
-<<<<<<< HEAD
     @Mock
     private PaymentDetails paymentDetails;
 
-=======
->>>>>>> ee6a51022efd2d1e608f8db6cf13466197d00ba8
     @InjectMocks
     private HearingFeePaidHandler handler;
 

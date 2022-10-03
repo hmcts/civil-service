@@ -473,12 +473,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DynamicList trialHearingMethodInPersonDJ;
     private DynamicList disposalHearingMethodInPersonDJ;
 
-<<<<<<< HEAD
     private LocalDate hearingDueDate;
     private LocalDateTime caseDismissedHearingFeeDueDate;
-=======
-    LocalDate hearingDueDate;
->>>>>>> ee6a51022efd2d1e608f8db6cf13466197d00ba8
 
     //default judgement SDO fields for trial/fast track
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
