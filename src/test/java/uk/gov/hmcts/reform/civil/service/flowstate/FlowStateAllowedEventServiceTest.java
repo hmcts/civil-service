@@ -242,8 +242,8 @@ class FlowStateAllowedEventServiceTest {
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL,
                         STANDARD_DIRECTION_ORDER_DJ,
+                        HEARING_SCHEDULED,
                         TAKE_CASE_OFFLINE
-
                     }
                 ),
                 of(

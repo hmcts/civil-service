@@ -192,8 +192,8 @@ public class FlowStateAllowedEventService {
                 STANDARD_DIRECTION_ORDER_DJ,
                 CREATE_SDO,
                 NotSuitable_SDO,
+                HEARING_SCHEDULED,
                 TAKE_CASE_OFFLINE
-
             )
         ),
         entry(
