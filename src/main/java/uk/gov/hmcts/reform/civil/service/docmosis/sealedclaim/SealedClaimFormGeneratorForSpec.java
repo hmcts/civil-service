@@ -47,10 +47,12 @@ import static uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions.
 import static uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions.SAME_RATE_INTEREST;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_LIP;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_DIFFERENT_SOL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_DIFFERENT_SOL_LIP;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_LIP;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1_LIP;
 
 @Service
 @RequiredArgsConstructor
@@ -91,7 +93,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         DocmosisTemplates sealedTemplate;
         if (caseData.getApplicant2() != null) {
             if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
-                sealedTemplate = N2_LIP;
+                sealedTemplate = N2_2V1_LIP;
             } else {
                 sealedTemplate = N2_2V1;
             }
@@ -101,7 +103,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                 sealedTemplate = N2_1V2_SAME_SOL;
             } else {
                 if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
-                    sealedTemplate = N2_LIP;
+                    sealedTemplate = N2_1V2_DIFFERENT_SOL_LIP;
                 } else {
                     sealedTemplate = N2_1V2_DIFFERENT_SOL;
                 }
