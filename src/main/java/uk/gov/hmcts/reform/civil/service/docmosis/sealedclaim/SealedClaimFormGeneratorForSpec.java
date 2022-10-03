@@ -45,7 +45,12 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions.BREAK_DOWN_INTEREST;
 import static uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions.SAME_RATE_INTEREST;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.*;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_DIFFERENT_SOL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_SAME_SOL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_LIP;
 
 @Service
 @RequiredArgsConstructor
