@@ -321,7 +321,7 @@ public class EventHistoryMapper {
             .eventDetailsText("")
             .eventDetails(EventDetails.builder().miscText("")
                               .amountOfJudgment(amountClaimedWithInterest.setScale(2))
-                              .amountOfCosts(getCostOfJudgment(caseData).setScale(2))
+                              .amountOfCosts(getCostOfJudgment(caseData))
                               .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES)
                                                             ? partialPaymentPounds : BigDecimal.ZERO)
                               .isJudgmentForthwith((caseData.getPaymentTypeSelection()
@@ -2018,7 +2018,7 @@ public class EventHistoryMapper {
             ));
         }
 
-        return fixedCost != null && claimCost != null ? fixedCost.add(claimCost) : claimCost;
+        return fixedCost != null && claimCost != null ? fixedCost.add(claimCost).setScale(2) : claimCost.setScale(2);
 
     }
 
