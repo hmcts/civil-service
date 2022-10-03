@@ -10,9 +10,14 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.Time;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +35,8 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_CUI);
 
     private final ObjectMapper objectMapper;
+    private final DeadlinesCalculator deadlinesCalculator;
+    private final Time time;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -46,13 +53,26 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        caseData = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI))
-            .build();
+        CaseData updatedData = getUpdatedCaseData(callbackParams);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
+            .data(updatedData.toMap(objectMapper))
+            .state(CaseState.AWAITING_APPLICANT_INTENTION.name())
             .build();
+    }
+
+    private CaseData getUpdatedCaseData(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        LocalDateTime responseDate = time.now();
+        AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
+        CaseData updatedData = caseData.toBuilder()
+            .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI))
+            .respondent1ResponseDate(responseDate)
+            .applicant1ResponseDeadline(deadlinesCalculator.calculateApplicantResponseDeadline(
+                responseDate,
+                allocatedTrack
+            ))
+            .build();
+        return updatedData;
     }
 }
