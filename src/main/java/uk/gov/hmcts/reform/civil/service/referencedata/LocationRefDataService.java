@@ -45,6 +45,29 @@ public class LocationRefDataService {
         return new ArrayList<>();
     }
 
+    public LocationRefData getCcmccLocation(String authToken) {
+        try {
+            ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
+                buildURIforCcmcc(),
+                HttpMethod.GET,
+                getHeaders(authToken),
+                new ParameterizedTypeReference<List<LocationRefData>>() {});
+            List<LocationRefData> ccmccLocations = responseEntity.getBody();
+            if (ccmccLocations == null || ccmccLocations.isEmpty()) {
+                log.warn("Location Reference Data Lookup did not return any CCMCC location");
+                return LocationRefData.builder().build();
+            } else {
+                if (ccmccLocations.size() > 1) {
+                    log.warn("Location Reference Data Lookup returned more than one CCMCC location");
+                }
+                return ccmccLocations.get(0);
+            }
+        } catch (Exception e) {
+            log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
+        }
+        return LocationRefData.builder().build();
+    }
+
     public List<LocationRefData> getCourtLocationsForDefaultJudgments(String authToken) {
         try {
             ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
@@ -64,6 +87,13 @@ public class LocationRefDataService {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
                 .queryParam("is_hearing_location", "Y")
                 .queryParam("location_type", "Court");
+        return builder.buildAndExpand(new HashMap<>()).toUri();
+    }
+
+    private URI buildURIforCcmcc() {
+        String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
+            .queryParam("court_venue_name", "County Court Money Claims Centre");
         return builder.buildAndExpand(new HashMap<>()).toUri();
     }
 
