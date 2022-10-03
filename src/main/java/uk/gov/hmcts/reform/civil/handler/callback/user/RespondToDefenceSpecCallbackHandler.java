@@ -189,20 +189,16 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private CallbackResponse populateCaseData(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
 
-        CaseData updatedCaseData;
+        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
 
         if (V_1.equals(callbackParams.getVersion())
             && featureToggleService.isAccessProfilesEnabled()) {
-            updatedCaseData = caseData.toBuilder()
-                .respondent1Copy(caseData.getRespondent1())
-                .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-                .build();
+            updatedCaseData.respondent1Copy(caseData.getRespondent1())
+                .claimantResponseScenarioFlag(getMultiPartyScenario(caseData));
         } else {
-            updatedCaseData = caseData.toBuilder()
-                .respondent1Copy(caseData.getRespondent1())
+            updatedCaseData.respondent1Copy(caseData.getRespondent1())
                 .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-                .superClaimType(SPEC_CLAIM)
-                .build();
+                .superClaimType(SPEC_CLAIM);
         }
 
         if (V_1.equals(callbackParams.getVersion()) && featureToggleService.isCourtLocationDynamicListEnabled()) {
