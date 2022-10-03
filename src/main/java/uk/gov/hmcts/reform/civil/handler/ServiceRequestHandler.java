@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.HearingFeeServiceRequestDetails;
 import uk.gov.hmcts.reform.civil.service.ServiceRequestService;
-import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,7 +60,8 @@ public class ServiceRequestHandler extends CallbackHandler {
             log.info("calling payment service request " + caseData.getCcdCaseReference());
             var serviceRequestReference = paymentsService.createPaymentServiceRequest(caseData, authToken)
                 .getServiceRequestReference();
-            HearingFeeServiceRequestDetails hearingFeeServiceRequestDetails = caseData.getHearingFeeServiceRequestDetails();
+            HearingFeeServiceRequestDetails hearingFeeServiceRequestDetails
+                = caseData.getHearingFeeServiceRequestDetails();
             caseData = caseData.toBuilder()
                 .hearingFeeServiceRequestDetails(hearingFeeServiceRequestDetails.toBuilder()
                                           .fee(caseData.getGeneralAppPBADetails().getFee())
