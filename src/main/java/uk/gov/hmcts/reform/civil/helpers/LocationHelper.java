@@ -101,10 +101,7 @@ public class LocationHelper {
         }
 
         Optional<RequestedCourt> byParties = prioritized.stream().findFirst();
-        if ((caseData.getSuperClaimType() == SPEC_CLAIM
-            && ccmccAmount.compareTo(caseData.getTotalClaimAmount()) > 0)
-            || (caseData.getSuperClaimType() == UNSPEC_CLAIM
-            && ccmccAmount.compareTo(caseData.getClaimValue().toPounds()) > 0)) {
+        if (ccmccAmount.compareTo(getClaimValue(caseData)) >= 0) {
             return Optional.of(byParties.map(requestedCourt -> requestedCourt.toBuilder()
                     .caseLocation(getCcmccCaseLocation()).build())
                                    .orElseGet(() -> RequestedCourt.builder()
@@ -112,6 +109,14 @@ public class LocationHelper {
                                        .build()));
         } else {
             return byParties;
+        }
+    }
+
+    private BigDecimal getClaimValue(CaseData caseData) {
+        if (caseData.getSuperClaimType() == SPEC_CLAIM) {
+            return caseData.getTotalClaimAmount();
+        } else {
+            return caseData.getClaimValue().toPounds();
         }
     }
 

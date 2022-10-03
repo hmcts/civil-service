@@ -12,9 +12,11 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,6 +83,113 @@ public class LocationHelperTest {
 
         Assertions.assertThat(court.isPresent()).isTrue();
         Assertions.assertThat(court.get()).isEqualTo(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt());
+    }
+
+    @Test
+    public void whenSpecDefendantIsPersonAndDefendant2_courtIsDefendant2() {
+        CaseData caseData = CaseData.builder()
+            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .totalClaimAmount(BigDecimal.valueOf(10000))
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .build())
+            .applicant1DQ(Applicant1DQ.builder()
+                              .applicant1DQRequestedCourt(
+                                  RequestedCourt.builder()
+                                      .requestHearingAtSpecificCourt(YesOrNo.YES)
+                                      .responseCourtCode("123")
+                                      .build()
+                              )
+                              .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQRequestedCourt(
+                                   RequestedCourt.builder()
+                                       .requestHearingAtSpecificCourt(YesOrNo.YES)
+                                       .responseCourtCode("321")
+                                       .build()
+                               )
+                               .build())
+            .respondent2(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .build())
+            .respondent2DQ(Respondent2DQ.builder()
+                               .respondent2DQRequestedCourt(RequestedCourt.builder()
+                                                                .requestHearingAtSpecificCourt(YesOrNo.YES)
+                                                                .responseCourtCode("432")
+                                                                .build())
+                               .build())
+            .respondent2ResponseDate(LocalDateTime.now())
+            .build();
+
+        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
+
+        Assertions.assertThat(court.isPresent()).isTrue();
+        Assertions.assertThat(court.get()).isEqualTo(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt());
+    }
+
+    @Test
+    public void whenLessThan1000_locationIsCcmcc() {
+        CaseData caseData = CaseData.builder()
+            .superClaimType(SuperClaimType.UNSPEC_CLAIM)
+            .claimValue(ClaimValue.builder()
+                            .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
+                            .build())
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .build())
+            .applicant1DQ(Applicant1DQ.builder()
+                              .applicant1DQRequestedCourt(
+                                  RequestedCourt.builder()
+                                      .requestHearingAtSpecificCourt(YesOrNo.YES)
+                                      .responseCourtCode("123")
+                                      .build()
+                              )
+                              .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQRequestedCourt(
+                                   RequestedCourt.builder()
+                                       .requestHearingAtSpecificCourt(YesOrNo.YES)
+                                       .responseCourtCode("321")
+                                       .build()
+                               )
+                               .build())
+            .build();
+
+        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
+
+        Assertions.assertThat(court.isPresent()).isTrue();
+        Assertions.assertThat(court.get().getCaseLocation())
+            .isEqualTo(CaseLocation.builder()
+                           .baseLocation(CCMCC_EPIMS)
+                           .region(CCMCC_REGION_ID).build());
+    }
+
+    @Test
+    public void whenLessThan1000_locationIsCcmccEvenUndef() {
+        CaseData caseData = CaseData.builder()
+            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .totalClaimAmount(BigDecimal.valueOf(1000))
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .build())
+            .build();
+
+        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
+
+        Assertions.assertThat(court.isPresent()).isTrue();
+        Assertions.assertThat(court.get().getCaseLocation())
+            .isEqualTo(CaseLocation.builder()
+                           .baseLocation(CCMCC_EPIMS)
+                           .region(CCMCC_REGION_ID).build());
     }
 
     @Test
