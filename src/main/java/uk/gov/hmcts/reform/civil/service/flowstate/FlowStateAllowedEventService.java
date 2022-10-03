@@ -610,7 +610,8 @@ public class FlowStateAllowedEventService {
                 DEFAULT_JUDGEMENT_SPEC,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                NotSuitable_SDO
+                NotSuitable_SDO,
+                EVIDENCE_UPLOAD_JUDGE
             )
         ),
         entry(
