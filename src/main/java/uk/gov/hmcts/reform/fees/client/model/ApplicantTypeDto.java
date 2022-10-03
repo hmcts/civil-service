@@ -15,6 +15,7 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApplicantTypeDto {
+
     private OffsetDateTime creationTime;
     private OffsetDateTime lastUpdated;
     private String name;

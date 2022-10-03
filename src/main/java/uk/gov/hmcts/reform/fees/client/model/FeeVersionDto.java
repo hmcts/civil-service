@@ -17,6 +17,7 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FeeVersionDto {
+
     public static final String STATUS_DRAFT = "draft";
     public static final String STATUS_APPROVED = "approved";
     public static final String STATUS_PENDING = "pending_approval";

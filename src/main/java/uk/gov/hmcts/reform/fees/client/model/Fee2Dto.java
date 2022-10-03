@@ -18,6 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Fee2Dto {
+
     private ApplicantTypeDto applicantType;
     private ChannelTypeDto channelType;
     private String code;

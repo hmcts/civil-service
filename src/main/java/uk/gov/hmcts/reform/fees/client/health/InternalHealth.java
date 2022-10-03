@@ -10,6 +10,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 public class InternalHealth {
+
     private final Status status;
     private final Map<String, Object> components;
 

@@ -15,5 +15,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Jurisdiction1Dto {
+
     private String name;
 }

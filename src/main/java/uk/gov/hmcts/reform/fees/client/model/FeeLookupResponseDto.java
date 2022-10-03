@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FeeLookupResponseDto {
+
     private String code;
     private String description;
     private BigDecimal feeAmount;

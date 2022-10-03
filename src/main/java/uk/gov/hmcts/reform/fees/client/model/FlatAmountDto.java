@@ -17,5 +17,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FlatAmountDto {
+
     private BigDecimal amount;
 }

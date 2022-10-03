@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 @FeignClient(name = "fees-api", url = "${fees.api.url}")
 
 public interface FeesApi {
+
     @GetMapping("/health")
     InternalHealth health();
 
