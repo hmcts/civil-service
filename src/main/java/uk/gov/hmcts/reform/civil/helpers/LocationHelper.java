@@ -23,7 +23,6 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 
 @Slf4j
 @Component
