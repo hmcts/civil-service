@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Case;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -48,7 +47,7 @@ public class HearingFeePaidHandler implements BaseExternalTaskHandler {
         });
     }
 
-    public void hearingFeeCheck(){
+    public void hearingFeeCheck() {
         List<CaseDetails> cases = caseSearchService.getCases();
 
     }
