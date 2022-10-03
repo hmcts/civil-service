@@ -11,15 +11,18 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
@@ -33,6 +36,8 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private Time time;
+    @MockBean
+    private DeadlinesCalculator deadlinesCalculator;
 
     @Autowired
     private RespondToClaimCuiCallbackHandler handler;
@@ -54,15 +59,23 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
         LocalDateTime now;
+        private final LocalDateTime respondToDeadline = LocalDateTime.of(
+            2023,
+            1,
+            1,
+            0,
+            0,
+            0);
 
         @BeforeEach
         void setup() {
             now = LocalDateTime.now();
-            when(time.now()).thenReturn(now);
+            given(time.now()).willReturn(now);
+            given(deadlinesCalculator.calculateApplicantResponseDeadline(any(), any())).willReturn(respondToDeadline);
         }
 
         @Test
-        void shouldReturnAddTakenOfflineDate_WhenInvoked() {
+        void shouldUpdateBusinessProcessAndClaimStatus_whenAboutToSubmit() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -72,12 +85,11 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
                 .isEqualTo(DEFENDANT_RESPONSE_CUI.name());
-
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("status")
                 .isEqualTo("READY");
+            assertThat(response.getState()).isEqualTo(CaseState.AWAITING_APPLICANT_INTENTION.name());
         }
     }
 }
-
