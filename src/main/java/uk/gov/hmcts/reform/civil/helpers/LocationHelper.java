@@ -24,8 +24,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
-
 @Slf4j
 @Component
 public class LocationHelper {
@@ -145,17 +143,27 @@ public class LocationHelper {
      * @return requested court object for the lead claimant
      */
     private Optional<RequestedCourt> getClaimantRequestedCourt(CaseData caseData) {
-        if (caseData.getSuperClaimType() == SPEC_CLAIM) {
-            return Optional.ofNullable(caseData.getApplicant1DQ())
-                .map(Applicant1DQ::getApplicant1DQRequestedCourt);
-        } else {
-            return Optional.ofNullable(caseData.getCourtLocation())
-                .map(courtLocation -> RequestedCourt.builder()
-                    .requestHearingAtSpecificCourt(YesOrNo.YES)
-                    .responseCourtCode(courtLocation.getApplicantPreferredCourt())
-                    .caseLocation(courtLocation.getCaseLocation())
-                    .build());
-        }
+        // sometimes super claim type is not loaded
+        return Stream.of(
+            getSpecClaimantRequestedCourt(caseData),
+            getUnspecClaimantRequestedCourt(caseData)
+        ).filter(Optional::isPresent)
+            .findFirst()
+            .orElse(Optional.empty());
+    }
+
+    private Optional<RequestedCourt> getSpecClaimantRequestedCourt(CaseData caseData) {
+        return Optional.ofNullable(caseData.getApplicant1DQ())
+            .map(Applicant1DQ::getApplicant1DQRequestedCourt);
+    }
+
+    private Optional<RequestedCourt> getUnspecClaimantRequestedCourt(CaseData caseData) {
+        return Optional.ofNullable(caseData.getCourtLocation())
+            .map(courtLocation -> RequestedCourt.builder()
+                .requestHearingAtSpecificCourt(YesOrNo.YES)
+                .responseCourtCode(courtLocation.getApplicantPreferredCourt())
+                .caseLocation(courtLocation.getCaseLocation())
+                .build());
     }
 
     /**
