@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -18,6 +19,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -112,11 +114,12 @@ public class LocationHelper {
     }
 
     private BigDecimal getClaimValue(CaseData caseData) {
-        if (caseData.getSuperClaimType() == SPEC_CLAIM) {
-            return caseData.getTotalClaimAmount();
-        } else {
-            return caseData.getClaimValue().toPounds();
-        }
+        // super claim type is not always loaded
+        return Stream.of(caseData.getTotalClaimAmount(),
+                  Optional.ofNullable(caseData.getClaimValue()).map(ClaimValue::toPounds).orElse(null))
+            .filter(Objects::nonNull)
+            .findFirst()
+            .orElse(BigDecimal.ZERO);
     }
 
     private CaseLocation getCcmccCaseLocation() {
