@@ -2,12 +2,52 @@ package uk.gov.hmcts.reform.civil.sampledata;
 
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-
-import uk.gov.hmcts.reform.civil.enums.*;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
+import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
+import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
-import uk.gov.hmcts.reform.civil.model.*;
+import uk.gov.hmcts.reform.civil.model.Address;
+import uk.gov.hmcts.reform.civil.model.Bundle;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CaseNote;
+import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
+import uk.gov.hmcts.reform.civil.model.ClaimValue;
+import uk.gov.hmcts.reform.civil.model.CloseClaim;
+import uk.gov.hmcts.reform.civil.model.CorrectEmail;
+import uk.gov.hmcts.reform.civil.model.CourtLocation;
+import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
+import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.HearingFeeServiceRequestDetails;
+import uk.gov.hmcts.reform.civil.model.IdValue;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
+import uk.gov.hmcts.reform.civil.model.LitigationFriend;
+import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
+import uk.gov.hmcts.reform.civil.model.ResponseDocument;
+import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.UnemployedComplexTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
@@ -3283,7 +3323,9 @@ public class CaseDataBuilder {
             .code("FE203")
             .version("1")
             .build())
-            .applicant1(applicant1)
+            .applicant1(Party.builder()
+                    .type(Party.Type.INDIVIDUAL)
+                        .partyName("Test Applicant Name").build())
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
             .hearingFeeServiceRequestDetails(
                 HearingFeeServiceRequestDetails.builder()
