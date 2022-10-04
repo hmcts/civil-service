@@ -4,7 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingAddNewDirectionsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
@@ -13,11 +16,11 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingMedicalEvi
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingQuestionsToExpertsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingSchedulesOfLossDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingStandardDisposalOrderDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingWitnessOfFactDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingAddNewDirectionsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
@@ -28,6 +31,8 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 
+import java.util.List;
+
 @Getter
 @Builder
 @AllArgsConstructor
@@ -37,6 +42,7 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private final String caseNumber;
     private final String applicant;
     private final String respondent;
+    private final String judgeNameTitle;
 
     //default judgement SDO fields for disposal
     private final DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
@@ -45,10 +51,11 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private final DisposalHearingMedicalEvidenceDJ disposalHearingMedicalEvidenceDJ;
     private final DisposalHearingQuestionsToExpertsDJ disposalHearingQuestionsToExpertsDJ;
     private final DisposalHearingSchedulesOfLossDJ disposalHearingSchedulesOfLossDJ;
-    private final DisposalHearingStandardDisposalOrderDJ disposalHearingStandardDisposalOrderDJ;
     private final DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private final DisposalHearingBundleDJ disposalHearingBundleDJ;
     private final DisposalHearingNotesDJ disposalHearingNotesDJ;
+    private final List<Element<DisposalHearingAddNewDirectionsDJ>> disposalHearingAddNewDirectionsDJ;
+    private final boolean hasNewDirections;
 
     //default judgement SDO fields for trial
     private final TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
@@ -63,6 +70,7 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private final TrialPersonalInjury trialPersonalInjury;
     private final TrialRoadTrafficAccident trialRoadTrafficAccident;
     private final TrialHousingDisrepair trialHousingDisrepair;
+    private final List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
 
     //additional data for hearings
     private final boolean disposalHearingDisclosureOfDocumentsDJAddSection;
@@ -77,7 +85,11 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
 
     private final String typeBundleInfo;
     private final String disposalHearingTime;
-    private final String disposalHearingMethod;
+    private final DisposalHearingMethodDJ disposalHearingMethodDJ;
+    private final String disposalHearingAttendance;
+    private final String courtLocation;
+    private final String telephoneOrganisedBy;
+    private final String videoConferenceOrganisedBy;
 
     //additional data for trial
     private final boolean trialHearingDisputeAddSection;
@@ -96,8 +108,6 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private final boolean trialRoadTrafficAccidentAddSection;
     private final boolean trialHousingDisrepairAddSection;
     private final boolean trialHearingMethodInPersonAddSection;
-
-    private final String trialDays;
-    private final String trialHearingMethod;
+    private final DisposalHearingMethodDJ trialHearingMethodDJ;
     private final String trialHearingLocation;
 }
