@@ -836,4 +836,7 @@ public class FlowPredicate {
         }
         return false;
     };
+
+    public static final Predicate<CaseData> contactDetailsChange = caseData ->
+        NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());
 }

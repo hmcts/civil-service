@@ -28,11 +28,14 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
+import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
+import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingAddNewDirectionsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
@@ -41,12 +44,12 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingMedicalEvi
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingQuestionsToExpertsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingSchedulesOfLossDJ;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingStandardDisposalOrderDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingWitnessOfFactDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialCreditHire;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialEmployersLiability;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingAddNewDirectionsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingNotes;
@@ -162,6 +165,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final AllocatedTrack allocatedTrack;
     private final PaymentDetails paymentDetails;
     private final PaymentDetails claimIssuedPaymentDetails;
+    private final PaymentDetails hearingFeePaymentDetails;
     private final OrganisationPolicy applicant1OrganisationPolicy;
     private final OrganisationPolicy applicant2OrganisationPolicy;
     private final OrganisationPolicy respondent1OrganisationPolicy;
@@ -464,13 +468,23 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DisposalHearingMedicalEvidenceDJ disposalHearingMedicalEvidenceDJ;
     private DisposalHearingQuestionsToExpertsDJ disposalHearingQuestionsToExpertsDJ;
     private DisposalHearingSchedulesOfLossDJ disposalHearingSchedulesOfLossDJ;
-    private DisposalHearingStandardDisposalOrderDJ disposalHearingStandardDisposalOrderDJ;
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private DisposalHearingBundleDJ disposalHearingBundleDJ;
     private DisposalHearingNotesDJ disposalHearingNotesDJ;
     private DisposalHearingMethodDJ disposalHearingMethodDJ;
     private DynamicList trialHearingMethodInPersonDJ;
     private DynamicList disposalHearingMethodInPersonDJ;
+    private List<Element<DisposalHearingAddNewDirectionsDJ>> disposalHearingAddNewDirectionsDJ;
+    private List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
+    private HearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ;
+    private HearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceHearingDJ;
+
+    //Hearing Scheduled
+    private DynamicList hearingLocation;
+    private LocalDate dateOfApplication;
+    private LocalDate hearingDate;
+    private String hearingTimeHourMinute;
+    private String hearingReferenceNumber;
 
     //default judgement SDO fields for trial/fast track
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
@@ -487,6 +501,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private TrialEmployersLiability trialEmployersLiability;
     private TrialHousingDisrepair trialHousingDisrepair;
     private DisposalHearingMethodDJ trialHearingMethodDJ;
+    private HearingMethodTelephoneHearingDJ trialHearingMethodTelephoneHearingDJ;
+    private HearingMethodVideoConferenceDJ trialHearingMethodVideoConferenceHearingDJ;
 
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
@@ -501,7 +517,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private List<DisposalAndTrialHearingDJToggle> disposalHearingBundleDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingClaimSettlingDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingCostsDJToggle;
-    private List<DisposalAndTrialHearingDJToggle> disposalHearingApplicationsDJToggle;
 
     private List<DisposalAndTrialHearingDJToggle> trialHearingAlternativeDisputeDJToggle;
     private List<DisposalAndTrialHearingDJToggle> trialHearingVariationsDirectionsDJToggle;
