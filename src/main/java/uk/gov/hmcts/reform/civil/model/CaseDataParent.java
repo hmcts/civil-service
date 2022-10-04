@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
@@ -13,6 +15,13 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodTelephoneHearing;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodVideoConferenceHearing;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodTelephoneHearing;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
@@ -26,6 +35,7 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
@@ -33,12 +43,11 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgementDeductionValu
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingPreferredEmail;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingPreferredTelephone;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
@@ -48,13 +57,12 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPreferredEmail;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPreferredTelephone;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
@@ -129,12 +137,16 @@ public class CaseDataParent implements MappableObject {
     private DisposalHearingSchedulesOfLoss disposalHearingSchedulesOfLoss;
     private DisposalHearingStandardDisposalOrder disposalHearingStandardDisposalOrder;
     private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearing;
-    private DisposalHearingPreferredTelephone disposalHearingPreferredTelephone;
-    private DisposalHearingPreferredEmail disposalHearingPreferredEmail;
     private DisposalHearingBundle disposalHearingBundle;
     private DisposalHearingNotes disposalHearingNotes;
+    private final DisposalHearingMethod disposalHearingMethod;
+    private final DisposalHearingMethodTelephoneHearing disposalHearingMethodTelephoneHearing;
+    private final DisposalHearingMethodVideoConferenceHearing disposalHearingMethodVideoConferenceHearing;
+    private final List<Element<DisposalHearingAddNewDirections>> disposalHearingAddNewDirections;
+
     private final DynamicList disposalHearingMethodInPerson;
     private final DynamicList fastTrackMethodInPerson;
+    private final DynamicList smallClaimsMethodInPerson;
     private final YesOrNo drawDirectionsOrderRequired;
     private final YesOrNo drawDirectionsOrderSmallClaims;
     private final ClaimsTrack claimsTrack;
@@ -152,8 +164,11 @@ public class CaseDataParent implements MappableObject {
     private FastTrackSchedulesOfLoss fastTrackSchedulesOfLoss;
     private FastTrackTrial fastTrackTrial;
     private FastTrackNotes fastTrackNotes;
-    private FastTrackPreferredTelephone fastTrackPreferredTelephone;
-    private FastTrackPreferredEmail fastTrackPreferredEmail;
+    private final List<FastTrack> fastClaims;
+    private final FastTrackMethod fastTrackMethod;
+    private final FastTrackMethodTelephoneHearing fastTrackMethodTelephoneHearing;
+    private final FastTrackMethodVideoConferenceHearing fastTrackMethodVideoConferenceHearing;
+    private final List<Element<FastTrackAddNewDirections>> fastTrackAddNewDirections;
     private SmallClaimsCreditHire smallClaimsCreditHire;
     private SmallClaimsRoadTrafficAccident smallClaimsRoadTrafficAccident;
     private SmallClaimsDocuments smallClaimsDocuments;
@@ -162,6 +177,7 @@ public class CaseDataParent implements MappableObject {
     private SmallClaimsJudgesRecital smallClaimsJudgesRecital;
     private SmallClaimsNotes smallClaimsNotes;
     private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
+    private ReasonNotSuitableSDO reasonNotSuitableSDO;
     private final List<SmallTrack> smallClaims;
     private final SmallClaimsMethod smallClaimsMethod;
     private final SmallClaimsMethodTelephoneHearing smallClaimsMethodTelephoneHearing;
@@ -191,6 +207,8 @@ public class CaseDataParent implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> smallClaimsMethodToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsDocumentsToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsWitnessStatementToggle;
+
+    private Document sdoOrderDocument;
 
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
@@ -260,6 +278,9 @@ public class CaseDataParent implements MappableObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal respondToAdmittedClaimOwingAmountPounds2;
 
+    @JsonProperty("CaseAccessCategory")
+    private final CaseCategory caseAccessCategory;
+
     private final ChangeOrganisationRequest changeOrganisationRequestField;
     private final List<Element<ChangeOfRepresentation>> changeOfRepresentation;
 
@@ -267,6 +288,9 @@ public class CaseDataParent implements MappableObject {
      * Adding for PiP to citizen UI.
      */
     private final DefendantPinToPostLRspec respondent1PinToPostLRspec;
+
+    private final ScheduledHearing nextHearingDetails;
+
     private final String respondent1EmailAddress;
 
 }

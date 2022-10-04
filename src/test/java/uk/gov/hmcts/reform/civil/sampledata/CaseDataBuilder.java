@@ -4,6 +4,7 @@ import uk.gov.hmcts.reform.ccd.model.ChangeOrganisationApprovalStatus;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
@@ -57,6 +58,8 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -154,6 +157,7 @@ public class CaseDataBuilder {
     protected CaseState ccdState;
     protected List<Element<CaseDocument>> systemGeneratedCaseDocuments;
     protected PaymentDetails claimIssuedPaymentDetails;
+    protected PaymentDetails hearingFeePaymentDetails;
     protected CorrectEmail applicantSolicitor1CheckEmail;
     protected IdamUserDetails applicantSolicitor1UserDetails;
     //Deadline extension
@@ -203,6 +207,11 @@ public class CaseDataBuilder {
     protected YesOrNo addApplicant2;
     protected SuperClaimType superClaimType;
     protected YesOrNo addRespondent2;
+    protected CaseCategory caseAccessCategory;
+
+    protected YesOrNo specRespondent1Represented;
+    protected YesOrNo specRespondent2Represented;
+
     protected YesOrNo respondent2SameLegalRepresentative;
     protected LitigationFriend respondent1LitigationFriend;
     protected LitigationFriend respondent2LitigationFriend;
@@ -288,6 +297,8 @@ public class CaseDataBuilder {
     private DisposalHearingBundleDJ disposalHearingBundleDJ;
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private TrialHearingTrial trialHearingTrialDJ;
+    private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
+    private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
 
     private List<Element<ChangeOfRepresentation>> changeOfRepresentation;
     private ChangeOrganisationRequest changeOrganisationRequest;
@@ -712,6 +723,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent1ClaimResponseType(RespondentResponseType respondent1ClaimResponseType) {
+        this.respondent1ClaimResponseType = respondent1ClaimResponseType;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2ClaimResponseType(RespondentResponseType respondent2ClaimResponseType) {
+        this.respondent2ClaimResponseType = respondent2ClaimResponseType;
+        return this;
+    }
+
     public CaseDataBuilder setRespondent1LitigationFriendCreatedDate(LocalDateTime createdDate) {
         this.respondent1LitigationFriendCreatedDate = createdDate;
         return this;
@@ -918,6 +939,26 @@ public class CaseDataBuilder {
         respondent2Represented = null;
         respondent2OrganisationPolicy = null;
         respondent2OrgRegistered = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssued1v1UnrepresentedDefendantSpec() {
+        atStateClaimIssuedUnrepresentedDefendants();
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        addRespondent2 = NO;
+        respondent2 = null;
+        respondent2Represented = null;
+        respondent2OrganisationPolicy = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssued1v2UnrepresentedDefendant() {
+        atStateClaimIssuedUnrepresentedDefendants();
+        addRespondent2 = YES;
+        respondent2 = PartyBuilder.builder().individual().build();
+        takenOfflineDate = LocalDateTime.now();
+        respondentSolicitor2OrganisationDetails = null;
+        respondent2OrganisationPolicy = null;
         return this;
     }
 
@@ -1198,13 +1239,20 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder courtLocation_old() {
+        this.courtLocation = CourtLocation.builder()
+            .applicantPreferredCourt("127").build();
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimDraft() {
         solicitorReferences = SolicitorReferences.builder()
             .applicantSolicitor1Reference("12345")
             .respondentSolicitor1Reference("6789")
             .build();
         courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("127")
+            .applicantPreferredCourtLocationList(
+                DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
             .build();
         claimValue = ClaimValue.builder()
             .statementOfValueInPennies(BigDecimal.valueOf(10000000))
@@ -1323,7 +1371,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimSubmitted1v2AndSecondRespondentIsRepresented() {
+    public CaseDataBuilder atStateClaimSubmitted1v2AndOnlySecondRespondentIsRepresented() {
         atStateClaimSubmitted();
         addRespondent2 = YES;
         respondent2SameLegalRepresentative = NO;
@@ -1395,11 +1443,21 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimIssuedDisposalHearing() {
         caseManagementOrderSelection = DISPOSAL_HEARING;
+
+        disposalHearingJudgesRecitalDJ = DisposalHearingJudgesRecitalDJ
+            .builder()
+            .judgeNameTitle("test name")
+            .build();
         return this;
     }
 
     public CaseDataBuilder atStateClaimIssuedTrialHearing() {
         caseManagementOrderSelection = "TRIAL_HEARING";
+
+        trialHearingJudgesRecitalDJ = TrialHearingJudgesRecital
+            .builder()
+            .judgeNameTitle("test name")
+            .build();
         return this;
     }
 
@@ -1433,6 +1491,7 @@ public class CaseDataBuilder {
                         + "bundle before it is filed. "
                         + "The bundle will include a case summary"
                         + " and a chronology.")
+            .type(DisposalHearingBundleType.DOCUMENTS)
             .build();
         return this;
     }
@@ -2910,7 +2969,6 @@ public class CaseDataBuilder {
         LocalDateTime tomrrowsDateTime = LocalDateTime.now().plusDays(1);
         this.respondent1LitigationFriendDate = tomrrowsDateTime;
         this.respondent1LitigationFriendCreatedDate = tomrrowsDateTime;
-
         return this;
     }
 
@@ -2956,6 +3014,16 @@ public class CaseDataBuilder {
         this.addRespondent2 = YES;
         this.respondent2 = PartyBuilder.builder().individual().build();
         this.respondent2SameLegalRepresentative = YES;
+        return this;
+    }
+
+    public CaseDataBuilder multiPartyClaimTwoDefendantSolicitorsSpec() {
+        this.addRespondent2 = YES;
+        this.respondent2 = PartyBuilder.builder().individual().build();
+        this.respondent2SameLegalRepresentative = NO;
+        this.respondentSolicitor2Reference = "01234";
+        this.specRespondent1Represented = YES;
+        this.specRespondent2Represented = YES;
         return this;
     }
 
@@ -3108,6 +3176,15 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder receiveUpdatePaymentRequest() {
+        atStateRespondentFullDefence();
+        this.hearingFeePaymentDetails = PaymentDetails.builder()
+            .customerReference("RC-1604-0739-2145-4711")
+        .build();
+
+        return this;
+    }
+
     public CaseDataBuilder atSpecAoSApplicantCorrespondenceAddressRequired(
         YesOrNo specAoSApplicantCorrespondenceAddressRequired) {
         this.specAoSApplicantCorrespondenceAddressRequired = specAoSApplicantCorrespondenceAddressRequired;
@@ -3117,6 +3194,11 @@ public class CaseDataBuilder {
     public CaseDataBuilder atSpecAoSApplicantCorrespondenceAddressDetails(
         Address specAoSApplicantCorrespondenceAddressDetails) {
         this.specAoSApplicantCorrespondenceAddressDetails = specAoSApplicantCorrespondenceAddressDetails;
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent1PinToPostLRspec(DefendantPinToPostLRspec respondent1PinToPostLRspec) {
+        this.respondent1PinToPostLRspec = respondent1PinToPostLRspec;
         return this;
     }
 
@@ -3281,6 +3363,8 @@ public class CaseDataBuilder {
             .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
             .respondToAdmittedClaim(respondToClaim)
             .responseClaimAdmitPartEmployer(responseClaimAdmitPartEmployer)
+            //case progression
+            .hearingFeePaymentDetails(hearingFeePaymentDetails)
             //workaround fields
             .respondent1Copy(respondent1Copy)
             .respondent2Copy(respondent2Copy)
@@ -3313,6 +3397,8 @@ public class CaseDataBuilder {
             .applicant1ProceedWithClaimSpec2v1(applicant1ProceedWithClaimSpec2v1)
             .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
+            .specRespondent1Represented(specRespondent1Represented)
+            .specRespondent2Represented(specRespondent2Represented)
             .breathing(breathing)
             .caseManagementOrderSelection(caseManagementOrderSelection)
             .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
@@ -3322,6 +3408,8 @@ public class CaseDataBuilder {
             .disposalHearingBundleDJ(disposalHearingBundleDJ)
             .disposalHearingFinalDisposalHearingDJ(disposalHearingFinalDisposalHearingDJ)
             .trialHearingTrialDJ(trialHearingTrialDJ)
+            .disposalHearingJudgesRecitalDJ(disposalHearingJudgesRecitalDJ)
+            .trialHearingJudgesRecitalDJ(trialHearingJudgesRecitalDJ)
             .changeOfRepresentation(changeOfRepresentation)
             .changeOrganisationRequestField(changeOrganisationRequest)
             .build();

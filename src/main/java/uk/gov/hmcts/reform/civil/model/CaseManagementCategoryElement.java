@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.sdo;
+package uk.gov.hmcts.reform.civil.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class DisposalHearingPreferredEmail {
+public class CaseManagementCategoryElement {
 
-    private String email;
+    private String code;
+    private String label;
+
 }
