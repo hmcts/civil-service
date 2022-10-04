@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.helpers;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -14,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -28,14 +31,18 @@ import java.util.stream.Stream;
 @Component
 public class LocationHelper {
 
+    private final FeatureToggleService featureToggleService;
+
     private final BigDecimal ccmccAmount;
     private final String ccmccRegionId;
     private final String ccmccEpimsId;
 
     public LocationHelper(
+        FeatureToggleService featureToggleService,
         @Value("${genApp.lrd.ccmcc.amountPounds}") BigDecimal ccmccAmount,
         @Value("${genApp.lrd.ccmcc.epimsId}") String ccmccRegionId,
         @Value("${genApp.lrd.ccmcc.regionId}") String ccmccEpimsId) {
+        this.featureToggleService = featureToggleService;
         this.ccmccAmount = ccmccAmount;
         this.ccmccRegionId = ccmccRegionId;
         this.ccmccEpimsId = ccmccEpimsId;
@@ -143,13 +150,11 @@ public class LocationHelper {
      * @return requested court object for the lead claimant
      */
     private Optional<RequestedCourt> getClaimantRequestedCourt(CaseData caseData) {
-        // sometimes super claim type is not loaded
-        return Stream.of(
-            getSpecClaimantRequestedCourt(caseData),
-            getUnspecClaimantRequestedCourt(caseData)
-        ).filter(Optional::isPresent)
-            .findFirst()
-            .orElse(Optional.empty());
+        if (CaseCategoryUtils.isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+            return getSpecClaimantRequestedCourt(caseData);
+        } else {
+            return getUnspecClaimantRequestedCourt(caseData);
+        }
     }
 
     private Optional<RequestedCourt> getSpecClaimantRequestedCourt(CaseData caseData) {
