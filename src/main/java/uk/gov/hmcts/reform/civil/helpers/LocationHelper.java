@@ -32,7 +32,6 @@ import java.util.stream.Stream;
 public class LocationHelper {
 
     private final FeatureToggleService featureToggleService;
-
     private final BigDecimal ccmccAmount;
     private final String ccmccRegionId;
     private final String ccmccEpimsId;
