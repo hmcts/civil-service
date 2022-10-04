@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -68,7 +68,7 @@ class ResubmitClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUpdateBusinessProcess_whenInvoked_spec() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim()
-                .build().toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
+                .build().toBuilder().caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
@@ -89,7 +89,7 @@ class ResubmitClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUpdateBusinessProcess_whenInvoked_spec_blocked() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim()
-                .build().toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
+                .build().toBuilder().caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(false);

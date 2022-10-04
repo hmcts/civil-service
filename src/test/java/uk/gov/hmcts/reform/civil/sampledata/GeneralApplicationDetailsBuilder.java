@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -531,7 +532,8 @@ public class GeneralApplicationDetailsBuilder {
     public CaseData getTestCaseDataSPEC(SuperClaimType claimType) {
         return CaseData.builder()
             .ccdCaseReference(1234L)
-            .superClaimType(claimType)
+            .caseAccessCategory(claimType == SuperClaimType.SPEC_CLAIM
+                                    ? CaseCategory.SPEC_CLAIM : CaseCategory.UNSPEC_CLAIM)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
                                                .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                                                                  .organisationID(STRING_CONSTANT).build())

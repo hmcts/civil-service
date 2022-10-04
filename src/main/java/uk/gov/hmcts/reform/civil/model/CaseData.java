@@ -11,6 +11,7 @@ import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
@@ -88,6 +89,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 import javax.validation.Valid;
 
@@ -155,6 +157,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String paymentReference;
     private final DynamicList applicantSolicitor1PbaAccounts;
     private final ClaimType claimType;
+    /**
+     * spec or unspec claim.
+     *
+     * @deprecated use caseCategoryUtils.isSpecCaseCategory instead
+     */
+    @Deprecated
     private final SuperClaimType superClaimType;
     private final String claimTypeOther;
     private final PersonalInjuryType personalInjuryType;
@@ -545,16 +553,56 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     public YesOrNo getRespondent1Represented() {
-        return Stream.of(respondent1Represented,
-                         specRespondent1Represented)
+        return Stream.of(
+                respondent1Represented,
+                specRespondent1Represented
+            )
             .filter(Objects::nonNull)
             .findFirst().orElse(null);
     }
 
     public YesOrNo getRespondent2Represented() {
-        return Stream.of(respondent2Represented,
-                         specRespondent2Represented)
+        return Stream.of(
+                respondent2Represented,
+                specRespondent2Represented
+            )
             .filter(Objects::nonNull)
             .findFirst().orElse(null);
+    }
+
+    /**
+     * Should be here only until access profiles flag is always enabled, after that
+     * superClaimType field is going to be unused.
+     *
+     * @return super claim type for this case data
+     * @deprecated use getCaseAccessCategory()
+     */
+    @Deprecated
+    public SuperClaimType getSuperClaimType() {
+        if (superClaimType != null) {
+            return superClaimType;
+        } else if (super.getCaseAccessCategory() != null) {
+            return super.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM
+                ? SuperClaimType.SPEC_CLAIM : SuperClaimType.UNSPEC_CLAIM;
+        } else {
+            return SuperClaimType.UNSPEC_CLAIM;
+        }
+    }
+
+    /**
+     * Should be here only until access profiles flag is always enabled, after that
+     * superClaimType field is going to be unused.
+     *
+     * @return case category for this case data
+     */
+    public CaseCategory getCaseAccessCategory() {
+        return Optional.ofNullable(super.getCaseAccessCategory())
+            .orElseGet(() -> {
+                if (superClaimType == SuperClaimType.SPEC_CLAIM) {
+                    return CaseCategory.SPEC_CLAIM;
+                } else {
+                    return CaseCategory.UNSPEC_CLAIM;
+                }
+            });
     }
 }

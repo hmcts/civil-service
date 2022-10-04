@@ -14,8 +14,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -148,7 +148,7 @@ class RoboticsNotificationServiceTest {
     @SneakyThrows
     void shouldSendNotificationEmailLRSpec_whenCaseDataIsProvided() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
-            .toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
+            .toBuilder().caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
         if (caseData.getRespondent2OrgRegistered() != null
             && caseData.getRespondent2Represented() == null) {
             caseData = caseData.toBuilder()
@@ -269,7 +269,7 @@ class RoboticsNotificationServiceTest {
     @SneakyThrows
     void shouldSendNotificationEmailForMultiPartySpec_whenCaseDataIsProvided() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .respondent2(PartyBuilder.builder().individual().build())
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(NO)
@@ -307,7 +307,7 @@ class RoboticsNotificationServiceTest {
     @Test
     void shouldFailGracefully_whenLDException() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .respondent2(PartyBuilder.builder().individual().build())
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(NO)

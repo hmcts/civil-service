@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -280,7 +280,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotifiedTimeExtension()
                 .extensionDate(RESPONSE_DEADLINE.toLocalDate().plusDays(14))
                 .build().toBuilder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .businessProcess(BusinessProcess.builder()
                                      .camundaEvent(InformAgreedExtensionDateCallbackHandler
                                                        .SPEC_ACKNOWLEDGEMENT_OF_SERVICE)
@@ -527,7 +527,7 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
             LocalDateTime responseDeadline = now().atTime(END_OF_BUSINESS_DAY);
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1ResponseDeadline(responseDeadline)
-                .build().toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM)
+                .build().toBuilder().caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .build();
             when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);

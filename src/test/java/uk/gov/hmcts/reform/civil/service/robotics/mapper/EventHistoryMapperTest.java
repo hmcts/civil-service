@@ -7,11 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PartyRole;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -5635,7 +5635,7 @@ class EventHistoryMapperTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v2UnrepresentedDefendant()
             .build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .build();
         when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
         when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(false);
@@ -5690,7 +5690,7 @@ class EventHistoryMapperTest {
                            .note("my note")
                            .build())
             .build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .respondent1LitigationFriendCreatedDate(LocalDateTime.now())
             .build();
         when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
@@ -5757,7 +5757,7 @@ class EventHistoryMapperTest {
                            .note("my note")
                            .build())
             .build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .respondent2(Party.builder()
                              .type(Party.Type.COMPANY)
                              .companyName("Company Name")

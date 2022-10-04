@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.spec;
 
 import org.apache.commons.lang3.tuple.Pair;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AdmitNotProceedConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AdmitProceedConfHeader;
@@ -36,7 +36,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
 
     public static CaseData buildFullDefenceProceedCaseData() {
         return CaseData.builder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -45,7 +45,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
 
     public static CaseData buildFullDefenceNotProceedCaseData() {
         return CaseData.builder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -54,7 +54,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
 
     public static CaseData buildFullAdmitProceedCaseData() {
         return CaseData.builder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -63,7 +63,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
 
     public static CaseData buildFullAdmitNotProceedCaseData() {
         return CaseData.builder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -72,7 +72,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
 
     public static CaseData buildPartAdmitProceedCaseData() {
         return CaseData.builder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
@@ -81,7 +81,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
 
     public static CaseData buildPartAdmitNotProceedCaseData() {
         return CaseData.builder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)

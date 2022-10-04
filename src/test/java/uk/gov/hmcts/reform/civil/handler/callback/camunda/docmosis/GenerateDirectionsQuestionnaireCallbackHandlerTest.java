@@ -11,8 +11,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -104,7 +104,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldAddDocumentToSystemGeneratedDocuments_whenSameLRDiffResponseRespondent1DQ() {
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .respondent2(mock(Party.class))
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .respondentResponseIsSame(YesOrNo.NO)
@@ -130,7 +130,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     void shouldAddDocumentToSystemGeneratedDocuments_whenSameLRDiffResponseRespondent2DQ() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentAdmitPartOfClaimFastTrack().build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .respondent2(mock(Party.class))
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .respondentResponseIsSame(YesOrNo.NO)
@@ -258,7 +258,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
         for (RespondentResponseTypeSpec responseType : EnumSet.of(RespondentResponseTypeSpec.FULL_DEFENCE,
                                                                   RespondentResponseTypeSpec.PART_ADMISSION)) {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .respondent2DQ(Respondent2DQ.builder().build())
                 .respondent2ClaimResponseTypeForSpec(responseType)
@@ -284,7 +284,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldAddDocumentToSystemGeneratedDocuments_when1v2DiffSolBothRespondents() {
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .respondent2(mock(Party.class))
             .respondent2SameLegalRepresentative(YesOrNo.NO)
             .respondent1DQ(Respondent1DQ.builder().build())

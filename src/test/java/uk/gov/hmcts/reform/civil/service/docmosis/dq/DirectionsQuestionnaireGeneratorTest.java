@@ -13,6 +13,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -255,9 +256,10 @@ class DirectionsQuestionnaireGeneratorTest {
             ).thenReturn(CASE_DOCUMENT_DEFENDANT);
 
             CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
                 .atStateRespondentFullDefence()
                 .build().toBuilder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .build();
 
             CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -314,7 +316,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                          .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
-                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                     .build();
 
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
@@ -338,7 +340,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                          .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
-                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                     .applicant1ProceedWithClaimSpec2v1(YES)
                     .addApplicant2(YES)
                     .build();
@@ -366,7 +368,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                     .applicant1ProceedWithClaim(YES)
-                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                     .respondent2SameLegalRepresentative(YES)
                     .respondentResponseIsSame(YES)
                     .build();
@@ -392,7 +394,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
                     .applicant1ProceedWithClaim(YES)
-                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                     .respondent2SameLegalRepresentative(NO)
                     .build();
 

@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -68,7 +69,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
             caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
             caseDataBuilder.respondent1GeneratedResponseDocument(directionsQuestionnaire);
         }
     }
@@ -87,7 +88,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
-        if (!isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
+        if (caseData.getCaseAccessCategory() != CaseCategory.SPEC_CLAIM
             || DirectionsQuestionnaireGenerator.isClaimantResponse(caseData)
             || scenario == MultiPartyScenario.ONE_V_ONE
             || scenario == MultiPartyScenario.TWO_V_ONE) {

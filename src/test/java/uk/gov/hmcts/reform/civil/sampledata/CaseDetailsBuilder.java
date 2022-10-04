@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDateTime;
@@ -113,7 +113,7 @@ public class CaseDetailsBuilder {
 
     public CaseDetailsBuilder atStateFullDefenceSpec() {
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .ccdState(AWAITING_APPLICANT_INTENTION)
@@ -125,7 +125,7 @@ public class CaseDetailsBuilder {
 
     public CaseDetailsBuilder atStateFullAdmitSpec() {
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .ccdState(AWAITING_APPLICANT_INTENTION)
@@ -137,7 +137,7 @@ public class CaseDetailsBuilder {
 
     public CaseDetailsBuilder atStatePartAdmitSpec() {
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .ccdState(AWAITING_APPLICANT_INTENTION)

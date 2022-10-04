@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -569,7 +570,7 @@ public class FlowPredicate {
             && caseData.getRespondent1ClaimResponseTypeForSpec() == responseType;
         boolean predicate = false;
 
-        if (!isSpecCaseCategory(caseData, caseData.getCaseAccessCategory() != null)) {
+        if (caseData.getCaseAccessCategory() != CaseCategory.SPEC_CLAIM) {
             return false;
         }
 
