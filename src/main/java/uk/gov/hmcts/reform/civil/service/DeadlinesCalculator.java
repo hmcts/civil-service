@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getDaysToAddToDeadline;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getDaysToAddToDeadlineSpec;
 
 @Service
 @RequiredArgsConstructor
@@ -73,7 +72,7 @@ public class DeadlinesCalculator {
         if (is4pmOrAfter(responseDate)) {
             dateTime = responseDate.plusDays(1);
         }
-        int daysToAdd = getDaysToAddToDeadlineSpec();
+        int daysToAdd = 28;
         return calculateFirstWorkingDay(dateTime.toLocalDate()).plusDays(daysToAdd).atTime(END_OF_BUSINESS_DAY);
     }
 
