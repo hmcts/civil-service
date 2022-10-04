@@ -154,6 +154,18 @@ public class NotificationsProperties {
     private String standardDirectionOrderDJTemplate;
 
     @NotEmpty
+    private String respondentChangeOfAddressNotificationTemplate;
+
+    @NotEmpty
+    private String respondentLipFullAdmitOrPartAdmitTemplate;
+
+    @NotEmpty
+    private String respondentLipFullDefenceWithMediationTemplate;
+
+    @NotEmpty
+    private String respondentLipFullDefenceNoMediationTemplate;
+
+    @NotEmpty
     private String notificationOfHearing;
 
     @NotEmpty
