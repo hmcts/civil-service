@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.fees.client;
 
 import java.math.BigDecimal;
 
-enum ClaimIssueFeeKeyword {
+public enum ClaimIssueFeeKeyword {
     HearingFeeUpTo300,
     HearingFeeUpTo500,
     HearingFeeUpTo1000,
