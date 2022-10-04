@@ -1713,7 +1713,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         } else {
             updatedData
                 .respondent1ResponseDate(responseDate)
-                .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate ))
+                .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate))
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
 
             updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
