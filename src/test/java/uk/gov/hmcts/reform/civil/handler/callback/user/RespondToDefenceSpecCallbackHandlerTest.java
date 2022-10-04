@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -68,7 +69,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     JacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class,
     UnavailableDateValidator.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    LocationHelper.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
