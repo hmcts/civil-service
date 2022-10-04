@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import java.math.BigDecimal;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.DayOfWeek;
@@ -38,21 +39,21 @@ public class HearingUtils {
         return result;
     }
 
-    public static String getFastTrackFee(int claimFee) {
+    public static BigDecimal getFastTrackFee(int claimFee) {
         if (claimFee == 0) {
-            return "£0";
+            return new BigDecimal(0);
         } else if (claimFee < 300_00) {
-            return "£27";
+            return new BigDecimal(27);
         } else if (claimFee < 500_00) {
-            return "£59";
+            return new BigDecimal(59);
         } else if (claimFee < 1000_00) {
-            return "£85";
+            return new BigDecimal(85);
         } else if (claimFee < 1500_00) {
-            return "£123";
+            return new BigDecimal(123);
         } else if (claimFee < 3000_00) {
-            return "£181";
+            return new BigDecimal(181);
         } else {
-            return "£346";
+            return new BigDecimal(346);
         }
     }
 
