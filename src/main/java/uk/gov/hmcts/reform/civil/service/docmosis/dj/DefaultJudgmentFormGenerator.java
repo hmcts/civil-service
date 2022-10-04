@@ -165,11 +165,11 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             .map(OrganisationPolicy::getOrganisation)
             .map(uk.gov.hmcts.reform.ccd.model.Organisation::getOrganisationID)
             .map(organisationService::findOrganisationById)
-            .flatMap(value -> value.map( o -> Party.builder()
+            .flatMap(value -> value.map(o -> Party.builder()
                 .name(o.getName())
                 .primaryAddress(getAddress(o.getContactInformation().get(0)))
                 .build())).orElse(null);
-  }
+    }
 
     private Address getAddress(ContactInformation address) {
         return Address.builder().addressLine1(address.getAddressLine1())
