@@ -2,50 +2,11 @@ package uk.gov.hmcts.reform.civil.sampledata;
 
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.ClaimType;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
-import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
-import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
-import uk.gov.hmcts.reform.civil.model.Address;
-import uk.gov.hmcts.reform.civil.model.Bundle;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.CaseNote;
-import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
-import uk.gov.hmcts.reform.civil.model.ClaimValue;
-import uk.gov.hmcts.reform.civil.model.CloseClaim;
-import uk.gov.hmcts.reform.civil.model.CorrectEmail;
-import uk.gov.hmcts.reform.civil.model.CourtLocation;
-import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
-import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.IdValue;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
-import uk.gov.hmcts.reform.civil.model.LitigationFriend;
-import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
-import uk.gov.hmcts.reform.civil.model.RespondToClaim;
-import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
-import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
-import uk.gov.hmcts.reform.civil.model.ResponseDocument;
-import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
-import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.UnemployedComplexTypeLRspec;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
@@ -79,6 +40,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
+import uk.gov.hmcts.reform.payments.client.models.FeeDto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -121,6 +83,7 @@ public class CaseDataBuilder {
     public static final LocalDateTime NOTIFICATION_DEADLINE = LocalDate.now().atStartOfDay().plusDays(14);
     public static final BigDecimal FAST_TRACK_CLAIM_AMOUNT = BigDecimal.valueOf(10000);
     public static final LocalDate FUTURE_DATE = LocalDate.now().plusYears(1);
+    public static final String CUSTOMER_REFERENCE = "12345";
 
     // Create Claim
     protected Long ccdCaseReference;
@@ -3308,4 +3271,30 @@ public class CaseDataBuilder {
             .trialHearingTrialDJ(trialHearingTrialDJ)
             .build();
     }
+
+    public CaseData buildServiceRequestCaseData() {
+        Organisation orgId = Organisation.builder()
+            .organisationID("OrgId").build();
+
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .hearingFee(Fee.builder()
+            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+            .code("FE203")
+            .version("1")
+            .build() )
+            .applicant1(applicant1)
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .hearingFeeServiceRequestDetails(
+                HearingFeeServiceRequestDetails.builder()
+                    .fee(
+                        Fee.builder()
+                            .code("FE203")
+                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .version("1")
+                            .build())
+                        .serviceRequestReference(CUSTOMER_REFERENCE).build())
+        .build();
+    }
+
 }
