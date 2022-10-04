@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.defaultjudgment;
+package uk.gov.hmcts.reform.civil.model.genapplication;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class TrialHearingJudgesRecital {
+public class CaseLocation {
 
-    private String input;
+    private String region;
 
-    private String judgeNameTitle;
+    private String baseLocation;
 }
