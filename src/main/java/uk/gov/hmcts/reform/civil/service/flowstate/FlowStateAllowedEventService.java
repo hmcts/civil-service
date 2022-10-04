@@ -32,11 +32,13 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
@@ -145,6 +147,7 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
+                HEARING_SCHEDULED,
                 NotSuitable_SDO
             )
         ),
@@ -193,8 +196,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 TAKE_CASE_OFFLINE,
-                EVIDENCE_UPLOAD_JUDGE
-
+                EVIDENCE_UPLOAD_JUDGE,
+                HEARING_SCHEDULED,
             )
         ),
         entry(
@@ -525,12 +528,14 @@ public class FlowStateAllowedEventService {
                 INFORM_AGREED_EXTENSION_DATE,
                 INFORM_AGREED_EXTENSION_DATE_SPEC,
                 DEFENDANT_RESPONSE_SPEC,
+                DEFENDANT_RESPONSE_CUI,
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
                 DEFAULT_JUDGEMENT_SPEC,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
+                HEARING_SCHEDULED,
                 NotSuitable_SDO
             )
         ),
@@ -543,6 +548,7 @@ public class FlowStateAllowedEventService {
                 INFORM_AGREED_EXTENSION_DATE,
                 INFORM_AGREED_EXTENSION_DATE_SPEC,
                 DEFENDANT_RESPONSE_SPEC,
+                DEFENDANT_RESPONSE_CUI,
                 NOTIFY_DEFENDANT_OF_CLAIM_DETAILS,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,
@@ -725,6 +731,7 @@ public class FlowStateAllowedEventService {
             AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
             List.of(
                 DEFENDANT_RESPONSE_SPEC,
+                DEFENDANT_RESPONSE_CUI,
                 ACKNOWLEDGE_CLAIM,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
@@ -745,7 +752,8 @@ public class FlowStateAllowedEventService {
         entry(
             AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
             List.of(
-                DEFENDANT_RESPONSE_SPEC
+                DEFENDANT_RESPONSE_SPEC,
+                DEFENDANT_RESPONSE_CUI
             )
         )
     );
