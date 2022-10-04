@@ -68,12 +68,12 @@ public class DeadlinesCalculator {
         return calculateFirstWorkingDay(dateTime.toLocalDate()).plusDays(daysToAdd).atTime(END_OF_BUSINESS_DAY);
     }
 
-    public LocalDateTime calculateApplicantResponseDeadlineSpec(LocalDateTime responseDate, AllocatedTrack track) {
+    public LocalDateTime calculateApplicantResponseDeadlineSpec(LocalDateTime responseDate) {
         LocalDateTime dateTime = responseDate;
         if (is4pmOrAfter(responseDate)) {
             dateTime = responseDate.plusDays(1);
         }
-        int daysToAdd = getDaysToAddToDeadlineSpec(track);
+        int daysToAdd = getDaysToAddToDeadlineSpec();
         return calculateFirstWorkingDay(dateTime.toLocalDate()).plusDays(daysToAdd).atTime(END_OF_BUSINESS_DAY);
     }
 

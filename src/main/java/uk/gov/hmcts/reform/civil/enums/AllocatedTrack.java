@@ -32,7 +32,7 @@ public enum AllocatedTrack {
         return 28;
     }
 
-    public static int getDaysToAddToDeadlineSpec(AllocatedTrack track) {
+    public static int getDaysToAddToDeadlineSpec() {
         return 28;
     }
 
