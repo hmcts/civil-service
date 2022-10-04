@@ -34,6 +34,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DETAILS_A
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Address.fromContactInformation;
+import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
+import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
 import static uk.gov.hmcts.reform.civil.utils.ChangeOfRepresentationUtils.getLatestChangeOfRepresentation;
 
 @Slf4j
@@ -251,6 +253,16 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             // only update if it's been created during acknowledge claim
             if (caseData.getSolicitorReferencesCopy() != null) {
                 caseDataBuilder.solicitorReferencesCopy(updatedSolicitorReferences);
+            }
+
+            CaseData tempCaseData = caseDataBuilder.build();
+
+            if (caseData.getCaseListDisplayDefendantSolicitorReferences() != null) {
+                caseDataBuilder.caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(tempCaseData));
+            }
+
+            if (caseData.getUnassignedCaseListDisplayOrganisationReferences() != null) {
+                caseDataBuilder.caseListDisplayDefendantSolicitorReferences(getAllOrganisationPolicyReferences(tempCaseData));
             }
         }
     }
