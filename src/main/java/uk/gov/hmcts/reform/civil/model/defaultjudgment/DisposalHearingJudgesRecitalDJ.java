@@ -11,5 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DisposalHearingJudgesRecitalDJ {
 
+    private String judgeNameTitle;
+
     private String input;
+
 }
