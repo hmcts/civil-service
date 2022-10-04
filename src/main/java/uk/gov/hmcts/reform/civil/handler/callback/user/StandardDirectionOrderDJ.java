@@ -47,10 +47,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -519,11 +516,14 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         if (nonNull(locations)) {
             location = fillPreferredLocationData(locations, getLocationListFromCaseData(
                 caseData.getDisposalHearingMethodInPersonDJ(), caseData.getTrialHearingMethodInPersonDJ()));
+            Optional.ofNullable(location)
+                    .map(value -> caseDataBuilder.caseManagementLocation(CaseLocation.builder()
+                                                                             .region(value.getRegionId())
+                                                                             .baseLocation(value.getEpimmsId())
+                                                                             .build()));
+
         }
-        if (Objects.nonNull(location)) {
-            caseDataBuilder.caseManagementLocation(CaseLocation.builder().region(location.getRegionId()).baseLocation(
-                    location.getEpimmsId()).build());
-        }
+
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
