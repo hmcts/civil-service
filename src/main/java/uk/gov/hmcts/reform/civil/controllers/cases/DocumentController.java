@@ -40,8 +40,8 @@ public class DocumentController {
         produces = MediaType.APPLICATION_PDF_VALUE)
     public @ResponseBody
     byte[] downloadSealedDocument(
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @NotNull @RequestBody CaseDocument caseDocument) {
-        return claimFormService.downloadSealedDocument(authorisation, caseDocument);
+        return claimFormService.downloadSealedDocument(caseDocument);
     }
+
 }

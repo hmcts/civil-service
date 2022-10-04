@@ -134,7 +134,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
              )
         ).thenReturn(responseEntity);
 
-        byte[] pdf = documentController.downloadSealedDocument(BEARER_TOKEN, caseDocument);
+        byte[] pdf = documentController.downloadSealedDocument(caseDocument);
 
         assertNotNull(pdf);
         assertArrayEquals("test".getBytes(), pdf);
