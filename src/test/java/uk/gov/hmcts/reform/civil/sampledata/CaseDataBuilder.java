@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.sampledata;
 
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+
 import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
@@ -40,7 +41,6 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
-import uk.gov.hmcts.reform.payments.client.models.FeeDto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -3282,7 +3282,7 @@ public class CaseDataBuilder {
             .calculatedAmountInPence(BigDecimal.valueOf(27500))
             .code("FE203")
             .version("1")
-            .build() )
+            .build())
             .applicant1(applicant1)
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
             .hearingFeeServiceRequestDetails(
