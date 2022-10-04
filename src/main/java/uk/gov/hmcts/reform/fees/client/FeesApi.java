@@ -13,11 +13,11 @@ import java.math.BigDecimal;
 
 public interface FeesApi {
 
-    String baseUrl = "/fees-register/fees/lookup";
+    String baseUrl = "/fees-register/fees";
     @GetMapping("/health")
     InternalHealth health();
 
-    @GetMapping(baseUrl
+    @GetMapping(baseUrl+"/lookup"
         + "?service={service}"
         + "&jurisdiction1={jurisdiction1}"
         + "&jurisdiction2={jurisdiction2}"
