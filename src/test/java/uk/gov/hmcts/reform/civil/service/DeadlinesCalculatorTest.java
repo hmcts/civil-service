@@ -292,6 +292,7 @@ public class DeadlinesCalculatorTest {
                 .isWeekday()
                 .isTheSame(expectedDeadline);
         }
+
         @Test
         void shouldReturnDeadlinePlus28DaysWithAnExtraDay_whenResponseDateIsWeekdayAfter4pm() {
             LocalDateTime weekdayDate = LocalDate.of(2021, 2, 4).atTime(17, 0);
