@@ -47,7 +47,11 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -521,9 +525,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                              .region(value.getRegionId())
                                                                              .baseLocation(value.getEpimmsId())
                                                                              .build()));
-
         }
-
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
