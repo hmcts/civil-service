@@ -12,4 +12,6 @@ import lombok.NoArgsConstructor;
 public class TrialHearingJudgesRecital {
 
     private String input;
+
+    private String judgeNameTitle;
 }
