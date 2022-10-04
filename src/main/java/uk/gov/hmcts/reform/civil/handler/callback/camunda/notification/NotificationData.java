@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 public interface NotificationData {
@@ -50,6 +52,15 @@ public interface NotificationData {
     String RESPOND_URL = "respondToClaimUrl";
     String PIN = "pin";
     String FRONTEND_URL = "frontendBaseUrl";
+
+    //Hearing notification
+    String EMAIL_ADDRESS = "emailAddress";
+    String HEARING_FEE = "hearingFee";
+    String HEARING_DATE = "hearingDate";
+    String HEARING_TIME = "hearingTime";
+    String DEADLINE_DATE = "deadlineDate";
+    String CLAIMANT_REFERENCE_NUMBER = "claimantReferenceNumber";
+    String DEFENDANT_REFERENCE_NUMBER = "defendantReferenceNumber";
 
     Map<String, String> addProperties(CaseData caseData);
 

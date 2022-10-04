@@ -156,4 +156,13 @@ public class NotificationsProperties {
     @NotEmpty
     private String notificationOfHearing;
 
+    @NotEmpty
+    private String hearingListedFeeClaimantLegalRep;
+
+    @NotEmpty
+    private String hearingListedNoFeeClaimantLegalRep;
+
+    @NotEmpty
+    private String hearingListedNoFeeDefendantLegalRep;
+
 }
