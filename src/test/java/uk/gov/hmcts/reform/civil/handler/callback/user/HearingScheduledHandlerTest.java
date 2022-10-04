@@ -37,6 +37,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -207,6 +208,7 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+
     class SubmittedCallback {
 
         @Test

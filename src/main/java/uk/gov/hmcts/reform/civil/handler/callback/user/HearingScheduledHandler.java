@@ -22,6 +22,13 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
 import java.math.BigDecimal;
+
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -33,7 +40,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+
 import static java.util.Objects.nonNull;
+
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -54,7 +63,9 @@ public class HearingScheduledHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(HEARING_SCHEDULED);
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
+
     private final PublicHolidaysCollection publicHolidaysCollection;
+
     private final HearingReferenceNumberRepository hearingReferenceNumberRepository;
 
     @Override
@@ -65,6 +76,7 @@ public class HearingScheduledHandler extends CallbackHandler {
             .put(callbackKey(MID, "checkPastDate"), this::checkPastDate)
             .put(callbackKey(MID, "checkFutureDate"), this::checkFutureDate)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::getDueDateAndFee)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -74,6 +86,11 @@ public class HearingScheduledHandler extends CallbackHandler {
     }
 
     private String getHeader() {
+    private String getBody(CaseData caseData) {
+        return format(HEARING_TASKS);
+    }
+
+    private String getHeader(CaseData caseData) {
         return format(HEARING_CREATED_HEADER, hearingReferenceNumberRepository.getHearingReferenceNumber());
     }
 
@@ -82,6 +99,8 @@ public class HearingScheduledHandler extends CallbackHandler {
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(getHeader())
             .confirmationBody(getBody())
+            .confirmationHeader(getHeader(caseData))
+            .confirmationBody(getBody(caseData))
             .build();
     }
 
@@ -98,6 +117,8 @@ public class HearingScheduledHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
     }
 
     private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
@@ -111,6 +132,7 @@ public class HearingScheduledHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
 
         LocalDate dateOfApplication = caseData.getDateOfApplication();
+
         List<String> errors = (Objects.isNull(dateOfApplication)) ? null :
             isPastDate(dateOfApplication);
 
