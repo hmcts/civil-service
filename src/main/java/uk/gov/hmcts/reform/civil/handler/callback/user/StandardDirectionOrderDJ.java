@@ -520,11 +520,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         if (nonNull(locations)) {
             location = fillPreferredLocationData(locations, getLocationListFromCaseData(
                 caseData.getDisposalHearingMethodInPersonDJ(), caseData.getTrialHearingMethodInPersonDJ()));
-           var caseBuilder = Optional.ofNullable(location)
-                    .map(value -> caseDataBuilder.caseManagementLocation(CaseLocation.builder()
-                                                                             .region(value.getRegionId())
-                                                                             .baseLocation(value.getEpimmsId())
-                                                                             .build()));
+            var caseBuilder = Optional.ofNullable(location)
+                .map(value -> caseDataBuilder.caseManagementLocation(CaseLocation.builder()
+                                                                         .region(value.getRegionId())
+                                                                         .baseLocation(value.getEpimmsId())
+                                                                         .build()));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
