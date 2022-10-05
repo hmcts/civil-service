@@ -96,8 +96,8 @@ public class HearingScheduledHandler extends CallbackHandler {
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
     }
 
     private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
