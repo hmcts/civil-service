@@ -96,10 +96,10 @@ allprojects {
       }
       // Solves CVE-2022-25647
       dependencySet(
-        group: 'com.google.code.gson',
-        version: '2.9.0'
+        group: 'org.camunda.bpm',
+        version: '7.17.0'
       ) {
-        entry 'gson'
+        entry 'camunda-engine'
       }
     }
     imports {
