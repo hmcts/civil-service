@@ -310,6 +310,7 @@ public class CaseDataBuilder {
     private TrialHearingTrial trialHearingTrialDJ;
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
+    private CaseLocation caseLocation;
 
     //update pdf document from general applications
     private List<Element<CaseDocument>> generalOrderDocument;
