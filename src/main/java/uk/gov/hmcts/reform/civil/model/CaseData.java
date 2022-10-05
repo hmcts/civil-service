@@ -479,6 +479,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private HearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceHearingDJ;
 
+    //Hearing Scheduled
+    private DynamicList hearingLocation;
+    private LocalDate dateOfApplication;
+    private LocalDate hearingDate;
+    private String hearingTimeHourMinute;
+    private String hearingReferenceNumber;
+
     //default judgement SDO fields for trial/fast track
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
     private TrialHearingDisclosureOfDocuments trialHearingDisclosureOfDocumentsDJ;
