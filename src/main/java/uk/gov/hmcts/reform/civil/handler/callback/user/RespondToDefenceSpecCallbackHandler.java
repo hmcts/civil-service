@@ -175,7 +175,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                     .applicant1DQ(dq.applicant1DQRequestedCourt(
                                           caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().toBuilder()
                                               .responseCourtLocations(null)
-                                              .requestHearingAtSpecificCourt(YES)
                                               .caseLocation(CaseLocation.builder()
                                                                 .region(courtLocation.getRegionId())
                                                                 .baseLocation(courtLocation.getEpimmsId())
