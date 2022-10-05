@@ -6,6 +6,7 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.StrikeOutEvent;
@@ -36,7 +37,7 @@ public class HearingFeePaidHandler implements BaseExternalTaskHandler {
                 if (caseData.getHearingDueDate() == null
                     || caseData.getHearingFeePaymentDetails().getStatus() == PaymentStatus.SUCCESS) {
                     log.info("Current case status '{}'", caseDetails.getState());
-                    applicationEventPublisher.publishEvent(new StrikeOutEvent(caseDetails.getId()));
+                    caseDetails.setState(String.valueOf(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING));
                 } else if (caseData.getHearingFeePaymentDetails().getStatus() == null
                             || caseData.getHearingFeePaymentDetails().getStatus() == PaymentStatus.FAILED) {
                     log.info("Current case status '{}'", caseDetails.getState());
