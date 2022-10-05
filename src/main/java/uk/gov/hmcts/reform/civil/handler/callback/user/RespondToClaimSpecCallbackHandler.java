@@ -148,7 +148,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     @Override
     protected Map<String, Callback> callbacks() {
-        System.out.println("inside RespondToClaimSpecCallbackHandler class ");
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::populateRespondent1Copy)
             .put(callbackKey(V_1, ABOUT_TO_START), this::populateRespondent1CopyV1)
