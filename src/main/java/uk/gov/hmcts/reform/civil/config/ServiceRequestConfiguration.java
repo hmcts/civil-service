@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @Configuration
 public class ServiceRequestConfiguration {
+    
     private final String siteId;
     private final String service;
 
