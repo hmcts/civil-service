@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
@@ -64,6 +65,7 @@ public class HearingScheduledHandler extends CallbackHandler {
             .put(callbackKey(MID, "checkPastDate"), this::checkPastDate)
             .put(callbackKey(MID, "checkFutureDate"), this::checkFutureDate)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::getDueDateAndFee)
+            .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
 
@@ -72,7 +74,6 @@ public class HearingScheduledHandler extends CallbackHandler {
     }
 
     private String getHeader() {
-
         return format(HEARING_CREATED_HEADER, hearingReferenceNumberRepository.getHearingReferenceNumber());
     }
 
@@ -101,8 +102,8 @@ public class HearingScheduledHandler extends CallbackHandler {
 
     private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
         return fromList(locations.stream().map(location -> new StringBuilder().append(location.getSiteName())
-                                 .append(" - ").append(location.getCourtAddress())
-                                .append(" - ").append(location.getPostcode()).toString())
+                .append(" - ").append(location.getCourtAddress())
+                .append(" - ").append(location.getPostcode()).toString())
                             .collect(Collectors.toList()));
     }
 
@@ -110,7 +111,6 @@ public class HearingScheduledHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
 
         LocalDate dateOfApplication = caseData.getDateOfApplication();
-
         List<String> errors = (Objects.isNull(dateOfApplication)) ? null :
             isPastDate(dateOfApplication);
 

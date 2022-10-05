@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.ListingOrRelisting;
@@ -38,6 +39,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @ExtendWith(SpringExtension.class)
@@ -151,7 +153,7 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .addRespondent2(NO)
                 .listingOrRelisting(ListingOrRelisting.LISTING)
-                .hearingDate(LocalDate.now().plusWeeks(5))
+                .hearingDate(LocalDate.now().plusWeeks(2))
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
                 .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                 .build();
@@ -204,9 +206,8 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
-    /*   @Nested
-
-class SubmittedCallback {
+    @Nested
+    class SubmittedCallback {
 
         @Test
         void shouldReturnHearingNoticeCreated_WhenSubmitted() {
@@ -228,7 +229,5 @@ class SubmittedCallback {
                                                                           .confirmationBody(String.format(body))
                                                                           .build());
         }
-    }*/
+    }
 }
-
-
