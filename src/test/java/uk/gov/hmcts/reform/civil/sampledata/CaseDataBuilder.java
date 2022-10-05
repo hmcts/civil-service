@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.sampledata;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -54,6 +55,8 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -150,6 +153,7 @@ public class CaseDataBuilder {
     protected CaseState ccdState;
     protected List<Element<CaseDocument>> systemGeneratedCaseDocuments;
     protected PaymentDetails claimIssuedPaymentDetails;
+    protected PaymentDetails hearingFeePaymentDetails;
     protected CorrectEmail applicantSolicitor1CheckEmail;
     protected IdamUserDetails applicantSolicitor1UserDetails;
     //Deadline extension
@@ -199,6 +203,7 @@ public class CaseDataBuilder {
     protected YesOrNo addApplicant2;
     protected SuperClaimType superClaimType;
     protected YesOrNo addRespondent2;
+    protected CaseCategory caseAccessCategory;
 
     protected YesOrNo specRespondent1Represented;
     protected YesOrNo specRespondent2Represented;
@@ -288,6 +293,8 @@ public class CaseDataBuilder {
     private DisposalHearingBundleDJ disposalHearingBundleDJ;
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private TrialHearingTrial trialHearingTrialDJ;
+    private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
+    private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
 
     //update pdf document from general applications
     private List<Element<CaseDocument>> generalOrderDocument;
@@ -1429,11 +1436,21 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimIssuedDisposalHearing() {
         caseManagementOrderSelection = DISPOSAL_HEARING;
+
+        disposalHearingJudgesRecitalDJ = DisposalHearingJudgesRecitalDJ
+            .builder()
+            .judgeNameTitle("test name")
+            .build();
         return this;
     }
 
     public CaseDataBuilder atStateClaimIssuedTrialHearing() {
         caseManagementOrderSelection = "TRIAL_HEARING";
+
+        trialHearingJudgesRecitalDJ = TrialHearingJudgesRecital
+            .builder()
+            .judgeNameTitle("test name")
+            .build();
         return this;
     }
 
@@ -1467,6 +1484,7 @@ public class CaseDataBuilder {
                         + "bundle before it is filed. "
                         + "The bundle will include a case summary"
                         + " and a chronology.")
+            .type(DisposalHearingBundleType.DOCUMENTS)
             .build();
         return this;
     }
@@ -3071,6 +3089,15 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder receiveUpdatePaymentRequest() {
+        atStateRespondentFullDefence();
+        this.hearingFeePaymentDetails = PaymentDetails.builder()
+            .customerReference("RC-1604-0739-2145-4711")
+        .build();
+
+        return this;
+    }
+
     public CaseDataBuilder atSpecAoSApplicantCorrespondenceAddressRequired(
         YesOrNo specAoSApplicantCorrespondenceAddressRequired) {
         this.specAoSApplicantCorrespondenceAddressRequired = specAoSApplicantCorrespondenceAddressRequired;
@@ -3249,6 +3276,8 @@ public class CaseDataBuilder {
             .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
             .respondToAdmittedClaim(respondToClaim)
             .responseClaimAdmitPartEmployer(responseClaimAdmitPartEmployer)
+            //case progression
+            .hearingFeePaymentDetails(hearingFeePaymentDetails)
             //workaround fields
             .respondent1Copy(respondent1Copy)
             .respondent2Copy(respondent2Copy)
@@ -3292,6 +3321,8 @@ public class CaseDataBuilder {
             .disposalHearingBundleDJ(disposalHearingBundleDJ)
             .disposalHearingFinalDisposalHearingDJ(disposalHearingFinalDisposalHearingDJ)
             .trialHearingTrialDJ(trialHearingTrialDJ)
+            .disposalHearingJudgesRecitalDJ(disposalHearingJudgesRecitalDJ)
+            .trialHearingJudgesRecitalDJ(trialHearingJudgesRecitalDJ)
             .build();
     }
 }
