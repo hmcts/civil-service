@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -20,7 +21,6 @@ import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementSe
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.prd.model.ContactInformation;
-import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -111,8 +111,8 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
             .formText("No response,")
             .applicant(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
             .respondent(getRespondent(respondent))
-            .claimantLR(getApplicantOrgDetails(caseData.getApplicant1OrganisationPolicy()
-                                                   .getOrganisation().getOrganisationID()))
+            .claimantLR(getApplicantOrgDetails(caseData.getApplicant1OrganisationPolicy())
+                                                   )
             .debt(debtAmount.toString())
             .costs(cost.toString())
             .totalCost(debtAmount.add(cost).setScale(2).toString())
@@ -153,12 +153,16 @@ public class DefaultJudgmentFormGenerator implements TemplateDataGenerator<Defau
         return applicants;
     }
 
-    private Party getApplicantOrgDetails(String id) {
-        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
-        return organisation.map(value -> Party.builder()
-            .name(value.getName())
-            .primaryAddress(getAddress(value.getContactInformation().get(0)))
-            .build()).orElse(null);
+    private Party getApplicantOrgDetails(OrganisationPolicy organisationPolicy) {
+
+        return Optional.ofNullable(organisationPolicy)
+            .map(OrganisationPolicy::getOrganisation)
+            .map(uk.gov.hmcts.reform.ccd.model.Organisation::getOrganisationID)
+            .map(organisationService::findOrganisationById)
+            .flatMap(value -> value.map(o -> Party.builder()
+                .name(o.getName())
+                .primaryAddress(getAddress(o.getContactInformation().get(0)))
+                .build())).orElse(null);
     }
 
     private Address getAddress(ContactInformation address) {
