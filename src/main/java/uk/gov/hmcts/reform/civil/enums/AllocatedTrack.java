@@ -36,7 +36,6 @@ public enum AllocatedTrack {
         return 28;
     }
 
-
     private static boolean isValueSmallerThan(BigDecimal value, int comparisionValue) {
         return value.compareTo(BigDecimal.valueOf(comparisionValue)) < 0;
     }
