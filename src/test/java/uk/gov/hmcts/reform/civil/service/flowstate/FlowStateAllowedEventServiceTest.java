@@ -246,7 +246,7 @@ class FlowStateAllowedEventServiceTest {
                         STANDARD_DIRECTION_ORDER_DJ,
                         TAKE_CASE_OFFLINE,
                         EVIDENCE_UPLOAD_JUDGE,
-                        HEARING_SCHEDULED,
+                        HEARING_SCHEDULED
                     }
                 ),
                 of(
