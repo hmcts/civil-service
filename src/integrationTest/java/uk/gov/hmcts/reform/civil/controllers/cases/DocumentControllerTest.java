@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
 import uk.gov.hmcts.reform.ccd.document.am.model.Document;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -96,6 +97,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
     @Mock
     private ResponseEntity<Resource> responseEntity;
+
     private final UserInfo userInfo = UserInfo.builder()
         .roles(List.of("role"))
         .uid("id")
@@ -108,6 +110,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     public void setUp() {
         when(authTokenGenerator.generate()).thenReturn(BEARER_TOKEN);
         when(userService.getUserInfo(anyString())).thenReturn(userInfo);
+        when(userService.getAccessToken(anyString(), anyString())).thenReturn(BEARER_TOKEN);
     }
 
     @Test
