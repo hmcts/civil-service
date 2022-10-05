@@ -214,8 +214,8 @@ public class DeadlinesCalculatorTest {
         void shouldReturnDeadlinePlus28Days_whenResponseDateIsWeekdayAndTrackIsSmallClaim() {
             LocalDateTime weekdayDate = LocalDate.of(2023, 3, 1).atTime(12, 0);
             LocalDateTime expectedDeadline = weekdayDate.toLocalDate().plusDays(28).atTime(END_OF_BUSINESS_DAY);
-            LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadlineSpec
-                (weekdayDate, SMALL_CLAIM);
+            LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadlineSpec(
+                weekdayDate, SMALL_CLAIM);
 
             assertThat(responseDeadline)
                 .isWeekday()
@@ -237,8 +237,8 @@ public class DeadlinesCalculatorTest {
         void shouldReturnDeadlinePlus28Days_whenResponseDateIsWeekendAndTrackIsSmallClaim() {
             LocalDateTime weekendDate = LocalDate.of(2023, 3, 1).atTime(12, 0);
             LocalDateTime expectedDeadline = LocalDate.of(2023, 3, 29).atTime(END_OF_BUSINESS_DAY);
-            LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadlineSpec
-                (weekendDate, SMALL_CLAIM);
+            LocalDateTime responseDeadline = calculator.calculateApplicantResponseDeadlineSpec(
+                weekendDate, SMALL_CLAIM);
 
             assertThat(responseDeadline)
                 .isWeekday()
