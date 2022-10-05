@@ -1,8 +1,10 @@
-package uk.gov.hmcts.reform.civil.callback;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.callback;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
+import uk.gov.hmcts.reform.civil.callback.CallbackType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;

@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DISMISSED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_DISMISSED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_HEARING_FEE_UNPAID;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isRespondent1;
 
@@ -27,8 +27,8 @@ public class HearingFeeUnpaidRespondentNotificationHandler extends CallbackHandl
     implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(
-        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DISMISSED,
-        NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_DISMISSED
+        NOTIFY_RESPONDENT_SOLICITOR1_FOR_HEARING_FEE_UNPAID,
+        NOTIFY_RESPONDENT_SOLICITOR2_FOR_HEARING_FEE_UNPAID
     );
     public static final String TASK_ID_RESPONDENT1 = "HearingFeeUnpaidNotifyRespondentSolicitor1";
     public static final String TASK_ID_RESPONDENT2 = "HearingFeeUnpaidNotifyRespondentSolicitor2";
@@ -48,7 +48,7 @@ public class HearingFeeUnpaidRespondentNotificationHandler extends CallbackHandl
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return isRespondent1(callbackParams, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DISMISSED) ? TASK_ID_RESPONDENT1
+        return isRespondent1(callbackParams, NOTIFY_RESPONDENT_SOLICITOR1_FOR_HEARING_FEE_UNPAID) ? TASK_ID_RESPONDENT1
             : TASK_ID_RESPONDENT2;
     }
 
@@ -61,7 +61,7 @@ public class HearingFeeUnpaidRespondentNotificationHandler extends CallbackHandl
         CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String recipient = !is1v1Or2v1Case(caseData)
-            && !isRespondent1(callbackParams, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DISMISSED) ? caseData
+            && !isRespondent1(callbackParams, NOTIFY_RESPONDENT_SOLICITOR1_FOR_HEARING_FEE_UNPAID) ? caseData
                 .getRespondentSolicitor2EmailAddress() : caseData.getRespondentSolicitor1EmailAddress();
 
         notificationService.sendMail(

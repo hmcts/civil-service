@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_DISMISSED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_HEARING_FEE_UNPAID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +24,7 @@ public class HearingFeeUnpaidApplicantNotificationHandler extends CallbackHandle
     implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(
-        NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_DISMISSED);
+        NOTIFY_APPLICANT_SOLICITOR1_FOR_HEARING_FEE_UNPAID);
     public static final String TASK_ID = "HearingFeeUnpaidNotifyApplicantSolicitor1";
     private static final String REFERENCE_TEMPLATE =
         "hearing-fee-unpaid-applicant-notification-%s";
