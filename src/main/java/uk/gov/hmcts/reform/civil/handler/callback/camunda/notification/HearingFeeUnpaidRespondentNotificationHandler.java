@@ -20,7 +20,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_DISMISSED;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isRespondent1;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @Service
 @RequiredArgsConstructor
