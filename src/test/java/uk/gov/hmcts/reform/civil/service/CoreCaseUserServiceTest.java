@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 
 import java.util.List;
 
@@ -48,7 +47,7 @@ class CoreCaseUserServiceTest {
     private CaseAccessDataStoreApi caseAccessDataStoreApi;
 
     @MockBean
-    private IdamClient idamClient;
+    private UserService userService;
 
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
@@ -59,9 +58,9 @@ class CoreCaseUserServiceTest {
     @BeforeEach
     void init() {
         clearInvocations(authTokenGenerator);
-        clearInvocations(idamClient);
+        clearInvocations(userService);
         when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTH_TOKEN);
-        when(idamClient.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(
+        when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(
             CAA_USER_AUTH_TOKEN);
     }
 
@@ -181,7 +180,7 @@ class CoreCaseUserServiceTest {
 
         @BeforeEach
         void setup() {
-            when(idamClient.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(
+            when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(
                 CAA_USER_AUTH_TOKEN);
             CaseAssignedUserRolesResource caseAssignedUserRolesResource = CaseAssignedUserRolesResource.builder()
                 .caseAssignedUserRoles(List.of(
@@ -220,6 +219,38 @@ class CoreCaseUserServiceTest {
                 SERVICE_AUTH_TOKEN,
                 List.of(CASE_ID)
             );
+        }
+    }
+
+    @Nested
+    class GetUserCaseRoles {
+
+        @BeforeEach
+        void setup() {
+            when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(
+                CAA_USER_AUTH_TOKEN);
+        }
+
+        @Test
+        void shouldReturnCaseRoles_whenCaseRoleAssignedToUser() {
+            CaseAssignedUserRolesResource caseAssignedUserRolesResource = CaseAssignedUserRolesResource.builder()
+                .caseAssignedUserRoles(List.of(
+                    CaseAssignedUserRole.builder()
+                        .userId(USER_ID)
+                        .caseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                        .build(),
+                    CaseAssignedUserRole.builder()
+                        .userId(USER_ID2)
+                        .caseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                        .build()))
+                .build();
+            when(caseAccessDataStoreApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenReturn(caseAssignedUserRolesResource);
+
+            List<String> caseRoles = service.getUserCaseRoles(CASE_ID, USER_ID);
+
+            assertThat(caseRoles.contains("[RESPONDENTSOLICITORONE]"));
+            assertThat(!caseRoles.contains("[RESPONDENTSOLICITORTWO]"));
         }
     }
 }

@@ -18,25 +18,32 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.prd.model.DxAddress;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     StateFlowEngine.class,
+    EventHistorySequencer.class,
     EventHistoryMapper.class,
     RoboticsDataMapper.class,
     RoboticsAddressMapper.class,
@@ -66,15 +73,21 @@ class RoboticsDataMapperTest {
     @MockBean
     AuthTokenGenerator authTokenGenerator;
     @MockBean
-    IdamClient idamClient;
+    UserService userService;
     @MockBean
     FeatureToggleService featureToggleService;
     @MockBean
     PrdAdminUserConfiguration userConfig;
+    @MockBean
+    private Time time;
+
+    LocalDateTime localDateTime;
 
     @BeforeEach
     void setUp() {
         given(organisationApi.findOrganisationById(any(), any(), any())).willReturn(ORGANISATION);
+        localDateTime = LocalDateTime.of(2020, 8, 1, 12, 0, 0);
+        when(time.now()).thenReturn(localDateTime);
     }
 
     @Autowired
@@ -82,7 +95,7 @@ class RoboticsDataMapperTest {
 
     @Test
     void shouldMapToRoboticsCaseData_whenHandOffPointIsUnrepresentedDefendant() {
-        CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
 
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
 
@@ -111,6 +124,30 @@ class RoboticsDataMapperTest {
     @Test
     void shouldMapToRoboticsCaseData_whenOrganisationPolicyIsPresent() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
+
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
+
+        var firstSolicitor = roboticsCaseData.getSolicitors().get(0);
+        assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
+        assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
+        assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
+        CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
+            .isEqualTo(firstSolicitor.getAddresses().getContactAddress());
+
+        var secondSolicitor = roboticsCaseData.getSolicitors().get(1);
+        assertThat(secondSolicitor.getOrganisationId()).isEqualTo("QWERTY R");
+        assertThat(secondSolicitor.getName()).isEqualTo("Org Name");
+        assertThat(secondSolicitor.getContactDX()).isEqualTo("DX 12345");
+        CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
+            .isEqualTo(secondSolicitor.getAddresses().getContactAddress());
+    }
+
+    @Test
+    void atStatePaymentSuccessfulWithCopyOrganisationIdPresent() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessfulWithCopyOrganisationOnly().build();
 
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
 
@@ -170,8 +207,10 @@ class RoboticsDataMapperTest {
 
     @Test
     void shouldMapToRoboticsCaseData_whenOrganisationPolicyIsNotPresent() {
-        CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant()
-            .respondent1OrganisationPolicy(null).respondentSolicitor1OrganisationDetails(null).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants()
+            .respondent1OrganisationPolicy(null)
+            .respondentSolicitor1OrganisationDetails(null)
+            .respondent1OrganisationIDCopy(null).build();
 
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
 
@@ -191,5 +230,78 @@ class RoboticsDataMapperTest {
                          mapper.toRoboticsCaseData(null),
                      "caseData cannot be null"
         );
+    }
+
+    @Test
+    void shouldMapToRoboticsCaseDataWhen2ndClaimantIsPresent() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .applicant2(PartyBuilder.builder().individual().build())
+            .addApplicant2(YES)
+            .build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getLitigiousParties()).hasSize(3);
+    }
+
+    @Test
+    void shouldMapToRoboticsCaseDataWhen2ndDefendantIsPresent() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .respondent2(PartyBuilder.builder().company().build())
+            .addRespondent2(YES)
+            .build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getLitigiousParties()).hasSize(3);
+    }
+
+    @Test
+    void shouldMapToRoboticsCaseDataWhen2ndDefendantIsRepresented() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .respondent2(PartyBuilder.builder().company().build())
+            .addRespondent2(YES)
+            .respondent2Represented(YES)
+            .build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getSolicitors()).hasSize(3);
+    }
+
+    @Test
+    void shouldMapToRoboticsCaseDataWhen2ndDefendantIsRepresentedSameSolicitor() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .respondent2(PartyBuilder.builder().company().build())
+            .addRespondent2(YES)
+            .respondent2Represented(YES)
+            .respondent2SameLegalRepresentative(YES)
+            .build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
+    }
+
+    @Test
+    void shouldMapToRoboticsCaseDataWhen2ndDefendantIsRepresentedNotRegistered() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .respondent2(PartyBuilder.builder().company().build())
+            .addRespondent2(YES)
+            .respondent2Represented(YES)
+            .respondent2OrgRegistered(NO)
+            .build();
+
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getSolicitors()).hasSize(3);
+    }
+
+    @Test
+    void shouldMapToRoboticsCaseDataWhen2ndDefendantIsNotRepresented() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .respondent2(PartyBuilder.builder().company().build())
+            .addRespondent2(YES)
+            .respondent2Represented(NO)
+            .build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
     }
 }

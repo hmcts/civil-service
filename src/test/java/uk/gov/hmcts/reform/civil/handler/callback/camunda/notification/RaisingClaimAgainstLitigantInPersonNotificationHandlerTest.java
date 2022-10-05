@@ -20,7 +20,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @SpringBootTest(classes = {
     RaisingClaimAgainstLitigantInPersonNotificationHandler.class,
@@ -66,7 +68,8 @@ class RaisingClaimAgainstLitigantInPersonNotificationHandlerTest {
 
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE
+            CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+            PARTY_REFERENCES, buildPartiesReferences(caseData)
         );
     }
 }

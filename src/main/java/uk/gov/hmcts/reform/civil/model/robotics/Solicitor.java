@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.civil.model.robotics;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
+@AllArgsConstructor
 public class Solicitor {
 
     @JsonProperty("ID")

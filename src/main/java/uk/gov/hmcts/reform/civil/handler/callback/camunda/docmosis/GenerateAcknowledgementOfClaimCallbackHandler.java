@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class GenerateAcknowledgementOfClaimCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(GENERATE_ACKNOWLEDGEMENT_OF_CLAIM);
@@ -49,7 +50,7 @@ public class GenerateAcknowledgementOfClaimCallbackHandler extends CallbackHandl
 
     private CallbackResponse prepareAcknowledgementOfClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         CaseDocument acknowledgementOfClaim = acknowledgementOfClaimGenerator.generate(
             caseData,

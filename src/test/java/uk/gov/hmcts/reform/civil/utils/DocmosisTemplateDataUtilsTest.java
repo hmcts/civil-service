@@ -20,10 +20,15 @@ class DocmosisTemplateDataUtilsTest {
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
-                            .partyName("Mr. Sam Clark")
+                            .individualTitle("Mr.")
+                            .individualFirstName("Sam")
+                            .individualLastName("Clark")
                             .build())
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
+                             .individualTitle("Mr.")
+                             .individualFirstName("Alex")
+                             .individualLastName("Richards")
                              .partyName("Mr. Alex Richards")
                              .build())
             .build();
@@ -36,15 +41,22 @@ class DocmosisTemplateDataUtilsTest {
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
+                            .individualTitle("Mr.")
+                            .individualFirstName("Sam")
+                            .individualLastName("Clark")
                             .partyName("Mr. Sam Clark")
                             .build())
             .applicant2(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
-                            .partyName("Mr. White Clark")
+                            .individualTitle("Mr.")
+                            .individualFirstName("White")
+                            .individualLastName("Clark")
                             .build())
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
-                             .partyName("Mr. Alex Richards")
+                             .individualTitle("Mr.")
+                             .individualFirstName("Alex")
+                             .individualLastName("Richards")
                              .build())
             .build();
 
@@ -57,20 +69,28 @@ class DocmosisTemplateDataUtilsTest {
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
-                            .partyName("Mr. Sam Clark")
+                            .individualTitle("Mr.")
+                            .individualFirstName("Sam")
+                            .individualLastName("Clark")
+                            .partyName("Ms. Irrelevant name")
                             .build())
             .respondent2(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
-                             .partyName("Mr. White Richards")
+                             .individualTitle("Mr.")
+                             .individualFirstName("White")
+                             .individualLastName("Richards")
                              .build())
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
-                             .partyName("Mr. Alex Richards")
+                             .individualTitle("Mr.")
+                             .individualFirstName("Alex")
+                             .individualLastName("King")
+                             .partyName("Mr. Alex King")
                              .build())
             .build();
 
         String caseName = toCaseName.apply(caseData);
-        assertThat(caseName).isEqualTo("Mr. Sam Clark \nvs 1 Mr. Alex Richards & 2 Mr. White Richards");
+        assertThat(caseName).isEqualTo("Mr. Sam Clark \nvs 1 Mr. Alex King & 2 Mr. White Richards");
     }
 
     @Test
@@ -78,11 +98,16 @@ class DocmosisTemplateDataUtilsTest {
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder()
                             .type(Party.Type.SOLE_TRADER)
-                            .partyName("Mrs. Georgina Hammersmith")
+                            .soleTraderTitle("Mrs.")
+                            .soleTraderFirstName("Georgina")
+                            .soleTraderLastName("Hammersmith")
                             .soleTraderTradingAs("EuroStar")
                             .build())
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
+                             .individualTitle("Mr.")
+                             .individualFirstName("Alex")
+                             .individualLastName("Richards")
                              .partyName("Mr. Alex Richards")
                              .build())
             .build();
@@ -96,17 +121,20 @@ class DocmosisTemplateDataUtilsTest {
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
-                            .partyName("Mr. White Richards")
+                            .individualTitle("Mr.")
+                            .individualFirstName("White")
+                            .individualLastName("Richards")
                             .build())
             .respondent1(Party.builder()
                              .type(Party.Type.SOLE_TRADER)
-                             .partyName("Mr. Boris Johnson")
+                             .soleTraderFirstName("Boris")
+                             .soleTraderLastName("Johnson")
                              .soleTraderTradingAs("UberFlip")
                              .build())
             .build();
 
         String caseName = toCaseName.apply(caseData);
-        assertThat(caseName).isEqualTo("Mr. White Richards \nvs Mr. Boris Johnson T/A UberFlip");
+        assertThat(caseName).isEqualTo("Mr. White Richards \nvs Boris Johnson T/A UberFlip");
     }
 
     @Test
@@ -114,18 +142,22 @@ class DocmosisTemplateDataUtilsTest {
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder()
                             .type(Party.Type.SOLE_TRADER)
-                            .partyName("Mrs. Georgina Hammersmith")
+                            .soleTraderFirstName("Georgina")
+                            .soleTraderLastName("Hammersmith")
                             .soleTraderTradingAs("EuroStar")
                             .build())
             .respondent1(Party.builder()
                              .type(Party.Type.SOLE_TRADER)
+                             .soleTraderTitle("Mr.")
+                             .soleTraderFirstName("Sean")
+                             .soleTraderLastName("White")
                              .partyName("Mr. Boris Johnson")
                              .soleTraderTradingAs("UberFlip")
                              .build())
             .build();
 
         String caseName = toCaseName.apply(caseData);
-        assertThat(caseName).isEqualTo("Mrs. Georgina Hammersmith T/A EuroStar \nvs Mr. Boris Johnson T/A UberFlip");
+        assertThat(caseName).isEqualTo("Georgina Hammersmith T/A EuroStar \nvs Mr. Sean White T/A UberFlip");
     }
 
     @Test
@@ -133,11 +165,17 @@ class DocmosisTemplateDataUtilsTest {
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
+                            .individualTitle("Mr.")
+                            .individualFirstName("Sam")
+                            .individualLastName("Clark")
                             .partyName("Mr. Sam Clark")
                             .build())
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
-                             .partyName("Mr. Alex Richards")
+                             .individualTitle("Mr.")
+                             .individualFirstName("Alex")
+                             .individualLastName("Richards")
+                             .partyName("Mr. Other Party")
                              .build())
             .respondent1LitigationFriend(LitigationFriend.builder().fullName("Mr. Litigation Friend").build())
             .build();
@@ -151,11 +189,16 @@ class DocmosisTemplateDataUtilsTest {
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
-                            .partyName("Mr. Sam Clark")
+                            .individualTitle("Mr.")
+                            .individualFirstName("Sam")
+                            .individualLastName("Clark")
                             .build())
             .applicant1LitigationFriend(LitigationFriend.builder().fullName("Mr. Litigation Friend").build())
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
+                             .individualTitle("Mr.")
+                             .individualFirstName("Alex")
+                             .individualLastName("Richards")
                              .partyName("Mr. Alex Richards")
                              .build())
             .build();
@@ -169,12 +212,17 @@ class DocmosisTemplateDataUtilsTest {
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
+                            .individualTitle("Mr.")
+                            .individualFirstName("Sam")
+                            .individualLastName("Clark")
                             .partyName("Mr. Sam Clark")
                             .build())
             .applicant1LitigationFriend(LitigationFriend.builder().fullName("Mr. Applicant Friend").build())
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
-                             .partyName("Mr. Alex Richards")
+                             .individualTitle("Mr.")
+                             .individualFirstName("Alex")
+                             .individualLastName("Richards")
                              .build())
             .respondent1LitigationFriend(LitigationFriend.builder().fullName("Mr. Respondent Friend").build())
             .build();
@@ -188,23 +236,32 @@ class DocmosisTemplateDataUtilsTest {
 
         @Test
         void shouldPopulateNotProvided_whenSolicitorReferencesIsNull() {
-            SolicitorReferences solicitorReferences = null;
-            SolicitorReferences result = fetchSolicitorReferences(solicitorReferences);
+            CaseData caseData = CaseData.builder()
+                .solicitorReferences(null)
+                .respondentSolicitor2Reference(null)
+                .build();
+            SolicitorReferences result = fetchSolicitorReferences(caseData);
             assertAll(
                 "SolicitorReferences not provided",
                 () -> assertEquals("Not Provided", result.getApplicantSolicitor1Reference()),
-                () -> assertEquals("Not Provided", result.getRespondentSolicitor1Reference())
+                () -> assertEquals("Not Provided", result.getRespondentSolicitor1Reference()),
+                () -> assertEquals("Not Provided", result.getRespondentSolicitor2Reference())
             );
         }
 
         @Test
         void shouldPopulateNotProvided_whenSolicitorReferencesMissing() {
             SolicitorReferences solicitorReferences = SolicitorReferences.builder().build();
-            SolicitorReferences result = fetchSolicitorReferences(solicitorReferences);
+            CaseData caseData = CaseData.builder()
+                .solicitorReferences(solicitorReferences)
+                .respondentSolicitor2Reference(null)
+                .build();
+            SolicitorReferences result = fetchSolicitorReferences(caseData);
             assertAll(
                 "SolicitorReferences not provided",
                 () -> assertEquals("Not Provided", result.getApplicantSolicitor1Reference()),
-                () -> assertEquals("Not Provided", result.getRespondentSolicitor1Reference())
+                () -> assertEquals("Not Provided", result.getRespondentSolicitor1Reference()),
+                () -> assertEquals("Not Provided", result.getRespondentSolicitor2Reference())
             );
         }
 
@@ -215,12 +272,17 @@ class DocmosisTemplateDataUtilsTest {
                 .applicantSolicitor1Reference("Applicant ref")
                 .respondentSolicitor1Reference("Respondent ref")
                 .build();
+            CaseData caseData = CaseData.builder()
+                .solicitorReferences(solicitorReferences)
+                .respondentSolicitor2Reference("Respondent 2 ref")
+                .build();
 
-            SolicitorReferences result = fetchSolicitorReferences(solicitorReferences);
+            SolicitorReferences result = fetchSolicitorReferences(caseData);
             assertAll(
                 "SolicitorReferences provided",
                 () -> assertEquals("Applicant ref", result.getApplicantSolicitor1Reference()),
-                () -> assertEquals("Respondent ref", result.getRespondentSolicitor1Reference())
+                () -> assertEquals("Respondent ref", result.getRespondentSolicitor1Reference()),
+                () -> assertEquals("Respondent 2 ref", result.getRespondentSolicitor2Reference())
             );
         }
 
@@ -230,13 +292,17 @@ class DocmosisTemplateDataUtilsTest {
                 .builder()
                 .applicantSolicitor1Reference("Applicant ref")
                 .build();
+            CaseData caseData = CaseData.builder()
+                .solicitorReferences(solicitorReferences)
+                .build();
 
-            SolicitorReferences result = fetchSolicitorReferences(solicitorReferences);
+            SolicitorReferences result = fetchSolicitorReferences(caseData);
 
             assertAll(
                 "SolicitorReferences one is provided",
                 () -> assertEquals("Applicant ref", result.getApplicantSolicitor1Reference()),
-                () -> assertEquals("Not Provided", result.getRespondentSolicitor1Reference())
+                () -> assertEquals("Not Provided", result.getRespondentSolicitor1Reference()),
+                () -> assertEquals("Not Provided", result.getRespondentSolicitor2Reference())
             );
         }
     }

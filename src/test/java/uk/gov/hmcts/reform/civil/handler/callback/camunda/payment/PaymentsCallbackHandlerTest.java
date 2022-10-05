@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.client.models.StatusHistoryDto;
 
@@ -36,7 +37,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
@@ -50,6 +50,8 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
     private static final String SUCCESSFUL_PAYMENT_REFERENCE = "RC-1234-1234-1234-1234";
     private static final String PAYMENT_ERROR_MESSAGE = "Your account is deleted";
     private static final String PAYMENT_ERROR_CODE = "CA-E0004";
+    public static final String DUPLICATE_PAYMENT_MESSAGE
+        = "You attempted to retry the payment to soon. Try again later.";
 
     @MockBean
     private PaymentsService paymentsService;
@@ -78,7 +80,7 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         }
 
         @Test
@@ -96,14 +98,14 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @ParameterizedTest
-        @ValueSource(ints = {403})
-        void shouldUpdateFailureReason_whenForbiddenExceptionThrown(int status) {
+        @ValueSource(ints = {403, 422, 504})
+        void shouldUpdateFailureReason_whenSpecificFeignExceptionsThrown(int status) {
             doThrow(buildFeignException(status)).when(paymentsService).createCreditAccountPayment(any(), any());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
-            assertThat(response.getData()).extracting("claimIssuedPaymentDetails").extracting("reference").isNull();
+            assertThat(response.getData()).extracting("claimIssuedPaymentDetails").doesNotHaveToString("reference");
             assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
                 .extracting("errorMessage", "errorCode", "status", "customerReference")
                 .containsExactly(PAYMENT_ERROR_MESSAGE, PAYMENT_ERROR_CODE, FAILED.toString(), "12345");
@@ -112,26 +114,31 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotThrowError_whenPaymentIsResubmittedWithInTwoMinutes() {
-            doThrow(buildFeignException(400)).when(paymentsService).createCreditAccountPayment(any(), any());
+            doThrow(new InvalidPaymentRequestException("Duplicate Payment."))
+                .when(paymentsService).createCreditAccountPayment(any(), any());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
             assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
+                .extracting("errorMessage", "status", "customerReference")
+                .containsExactly(DUPLICATE_PAYMENT_MESSAGE, FAILED.toString(), "12345");
         }
 
         @ParameterizedTest
-        @ValueSource(ints = {404, 422, 504})
+        @ValueSource(ints = {401, 404, 409})
         void shouldAddError_whenOtherExceptionThrown(int status) {
             doThrow(buildFeignException(status)).when(paymentsService).createCreditAccountPayment(any(), any());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
-            assertThat(response.getData()).extracting("paymentReference").isNull();
+            assertThat(response.getData()).doesNotHaveToString("paymentReference");
             assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
-                .extracting("paymentErrorMessage", "paymentErrorCode")
-                .containsExactly(null, null);
+                .doesNotHaveToString("paymentErrorMessage");
+            assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
+                .doesNotHaveToString("paymentErrorCode");
             assertThat(response.getErrors()).containsOnly("Technical error occurred");
         }
 
@@ -152,81 +159,11 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
-    @Nested
-    class OldCode {
-
-        @BeforeEach
-        void setup() {
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        }
-
-        @Test
-        void shouldMakePbaPayment_whenInvoked() {
-            when(paymentsService.createCreditAccountPayment(any(), any()))
-                .thenReturn(PaymentDto.builder().reference(SUCCESSFUL_PAYMENT_REFERENCE).build());
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
-            assertThat(response.getData()).extracting("paymentDetails")
-                .extracting("reference", "status", "customerReference")
-                .containsExactly(SUCCESSFUL_PAYMENT_REFERENCE, SUCCESS.toString(), null);
-            assertThat(response.getData()).containsEntry("paymentSuccessfulDate", "2020-01-01T12:00:00");
-        }
-
-        @ParameterizedTest
-        @ValueSource(ints = {403})
-        void shouldUpdateFailureReason_whenForbiddenExceptionThrown(int status) {
-            doThrow(buildFeignException(status)).when(paymentsService).createCreditAccountPayment(any(), any());
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
-            assertThat(response.getData()).extracting("paymentDetails").extracting("reference").isNull();
-            assertThat(response.getData()).extracting("paymentDetails")
-                .extracting("errorMessage", "errorCode", "status", "customerReference")
-                .containsExactly(PAYMENT_ERROR_MESSAGE, PAYMENT_ERROR_CODE, FAILED.toString(), null);
-            assertThat(response.getErrors()).isEmpty();
-        }
-
-        @Test
-        void shouldNotThrowError_whenPaymentIsResubmittedWithInTwoMinutes() {
-            doThrow(buildFeignException(400)).when(paymentsService).createCreditAccountPayment(any(), any());
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
-            assertThat(response.getErrors()).isEmpty();
-        }
-
-        @ParameterizedTest
-        @ValueSource(ints = {404, 422, 504})
-        void shouldAddError_whenOtherExceptionThrown(int status) {
-            doThrow(buildFeignException(status)).when(paymentsService).createCreditAccountPayment(any(), any());
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
-            assertThat(response.getData()).extracting("paymentReference").isNull();
-            assertThat(response.getData()).extracting("paymentDetails").isNull();
-            assertThat(response.getErrors()).containsOnly("Technical error occurred");
-        }
-
-        @Test
-        void shouldThrowException_whenForbiddenExceptionThrownContainsInvalidResponse() {
-            doThrow(buildForbiddenFeignExceptionWithInvalidResponse())
-                .when(paymentsService).createCreditAccountPayment(any(), any());
-
-            assertThrows(FeignException.class, () -> handler.handle(params));
-            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
-        }
-    }
-
     @SneakyThrows
     private FeignException buildFeignException(int status) {
         return buildFeignClientException(status, objectMapper.writeValueAsBytes(
             PaymentDto.builder()
-                .statusHistories(new StatusHistoryDto[] {
+                .statusHistories(new StatusHistoryDto[]{
                     StatusHistoryDto.builder()
                         .errorCode(PAYMENT_ERROR_CODE)
                         .errorMessage(PAYMENT_ERROR_MESSAGE)
@@ -244,7 +181,7 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
         return new FeignException.FeignClientException(
             status,
             "exception message",
-            Request.create(GET, "", Map.of(), new byte[] {}, UTF_8, null),
+            Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
             body
         );
     }

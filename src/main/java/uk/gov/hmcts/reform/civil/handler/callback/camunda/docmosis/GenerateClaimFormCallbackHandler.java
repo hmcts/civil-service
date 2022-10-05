@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -9,12 +10,18 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGenerator;
+import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -26,14 +33,23 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class GenerateClaimFormCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(GENERATE_CLAIM_FORM);
     private static final String TASK_ID = "GenerateClaimForm";
+    private static final String BUNDLE_NAME = "Sealed Claim Form with LiP Claim Form";
 
+    private final CivilDocumentStitchingService civilDocumentStitchingService;
+    private final LitigantInPersonFormGenerator litigantInPersonFormGenerator;
     private final SealedClaimFormGenerator sealedClaimFormGenerator;
     private final ObjectMapper objectMapper;
     private final Time time;
+
+    private final FeatureToggleService featureToggleService;
+
+    @Value("${stitching.enabled}")
+    private boolean stitchEnabled;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -54,14 +70,49 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         LocalDate issueDate = time.now().toLocalDate();
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder().issueDate(issueDate);
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder().issueDate(issueDate);
 
         CaseDocument sealedClaim = sealedClaimFormGenerator.generate(
             caseDataBuilder.build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
-        caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
+        if (featureToggleService.isNoticeOfChangeEnabled() && stitchEnabled
+            && (YesOrNo.NO.equals(caseData.getRespondent1Represented())
+            || YesOrNo.NO.equals(caseData.getRespondent2Represented()))) {
+
+            CaseDocument lipForm = litigantInPersonFormGenerator.generate(
+                caseDataBuilder.build(),
+                callbackParams.getParams().get(BEARER_TOKEN).toString()
+            );
+
+            List<DocumentMetaData> documents = Arrays.asList(
+                new DocumentMetaData(
+                    sealedClaim.getDocumentLink(),
+                    "Sealed Claim Form",
+                    LocalDate.now().toString()
+                ),
+                new DocumentMetaData(
+                    lipForm.getDocumentLink(),
+                    "Litigant in person claim form",
+                    LocalDate.now().toString()
+                )
+            );
+
+            CaseDocument sealedClaimFormWithLiPForm =
+                civilDocumentStitchingService.bundle(
+                    documents,
+                    callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
+                    sealedClaim.getDocumentName(),
+                    BUNDLE_NAME,
+                    caseData
+                );
+
+            caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaimFormWithLiPForm));
+
+        } else {
+            caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))

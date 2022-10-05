@@ -94,7 +94,9 @@
     <module name="MultipleVariableDeclarations"/>
     <module name="ArrayTypeStyle"/>
     <module name="MissingSwitchDefault"/>
-    <module name="FallThrough"/>
+    <module name="FallThrough">
+      <property name="reliefPattern" value="FALL?[ -]?THROUGH"/>
+    </module>
     <module name="UpperEll"/>
     <module name="ModifierOrder"/>
     <module name="EmptyLineSeparator">

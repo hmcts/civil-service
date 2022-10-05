@@ -9,7 +9,9 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
@@ -18,7 +20,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CaseNoteService;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,6 +29,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SpringBootTest(classes = {
@@ -59,22 +62,23 @@ class AddCaseNoteCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+    private CaseNote caseNote(LocalDateTime timeStamp, String createdBy, String note) {
+        return CaseNote.builder()
+            .createdOn(timeStamp)
+            .createdBy(createdBy)
+            .note(note)
+            .build();
+    }
+
     @Nested
     class AboutToSubmit {
-
-        private CaseNote caseNote(LocalDate date, String createdBy, String note) {
-            return CaseNote.builder()
-                .createdOn(date)
-                .createdBy(createdBy)
-                .note(note)
-                .build();
-        }
 
         @Test
         void shouldAddCaseNoteToList_whenInvoked() {
 
-            CaseNote caseNote = caseNote(LocalDate.of(2021, 7, 5), "John Doe", "Existing case note");
-            CaseNote expectedCaseNote = caseNote(LocalDate.now(), "John Smith", "Example case note");
+            CaseNote caseNote = caseNote(LocalDateTime.of(2021, 7, 5, 0, 0, 0),
+                                         "John Doe", "Existing case note");
+            CaseNote expectedCaseNote = caseNote(LocalDateTime.now(), "John Smith", "Example case note");
             List<Element<CaseNote>> updatedCaseNotes = wrapElements(caseNote, expectedCaseNote);
 
             CaseData caseData = CaseData.builder()
@@ -94,12 +98,35 @@ class AddCaseNoteCallbackHandlerTest extends BaseCallbackHandlerTest {
             verify(caseNoteService).addNoteToList(expectedCaseNote, caseData.getCaseNotes());
 
             assertThat(response.getData())
-                .extracting("caseNote")
-                .isNull();
+                .doesNotHaveToString("caseNote");
 
             assertThat(response.getData())
                 .extracting("caseNotes")
-                .isEqualTo(objectMapper.convertValue(updatedCaseNotes, new TypeReference<>() {}));
+                .isEqualTo(objectMapper.convertValue(updatedCaseNotes, new TypeReference<>() {
+                }));
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(ADD_CASE_NOTE.name(), "READY");
+        }
+    }
+
+    @Nested
+    class SubmittedCallback {
+
+        @Test
+        void shouldReturnEmptyResponse_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .caseNotes(caseNote(LocalDateTime.of(2021, 7, 5, 0, 0, 0),
+                                    "John Doe", "Existing case note"
+                ))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response).isEqualTo(SubmittedCallbackResponse.builder().build());
         }
     }
 }

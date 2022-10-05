@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -68,21 +69,57 @@ class FeatureToggleServiceTest {
     }
 
     @Test
-    void shouldCallBoolVariation_whenIsMultipartyEnabledInvoked() {
-        var multipartyFeatureKey = "multiparty";
-        givenToggle(multipartyFeatureKey, true);
-
-        assertThat(featureToggleService.isMultipartyEnabled()).isTrue();
-        verifyBoolVariationCalled(multipartyFeatureKey, List.of("timestamp", "environment"));
-    }
-
-    @Test
     void shouldCallBoolVariation_whenIsRpaContinuousFeedEnabledInvoked() {
         var multipartyFeatureKey = "rpaContinuousFeed";
         givenToggle(multipartyFeatureKey, true);
 
         assertThat(featureToggleService.isRpaContinuousFeedEnabled()).isTrue();
         verifyBoolVariationCalled(multipartyFeatureKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
+    void shouldCallBoolVariation_whenIsNoticeOfChangeEnabledInvoked() {
+        var noticeOfChangeKey = "notice-of-change";
+        givenToggle(noticeOfChangeKey, true);
+
+        assertThat(featureToggleService.isNoticeOfChangeEnabled()).isTrue();
+        verifyBoolVariationCalled(noticeOfChangeKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
+    void shouldCallBoolVariation_whenIsHearingAndListingSDOEnabledInvoked() {
+        var hearingAndListingKey = "hearing-and-listing-sdo";
+        givenToggle(hearingAndListingKey, true);
+
+        assertThat(featureToggleService.isHearingAndListingSDOEnabled()).isTrue();
+        verifyBoolVariationCalled(hearingAndListingKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
+    void shouldCallBoolVariation_whenisCourtLocationDynamicListEnabledInvoked() {
+        var courtLocationDynamicListKey = "court-location-dynamic-list";
+        givenToggle(courtLocationDynamicListKey, true);
+
+        assertThat(featureToggleService.isCourtLocationDynamicListEnabled()).isTrue();
+        verifyBoolVariationCalled(courtLocationDynamicListKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
+    void shouldCallBoolVariation_whenIsPinInPostEnabledInvoked() {
+        var pinInPostKey = "pin-in-post";
+        givenToggle(pinInPostKey, true);
+
+        assertThat(featureToggleService.isPinInPostEnabled()).isTrue();
+        verifyBoolVariationCalled(pinInPostKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
+    void shouldCallBoolVariation_whenIsAccessProfilesEnabledInvoked() {
+        var accessProfilesKey = "access-profiles";
+        givenToggle(accessProfilesKey, true);
+
+        assertThat(featureToggleService.isAccessProfilesEnabled()).isTrue();
+        verifyBoolVariationCalled(accessProfilesKey, List.of("timestamp", "environment"));
     }
 
     @Test
@@ -110,5 +147,27 @@ class FeatureToggleServiceTest {
         assertThat(capturedLdUser.getKey()).isEqualTo("civil-service");
         assertThat(ImmutableList.copyOf(capturedLdUser.getCustomAttributes())).extracting("name")
             .containsOnlyOnceElementsOf(customAttributesKeys);
+    }
+
+    @Test
+    public void rpaContinuousFeed_LDTagName() {
+        featureToggleService.isSpecRpaContinuousFeedEnabled();
+
+        Mockito.verify(ldClient).boolVariation(
+            eq("specified-rpa-continuous-feed"),
+            any(LDUser.class),
+            eq(false)
+        );
+    }
+
+    @Test
+    public void globalSearch_LDTagName() {
+        featureToggleService.isGlobalSearchEnabled();
+
+        Mockito.verify(ldClient).boolVariation(
+            eq("global-search-specified"),
+            any(LDUser.class),
+            eq(false)
+        );
     }
 }

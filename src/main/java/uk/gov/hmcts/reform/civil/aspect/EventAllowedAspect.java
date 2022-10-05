@@ -11,7 +11,10 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowStateAllowedEventService;
+import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
 import java.util.List;
 
@@ -29,6 +32,8 @@ public class EventAllowedAspect {
 
     private final FlowStateAllowedEventService flowStateAllowedEventService;
 
+    private final StateFlowEngine stateFlowEngine;
+
     @Pointcut("execution(* *(*)) && @annotation(EventAllowed)")
     public void eventAllowedPointCut() {
         //Pointcut no implementation required
@@ -44,12 +49,19 @@ public class EventAllowedAspect {
         }
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
+        CaseData caseData = callbackParams.getCaseData();
+        StringBuilder stateHistoryBuilder = new StringBuilder();
+        FlowState flowState = flowStateAllowedEventService.getFlowState(caseData);
+        stateFlowEngine.evaluate(caseData).getStateHistory().forEach(s -> {
+            stateHistoryBuilder.append(s.getName());
+            stateHistoryBuilder.append(", ");
+        });
         if (flowStateAllowedEventService.isAllowed(caseDetails, caseEvent)) {
             return joinPoint.proceed();
         } else {
             log.info(format(
-                "%s is not allowed on the case id %s",
-                caseEvent.name(), caseDetails.getId()
+                "%s is not allowed on the case id %s, current FlowState: %s, stateFlowHistory: %s",
+                caseEvent.name(), caseDetails.getId(), flowState, stateHistoryBuilder.toString()
             ));
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_MESSAGE))

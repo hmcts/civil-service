@@ -26,8 +26,8 @@ java:
     CORE_CASE_DATA_API_URL: http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     MANAGE_CASE_UI_BASE_URL: https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net
     SPRING_SECURITY_ENABLED: true
-    CMC_DB_USERNAME: 'cmc@cmc-{{ .Values.global.environment }}'
-    CMC_DB_HOST: cmc-{{ .Values.global.environment }}.postgres.database.azure.com
+    CMC_DB_USERNAME: 'cmc@cmc-db-v11-{{ .Values.global.environment }}'
+    CMC_DB_HOST: cmc-db-v11-{{ .Values.global.environment }}.postgres.database.azure.com
     CMC_DB_CONNECTION_OPTIONS: '?sslmode=require&gssEncMode=disable'
     CMC_DB_NAME: cmc
     CMC_DB_PORT: 5432
@@ -38,15 +38,23 @@ java:
     AUTH_PROVIDER_SERVICE_CLIENT_BASEURL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-{{ .Values.global.environment }}.internal:8443/openam/oauth2/realms/root/realms/hmcts
     FEES_API_URL: http://fees-register-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    GENAPP_LRD_URL: http://rd-location-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    GENAPP_JRD_URL: http://rd-judicial-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     PAYMENTS_API_URL: http://payment-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    SERVICE_REQUEST_UPDATE: http://civil-service-{{ .Values.global.environment }}.service.core-compute-{{- .Values.global.environment }}.internal/service-request-update
     DOCMOSIS_TORNADO_URL: https://docmosis.{{ .Values.global.environment }}.platform.hmcts.net
     DOCUMENT_MANAGEMENT_URL: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    CLAIM_STORE_URL: http://cmc-claim-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     FEIGN_CLIENT_CONFIG_REMOTERUNTIMESERVICE_URL: http://camunda-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/engine-rest/
     FEIGN_CLIENT_CONFIG_REMOTEEXTERNALTASKSERVICE_URL: http://camunda-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/engine-rest/
     FEIGN_CLIENT_CONFIG_REMOTEREPOSITORYSERVICE_URL: http://camunda-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/engine-rest/
     SPRING_CLOUD_BOOTSTRAP_ENABLED: true
     RD_PROFESSIONAL_API_URL: http://rd-professional-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    EM_CCD_ORCHESTRATOR_URL: http://em-ccd-orchestrator-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     SOME_ENV_VARIABLE: true
+    DOCUMENT_MANAGEMENT_SECURED: false
+    REST_TEMPLATE_TIMEOUT: 30000
 
   keyVaults:
     civil:
@@ -62,9 +70,13 @@ java:
         - prd-admin-user-password
         - AppInsightsInstrumentationKey
         - docmosis-api-key
-        - cmc-db-password
+        - cmc-db-password-v11
         - gov-notify-api-key
         - sendgrid-api-key
         - robotics-notification-sender
         - robotics-notification-recipient
         - launch-darkly-sdk-key
+        - robotics-notification-multipartyrecipient
+        - robotics-notification-recipient-spec
+        - ordnance-survey-api-key
+

@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -26,10 +27,11 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,10 +61,13 @@ class CoreCaseDataServiceTest {
     private CoreCaseDataApi coreCaseDataApi;
 
     @MockBean
-    private IdamClient idamClient;
+    private UserService userService;
 
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
+
+    @MockBean
+    private PaymentsConfiguration paymentsConfiguration;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -73,9 +78,11 @@ class CoreCaseDataServiceTest {
     @BeforeEach
     void init() {
         clearInvocations(authTokenGenerator);
-        clearInvocations(idamClient);
+        clearInvocations(userService);
         when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTH_TOKEN);
-        when(idamClient.getAccessToken(userConfig.getUserName(), userConfig.getPassword())).thenReturn(USER_AUTH_TOKEN);
+        when(userService.getAccessToken(userConfig.getUserName(),
+                                        userConfig.getPassword()))
+            .thenReturn(USER_AUTH_TOKEN);
     }
 
     @Nested
@@ -95,7 +102,7 @@ class CoreCaseDataServiceTest {
 
         @BeforeEach
         void setUp() {
-            when(idamClient.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            when(userService.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
 
             when(coreCaseDataApi.startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID, JURISDICTION,
                                                          CASE_TYPE, CASE_ID, EVENT_ID
@@ -159,7 +166,7 @@ class CoreCaseDataServiceTest {
 
             assertThat(casesFound).isEqualTo(cases);
             verify(coreCaseDataApi).searchCases(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, CASE_TYPE, query.toString());
-            verify(idamClient).getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+            verify(userService).getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         }
     }
 
@@ -176,7 +183,34 @@ class CoreCaseDataServiceTest {
 
             assertThat(caseDetails).isEqualTo(expectedCaseDetails);
             verify(coreCaseDataApi).getCase(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, "1");
-            verify(idamClient).getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+            verify(userService).getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         }
+    }
+
+    @Nested
+    class GetSupplementaryData {
+        private static final String USER_ID = "User1";
+
+        @Test
+        void shouldReturnCase_WhenInvoked1() {
+            when(userService.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            service.setSupplementaryData(Long.valueOf("1"), supplementaryData());
+
+            verify(coreCaseDataApi).submitSupplementaryData(USER_AUTH_TOKEN,
+                                                            SERVICE_AUTH_TOKEN, "1", supplementaryData());
+        }
+    }
+
+    private Map<String, Map<String, Map<String, Object>>> supplementaryData() {
+        Map<String, Object> hmctsServiceIdMap = new HashMap<>();
+        hmctsServiceIdMap.put("HMCTSServiceId", "AAA6");
+
+        Map<String, Map<String, Object>> supplementaryDataRequestMap = new HashMap<>();
+        supplementaryDataRequestMap.put("$set", hmctsServiceIdMap);
+
+        Map<String, Map<String, Map<String, Object>>> supplementaryDataUpdates = new HashMap<>();
+        supplementaryDataUpdates.put("supplementary_data_updates", supplementaryDataRequestMap);
+
+        return supplementaryDataUpdates;
     }
 }

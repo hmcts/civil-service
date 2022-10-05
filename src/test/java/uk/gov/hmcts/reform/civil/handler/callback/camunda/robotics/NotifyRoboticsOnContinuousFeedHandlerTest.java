@@ -18,14 +18,17 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 
@@ -37,13 +40,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 
 @SpringBootTest(classes = {
     NotifyRoboticsOnContinuousFeedHandler.class,
     JsonSchemaValidationService.class,
     RoboticsDataMapper.class,
+    RoboticsDataMapperForSpec.class,
     RoboticsAddressMapper.class,
     AddressLinesMapper.class,
+    EventHistorySequencer.class,
     EventHistoryMapper.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
@@ -64,6 +70,8 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
     FeatureToggleService featureToggleService;
     @MockBean
     PrdAdminUserConfiguration userConfig;
+    @MockBean
+    private Time time;
 
     @Nested
     class ValidJsonPayload {
@@ -75,10 +83,22 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
         void shouldNotifyRobotics_whenNoSchemaErrors() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
             handler.handle(params);
 
-            verify(roboticsNotificationService).notifyRobotics(caseData);
+            verify(roboticsNotificationService).notifyRobotics(caseData, false);
+        }
+
+        @Test
+        void shouldNotifyRoboticsSpecClaim_whenNoSchemaErrors() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentAdmitPartOfClaimFastTrack()
+                .build();
+            when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
+            caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            handler.handle(params);
+
+            verify(roboticsNotificationService).notifyRobotics(caseData, false);
         }
     }
 

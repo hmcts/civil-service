@@ -24,7 +24,7 @@ class ProceedOfflineCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldCaptureTakenOfflineDate_whenProceedInHeritageSystemRequested() {
-        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnRepresentedDefendant().build();
+        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnrepresentedDefendant().build();
         CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

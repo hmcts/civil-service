@@ -27,7 +27,8 @@ public class SealedClaimForm implements MappableObject {
     private final List<Party> respondents;
     private final String referenceNumber;
     private final String applicantExternalReference;
-    private final String respondentExternalReference;
+    private final String respondent1ExternalReference;
+    private final String respondent2ExternalReference;
     private final String caseName;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
