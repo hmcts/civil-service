@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.model.Fee;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -63,16 +64,19 @@ public class HearingUtilsTest {
 
     @Test
     void shouldReturnFormattedFee_whenGivenAnyClaimFee() {
-        assertThat(HearingUtils.formatHearingFee(new BigDecimal(34600))).isEqualTo("£346");
+        assertThat(HearingUtils.formatHearingFee(
+            Fee.builder().calculatedAmountInPence(new BigDecimal(34600)).build())).isEqualTo("£346");
     }
 
     @Test
     void shouldReturnFormattedFee2_whenGivenAnyClaimFee() {
-        assertThat(HearingUtils.formatHearingFee(new BigDecimal(132000))).isEqualTo("£1,320");
+        assertThat(HearingUtils.formatHearingFee(
+            Fee.builder().calculatedAmountInPence(new BigDecimal(132000)).build())).isEqualTo("£1,320");
     }
 
     @Test
     void shouldReturnFormattedFee3_whenGivenAnyClaimFee() {
-        assertThat(HearingUtils.formatHearingFee(new BigDecimal(5000))).isEqualTo("£50");
+        assertThat(HearingUtils.formatHearingFee(
+            Fee.builder().calculatedAmountInPence(new BigDecimal(5000)).build())).isEqualTo("£50");
     }
 }

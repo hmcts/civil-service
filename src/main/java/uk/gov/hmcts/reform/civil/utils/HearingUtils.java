@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.civil.utils;
 
-import java.math.BigDecimal;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 
+import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -97,12 +98,12 @@ public class HearingUtils {
         }
     }
 
-    public static String formatHearingFee(BigDecimal hearingFee) {
-        if (nonNull(hearingFee) && hearingFee.intValue() > 0) {
+    public static String formatHearingFee(Fee hearingFee) {
+        if (nonNull(hearingFee) && hearingFee.getCalculatedAmountInPence().intValue() > 0) {
             StringBuilder builder = new StringBuilder(hearingFee.toString());
-            builder.delete(builder.length()-2, builder.length());
+            builder.delete(builder.length() - 2, builder.length());
             if (builder.length() > 3) {
-                builder.insert(1,',');
+                builder.insert(1, ',');
             }
             builder.insert(0, '£');
             return builder.toString();

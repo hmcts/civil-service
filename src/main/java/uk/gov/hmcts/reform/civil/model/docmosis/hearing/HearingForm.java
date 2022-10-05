@@ -6,8 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
-import java.time.LocalDate;
-
 @Getter
 @Builder
 @AllArgsConstructor

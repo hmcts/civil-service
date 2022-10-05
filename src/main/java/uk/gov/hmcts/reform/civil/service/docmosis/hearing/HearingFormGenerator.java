@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -36,7 +35,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
 
-    public List<CaseDocument> generate(CaseData caseData, String authorisation, String event) throws IOException {
+    public List<CaseDocument> generate(CaseData caseData, String authorisation) {
 
         List<CaseDocument> caseDocuments = new ArrayList<>();
         HearingForm templateData = getTemplateData(caseData);
@@ -55,7 +54,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     }
 
     @Override
-    public HearingForm getTemplateData(CaseData caseData) throws IOException {
+    public HearingForm getTemplateData(CaseData caseData) {
 
         return HearingForm.builder()
             .court(caseData.getHearingLocation().getValue().getLabel())
@@ -73,7 +72,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
             .applicationDate(getDateFormatted(caseData.getDateOfApplication()))
             .hearingDuration(getHearingDuration(caseData))
             .additionalInfo(caseData.getInformation())
-            .feeAmount(HearingUtils.formatHearingFee(caseData.getHearingFee().getCalculatedAmountInPence()))
+            .feeAmount(HearingUtils.formatHearingFee(caseData.getHearingFee()))
             .hearingDueDate(getDateFormatted(caseData.getHearingDueDate()))
             .additionalText(caseData.getHearingNoticeListOther())
             .claimant2exists(nonNull(caseData.getApplicant2()))
@@ -93,7 +92,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
 
     private String getHearingTimeFormatted(String hearingTime) {
         StringBuilder hearingTimeBuilder = new StringBuilder(hearingTime);
-        hearingTimeBuilder.insert(2,':');
+        hearingTimeBuilder.insert(2, ':');
         return hearingTimeBuilder.toString();
     }
 
@@ -121,7 +120,5 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
                 return HEARING_OTHER;
         }
     }
-
-
 }
 

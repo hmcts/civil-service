@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.service.docmosis.hearing.HearingFormGenerator;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,11 +53,7 @@ public class GenerateHearingFormHandler extends CallbackHandler {
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        try {
-            buildDocument(callbackParams, caseDataBuilder, caseData);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        buildDocument(callbackParams, caseDataBuilder, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -66,11 +61,10 @@ public class GenerateHearingFormHandler extends CallbackHandler {
     }
 
     private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                               CaseData caseData) throws IOException {
+                               CaseData caseData) {
         List<CaseDocument> caseDocuments = hearingFormGenerator.generate(
             callbackParams.getCaseData(),
-            callbackParams.getParams().get(BEARER_TOKEN).toString(),
-            callbackParams.getRequest().getEventId()
+            callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(caseDocuments.get(0)));
