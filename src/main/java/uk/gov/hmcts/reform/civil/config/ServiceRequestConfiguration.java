@@ -16,5 +16,4 @@ public class ServiceRequestConfiguration {
         this.siteId = siteId;
         this.service = service;
     }
-
 }
