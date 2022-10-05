@@ -531,7 +531,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
-            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any())).thenReturn(LocalDateTime.now());
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                .thenReturn(LocalDateTime.now());
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -568,7 +569,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
-            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any())).thenReturn(LocalDateTime.now());
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                .thenReturn(LocalDateTime.now());
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
