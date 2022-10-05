@@ -38,7 +38,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
@@ -65,8 +64,6 @@ public class HearingScheduledHandler extends CallbackHandler {
             .put(callbackKey(MID, "checkPastDate"), this::checkPastDate)
             .put(callbackKey(MID, "checkFutureDate"), this::checkFutureDate)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::getDueDateAndFee)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse)
-            .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
 
