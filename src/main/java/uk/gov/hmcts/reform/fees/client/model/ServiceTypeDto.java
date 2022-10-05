@@ -10,7 +10,6 @@ import java.time.OffsetDateTime;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-//@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
