@@ -89,6 +89,7 @@ public class FeatureToggleService {
     public boolean isAccessProfilesEnabled() {
         return internalClient.boolVariation("access-profiles", createLDUser().build(), false);
     }
+
     public boolean isSDOEnabled() {
         return internalClient.boolVariation("enableSDO", createLDUser().build(), false);
     }

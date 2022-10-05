@@ -1078,7 +1078,7 @@ public class EventHistoryMapper {
 
                     respondent1MediationRequired = caseData.getResponseClaimMediationSpecRequired();
 
-                    if (claimType == SPEC_CLAIM
+                    if (claimType == SuperClaimType.SPEC_CLAIM
                         && AllocatedTrack.SMALL_CLAIM.name().equals(track)
                         && respondent1MediationRequired == YesOrNo.YES
                         && applicant1MediationRequired == YesOrNo.YES
@@ -1100,7 +1100,7 @@ public class EventHistoryMapper {
                     respondent1MediationRequired = caseData.getResponseClaimMediationSpecRequired();
 
                     if (NO.equals(proceedRespondent1) || NO.equals(proceedRespondent2)
-                        || (claimType == SPEC_CLAIM
+                        || (claimType == SuperClaimType.SPEC_CLAIM
                             && AllocatedTrack.SMALL_CLAIM.name().equals(track)
                             && respondent1MediationRequired == YesOrNo.YES
                             && applicant1MediationRequired == YesOrNo.YES
@@ -1125,7 +1125,7 @@ public class EventHistoryMapper {
                     respondent2MediationRequired = caseData.getResponseClaimMediationSpec2Required();
 
                     if (NO.equals(proceedRespondent1) || NO.equals(proceedRespondent2)
-                        || (claimType == SPEC_CLAIM
+                        || (claimType == SuperClaimType.SPEC_CLAIM
                             && AllocatedTrack.SMALL_CLAIM.name().equals(track)
                             && respondent1MediationRequired == YesOrNo.YES
                             && respondent2MediationRequired == YesOrNo.YES
@@ -1148,7 +1148,7 @@ public class EventHistoryMapper {
                     respondent1MediationRequired = caseData.getResponseClaimMediationSpecRequired();
 
                     if (NO.equals(applicant1Proceeds) || NO.equals(applicant2Proceeds)
-                        || (claimType == SPEC_CLAIM
+                        || (claimType == SuperClaimType.SPEC_CLAIM
                             && AllocatedTrack.SMALL_CLAIM.name().equals(track)
                             && respondent1MediationRequired == YesOrNo.YES
                             && applicant1MediationRequired == YesOrNo.YES

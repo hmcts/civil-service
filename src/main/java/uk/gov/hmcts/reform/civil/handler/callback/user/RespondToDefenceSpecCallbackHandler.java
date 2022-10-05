@@ -60,7 +60,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final LocationRefDataService locationRefDataService;
     private final LocationHelper locationHelper = new LocationHelper();
 
-
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
