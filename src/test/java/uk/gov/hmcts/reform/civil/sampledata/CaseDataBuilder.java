@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.sampledata;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
@@ -30,6 +31,7 @@ import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.HearingFeeServiceRequestDetails;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
@@ -123,6 +125,7 @@ public class CaseDataBuilder {
     public static final LocalDateTime NOTIFICATION_DEADLINE = LocalDate.now().atStartOfDay().plusDays(14);
     public static final BigDecimal FAST_TRACK_CLAIM_AMOUNT = BigDecimal.valueOf(10000);
     public static final LocalDate FUTURE_DATE = LocalDate.now().plusYears(1);
+    public static final String CUSTOMER_REFERENCE = "12345";
 
     // Create Claim
     protected Long ccdCaseReference;
@@ -3323,6 +3326,33 @@ public class CaseDataBuilder {
             .trialHearingTrialDJ(trialHearingTrialDJ)
             .disposalHearingJudgesRecitalDJ(disposalHearingJudgesRecitalDJ)
             .trialHearingJudgesRecitalDJ(trialHearingJudgesRecitalDJ)
+            .build();
+    }
+
+    public CaseData buildServiceRequestCaseData() {
+        Organisation orgId = Organisation.builder()
+            .organisationID("OrgId").build();
+
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .hearingFee(Fee.builder()
+                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .code("FE203")
+                            .version("1")
+                            .build())
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .partyName("Test Applicant Name").build())
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .hearingFeeServiceRequestDetails(
+                HearingFeeServiceRequestDetails.builder()
+                    .fee(
+                        Fee.builder()
+                            .code("FE203")
+                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .version("1")
+                            .build())
+                    .serviceRequestReference(CUSTOMER_REFERENCE).build())
             .build();
     }
 }
