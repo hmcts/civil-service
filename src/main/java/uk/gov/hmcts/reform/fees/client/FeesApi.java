@@ -17,7 +17,7 @@ public interface FeesApi {
     @GetMapping("/health")
     InternalHealth health();
 
-    @GetMapping(baseUrl+"/lookup"
+    @GetMapping(baseUrl + "/lookup"
         + "?service={service}"
         + "&jurisdiction1={jurisdiction1}"
         + "&jurisdiction2={jurisdiction2}"
