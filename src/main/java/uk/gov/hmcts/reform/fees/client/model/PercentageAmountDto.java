@@ -20,3 +20,4 @@ public class PercentageAmountDto {
 
     private BigDecimal percentage;
 }
+
