@@ -375,6 +375,54 @@ public class DeadlinesCalculatorTest {
         }
     }
 
+    @Nested
+    class NextDeadline {
+        @Test
+        void shouldReturnEarliestDate() {
+            List<LocalDateTime> datelines = new ArrayList<>();
+            LocalDateTime earliestDeadline = LocalDateTime.of(2019, 03, 28, 14, 33, 48);
+            datelines.add(earliestDeadline);
+            datelines.add(LocalDateTime.of(2019, 03, 28, 14, 50, 48));
+            datelines.add(LocalDateTime.of(2019, 05, 28, 14, 33, 48));
+
+            assertThat(calculator.nextDeadline(datelines)).isTheSame(earliestDeadline);
+        }
+
+        @Test
+        void shouldReturnEarliestDate_whenOneOfDatesIsNull() {
+            List<LocalDateTime> datelines = new ArrayList<>();
+            LocalDateTime earliestDeadline = LocalDateTime.of(2019, 03, 28, 14, 33, 48);
+            datelines.add(earliestDeadline);
+            datelines.add(LocalDateTime.of(2019, 03, 28, 14, 50, 48));
+            datelines.add(null);
+            datelines.add(LocalDateTime.of(2019, 05, 28, 14, 33, 48));
+
+            assertThat(calculator.nextDeadline(datelines)).isTheSame(earliestDeadline);
+        }
+
+        @Test
+        void shouldReturnEarliestDate_AllDatesAreSame() {
+            List<LocalDateTime> datelines = new ArrayList<>();
+            LocalDateTime earliestDeadline = LocalDateTime.of(2019, 03, 28, 14, 33, 48);
+            datelines.add(earliestDeadline);
+            datelines.add(earliestDeadline);
+            datelines.add(earliestDeadline);
+
+            assertThat(calculator.nextDeadline(datelines)).isTheSame(earliestDeadline);
+        }
+
+        @Test
+        void shouldReturnDeadlinePlus14Days_whenNotifyClaimDetails() {
+            LocalDateTime startDate = LocalDate.of(2022, 8, 19).atTime(12, 0);
+            LocalDateTime expectedDeadline = LocalDate.of(2022, 9, 2).atTime(END_OF_BUSINESS_DAY);
+            LocalDateTime responseDeadline = calculator.plus14DaysDeadline(startDate);
+
+            assertThat(responseDeadline)
+                .isWeekday()
+                .isTheSame(expectedDeadline);
+        }
+    }
+
     /**
      * The fixture is taken from the real bank holidays API.
      */
