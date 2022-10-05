@@ -27,7 +27,6 @@ import javax.validation.constraints.NotNull;
 )
 public class DocumentController {
 
-    @Autowired
     private final ClaimFormService claimFormService;
 
     @PostMapping("/generateSealedDoc")
