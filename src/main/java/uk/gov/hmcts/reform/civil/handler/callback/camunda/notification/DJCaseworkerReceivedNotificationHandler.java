@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -28,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CASEWORKER_DJ_RECEIVED;
 import static uk.gov.hmcts.reform.civil.utils.DefaultJudgmentUtils.calculateFixedCosts;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DJCaseworkerReceivedNotificationHandler extends CallbackHandler implements NotificationData {
@@ -56,6 +58,7 @@ public class DJCaseworkerReceivedNotificationHandler extends CallbackHandler imp
 
     private CallbackResponse notifyDJApprovedCaseworker(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        log.info("Default Judgment Spec email sent to: " + defaultJudgmentSpecEmailConfiguration.getReceiver());
         notificationService.sendMail(defaultJudgmentSpecEmailConfiguration.getReceiver(),
                                      notificationsProperties.getCaseworkerDefaultJudgmentRequested(),
                                              addProperties(caseData),
