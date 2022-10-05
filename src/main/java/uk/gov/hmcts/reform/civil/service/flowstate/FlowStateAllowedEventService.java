@@ -197,9 +197,10 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 TAKE_CASE_OFFLINE,
                 EVIDENCE_UPLOAD_JUDGE,
-                HEARING_SCHEDULED,
+                HEARING_SCHEDULED
             )
         ),
+
         entry(
             CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
             List.of(
