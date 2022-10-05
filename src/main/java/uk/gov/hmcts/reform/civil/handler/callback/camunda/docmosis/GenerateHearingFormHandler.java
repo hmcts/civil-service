@@ -14,11 +14,12 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.service.docmosis.hearing.HearingFormGenerator;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Objects.isNull;
+import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -53,7 +54,11 @@ public class GenerateHearingFormHandler extends CallbackHandler {
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        buildDocument(callbackParams, caseDataBuilder, caseData);
+        try {
+            buildDocument(callbackParams, caseDataBuilder, caseData);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -61,7 +66,7 @@ public class GenerateHearingFormHandler extends CallbackHandler {
     }
 
     private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                               CaseData caseData) {
+                               CaseData caseData) throws IOException {
         List<CaseDocument> caseDocuments = hearingFormGenerator.generate(
             callbackParams.getCaseData(),
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
@@ -69,7 +74,7 @@ public class GenerateHearingFormHandler extends CallbackHandler {
         );
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(caseDocuments.get(0)));
-        if (!isNull(caseData.getHearingDocuments())) {
+        if (!isEmpty(caseData.getHearingDocuments())) {
             systemGeneratedCaseDocuments.addAll(caseData.getHearingDocuments());
         }
         caseDataBuilder.hearingDocuments(systemGeneratedCaseDocuments);

@@ -327,7 +327,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         List<String> validationErrors;
 
         if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
-            validationErrors = validateCourtChoice(caseData);
+            validationErrors = new ArrayList<>();
         } else {
             validationErrors = validateCourtTextOld(caseData);
         }

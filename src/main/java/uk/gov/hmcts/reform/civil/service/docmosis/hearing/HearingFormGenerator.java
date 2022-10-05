@@ -12,12 +12,15 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_FAST_TRACK;
@@ -33,13 +36,13 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
 
-    public List<CaseDocument> generate(CaseData caseData, String authorisation, String event) {
+    public List<CaseDocument> generate(CaseData caseData, String authorisation, String event) throws IOException {
 
         List<CaseDocument> caseDocuments = new ArrayList<>();
-        List<HearingForm> templateData = getHearingForms(caseData, event);
+        HearingForm templateData = getTemplateData(caseData);
         DocmosisTemplates template = getTemplate(caseData);
         DocmosisDocument document =
-            documentGeneratorService.generateDocmosisDocument(templateData.get(0), template);
+            documentGeneratorService.generateDocmosisDocument(templateData, template);
         caseDocuments.add(documentManagementService.uploadDocument(
             authorisation,
             new PDF(
@@ -54,49 +57,56 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     @Override
     public HearingForm getTemplateData(CaseData caseData) throws IOException {
 
-        HearingForm form = HearingForm.builder()
+        return HearingForm.builder()
             .court(caseData.getHearingLocation().getValue().getLabel())
             .caseNumber(caseData.getLegacyCaseReference())
-            .creationDate(LocalDate.now())
+            .creationDate(getDateFormatted(LocalDate.now()))
             .claimant(caseData.getApplicant1().getPartyName())
-            .claimantReference("TBC")
+            .claimantReference(checkReference(caseData)
+                                   ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
             .defendant(caseData.getRespondent1().getPartyName())
-            .defendantReference("TBC")
-            .hearingDate(caseData.getDateOfApplication())
-            .hearingTime(caseData.getHearingTimeHourMinute())
+            .defendantReference(checkReference(caseData)
+                                    ? caseData.getSolicitorReferences().getRespondentSolicitor1Reference() : null)
+            .hearingDate(getDateFormatted(caseData.getHearingDate()))
+            .hearingTime(getHearingTimeFormatted(caseData.getHearingTimeHourMinute()))
             .hearingType(getHearingType(caseData))
-            .duration(getHearingDuration(caseData))
-            .additionalInfo(caseData.getHearingAdditionalInformation())
-            .feeAmount(caseData.getHearingFee())
-            .hearingDueDate(caseData.getHearingDueDate())
+            .applicationDate(getDateFormatted(caseData.getDateOfApplication()))
+            .hearingDuration(getHearingDuration(caseData))
+            .additionalInfo(caseData.getInformation())
+            .feeAmount(HearingUtils.formatHearingFee(caseData.getHearingFee().getCalculatedAmountInPence()))
+            .hearingDueDate(getDateFormatted(caseData.getHearingDueDate()))
             .additionalText(caseData.getHearingNoticeListOther())
             .claimant2exists(nonNull(caseData.getApplicant2()))
             .defendant2exists(nonNull(caseData.getApplicant2()))
             .claimant2(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
             .defendant2(nonNull(caseData.getApplicant2()) ? caseData.getRespondent2().getPartyName() : null)
-            .claimant2Reference("TBC")
-            .defendant2Reference("TBC").build();
-
-        return form;
+            .claimant2Reference(checkReference(caseData)
+                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
+            .defendant2Reference(checkReference(caseData)
+                                     ? caseData.getSolicitorReferences().getRespondentSolicitor2Reference() : null)
+            .build();
     }
 
     private String getFileName(CaseData caseData, DocmosisTemplates template) {
         return String.format(template.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
 
-    private List<HearingForm> getHearingForms(CaseData caseData, String event) {
-        List<HearingForm> hearingForms = new ArrayList<>();
-        hearingForms.add(getHearingForm(caseData, caseData.getRespondent1(), event));
-
-        return hearingForms;
+    private String getHearingTimeFormatted(String hearingTime) {
+        StringBuilder hearingTimeBuilder = new StringBuilder(hearingTime);
+        hearingTimeBuilder.insert(2,':');
+        return hearingTimeBuilder.toString();
     }
 
-    private HearingForm getHearingForm(CaseData caseData,
-                                                       uk.gov.hmcts.reform.civil.model.Party respondent,
-                                                       String event) {
-        return HearingForm.builder()
-            .caseNumber(caseData.getLegacyCaseReference()).build();
+    private String getDateFormatted(LocalDate date) {
+        if (isNull(date)) {
+            return null;
+        } else {
+            return date.format(DateTimeFormatter.ofPattern("dd/MMM/yyyy"));
+        }
+    }
 
+    private boolean checkReference(CaseData caseData) {
+        return nonNull(caseData.getSolicitorReferences());
     }
 
     private DocmosisTemplates getTemplate(CaseData caseData) {
