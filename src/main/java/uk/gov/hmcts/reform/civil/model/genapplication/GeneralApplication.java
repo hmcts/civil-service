@@ -89,7 +89,6 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("caseManagementCategory") GACaseManagementCategory caseManagementCategory,
                        @JsonProperty("CaseAccessCategory") CaseCategory caseAccessCategory,
                        @JsonProperty("locationName") String locationName,
-                       @JsonProperty("generalAppSuperClaimType") String generalAppSuperClaimType,
                        @JsonProperty("applicationClosedDate") LocalDateTime applicationClosedDate,
                        @JsonProperty("applicationTakenOfflineDate") LocalDateTime applicationTakenOfflineDate
                        ) {
