@@ -86,4 +86,10 @@
   <suppress until="2022-10-10">
     <cve>CVE-2021-43980</cve>
   </suppress>
+  <suppress until="2022-11-06">
+    <cve>CVE-2022-42003</cve>
+  </suppress>
+  <suppress until="2022-11-06">
+    <cve>CVE-2021-42004</cve>
+  </suppress>
 </suppressions>
