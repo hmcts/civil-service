@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -14,6 +15,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -41,12 +44,16 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +89,10 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
     private final IdamClient idamClient;
+    private final FeatureToggleService featureToggleService;
+
+    @Autowired
+    private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -364,6 +375,39 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                 .input3("At least 7 days before the trial, the claimant must"
                                                             + " upload to the Digital Portal ")
                                                 .build());
+
+        // copy of above method as to not break existing cases
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            caseDataBuilder.trialHearingTimeDJ(TrialHearingTimeDJ.builder()
+                                               .helpText1(
+                                                   "If either party considers that the time estimate is insufficient, "
+                                                       + "they must inform the court within 7 days of the date of this order.")
+                                               .helpText2(
+                                                   "Not more than seven nor less than three clear days before the "
+                                                       + "trial, the claimant must file at court and serve an indexed "
+                                                       + "and paginated bundle of documents which complies with the "
+                                                       + "requirements of Rule 39.5 Civil Procedure Rules "
+                                                       + "and which complies with requirements of PD32. The parties "
+                                                       + "must endeavour to agree the contents of the bundle before it "
+                                                       + "is filed. The bundle will include a case summary and a "
+                                                       + "chronology.")
+                                               .build());
+        }
+
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            caseDataBuilder.trialOrderMadeWithoutHearingDJ(TrialOrderMadeWithoutHearingDJ.builder()
+                                               .input(String.format(
+                                                   "This order has been made without a hearing. "
+                                                       + "Each party has the right to apply to have this Order "
+                                                       + "set aside or varied. Any such application must be "
+                                                       + "received by the Court "
+                                                       + "(together with the appropriate fee) by 4pm on %s.",
+                                                   deadlinesCalculator.plusWorkingDays(
+                                                           LocalDate.now(), 5)
+                                                       .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
+                                               ))
+                                               .build());
+        }
 
         caseDataBuilder.trialHearingNotesDJ(TrialHearingNotes
                                                 .builder()
