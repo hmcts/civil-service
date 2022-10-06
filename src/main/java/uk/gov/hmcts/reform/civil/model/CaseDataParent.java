@@ -201,7 +201,6 @@ public class CaseDataParent implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> disposalHearingBundleToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingClaimSettlingToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingCostsToggle;
-    private List<OrderDetailsPagesSectionsToggle> disposalHearingApplicationsOrderToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsHearingToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsMethodToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsDocumentsToggle;
