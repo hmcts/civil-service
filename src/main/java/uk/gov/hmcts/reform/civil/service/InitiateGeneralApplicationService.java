@@ -132,12 +132,6 @@ public class InitiateGeneralApplicationService {
         } else {
             applicationBuilder.isMultiParty(NO);
         }
-
-        Pair<CaseLocation, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
-        //Setting Work Allocation location and location name
-        applicationBuilder.caseManagementLocation(caseLocation.getLeft());
-        applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
-
         applicationBuilder.claimant1PartyName(caseData.getApplicant1().getPartyName());
         applicationBuilder.defendant1PartyName(caseData.getRespondent1().getPartyName());
         if (YES.equals(caseData.getAddApplicant2())) {
@@ -181,6 +175,12 @@ public class InitiateGeneralApplicationService {
         itemList.add(element(civil));
         applicationBuilder.caseManagementCategory(
             GACaseManagementCategory.builder().value(civil).list_items(itemList).build());
+
+        Pair<CaseLocation, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
+        //Setting Work Allocation location and location name
+        applicationBuilder.caseManagementLocation(caseLocation.getLeft());
+        applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
+        applicationBuilder.locationName(caseLocation.getLeft().getSiteName());
 
         LocalDateTime deadline = deadlinesCalculator
             .calculateApplicantResponseDeadline(
