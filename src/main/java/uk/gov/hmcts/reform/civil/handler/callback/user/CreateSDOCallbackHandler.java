@@ -158,10 +158,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
-        if (featureToggleService.isHearingsAndListingsEnabled()) {
-            updatedData.hearingMethod(getHearingMethodOptions(callbackParams));
-        }
-
         updatedData.disposalHearingMethodInPerson(fromList(fetchLocationData(callbackParams)));
         updatedData.fastTrackMethodInPerson(fromList(fetchLocationData(callbackParams)));
         updatedData.smallClaimsMethodInPerson(fromList(fetchLocationData(callbackParams)));
@@ -564,9 +560,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         SmallClaimsNotes.SmallClaimsNotesBuilder tempSmallClaimsNotes = SmallClaimsNotes.builder();
         if (featureToggleService.isHearingsAndListingsEnabled()) {
-            tempSmallClaimsNotes.input(
-                "The order has been made without a hearing. "
-                    + "Each party has the right to apply to have this Order set aside or varied. "
+            tempSmallClaimsNotes.input("Each party has the right to apply to have this Order set aside or varied. "
                     + "Any such application must be received by the Court "
                     + "(together with the appropriate fee) by 4pm on "
                     + DateFormatHelper.formatLocalDate(
@@ -677,19 +671,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
-        if (featureToggleService.isHearingsAndListingsEnabled()) {
-            cleanHearingMethodOptions(callbackParams, dataBuilder);
-        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
-    }
-
-    private void cleanHearingMethodOptions(CallbackParams params, CaseData.CaseDataBuilder builder) {
-        builder.hearingMethod(DynamicList.builder()
-                                  .value(params.getCaseData().getHearingMethod().getValue())
-                                  .listItems(Collections.emptyList())
-                                  .build());
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
@@ -752,15 +736,4 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return locationRefDataService.getCourtLocations(authToken);
     }
 
-    private DynamicList getHearingMethodOptions(CallbackParams callbackParams) {
-        HearingChannelLov hearingChannels = commonReferenceDataApi.findHearingChannels(
-            callbackParams.getParams().get(BEARER_TOKEN).toString(),
-            authTokenGenerator.generate(),
-            hearingChannelServiceId
-        );
-        return DynamicList.fromList(
-            hearingChannels.getValues().stream()
-                .filter(channel -> !"NA".equals(channel.getKey()) && !"ONPPRS".equals(channel.getKey()))
-                .map(channel -> channel.getValueEn()).collect(Collectors.toList()));
-    }
 }
