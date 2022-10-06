@@ -94,6 +94,13 @@ allprojects {
       ) {
         entry 'snakeyaml'
       }
+      // Solves CVE-2022-25647
+      dependencySet(
+        group: 'org.camunda.bpm',
+        version: '7.17.0'
+      ) {
+        entry 'camunda-engine'
+      }
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2020.0.4'
@@ -371,7 +378,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: versions.springSecurity
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.23'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.25.4'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
 
@@ -387,9 +394,10 @@ dependencies {
 
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.71'
 
-  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.16.0'
+  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.17.0'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
-  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.16.0'
+  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.17.0'
+
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.13.1'
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.1'
 
