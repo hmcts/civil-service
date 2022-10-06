@@ -174,7 +174,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             courtLocationList = courtLocationUtils.getLocationsFromList(fetchLocationData(callbackParams));
             updatedCaseData.respondent1DQ(Respondent1DQ.builder()
                                               .respondent1DQRequestedCourt(
-                                                  RequestedCourt.builder().responseCourtLocations(courtLocationList).build())
+                                                  RequestedCourt.builder()
+                                                      .responseCourtLocations(courtLocationList)
+                                                      .build())
                                               .build());
         }
 
@@ -567,28 +569,32 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         Optional.ofNullable(caseData.getRespondent1ClaimResponseDocument())
             .map(ResponseDocument::getFile).ifPresent(respondent1ClaimDocument -> defendantUploads.add(
                 buildElemCaseDocument(respondent1ClaimDocument, "Defendant",
-                                      updatedCaseData.build().getRespondent1ResponseDate(), DocumentType.DEFENDANT_DEFENCE
+                                      updatedCaseData.build().getRespondent1ResponseDate(),
+                                      DocumentType.DEFENDANT_DEFENCE
                 )));
         Optional.ofNullable(caseData.getRespondent1DQ())
             .map(Respondent1DQ::getRespondent1DQDraftDirections)
             .ifPresent(respondent1DQ -> defendantUploads.add(
-                buildElemCaseDocument(respondent1DQ,
-                                      "Defendant",
-                                      updatedCaseData.build().getRespondent1ResponseDate(),
-                                      DocumentType.DEFENDANT_DRAFT_DIRECTIONS
+                buildElemCaseDocument(
+                    respondent1DQ,
+                    "Defendant",
+                    updatedCaseData.build().getRespondent1ResponseDate(),
+                    DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                 )));
         Optional.ofNullable(caseData.getRespondent2ClaimResponseDocument())
             .map(ResponseDocument::getFile).ifPresent(respondent2ClaimDocument -> defendantUploads.add(
                 buildElemCaseDocument(respondent2ClaimDocument, "Defendant 2",
-                                      updatedCaseData.build().getRespondent2ResponseDate(), DocumentType.DEFENDANT_DEFENCE
+                                      updatedCaseData.build().getRespondent2ResponseDate(),
+                                      DocumentType.DEFENDANT_DEFENCE
                 )));
         Optional.ofNullable(caseData.getRespondent2DQ())
             .map(Respondent2DQ::getRespondent2DQDraftDirections)
             .ifPresent(respondent2DQ -> defendantUploads.add(
-                buildElemCaseDocument(respondent2DQ,
-                                      "Defendant 2",
-                                      updatedCaseData.build().getRespondent2ResponseDate(),
-                                      DocumentType.DEFENDANT_DRAFT_DIRECTIONS
+                buildElemCaseDocument(
+                    respondent2DQ,
+                    "Defendant 2",
+                    updatedCaseData.build().getRespondent2ResponseDate(),
+                    DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                 )));
         if (!defendantUploads.isEmpty()) {
             updatedCaseData.defendantResponseDocuments(defendantUploads);
@@ -750,9 +756,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .toBuilder()
                 .responseCourtLocations(null)
                 .responseCourtCode(Optional.ofNullable(courtLocation)
-                        .map(LocationRefData::getCourtLocationCode)
-                            .orElse(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
-                                        .getResponseCourtCode()));
+                                       .map(LocationRefData::getCourtLocationCode)
+                                       .orElse(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
+                                                   .getResponseCourtCode()));
             buildWithMatching(courtLocation).ifPresent(dqBuilder::caseLocation);
             dq.respondent2DQRequestedCourt(dqBuilder.build());
         }
