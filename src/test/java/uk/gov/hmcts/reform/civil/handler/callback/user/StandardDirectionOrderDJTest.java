@@ -479,9 +479,9 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("trialOrderMadeWithoutHearingDJ").extracting("input")
                 .isEqualTo(String.format("This order has been made without a hearing. Each party has the right to "
-                                             + "apply to have this Order set aside or varied. Any such application must "
-                                             + "be received by the Court (together with the appropriate fee) by 4pm "
-                                             + "on %s.",
+                                             + "apply to have this Order set aside or varied. Any such application "
+                                             + "must be received by the Court (together with the appropriate fee) "
+                                             + "by 4pm on %s.",
                                          date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))));
         }
 
