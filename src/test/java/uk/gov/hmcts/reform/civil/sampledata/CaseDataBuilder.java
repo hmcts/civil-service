@@ -303,6 +303,9 @@ public class CaseDataBuilder {
     private List<Element<ChangeOfRepresentation>> changeOfRepresentation;
     private ChangeOrganisationRequest changeOrganisationRequest;
 
+    private String unassignedCaseListDisplayOrganisationReferences;
+    private String caseListDisplayDefendantSolicitorReferences;
+
     //update pdf document from general applications
     private List<Element<CaseDocument>> generalOrderDocument;
 
@@ -3228,6 +3231,22 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder setUnassignedCaseListDisplayOrganisationReferences() {
+        this.unassignedCaseListDisplayOrganisationReferences = "Organisation references String";
+        return this;
+    }
+
+    public CaseDataBuilder setCaseListDisplayDefendantSolicitorReferences(boolean isOneDefendantSolicitor) {
+        if (!isOneDefendantSolicitor) {
+            this.caseListDisplayDefendantSolicitorReferences =
+                this.solicitorReferences.getRespondentSolicitor1Reference() + this.respondentSolicitor2Reference;
+        } else {
+            this.caseListDisplayDefendantSolicitorReferences =
+                this.solicitorReferences.getRespondentSolicitor1Reference();
+        }
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -3412,6 +3431,8 @@ public class CaseDataBuilder {
             .trialHearingJudgesRecitalDJ(trialHearingJudgesRecitalDJ)
             .changeOfRepresentation(changeOfRepresentation)
             .changeOrganisationRequestField(changeOrganisationRequest)
+            .unassignedCaseListDisplayOrganisationReferences(unassignedCaseListDisplayOrganisationReferences)
+            .caseListDisplayDefendantSolicitorReferences(caseListDisplayDefendantSolicitorReferences)
             .build();
     }
 }

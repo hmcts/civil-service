@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.prd.model.DxAddress;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -60,11 +61,60 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
     class AboutToSubmit {
 
         @Test
+        void shouldThrowError_whenOrgToAddIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .changeOfRepresentation(true, false, "1234", "QWERTY A")
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            when(organisationService.findOrganisationById(NEW_ORG_ID)).thenReturn(Optional.empty());
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).containsExactly("Organisation to add is null");
+        }
+
+        @Test
+        void shouldThrowError_whenChangeOfRepresentationIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).containsExactly("No Notice of Change events recorded");
+        }
+
+        @Test
+        void shouldThrowError_whenChangeOfRepresentationIsEmpty() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .build();
+
+            caseData.toBuilder().changeOfRepresentation(new ArrayList<>());
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).containsExactly("No Notice of Change events recorded");
+        }
+
+        @Test
         void shouldUpdateSolicitorDetails_afterNoCSubmittedByApplicantSolicitor1v1() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .changeOfRepresentation(true, false, "1234", "QWERTY A")
                 .updateOrgPolicyAfterNoC(true, false)
+                .setCaseListDisplayDefendantSolicitorReferences(true)
+                .setUnassignedCaseListDisplayOrganisationReferences()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -83,8 +133,12 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getApplicantSolicitor1PbaAccounts().getListItems().get(0).getLabel())
                 .isEqualTo("account");
             assertThat(updatedCaseData.getApplicantSolicitor1PbaAccountsIsEmpty()).isEqualTo(NO);
-            assertSolicitorReferences(true, false, caseData, updatedCaseData);
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
+
+            assertSolicitorReferences(true, false, caseData, updatedCaseData);
+            assertThat(updatedCaseData.getCaseListDisplayDefendantSolicitorReferences())
+                .isEqualTo(updatedCaseData.getSolicitorReferences().getRespondentSolicitor1Reference());
+            assertThat(updatedCaseData.getUnassignedCaseListDisplayOrganisationReferences()).isEmpty();
 
             //TODO update this after CCD-3538
             assertThat(updatedCaseData.getApplicantSolicitor1UserDetails()).isNull();
@@ -96,6 +150,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .atStateClaimIssued()
                 .changeOfRepresentation(false, false, "1234", "QWERTY R")
                 .updateOrgPolicyAfterNoC(true, false)
+                .setCaseListDisplayDefendantSolicitorReferences(true)
+                .setUnassignedCaseListDisplayOrganisationReferences()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -112,10 +168,15 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondentSolicitor1OrganisationDetails()).isEqualTo(getNewOrgDetails());
             assertThat(updatedCaseData.getRespondentSolicitor1ServiceAddress())
                 .isEqualTo(getNewOrgDetails().getAddress());
-            assertSolicitorReferences(false, false, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent1OrganisationIDCopy()).isEqualTo("1234");
             assertThat(updatedCaseData.getRespondent1Represented()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondent1OrgRegistered()).isEqualTo(YES);
+
+            assertSolicitorReferences(false, false, caseData, updatedCaseData);
+            assertThat(updatedCaseData.getCaseListDisplayDefendantSolicitorReferences())
+                .isBlank();
+            assertThat(updatedCaseData.getUnassignedCaseListDisplayOrganisationReferences()).isEmpty();
+
             //TODO update this after CCD-3538
             assertThat(updatedCaseData.getRespondentSolicitor1EmailAddress()).isNull();
         }
@@ -157,6 +218,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .multiPartyClaimTwoDefendantSolicitors()
                 .changeOfRepresentation(false, true, "1234", "QWERTY R2")
                 .updateOrgPolicyAfterNoC(false, true)
+                .setCaseListDisplayDefendantSolicitorReferences(false)
+                .setUnassignedCaseListDisplayOrganisationReferences()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -173,11 +236,16 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondentSolicitor2OrganisationDetails()).isEqualTo(getNewOrgDetails());
             assertThat(updatedCaseData.getRespondentSolicitor2ServiceAddress())
                 .isEqualTo(getNewOrgDetails().getAddress());
-            assertSolicitorReferences(false, true, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent2OrganisationIDCopy()).isEqualTo("1234");
             assertThat(updatedCaseData.getRespondent2Represented()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondent2OrgRegistered()).isEqualTo(YES);
             assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
+
+            assertSolicitorReferences(false, true, caseData, updatedCaseData);
+            assertThat(updatedCaseData.getCaseListDisplayDefendantSolicitorReferences())
+                .isEqualTo(updatedCaseData.getSolicitorReferences().getRespondentSolicitor1Reference());
+            assertThat(updatedCaseData.getUnassignedCaseListDisplayOrganisationReferences()).isEmpty();
+
             //TODO update this after CCD-3538
             assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress()).isNull();
         }

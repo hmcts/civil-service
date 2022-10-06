@@ -107,16 +107,12 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         boolean isApplicantSolicitorRole = isApplicantOrRespondent(replacedSolicitorCaseRole);
 
         if (isApplicantSolicitorRole) {
-            if (addedOrganisation != null) {
-                updateApplicantSolicitorDetails(caseDataBuilder, addedSolicitorDetails, addedOrganisation);
-            }
+            updateApplicantSolicitorDetails(caseDataBuilder, addedSolicitorDetails, addedOrganisation);
         } else {
-            if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
-                && addedOrganisation != null) {
+            if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
                 updateRespondentSolicitor1Details(caseDataBuilder, addedOrganisation, addedSolicitorDetails);
             } else {
-                if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
-                    && addedOrganisation != null) {
+                if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
                     updateRespondentSolicitor2Details(caseDataBuilder, addedOrganisation, addedSolicitorDetails);
                 }
             }
@@ -281,6 +277,11 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             // only update if it's been created during acknowledge claim
             if (caseData.getSolicitorReferencesCopy() != null) {
                 caseDataBuilder.solicitorReferencesCopy(updatedSolicitorReferences);
+            }
+
+            // also update this field because it exists
+            if (replacedCaseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
+                caseDataBuilder.respondentSolicitor2Reference(null);
             }
 
             if (caseData.getCaseListDisplayDefendantSolicitorReferences() != null) {

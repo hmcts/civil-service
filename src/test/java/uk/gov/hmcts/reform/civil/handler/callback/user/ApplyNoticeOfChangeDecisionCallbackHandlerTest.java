@@ -107,10 +107,40 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
             }
 
             @Test
+            void shouldApplyNoticeOfChange_whenInvokedByRespondent1For1v1RepresentedOldOrgNullCopyExists() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                    .changeOrganisationRequestField(false, false, "1234", null)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData,
+                                                         CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                                                         ABOUT_TO_SUBMIT);
+
+                CaseDetails caseDetailsAfterNoCApplied =
+                    caseDetailsAfterNoCApplied(CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                                               RESPONDENT_ONE_ORG_POLICY);
+
+                when(caseAssignmentApi.applyDecision(params.getParams().get(BEARER_TOKEN).toString(),
+                                                     authTokenGenerator.generate(),
+                                                     DecisionRequest.decisionRequest(
+                                                         params.getRequest().getCaseDetails())))
+                    .thenReturn(
+                        AboutToStartOrSubmitCallbackResponse.builder()
+                            .data(caseDetailsAfterNoCApplied.getData()).build());
+
+                AboutToStartOrSubmitCallbackResponse response =
+                    (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertChangeOrganisationFieldIsUpdated(response);
+                assertOrgIDIsUpdated(response, RESPONDENT_ONE_ORG_POLICY);
+                assertCamundaEventIsReady(response);
+            }
+
+            @Test
             void shouldApplyNoticeOfChange_whenInvokedByRespondent1For1v1LiP() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
                     .changeOrganisationRequestField(false, false, "1234", null)
                     .build();
+                caseData = caseData.toBuilder().respondent1OrganisationIDCopy(null).build();
                 CallbackParams params = callbackParamsOf(caseData,
                                                          CaseDetails.builder().data(caseData.toMap(mapper)).build(),
                                                          ABOUT_TO_SUBMIT);
@@ -321,10 +351,41 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
             }
 
             @Test
+            void shouldApplyNoticeOfChange_whenInvokedByRespondent2For1v2DSOldOrgNullCopyExists() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .changeOrganisationRequestField(false, true, "1234", null)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData,
+                                                         CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                                                         ABOUT_TO_SUBMIT);
+
+                CaseDetails caseDetailsAfterNoCApplied =
+                    caseDetailsAfterNoCApplied(CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                                               RESPONDENT_TWO_ORG_POLICY);
+
+                when(caseAssignmentApi.applyDecision(params.getParams().get(BEARER_TOKEN).toString(),
+                                                     authTokenGenerator.generate(),
+                                                     DecisionRequest.decisionRequest(
+                                                         params.getRequest().getCaseDetails()))).thenReturn(
+                    AboutToStartOrSubmitCallbackResponse.builder()
+                        .data(caseDetailsAfterNoCApplied.getData()).build()
+                );
+
+                AboutToStartOrSubmitCallbackResponse response =
+                    (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertChangeOrganisationFieldIsUpdated(response);
+                assertOrgIDIsUpdated(response, RESPONDENT_TWO_ORG_POLICY);
+                assertCamundaEventIsReady(response);
+            }
+
+            @Test
             void shouldApplyNoticeOfChange_whenInvokedByRespondent2For1v2DSLiP() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v2Respondent2LiP()
                     .changeOrganisationRequestField(false, true, "1234", null)
                     .build();
+                caseData = caseData.toBuilder().respondent2OrganisationIDCopy(null).build();
                 CallbackParams params = callbackParamsOf(caseData,
                                                          CaseDetails.builder().data(caseData.toMap(mapper)).build(),
                                                          ABOUT_TO_SUBMIT);
@@ -348,7 +409,6 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
                 assertOrgIDIsUpdated(response, RESPONDENT_TWO_ORG_POLICY);
                 assertCamundaEventIsReady(response);
             }
-
         }
 
         @NotNull
