@@ -49,6 +49,12 @@ cmc-claim-store:
   api:
     url: ${CLAIM_STORE_URL:http://localhost:8765}
 
+serviceRequest:
+  api:
+    callback-url : http://civil-service-{{ .Values.global.environment }}.service.core-compute-{{- .Values.global.environment }}.internal/service-request-update
+    site_id : AAA7
+    service : CIVIL
+
 fees:
   api:
     service: civil money claims
