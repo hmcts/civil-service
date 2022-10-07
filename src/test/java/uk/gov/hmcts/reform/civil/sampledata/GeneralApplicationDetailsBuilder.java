@@ -41,6 +41,7 @@ import java.util.Optional;
 
 import static java.time.LocalDate.EPOCH;
 import static java.util.Collections.singletonList;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
@@ -468,6 +469,7 @@ public class GeneralApplicationDetailsBuilder {
 
     public CaseData getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement respondentOrderAgreement) {
         return CaseData.builder()
+            .ccdState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             .ccdCaseReference(1234L)
             .respondent2OrganisationPolicy(OrganisationPolicy.builder()
                     .organisation(Organisation.builder()

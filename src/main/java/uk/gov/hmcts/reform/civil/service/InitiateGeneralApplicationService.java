@@ -352,6 +352,7 @@ public class InitiateGeneralApplicationService {
             CaseLocation courtLocation = CaseLocation.builder()
                     .region(ccmccLocation.getRegionId())
                     .baseLocation(ccmccLocation.getEpimmsId())
+                    .siteName(ccmccLocation.getSiteName())
                     .build();
             return Pair.of(courtLocation, true);
         }
