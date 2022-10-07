@@ -11,12 +11,20 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentAndNote;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -27,6 +35,8 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private EvidenceUploadJudgeHandler handler;
+
+    public static final String REFERENCE_NUMBER = "000DC001";
 
     @Nested
     class AboutToStartCallback {
@@ -60,10 +70,30 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void submittedCallback_placeholder() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            String header = "# Document uploaded and note added \n # " + REFERENCE_NUMBER;
+            String body = "## You have uploaded: \n * A Fancy Name\n";
+
+            Document testDocument = new Document("testurl",
+                                                 "testBinUrl",
+                                                 "A Fancy Name",
+                                                 "hash");
+            var documentAndNote = DocumentAndNote.builder().DOCUMENT(testDocument).build();
+
+            List<Element<DocumentAndNote>> documentList = new ArrayList<>();
+            documentList.add(Element.<DocumentAndNote>builder().value(documentAndNote).build());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .documentAndNote(documentList)
+                .caseNoteType(CaseNoteType.DOCUMENT_AND_NOTE)
+                .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
+                                                                      .confirmationHeader(header)
+                                                                      .confirmationBody(String.format(body))
+                                                                      .build());
 
         }
     }
