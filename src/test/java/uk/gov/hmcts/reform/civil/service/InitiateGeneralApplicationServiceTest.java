@@ -88,6 +88,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                                                                   .caseLocation(CaseLocation.builder()
                                                                                     .region("2")
                                                                                     .baseLocation("00000")
+                                                                                    .siteName("App1SiteName")
                                                                                     .build())
                                                                   .build()).build();
     private static final Respondent1DQ respondent1DQ =
@@ -96,6 +97,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                                                                     .caseLocation(CaseLocation.builder()
                                                                                       .region("2")
                                                                                       .baseLocation("11111")
+                                                                                      .siteName("Resp1SiteName")
                                                                                       .build())
                                                                     .build()).build();
     private static final Respondent2DQ respondent2DQ =
@@ -104,6 +106,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                                                                 .caseLocation(CaseLocation.builder()
                                                                                   .region("3")
                                                                                   .baseLocation("22222")
+                                                                                  .siteName("Resp2SiteName")
                                                                                   .build())
                                                                 .build()).build();
     @Autowired
@@ -896,6 +899,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
             .isEqualTo("00000");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getSiteName())
+            .isEqualTo("App1SiteName");
     }
 
     @Test
@@ -906,6 +911,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
             .isEqualTo("11111");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getSiteName())
+            .isEqualTo("Resp1SiteName");
     }
 
     @Test
@@ -973,6 +980,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                 .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
             .isEqualTo("22222");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getSiteName())
+            .isEqualTo("Resp2SiteName");
     }
 
     @Test

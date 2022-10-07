@@ -16,4 +16,5 @@ public class CaseLocation {
 
     //EpimmsId
     private String baseLocation;
+    private String siteName;
 }
