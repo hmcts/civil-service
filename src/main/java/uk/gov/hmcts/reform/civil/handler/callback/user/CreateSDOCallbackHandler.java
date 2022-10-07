@@ -12,18 +12,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
-import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
@@ -63,7 +58,6 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -72,6 +66,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
 @Service
 @RequiredArgsConstructor
@@ -100,13 +95,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         + "<br/>%s"
         + "<br/>%n%n<strong>Defendant 2</strong>%n"
         + "<br/>%s";
-    private static final String UPON_CONSIDERING =
-        "Upon considering the claim form, particulars of claim, statements of case and Directions questionnaires";
 
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final SdoGeneratorService sdoGeneratorService;
-    private final LocationHelper locationHelper;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -136,24 +128,39 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
-        updatedData
-            .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
-            .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
-
-        Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
-        preferredCourt.map(RequestedCourt::getCaseLocation)
-            .ifPresent(updatedData::caseManagementLocation);
-
-        DynamicList locationsList = getLocationList(callbackParams, updatedData, preferredCourt.orElse(null));
-        updatedData.disposalHearingMethodInPerson(locationsList);
-        updatedData.fastTrackMethodInPerson(locationsList);
-        updatedData.smallClaimsMethodInPerson(locationsList);
+        updatedData.disposalHearingMethodInPerson(fromList(fetchLocationData(callbackParams)));
+        updatedData.fastTrackMethodInPerson(fromList(fetchLocationData(callbackParams)));
+        updatedData.smallClaimsMethodInPerson(fromList(fetchLocationData(callbackParams)));
 
         List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
-        setCheckList(updatedData, checkList);
+
+        updatedData.fastTrackAltDisputeResolutionToggle(checkList);
+        updatedData.fastTrackVariationOfDirectionsToggle(checkList);
+        updatedData.fastTrackSettlementToggle(checkList);
+        updatedData.fastTrackDisclosureOfDocumentsToggle(checkList);
+        updatedData.fastTrackWitnessOfFactToggle(checkList);
+        updatedData.fastTrackSchedulesOfLossToggle(checkList);
+        updatedData.fastTrackCostsToggle(checkList);
+        updatedData.fastTrackTrialToggle(checkList);
+        updatedData.fastTrackMethodToggle(checkList);
+        updatedData.disposalHearingDisclosureOfDocumentsToggle(checkList);
+        updatedData.disposalHearingWitnessOfFactToggle(checkList);
+        updatedData.disposalHearingMedicalEvidenceToggle(checkList);
+        updatedData.disposalHearingQuestionsToExpertsToggle(checkList);
+        updatedData.disposalHearingSchedulesOfLossToggle(checkList);
+        updatedData.disposalHearingFinalDisposalHearingToggle(checkList);
+        updatedData.disposalHearingMethodToggle(checkList);
+        updatedData.disposalHearingBundleToggle(checkList);
+        updatedData.disposalHearingClaimSettlingToggle(checkList);
+        updatedData.disposalHearingCostsToggle(checkList);
+        updatedData.smallClaimsHearingToggle(checkList);
+        updatedData.smallClaimsMethodToggle(checkList);
+        updatedData.smallClaimsDocumentsToggle(checkList);
+        updatedData.smallClaimsWitnessStatementToggle(checkList);
 
         DisposalHearingJudgesRecital tempDisposalHearingJudgesRecital = DisposalHearingJudgesRecital.builder()
-            .input(UPON_CONSIDERING)
+            .input("Upon considering the claim form, particulars of claim, statements of case"
+                       + " and Directions questionnaires")
             .build();
 
         updatedData.disposalHearingJudgesRecital(tempDisposalHearingJudgesRecital).build();
@@ -171,13 +178,13 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         DisposalHearingDisclosureOfDocuments tempDisposalHearingDisclosureOfDocuments =
             DisposalHearingDisclosureOfDocuments.builder()
-                .input1("The parties shall serve on each other copies of the documents upon which reliance is to be"
-                            + " placed at the disposal hearing by 4pm on")
-                .date1(LocalDate.now().plusWeeks(10))
-                .input2("The parties must upload to the Digital Portal copies of those documents which they wish the"
-                            + "court to consider when deciding the amount of damages, by 4pm on")
-                .date2(LocalDate.now().plusWeeks(10))
-                .build();
+            .input1("The parties shall serve on each other copies of the documents upon which reliance is to be"
+                       + " placed at the disposal hearing by 4pm on")
+            .date1(LocalDate.now().plusWeeks(10))
+            .input2("The parties must upload to the Digital Portal copies of those documents which they wish the"
+                       + "court to consider when deciding the amount of damages, by 4pm on")
+            .date2(LocalDate.now().plusWeeks(10))
+            .build();
 
         updatedData.disposalHearingDisclosureOfDocuments(tempDisposalHearingDisclosureOfDocuments).build();
 
@@ -202,9 +209,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         DisposalHearingMedicalEvidence tempDisposalHearingMedicalEvidence = DisposalHearingMedicalEvidence.builder()
             .input("The claimant has permission to rely upon the written expert evidence already uploaded to the"
-                       + " Digital Portal with the particulars of claim and in addition has permission to rely upon"
-                       + " any associated correspondence or updating report which is uploaded to the Digital Portal"
-                       + " by 4pm on")
+                        + " Digital Portal with the particulars of claim and in addition has permission to rely upon"
+                        + " any associated correspondence or updating report which is uploaded to the Digital Portal"
+                        + " by 4pm on")
             .date(LocalDate.now().plusWeeks(4))
             .build();
 
@@ -241,6 +248,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 .build();
 
         updatedData.disposalHearingFinalDisposalHearing(tempDisposalHearingFinalDisposalHearing).build();
+
+        HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ();
 
         DisposalHearingBundle tempDisposalHearingBundle = DisposalHearingBundle.builder()
             .input("At least 7 days before the disposal hearing, the claimant must upload to the Digital Portal")
@@ -337,8 +346,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         FastTrackNotes tempFastTrackNotes = FastTrackNotes.builder()
             .input("This Order has been made without a hearing. Each party has the right to apply to have this Order "
-                       + "set aside or varied. Any application must be received by the Court, "
-                       + "together with the appropriate fee by 4pm on")
+                        + "set aside or varied. Any application must be received by the Court, "
+                        + "together with the appropriate fee by 4pm on")
             .date(LocalDate.now().plusWeeks(1))
             .build();
 
@@ -466,8 +475,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (judgementSum != null) {
             SmallClaimsJudgementDeductionValue tempSmallClaimsJudgementDeductionValue =
                 SmallClaimsJudgementDeductionValue.builder()
-                    .value(judgementSum.getJudgementSum().toString() + "%")
-                    .build();
+                .value(judgementSum.getJudgementSum().toString() + "%")
+                .build();
 
             updatedData.smallClaimsJudgementDeductionValue(tempSmallClaimsJudgementDeductionValue).build();
         }
@@ -562,10 +571,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input7("and the claimant's evidence is reply if so advised to be uploaded by 4pm on")
             .date4(LocalDate.now().plusWeeks(10))
             .input8("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
-                        + "paragraph above, each party may rely upon the written evidence by way of witness statement "
-                        + "of one witness to provide evidence of basic hire rates available within the claimant's "
-                        + "geographical location from a mainstream supplier, or a local reputable supplier if none is "
-                        + "available.")
+                + "paragraph above, each party may rely upon the written evidence by way of witness statement "
+                + "of one witness to provide evidence of basic hire rates available within the claimant's "
+                + "geographical location from a mainstream supplier, or a local reputable supplier if none is "
+                + "available.")
             .input9("The defendant’s evidence is to be uploaded to the Digital Portal by 4pm on")
             .date5(LocalDate.now().plusWeeks(8))
             .input10(", and the claimant’s evidence in reply if so advised is to be uploaded by 4pm on")
@@ -585,39 +594,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
-    }
-
-    /**
-     * Creates the dynamic list for the hearing location, pre-selecting the preferred court if possible.
-     *
-     * @param callbackParams callback params
-     * @param updatedData    updated case data
-     * @param preferredCourt (optional) preferred court if any
-     * @return dynamic list, with a value selected if appropriate and possible
-     */
-    private DynamicList getLocationList(CallbackParams callbackParams,
-                                        CaseData.CaseDataBuilder<?, ?> updatedData,
-                                        RequestedCourt preferredCourt) {
-        List<LocationRefData> locations = locationRefDataService.getCourtLocationsForDefaultJudgments(
-            callbackParams.getParams().get(BEARER_TOKEN).toString()
-        );
-        Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
-            .flatMap(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                updatedData,
-                requestedCourt,
-                () -> locations
-            ));
-        DynamicList locationsList;
-        if (matchingLocation.isPresent()) {
-            locationsList = DynamicList.fromList(locations, LocationRefDataService::getDisplayEntry,
-                                                 matchingLocation.get(), true
-            );
-        } else {
-            locationsList = DynamicList.fromList(locations, LocationRefDataService::getDisplayEntry,
-                                                 null, true
-            );
-        }
-        return locationsList;
     }
 
     private CallbackResponse setOrderDetailsFlags(CallbackParams callbackParams) {
@@ -718,32 +694,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
     }
 
-    private void setCheckList(
-        CaseData.CaseDataBuilder<?, ?> updatedData,
-        List<OrderDetailsPagesSectionsToggle> checkList
-    ) {
-        updatedData.fastTrackAltDisputeResolutionToggle(checkList);
-        updatedData.fastTrackVariationOfDirectionsToggle(checkList);
-        updatedData.fastTrackSettlementToggle(checkList);
-        updatedData.fastTrackDisclosureOfDocumentsToggle(checkList);
-        updatedData.fastTrackWitnessOfFactToggle(checkList);
-        updatedData.fastTrackSchedulesOfLossToggle(checkList);
-        updatedData.fastTrackCostsToggle(checkList);
-        updatedData.fastTrackTrialToggle(checkList);
-        updatedData.fastTrackMethodToggle(checkList);
-        updatedData.disposalHearingDisclosureOfDocumentsToggle(checkList);
-        updatedData.disposalHearingWitnessOfFactToggle(checkList);
-        updatedData.disposalHearingMedicalEvidenceToggle(checkList);
-        updatedData.disposalHearingQuestionsToExpertsToggle(checkList);
-        updatedData.disposalHearingSchedulesOfLossToggle(checkList);
-        updatedData.disposalHearingFinalDisposalHearingToggle(checkList);
-        updatedData.disposalHearingMethodToggle(checkList);
-        updatedData.disposalHearingBundleToggle(checkList);
-        updatedData.disposalHearingClaimSettlingToggle(checkList);
-        updatedData.disposalHearingCostsToggle(checkList);
-        updatedData.smallClaimsHearingToggle(checkList);
-        updatedData.smallClaimsMethodToggle(checkList);
-        updatedData.smallClaimsDocumentsToggle(checkList);
-        updatedData.smallClaimsWitnessStatementToggle(checkList);
+    private List<String> fetchLocationData(CallbackParams callbackParams) {
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+
+        return locationRefDataService.getCourtLocations(authToken);
     }
 }
