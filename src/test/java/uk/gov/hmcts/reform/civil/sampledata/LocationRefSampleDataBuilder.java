@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 public class LocationRefSampleDataBuilder {
 
     protected static final String STRING_CONSTANT = "this is a string";
+    protected static final String CASE_MANAGEMENT_CATEGORY = "Civil";
     protected static final String STRING_NUM_CONSTANT = "123456789";
     protected static final DynamicList PBA_ACCOUNTS = DynamicList.builder().build();
     protected static final LocalDate APP_DATE_EPOCH = EPOCH;
