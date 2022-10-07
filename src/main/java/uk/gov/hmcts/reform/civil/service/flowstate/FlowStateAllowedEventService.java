@@ -184,7 +184,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                EVIDENCE_UPLOAD_JUDGE
+                EVIDENCE_UPLOAD_JUDGE,
+                EVIDENCE_UPLOAD
             )
         ),
 
@@ -216,6 +217,7 @@ public class FlowStateAllowedEventService {
 
             )
         ),
+
         entry(
             CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
             List.of(
@@ -613,7 +615,8 @@ public class FlowStateAllowedEventService {
                 DEFAULT_JUDGEMENT_SPEC,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                NotSuitable_SDO
+                NotSuitable_SDO,
+                EVIDENCE_UPLOAD
             )
         ),
         entry(
