@@ -16,6 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -451,6 +452,26 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             mode = EnumSource.Mode.INCLUDE)
         void shouldUpdateBusinessProcess_whenAtFullDefenceState(FlowState.Main flowState) {
             var params = callbackParamsOf(
+                CaseDataBuilder.builder().atState(flowState).build(),
+                ABOUT_TO_SUBMIT
+            );
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("status", "camundaEvent")
+                .containsExactly(READY.name(), CLAIMANT_RESPONSE.name());
+
+            assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = FlowState.Main.class,
+            names = {"FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED"},
+            mode = EnumSource.Mode.INCLUDE)
+        void shouldUpdateBusinessProcess_whenAtFullDefenceStateV1(FlowState.Main flowState) {
+            var params = callbackParamsOf(
+                CallbackVersion.V_1,
                 CaseDataBuilder.builder().atState(flowState).build(),
                 ABOUT_TO_SUBMIT
             );
