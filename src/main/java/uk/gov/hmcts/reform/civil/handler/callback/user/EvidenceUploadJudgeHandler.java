@@ -70,7 +70,7 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
                 .size()).forEachOrdered(i -> stringBuilder.append("* ").append(
                 caseData.getDocumentAndNote().get(i)
                     .getValue()
-                    .getDOCUMENT()
+                    .getDocument()
                     .getDocumentFileName()).append("\n"));
 
             return format(EVIDENCE_UPLOAD_BODY_ONE, stringBuilder);
