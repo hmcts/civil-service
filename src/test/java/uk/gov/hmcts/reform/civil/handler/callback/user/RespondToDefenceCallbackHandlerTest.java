@@ -486,6 +486,35 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldUpdateBusinessProcess_whenAtFullDefenceStateV1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
+                .build();
+            var params = callbackParamsOf(
+                CallbackVersion.V_1,
+                caseData.toBuilder()
+                    .applicant2(Party.builder()
+                                    .companyName("company")
+                                    .type(Party.Type.COMPANY)
+                                    .build())
+                    .addApplicant2(YES)
+                    .applicant2DQ(Applicant2DQ.builder()
+                                      .applicant2DQFileDirectionsQuestionnaire(
+                                          caseData.getApplicant1DQ()
+                                              .getApplicant1DQFileDirectionsQuestionnaire())
+                                      .build())
+                    .build(),
+                ABOUT_TO_SUBMIT
+            );
+            when(featureToggleService.isSdoEnabled()).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).containsEntry("applicant2ResponseDate", localDateTime.format(ISO_DATE_TIME));
+            assertThat(response.getData()).extracting("applicant2DQStatementOfTruth").isNotNull();
+        }
+
+        @Test
         void shouldAssembleClaimantResponseDocuments() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             var caseData = CaseDataBuilder.builder().build().toBuilder()
