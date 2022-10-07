@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
@@ -171,11 +172,18 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .isRespondent1(isRespondent1);
 
         if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
-            courtLocationList = courtLocationUtils.getLocationsFromList(fetchLocationData(callbackParams));
+            List<LocationRefData> locations = fetchLocationData(callbackParams);
+            courtLocationList = courtLocationUtils.getLocationsFromList(locations);
             updatedCaseData.respondent1DQ(Respondent1DQ.builder()
-                           .respondent1DQRequestedCourt(
-                               RequestedCourt.builder().responseCourtLocations(courtLocationList).build())
-                           .build());
+                                              .respondent1DQRequestedCourt(
+                                                  RequestedCourt.builder().responseCourtLocations(courtLocationList).build())
+                                              .build());
+            Optional.ofNullable(caseData.getCourtLocation())
+                .map(CourtLocation::getApplicantPreferredCourt)
+                .flatMap(applicantCourt -> locations.stream()
+                    .filter(locationRefData -> applicantCourt.equals(locationRefData.getCourtLocationCode()))
+                    .findFirst())
+                .ifPresent(locationRefData -> updatedCaseData.locationName(locationRefData.getSiteName()));
         }
 
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
@@ -521,7 +529,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         @SuppressWarnings("unchecked")
         Map<String, String> solicitorRefs = ofNullable(beforeCaseData.get("solicitorReferences"))
             .map(refs -> objectMapper.convertValue(refs, HashMap.class))
-                .orElse(null);
+            .orElse(null);
         SolicitorReferences solicitorReferences = ofNullable(solicitorRefs)
             .map(refMap -> {
 
@@ -558,7 +566,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(
                 solicitorReferences != null ? ofNullable(solicitorReferences.getRespondentSolicitor1Reference())
                     .map(Object::toString).orElse(null) : null,
-                respondentSolicitor2Reference));
+                respondentSolicitor2Reference
+            ));
     }
 
     private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
@@ -566,24 +575,28 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         Optional.ofNullable(caseData.getRespondent1ClaimResponseDocument())
             .map(ResponseDocument::getFile).ifPresent(respondent1ClaimDocument -> defendantUploads.add(
                 buildElemCaseDocument(respondent1ClaimDocument, "Defendant",
-                    updatedCaseData.build().getRespondent1ResponseDate(), DocumentType.DEFENDANT_DEFENCE
+                                      updatedCaseData.build().getRespondent1ResponseDate(), DocumentType.DEFENDANT_DEFENCE
                 )));
         Optional.ofNullable(caseData.getRespondent1DQ())
             .map(Respondent1DQ::getRespondent1DQDraftDirections)
             .ifPresent(respondent1DQ -> defendantUploads.add(
-                buildElemCaseDocument(respondent1DQ, "Defendant",
-                    updatedCaseData.build().getRespondent1ResponseDate(), DocumentType.DEFENDANT_DRAFT_DIRECTIONS
+                buildElemCaseDocument(respondent1DQ,
+                                      "Defendant",
+                                      updatedCaseData.build().getRespondent1ResponseDate(),
+                                      DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                 )));
         Optional.ofNullable(caseData.getRespondent2ClaimResponseDocument())
             .map(ResponseDocument::getFile).ifPresent(respondent2ClaimDocument -> defendantUploads.add(
                 buildElemCaseDocument(respondent2ClaimDocument, "Defendant 2",
-                    updatedCaseData.build().getRespondent2ResponseDate(), DocumentType.DEFENDANT_DEFENCE
+                                      updatedCaseData.build().getRespondent2ResponseDate(), DocumentType.DEFENDANT_DEFENCE
                 )));
         Optional.ofNullable(caseData.getRespondent2DQ())
             .map(Respondent2DQ::getRespondent2DQDraftDirections)
             .ifPresent(respondent2DQ -> defendantUploads.add(
-                buildElemCaseDocument(respondent2DQ, "Defendant 2",
-                    updatedCaseData.build().getRespondent2ResponseDate(), DocumentType.DEFENDANT_DRAFT_DIRECTIONS
+                buildElemCaseDocument(respondent2DQ,
+                                      "Defendant 2",
+                                      updatedCaseData.build().getRespondent2ResponseDate(),
+                                      DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                 )));
         if (!defendantUploads.isEmpty()) {
             updatedCaseData.defendantResponseDocuments(defendantUploads);
@@ -681,21 +694,21 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     }
 
     private boolean isSameSolicitorAndAnyRespondentResponseIsMatchingType(CaseData caseData,
-                                                                    RespondentResponseType type) {
+                                                                          RespondentResponseType type) {
         return respondent2HasSameLegalRep(caseData)
             && (type.equals(caseData.getRespondent1ClaimResponseType())
             || type.equals(caseData.getRespondent2ClaimResponseType()));
     }
 
     private boolean isSolicitor2AndRespondent2ResponseIsMatchingType(CaseData caseData, YesOrNo isRespondent1,
-                                                               RespondentResponseType type) {
+                                                                     RespondentResponseType type) {
         return caseData.getRespondent2ClaimResponseType() != null
             && caseData.getRespondent2ClaimResponseType().equals(type)
             && isRespondent1.equals(NO);
     }
 
     private boolean isSolicitor1AndRespondent1ResponseIsMatchingType(CaseData caseData, YesOrNo isRespondent1,
-                                                               RespondentResponseType type) {
+                                                                     RespondentResponseType type) {
         return caseData.getRespondent1ClaimResponseType() != null
             && caseData.getRespondent1ClaimResponseType().equals(type)
             && isRespondent1.equals(YES);
