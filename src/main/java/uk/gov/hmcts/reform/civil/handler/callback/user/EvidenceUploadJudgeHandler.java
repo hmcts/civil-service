@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Collections;
@@ -55,20 +56,28 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
     }
 
     private String getHeader(CaseData caseData) {
-        return format(EVIDENCE_UPLOAD_HEADER_ONE, caseData.getLegacyCaseReference());
+        if (caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_AND_NOTE)) {
+            return format(EVIDENCE_UPLOAD_HEADER_ONE, caseData.getLegacyCaseReference());
+        }
+        return null;
     }
-
 
     private String getBody(CaseData caseData) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        IntStream.range(0, caseData.getDocumentAndNote().size()).forEachOrdered(i -> stringBuilder.append("* ").append(
-            caseData.getDocumentAndNote().get(i)
-                .getValue()
-                .getDOCUMENT()
-                .getDocumentFileName()).append("\n"));
+        if (caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_AND_NOTE)) {
+            IntStream.range(0, caseData.getDocumentAndNote()
+                .size()).forEachOrdered(i -> stringBuilder.append("* ").append(
+                caseData.getDocumentAndNote().get(i)
+                    .getValue()
+                    .getDOCUMENT()
+                    .getDocumentFileName()).append("\n"));
 
-        return format(EVIDENCE_UPLOAD_BODY_ONE, stringBuilder);
+            return format(EVIDENCE_UPLOAD_BODY_ONE, stringBuilder);
+        }
+        return null;
     }
 
 }
+
+
