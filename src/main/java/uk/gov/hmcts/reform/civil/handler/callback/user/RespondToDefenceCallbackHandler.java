@@ -84,8 +84,8 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             callbackKey(MID, "witnesses"), this::validateApplicantWitnesses,
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
-            callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
-            callbackKey(V_1, ABOUT_TO_SUBMIT), this::aboutToSubmit_v1,
+            callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false),
+            callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true),
             callbackKey(SUBMITTED), this::buildConfirmation
         );
     }
@@ -191,15 +191,19 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .build();
     }
 
-    private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
+    private CallbackResponse aboutToSubmit(CallbackParams callbackParams, boolean v1) {
         CaseData caseData = callbackParams.getCaseData();
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         LocalDateTime currentTime = time.now();
 
         CaseData.CaseDataBuilder builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
             .applicant1ResponseDate(currentTime);
 
+        if (v1) {
+            updateCaseManagementLocation(callbackParams, builder);
+        }
+
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         if (multiPartyScenario == TWO_V_ONE) {
             builder.applicant2ResponseDate(currentTime);
         }
@@ -239,19 +243,20 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         //Set to null because there are no more deadlines
         builder.nextDeadline(null);
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
-            .build();
+        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
+            AboutToStartOrSubmitCallbackResponse.builder()
+                .data(builder.build().toMap(objectMapper));
+
+        if (v1 && featureToggleService.isSdoEnabled()) {
+            response.state(CaseState.JUDICIAL_REFERRAL.name());
+        }
+
+        return response.build();
     }
 
-    private CallbackResponse aboutToSubmit_v1(CallbackParams callbackParams) {
+    private void updateCaseManagementLocation(CallbackParams callbackParams,
+                                              CaseData.CaseDataBuilder builder) {
         CaseData caseData = callbackParams.getCaseData();
-
-        LocalDateTime currentTime = time.now();
-
-        CaseData.CaseDataBuilder builder = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
-            .applicant1ResponseDate(currentTime);
         Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
         preferredCourt.map(RequestedCourt::getCaseLocation)
             .ifPresent(builder::caseManagementLocation);
@@ -267,60 +272,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             log.debug("Case management location for " + caseData.getLegacyCaseReference()
                           + " is " + builder.build().getCaseManagementLocation());
         }
-
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        if (multiPartyScenario == TWO_V_ONE) {
-            builder.applicant2ResponseDate(currentTime);
-        }
-
-        if (anyApplicantDecidesToProceedWithClaim(caseData)) {
-            // moving statement of truth value to correct field, this was not possible in mid event.
-            StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-
-            if (caseData.getApplicant1DQ() != null
-                && caseData.getApplicant1DQ().getApplicant1DQFileDirectionsQuestionnaire() != null) {
-                Applicant1DQ dq = caseData.getApplicant1DQ().toBuilder()
-                    .applicant1DQStatementOfTruth(statementOfTruth)
-                    .build();
-
-                builder.applicant1DQ(dq);
-            }
-
-            if (caseData.getApplicant2DQ() != null
-                && caseData.getApplicant2DQ().getApplicant2DQFileDirectionsQuestionnaire() != null) {
-                Applicant2DQ dq = caseData.getApplicant2DQ().toBuilder()
-                    .applicant2DQStatementOfTruth(statementOfTruth)
-                    .build();
-
-                builder.applicant2DQ(dq);
-            }
-
-            // resetting statement of truth to make sure it's empty the next time it appears in the UI.
-            builder.uiStatementOfTruth(StatementOfTruth.builder().build());
-        }
-
-        assembleResponseDocuments(caseData, builder);
-
-        if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {
-            builder.respondentSharedClaimResponseDocument(null);
-        }
-
-        //Set to null because there are no more deadlines
-        builder.nextDeadline(null);
-        AboutToStartOrSubmitCallbackResponse response = null;
-
-        if (featureToggleService.isSdoEnabled()) {
-            response = AboutToStartOrSubmitCallbackResponse.builder()
-                .data(builder.build().toMap(objectMapper))
-                .state(CaseState.JUDICIAL_REFERRAL.name())
-                .build();
-        } else {
-            response = AboutToStartOrSubmitCallbackResponse.builder()
-                .data(builder.build().toMap(objectMapper))
-                .build();
-        }
-
-        return response;
     }
 
     private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder updatedCaseData) {
