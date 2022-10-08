@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.hearing.HearingFeeServiceRequestDetails;
+import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.CasePaymentRequestDto;
 import uk.gov.hmcts.reform.payments.client.models.FeeDto;
@@ -20,6 +21,8 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
+
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,22 @@ public class PaymentsService {
 
     @Value("${serviceRequest.api.callback-url}")
     String callBackUrl;
+
+    public void validateRequest(CaseData caseData) {
+        String error = null;
+        HearingFeeServiceRequestDetails hearingFeeServiceRequestDetails = caseData.getHearingFeeServiceRequestDetails();
+        if (hearingFeeServiceRequestDetails == null) {
+            error = "Hearing Fee details not received.";
+        } else if (hearingFeeServiceRequestDetails.getFee() == null
+            || hearingFeeServiceRequestDetails.getFee().getCalculatedAmountInPence() == null
+            || isBlank(hearingFeeServiceRequestDetails.getFee().getVersion())
+            || isBlank(hearingFeeServiceRequestDetails.getFee().getCode())) {
+            error = "Fees are not set correctly.";
+        }
+        if (!isBlank(error)) {
+            throw new InvalidPaymentRequestException(error);
+        }
+    }
 
     public PaymentDto createCreditAccountPayment(CaseData caseData, String authToken) throws FeignException {
         return paymentsClient.createCreditAccountPayment(authToken, buildRequest(caseData));

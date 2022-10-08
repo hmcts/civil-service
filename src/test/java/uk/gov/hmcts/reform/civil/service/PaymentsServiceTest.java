@@ -13,18 +13,24 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.hearing.HearingFeeServiceRequestDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.FeeDto;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.request.CreditAccountPaymentRequest;
+import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -43,11 +49,14 @@ class PaymentsServiceTest {
     private static final String SPEC_SITE_ID = "spec_site_id";
     private static final String AUTH_TOKEN = "Bearer token";
     private static final PaymentDto PAYMENT_DTO = PaymentDto.builder().reference("RC-1234-1234-1234-1234").build();
+    private static final PaymentServiceResponse PAYMENT_SERVICE_RESPONSE = PaymentServiceResponse.builder()
+        .serviceRequestReference("RC-1234-1234-1234-1234").build();
     private static final Organisation ORGANISATION = Organisation.builder()
         .name("test org")
         .contactInformation(List.of(ContactInformation.builder().build()))
         .build();
     private static final String CUSTOMER_REFERENCE = "12345";
+    private static final String FEE_NOT_SET_CORRECTLY_ERROR = "Fees are not set correctly.";
 
     @MockBean
     private PaymentsClient paymentsClient;
@@ -151,5 +160,72 @@ class PaymentsServiceTest {
                 .fees(new FeeDto[]{caseData.getClaimFee().toFeeDto()})
                 .build();
         }
+    }
+
+    @Test
+    void validateRequestShouldThrowAnError_whenFeeDetailsNotProvided() {
+        CaseData caseData = CaseData.builder()
+            .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder().build())
+            .build();
+
+        Exception exception = assertThrows(
+            InvalidPaymentRequestException.class,
+            () -> paymentsService.validateRequest(caseData)
+        );
+        assertThat(exception.getMessage()).isEqualTo(FEE_NOT_SET_CORRECTLY_ERROR);
+    }
+
+    @Test
+    void validateRequestShouldThrowAnError_whenFeeDetailsDoNotHaveFeeCode() {
+        CaseData caseData = CaseData.builder()
+            .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder()
+                                      .fee(Fee.builder()
+                                               .calculatedAmountInPence(BigDecimal.valueOf(10800))
+                                               .version("1")
+                                               .build())
+                                      .build())
+            .build();
+
+        Exception exception = assertThrows(
+            InvalidPaymentRequestException.class,
+            () -> paymentsService.validateRequest(caseData)
+        );
+        assertThat(exception.getMessage()).isEqualTo(FEE_NOT_SET_CORRECTLY_ERROR);
+    }
+
+    @Test
+    void validateRequestShouldThrowAnError_whenFeeDetailsDoNotHaveFeeVersion() {
+        CaseData caseData = CaseData.builder()
+            .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder()
+                                      .fee(Fee.builder()
+                                               .calculatedAmountInPence(BigDecimal.valueOf(10800))
+                                               .code("FEE0442")
+                                               .build())
+                                      .build())
+            .build();
+
+        Exception exception = assertThrows(
+            InvalidPaymentRequestException.class,
+            () -> paymentsService.validateRequest(caseData)
+        );
+        assertThat(exception.getMessage()).isEqualTo(FEE_NOT_SET_CORRECTLY_ERROR);
+    }
+
+    @Test
+    void validateRequestShouldThrowAnError_whenFeeDetailsDoNotHaveFeeAmount() {
+        CaseData caseData = CaseData.builder()
+            .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder()
+                                      .fee(Fee.builder()
+                                               .code("FEE0442")
+                                               .version("1")
+                                               .build())
+                                      .build())
+            .build();
+
+        Exception exception = assertThrows(
+            InvalidPaymentRequestException.class,
+            () -> paymentsService.validateRequest(caseData)
+        );
+        assertThat(exception.getMessage()).isEqualTo(FEE_NOT_SET_CORRECTLY_ERROR);
     }
 }
