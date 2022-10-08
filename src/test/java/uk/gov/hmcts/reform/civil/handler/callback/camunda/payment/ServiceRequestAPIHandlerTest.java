@@ -64,19 +64,6 @@ public class ServiceRequestAPIHandlerTest {
     class MakeServiceRequestPayments {
 
         @Test
-        void shouldMakePaymentServiceRequest_whenInvoked() throws Exception {
-            when(paymentsService.createServiceRequest(any(), any()))
-                .thenReturn(paymentServiceResponse.builder()
-                                .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
-            assertThat(extractPaymentDetailsFromResponse(response).getServiceRequestReference())
-                .isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
-        }
-
-        @Test
         void handleEventsReturnsTheExpectedCallbackEvent() {
             assertThat(handler.handledEvents()).contains(CREATE_SERVICE_REQUEST_API);
         }
