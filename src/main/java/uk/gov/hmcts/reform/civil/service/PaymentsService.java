@@ -20,9 +20,8 @@ import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
-
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Service
 @RequiredArgsConstructor

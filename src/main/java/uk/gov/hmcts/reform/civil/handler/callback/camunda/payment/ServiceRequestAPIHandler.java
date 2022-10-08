@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.hearing.HearingFeeServiceRequestDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
@@ -61,6 +62,12 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
             log.info("calling payment service request " + caseData.getCcdCaseReference());
             var serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
                 .getServiceRequestReference();
+            HearingFeeServiceRequestDetails hearingFeeDetails = caseData.getHearingFeeServiceRequestDetails();
+            caseData = caseData.toBuilder()
+                .hearingFeeServiceRequestDetails(hearingFeeDetails.toBuilder()
+                                          .fee(caseData.getGeneralAppPBADetails().getFee())
+                                          .serviceRequestReference(serviceRequestReference).build())
+                .build();
 
         } catch (FeignException e) {
             log.info(String.format("Http Status %s ", e.status()), e);

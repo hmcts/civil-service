@@ -3,11 +3,13 @@ package uk.gov.hmcts.reform.civil.sampledata;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
@@ -75,6 +77,7 @@ import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.hearing.HearingFeeServiceRequestDetails;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
@@ -85,6 +88,7 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,6 +127,7 @@ public class CaseDataBuilder {
     public static final LocalDateTime NOTIFICATION_DEADLINE = LocalDate.now().atStartOfDay().plusDays(14);
     public static final BigDecimal FAST_TRACK_CLAIM_AMOUNT = BigDecimal.valueOf(10000);
     public static final LocalDate FUTURE_DATE = LocalDate.now().plusYears(1);
+    public static final String CUSTOMER_REFERENCE = "12345";
 
     // Create Claim
     protected Long ccdCaseReference;
@@ -3323,6 +3328,84 @@ public class CaseDataBuilder {
             .trialHearingTrialDJ(trialHearingTrialDJ)
             .disposalHearingJudgesRecitalDJ(disposalHearingJudgesRecitalDJ)
             .trialHearingJudgesRecitalDJ(trialHearingJudgesRecitalDJ)
+            .build();
+    }
+
+    public CaseData buildMakePaymentsCaseData() {
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            .organisationID("OrgId").build();
+
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .ccdCaseReference(1644495739087775L)
+            .legacyCaseReference("000DC001")
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .hearingFeeServiceRequestDetails(
+                HearingFeeServiceRequestDetails.builder()
+                    .fee(
+                        Fee.builder()
+                            .code("FE203")
+                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .version("1")
+                            .build())
+                    .serviceRequestReference(CUSTOMER_REFERENCE).build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .build();
+    }
+
+    public CaseData buildPaymentFailureCaseData() {
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            .organisationID("OrgId").build();
+
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .ccdCaseReference(1644495739087775L)
+            .legacyCaseReference("000DC001")
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .hearingFeeServiceRequestDetails(
+                HearingFeeServiceRequestDetails.builder()
+                    .paymentDetails(PaymentDetails.builder()
+                                        .status(PaymentStatus.FAILED)
+                                        .reference("RC-1658-4258-2679-9795")
+                                        .customerReference(CUSTOMER_REFERENCE)
+                                        .build())
+                    .fee(
+                        Fee.builder()
+                            .code("FE203")
+                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .version("1")
+                            .build())
+                    .serviceRequestReference(CUSTOMER_REFERENCE).build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .build();
+    }
+
+    public CaseData buildPaymentSuccessfulCaseData() {
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            .organisationID("OrgId").build();
+
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .ccdCaseReference(1644495739087775L)
+            .legacyCaseReference("000DC001")
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .hearingFeeServiceRequestDetails(
+                HearingFeeServiceRequestDetails.builder()
+                    .paymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 01, 01),
+                                                            LocalTime.of(12, 00, 00)))
+                    .paymentDetails(PaymentDetails.builder()
+                                        .status(PaymentStatus.SUCCESS)
+                                        .reference("RC-1658-4258-2679-9795")
+                                        .customerReference(CUSTOMER_REFERENCE)
+                                        .build())
+                    .fee(
+                        Fee.builder()
+                            .code("FE203")
+                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .version("1")
+                            .build())
+                    .serviceRequestReference(CUSTOMER_REFERENCE).build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .build();
     }
 }
