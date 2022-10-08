@@ -2,15 +2,20 @@ package uk.gov.hmcts.reform.civil.service;
 
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.hearing.HearingFeeServiceRequestDetails;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
+import uk.gov.hmcts.reform.payments.client.models.CasePaymentRequestDto;
 import uk.gov.hmcts.reform.payments.client.models.FeeDto;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
+import uk.gov.hmcts.reform.payments.request.CreateServiceRequestDTO;
 import uk.gov.hmcts.reform.payments.request.CreditAccountPaymentRequest;
+import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import static java.util.Optional.ofNullable;
@@ -20,10 +25,14 @@ import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCatego
 @RequiredArgsConstructor
 public class PaymentsService {
 
+    private static final String PAYMENT_ACTION = "Case Submit";
     private final PaymentsClient paymentsClient;
     private final PaymentsConfiguration paymentsConfiguration;
     private final OrganisationService organisationService;
     private final FeatureToggleService featureToggleService;
+
+    @Value("${serviceRequest.api.callback-url}")
+    String callBackUrl;
 
     public PaymentDto createCreditAccountPayment(CaseData caseData, String authToken) throws FeignException {
         return paymentsClient.createCreditAccountPayment(authToken, buildRequest(caseData));
@@ -69,5 +78,29 @@ public class PaymentsService {
                 .build();
         }
         return creditAccountPaymentRequest;
+    }
+
+    public PaymentServiceResponse createServiceRequest(CaseData caseData, String authToken) {
+        return paymentsClient.createServiceRequest(authToken, buildServiceRequest(caseData));
+    }
+
+    private CreateServiceRequestDTO buildServiceRequest(CaseData caseData) {
+        HearingFeeServiceRequestDetails hearingFeeServiceRequestDetails = caseData.getHearingFeeServiceRequestDetails();
+        FeeDto feeResponse = hearingFeeServiceRequestDetails.getFee().toFeeDto();
+        String siteId = paymentsConfiguration.getSpecSiteId();
+        return CreateServiceRequestDTO.builder()
+            .ccdCaseNumber(caseData.getCcdCaseReference().toString())
+            .caseReference(caseData.getCcdCaseReference().toString())
+            .hmctsOrgId(siteId)
+            .callBackUrl(callBackUrl)
+            .fees(new FeeDto[] { (FeeDto.builder()
+                .calculatedAmount(feeResponse.getCalculatedAmount())
+                .code(feeResponse.getCode())
+                .version(feeResponse.getVersion())
+                .volume(1).build())})
+            .casePaymentRequest(CasePaymentRequestDto.builder()
+                                    .action(PAYMENT_ACTION)
+                                    .responsibleParty(caseData.getApplicantPartyName()).build())
+            .build();
     }
 }
