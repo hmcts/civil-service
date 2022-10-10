@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakupDetails;
@@ -108,6 +109,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
 
     @Override
     public SealedClaimFormForSpec getTemplateData(CaseData caseData) {
+        System.out.println("Inside getTemaplateData method");
         Optional<SolicitorReferences> solicitorReferences = ofNullable(caseData.getSolicitorReferences());
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         return SealedClaimFormForSpec.builder()
@@ -174,13 +176,13 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     }
 
     private String getResponseDedline(CaseData caseData) {
-        System.out.println("inside getResponseDeadline method");
+        System.out.println("inside getResponseDedline method  ");
         var notificationDeadline = formatLocalDate(
             deadlinesCalculator
                 .calculateFirstWorkingDay(caseData.getIssueDate().plusDays(28)),
             DATE
         );
-        System.out.println("Notification deadline " + notificationDeadline);
+        System.out.println("notification date " + notificationDeadline);
         return END_OF_BUSINESS_DAY + notificationDeadline;
     }
 
