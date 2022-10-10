@@ -108,7 +108,6 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
 
     @Override
     public SealedClaimFormForSpec getTemplateData(CaseData caseData) {
-        System.out.println("Inside getTemaplateData method");
         Optional<SolicitorReferences> solicitorReferences = ofNullable(caseData.getSolicitorReferences());
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         return SealedClaimFormForSpec.builder()
