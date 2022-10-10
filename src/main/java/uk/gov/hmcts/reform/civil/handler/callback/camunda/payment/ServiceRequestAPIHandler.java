@@ -38,11 +38,6 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
     private final Time time;
 
     @Override
-    public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
-    }
-
-    @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT), this::makePaymentServiceReq

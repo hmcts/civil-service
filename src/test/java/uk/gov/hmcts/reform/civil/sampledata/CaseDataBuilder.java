@@ -693,12 +693,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder
-        hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails hearingFeeServiceRequestDetails) {
-        this.hearingFeeServiceRequestDetails = hearingFeeServiceRequestDetails;
-        return this;
-    }
-
     public CaseDataBuilder applicant1OrganisationPolicy(OrganisationPolicy applicant1OrganisationPolicy) {
         this.applicant1OrganisationPolicy = applicant1OrganisationPolicy;
         return this;
