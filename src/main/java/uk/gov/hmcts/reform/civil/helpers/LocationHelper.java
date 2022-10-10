@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.helpers;
 
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;

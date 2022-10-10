@@ -193,34 +193,14 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams, boolean v1) {
         CaseData caseData = callbackParams.getCaseData();
-<<<<<<< HEAD
-
-=======
->>>>>>> 1fd271976208cd780fb8f08e782b13c04a9fd6d5
         LocalDateTime currentTime = time.now();
 
         CaseData.CaseDataBuilder builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
             .applicant1ResponseDate(currentTime);
-        Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
-        preferredCourt.map(RequestedCourt::getCaseLocation)
-            .ifPresent(builder::caseManagementLocation);
 
-<<<<<<< HEAD
-        locationHelper.getCaseManagementLocation(caseData)
-            .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                builder,
-                requestedCourt,
-                () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
-                    CallbackParams.Params.BEARER_TOKEN).toString())
-            ));
-        if (log.isDebugEnabled()) {
-            log.debug("Case management location for " + caseData.getLegacyCaseReference()
-                          + " is " + builder.build().getCaseManagementLocation());
-=======
         if (v1) {
             updateCaseManagementLocation(callbackParams, builder);
->>>>>>> 1fd271976208cd780fb8f08e782b13c04a9fd6d5
         }
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
@@ -262,22 +242,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         //Set to null because there are no more deadlines
         builder.nextDeadline(null);
-        AboutToStartOrSubmitCallbackResponse response = null;
 
-<<<<<<< HEAD
-        if (featureToggleService.isSdoEnabled()) {
-            response = AboutToStartOrSubmitCallbackResponse.builder()
-                .data(builder.build().toMap(objectMapper))
-                .state(CaseState.JUDICIAL_REFERRAL.name())
-                .build();
-        } else {
-            response = AboutToStartOrSubmitCallbackResponse.builder()
-                .data(builder.build().toMap(objectMapper))
-                .build();
-        }
-
-        return response;
-=======
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder.build().toMap(objectMapper));
@@ -307,7 +272,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             log.debug("Case management location for " + caseData.getLegacyCaseReference()
                           + " is " + builder.build().getCaseManagementLocation());
         }
->>>>>>> 1fd271976208cd780fb8f08e782b13c04a9fd6d5
     }
 
     private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder updatedCaseData) {

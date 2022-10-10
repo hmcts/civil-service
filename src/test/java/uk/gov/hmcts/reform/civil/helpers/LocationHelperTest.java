@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.helpers;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
