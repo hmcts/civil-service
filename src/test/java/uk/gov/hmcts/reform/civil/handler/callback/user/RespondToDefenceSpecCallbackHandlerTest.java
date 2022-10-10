@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -94,9 +95,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private UnavailableDateValidator unavailableDateValidator;
 
     @MockBean
-    private LocationRefDataService locationRefDataService;
-
-    @MockBean
     private Time time;
 
     @MockBean
@@ -105,9 +103,57 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private FeatureToggleService featureToggleService;
 
+    @MockBean
+    private LocationRefDataService locationRefDataService;
+
     @Nested
     class AboutToStart {
 
+        @Test
+        void shouldPopulateInitialData() {
+            var params = callbackParamsOf(
+                CaseData.builder()
+                    .respondent1(Party.builder()
+                                     .type(Party.Type.COMPANY)
+                                     .companyName("company name")
+                                     .build())
+                    .build(),
+                ABOUT_TO_START
+            );
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("respondent1Copy")
+                .isNotNull();
+            assertThat(response.getData()).extracting("claimantResponseScenarioFlag")
+                .isNotNull();
+            assertThat(response.getData()).extracting("superClaimType")
+                .isNotNull();
+        }
+
+        @Test
+        void shouldPopulateInitialDataV1() {
+            var params = callbackParamsOf(
+                CallbackVersion.V_1,
+                CaseData.builder()
+                    .respondent1(Party.builder()
+                                     .type(Party.Type.COMPANY)
+                                     .companyName("company name")
+                                     .build())
+                    .build(),
+                ABOUT_TO_START
+            );
+
+            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("respondent1Copy")
+                .isNotNull();
+            assertThat(response.getData()).extracting("claimantResponseScenarioFlag")
+                .isNotNull();
+        }
+
+        // TODO my test
         @Test
         void shouldPopulateCourtLocations() {
             when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
@@ -384,6 +430,26 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
         }
 
+        @ParameterizedTest
+        @EnumSource(value = FlowState.Main.class,
+            names = {"FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED"},
+            mode = EnumSource.Mode.INCLUDE)
+        void shouldUpdateBusinessProcess_whenAtFullDefenceStateV1(FlowState.Main flowState) {
+            var params = callbackParamsOf(
+                CallbackVersion.V_1,
+                CaseDataBuilder.builder().atState(flowState).build(),
+                ABOUT_TO_SUBMIT
+            );
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("status", "camundaEvent")
+                .containsExactly(READY.name(), CLAIMANT_RESPONSE_SPEC.name());
+
+            assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
+        }
+
         @Nested
         class ResetStatementOfTruth {
 
@@ -480,8 +546,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getConfirmationBody())
                 .contains("contact you about what to do next");
             assertThat(response.getConfirmationHeader())
-                .contains("decided to proceed",
-                          caseData.getLegacyCaseReference());
+                .contains(
+                    "decided to proceed",
+                    caseData.getLegacyCaseReference()
+                );
         }
 
         @Test
@@ -500,8 +568,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getConfirmationBody())
                 .contains("not to proceed");
             assertThat(response.getConfirmationHeader())
-                .contains("not to proceed",
-                          caseData.getLegacyCaseReference());
+                .contains(
+                    "not to proceed",
+                    caseData.getLegacyCaseReference()
+                );
         }
     }
 
