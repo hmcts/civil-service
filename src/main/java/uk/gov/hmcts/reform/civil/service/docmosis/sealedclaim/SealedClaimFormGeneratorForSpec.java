@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakupDetails;
