@@ -156,7 +156,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         // TODO my test
         @Test
         void shouldPopulateCourtLocations() {
-            when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
+            when(featureToggleService.isCourtLocationDynamicListEnabledSpec()).thenReturn(true);
             when(courtLocationUtils.getLocationsFromList(any()))
                 .thenReturn(fromList(List.of("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124")));
 
@@ -485,7 +485,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         class HandleCourtLocation {
             @BeforeEach
             void setup() {
-                when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
+                when(featureToggleService.isCourtLocationDynamicListEnabledSpec()).thenReturn(true);
             }
 
             @Test

@@ -101,7 +101,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWOSPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -617,7 +616,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .listItems(locationValues.getListItems())
                 .value(locationValues.getListItems().get(0))
                 .build();
-            when(toggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
+            when(toggleService.isCourtLocationDynamicListEnabledSpec()).thenReturn(true);
             Party defendant1 = Party.builder()
                 .type(Party.Type.COMPANY)
                 .companyName("company")
@@ -1257,7 +1256,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                           .build());
             when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .thenReturn(locations);
-            when(toggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
+            when(toggleService.isCourtLocationDynamicListEnabledSpec()).thenReturn(true);
             DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
             when(courtLocationUtils.getLocationsFromList(locations))
                 .thenReturn(locationValues);
