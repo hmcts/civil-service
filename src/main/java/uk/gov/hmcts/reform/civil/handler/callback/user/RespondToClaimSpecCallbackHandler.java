@@ -1384,7 +1384,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .respondent2DetailsForClaimDetailsTab(r2)
             );
 
-        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
+        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabledSpec()) {
             DynamicList courtLocationList = courtLocationUtils.getLocationsFromList(fetchLocationData(callbackParams));
             if (initialShowTags.contains(CAN_ANSWER_RESPONDENT_1)) {
                 updatedCaseData.respondent1DQ(Respondent1DQ.builder()
@@ -1706,7 +1706,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Respondent2DQ.Respondent2DQBuilder dq = caseData.getRespondent2DQ().toBuilder()
                 .respondent2DQStatementOfTruth(statementOfTruth);
-            if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
+            if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabledSpec()) {
                 handleCourtLocationForRespondent2DQ(caseData, updatedData, dq, callbackParams);
             }
             updatedData.respondent2DQ(dq.build());
@@ -1743,7 +1743,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                             .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
                                             .details(caseData.getRespondent1DQWitnessesDetailsSpec())
                                             .build());
-            if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
+            if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabledSpec()) {
                 handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
             }
             updatedData.respondent1DQ(dq.build());

@@ -169,7 +169,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Applicant1DQ.Applicant1DQBuilder dq = caseData.getApplicant1DQ().toBuilder()
                 .applicant1DQStatementOfTruth(statementOfTruth);
-            if (V_1.equals(callbackParams.getVersion()) && featureToggleService.isCourtLocationDynamicListEnabled()) {
+            if (V_1.equals(callbackParams.getVersion())
+                && featureToggleService.isCourtLocationDynamicListEnabledSpec()) {
                 handleCourtLocationData(caseData, builder, dq, callbackParams);
             }
 
@@ -220,7 +221,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 .superClaimType(SPEC_CLAIM);
         }
 
-        if (V_1.equals(callbackParams.getVersion()) && featureToggleService.isCourtLocationDynamicListEnabled()) {
+        if (V_1.equals(callbackParams.getVersion()) && featureToggleService.isCourtLocationDynamicListEnabledSpec()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);
             updatedCaseData.applicant1DQ(Applicant1DQ.builder()
                                              .applicant1DQRequestedCourt(
