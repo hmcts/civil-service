@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.civil.helpers;
 
-import lombok.RequiredArgsConstructor;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
@@ -14,7 +12,6 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
-import uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -23,12 +20,10 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-@Slf4j
-@Component
-@RequiredArgsConstructor
-public class LocationHelper {
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 
-    private final FeatureToggleService featureToggleService;
+@Slf4j
+public class LocationHelper {
 
     /**
      * If the defendant is individual or sole trader, their preferred court is the case's court.
@@ -45,7 +40,6 @@ public class LocationHelper {
         Supplier<Party.Type> getDefendantType;
         Supplier<Optional<RequestedCourt>> getDefendantCourt;
         if (leadDefendantIs1) {
-
             log.debug("Case {}, lead defendant is 1", caseData.getLegacyCaseReference());
             getDefendantType = caseData.getRespondent1()::getType;
             getDefendantCourt = () -> Optional.ofNullable(caseData.getRespondent1DQ())
@@ -111,26 +105,17 @@ public class LocationHelper {
      * @return requested court object for the lead claimant
      */
     private Optional<RequestedCourt> getClaimantRequestedCourt(CaseData caseData) {
-
-        if (CaseCategoryUtils.isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
-            return getSpecClaimantRequestedCourt(caseData);
+        if (caseData.getSuperClaimType() == SPEC_CLAIM) {
+            return Optional.ofNullable(caseData.getApplicant1DQ())
+                .map(Applicant1DQ::getApplicant1DQRequestedCourt);
         } else {
-            return getUnspecClaimantRequestedCourt(caseData);
+            return Optional.ofNullable(caseData.getCourtLocation())
+                .map(courtLocation -> RequestedCourt.builder()
+                    .requestHearingAtSpecificCourt(YesOrNo.YES)
+                    .responseCourtCode(courtLocation.getApplicantPreferredCourt())
+                    .caseLocation(courtLocation.getCaseLocation())
+                    .build());
         }
-    }
-
-    private Optional<RequestedCourt> getSpecClaimantRequestedCourt(CaseData caseData) {
-        return Optional.ofNullable(caseData.getApplicant1DQ())
-            .map(Applicant1DQ::getApplicant1DQRequestedCourt);
-    }
-
-    private Optional<RequestedCourt> getUnspecClaimantRequestedCourt(CaseData caseData) {
-        return Optional.ofNullable(caseData.getCourtLocation())
-            .map(courtLocation -> RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(YesOrNo.YES)
-                .responseCourtCode(courtLocation.getApplicantPreferredCourt())
-                .caseLocation(courtLocation.getCaseLocation())
-                .build());
     }
 
     /**
@@ -143,7 +128,6 @@ public class LocationHelper {
      * @return first matching location
      */
     private Optional<LocationRefData> getMatching(List<LocationRefData> locations, RequestedCourt preferredCourt) {
-
         if (preferredCourt == null) {
             return Optional.empty();
         }
