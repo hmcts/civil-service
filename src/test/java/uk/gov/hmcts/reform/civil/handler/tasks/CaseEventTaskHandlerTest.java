@@ -700,8 +700,7 @@ class CaseEventTaskHandlerTest {
                               "ONE_RESPONDENT_REPRESENTATIVE", false,
                               "RPA_CONTINUOUS_FEED", false,
                               FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
-                              FlowFlag.NOTICE_OF_CHANGE.name(), true,
-                              FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false
+                              FlowFlag.NOTICE_OF_CHANGE.name(), true
                 );
             } else if (state.equals(TAKEN_OFFLINE_BY_STAFF)
                 || state.equals(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)
@@ -712,14 +711,11 @@ class CaseEventTaskHandlerTest {
                 || state.equals(FULL_DEFENCE_NOT_PROCEED)) {
                 return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false,
                               FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
-                              FlowFlag.NOTICE_OF_CHANGE.name(), true,
-                              FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false);
+                              FlowFlag.NOTICE_OF_CHANGE.name(), true);
             }
             return Map.of("RPA_CONTINUOUS_FEED", false,
                           FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
-                          FlowFlag.NOTICE_OF_CHANGE.name(), true,
-                          FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false
-                    );
+                          FlowFlag.NOTICE_OF_CHANGE.name(), true);
         }
 
         private CaseData getCaseData(FlowState.Main state) {

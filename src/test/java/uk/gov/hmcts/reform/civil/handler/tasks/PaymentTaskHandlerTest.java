@@ -83,7 +83,6 @@ class PaymentTaskHandlerTest {
             variables.putValue(FLOW_FLAGS, Map.of("ONE_RESPONDENT_REPRESENTATIVE", true,
                                                   "RPA_CONTINUOUS_FEED", false,
                                                   FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
-                                                  FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
                                                   FlowFlag.NOTICE_OF_CHANGE.name(), false));
 
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();

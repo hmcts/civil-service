@@ -96,7 +96,6 @@ public class DocumentControllerTest extends BaseIntegrationTest {
 
     @Mock
     private ResponseEntity<Resource> responseEntity;
-
     private final UserInfo userInfo = UserInfo.builder()
         .roles(List.of("role"))
         .uid("id")
@@ -109,7 +108,6 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     public void setUp() {
         when(authTokenGenerator.generate()).thenReturn(BEARER_TOKEN);
         when(userService.getUserInfo(anyString())).thenReturn(userInfo);
-        when(userService.getAccessToken(anyString(), anyString())).thenReturn(BEARER_TOKEN);
     }
 
     @Test
@@ -136,7 +134,7 @@ public class DocumentControllerTest extends BaseIntegrationTest {
              )
         ).thenReturn(responseEntity);
 
-        byte[] pdf = documentController.downloadSealedDocument(caseDocument);
+        byte[] pdf = documentController.downloadSealedDocument(BEARER_TOKEN, caseDocument);
 
         assertNotNull(pdf);
         assertArrayEquals("test".getBytes(), pdf);

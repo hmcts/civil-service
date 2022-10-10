@@ -25,8 +25,6 @@ import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
-import static uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils.getRespondent1SolicitorOrgId;
-import static uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils.getRespondent2SolicitorOrgId;
 
 @Service
 @RequiredArgsConstructor
@@ -100,12 +98,14 @@ public class InitiateGeneralApplicationServiceHelper {
                         Solicitor 1 details if caserole of collected user matches with caserole Respondent Solicitor 1*/
                     } else if (respSol.getCaseRole().equals(respondent1OrgCaseRole)) {
                         specBuilder.email(caseData.getRespondentSolicitor1EmailAddress());
-                        specBuilder.organisationIdentifier(getRespondent1SolicitorOrgId(caseData));
+                        specBuilder.organisationIdentifier(caseData.getRespondent1OrganisationPolicy()
+                                                               .getOrganisation().getOrganisationID());
                         /*Populate the GA respondent solicitor details in accordance with civil case Respondent
                         Solicitor 2 details if it's 1 V 2 Different Solicitor scenario*/
                     } else {
                         specBuilder.email(caseData.getRespondentSolicitor2EmailAddress());
-                        specBuilder.organisationIdentifier(getRespondent2SolicitorOrgId(caseData));
+                        specBuilder.organisationIdentifier(caseData.getRespondent2OrganisationPolicy()
+                                                               .getOrganisation().getOrganisationID());
                     }
                     /*Set the GA Respondent solicitor details to Empty if above checks are failed*/
                 } else {

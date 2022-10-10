@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.service.data.UserAuthContent;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.CASE_TYPE;
-import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
 import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataContentFromStartEventResponse;
 
@@ -69,48 +68,6 @@ public class CoreCaseDataService {
             caseDataContent
         );
         return caseDetailsConverter.toCaseData(caseDetails);
-    }
-
-    public CaseData triggerGeneralApplicationEvent(Long caseId, CaseEvent eventName) {
-        return triggerGeneralApplicationEvent(caseId, eventName, Map.of());
-    }
-
-    public CaseData triggerGeneralApplicationEvent(Long caseId,
-                                                   CaseEvent eventName,
-                                                   Map<String, Object> contentModified) {
-        StartEventResponse startEventResponse = startGeneralApplicationUpdate(caseId.toString(), eventName);
-        return submitGeneralApplicationUpdate(caseId.toString(),
-                caseDataContentFromStartEventResponse(startEventResponse, contentModified));
-    }
-
-    public StartEventResponse startGeneralApplicationUpdate(String caseId, CaseEvent eventName) {
-        UserAuthContent systemUpdateUser = getSystemUpdateUser();
-
-        return coreCaseDataApi.startEventForCaseWorker(
-                systemUpdateUser.getUserToken(),
-                authTokenGenerator.generate(),
-                systemUpdateUser.getUserId(),
-                JURISDICTION,
-                GENERALAPPLICATION_CASE_TYPE,
-                caseId,
-                eventName.name()
-        );
-    }
-
-    public CaseData submitGeneralApplicationUpdate(String caseId, CaseDataContent caseDataContent) {
-        UserAuthContent systemUpdateUser = getSystemUpdateUser();
-
-        CaseDetails caseDetails = coreCaseDataApi.submitEventForCaseWorker(
-                systemUpdateUser.getUserToken(),
-                authTokenGenerator.generate(),
-                systemUpdateUser.getUserId(),
-                JURISDICTION,
-                GENERALAPPLICATION_CASE_TYPE,
-                caseId,
-                true,
-                caseDataContent
-        );
-        return caseDetailsConverter.toGACaseData(caseDetails);
     }
 
     public SearchResult searchCases(Query query, String authorization) {

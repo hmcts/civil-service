@@ -16,14 +16,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.CourtLocation;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
@@ -42,7 +39,6 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
 import java.time.LocalDate;
@@ -92,9 +88,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private FeatureToggleService featureToggleService;
-
-    @MockBean
-    private LocationRefDataService locationRefDataService;
 
     @Nested
     class AboutToStartCallback {
@@ -465,60 +458,10 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
         }
 
-        @ParameterizedTest
-        @EnumSource(value = FlowState.Main.class,
-            names = {"FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED"},
-            mode = EnumSource.Mode.INCLUDE)
-        void shouldUpdateBusinessProcess_whenAtFullDefenceStateV1(FlowState.Main flowState) {
-            var params = callbackParamsOf(
-                CallbackVersion.V_1,
-                CaseDataBuilder.builder().atState(flowState).build(),
-                ABOUT_TO_SUBMIT
-            );
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("businessProcess")
-                .extracting("status", "camundaEvent")
-                .containsExactly(READY.name(), CLAIMANT_RESPONSE.name());
-
-            assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
-        }
-
-        @Test
-        void shouldUpdateBusinessProcess_whenAtFullDefenceStateV1() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
-                .build();
-            var params = callbackParamsOf(
-                CallbackVersion.V_1,
-                caseData.toBuilder()
-                    .applicant2(Party.builder()
-                                    .companyName("company")
-                                    .type(Party.Type.COMPANY)
-                                    .build())
-                    .addApplicant2(YES)
-                    .applicant2DQ(Applicant2DQ.builder()
-                                      .applicant2DQFileDirectionsQuestionnaire(
-                                          caseData.getApplicant1DQ()
-                                              .getApplicant1DQFileDirectionsQuestionnaire())
-                                      .build())
-                    .build(),
-                ABOUT_TO_SUBMIT
-            );
-            when(featureToggleService.isSdoEnabled()).thenReturn(true);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).containsEntry("applicant2ResponseDate", localDateTime.format(ISO_DATE_TIME));
-            assertThat(response.getData()).extracting("applicant2DQStatementOfTruth").isNotNull();
-        }
-
         @Test
         void shouldAssembleClaimantResponseDocuments() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             var caseData = CaseDataBuilder.builder().build().toBuilder()
-                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
                                                            "claimant-response-def1.pdf").build())
@@ -537,13 +480,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                           "claimant-2-draft-dir.pdf")
                                                                    .build())
                                   .build())
-                .build().toBuilder().courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
                 .build();
-            /*
-            CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .build();
-             */
             var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
