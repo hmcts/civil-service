@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.hearing.HearingFeeServiceRequestDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
-import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,11 +30,9 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_SERVICE_REQUEST_API);
     private static final String ERROR_MESSAGE = "Technical error occurred";
-    private static final String TASK_ID = "ServiceRequestAPI";
 
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
-    private final Time time;
 
     @Override
     protected Map<String, Callback> callbacks() {
