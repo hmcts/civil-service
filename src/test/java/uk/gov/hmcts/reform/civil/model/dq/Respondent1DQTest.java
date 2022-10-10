@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -261,7 +262,7 @@ class Respondent1DQTest extends DQTest {
                 .responseClaimCourtLocationRequired(YES)
                 .build().getRequestedCourt();
 
-            assertThat(court.getRequestHearingAtSpecificCourt()).isEqualTo(YES);
+            assertNotNull(court);
         }
 
         @Test
@@ -273,11 +274,9 @@ class Respondent1DQTest extends DQTest {
                 .respondToCourtLocation(RequestedCourt.builder()
                                             .responseCourtCode(courtCode)
                                             .reasonForHearingAtSpecificCourt(reason)
-                                            .requestHearingAtSpecificCourt(YES)
                                             .build())
                 .build().getRequestedCourt();
 
-            assertThat(court.getRequestHearingAtSpecificCourt()).isEqualTo(YES);
             assertThat(court.getResponseCourtCode()).isEqualTo(courtCode);
             assertThat(court.getReasonForHearingAtSpecificCourt()).isEqualTo(reason);
         }

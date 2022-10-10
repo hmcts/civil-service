@@ -40,7 +40,6 @@ import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.FutureApplications;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
-import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -491,8 +490,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .build();
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
-                assertThat(templateData.getRequestedCourt()).isNotNull()
-                    .returns(NO, RequestedCourt::getRequestHearingAtSpecificCourt);
+                assertThat(templateData.getRequestedCourt()).isNotNull();
             }
 
             @Test
@@ -507,8 +505,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .build();
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
-                assertThat(templateData.getRequestedCourt()).isNotNull()
-                    .returns(NO, RequestedCourt::getRequestHearingAtSpecificCourt);
+                assertThat(templateData.getRequestedCourt()).isNotNull();
             }
 
             @Test
@@ -624,8 +621,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .build();
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
-                assertThat(templateData.getRequestedCourt()).isNotNull()
-                    .returns(NO, RequestedCourt::getRequestHearingAtSpecificCourt);
+                assertThat(templateData.getRequestedCourt()).isNotNull();
                 assertThat(templateData.getWitnessesIncludingDefendants())
                     .isEqualTo(0);
             }
@@ -647,8 +643,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .build();
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
-                assertThat(templateData.getRequestedCourt()).isNotNull()
-                    .returns(NO, RequestedCourt::getRequestHearingAtSpecificCourt);
+                assertThat(templateData.getRequestedCourt()).isNotNull();
                 assertThat(templateData.getWitnessesIncludingDefendants())
                     .isEqualTo(witnessesIncludingDefendant);
             }
@@ -670,8 +665,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .build();
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
-                assertThat(templateData.getRequestedCourt()).isNotNull()
-                    .returns(NO, RequestedCourt::getRequestHearingAtSpecificCourt);
+                assertThat(templateData.getRequestedCourt()).isNotNull();
                 assertThat(templateData.getWitnessesIncludingDefendants())
                     .isEqualTo(witnessesIncludingDefendant);
             }
@@ -699,8 +693,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .build();
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
-                assertThat(templateData.getRequestedCourt()).isNotNull()
-                    .returns(NO, RequestedCourt::getRequestHearingAtSpecificCourt);
+                assertThat(templateData.getRequestedCourt()).isNotNull();
                 assertThat(templateData.getWitnessesIncludingDefendants())
                     .isEqualTo(witnessesIncludingDefendant);
             }

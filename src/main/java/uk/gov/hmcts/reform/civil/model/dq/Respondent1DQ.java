@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.account.AccountSimple;
@@ -137,7 +136,6 @@ public class Respondent1DQ implements DQ {
             ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
 
             return RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(StringUtils.isNotBlank(responseCourtCode) ? YesOrNo.YES : YesOrNo.NO)
                 .responseCourtCode(responseCourtCode)
                 .reasonForHearingAtSpecificCourt(reasonForHearingAtSpecificCourt)
                 .build();

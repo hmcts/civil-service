@@ -10,6 +10,12 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 @Builder(toBuilder = true)
 public class RequestedCourt {
 
+    /**
+     * Yes if the party wants to request a particular court for the claim.
+     *
+     * @deprecated requested court is mandatory for all parties
+     */
+    @Deprecated(since = "CIV-5123 and 5128")
     private final YesOrNo requestHearingAtSpecificCourt;
     private final String responseCourtCode;
     private final String reasonForHearingAtSpecificCourt;
