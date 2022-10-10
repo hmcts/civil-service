@@ -34,15 +34,40 @@ public class LocationRefDataService {
     public List<String> getCourtLocations(String authToken) {
         try {
             ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
-                    buildURI(),
-                    HttpMethod.GET,
-                    getHeaders(authToken),
-                    new ParameterizedTypeReference<List<LocationRefData>>() {});
+                buildURI(),
+                HttpMethod.GET,
+                getHeaders(authToken),
+                new ParameterizedTypeReference<List<LocationRefData>>() {
+                }
+            );
             return onlyEnglandAndWalesLocations(responseEntity.getBody());
         } catch (Exception e) {
             log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
         }
         return new ArrayList<>();
+    }
+
+    public LocationRefData getCcmccLocation(String authToken) {
+        try {
+            ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
+                buildURIforCcmcc(),
+                HttpMethod.GET,
+                getHeaders(authToken),
+                new ParameterizedTypeReference<List<LocationRefData>>() {});
+            List<LocationRefData> ccmccLocations = responseEntity.getBody();
+            if (ccmccLocations == null || ccmccLocations.isEmpty()) {
+                log.warn("Location Reference Data Lookup did not return any CCMCC location");
+                return LocationRefData.builder().build();
+            } else {
+                if (ccmccLocations.size() > 1) {
+                    log.warn("Location Reference Data Lookup returned more than one CCMCC location");
+                }
+                return ccmccLocations.get(0);
+            }
+        } catch (Exception e) {
+            log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
+        }
+        return LocationRefData.builder().build();
     }
 
     public List<LocationRefData> getCourtLocationsForDefaultJudgments(String authToken) {
@@ -51,7 +76,9 @@ public class LocationRefDataService {
                 buildURIForDefaultJudgments(),
                 HttpMethod.GET,
                 getHeaders(authToken),
-                new ParameterizedTypeReference<>() {});
+                new ParameterizedTypeReference<>() {
+                }
+            );
             return responseEntity.getBody();
         } catch (Exception e) {
             log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
@@ -62,8 +89,15 @@ public class LocationRefDataService {
     private URI buildURI() {
         String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
-                .queryParam("is_hearing_location", "Y")
-                .queryParam("location_type", "Court");
+            .queryParam("is_hearing_location", "Y")
+            .queryParam("location_type", "Court");
+        return builder.buildAndExpand(new HashMap<>()).toUri();
+    }
+
+    private URI buildURIforCcmcc() {
+        String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
+            .queryParam("court_venue_name", "County Court Money Claims Centre");
         return builder.buildAndExpand(new HashMap<>()).toUri();
     }
 
@@ -86,13 +120,21 @@ public class LocationRefDataService {
 
     private List<String> onlyEnglandAndWalesLocations(List<LocationRefData> locationRefData) {
         return locationRefData == null
-                ? new ArrayList<>()
-                : locationRefData.stream().filter(location -> !"Scotland".equals(location.getRegion()))
-                .map(this::getDisplayEntry).collect(Collectors.toList());
+            ? new ArrayList<>()
+            : locationRefData.stream().filter(location -> !"Scotland".equals(location.getRegion()))
+            .map(LocationRefDataService::getDisplayEntry).collect(Collectors.toList());
     }
 
-    private String getDisplayEntry(LocationRefData location) {
-        return concat(concat(concat(location.getSiteName(), " - "), concat(location.getCourtAddress(), " - ")),
-                      location.getPostcode());
+    /**
+     * Label is siteName - courtAddress - postCode.
+     *
+     * @param location a location
+     * @return string to serve as label
+     */
+    public static String getDisplayEntry(LocationRefData location) {
+        return concat(
+            concat(concat(location.getSiteName(), " - "), concat(location.getCourtAddress(), " - ")),
+            location.getPostcode()
+        );
     }
 }

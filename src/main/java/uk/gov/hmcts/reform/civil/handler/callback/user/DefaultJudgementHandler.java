@@ -257,6 +257,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
                             .map(location -> location.getSiteName()
                                 + " - " + location.getCourtAddress()
                                 + " - " + location.getPostcode())
+                            .sorted()
                             .collect(Collectors.toList()));
     }
 

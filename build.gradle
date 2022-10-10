@@ -90,11 +90,11 @@ allprojects {
       // solves CVE-2022-25857
       dependencySet(
         group: 'org.yaml',
-        version: '1.31'
+        version: '1.33'
       ) {
         entry 'snakeyaml'
       }
-
+      // Solves CVE-2022-25647
       dependencySet(
         group: 'org.camunda.bpm',
         version: '7.17.0'
@@ -394,9 +394,10 @@ dependencies {
 
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.71'
 
-  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.16.0'
+  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.17.0'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
-  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.16.0'
+  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.17.0'
+
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.13.1'
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.1'
 
@@ -405,7 +406,7 @@ dependencies {
   implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.0'
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.0'
 
-  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.10.1'
+  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.10.2'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.2.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.1.0'
