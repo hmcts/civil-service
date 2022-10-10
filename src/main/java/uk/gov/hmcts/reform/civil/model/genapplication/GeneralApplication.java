@@ -49,6 +49,8 @@ public class GeneralApplication implements MappableObject {
     private final GACaseManagementCategory caseManagementCategory;
     private final CaseCategory caseAccessCategory;
     private final String locationName;
+    private final YesOrNo generalAppVaryJudgementType;
+    private final GAN245Form gaUploadN245FormUpload;
 
     @JsonCreator
     GeneralApplication(@JsonProperty("generalAppType") GAApplicationType generalAppType,
@@ -82,7 +84,9 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("isCcmccLocation") YesOrNo isCcmccLocation,
                        @JsonProperty("caseManagementCategory") GACaseManagementCategory caseManagementCategory,
                        @JsonProperty("CaseAccessCategory") CaseCategory caseAccessCategory,
-                       @JsonProperty("locationName") String locationName) {
+                       @JsonProperty("locationName") String locationName,
+                       @JsonProperty("generalAppVaryJudgementType") YesOrNo generalAppVaryJudgementType,
+                       @JsonProperty("gaUploadN245FormUpload") GAN245Form gaUploadN245FormUpload) {
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
         this.businessProcess = businessProcess;
@@ -113,5 +117,7 @@ public class GeneralApplication implements MappableObject {
         this.caseManagementCategory = caseManagementCategory;
         this.caseAccessCategory = caseAccessCategory;
         this.locationName = locationName;
+        this.generalAppVaryJudgementType = generalAppVaryJudgementType;
+        this.gaUploadN245FormUpload = gaUploadN245FormUpload;
     }
 }
