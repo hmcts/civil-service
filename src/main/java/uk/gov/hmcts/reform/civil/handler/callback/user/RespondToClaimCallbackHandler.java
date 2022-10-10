@@ -172,19 +172,12 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .isRespondent1(isRespondent1);
 
         if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
-            List<LocationRefData> locations = fetchLocationData(callbackParams);
-            courtLocationList = courtLocationUtils.getLocationsFromList(locations);
+            courtLocationList = courtLocationUtils.getLocationsFromList(fetchLocationData(callbackParams));
             updatedCaseData.respondent1DQ(Respondent1DQ.builder()
                                               .respondent1DQRequestedCourt(
                                                   RequestedCourt.builder()
                                                       .responseCourtLocations(courtLocationList).build())
                                               .build());
-            Optional.ofNullable(caseData.getCourtLocation())
-                .map(CourtLocation::getApplicantPreferredCourt)
-                .flatMap(applicantCourt -> locations.stream()
-                    .filter(locationRefData -> applicantCourt.equals(locationRefData.getCourtLocationCode()))
-                    .findFirst())
-                .ifPresent(locationRefData -> updatedCaseData.locationName(locationRefData.getSiteName()));
         }
 
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
