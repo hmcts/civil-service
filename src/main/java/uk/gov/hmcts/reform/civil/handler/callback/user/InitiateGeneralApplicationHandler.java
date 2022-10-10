@@ -121,7 +121,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
         if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)
-            && ! Objects.isNull(caseData.getGaUploadN245FormUpload().getGeneralAppN245FormUpload())) {
+            && ! Objects.isNull(caseData.getGeneralAppN245FormUpload())) {
 
             /*if (caseData.getGaUploadN245FormUpload().getGeneralAppN245FormUpload().getDocumentFileName()) {
 

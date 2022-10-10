@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategory;
@@ -40,6 +41,7 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -98,6 +100,7 @@ public class InitiateGeneralApplicationService {
             .generalAppPBADetails(GAPbaDetails.builder().build())
             .generalAppDetailsOfOrder(EMPTY)
             .generalAppReasonsOfOrder(EMPTY)
+            .generalAppN245FormUpload(Document.builder().build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().build())
             .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().build())
             .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
@@ -174,8 +177,8 @@ public class InitiateGeneralApplicationService {
                 LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS);
 
         if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)
-            && ! Objects.isNull(caseData.getGaUploadN245FormUpload().getGeneralAppN245FormUpload())) {
-            applicationBuilder.gaUploadN245FormUpload(caseData.getGaUploadN245FormUpload());
+            && ! Objects.isNull(caseData.getGeneralAppN245FormUpload())) {
+            applicationBuilder.generalAppN245FormUpload(caseData.getGeneralAppN245FormUpload());
         }
 
         GeneralApplication generalApplication = applicationBuilder
