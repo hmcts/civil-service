@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearing.HearingFeeServiceRequestDetails;
@@ -21,7 +22,10 @@ import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_API;
 
 @SpringBootTest(classes = {
@@ -29,7 +33,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUES
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class
 })
-public class ServiceRequestAPIHandlerTest {
+public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
     private static final String SUCCESSFUL_PAYMENT_REFERENCE = "2022-1655915218557";
 
@@ -60,6 +64,30 @@ public class ServiceRequestAPIHandlerTest {
 
     @Nested
     class MakeServiceRequestPayments {
+
+        @BeforeEach
+        void setup() {
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        }
+
+        @Test
+        void shouldMakePaymentServiceRequest_whenInvoked() throws Exception {
+            when(paymentsService.createServiceRequest(any(), any()))
+                .thenReturn(paymentServiceResponse.builder()
+                            .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
+            assertThat(extractPaymentDetailsFromResponse(response).getServiceRequestReference())
+                .isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
+        }
+
+        @Test
+        void shouldReturnCorrectActivityId_whenRequested() {
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            assertThat(handler.camundaActivityId(params)).isEqualTo("ServiceRequestAPI");
+        }
 
         @Test
         void handleEventsReturnsTheExpectedCallbackEvent() {

@@ -162,70 +162,98 @@ class PaymentsServiceTest {
         }
     }
 
-    @Test
-    void validateRequestShouldThrowAnError_whenFeeDetailsNotProvided() {
-        CaseData caseData = CaseData.builder()
-            .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder().build())
-            .build();
+    @Nested
+    class ServiceRequest {
+        @BeforeEach
+        void setUp() {
+            given(paymentsClient.createServiceRequest(any(), any())).willReturn(PAYMENT_SERVICE_RESPONSE);
+            given(paymentsClient.createCreditAccountPayment(any(), any())).willReturn(PAYMENT_DTO);
+            given(paymentsConfiguration.getSpecService()).willReturn(SPEC_SERVICE);
+            given(paymentsConfiguration.getSpecSiteId()).willReturn(SPEC_SITE_ID);
+            given(organisationService.findOrganisationById(any())).willReturn(Optional.of(ORGANISATION));
+        }
 
-        Exception exception = assertThrows(
-            InvalidPaymentRequestException.class,
-            () -> paymentsService.validateRequest(caseData)
-        );
-        assertThat(exception.getMessage()).isEqualTo(FEE_NOT_SET_CORRECTLY_ERROR);
-    }
+        @Test
+        void validateRequestShouldNotThrowAnError_whenValidCaseDataIsProvided() {
+            CaseData caseData = CaseDataBuilder.builder().buildMakePaymentsCaseData();
+            paymentsService.validateRequest(caseData);
+            assertThat(caseData).isNotNull();
+        }
 
-    @Test
-    void validateRequestShouldThrowAnError_whenFeeDetailsDoNotHaveFeeCode() {
-        CaseData caseData = CaseData.builder()
-            .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder()
-                                      .fee(Fee.builder()
-                                               .calculatedAmountInPence(BigDecimal.valueOf(10800))
-                                               .version("1")
-                                               .build())
-                                      .build())
-            .build();
+        @Test
+        void validateRequestShouldThrowAnError_whenFeeDetailsNotProvided() {
+            CaseData caseData = CaseData.builder()
+                .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder().build())
+                .build();
 
-        Exception exception = assertThrows(
-            InvalidPaymentRequestException.class,
-            () -> paymentsService.validateRequest(caseData)
-        );
-        assertThat(exception.getMessage()).isEqualTo(FEE_NOT_SET_CORRECTLY_ERROR);
-    }
+            Exception exception = assertThrows(
+                InvalidPaymentRequestException.class,
+                () -> paymentsService.validateRequest(caseData)
+            );
+            assertThat(exception.getMessage()).isEqualTo(FEE_NOT_SET_CORRECTLY_ERROR);
+        }
 
-    @Test
-    void validateRequestShouldThrowAnError_whenFeeDetailsDoNotHaveFeeVersion() {
-        CaseData caseData = CaseData.builder()
-            .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder()
-                                      .fee(Fee.builder()
-                                               .calculatedAmountInPence(BigDecimal.valueOf(10800))
-                                               .code("FEE0442")
-                                               .build())
-                                      .build())
-            .build();
+        @Test
+        void validateRequestShouldThrowAnError_whenFeeDetailsDoNotHaveFeeCode() {
+            CaseData caseData = CaseData.builder()
+                .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder()
+                                                     .fee(Fee.builder()
+                                                              .calculatedAmountInPence(BigDecimal.valueOf(10800))
+                                                              .version("1")
+                                                              .build())
+                                                     .build())
+                .build();
 
-        Exception exception = assertThrows(
-            InvalidPaymentRequestException.class,
-            () -> paymentsService.validateRequest(caseData)
-        );
-        assertThat(exception.getMessage()).isEqualTo(FEE_NOT_SET_CORRECTLY_ERROR);
-    }
+            Exception exception = assertThrows(
+                InvalidPaymentRequestException.class,
+                () -> paymentsService.validateRequest(caseData)
+            );
+            assertThat(exception.getMessage()).isEqualTo(FEE_NOT_SET_CORRECTLY_ERROR);
+        }
 
-    @Test
-    void validateRequestShouldThrowAnError_whenFeeDetailsDoNotHaveFeeAmount() {
-        CaseData caseData = CaseData.builder()
-            .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder()
-                                      .fee(Fee.builder()
-                                               .code("FEE0442")
-                                               .version("1")
-                                               .build())
-                                      .build())
-            .build();
+        @Test
+        void validateRequestShouldThrowAnError_whenFeeDetailsDoNotHaveFeeVersion() {
+            CaseData caseData = CaseData.builder()
+                .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder()
+                                                     .fee(Fee.builder()
+                                                              .calculatedAmountInPence(BigDecimal.valueOf(10800))
+                                                              .code("FEE0442")
+                                                              .build())
+                                                     .build())
+                .build();
 
-        Exception exception = assertThrows(
-            InvalidPaymentRequestException.class,
-            () -> paymentsService.validateRequest(caseData)
-        );
-        assertThat(exception.getMessage()).isEqualTo(FEE_NOT_SET_CORRECTLY_ERROR);
+            Exception exception = assertThrows(
+                InvalidPaymentRequestException.class,
+                () -> paymentsService.validateRequest(caseData)
+            );
+            assertThat(exception.getMessage()).isEqualTo(FEE_NOT_SET_CORRECTLY_ERROR);
+        }
+
+        @Test
+        void validateRequestShouldThrowAnError_whenFeeDetailsDoNotHaveFeeAmount() {
+            CaseData caseData = CaseData.builder()
+                .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder()
+                                                     .fee(Fee.builder()
+                                                              .code("FEE0442")
+                                                              .version("1")
+                                                              .build())
+                                                     .build())
+                .build();
+
+            Exception exception = assertThrows(
+                InvalidPaymentRequestException.class,
+                () -> paymentsService.validateRequest(caseData)
+            );
+            assertThat(exception.getMessage()).isEqualTo(FEE_NOT_SET_CORRECTLY_ERROR);
+        }
+
+        @Test
+        void shouldCreatePaymentServiceRequest_whenValidCaseDetails() {
+
+            CaseData caseData = CaseDataBuilder.builder().buildMakePaymentsCaseData();
+            PaymentServiceResponse serviceRequestResponse = paymentsService.createServiceRequest(caseData, AUTH_TOKEN);
+            assertThat(serviceRequestResponse).isEqualTo(PAYMENT_SERVICE_RESPONSE);
+
+        }
     }
 }

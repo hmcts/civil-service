@@ -91,6 +91,7 @@ payments:
     service: CIVIL
     spec_site_id: AAA6
     spec_service: SPEC
+    url: http://localhost:8765
 
 idam:
   s2s-auth:

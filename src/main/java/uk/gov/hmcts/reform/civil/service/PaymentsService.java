@@ -106,9 +106,10 @@ public class PaymentsService {
         HearingFeeServiceRequestDetails hearingFeeServiceRequestDetails = caseData.getHearingFeeServiceRequestDetails();
         FeeDto feeResponse = hearingFeeServiceRequestDetails.getFee().toFeeDto();
         String siteId = paymentsConfiguration.getSpecSiteId();
+
         return CreateServiceRequestDTO.builder()
-            .ccdCaseNumber(caseData.getCcdCaseReference().toString())
             .caseReference(caseData.getCcdCaseReference().toString())
+            .ccdCaseNumber(caseData.getCcdCaseReference().toString())
             .hmctsOrgId(siteId)
             .callBackUrl(callBackUrl)
             .fees(new FeeDto[] { (FeeDto.builder()
