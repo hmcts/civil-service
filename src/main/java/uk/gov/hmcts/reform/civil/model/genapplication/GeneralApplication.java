@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.genapplication;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -17,8 +18,10 @@ import java.util.List;
 
 @Data
 @Builder(toBuilder = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GeneralApplication implements MappableObject {
 
+    private final String generalApplicationState;
     private final GAApplicationType generalAppType;
     private final GARespondentOrderAgreement generalAppRespondentAgreement;
     private final BusinessProcess businessProcess;
@@ -49,11 +52,14 @@ public class GeneralApplication implements MappableObject {
     private final GACaseManagementCategory caseManagementCategory;
     private final CaseCategory caseAccessCategory;
     private final String locationName;
+    private final LocalDateTime applicationClosedDate;
+    private final LocalDateTime applicationTakenOfflineDate;
     private final YesOrNo generalAppVaryJudgementType;
     private final Document generalAppN245FormUpload;
 
     @JsonCreator
-    GeneralApplication(@JsonProperty("generalAppType") GAApplicationType generalAppType,
+    GeneralApplication(@JsonProperty("generalApplicationState") String generalApplicationState,
+                       @JsonProperty("generalAppType") GAApplicationType generalAppType,
                        @JsonProperty("generalAppRespondentAgreement")
                            GARespondentOrderAgreement generalAppRespondentAgreement,
                        @JsonProperty("businessProcess") BusinessProcess businessProcess,
@@ -85,8 +91,12 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("caseManagementCategory") GACaseManagementCategory caseManagementCategory,
                        @JsonProperty("CaseAccessCategory") CaseCategory caseAccessCategory,
                        @JsonProperty("locationName") String locationName,
+                       @JsonProperty("applicationClosedDate") LocalDateTime applicationClosedDate,
+                       @JsonProperty("applicationTakenOfflineDate") LocalDateTime applicationTakenOfflineDate,
                        @JsonProperty("generalAppVaryJudgementType") YesOrNo generalAppVaryJudgementType,
                        @JsonProperty("generalAppN245FormUpload") Document generalAppN245FormUpload) {
+
+        this.generalApplicationState = generalApplicationState;
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
         this.businessProcess = businessProcess;
@@ -117,6 +127,8 @@ public class GeneralApplication implements MappableObject {
         this.caseManagementCategory = caseManagementCategory;
         this.caseAccessCategory = caseAccessCategory;
         this.locationName = locationName;
+        this.applicationClosedDate = applicationClosedDate;
+        this.applicationTakenOfflineDate = applicationTakenOfflineDate;
         this.generalAppVaryJudgementType = generalAppVaryJudgementType;
         this.generalAppN245FormUpload = generalAppN245FormUpload;
     }
