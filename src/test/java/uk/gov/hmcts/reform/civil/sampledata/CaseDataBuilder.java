@@ -304,6 +304,11 @@ public class CaseDataBuilder {
     //update pdf document from general applications
     private List<Element<CaseDocument>> generalOrderDocument;
 
+    public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
+        this.sameRateInterestSelection = sameRateInterestSelection;
+        return this;
+    }
+
     public CaseDataBuilder generalAppVaryJudgementType(YesOrNo generalAppVaryJudgementType) {
         this.generalAppVaryJudgementType = generalAppVaryJudgementType;
         return this;
