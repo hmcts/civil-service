@@ -174,17 +174,22 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);
             courtLocationList = courtLocationUtils.getLocationsFromList(locations);
-            updatedCaseData.respondent1DQ(Respondent1DQ.builder()
-                                              .respondent1DQRequestedCourt(
-                                                  RequestedCourt.builder()
-                                                      .responseCourtLocations(courtLocationList).build())
-                                              .build());
+            RequestedCourt.RequestedCourtBuilder requestedCourt1 = RequestedCourt.builder()
+                .responseCourtLocations(courtLocationList);
             Optional.ofNullable(caseData.getCourtLocation())
                 .map(CourtLocation::getApplicantPreferredCourt)
                 .flatMap(applicantCourt -> locations.stream()
                     .filter(locationRefData -> applicantCourt.equals(locationRefData.getCourtLocationCode()))
                     .findFirst())
-                .ifPresent(locationRefData -> updatedCaseData.locationName(locationRefData.getSiteName()));
+                .ifPresent(locationRefData -> requestedCourt1
+                    .otherPartyPreferredSite(locationRefData.getCourtLocationCode()
+                                                 + " " + locationRefData.getSiteName()));
+            updatedCaseData
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQRequestedCourt(requestedCourt1.build()).build())
+                .respondent2DQ(Respondent2DQ.builder()
+                                   .respondent2DQRequestedCourt(requestedCourt1.build()).build())
+                .locationName(requestedCourt1.build().getOtherPartyPreferredSite());
         }
 
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());

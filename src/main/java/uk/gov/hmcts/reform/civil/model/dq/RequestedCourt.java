@@ -17,6 +17,7 @@ public class RequestedCourt {
      */
     @Deprecated(since = "CIV-5123 and 5128")
     private final YesOrNo requestHearingAtSpecificCourt;
+    private final String otherPartyPreferredSite;
     private final String responseCourtCode;
     private final String reasonForHearingAtSpecificCourt;
     private final DynamicList responseCourtLocations;
