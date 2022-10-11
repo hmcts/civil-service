@@ -73,7 +73,7 @@ public class RoboticsNotificationService {
                 if (canSendEmailSpec()) {
                     RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
                     triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseData.getEvents());
-                    log.info("Event that triggered RPA: "+ triggerEvent);
+                    log.info("Event that triggered RPA: " + triggerEvent);
                     roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
                     log.info(roboticsCaseData.toJsonString());
                 } else {
@@ -83,7 +83,7 @@ public class RoboticsNotificationService {
                 log.info("It's an unspec case category.");
                 RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
-                log.info("Event that triggered RPA: "+ triggerEvent);
+                log.info("Event that triggered RPA: " + triggerEvent);
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
                 log.info(roboticsCaseData.toJsonString());
             }
