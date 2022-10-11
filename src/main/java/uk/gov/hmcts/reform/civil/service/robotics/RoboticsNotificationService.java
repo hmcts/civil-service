@@ -69,17 +69,23 @@ public class RoboticsNotificationService {
             String triggerEvent;
 
             if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
+                log.info("It's a spec case category.");
                 if (canSendEmailSpec()) {
                     RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
                     triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseData.getEvents());
+                    log.info("Event that triggered RPA: "+ triggerEvent);
                     roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
+                    log.info(roboticsCaseData.toJsonString());
                 } else {
                     return Optional.empty();
                 }
             } else {
+                log.info("It's an unspec case category.");
                 RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
+                log.info("Event that triggered RPA: "+ triggerEvent);
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
+                log.info(roboticsCaseData.toJsonString());
             }
             return Optional.of(EmailData.builder()
                 .message(getMessage(caseData, isMultiParty))
@@ -143,7 +149,6 @@ public class RoboticsNotificationService {
                         event.getDateReceived().equals(events.get(events.size() - 1).getDateReceived())
                             && event.getEventCode().equals(MISCELLANEOUS.getCode()))
             .collect(Collectors.toList());
-
         return lastMiscellaneousEvent.size() == 1 ? lastMiscellaneousEvent.get(0).getEventDetailsText()
             : events.get(events.size() - 1).getEventDetailsText();
     }

@@ -22,6 +22,7 @@ import java.util.Set;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @RequiredArgsConstructor
@@ -43,14 +44,19 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
         try {
 
             if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
+                log.info("Access Profiles enabled");
                 if (toggleService.isLrSpecEnabled()) {
+                    log.info("LR Spec Enabled");
                     roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+                    log.info(roboticsCaseDataSpec.toJsonString());
                     errors = jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString());
                 } else {
                     throw new UnsupportedOperationException("Specified claims are not enabled");
                 }
             } else {
+                log.info("Access Profiles disabled");
                 roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
+                log.info(roboticsCaseData.toJsonString());
                 errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());
             }
 
