@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -208,7 +207,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             updateCaseManagementLocation(callbackParams, builder);
         }
 
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         locationHelper.getCaseManagementLocation(caseData)
             .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
                 builder,
@@ -260,7 +258,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         //Set to null because there are no more deadlines
         builder.nextDeadline(null);
-        AboutToStartOrSubmitCallbackResponse response = null;
 
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
