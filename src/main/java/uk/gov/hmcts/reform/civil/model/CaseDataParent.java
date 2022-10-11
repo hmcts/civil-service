@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
@@ -201,7 +203,6 @@ public class CaseDataParent implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> disposalHearingBundleToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingClaimSettlingToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingCostsToggle;
-    private List<OrderDetailsPagesSectionsToggle> disposalHearingApplicationsOrderToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsHearingToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsMethodToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsDocumentsToggle;
@@ -276,6 +277,9 @@ public class CaseDataParent implements MappableObject {
      */
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal respondToAdmittedClaimOwingAmountPounds2;
+
+    @JsonProperty("CaseAccessCategory")
+    private final CaseCategory caseAccessCategory;
 
     /**
      * Adding for PiP to citizen UI.

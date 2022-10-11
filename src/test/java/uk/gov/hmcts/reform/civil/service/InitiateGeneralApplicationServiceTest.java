@@ -17,15 +17,19 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 
@@ -91,6 +95,12 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
+
+    @MockBean
+    private LocationRefDataService locationRefDataService;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     public void setUp() throws IOException {
@@ -340,19 +350,24 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithEmptyCollectionOfApps(CaseData.builder().build());
-
+        when(locationRefDataService.getCcmccLocation(any()))
+            .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
         assertCollectionPopulated(result);
         assertCaseDateEntries(result);
+        result.getGeneralApplications().forEach(generalApplicationElement -> {
+            assertCaseManagementCategoryPopulated(generalApplicationElement.getValue().getCaseManagementCategory());
+        });
     }
 
     @Test
     void shouldReturnCaseDataWithAdditionToCollection_whenAnotherApplicationIsBeingInitiated() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataCollectionOfApps(CaseData.builder().build());
-
+        when(locationRefDataService.getCcmccLocation(any()))
+            .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
@@ -363,7 +378,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     void shouldNotPopulateInformOtherPartyAndStatementOfTruthIfConsentInfoNotProvided() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(null);
-
+        when(locationRefDataService.getCcmccLocation(any()))
+            .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
@@ -382,6 +398,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     void shouldNotPopulateInformOtherPartyAndStatementOfTruthIfConsented() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(YES).build());
+        when(locationRefDataService.getCcmccLocation(any()))
+            .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
 
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
@@ -401,7 +419,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     void shoulAddSpecClaimType() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataSPEC(SuperClaimType.SPEC_CLAIM);
-
+        when(locationRefDataService.getCcmccLocation(any()))
+            .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
@@ -414,7 +433,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     void shoulAddUnSpecClaimType() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataSPEC(null);
-
+        when(locationRefDataService.getCcmccLocation(any()))
+            .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
@@ -427,7 +447,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     void shouldPopulateInformOtherPartyAndStatementOfTruthIfUnconsented() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
-
+        when(locationRefDataService.getCcmccLocation(any()))
+            .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
@@ -746,7 +767,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     void shouldPopulatePartyNameDetails() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
-
+        when(locationRefDataService.getCcmccLocation(any()))
+            .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
 
@@ -762,7 +784,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     void shouldPopulateApplicantDetails() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
-
+        when(locationRefDataService.getCcmccLocation(any()))
+            .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").siteName("CCMCC").build());
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).id(STRING_NUM_CONSTANT).build(), CallbackParams.builder().toString());
 
@@ -772,6 +795,9 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         assertThat(result.getGeneralApplications().get(0).getValue()
                        .getGeneralAppRespondentSolicitors().size()).isEqualTo(4);
+
+        assertThat(result.getGeneralApplications().get(0).getValue().getLocationName())
+            .isEqualTo("CCMCC");
 
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppRespondentSolicitors()
                        .stream().filter(e -> STRING_NUM_CONSTANT.equals(e.getValue().getId())).count()).isEqualTo(0);
@@ -812,6 +838,17 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         assertThat(generalAppHearingDetails.getHearingPreferencesPreferredType()).isNull();
         assertThat(generalAppHearingDetails.getUnavailableTrialRequiredYesOrNo()).isNull();
         assertThat(generalAppHearingDetails.getSupportRequirementLanguageInterpreter()).isNull();
+    }
+
+    private void assertCaseManagementCategoryPopulated(GACaseManagementCategory gaCaseManagementCategory) {
+        assertThat(gaCaseManagementCategory.getValue().getCode())
+            .isEqualTo(CASE_MANAGEMENT_CATEGORY);
+        assertThat(gaCaseManagementCategory.getValue().getLabel())
+            .isEqualTo(CASE_MANAGEMENT_CATEGORY);
+        assertThat(gaCaseManagementCategory.getList_items().get(0).getValue().getLabel())
+            .isEqualTo(CASE_MANAGEMENT_CATEGORY);
+        assertThat(gaCaseManagementCategory.getList_items().get(0).getValue().getCode())
+            .isEqualTo(CASE_MANAGEMENT_CATEGORY);
     }
 
     private void assertCollectionPopulated(CaseData caseData) {
