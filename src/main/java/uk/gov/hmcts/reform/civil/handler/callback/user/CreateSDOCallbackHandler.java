@@ -543,6 +543,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                     + DateFormatHelper.formatLocalDate(
                     deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5), DATE)
             );
+        } else {
+            tempSmallClaimsNotes.input(
+                    "This Order has been made without a hearing. Each party has the right to apply to have this Order "
+                        + "set aside or varied. Any such application must be received by the Court, "
+                        + "together with the appropriate fee by 4pm on")
+                .date(LocalDate.now().plusWeeks(1));
         }
 
         updatedData.smallClaimsNotes(tempSmallClaimsNotes.build()).build();
