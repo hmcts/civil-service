@@ -78,6 +78,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
             callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
+            callbackKey(V_1, ABOUT_TO_SUBMIT), this::aboutToSubmit_V1,
             callbackKey(ABOUT_TO_START), this::populateCaseData,
             callbackKey(V_1, ABOUT_TO_START), this::populateCaseData,
             callbackKey(SUBMITTED), this::buildConfirmation
@@ -137,6 +138,41 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+            .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC))
+            .applicant1ResponseDate(time.now());
+        locationHelper.getCaseManagementLocation(caseData)
+            .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
+                builder,
+                requestedCourt,
+                () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
+                    CallbackParams.Params.BEARER_TOKEN).toString())
+            ));
+        if (log.isDebugEnabled()) {
+            log.debug("Case management location for " + caseData.getLegacyCaseReference()
+                          + " is " + builder.build().getCaseManagementLocation());
+        }
+
+        if (caseData.getApplicant1ProceedWithClaim() == YES
+            || caseData.getApplicant1ProceedWithClaimSpec2v1() == YES) {
+            // moving statement of truth value to correct field, this was not possible in mid event.
+            StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
+            Applicant1DQ dq = caseData.getApplicant1DQ().toBuilder()
+                .applicant1DQStatementOfTruth(statementOfTruth)
+                .build();
+
+            builder.applicant1DQ(dq);
+            // resetting statement of truth to make sure it's empty the next time it appears in the UI.
+            builder.uiStatementOfTruth(StatementOfTruth.builder().build());
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(builder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse aboutToSubmit_V1(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC))
