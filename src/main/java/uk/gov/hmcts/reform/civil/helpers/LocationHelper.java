@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.civil.helpers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -23,6 +24,11 @@ import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 
 @Slf4j
 public class LocationHelper {
+
+    private static final Predicate<RequestedCourt> HAS_INFO = requestedCourt ->
+        StringUtils.isNotBlank(requestedCourt.getResponseCourtCode())
+            || requestedCourt.getCaseLocation() != null
+            || Optional.ofNullable(requestedCourt.getResponseCourtLocations()).map(DynamicList::getValue).isPresent();
 
     /**
      * If the defendant is individual or sole trader, their preferred court is the case's court.
@@ -56,7 +62,7 @@ public class LocationHelper {
                 caseData.getLegacyCaseReference()
             );
             getDefendantCourt.get()
-                .filter(requestedCourt -> requestedCourt.getRequestHearingAtSpecificCourt() == YesOrNo.YES)
+                .filter(HAS_INFO)
                 .ifPresent(requestedCourt -> {
                     log.debug("Case {}, Defendant has requested a court", caseData.getLegacyCaseReference());
                     prioritized.add(requestedCourt);
@@ -71,7 +77,7 @@ public class LocationHelper {
                 caseData.getLegacyCaseReference()
             );
             getClaimantRequestedCourt(caseData)
-                .filter(requestedCourt -> requestedCourt.getRequestHearingAtSpecificCourt() == YesOrNo.YES)
+                .filter(HAS_INFO)
                 .ifPresent(requestedCourt -> {
                     log.debug("Case {}, Claimant has requested a court", caseData.getLegacyCaseReference());
                     prioritized.add(requestedCourt);
@@ -110,7 +116,6 @@ public class LocationHelper {
         } else {
             return Optional.ofNullable(caseData.getCourtLocation())
                 .map(courtLocation -> RequestedCourt.builder()
-                    .requestHearingAtSpecificCourt(YesOrNo.YES)
                     .responseCourtCode(courtLocation.getApplicantPreferredCourt())
                     .caseLocation(courtLocation.getCaseLocation())
                     .build());

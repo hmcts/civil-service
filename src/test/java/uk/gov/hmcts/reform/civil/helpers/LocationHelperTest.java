@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.helpers;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -33,7 +32,6 @@ public class LocationHelperTest {
                                                       .build());
         RequestedCourt requestedCourt = RequestedCourt.builder()
             .responseCourtCode("123")
-            .requestHearingAtSpecificCourt(YesOrNo.YES)
             .build();
         helper.updateCaseManagementLocation(updatedData, requestedCourt, () -> locations);
         Assertions.assertThat(updatedData.build().getCaseManagementLocation())
@@ -58,7 +56,6 @@ public class LocationHelperTest {
                               .region("regionId")
                               .baseLocation("epimms")
                               .build())
-            .requestHearingAtSpecificCourt(YesOrNo.YES)
             .build();
         helper.updateCaseManagementLocation(updatedData, requestedCourt, () -> locations);
         Assertions.assertThat(updatedData.build().getCaseManagementLocation())
@@ -79,7 +76,6 @@ public class LocationHelperTest {
             .applicant1DQ(Applicant1DQ.builder()
                               .applicant1DQRequestedCourt(
                                   RequestedCourt.builder()
-                                      .requestHearingAtSpecificCourt(YesOrNo.YES)
                                       .responseCourtCode("123")
                                       .build()
                               )
@@ -90,7 +86,6 @@ public class LocationHelperTest {
             .respondent1DQ(Respondent1DQ.builder()
                                .respondent1DQRequestedCourt(
                                    RequestedCourt.builder()
-                                       .requestHearingAtSpecificCourt(YesOrNo.YES)
                                        .responseCourtCode("321")
                                        .build()
                                )
@@ -119,7 +114,6 @@ public class LocationHelperTest {
             .respondent1DQ(Respondent1DQ.builder()
                                .respondent1DQRequestedCourt(
                                    RequestedCourt.builder()
-                                       .requestHearingAtSpecificCourt(YesOrNo.YES)
                                        .responseCourtCode("321")
                                        .build()
                                )
@@ -152,7 +146,6 @@ public class LocationHelperTest {
             .respondent2DQ(Respondent2DQ.builder()
                                .respondent2DQRequestedCourt(
                                    RequestedCourt.builder()
-                                       .requestHearingAtSpecificCourt(YesOrNo.YES)
                                        .responseCourtCode("321")
                                        .build()
                                )
@@ -175,7 +168,6 @@ public class LocationHelperTest {
             .applicant1DQ(Applicant1DQ.builder()
                               .applicant1DQRequestedCourt(
                                   RequestedCourt.builder()
-                                      .requestHearingAtSpecificCourt(YesOrNo.YES)
                                       .responseCourtCode("123")
                                       .build()
                               )
@@ -186,7 +178,6 @@ public class LocationHelperTest {
             .respondent1DQ(Respondent1DQ.builder()
                                .respondent1DQRequestedCourt(
                                    RequestedCourt.builder()
-                                       .requestHearingAtSpecificCourt(YesOrNo.YES)
                                        .responseCourtCode("321")
                                        .build()
                                )
@@ -216,7 +207,6 @@ public class LocationHelperTest {
             .respondent1DQ(Respondent1DQ.builder()
                                .respondent1DQRequestedCourt(
                                    RequestedCourt.builder()
-                                       .requestHearingAtSpecificCourt(YesOrNo.YES)
                                        .responseCourtCode("321")
                                        .build()
                                )

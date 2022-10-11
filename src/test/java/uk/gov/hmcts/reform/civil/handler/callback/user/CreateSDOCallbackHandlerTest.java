@@ -191,7 +191,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1DQ(Applicant1DQ.builder()
                                   .applicant1DQRequestedCourt(
                                       RequestedCourt.builder()
-                                          .requestHearingAtSpecificCourt(YesOrNo.NO)
                                           .build()
                                   )
                                   .build())
@@ -226,7 +225,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1DQ(Applicant1DQ.builder()
                                   .applicant1DQRequestedCourt(
                                       RequestedCourt.builder()
-                                          .requestHearingAtSpecificCourt(YesOrNo.YES)
                                           .responseCourtCode("court3")
                                           .caseLocation(
                                               CaseLocation.builder()
