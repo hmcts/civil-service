@@ -1216,7 +1216,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     DynamicListElement selectedCourtLocation = DynamicListElement.builder()
                         .label("selected location label")
-                        .code(UUID.fromString("selected location id"))
+                        .code(UUID.randomUUID())
                         .build();
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
@@ -1269,7 +1269,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     DynamicListElement selectedCourtLocation = DynamicListElement.builder()
                         .label("selected location label")
-                        .code(UUID.fromString("selected location id"))
+                        .code(UUID.randomUUID())
                         .build();
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimOneDefendantSolicitor()
@@ -1322,7 +1322,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                     DynamicListElement selectedCourtLocation = DynamicListElement.builder()
                         .label("selected location label")
-                        .code(UUID.fromString("selected location id"))
+                        .code(UUID.randomUUID())
                         .build();
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimOneDefendantSolicitor()
