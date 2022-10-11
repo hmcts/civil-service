@@ -130,7 +130,7 @@ public class LocationHelper {
                 .caseLocation(courtLocation.getCaseLocation())
                 .build());
     }
-
+    
     /**
      * We say that a locationRefData matches a RequestedCourt if the court code is the same or if
      * (a) the court's case location has region equal to locationRefData.regionId and (b) base location

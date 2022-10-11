@@ -165,6 +165,7 @@ public class InitiateGeneralApplicationService {
         //Setting Work Allocation location and location name
         applicationBuilder.caseManagementLocation(caseLocation.getLeft());
         applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
+        applicationBuilder.locationName(caseLocation.getLeft().getSiteName());
 
         LocalDateTime deadline = deadlinesCalculator
             .calculateApplicantResponseDeadline(
@@ -225,6 +226,7 @@ public class InitiateGeneralApplicationService {
         CaseLocation courtLocation = CaseLocation.builder()
             .region(ccmccLocation.getRegionId())
             .baseLocation(ccmccLocation.getEpimmsId())
+            .siteName(ccmccLocation.getSiteName())
             .build();
         return Pair.of(courtLocation, true);
     }
