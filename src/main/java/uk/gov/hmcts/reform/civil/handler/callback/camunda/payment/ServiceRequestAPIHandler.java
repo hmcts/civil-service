@@ -30,6 +30,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_SERVICE_REQUEST_API);
     private static final String ERROR_MESSAGE = "Technical error occurred";
+    private static final String TASK_ID = "ServiceRequestAPI";
 
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
