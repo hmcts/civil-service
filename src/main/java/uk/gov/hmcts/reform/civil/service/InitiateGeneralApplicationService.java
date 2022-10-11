@@ -376,8 +376,6 @@ public class InitiateGeneralApplicationService {
                         .getCaseLocation().getRegion())
             .baseLocation(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt()
                               .getCaseLocation().getBaseLocation())
-            .siteName(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt()
-                          .getCaseLocation().getSiteName())
             .build();
     }
 
@@ -399,8 +397,6 @@ public class InitiateGeneralApplicationService {
                         .getCaseLocation().getRegion())
             .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
                               .getCaseLocation().getBaseLocation())
-            .siteName(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
-                          .getCaseLocation().getSiteName())
             .build();
     }
 
@@ -413,8 +409,6 @@ public class InitiateGeneralApplicationService {
                             .getCaseLocation().getRegion())
                 .baseLocation(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
                                   .getCaseLocation().getBaseLocation())
-                .siteName(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
-                              .getCaseLocation().getSiteName())
                 .build();
         } else if (!(isDefendant1RespondedFirst(caseData)) || !(caseData.getRespondent2DQ() == null
             || caseData.getRespondent2DQ().getRespondent2DQRequestedCourt() == null)) {
@@ -423,8 +417,6 @@ public class InitiateGeneralApplicationService {
                             .getCaseLocation().getRegion())
                 .baseLocation(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
                                   .getCaseLocation().getBaseLocation())
-                .siteName(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
-                              .getCaseLocation().getSiteName())
                 .build();
         } else {
             return CaseLocation.builder().build();
