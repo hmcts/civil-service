@@ -186,6 +186,7 @@ notifications:
   respondentLipFullAdmitOrPartAdmitTemplate: "d41a95de-ab84-4442-b6d1-33db03b5e1b0"
   respondentLipFullDefenceWithMediationTemplate: "2177f3b0-3833-4788-bd7f-a473e32950af"
   respondentLipFullDefenceNoMediationTemplate: "8825e67e-44a2-444d-afd0-3fa6c34af373"
+  respondentLipResponseSubmissionTemplate: "1f6f1053-02f5-4b44-a1f8-90e78930c10a"
 
 
 sendgrid:
