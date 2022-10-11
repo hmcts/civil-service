@@ -700,8 +700,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + " much reliance, if any, to place on their evidence.");
 
             assertThat(response.getData()).extracting("smallClaimsNotes").extracting("input")
-                .isEqualTo("This Order has been made without a hearing. Each party has the right to apply to have this Order "
-                               + "set aside or varied. Any such application must be received by the Court, "
+                .isEqualTo("This Order has been made without a hearing. Each party has the right to apply to have this "
+                               + "Order set aside or varied. Any such application must be received by the Court, "
                                + "together with the appropriate fee by 4pm on");
 
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input1")

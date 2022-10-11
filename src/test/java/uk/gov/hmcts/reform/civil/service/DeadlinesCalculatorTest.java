@@ -318,7 +318,7 @@ public class DeadlinesCalculatorTest {
     }
 
     @Nested
-    class PluWorkingsDays {
+    class PlusWorkingsDays {
         @Test
         void plusWorkingDays() {
             LocalDate start = LocalDate.of(2022, 9, 12);
