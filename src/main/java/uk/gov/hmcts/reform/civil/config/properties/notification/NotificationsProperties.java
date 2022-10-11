@@ -156,4 +156,16 @@ public class NotificationsProperties {
     @NotEmpty
     private String respondentChangeOfAddressNotificationTemplate;
 
+    @NotEmpty
+    private String respondentLipFullAdmitOrPartAdmitTemplate;
+
+    @NotEmpty
+    private String respondentLipFullDefenceWithMediationTemplate;
+
+    @NotEmpty
+    private String respondentLipFullDefenceNoMediationTemplate;
+
+    @NotEmpty
+    private String respondentLipResponseSubmissionTemplate;
+
 }
