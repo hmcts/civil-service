@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -94,6 +95,7 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseE
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class EventHistoryMapper {
 
     private final StateFlowEngine stateFlowEngine;
@@ -1989,6 +1991,7 @@ public class EventHistoryMapper {
 
         if (featureToggleService.isSDOEnabled()) {
 
+            log.info("----------buildSDONotDrawncalled-------");
             String miscText = left(format(
                 "RPA Reason: Case proceeds offline. "
                     + "Judge / Legal Advisor did not draw a Direction's Order: %s",
