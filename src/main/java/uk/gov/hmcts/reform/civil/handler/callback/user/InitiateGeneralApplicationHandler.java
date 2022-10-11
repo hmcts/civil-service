@@ -51,6 +51,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private static final String VALIDATE_GA_TYPE = "ga-validate-type";
     private static final String VALIDATE_N245_FORM_NAME = "ga-validate-n245form-name";
     private static final String VALIDATE_HEARING_PAGE = "ga-hearing-screen-validation";
+    private static final String N245_FILE_NAME = "Statement of incomings and outgoings";
+    private static final String N245_FILE_NAME_ERROR = "File should be named "
+        + "as \"Statement of incomings and outgoings\"";
     private static final String SET_FEES_AND_PBA = "ga-fees-and-pba";
     private static final String POUND_SYMBOL = "£";
     private static final List<CaseEvent> EVENTS = Collections.singletonList(INITIATE_GENERAL_APPLICATION);
@@ -123,11 +126,11 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)
             && ! Objects.isNull(caseData.getGeneralAppN245FormUpload())) {
 
-            /*if (caseData.getGaUploadN245FormUpload().getGeneralAppN245FormUpload().getDocumentFileName()) {
-
-            }*/
-
-            // errors.add(RESP_NOT_ASSIGNED_ERROR);
+            if (!initiateGeneralApplicationService.validateFileName(caseData
+                                                                        .getGeneralAppN245FormUpload()
+                                                                        .getDocumentFileName(), N245_FILE_NAME)) {
+                errors.add(N245_FILE_NAME_ERROR);
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
