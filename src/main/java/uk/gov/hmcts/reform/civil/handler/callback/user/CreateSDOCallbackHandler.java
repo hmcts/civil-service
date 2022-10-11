@@ -3,14 +3,11 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
-import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -18,15 +15,13 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
-import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
+import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -66,16 +61,11 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
-import uk.gov.hmcts.reform.prd.client.CommonReferenceDataApi;
-import uk.gov.hmcts.reform.prd.model.HearingChannelLov;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -85,6 +75,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 
 @Service
 @RequiredArgsConstructor
@@ -131,12 +122,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final SdoGeneratorService sdoGeneratorService;
     private final LocationHelper locationHelper = new LocationHelper();
     private final DeadlinesCalculator deadlinesCalculator;
-    private final CommonReferenceDataApi commonReferenceDataApi;
-    private final AuthTokenGenerator authTokenGenerator;
-    @Value("${rd_common.api.service}")
-    private String hearingChannelServiceId;
     private final FeatureToggleService featureToggleService;
-
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -557,12 +543,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                     + DateFormatHelper.formatLocalDate(
                     deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5), DATE)
             );
-        } else {
-            tempSmallClaimsNotes.input(
-                    "This Order has been made without a hearing. Each party has the right to apply to have this Order "
-                        + "set aside or varied. Any such application must be received by the Court, "
-                        + "together with the appropriate fee by 4pm on")
-                .date(LocalDate.now().plusWeeks(1));
         }
 
         updatedData.smallClaimsNotes(tempSmallClaimsNotes.build()).build();

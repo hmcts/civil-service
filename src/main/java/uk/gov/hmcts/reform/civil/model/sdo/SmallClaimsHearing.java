@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsTimeEstimate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor

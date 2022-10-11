@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -43,7 +42,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.client.CommonReferenceDataApi;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -53,6 +51,7 @@ import java.util.UUID;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -64,7 +63,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_2v1;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 
 @SpringBootTest(classes = {
     CreateSDOCallbackHandler.class,
@@ -72,6 +70,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
     CaseDetailsConverter.class,
     ClaimIssueConfiguration.class,
     MockDatabaseConfiguration.class,
+    DeadlinesCalculator.class,
     ValidationAutoConfiguration.class},
     properties = {"reference.database.enabled=false"})
 public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -101,9 +100,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private NonWorkingDaysCollection nonWorkingDaysCollection;
-
-    @MockBean
-    private CommonReferenceDataApi commonReferenceDataApi;
 
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
@@ -282,6 +278,16 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class MidEventPrePopulateOrderDetailsPagesCallback extends LocationRefSampleDataBuilder {
+        private LocalDate newDate;
+        private LocalDateTime localDateTime;
+
+        @BeforeEach
+        void setup() {
+            newDate = LocalDate.of(2020, 1, 15);
+            localDateTime = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
+            when(time.now()).thenReturn(localDateTime);
+            when(deadlinesCalculator.plusWorkingDays(any(LocalDate.class), anyInt())).thenReturn(newDate);
+        }
 
         @Test
         void shouldPrePopulateOrderDetailsPages() {
@@ -291,8 +297,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(getSampleCourLocationsRefObjectToSort());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5))
-                .thenReturn(LocalDate.now().plusDays(5));
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -695,14 +699,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + " attend the hearing. If they do not attend, it will be for the court to decide how"
                                + " much reliance, if any, to place on their evidence.");
 
-            assertThat(response.getData()).extracting("smallClaimsNotes").extracting("input")
-                .isEqualTo("The order has been made without a hearing. "
-                               + "Each party has the right to apply to have this Order set aside or varied. "
-                               + "Any such application must be received by the Court "
-                               + "(together with the appropriate fee) by 4pm on "
-                               + DateFormatHelper.formatLocalDate(
-                    deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5), DATE));
-
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input1")
                 .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
                                + "claimant's disclosure as ordered earlier in this Order must include:\n"
@@ -766,6 +762,37 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("Photographs and/or a place of the accident location shall be prepared and agreed by the "
                                + "parties and uploaded to the Digital Portal no later than 14 days before the "
                                + "hearing.");
+        }
+
+        @Test
+        void shouldPrePopulateOrderDetailsPages_ForSmallClaims_WhenIsHearingAndListingSDOEnabled() {
+            CaseData caseData = CaseDataBuilder.builder().setSuperClaimTypeToSpecClaim().atStateClaimDraft()
+                .applicant1DQWithLocation().build();
+            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("smallClaimsHearing").extracting("input2")
+                .isEqualTo("The claimant must by no later than 4 weeks before the hearing date, pay the court the "
+                               + "required hearing fee or submit a fully completed application for Help with Fees. "
+                               + "If the claimant fails to pay the fee or obtain a fee exemption by that time the "
+                               + "claim will be struck without further order.");
+
+            assertThat(response.getData()).extracting("smallClaimsDocuments").extracting("input1")
+                .isEqualTo("Each party must upload to the Digital Portal copies of all documents which they wish the"
+                               + " court to consider when reaching its decision not less than 14 days before "
+                               + "the hearing.");
+            assertThat(response.getData()).extracting("smallClaimsDocuments").extracting("input2")
+                .isEqualTo("The court may refuse to consider any document which has not been uploaded to the "
+                               + "Digital Portal by the above date.");
+
+            assertThat(response.getData()).extracting("smallClaimsNotes").extracting("input")
+                .isEqualTo("Each party has the right to apply to have this Order set aside or varied. "
+                               + "Any such application must be received by the Court "
+                               + "(together with the appropriate fee) by 4pm on "
+                               + DateFormatHelper.formatLocalDate(newDate, DateFormatHelper.DATE));
         }
 
         @Test
