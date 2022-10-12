@@ -296,7 +296,7 @@ class RoboticsNotificationServiceTest {
         EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
         String reference = caseData.getLegacyCaseReference();
         String message = format("Multiparty claim data for %s - %s", reference, caseData.getCcdState());
-        String subject = format("Multiparty LR v LR Case Data for %s - %s - %s", reference, caseData.getCcdState(),
+        String subject = format("SDO Test Multiparty LR v LR Case Data for %s - %s - %s", reference, caseData.getCcdState(),
                                 lastEventText);
 
         assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
