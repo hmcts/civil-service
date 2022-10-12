@@ -158,7 +158,6 @@ public class LocationHelper {
     public Optional<LocationRefData> updateCaseManagementLocation(CaseData.CaseDataBuilder<?, ?> updatedData,
                                                                   RequestedCourt requestedCourt,
                                                                   Supplier<List<LocationRefData>> getLocations) {
-
         Optional<LocationRefData> matchingLocation = getMatching(getLocations.get(), requestedCourt);
         if (log.isDebugEnabled()) {
             String reference = updatedData.build().getLegacyCaseReference();

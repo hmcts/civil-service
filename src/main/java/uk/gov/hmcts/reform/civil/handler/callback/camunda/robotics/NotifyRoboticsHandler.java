@@ -45,7 +45,6 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
             if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
                 if (toggleService.isLrSpecEnabled()) {
                     roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
-                    log.info(roboticsCaseDataSpec.toJsonString());
                     errors = jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString());
                 } else {
                     throw new UnsupportedOperationException("Specified claims are not enabled");

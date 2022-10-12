@@ -143,6 +143,7 @@ public class RoboticsNotificationService {
                         event.getDateReceived().equals(events.get(events.size() - 1).getDateReceived())
                             && event.getEventCode().equals(MISCELLANEOUS.getCode()))
             .collect(Collectors.toList());
+
         return lastMiscellaneousEvent.size() == 1 ? lastMiscellaneousEvent.get(0).getEventDetailsText()
             : events.get(events.size() - 1).getEventDetailsText();
     }
