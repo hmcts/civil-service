@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import com.google.common.collect.Lists;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
@@ -17,7 +19,10 @@ import static java.util.Objects.requireNonNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Component
+@RequiredArgsConstructor
 public class EventHistorySequencer {
+
+    private final FeatureToggleService featureToggleService;
 
     public EventHistory sortEvents(EventHistory eventHistory) {
         requireNonNull(eventHistory);
@@ -89,10 +94,14 @@ public class EventHistorySequencer {
                     builder.breathingSpaceMentalHealthLifted(event);
                     break;
                 case  INTERLOCUTORY_JUDGMENT_GRANTED:
-                    builder.interlocutoryJudgment(event);
+                    if (featureToggleService.isDJEnabled()) {
+                        builder.interlocutoryJudgment(event);
+                    }
                     break;
                 case  DEFAULT_JUDGMENT_GRANTED:
-                    builder.defaultJudgment(event);
+                    if (featureToggleService.isDJEnabled()) {
+                        builder.defaultJudgment(event);
+                    }
                     break;
                 default:
                     throw new IllegalStateException("Unexpected event type: " + eventType);
@@ -137,11 +146,13 @@ public class EventHistorySequencer {
         if (isEmpty(builder.build().getBreathingSpaceMentalHealthLifted())) {
             builder.breathingSpaceMentalHealthLifted(List.of(Event.builder().build()));
         }
-        if (isEmpty(builder.build().getInterlocutoryJudgment())) {
-            builder.interlocutoryJudgment(List.of(Event.builder().build()));
-        }
-        if (isEmpty(builder.build().getDefaultJudgment())) {
-            builder.defaultJudgment(List.of(Event.builder().build()));
+        if (featureToggleService.isDJEnabled()) {
+            if (isEmpty(builder.build().getInterlocutoryJudgment())) {
+                builder.interlocutoryJudgment(List.of(Event.builder().build()));
+            }
+            if (isEmpty(builder.build().getDefaultJudgment())) {
+                builder.defaultJudgment(List.of(Event.builder().build()));
+            }
         }
         return builder
             .build();
