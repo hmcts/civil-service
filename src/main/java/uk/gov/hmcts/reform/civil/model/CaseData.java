@@ -10,21 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.ClaimType;
-import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
-import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
-import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
@@ -60,6 +46,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
@@ -532,6 +519,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> generalOrderDocument;
     private final List<Element<CaseDocument>> dismissalOrderDocument;
     private final List<Element<CaseDocument>> directionOrderDocument;
+
+    //case progression
+    private final List<Element<DocumentWithName>> documentOnly;
+    private final CaseNoteType caseNoteType;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
