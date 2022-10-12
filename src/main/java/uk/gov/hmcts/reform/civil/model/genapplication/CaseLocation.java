@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class CaseLocation {
 
     private String region;
-
+    private String siteName;
     private String baseLocation;
 }
