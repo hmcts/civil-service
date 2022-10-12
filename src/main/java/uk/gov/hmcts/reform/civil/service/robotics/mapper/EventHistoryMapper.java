@@ -1275,13 +1275,15 @@ public class EventHistoryMapper {
     }
 
     public List<Event> prepareMiscEventList(EventHistory.EventHistoryBuilder builder, CaseData caseData,
-                                            List<String> miscEventText) {
+                                            List<String> miscEventText, LocalDateTime... eventDate) {
         return IntStream.range(0, miscEventText.size())
             .mapToObj(index ->
                           Event.builder()
                               .eventSequence(prepareEventSequence(builder.build()))
                               .eventCode(MISCELLANEOUS.getCode())
-                              .dateReceived(caseData.getApplicant1ResponseDate())
+                              .dateReceived(eventDate.length > 0
+                                                && eventDate[0] != null
+                                                ? eventDate[0] : caseData.getApplicant1ResponseDate())
                               .eventDetailsText(miscEventText.get(index))
                               .eventDetails(EventDetails.builder()
                                                 .miscText(miscEventText.get(index))
@@ -2003,7 +2005,7 @@ public class EventHistoryMapper {
             List<String> miscTextList = new ArrayList<>();
             miscTextList.add(miscText);
 
-            List<Event> miscTextEvent = prepareMiscEventList(builder, caseData, miscTextList);
+            List<Event> miscTextEvent = prepareMiscEventList(builder, caseData, miscTextList, eventDate);
             builder.miscellaneous(miscTextEvent);
         }
     }
