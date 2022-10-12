@@ -56,7 +56,7 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
     }
 
     private String getHeader(CaseData caseData) {
-        if (caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_ONLY)) {
+        if (null!=caseData.getCaseNoteType() && caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_ONLY)) {
             return format(EVIDENCE_UPLOAD_HEADER_TWO, caseData.getLegacyCaseReference());
         }
         return null;
@@ -64,7 +64,7 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
 
     private String getBody(CaseData caseData) {
         StringBuilder stringBuilder = new StringBuilder();
-        if (caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_ONLY)) {
+        if (null!=caseData.getCaseNoteType() && caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_ONLY)) {
             IntStream.range(0, caseData.getDocumentOnly()
                 .size()).forEachOrdered(i -> stringBuilder.append("* ").append(
                 caseData.getDocumentOnly().get(i).getValue().getDocument().getDocumentFileName()).append("\n"));
