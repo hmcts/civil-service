@@ -2000,16 +2000,11 @@ public class EventHistoryMapper {
 
             LocalDateTime eventDate = caseData.getUnsuitableSDODate();
 
-            builder.miscellaneous(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(eventDate)
-                    .eventDetailsText(miscText)
-                    .eventDetails(EventDetails.builder()
-                                      .miscText(miscText)
-                                      .build())
-                    .build());
+            List<String> miscTextList = new ArrayList<>();
+            miscTextList.add(miscText);
+
+            List<Event> miscTextEvent = prepareMiscEventList(builder, caseData, miscTextList);
+            builder.miscellaneous(miscTextEvent);
         }
     }
 }

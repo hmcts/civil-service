@@ -111,21 +111,21 @@ public class RoboticsNotificationService {
     private String getSubject(CaseData caseData, String triggerEvent, boolean isMultiParty) {
         String subject = null;
         if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
-            subject = isMultiParty ? String.format("Multiparty LR v LR Case Data for %s - %s - %s",
+            subject = isMultiParty ? String.format("SDO Test Multiparty LR v LR Case Data for %s - %s - %s",
                                                 caseData.getLegacyCaseReference(),
                                                 caseData.getCcdState(), triggerEvent
             ) : String.format(
-                "LR v LR Case Data for %s",
+                "SDO Test LR v LR Case Data for %s",
                 caseData.getLegacyCaseReference()
             );
             log.info("Subject--------" + subject);
             return subject;
         } else {
-            return isMultiParty ? String.format("Multiparty claim data for %s - %s - %s",
+            return isMultiParty ? String.format("SDO Test Multiparty claim data for %s - %s - %s",
                                                 caseData.getLegacyCaseReference(),
                                                 caseData.getCcdState(), triggerEvent
             ) : String.format(
-                "Robotics case data for %s",
+                "SDO Test Robotics case data for %s",
                 caseData.getLegacyCaseReference()
             );
         }
