@@ -69,23 +69,17 @@ public class RoboticsNotificationService {
             String triggerEvent;
 
             if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
-                log.info("It's a spec case category.");
                 if (canSendEmailSpec()) {
                     RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
                     triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseData.getEvents());
-                    log.info("Event that triggered RPA: " + triggerEvent);
                     roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
-                    log.info(roboticsCaseData.toJsonString());
                 } else {
                     return Optional.empty();
                 }
             } else {
-                log.info("It's an unspec case category.");
                 RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
-                log.info("Event that triggered RPA: " + triggerEvent);
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
-                log.info(roboticsCaseData.toJsonString());
             }
             return Optional.of(EmailData.builder()
                 .message(getMessage(caseData, isMultiParty))
@@ -111,21 +105,21 @@ public class RoboticsNotificationService {
     private String getSubject(CaseData caseData, String triggerEvent, boolean isMultiParty) {
         String subject = null;
         if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
-            subject = isMultiParty ? String.format("SDO Test Multiparty LR v LR Case Data for %s - %s - %s",
+            subject = isMultiParty ? String.format("Multiparty LR v LR Case Data for %s - %s - %s",
                                                 caseData.getLegacyCaseReference(),
                                                 caseData.getCcdState(), triggerEvent
             ) : String.format(
-                "SDO Test LR v LR Case Data for %s",
+                "LR v LR Case Data for %s",
                 caseData.getLegacyCaseReference()
             );
             log.info("Subject--------" + subject);
             return subject;
         } else {
-            return isMultiParty ? String.format("SDO Test Multiparty claim data for %s - %s - %s",
+            return isMultiParty ? String.format("Multiparty claim data for %s - %s - %s",
                                                 caseData.getLegacyCaseReference(),
                                                 caseData.getCcdState(), triggerEvent
             ) : String.format(
-                "SDO Test Robotics case data for %s",
+                "Robotics case data for %s",
                 caseData.getLegacyCaseReference()
             );
         }
