@@ -78,7 +78,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
         if (respondent2OrganisationPolicy != null) {
             caseDataBuilder.respondent2OrganisationPolicy(OrganisationPolicy.builder()
                             .organisation(respondent2OrganisationPolicy.getOrganisation())
-                            .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
+                            .orgPolicyReference(respondent2OrganisationPolicy.getOrgPolicyReference())
                             .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
                             .build());
         }
