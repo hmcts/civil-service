@@ -62,6 +62,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             generalOrderDocument.addAll(generalAppCaseData.getGeneralOrderDocument());
         }
 
+
         List<Element<CaseDocument>> dismissalOrderDocument = Optional
             .ofNullable(civilCaseData.getDismissalOrderDocument())
             .orElse(newArrayList());

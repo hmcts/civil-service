@@ -96,6 +96,7 @@ public class GeneralApplication implements MappableObject {
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
         this.businessProcess = businessProcess;
+
         this.generalAppPBADetails = generalAppPBADetails;
         this.generalAppDetailsOfOrder = generalAppDetailsOfOrder;
         this.generalAppReasonsOfOrder = generalAppReasonsOfOrder;
@@ -103,6 +104,7 @@ public class GeneralApplication implements MappableObject {
         this.generalAppUrgencyRequirement = generalAppUrgencyRequirement;
         this.generalAppStatementOfTruth = generalAppStatementOfTruth;
         this.generalAppHearingDetails = generalAppHearingDetails;
+
         this.generalAppApplnSolicitor = generalAppApplnSolicitor;
         this.generalAppRespondentSolicitors = generalAppRespondentSolicitors;
         this.generalAppEvidenceDocument = generalAppEvidenceDocument;
