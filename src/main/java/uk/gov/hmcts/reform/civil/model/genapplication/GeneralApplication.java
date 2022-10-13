@@ -125,5 +125,6 @@ public class GeneralApplication implements MappableObject {
         this.locationName = locationName;
         this.applicationClosedDate = applicationClosedDate;
         this.applicationTakenOfflineDate = applicationTakenOfflineDate;
+
     }
 }

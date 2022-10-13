@@ -115,6 +115,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             .build();
     }
 
+
     private CallbackResponse gaValidateHearingScreen(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         GAHearingDetails hearingDetails = caseData.getGeneralAppHearingDetails();
