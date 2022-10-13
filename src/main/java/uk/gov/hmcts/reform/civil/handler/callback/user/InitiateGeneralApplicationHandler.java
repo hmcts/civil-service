@@ -115,6 +115,12 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         } else {
             caseDataBuilder.generalAppVaryJudgementType(YesOrNo.NO);
         }
+
+        if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.ADJOURN_VACATE_HEARING)) {
+            caseDataBuilder.generalAppAdjournVacateType(YesOrNo.YES);
+        } else {
+            caseDataBuilder.generalAppAdjournVacateType(YesOrNo.NO);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();

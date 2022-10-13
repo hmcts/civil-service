@@ -56,6 +56,7 @@ public class GeneralApplication implements MappableObject {
     private final LocalDateTime applicationTakenOfflineDate;
     private final YesOrNo generalAppVaryJudgementType;
     private final Document generalAppN245FormUpload;
+    private final YesOrNo generalAppAdjournVacateType;
 
     @JsonCreator
     GeneralApplication(@JsonProperty("generalApplicationState") String generalApplicationState,
@@ -94,7 +95,8 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("applicationClosedDate") LocalDateTime applicationClosedDate,
                        @JsonProperty("applicationTakenOfflineDate") LocalDateTime applicationTakenOfflineDate,
                        @JsonProperty("generalAppVaryJudgementType") YesOrNo generalAppVaryJudgementType,
-                       @JsonProperty("generalAppN245FormUpload") Document generalAppN245FormUpload) {
+                       @JsonProperty("generalAppN245FormUpload") Document generalAppN245FormUpload,
+                       @JsonProperty("generalAppAdjournVacateType") YesOrNo generalAppAdjournVacateType) {
 
         this.generalApplicationState = generalApplicationState;
         this.generalAppType = generalAppType;
@@ -131,5 +133,6 @@ public class GeneralApplication implements MappableObject {
         this.applicationTakenOfflineDate = applicationTakenOfflineDate;
         this.generalAppVaryJudgementType = generalAppVaryJudgementType;
         this.generalAppN245FormUpload = generalAppN245FormUpload;
+        this.generalAppAdjournVacateType = generalAppAdjournVacateType;
     }
 }
