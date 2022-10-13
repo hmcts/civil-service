@@ -93,10 +93,6 @@ resource "azurerm_key_vault_secret" "civil_db_password__v11_secret" {
   ]
 }
 
-data "azurerm_key_vault" "ethos_vault" {
-  name                = "ethos-${var.env}"
-  resource_group_name = "ethos-repl-docmosis-backend-${var.env}"
-}
 
 data "azurerm_key_vault_secret" "tornado_access_secret" {
   key_vault_id = "${data.azurerm_key_vault.ethos_vault.id}"
