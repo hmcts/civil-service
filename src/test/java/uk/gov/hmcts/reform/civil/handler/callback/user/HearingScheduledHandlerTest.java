@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
+import uk.gov.hmcts.reform.civil.enums.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -164,7 +164,7 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getHearingFee()).isEqualTo(
-                Fee.builder().calculatedAmountInPence(new BigDecimal(545)).build());
+                Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
         }
 
         @Test
@@ -183,7 +183,7 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getHearingFee()).isEqualTo(
-                Fee.builder().calculatedAmountInPence(new BigDecimal(1175)).build());
+                Fee.builder().calculatedAmountInPence(new BigDecimal(117500)).build());
         }
 
         @Test
@@ -202,7 +202,7 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getHearingFee()).isEqualTo(
-                Fee.builder().calculatedAmountInPence(new BigDecimal(27)).build());
+                Fee.builder().calculatedAmountInPence(new BigDecimal(2700)).build());
         }
     }
 
@@ -231,5 +231,3 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 }
-
-

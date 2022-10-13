@@ -11,8 +11,8 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.enums.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -103,8 +103,8 @@ public class HearingScheduledHandler extends CallbackHandler {
 
     private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
         return fromList(locations.stream().map(location -> new StringBuilder().append(location.getSiteName())
-                                 .append(" - ").append(location.getCourtAddress())
-                                .append(" - ").append(location.getPostcode()).toString())
+                .append(" - ").append(location.getCourtAddress())
+                .append(" - ").append(location.getPostcode()).toString())
                             .collect(Collectors.toList()));
     }
 
