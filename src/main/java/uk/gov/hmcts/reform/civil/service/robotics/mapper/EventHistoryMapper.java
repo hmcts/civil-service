@@ -1992,7 +1992,6 @@ public class EventHistoryMapper {
                                   CaseData caseData) {
 
         if (featureToggleService.isSDOEnabled()) {
-
             String miscText = left(format(
                 "RPA Reason: Case proceeds offline. "
                     + "Judge / Legal Advisor did not draw a Direction's Order: %s",
