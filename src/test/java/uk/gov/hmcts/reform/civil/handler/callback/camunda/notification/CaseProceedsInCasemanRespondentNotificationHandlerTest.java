@@ -98,19 +98,6 @@ class CaseProceedsInCasemanRespondentNotificationHandlerTest extends BaseCallbac
             verify(notificationService, never()).sendMail(anyString(), anyString(), anyMap(), anyString());
         }
 
-        @Test
-        void shouldNotNotifyRespondentSolicitor_whenSpecFlowStateHasNotTransitionedToClaimNotified() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            when(stateFlowEngine.hasTransitionedTo(params.getRequest().getCaseDetails(), CLAIM_NOTIFIED))
-                .thenReturn(false);
-
-            handler.handle(params);
-
-            verify(notificationService, never()).sendMail(anyString(), anyString(), anyMap(), anyString());
-        }
-
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
