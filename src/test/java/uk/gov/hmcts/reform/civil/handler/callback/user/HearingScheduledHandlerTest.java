@@ -13,25 +13,34 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.bankholidays.PublicHolidaysCollection;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -50,6 +59,8 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     private LocationRefDataService locationRefDataService;
     @MockBean
     private HearingReferenceNumberRepository hearingReferenceNumberRepository;
+    @MockBean
+    private PublicHolidaysCollection publicHolidaysCollection;
 
     @Nested
     class MidEventCheckLocationListCallback {
@@ -135,6 +146,67 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class AboutToSubmitCallback {
+
+        @Test
+        void shouldGetDueDateAndFeeSmallClaim_whenAboutToSubmit() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .addRespondent2(NO)
+                .listingOrRelisting(ListingOrRelisting.LISTING)
+                .hearingDate(LocalDate.now().plusWeeks(2))
+                .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            Set<LocalDate> publicHolidays = new HashSet<>();
+            publicHolidays.add(LocalDate.now().plusDays(3));
+            when(publicHolidaysCollection.getPublicHolidays()).thenReturn(publicHolidays);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getHearingFee()).isEqualTo(
+                Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
+        }
+
+        @Test
+        void shouldGetDueDateAndFeeMultiClaim_whenAboutToSubmit() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .addRespondent2(NO)
+                .listingOrRelisting(ListingOrRelisting.LISTING)
+                .hearingDate(LocalDate.now().plusWeeks(5))
+                .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            Set<LocalDate> publicHolidays = new HashSet<>();
+            publicHolidays.add(LocalDate.now().plusDays(3));
+            when(publicHolidaysCollection.getPublicHolidays()).thenReturn(publicHolidays);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getHearingFee()).isEqualTo(
+                Fee.builder().calculatedAmountInPence(new BigDecimal(117500)).build());
+        }
+
+        @Test
+        void shouldGetDueDateAndFeeFastClaim_whenAboutToSubmit() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .addRespondent2(NO)
+                .listingOrRelisting(ListingOrRelisting.LISTING)
+                .hearingDate(LocalDate.now().plusWeeks(5))
+                .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+                .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            Set<LocalDate> publicHolidays = new HashSet<>();
+            publicHolidays.add(LocalDate.now().plusDays(3));
+            when(publicHolidaysCollection.getPublicHolidays()).thenReturn(publicHolidays);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getHearingFee()).isEqualTo(
+                Fee.builder().calculatedAmountInPence(new BigDecimal(2700)).build());
+        }
+    }
+
+    @Nested
     class SubmittedCallback {
 
         @Test
@@ -159,5 +231,3 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 }
-
-
