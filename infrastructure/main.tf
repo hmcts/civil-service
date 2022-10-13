@@ -92,4 +92,3 @@ resource "azurerm_key_vault_secret" "civil_db_password__v11_secret" {
     module.key-vault
   ]
 }
-
