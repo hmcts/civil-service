@@ -71,7 +71,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final Time time;
     private final FeatureToggleService featureToggleService;
     private final LocationRefDataService locationRefDataService;
-    private final LocationHelper locationHelper = new LocationHelper();
+    private final LocationHelper locationHelper;
 
     @Override
     public List<CaseEvent> handledEvents() {

@@ -61,7 +61,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final List<RespondToResponseConfirmationTextGenerator> confirmationTextGenerators;
     private final FeatureToggleService featureToggleService;
     private final LocationRefDataService locationRefDataService;
-    private final LocationHelper locationHelper = new LocationHelper();
+    private final LocationHelper locationHelpers
 
     @Override
     public List<CaseEvent> handledEvents() {
