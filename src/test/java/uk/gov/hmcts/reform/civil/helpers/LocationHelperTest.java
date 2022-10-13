@@ -6,7 +6,6 @@ import org.mockito.Mockito;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
-
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -25,7 +24,6 @@ public class LocationHelperTest {
 
     private final FeatureToggleService featureToggleService = Mockito.mock(FeatureToggleService.class);
     private final LocationHelper helper = new LocationHelper(featureToggleService);
-
 
     @Test
     public void thereIsAMatchingLocationByCode() {
