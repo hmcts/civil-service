@@ -273,15 +273,14 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 .build();
         }
 
-        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
-            AboutToStartOrSubmitCallbackResponse.builder()
-                .data(builder.build().toMap(objectMapper));
-
         if (v1 && featureToggleService.isSdoEnabled()) {
-            response.state(CaseState.JUDICIAL_REFERRAL.name());
+            AboutToStartOrSubmitCallbackResponse.builder()
+                .data(builder.build().toMap(objectMapper))
+                .state(CaseState.JUDICIAL_REFERRAL.name())
+                .build();
         }
 
-        return response.build();
+        return response;
     }
 
     private void updateCaseManagementLocation(CallbackParams callbackParams,
