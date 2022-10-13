@@ -433,7 +433,6 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
-                NotSuitable_SDO,
                 CREATE_SDO,
                 NotSuitable_SDO,
                 REFER_TO_JUDGE,

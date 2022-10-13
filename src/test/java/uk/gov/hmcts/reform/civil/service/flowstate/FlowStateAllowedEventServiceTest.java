@@ -471,8 +471,8 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
-                        CREATE_SDO,
                         NotSuitable_SDO,
+                        CREATE_SDO,
                         REFER_TO_JUDGE,
                         APPLICATION_CLOSED_UPDATE_CLAIM,
                     }
