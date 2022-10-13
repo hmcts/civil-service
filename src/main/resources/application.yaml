@@ -183,9 +183,9 @@ notifications:
   respondentLipFullDefenceWithMediationTemplate: "2177f3b0-3833-4788-bd7f-a473e32950af"
   respondentLipFullDefenceNoMediationTemplate: "8825e67e-44a2-444d-afd0-3fa6c34af373"
 
-  hearingListedFeeClaimantLegalRep: "193b245b-63fd-4a02-93b6-1acfb6e99fe5"
-  hearingListedNoFeeClaimantLegalRep: "03763ce1-de17-4a9a-b1c6-d2e9ccffe9d7"
-  hearingListedNoFeeDefendantLegalRep: "81216268-36e6-4e0e-b510-24067ad32f24"
+  hearingListedFeeClaimantLrTemplate: "193b245b-63fd-4a02-93b6-1acfb6e99fe5"
+  hearingListedNoFeeClaimantLrTemplate: "03763ce1-de17-4a9a-b1c6-d2e9ccffe9d7"
+  hearingListedNoFeeDefendantLrTemplate;: "81216268-36e6-4e0e-b510-24067ad32f24"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}

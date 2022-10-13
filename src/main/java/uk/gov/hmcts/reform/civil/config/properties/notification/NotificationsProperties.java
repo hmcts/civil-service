@@ -166,15 +166,12 @@ public class NotificationsProperties {
     private String respondentLipFullDefenceNoMediationTemplate;
 
     @NotEmpty
-    private String notificationOfHearing;
+    private String hearingListedFeeClaimantLrTemplate;
 
     @NotEmpty
-    private String hearingListedFeeClaimantLegalRep;
+    private String hearingListedNoFeeClaimantLrTemplate;
 
     @NotEmpty
-    private String hearingListedNoFeeClaimantLegalRep;
-
-    @NotEmpty
-    private String hearingListedNoFeeDefendantLegalRep;
+    private String hearingListedNoFeeDefendantLrTemplate;
 
 }
