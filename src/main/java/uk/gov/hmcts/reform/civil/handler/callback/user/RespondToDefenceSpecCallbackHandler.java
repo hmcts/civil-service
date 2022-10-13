@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
@@ -61,7 +62,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final List<RespondToResponseConfirmationTextGenerator> confirmationTextGenerators;
     private final FeatureToggleService featureToggleService;
     private final LocationRefDataService locationRefDataService;
-    private final LocationHelper locationHelpers;
+    private final LocationHelper locationHelper;
 
     @Override
     public List<CaseEvent> handledEvents() {
