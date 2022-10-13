@@ -34,6 +34,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UPDATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
@@ -69,6 +71,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_I
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
@@ -360,7 +363,8 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO
+                        NotSuitable_SDO,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
@@ -375,7 +379,8 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO
+                        NotSuitable_SDO,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
@@ -390,7 +395,8 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO
+                        NotSuitable_SDO,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
@@ -405,7 +411,14 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO
+                        NotSuitable_SDO,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM
+                    }
+                ),
+                of(
+                    DIVERGENT_RESPOND_GO_OFFLINE,
+                    new CaseEvent[]{
+                        APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
@@ -448,6 +461,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        APPLICATION_CLOSED_UPDATE_CLAIM,
                         REFER_TO_JUDGE
                     }
                 ),
@@ -459,13 +473,14 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
-                        REFER_TO_JUDGE
+                        REFER_TO_JUDGE,
+                        APPLICATION_CLOSED_UPDATE_CLAIM,
                     }
                 ),
                 of(
                     PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[]{
-                        TAKE_CASE_OFFLINE
+                        TAKE_CASE_OFFLINE, APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
@@ -499,43 +514,43 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     TAKEN_OFFLINE_BY_STAFF,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_UNREGISTERED_DEFENDANT,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 )
             );
