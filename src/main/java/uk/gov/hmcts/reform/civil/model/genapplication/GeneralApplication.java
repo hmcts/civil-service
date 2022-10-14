@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -57,7 +56,7 @@ public class GeneralApplication implements MappableObject {
     private final LocalDateTime applicationTakenOfflineDate;
     private final YesOrNo generalAppVaryJudgementType;
     private final Document generalAppN245FormUpload;
-    private final LocalDate generalAppHearingDate;
+    private final GAHearingDateGAspec generalAppHearingDate;
 
     @JsonCreator
     GeneralApplication(@JsonProperty("generalApplicationState") String generalApplicationState,
@@ -97,7 +96,7 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("applicationTakenOfflineDate") LocalDateTime applicationTakenOfflineDate,
                        @JsonProperty("generalAppVaryJudgementType") YesOrNo generalAppVaryJudgementType,
                        @JsonProperty("generalAppN245FormUpload") Document generalAppN245FormUpload,
-                       @JsonProperty("generalAppHearingDate") LocalDate generalAppHearingDate) {
+                       @JsonProperty("generalAppHearingDate") GAHearingDateGAspec generalAppHearingDate) {
 
         this.generalApplicationState = generalApplicationState;
         this.generalAppType = generalAppType;
