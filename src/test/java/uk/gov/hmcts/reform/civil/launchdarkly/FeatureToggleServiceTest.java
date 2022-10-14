@@ -104,15 +104,6 @@ class FeatureToggleServiceTest {
         verifyBoolVariationCalled(courtLocationDynamicListKey, List.of("timestamp", "environment"));
     }
 
-//    @Test
-//    void shouldCallBoolVariation_whenIsGeneralApplicationsEnabledInvoked() {
-//        var generalApplicationsKey = "general_applications_enabled";
-//        givenToggle(generalApplicationsKey, true);
-//
-//        assertThat(featureToggleService.isGeneralApplicationsEnabled()).isTrue();
-//        verifyBoolVariationCalled(generalApplicationsKey, List.of("timestamp", "environment"));
-//    }
-
     @Test
     void shouldCallBoolVariation_whenIsPinInPostEnabledInvoked() {
         var pinInPostKey = "pin-in-post";
