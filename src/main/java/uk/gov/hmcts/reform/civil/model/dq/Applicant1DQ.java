@@ -107,7 +107,15 @@ public class Applicant1DQ implements DQ {
     @Override
     @JsonProperty("applicant1DQRequestedCourt")
     public RequestedCourt getRequestedCourt() {
-        return applicant1DQRequestedCourt;
+
+        if (applicant1DQRequestedCourt != null) {
+            return RequestedCourt.builder()
+                .requestHearingAtSpecificCourt(applicant1DQRequestedCourt.getRequestHearingAtSpecificCourt())
+                .responseCourtCode(applicant1DQRequestedCourt.getResponseCourtCode())
+                .reasonForHearingAtSpecificCourt(applicant1DQRequestedCourt.getReasonForHearingAtSpecificCourt())
+                .build();
+        }
+        return null;
     }
 
     @Override
