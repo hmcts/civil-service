@@ -1305,6 +1305,17 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder courtLocation() {
+        this.courtLocation = CourtLocation.builder()
+            .applicantPreferredCourt("127")
+            .caseLocation(CaseLocation.builder()
+                              .region("regionId1")
+                              .baseLocation("epimmsId1")
+                              .build())
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimDraft() {
         solicitorReferences = SolicitorReferences.builder()
             .applicantSolicitor1Reference("12345")
