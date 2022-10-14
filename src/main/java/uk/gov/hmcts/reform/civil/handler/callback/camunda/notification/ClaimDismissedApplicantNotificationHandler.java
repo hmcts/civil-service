@@ -54,6 +54,49 @@ public class ClaimDismissedApplicantNotificationHandler extends CallbackHandler
     private CallbackResponse notifyApplicantSolicitorForClaimDismissed(
         CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        String solicitorClaimDismissedProperty = null;
+
+        notificationService.sendMail(
+            caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            notificationsProperties.getSolicitorClaimDismissed(),
+            addProperties(caseData),
+            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+        );
+
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private CallbackResponse notifyApplicantSolicitorForClaimDismissedWithin4Months(
+        CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        notificationService.sendMail(
+            caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            notificationsProperties.getSolicitorClaimDismissed(),
+            addProperties(caseData),
+            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+        );
+
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private CallbackResponse notifyApplicantSolicitorForClaimDismissedWithin14Days(
+        CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        notificationService.sendMail(
+            caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            notificationsProperties.getSolicitorClaimDismissed(),
+            addProperties(caseData),
+            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+        );
+
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private CallbackResponse notifyApplicantSolicitorForClaimDismissedWithinDeadline(
+        CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
