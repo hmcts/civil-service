@@ -201,6 +201,13 @@ http:
   client:
     readTimeout: ${REST_TEMPLATE_TIMEOUT:30000}
 
+court-location:
+  specified-claim:
+    region-id: "2"
+    epimms-id: "420219"
+  unspecified-claim:
+    region-id: "4"
+    epimms-id: "192280"
 
 launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:}
