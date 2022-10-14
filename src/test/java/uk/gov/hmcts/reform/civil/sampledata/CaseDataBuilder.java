@@ -2665,7 +2665,7 @@ public class CaseDataBuilder {
         hearingDate = LocalDate.now().plusWeeks(5).plusDays(6);
         ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
 
-        if (mpScenario == ONE_V_TWO_TWO_LEGAL_REP){
+        if (mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             solicitorReferences = SolicitorReferences.builder()
                 .applicantSolicitor1Reference("123456")
                 .respondentSolicitor1Reference("123456")
@@ -2673,6 +2673,13 @@ public class CaseDataBuilder {
             return this;
         }
 
+        return this;
+    }
+
+    public CaseDataBuilder atStateTrialReadyCheck() {
+        atStateHearingFeeDuePaid();
+        ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
+        hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
         return this;
     }
 
@@ -2947,12 +2954,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateTrialReadyCheck() {
-        atStateHearingFeeDuePaid();
-        ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
-        hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
-        return this;
-    }
+
 
     public CaseDataBuilder businessProcess(BusinessProcess businessProcess) {
         this.businessProcess = businessProcess;
