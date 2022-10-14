@@ -19,7 +19,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_TRIAL_READY;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_TRIAL_READY;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.addTrialOrHearing;
 
 @Service
 @RequiredArgsConstructor
@@ -67,22 +67,40 @@ public class TrialReadyRespondentNotificationHandler extends CallbackHandler imp
         notificationService.sendMail(
             respondentEmail,
             notificationsProperties.getSolicitorTrialReady(),
-            addProperties(caseData),
+            isForRespondentSolicitor1(callbackParams) ? addPropertiesRep1(caseData) : addPropertiesRep2(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    @Override
-    public Map<String, String> addProperties(CaseData caseData) {
+    public Map<String, String> addPropertiesRep2(CaseData caseData) {
+
         return Map.of(
+            HEARING_OR_TRIAL, addTrialOrHearing(caseData),
+            HEARING_DATE, caseData.getHearingDate().toString(),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_REFERENCES, buildPartiesReferences(caseData)
+            CLAIMANT_DEFENDANT_REFERENCE, caseData.getSolicitorReferences().getRespondentSolicitor2Reference()
         );
+    }
+
+    public Map<String, String> addPropertiesRep1(CaseData caseData) {
+
+        return Map.of(
+            HEARING_OR_TRIAL, addTrialOrHearing(caseData),
+            HEARING_DATE, caseData.getHearingDate().toString(),
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIMANT_DEFENDANT_REFERENCE, caseData.getSolicitorReferences().getRespondentSolicitor1Reference()
+        );
+
     }
 
     private boolean isForRespondentSolicitor1(CallbackParams callbackParams) {
         return callbackParams.getRequest().getEventId()
             .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_TRIAL_READY.name());
+    }
+
+    @Override
+    public Map<String, String> addProperties(CaseData caseData) {
+        return null;
     }
 }

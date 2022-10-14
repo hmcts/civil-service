@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import org.apache.commons.lang.StringUtils;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -126,6 +127,47 @@ public class PartyUtils {
                 stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference());
             });
 
+        return stringBuilder.toString();
+    }
+
+    public static String addTrialOrHearing(CaseData caseData) {
+
+        if (caseData.getAllocatedTrack() == AllocatedTrack.FAST_CLAIM) {
+            return "trial";
+        } else {
+            return "hearing";
+        }
+    }
+
+    public static String buildClaimantReferenceOnly(CaseData caseData) {
+        SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getApplicantSolicitor1Reference)
+            .ifPresent(ref -> {
+                stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference());
+            });
+
+        return stringBuilder.toString();
+    }
+
+    public static String buildRespondentReference(CaseData caseData, boolean isRespondentSolicitorNumber2) {
+        SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        if (!isRespondentSolicitorNumber2) {
+            Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
+                .ifPresent(ref -> {
+                    stringBuilder.append(solicitorReferences.getRespondentSolicitor1Reference());
+                });
+        }
+
+        if (isRespondentSolicitorNumber2) {
+            Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor2Reference)
+                .ifPresent(ref -> {
+                    stringBuilder.append(solicitorReferences.getRespondentSolicitor2Reference());
+                });
+        }
         return stringBuilder.toString();
     }
 

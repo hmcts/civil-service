@@ -17,9 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_TRIAL_READY;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @Service
 @RequiredArgsConstructor
@@ -65,19 +63,19 @@ public class TrialReadyApplicantNotificationHandler extends CallbackHandler impl
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            ALLOCATED_TRACK, addTrialOrHearing(caseData),
+            HEARING_OR_TRIAL, addTrialOrHearing(caseData),
+            HEARING_DATE, caseData.getHearingDate().toString(),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_REFERENCES, buildPartiesReferences(caseData)
+            CLAIMANT_DEFENDANT_REFERENCE, caseData.getSolicitorReferences().getApplicantSolicitor1Reference()
         );
     }
 
     public String addTrialOrHearing(CaseData caseData) {
-        String trialOrHearing = "";
 
         if (caseData.getAllocatedTrack() == AllocatedTrack.FAST_CLAIM) {
-            trialOrHearing = "trial";
-        } else if (caseData.getAllocatedTrack() == AllocatedTrack.SMALL_CLAIM) {
-            trialOrHearing = "hearing";
+            return "trial";
+        } else {
+            return "hearing";
         }
     }
 }

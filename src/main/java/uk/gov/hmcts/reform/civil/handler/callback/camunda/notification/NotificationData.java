@@ -53,7 +53,8 @@ public interface NotificationData {
 
     //Case Progression
     String HEARING_DATE = "hearingDate";
-
+    String HEARING_OR_TRIAL = "hearing/trial";
+    String CLAIMANT_DEFENDANT_REFERENCE = "claimant/defendantReferenceNumber";
 
     Map<String, String> addProperties(CaseData caseData);
 
