@@ -114,7 +114,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final GAHearingDetails generalAppHearingDetails;
     private final GASolicitorDetailsGAspec generalAppApplnSolicitor;
     private final YesOrNo generalAppVaryJudgementType;
-    private final YesOrNo generalAppAdjournVacateType;
+    private final LocalDate generalAppHearingDate;
     private final Document generalAppN245FormUpload;
 
     @Builder.Default

@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,10 +51,12 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private static final String VALIDATE_URGENCY_DATE_PAGE = "ga-validate-urgency-date";
     private static final String VALIDATE_GA_TYPE = "ga-validate-type";
     private static final String VALIDATE_N245_FORM_NAME = "ga-validate-n245form-name";
+    private static final String VALIDATE_HEARING_DATE = "ga-validate-hearing-date";
     private static final String VALIDATE_HEARING_PAGE = "ga-hearing-screen-validation";
     private static final String N245_FILE_NAME = "Statement of incomings and outgoings";
     private static final String N245_FILE_NAME_ERROR = "File should be named "
         + "as \"Statement of incomings and outgoings\"";
+    private static final String INVALID_DATE = "Date should be in future";
     private static final String SET_FEES_AND_PBA = "ga-fees-and-pba";
     private static final String POUND_SYMBOL = "£";
     private static final List<CaseEvent> EVENTS = Collections.singletonList(INITIATE_GENERAL_APPLICATION);
@@ -71,6 +74,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::aboutToStartValidattionAndSetup,
             callbackKey(MID, VALIDATE_GA_TYPE), this::gaValidateType,
+            callbackKey(MID, VALIDATE_HEARING_DATE), this::gaValidateHearingDate,
             callbackKey(MID, VALIDATE_N245_FORM_NAME), this::gaValidateN245FormName,
             callbackKey(MID, VALIDATE_URGENCY_DATE_PAGE), this::gaValidateUrgencyDate,
             callbackKey(MID, VALIDATE_HEARING_PAGE), this::gaValidateHearingScreen,
@@ -116,13 +120,21 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             caseDataBuilder.generalAppVaryJudgementType(YesOrNo.NO);
         }
 
-        if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.ADJOURN_VACATE_HEARING)) {
-            caseDataBuilder.generalAppAdjournVacateType(YesOrNo.YES);
-        } else {
-            caseDataBuilder.generalAppAdjournVacateType(YesOrNo.NO);
-        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse gaValidateHearingDate(CallbackParams callbackParams) {
+        List<String> errors = new ArrayList<>();
+
+        CaseData caseData = callbackParams.getCaseData();
+        if (caseData.getGeneralAppHearingDate().isBefore(LocalDate.now())) {
+            errors.add(INVALID_DATE);
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
             .build();
     }
 
