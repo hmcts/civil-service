@@ -2954,8 +2954,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-
-
     public CaseDataBuilder businessProcess(BusinessProcess businessProcess) {
         this.businessProcess = businessProcess;
         return this;
