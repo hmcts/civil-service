@@ -65,7 +65,7 @@ public class FeatureToggleService {
     }
 
     public boolean isGeneralApplicationsEnabled() {
-        return true;
+        return internalClient.boolVariation("general_applications_enabled", createLDUser().build(), false);
     }
 
     public LDUser.Builder createLDUser() {
