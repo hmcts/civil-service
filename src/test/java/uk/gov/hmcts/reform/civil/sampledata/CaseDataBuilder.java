@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
+import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -80,6 +81,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
@@ -91,6 +93,7 @@ import java.util.List;
 
 import static java.time.LocalDate.now;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
@@ -99,6 +102,9 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.PersonalInjuryType.ROAD_ACCIDENT;
@@ -151,6 +157,7 @@ public class CaseDataBuilder {
     protected String paymentReference;
     protected String legacyCaseReference;
     protected AllocatedTrack allocatedTrack;
+    protected String responseClaimTrack;
     protected CaseState ccdState;
     protected List<Element<CaseDocument>> systemGeneratedCaseDocuments;
     protected PaymentDetails claimIssuedPaymentDetails;
@@ -241,6 +248,7 @@ public class CaseDataBuilder {
     protected LocalDateTime applicant2ResponseDate;
     protected LocalDateTime takenOfflineDate;
     protected LocalDateTime takenOfflineByStaffDate;
+    protected LocalDateTime unsuitableSDODate;
     protected LocalDateTime claimDismissedDate;
     private InterestClaimOptions interestClaimOptions;
     private YesOrNo claimInterest;
@@ -267,15 +275,21 @@ public class CaseDataBuilder {
     private List<IdValue<Bundle>> caseBundles;
     private RespondToClaim respondToClaim;
     private RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
+    private YesOrNo defendantSingleResponseToBothClaimants;
     private RespondentResponseTypeSpec respondent2ClaimResponseTypeForSpec;
     private UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
     private RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec;
     private Respondent1EmployerDetailsLRspec responseClaimAdmitPartEmployer;
+    private YesOrNo respondent1MediationRequired;
+    private YesOrNo respondent2MediationRequired;
     private PartnerAndDependentsLRspec respondent1PartnerAndDependent;
     private PartnerAndDependentsLRspec respondent2PartnerAndDependent;
+    private ReasonNotSuitableSDO reasonNotSuitableSDO;
     private RepaymentPlanLRspec respondent1RepaymentPlan;
     private RepaymentPlanLRspec respondent2RepaymentPlan;
     private YesOrNo applicantsProceedIntention;
+    private SmallClaimMedicalLRspec applicant1ClaimMediationSpecRequired;
+    private SmallClaimMedicalLRspec applicantMPClaimMediationSpecRequired;
     private YesOrNo specAoSApplicantCorrespondenceAddressRequired;
     private Address specAoSApplicantCorrespondenceAddressDetails;
     private YesOrNo specAoSRespondent2HomeAddressRequired;
@@ -942,6 +956,8 @@ public class CaseDataBuilder {
                 return atStateTakenOfflinePastApplicantResponseDeadline();
             case CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE:
                 return atStateClaimDismissedPastClaimNotificationDeadline();
+            case TAKEN_OFFLINE_SDO_NOT_DRAWN:
+                return atStateTakenOfflineSDONotDrawn(mpScenario);
             default:
                 throw new IllegalArgumentException("Invalid internal state: " + flowState);
         }
@@ -2687,6 +2703,19 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atState1v2DifferentSolicitorDivergentResponseSpec(
+                                                                    RespondentResponseTypeSpec respondent1Response,
+                                                                    RespondentResponseTypeSpec respondent2Response) {
+        atStateNotificationAcknowledged();
+        respondent1ClaimResponseTypeForSpec = respondent1Response;
+        respondent2RespondsSpec(respondent2Response);
+        respondent1ResponseDate = LocalDateTime.now().plusDays(1);
+        respondentResponseIsSame(NO);
+        respondent2ResponseDate = respondent1ResponseDate;
+        applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
+        return this;
+    }
+
     public CaseDataBuilder respondent2RespondsSpec(RespondentResponseTypeSpec responseType) {
         this.respondent2ClaimResponseTypeForSpec = responseType;
         this.respondent2ResponseDate = LocalDateTime.now().plusDays(1);
@@ -2749,6 +2778,27 @@ public class CaseDataBuilder {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         respondent1ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
         respondent1ClaimResponseTypeToApplicant2 = RespondentResponseType.FULL_DEFENCE;
+        applicant1ProceedWithClaimMultiParty2v1 = YES;
+        applicant2ProceedWithClaimMultiParty2v1 = YES;
+
+        applicant1DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response-1.pdf").build())
+            .build();
+        applicant1DQ();
+        applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
+        applicant2DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response-1.pdf").build())
+            .build();
+        applicant2DQ();
+        applicant2ResponseDate = respondent1ResponseDate.plusDays(1);
+        uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateBothApplicantsRespondToDefenceAndProceed_2v1_SPEC() {
+        atStateRespondentFullDefenceAfterNotificationAcknowledgement();
+        defendantSingleResponseToBothClaimants = YES;
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
         applicant1ProceedWithClaimMultiParty2v1 = YES;
         applicant2ProceedWithClaimMultiParty2v1 = YES;
 
@@ -2927,6 +2977,51 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateTakenOfflinePastApplicantResponseDeadline() {
         atStatePastApplicantResponseDeadline();
         takenOfflineDate = respondent1ResponseDate.plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflineSDONotDrawn(MultiPartyScenario mpScenario) {
+
+        atStateApplicantRespondToDefenceAndProceed(mpScenario);
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP) {
+            atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2();
+        } else if (mpScenario == TWO_V_ONE) {
+            atStateBothApplicantsRespondToDefenceAndProceed_2v1();
+        }
+
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
+                                                   .input("unforeseen complexities")
+                                                   .build();
+        unsuitableSDODate = applicant1ResponseDate.plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateApplicantProceedAllMediation(MultiPartyScenario mpScenario) {
+
+        applicant1ClaimMediationSpecRequired = new SmallClaimMedicalLRspec(YES);
+        applicantMPClaimMediationSpecRequired = new SmallClaimMedicalLRspec(YES);
+        respondent1MediationRequired = YES;
+        respondent2MediationRequired = YES;
+        responseClaimTrack = SMALL_CLAIM.name();
+        superClaimType = SPEC_CLAIM;
+
+        atStateApplicantRespondToDefenceAndProceed(mpScenario);
+
+        if (mpScenario == ONE_V_ONE) {
+            atStateRespondentFullDefenceSpec();
+        } else if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP) {
+            atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2();
+            atStateRespondentFullDefenceSpec();
+        } else if (mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2();
+            atState1v2DifferentSolicitorDivergentResponseSpec(RespondentResponseTypeSpec.FULL_DEFENCE,
+                                                              RespondentResponseTypeSpec.FULL_DEFENCE);
+        } else if (mpScenario == TWO_V_ONE) {
+            applicant1ProceedWithClaimSpec2v1 = YES;
+            atStateBothApplicantsRespondToDefenceAndProceed_2v1_SPEC();
+        }
+
         return this;
     }
 
@@ -3340,6 +3435,7 @@ public class CaseDataBuilder {
             .applicant1ResponseDeadline(applicant1ResponseDeadline)
             .takenOfflineDate(takenOfflineDate)
             .takenOfflineByStaffDate(takenOfflineByStaffDate)
+            .unsuitableSDODate(unsuitableSDODate)
             .claimDismissedDate(claimDismissedDate)
             .addLegalRepDeadline(addLegalRepDeadline)
             .applicantSolicitor1ServiceAddress(applicantSolicitor1ServiceAddress)
@@ -3379,6 +3475,11 @@ public class CaseDataBuilder {
             .claimant2ClaimResponseTypeForSpec(claimant2ClaimResponseTypeForSpec)
             .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
             .respondent2ClaimResponseTypeForSpec(respondent2ClaimResponseTypeForSpec)
+            .responseClaimTrack(responseClaimTrack)
+            .applicant1ClaimMediationSpecRequired(applicant1ClaimMediationSpecRequired)
+            .applicantMPClaimMediationSpecRequired(applicantMPClaimMediationSpecRequired)
+            .responseClaimMediationSpecRequired(respondent1MediationRequired)
+            .responseClaimMediationSpec2Required(respondent1MediationRequired)
             .respondentSolicitor2Reference(respondentSolicitor2Reference)
             .claimant1ClaimResponseTypeForSpec(claimant1ClaimResponseTypeForSpec)
             .claimant2ClaimResponseTypeForSpec(claimant2ClaimResponseTypeForSpec)
@@ -3395,6 +3496,7 @@ public class CaseDataBuilder {
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
             .specRespondent1Represented(specRespondent1Represented)
             .specRespondent2Represented(specRespondent2Represented)
+            .defendantSingleResponseToBothClaimants(defendantSingleResponseToBothClaimants)
             .breathing(breathing)
             .caseManagementOrderSelection(caseManagementOrderSelection)
             .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
@@ -3406,6 +3508,8 @@ public class CaseDataBuilder {
             .trialHearingTrialDJ(trialHearingTrialDJ)
             .disposalHearingJudgesRecitalDJ(disposalHearingJudgesRecitalDJ)
             .trialHearingJudgesRecitalDJ(trialHearingJudgesRecitalDJ)
+            //Unsuitable for SDO
+            .reasonNotSuitableSDO(reasonNotSuitableSDO)
             .build();
     }
 }
