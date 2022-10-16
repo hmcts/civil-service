@@ -125,6 +125,12 @@ public class Respondent1DQ implements DQ {
             Optional<RequestedCourt> optRespondentDQ = Optional.ofNullable(this.respondent1DQRequestedCourt);
             Optional<RequestedCourt> optRespond = Optional.ofNullable(this.respondToCourtLocation);
 
+            YesOrNo requestHearingAtSpecificCourt = Stream.of(
+                optRespondentDQ.map(RequestedCourt::getRequestHearingAtSpecificCourt),
+                Optional.ofNullable(responseClaimCourtLocationRequired),
+                optRespond.map(RequestedCourt::getRequestHearingAtSpecificCourt)
+            ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(YesOrNo.NO);
+
             String responseCourtCode = Stream.of(
                 optRespondentDQ.map(RequestedCourt::getResponseCourtCode),
                 optRespond.map(RequestedCourt::getResponseCourtCode)
@@ -135,9 +141,17 @@ public class Respondent1DQ implements DQ {
                 optRespond.map(RequestedCourt::getReasonForHearingAtSpecificCourt)
             ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
 
-            return RequestedCourt.builder()
+            RequestedCourt.RequestedCourtBuilder copyBuilder = RequestedCourt.builder()
+                .requestHearingAtSpecificCourt(requestHearingAtSpecificCourt)
                 .responseCourtCode(responseCourtCode)
-                .reasonForHearingAtSpecificCourt(reasonForHearingAtSpecificCourt)
+                .reasonForHearingAtSpecificCourt(reasonForHearingAtSpecificCourt);
+
+            Stream.of(
+                optRespondentDQ.map(RequestedCourt::getCaseLocation),
+                optRespond.map(RequestedCourt::getCaseLocation)
+            ).filter(Optional::isPresent).findFirst().map(Optional::get).ifPresent(copyBuilder::caseLocation);
+
+            return copyBuilder
                 .build();
         }
         return respondent1DQRequestedCourt;
