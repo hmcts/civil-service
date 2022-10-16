@@ -69,7 +69,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService featureToggleService;
-    private final LocationHelper locationHelper = new LocationHelper();
+    private final LocationHelper locationHelper;
 
     @Override
     public List<CaseEvent> handledEvents() {
