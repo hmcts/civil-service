@@ -576,6 +576,35 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Nested
+        class UpdateRequestedCourt {
+            @BeforeEach
+            void setup() {
+                when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
+            }
+
+            @Test
+            void updateApplicant1DQRequestedCourt() {
+                CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                    .courtLocation()
+                    .build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+                System.out.println(response.getData());
+
+                assertThat(response.getData()).extracting("applicant1DQRequestedCourt")
+                    .extracting("responseCourtCode")
+                    .isEqualTo("127");
+
+                assertThat(response.getData()).extracting("applicant1DQRequestedCourt")
+                    .extracting("caseLocation")
+                    .extracting("region", "baseLocation")
+                    .containsExactly("regionId1", "epimmsId1");
+            }
+        }
+
+        @Nested
         class ResetStatementOfTruth {
 
             @Test
