@@ -212,7 +212,8 @@ class CaseEventTaskHandlerTest {
         void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
             String errorMessage = "there was an error";
 
-            doThrow(new NotFoundException(errorMessage, new RestException(errorMessage, new Exception()))).when(externalTaskService).complete(mockTask);
+            doThrow(new NotFoundException(errorMessage, new RestException(errorMessage, new Exception())))
+                .when(externalTaskService).complete(mockTask);
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
