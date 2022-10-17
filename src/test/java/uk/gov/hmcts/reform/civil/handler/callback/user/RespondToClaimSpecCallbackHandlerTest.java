@@ -614,10 +614,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Nested
-        class handleLocations {
+        class HandleLocations {
 
             @Test
-            void OneVOne() {
+            void oneVOne() {
                 DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
                 DynamicList preferredCourt = DynamicList.builder()
                     .listItems(locationValues.getListItems())
@@ -690,7 +690,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             }
 
             @Test
-            void OneVTwo_SecondDefendantReplies() {
+            void oneVTwo_SecondDefendantReplies() {
                 DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
                 DynamicList preferredCourt = DynamicList.builder()
                     .listItems(locationValues.getListItems())
