@@ -82,7 +82,7 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
     public Map<String, String> addProperties(final CaseData caseData) {
         return new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            HEARING_FEE, caseData.getHearingFee() == null ? "0" : String.valueOf(caseData.getHearingFee()),
+            HEARING_FEE, caseData.getHearingFee() == null ? "0.00" : String.valueOf(caseData.getHearingFee().toPounds()),
             HEARING_DATE, caseData.getHearingDate().toString(),
             HEARING_TIME, caseData.getHearingTimeHourMinute(),
             DEADLINE_DATE, caseData.getRespondent1ResponseDeadline().toString()

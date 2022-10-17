@@ -159,7 +159,7 @@ public class NotificationDefendantOfHearingHandlerTest {
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            "defendantReferenceNumber", "6789", "hearingFee", "0", "hearingDate", "2022-10-07",
+            "defendantReferenceNumber", "6789", "hearingFee", "0.00", "hearingDate", "2022-10-07",
             "hearingTime", "1030", "deadlineDate", "2022-11-07T14:00"
         );
     }
@@ -168,7 +168,7 @@ public class NotificationDefendantOfHearingHandlerTest {
     private Map<String, String> getNotificationDataMapDef2(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            "defendantReferenceNumber", "10111213", "hearingFee", "0", "hearingDate", "2022-10-07",
+            "defendantReferenceNumber", "10111213", "hearingFee", "0.00", "hearingDate", "2022-10-07",
             "hearingTime", "1030", "deadlineDate", "2022-11-07T14:00"
         );
     }

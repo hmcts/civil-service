@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsPro
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +51,8 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
     private void sendEmail(CaseData caseData, String recipient) {
         String emailTemplate;
-        if (caseData.getHearingFee() != null && Integer.valueOf(caseData.getHearingFee()) > 0) {
+        if (caseData.getHearingFee() != null && caseData.getHearingFee().getCalculatedAmountInPence().compareTo(
+            BigDecimal.ZERO) > 0) {
             emailTemplate = notificationsProperties.getHearingListedFeeClaimantLrTemplate();
         } else {
             emailTemplate = notificationsProperties.getHearingListedNoFeeClaimantLrTemplate();
@@ -69,7 +71,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     public Map<String, String> addProperties(final CaseData caseData) {
         return new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            HEARING_FEE, caseData.getHearingFee() == null ? "0" : String.valueOf(caseData.getHearingFee()),
+            HEARING_FEE, caseData.getHearingFee() == null ? "0.00" : String.valueOf(caseData.getHearingFee().toPounds()),
             HEARING_DATE, caseData.getHearingDate().toString(),
             HEARING_TIME, caseData.getHearingTimeHourMinute(),
             DEADLINE_DATE, caseData.getRespondent1ResponseDeadline().toString(),

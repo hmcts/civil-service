@@ -22,7 +22,7 @@ public class MockDatabaseConfiguration {
     }
 
     @Bean
-    public ReferenceNumberRepository hearingReferenceNumberRepository() {
+    public HearingReferenceNumberRepository hearingReferenceNumberRepository() {
         return () -> "000HN001";
     }
 }
