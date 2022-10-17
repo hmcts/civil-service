@@ -100,7 +100,7 @@ public class HearingUtils {
 
     public static String formatHearingFee(Fee hearingFee) {
         if (nonNull(hearingFee) && hearingFee.getCalculatedAmountInPence().intValue() > 0) {
-            StringBuilder builder = new StringBuilder(hearingFee.toString());
+            StringBuilder builder = new StringBuilder(hearingFee.getCalculatedAmountInPence().toString());
             builder.delete(builder.length() - 2, builder.length());
             if (builder.length() > 3) {
                 builder.insert(1, ',');
