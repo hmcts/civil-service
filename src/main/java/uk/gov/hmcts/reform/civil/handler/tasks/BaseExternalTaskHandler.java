@@ -42,7 +42,7 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
             externalTaskService.handleBpmnError(externalTask, e.getErrorCode());
             log.error("Bpmn error for external task '{}'", topicName, e);
         } catch (Exception e) {
-            handleFailure(externalTask, externalTaskService, e);
+            //handleFailure(externalTask, externalTaskService, e);
             log.error("External task '{}' errored", topicName, e);
         }
     }
