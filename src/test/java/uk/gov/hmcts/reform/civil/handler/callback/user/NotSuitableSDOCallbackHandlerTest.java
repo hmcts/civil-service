@@ -76,6 +76,10 @@ public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             startedDate = LocalDateTime.now();
+            startedDate = LocalDateTime.of(startedDate.getYear(), startedDate.getMonth(), startedDate.getDayOfMonth(),
+                             startedDate.getHour(), startedDate.getMinute(), startedDate.getSecond(),
+                             0);  // set to avoid elision of zeroes to cause random test errors.
+
             given(time.now()).willReturn(startedDate);
 
         }
