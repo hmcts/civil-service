@@ -4,11 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -78,7 +78,7 @@ public class LocationHelper {
                 caseData.getLegacyCaseReference()
             );
             getDefendantCourt.get()
-                .filter(requestedCourt -> requestedCourt.getRequestHearingAtSpecificCourt() == YesOrNo.YES)
+                .filter(this::hasInfo)
                 .ifPresent(requestedCourt -> {
                     log.debug("Case {}, Defendant has requested a court", caseData.getLegacyCaseReference());
                     prioritized.add(requestedCourt);
@@ -93,7 +93,7 @@ public class LocationHelper {
                 caseData.getLegacyCaseReference()
             );
             getClaimantRequestedCourt(caseData)
-                .filter(requestedCourt -> requestedCourt.getRequestHearingAtSpecificCourt() == YesOrNo.YES)
+                .filter(this::hasInfo)
                 .ifPresent(requestedCourt -> {
                     log.debug("Case {}, Claimant has requested a court", caseData.getLegacyCaseReference());
                     prioritized.add(requestedCourt);
@@ -116,10 +116,18 @@ public class LocationHelper {
         }
     }
 
+    private boolean hasInfo(RequestedCourt requestedCourt) {
+        return StringUtils.isNotBlank(requestedCourt.getResponseCourtCode())
+            || Optional.ofNullable(requestedCourt.getResponseCourtLocations())
+            .map(DynamicList::getValue).isPresent();
+    }
+
     private BigDecimal getClaimValue(CaseData caseData) {
         // super claim type is not always loaded
-        return Stream.of(caseData.getTotalClaimAmount(),
-                  Optional.ofNullable(caseData.getClaimValue()).map(ClaimValue::toPounds).orElse(null))
+        return Stream.of(
+                caseData.getTotalClaimAmount(),
+                Optional.ofNullable(caseData.getClaimValue()).map(ClaimValue::toPounds).orElse(null)
+            )
             .filter(Objects::nonNull)
             .findFirst()
             .orElse(BigDecimal.ZERO);
@@ -163,7 +171,6 @@ public class LocationHelper {
     private Optional<RequestedCourt> getUnspecClaimantRequestedCourt(CaseData caseData) {
         return Optional.ofNullable(caseData.getCourtLocation())
             .map(courtLocation -> RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(YesOrNo.YES)
                 .responseCourtCode(courtLocation.getApplicantPreferredCourt())
                 .caseLocation(courtLocation.getCaseLocation())
                 .build());

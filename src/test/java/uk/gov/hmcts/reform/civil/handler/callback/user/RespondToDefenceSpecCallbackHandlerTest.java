@@ -82,7 +82,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     ValidationAutoConfiguration.class,
     UnavailableDateValidator.class,
     CaseDetailsConverter.class,
-    CourtLocationUtils.class
+    CourtLocationUtils.class,
+    LocationHelper.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -502,7 +503,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .applicant1DQ(
                         Applicant1DQ.builder().applicant1DQRequestedCourt(
                             RequestedCourt.builder()
-                                .requestHearingAtSpecificCourt(YES)
                                 .responseCourtLocations(DynamicList.builder().build())
                                 .build()).build())
                     .build();

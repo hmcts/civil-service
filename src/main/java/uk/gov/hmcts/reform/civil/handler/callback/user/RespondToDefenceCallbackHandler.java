@@ -199,24 +199,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         CaseData.CaseDataBuilder builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
             .applicant1ResponseDate(currentTime);
-        Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
-        preferredCourt.map(RequestedCourt::getCaseLocation)
-            .ifPresent(builder::caseManagementLocation);
 
         if (v1) {
             updateCaseManagementLocation(callbackParams, builder);
-        }
-
-        locationHelper.getCaseManagementLocation(caseData)
-            .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                builder,
-                requestedCourt,
-                () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
-                    CallbackParams.Params.BEARER_TOKEN).toString())
-            ));
-        if (log.isDebugEnabled()) {
-            log.debug("Case management location for " + caseData.getLegacyCaseReference()
-                          + " is " + builder.build().getCaseManagementLocation());
         }
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
