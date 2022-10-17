@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
