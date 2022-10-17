@@ -391,7 +391,6 @@ public class InitiateGeneralApplicationService {
                 || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode() == null) {
             return CaseLocation.builder().build();
         }
-        //return caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtCode();
         return CaseLocation.builder()
             .region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
                         .getCaseLocation().getRegion())

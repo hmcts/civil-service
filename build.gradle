@@ -94,7 +94,6 @@ allprojects {
       ) {
         entry 'snakeyaml'
       }
-
       // Solves CVE-2022-25647
       dependencySet(
         group: 'org.camunda.bpm',

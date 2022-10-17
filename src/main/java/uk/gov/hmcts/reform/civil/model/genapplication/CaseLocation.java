@@ -15,4 +15,3 @@ public class CaseLocation {
     private String siteName;
     private String baseLocation;
 }
-
