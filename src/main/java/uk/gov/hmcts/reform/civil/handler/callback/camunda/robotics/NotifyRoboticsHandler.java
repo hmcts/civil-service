@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.robotics;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.networknt.schema.ValidationMessage;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
@@ -27,6 +29,8 @@ import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCatego
 @RequiredArgsConstructor
 public abstract class NotifyRoboticsHandler extends CallbackHandler {
 
+    Logger log = LoggerFactory.getLogger(NotifyRoboticsHandler.class);
+
     private final RoboticsNotificationService roboticsNotificationService;
     private final JsonSchemaValidationService jsonSchemaValidationService;
     private final RoboticsDataMapper roboticsDataMapper;
@@ -38,7 +42,11 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
         RoboticsCaseDataSpec roboticsCaseDataSpec = null;
         Set<ValidationMessage> errors = null;
 
+
+        log.info("notifyRobotics callback params {}", callbackParams);
         CaseData caseData = callbackParams.getCaseData();
+        log.info("notifyRobotics casedata {}", caseData);
+        log.info("notifyRobotics casedata {}", caseData.getSuperClaimType());
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
         try {
 
