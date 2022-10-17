@@ -27,9 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.*;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationClaimantOfHearingHandler.TASK_ID_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 
 @SpringBootTest(classes = {
     NotificationClaimantOfHearingHandler.class,
@@ -120,7 +119,6 @@ public class NotificationClaimantOfHearingHandlerTest {
                 .respondent1ResponseDeadline(LocalDateTime.of(2022, 11, 07, 14, 00, 00))
                 .addApplicant2(YesOrNo.YES)
                 .addRespondent2(YesOrNo.NO)
-                .addApplicant2(YesOrNo.YES)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
@@ -192,7 +190,6 @@ public class NotificationClaimantOfHearingHandlerTest {
                 .respondent1ResponseDeadline(LocalDateTime.of(2022, 11, 07, 14, 00, 00))
                 .addApplicant2(YesOrNo.YES)
                 .addRespondent2(YesOrNo.NO)
-                .addApplicant2(YesOrNo.YES)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
