@@ -163,6 +163,7 @@ notifications:
   respondentSolicitorDefendantResponseForSpec: "9527f77e-b346-4527-b93c-c2affd39fa51"
   respondentDefendantResponseForSpec: "94c71894-9590-4995-aae0-edea94fc4594"
   sdoOrdered: "1518a883-d035-46c8-9dc0-a52538ca4545"
+  sdoOrderedSpec: "1c1a200c-b3c1-45eb-9768-aeea56857420"
   claimantSolicitorConfirmsNotToProceedSpec: "156b71f5-30ac-4398-aad2-72dfd424c6f2"
   respondentSolicitorNotifyNotToProceedSpec: "4dc0b5bb-674f-401e-8a39-05686dc0302e"
   claimantSolicitorConfirmsToProceedSpec: "99786d26-ab90-43c7-aa20-9d450d8ce4eb"
@@ -202,6 +203,13 @@ http:
   client:
     readTimeout: ${REST_TEMPLATE_TIMEOUT:30000}
 
+court-location:
+  specified-claim:
+    region-id: "2"
+    epimms-id: "420219"
+  unspecified-claim:
+    region-id: "4"
+    epimms-id: "192280"
 
 launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:}
