@@ -42,7 +42,6 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
         RoboticsCaseDataSpec roboticsCaseDataSpec = null;
         Set<ValidationMessage> errors = null;
 
-
         log.info("notifyRobotics callback params {}", callbackParams);
         CaseData caseData = callbackParams.getCaseData();
         log.info("notifyRobotics casedata {}", caseData);
