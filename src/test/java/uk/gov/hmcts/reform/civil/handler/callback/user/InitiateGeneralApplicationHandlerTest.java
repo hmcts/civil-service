@@ -10,11 +10,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
@@ -48,10 +51,14 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OTHER_SUPPORT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_UNAVAILABILITY_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.TRIAL_DATE_FROM_REQUIRED;
@@ -186,6 +193,119 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
             when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    public CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
+        return objectMapper.convertValue(response.getData(), CaseData.class);
+    }
+
+    @Nested
+    class MidEventForVaryJudgement extends LocationRefSampleDataBuilder {
+
+        private static final String VALIDATE_GA_TYPE = "ga-validate-type";
+
+        @Test
+        void shouldNotCauseAnyErrors_whenGaTypeIsNotVaryJudgement() {
+
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT);
+            CaseData caseData = CaseDataBuilder
+                .builder().generalAppType(GAApplicationType.builder().types(types).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_TYPE);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData responseCaseData = getCaseData(response);
+
+            assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(NO);
+            assertThat(response.getErrors()).isEqualTo(null);
+        }
+
+        @Test
+        void shouldNotCauseAnyErrorsWhenGaTypeIsVaryJudgement() {
+            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
+            CaseData caseData = CaseDataBuilder
+                .builder().generalAppType(GAApplicationType.builder().types(types).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_TYPE);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData responseCaseData = getCaseData(response);
+
+            assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(YES);
+            assertThat(response.getErrors()).isEqualTo(null);
+        }
+
+        @Test
+        void shouldNotCauseAnyErrorsWhenGaTypeIsMultipleType() {
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_JUDGEMENT);
+            CaseData caseData = CaseDataBuilder
+                .builder().generalAppType(GAApplicationType.builder().types(types).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_TYPE);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData responseCaseData = getCaseData(response);
+
+            assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(YES);
+            assertThat(response.getErrors()).isEqualTo(null);
+        }
+
+    }
+
+    @Nested
+    class MidEventForN245FormNameValidation extends LocationRefSampleDataBuilder {
+
+        private static final String VALIDATE_N245_FORM_NAME = "ga-validate-n245form-name";
+        private static final String N245_FILE_NAME = "Statement of incomings and outgoings";
+        private static final String N245_FILE_NAME_ERROR = "File should be named "
+            + "as \"Statement of incomings and outgoings\"";
+
+        @Test
+        void shouldThrowErrorsWhenFormNameDoesNot_Matches() {
+            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
+            CaseData caseData = CaseDataBuilder
+                .builder()
+                .generalAppN245FormUpload(Document.builder().documentFileName("capture.pdf").build())
+                .generalAppType(GAApplicationType.builder().types(types).build()).build();
+
+            when(initiateGeneralAppService.validateFileName(caseData
+                                                                .getGeneralAppN245FormUpload()
+                                                                .getDocumentFileName(), N245_FILE_NAME))
+                .thenCallRealMethod();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_N245_FORM_NAME);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors().size()).isEqualTo(1);
+
+            assertThat(response.getErrors().get(0)).isEqualTo(N245_FILE_NAME_ERROR);
+        }
+
+        @Test
+        void shouldNotCauseAnyErrorsWhenFormNameMatchesForMultipleTypes() {
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_JUDGEMENT);
+
+            CaseData caseData = CaseDataBuilder
+                .builder()
+                .generalAppN245FormUpload(Document.builder()
+                                              .documentFileName("Statement of incomings and outgoings.pdf").build())
+                .generalAppType(GAApplicationType.builder().types(types).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_N245_FORM_NAME);
+
+            when(initiateGeneralAppService.validateFileName(caseData
+                                                                .getGeneralAppN245FormUpload()
+                                                                .getDocumentFileName(), N245_FILE_NAME))
+                .thenCallRealMethod();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
