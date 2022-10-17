@@ -1851,7 +1851,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         Optional<LocationRefData> optCourtLocation = getCourtLocationDefendant2(caseData, callbackParams);
         if (optCourtLocation.isPresent()) {
             LocationRefData courtLocation = optCourtLocation.get();
-            dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ().getRequestedCourt().toBuilder()
+            dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ().getRespondToCourtLocation2().toBuilder()
                                                .responseCourtLocations(null)
                                                .requestHearingAtSpecificCourt(YES)
                                                .caseLocation(CaseLocation.builder()
