@@ -415,6 +415,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final LocalDateTime applicant2ResponseDate;
     private final LocalDateTime takenOfflineDate;
     private final LocalDateTime takenOfflineByStaffDate;
+    private final LocalDateTime unsuitableSDODate;
     private final LocalDateTime claimDismissedDate;
     private final String claimAmountBreakupSummaryObject;
     private final LocalDateTime respondent1LitigationFriendDate;
