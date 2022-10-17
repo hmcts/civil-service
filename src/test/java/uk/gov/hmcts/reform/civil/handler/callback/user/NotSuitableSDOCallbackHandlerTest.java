@@ -75,6 +75,10 @@ public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             startedDate = LocalDateTime.now();
+            startedDate = LocalDateTime.of(startedDate.getYear(), startedDate.getMonth(), startedDate.getDayOfMonth(),
+                             startedDate.getHour(), startedDate.getMinute(), startedDate.getSecond(),
+                             0);  // set to avoid elision of zeroes to cause random test errors.
+
             given(time.now()).willReturn(startedDate);
 
         }
@@ -84,6 +88,8 @@ public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             String timeString = time.now().toString();
+            String actualResponseString = (String)response.getData().get("unsuitableSDODate");
+
             assertThat(response.getData()).extracting("unsuitableSDODate")
                 .isEqualTo(timeString.substring(0, Math.min(timeString.length(), 27)));
 
