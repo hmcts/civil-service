@@ -166,6 +166,9 @@ public class NotificationsProperties {
     private String respondentLipFullDefenceNoMediationTemplate;
 
     @NotEmpty
+    private String respondentLipResponseSubmissionTemplate;
+
+    @NotEmpty
     private String hearingListedFeeClaimantLrTemplate;
 
     @NotEmpty

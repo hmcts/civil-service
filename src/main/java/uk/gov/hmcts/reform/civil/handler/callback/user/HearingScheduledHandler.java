@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.reform.civil.service.bankholidays.PublicHolidaysCollection;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -100,10 +102,9 @@ public class HearingScheduledHandler extends CallbackHandler {
     }
 
     private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
-        StringBuilder stringBuilder = new StringBuilder();
-        return fromList(locations.stream().map(location -> stringBuilder.append(location.getSiteName())
-                                 .append(" - ").append(location.getCourtAddress())
-                                .append(" - ").append(location.getPostcode()).toString())
+        return fromList(locations.stream().map(location -> new StringBuilder().append(location.getSiteName())
+                .append(" - ").append(location.getCourtAddress())
+                .append(" - ").append(location.getPostcode()).toString())
                             .collect(Collectors.toList()));
     }
 
@@ -111,7 +112,6 @@ public class HearingScheduledHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
 
         LocalDate dateOfApplication = caseData.getDateOfApplication();
-
         List<String> errors = (Objects.isNull(dateOfApplication)) ? null :
             isPastDate(dateOfApplication);
 
@@ -166,25 +166,26 @@ public class HearingScheduledHandler extends CallbackHandler {
             if (LocalDate.now().isBefore(caseData.getHearingDate().minusWeeks(4))) {
                 caseDataBuilder.hearingDueDate(
                     HearingUtils.addBusinessDays(
-                        LocalDate.now(), 7, publicHolidaysCollection.getPublicHolidays()).toString());
+                        LocalDate.now(), 7, publicHolidaysCollection.getPublicHolidays()));
             } else {
                 caseDataBuilder.hearingDueDate(
                     HearingUtils.addBusinessDays(
-                        LocalDate.now(), 20, publicHolidaysCollection.getPublicHolidays()).toString());
+                        LocalDate.now(), 20, publicHolidaysCollection.getPublicHolidays()));
             }
             switch (caseData.getAllocatedTrack()) {
                 case SMALL_CLAIM:
-                    caseDataBuilder.hearingFee("£545");
+                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
                     break;
                 case FAST_CLAIM:
-                    caseDataBuilder.hearingFee(
-                        HearingUtils.getFastTrackFee(caseData.getClaimFee().getCalculatedAmountInPence().intValue()));
+                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(
+                        HearingUtils.getFastTrackFee(
+                            caseData.getClaimFee().getCalculatedAmountInPence().intValue())).build());
                     break;
                 case MULTI_CLAIM:
-                    caseDataBuilder.hearingFee("£1.175");
+                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(117500)).build());
                     break;
                 default:
-                    caseDataBuilder.hearingFee("£0");
+                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(0)).build());
             }
         }
         if (nonNull(caseData.getHearingLocation())) {
@@ -192,7 +193,6 @@ public class HearingScheduledHandler extends CallbackHandler {
             locationList.setListItems(null);
             caseDataBuilder.hearingLocation(locationList);
         }
-        caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();

@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import java.util.Map;
 
 import static java.util.function.Predicate.not;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.GENERAL_APPLICATION_ENABLED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allResponsesReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeProcessedByCamunda;
@@ -80,6 +81,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawn;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
@@ -124,6 +126,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
@@ -148,7 +151,8 @@ public class StateFlowEngine {
                         FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true,
                         FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
                         FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
-                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
+                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
                     )))
             .transitionTo(CLAIM_SUBMITTED)
                 .onlyIf(claimSubmittedTwoRegisteredRespondentRepresentatives
@@ -161,7 +165,8 @@ public class StateFlowEngine {
                         FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true,
                         FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
                         FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
-                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
+                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
                     )))
             // To be removed when NOC is released. Needed for cases with unregistered and unrepresented defendants
             .transitionTo(CLAIM_SUBMITTED)
@@ -177,7 +182,8 @@ public class StateFlowEngine {
                     Map.of(
                         FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
                         FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
-                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
+                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
                     )))
             // Only one unrepresented defendant
             .transitionTo(CLAIM_SUBMITTED)
@@ -187,7 +193,8 @@ public class StateFlowEngine {
                         FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true,
                         FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
                         FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
-                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
+                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
                     )))
             // Unrepresented defendant 1
             .transitionTo(CLAIM_SUBMITTED)
@@ -201,7 +208,8 @@ public class StateFlowEngine {
                         FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false,
                         FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
                         FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
-                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
+                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
                     )))
             // Unrepresented defendant 2
             .transitionTo(CLAIM_SUBMITTED)
@@ -214,7 +222,8 @@ public class StateFlowEngine {
                         FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
                         FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
                         FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
-                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
+                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
                     )))
             // Unrepresented defendants
             .transitionTo(CLAIM_SUBMITTED)
@@ -226,7 +235,8 @@ public class StateFlowEngine {
                         FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true,
                         FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
                         FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
-                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled()
+                        FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                        GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
                     )))
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
@@ -467,6 +477,13 @@ public class StateFlowEngine {
             .state(AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED)
             .state(COUNTER_CLAIM)
             .state(FULL_DEFENCE_PROCEED)
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
+                .transitionTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyIf(takenOfflineSDONotDrawn)
+                    .set(flags -> {
+                        if (featureToggleService.isSdoEnabled()) {
+                            flags.put(FlowFlag.SDO_ENABLED.name(), true);
+                        }
+                    })
             .state(FULL_DEFENCE_NOT_PROCEED)
             .state(TAKEN_OFFLINE_BY_STAFF)
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
@@ -478,6 +495,7 @@ public class StateFlowEngine {
             .state(TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE)
             .state(TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED)
             .state(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED)
+            .state(TAKEN_OFFLINE_SDO_NOT_DRAWN)
             .state(PART_ADMIT_PROCEED)
             .state(PART_ADMIT_NOT_PROCEED)
             .state(FULL_ADMIT_PROCEED)

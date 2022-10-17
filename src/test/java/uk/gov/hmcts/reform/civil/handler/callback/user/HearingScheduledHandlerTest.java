@@ -18,12 +18,14 @@ import uk.gov.hmcts.reform.civil.enums.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.bankholidays.PublicHolidaysCollection;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -161,7 +163,8 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             when(publicHolidaysCollection.getPublicHolidays()).thenReturn(publicHolidays);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getHearingFee()).isEqualTo("£545");
+            assertThat(updatedData.getHearingFee()).isEqualTo(
+                Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
         }
 
         @Test
@@ -179,7 +182,8 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             when(publicHolidaysCollection.getPublicHolidays()).thenReturn(publicHolidays);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getHearingFee()).isEqualTo("£1.175");
+            assertThat(updatedData.getHearingFee()).isEqualTo(
+                Fee.builder().calculatedAmountInPence(new BigDecimal(117500)).build());
         }
 
         @Test
@@ -197,7 +201,8 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             when(publicHolidaysCollection.getPublicHolidays()).thenReturn(publicHolidays);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getHearingFee()).isEqualTo("£27");
+            assertThat(updatedData.getHearingFee()).isEqualTo(
+                Fee.builder().calculatedAmountInPence(new BigDecimal(2700)).build());
         }
     }
 
@@ -226,5 +231,3 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 }
-
-
