@@ -38,7 +38,7 @@ public enum DocmosisTemplates {
     SDO_FAST("CV-DAM-STD-ENG-00002.docx", "fast_track_sdo_%s.pdf"),
     SDO_DISPOSAL("CV-DAM-STD-ENG-00003.docx", "disposal_hearing_sdo_%s.pdf"),
     HEARING_SMALL_CLAIMS("CV-UNS-HNO-ENG-01188.docx", "hearing_small_claim_%s.pdf"),
-    HEARING_FAST_TRACK("CV-UNS-HNO-ENG-01186.docx", "hearing_fast_track_%s.pdf"),
+    HEARING_FAST_TRACK("CV-UNS-HNO-ENG-01189.docx", "hearing_fast_track_%s.pdf"),
     HEARING_APPLICATION("CV-UNS-HNO-ENG-01185.docx", "hearing_application_%s.pdf"),
     HEARING_OTHER("CV-UNS-HNO-ENG-01187.docx", "hearing_other_claim_%s.pdf");
 
