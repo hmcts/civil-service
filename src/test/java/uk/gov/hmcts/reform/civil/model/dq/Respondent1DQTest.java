@@ -256,16 +256,6 @@ class Respondent1DQTest extends DQTest {
     class GetCourtLocation {
 
         @Test
-        void build_whenYesRequired() {
-            RequestedCourt court = buildRespondent1Dq().toBuilder()
-                .respondent1DQRequestedCourt(null)
-                .responseClaimCourtLocationRequired(YES)
-                .build().getRequestedCourt();
-
-            assertNotNull(court);
-        }
-
-        @Test
         void build_whenRespondToCourtLocation() {
             String reason = "reason";
             String courtCode = "123";

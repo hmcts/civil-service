@@ -57,6 +57,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -1224,10 +1225,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .respondent1DQ(
                             Respondent1DQ.builder().respondent1DQRequestedCourt(
                                 RequestedCourt.builder()
-                                    .responseCourtLocations(DynamicList.builder()
-                                                                .value(selectedCourtLocation)
-                                                                .build())
-                                    .responseCourtCode("selectedCourtCode")
+                                    .responseCourtLocations(DynamicList.fromList(
+                                        Collections.singletonList(locationA),
+                                        LocationRefDataService::getDisplayEntry,
+                                        locationA,
+                                        false
+                                    ))
                                     .build()).build())
                         .build();
 
@@ -1280,10 +1283,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .respondent1DQ(
                             Respondent1DQ.builder().respondent1DQRequestedCourt(
                                 RequestedCourt.builder()
-                                    .responseCourtCode("selectedCourtCode")
-                                    .responseCourtLocations(DynamicList.builder()
-                                                                .value(selectedCourtLocation)
-                                                                .build())
+                                    .responseCourtLocations(DynamicList.fromList(
+                                        Collections.singletonList(locationA),
+                                        LocationRefDataService::getDisplayEntry,
+                                        locationA,
+                                        false
+                                    ))
                                     .build()).build())
                         .build();
 
@@ -1333,18 +1338,23 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .respondent1DQ(
                             Respondent1DQ.builder().respondent1DQRequestedCourt(
                                 RequestedCourt.builder()
-                                    .responseCourtLocations(DynamicList.builder()
-                                                                .value(selectedCourtLocation)
-                                                                .build())
-                                    .responseCourtCode("r1CourtCode")
+                                    .responseCourtLocations(
+                                        DynamicList.fromList(
+                                            Collections.singletonList(locationA),
+                                            LocationRefDataService::getDisplayEntry,
+                                            locationA,
+                                            false
+                                        ))
                                     .build()).build())
                         .respondent2DQ(
                             Respondent2DQ.builder().respondent2DQRequestedCourt(
                                 RequestedCourt.builder()
-                                    .responseCourtLocations(DynamicList.builder()
-                                                                .value(selectedCourtLocation)
-                                                                .build())
-                                    .responseCourtCode("r2CourtCode")
+                                    .responseCourtLocations(DynamicList.fromList(
+                                        Collections.singletonList(locationA),
+                                        LocationRefDataService::getDisplayEntry,
+                                        locationA,
+                                        false
+                                    ))
                                     .build()).build())
                         .build();
 
@@ -1405,10 +1415,14 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .respondent2DQ(
                             Respondent2DQ.builder().respondent2DQRequestedCourt(
                                 RequestedCourt.builder()
-                                    .responseCourtLocations(DynamicList.builder()
-                                                                .value(selectedCourtLocation)
-                                                                .build())
-                                    .responseCourtCode("selectedCourtCode")
+                                    .responseCourtLocations(
+                                        DynamicList.fromList(
+                                            Collections.singletonList(locationA),
+                                            LocationRefDataService::getDisplayEntry,
+                                            locationA,
+                                            false
+                                        )
+                                    )
                                     .build()).build())
                         .respondent1Copy(PartyBuilder.builder().individual().build())
                         .respondent2Copy(PartyBuilder.builder().individual().build())
@@ -1456,10 +1470,13 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .respondent1DQ(
                             Respondent1DQ.builder().respondent1DQRequestedCourt(
                                 RequestedCourt.builder()
-                                    .responseCourtLocations(DynamicList.builder()
-                                                                .value(selectedCourtLocation)
-                                                                .build())
-                                    .responseCourtCode("selectedCourtCode")
+                                    .responseCourtLocations(DynamicList.fromList(
+                                        Collections.singletonList(locationA),
+                                        LocationRefDataService::getDisplayEntry,
+                                        locationA,
+                                        false
+                                    ))
+                                    .responseCourtCode("312")
                                     .build()).build())
                         .build();
 

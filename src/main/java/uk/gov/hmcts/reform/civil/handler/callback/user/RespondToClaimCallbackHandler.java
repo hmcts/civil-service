@@ -172,24 +172,13 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .isRespondent1(isRespondent1);
 
         if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
-            List<LocationRefData> locations = fetchLocationData(callbackParams);
-            courtLocationList = courtLocationUtils.getLocationsFromList(locations);
-            RequestedCourt.RequestedCourtBuilder requestedCourt1 = RequestedCourt.builder()
-                .responseCourtLocations(courtLocationList);
-            Optional.ofNullable(caseData.getCourtLocation())
-                .map(CourtLocation::getApplicantPreferredCourt)
-                .flatMap(applicantCourt -> locations.stream()
-                    .filter(locationRefData -> applicantCourt.equals(locationRefData.getCourtLocationCode()))
-                    .findFirst())
-                .ifPresent(locationRefData -> requestedCourt1
-                    .otherPartyPreferredSite(locationRefData.getCourtLocationCode()
-                                                 + " " + locationRefData.getSiteName()));
-            updatedCaseData
-                .respondent1DQ(Respondent1DQ.builder()
-                                   .respondent1DQRequestedCourt(requestedCourt1.build()).build())
-                .respondent2DQ(Respondent2DQ.builder()
-                                   .respondent2DQRequestedCourt(requestedCourt1.build()).build())
-                .locationName(requestedCourt1.build().getOtherPartyPreferredSite());
+            courtLocationList = courtLocationUtils.getLocationsFromList(fetchLocationData(callbackParams));
+            updatedCaseData.respondent1DQ(Respondent1DQ.builder()
+                                              .respondent1DQRequestedCourt(
+                                                  RequestedCourt.builder()
+                                                      .responseCourtLocations(courtLocationList)
+                                                      .build())
+                                              .build());
         }
 
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
@@ -735,21 +724,27 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         if (Optional.ofNullable(caseData.getRespondent1DQ())
             .map(Respondent1DQ::getRespondent1DQRequestedCourt)
             .map(RequestedCourt::getResponseCourtLocations)
-            .map(DynamicList::getValue)
-            .isPresent()) {
+            .map(DynamicList::getValue).isPresent()) {
             DynamicList courtLocations = caseData
                 .getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtLocations();
             LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
                 fetchLocationData(callbackParams), courtLocations);
-            dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().toBuilder()
-                                               .responseCourtLocations(null)
-                                               .caseLocation(CaseLocation.builder()
-                                                                 .region(courtLocation.getRegionId())
-                                                                 .baseLocation(courtLocation.getEpimmsId())
-                                                                 .build())
-                                               .responseCourtCode(courtLocation.getCourtLocationCode()).build());
+            RequestedCourt.RequestedCourtBuilder dqBuilder = caseData.getRespondent1DQ()
+                .getRespondent1DQRequestedCourt().toBuilder()
+                .responseCourtLocations(null)
+                .responseCourtCode(Optional.ofNullable(courtLocation)
+                                       .map(LocationRefData::getCourtLocationCode)
+                                       .orElse(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
+                                                   .getResponseCourtCode()));
+            buildWithMatching(courtLocation).ifPresent(dqBuilder::caseLocation);
+            dq.respondent1DQRequestedCourt(dqBuilder.build());
+        } else if (Optional.ofNullable(caseData.getRespondent1DQ())
+            .map(Respondent1DQ::getRespondent1DQRequestedCourt)
+            .map(RequestedCourt::getResponseCourtLocations).isPresent()) {
+            dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ()
+                                               .getRespondent1DQRequestedCourt()
+                                               .toBuilder().responseCourtLocations(null).build());
         }
-
     }
 
     private void handleCourtLocationForRespondent2DQ(CaseData caseData, Respondent2DQ.Respondent2DQBuilder dq,
@@ -758,19 +753,37 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         if (Optional.ofNullable(caseData.getRespondent2DQ())
             .map(Respondent2DQ::getRespondent2DQRequestedCourt)
             .map(RequestedCourt::getResponseCourtLocations)
-            .map(DynamicList::getValue)
-            .isPresent()) {
+            .map(DynamicList::getValue).isPresent()) {
             DynamicList courtLocations = caseData
                 .getRespondent2DQ().getRespondent2DQRequestedCourt().getResponseCourtLocations();
             LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
                 fetchLocationData(callbackParams), courtLocations);
-            dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ().getRequestedCourt().toBuilder()
-                                               .responseCourtLocations(null)
-                                               .caseLocation(CaseLocation.builder()
-                                                                 .region(courtLocation.getRegionId())
-                                                                 .baseLocation(courtLocation.getEpimmsId())
-                                                                 .build())
-                                               .responseCourtCode(courtLocation.getCourtLocationCode()).build());
+            RequestedCourt.RequestedCourtBuilder dqBuilder = caseData.getRespondent2DQ().getRequestedCourt()
+                .toBuilder()
+                .responseCourtLocations(null)
+                .responseCourtCode(Optional.ofNullable(courtLocation)
+                                       .map(LocationRefData::getCourtLocationCode)
+                                       .orElse(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
+                                                   .getResponseCourtCode()));
+            buildWithMatching(courtLocation).ifPresent(dqBuilder::caseLocation);
+            dq.respondent2DQRequestedCourt(dqBuilder.build());
+        } else if (Optional.ofNullable(caseData.getRespondent2DQ())
+            .map(Respondent2DQ::getRespondent2DQRequestedCourt)
+            .map(RequestedCourt::getResponseCourtLocations).isPresent()) {
+            dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ()
+                                               .getRespondent2DQRequestedCourt()
+                                               .toBuilder().responseCourtLocations(null).build());
+        }
+    }
+
+    private Optional<CaseLocation> buildWithMatching(LocationRefData courtLocation) {
+        if (courtLocation == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(CaseLocation.builder()
+                                   .region(courtLocation.getRegionId())
+                                   .baseLocation(courtLocation.getEpimmsId())
+                                   .build());
         }
     }
 }

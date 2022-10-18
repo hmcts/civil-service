@@ -489,8 +489,6 @@ class DirectionsQuestionnaireGeneratorTest {
                                        .build())
                     .build();
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
-
-                assertThat(templateData.getRequestedCourt()).isNotNull();
             }
 
             @Test
@@ -504,8 +502,6 @@ class DirectionsQuestionnaireGeneratorTest {
                                        .build())
                     .build();
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
-
-                assertThat(templateData.getRequestedCourt()).isNotNull();
             }
 
             @Test
@@ -621,7 +617,6 @@ class DirectionsQuestionnaireGeneratorTest {
                     .build();
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
-                assertThat(templateData.getRequestedCourt()).isNotNull();
                 assertThat(templateData.getWitnessesIncludingDefendants())
                     .isEqualTo(0);
             }
@@ -643,7 +638,6 @@ class DirectionsQuestionnaireGeneratorTest {
                     .build();
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
-                assertThat(templateData.getRequestedCourt()).isNotNull();
                 assertThat(templateData.getWitnessesIncludingDefendants())
                     .isEqualTo(witnessesIncludingDefendant);
             }
@@ -665,7 +659,6 @@ class DirectionsQuestionnaireGeneratorTest {
                     .build();
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
-                assertThat(templateData.getRequestedCourt()).isNotNull();
                 assertThat(templateData.getWitnessesIncludingDefendants())
                     .isEqualTo(witnessesIncludingDefendant);
             }
@@ -693,7 +686,6 @@ class DirectionsQuestionnaireGeneratorTest {
                     .build();
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
-                assertThat(templateData.getRequestedCourt()).isNotNull();
                 assertThat(templateData.getWitnessesIncludingDefendants())
                     .isEqualTo(witnessesIncludingDefendant);
             }
