@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -94,22 +95,10 @@ public class ClaimDismissedRespondentNotificationHandler extends CallbackHandler
     }
 
     private String getSolicitorClaimDismissedProperty(CaseData caseData) {
-        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-        List<String> stateHistoryNameList = stateFlow.getStateHistory()
-                                            .stream()
-                                            .map(State::getName)
-                                            .collect(Collectors.toList());
-        //scenerio 1: Claim notification does not happen within 4 months of issue
-        if (stateHistoryNameList.contains(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName())) {
-            return notificationsProperties.getSolicitorClaimDismissedWithin4Months();
-        } else if (stateHistoryNameList.contains(CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName())) {
-            //scenerio 2: Claims details notification is not completed within 14 days of the claim notification step
-            return notificationsProperties.getSolicitorClaimDismissedWithin14Days();
-        } else if (stateHistoryNameList.contains(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName())) {
-            //scenerio 3 Claimant does not give their intention by the given deadline
-            return notificationsProperties.getSolicitorClaimDismissedWithinDeadline();
-        } else {
-            return notificationsProperties.getSolicitorClaimDismissedWithinDeadline();
-        }
+        return NotificationUtils.getSolicitorClaimDismissedProperty(
+            caseData, stateFlowEngine.evaluate(caseData).getStateHistory()
+                .stream()
+                .map(State::getName)
+                .collect(Collectors.toList()), notificationsProperties);
     }
 }
