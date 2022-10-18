@@ -2,9 +2,11 @@ package uk.gov.hmcts.reform.civil.helpers;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
@@ -14,35 +16,20 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 public class LocationHelperTest {
 
-    private final LocationHelper helper = new LocationHelper();
-
-    @Test
-    public void thereIsAMatchingLocationByCode() {
-        CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder();
-        List<LocationRefData> locations = List.of(LocationRefData.builder()
-                                                      .courtLocationCode("123")
-                                                      .regionId("regionId")
-                                                      .region("region name")
-                                                      .epimmsId("epimms")
-                                                      .build());
-        RequestedCourt requestedCourt = RequestedCourt.builder()
-            .responseCourtCode("123")
-            .requestHearingAtSpecificCourt(YesOrNo.YES)
-            .build();
-        helper.updateCaseManagementLocation(updatedData, requestedCourt, () -> locations);
-        Assertions.assertThat(updatedData.build().getCaseManagementLocation())
-            .isNotNull()
-            .isEqualTo(CaseLocation.builder()
-                           .region("regionId")
-                           .baseLocation("epimms")
-                           .build());
-    }
+    private static final BigDecimal CCMCC_AMOUNT = BigDecimal.valueOf(1000);
+    private static final String CCMCC_REGION_ID = "ccmccRegionId";
+    private static final String CCMCC_EPIMS = "ccmccEpims";
+    private final FeatureToggleService featureToggleService = Mockito.mock(FeatureToggleService.class);
+    private final LocationHelper helper = new LocationHelper(
+        featureToggleService,
+        CCMCC_AMOUNT, CCMCC_REGION_ID, CCMCC_EPIMS);
 
     @Test
     public void thereIsAMatchingLocation() {
@@ -54,11 +41,7 @@ public class LocationHelperTest {
                                                       .epimmsId("epimms")
                                                       .build());
         RequestedCourt requestedCourt = RequestedCourt.builder()
-            .caseLocation(CaseLocation.builder()
-                              .region("regionId")
-                              .baseLocation("epimms")
-                              .build())
-            .requestHearingAtSpecificCourt(YesOrNo.YES)
+            .responseCourtCode("123")
             .build();
         helper.updateCaseManagementLocation(updatedData, requestedCourt, () -> locations);
         Assertions.assertThat(updatedData.build().getCaseManagementLocation())
@@ -73,13 +56,13 @@ public class LocationHelperTest {
     public void whenSpecDefendantIsPerson_courtIsDefendants() {
         CaseData caseData = CaseData.builder()
             .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .totalClaimAmount(BigDecimal.valueOf(10000))
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
                             .build())
             .applicant1DQ(Applicant1DQ.builder()
                               .applicant1DQRequestedCourt(
                                   RequestedCourt.builder()
-                                      .requestHearingAtSpecificCourt(YesOrNo.YES)
                                       .responseCourtCode("123")
                                       .build()
                               )
@@ -90,7 +73,6 @@ public class LocationHelperTest {
             .respondent1DQ(Respondent1DQ.builder()
                                .respondent1DQRequestedCourt(
                                    RequestedCourt.builder()
-                                       .requestHearingAtSpecificCourt(YesOrNo.YES)
                                        .responseCourtCode("321")
                                        .build()
                                )
@@ -104,9 +86,114 @@ public class LocationHelperTest {
     }
 
     @Test
+    public void whenSpecDefendantIsPersonAndDefendant2_courtIsDefendant2() {
+        CaseData caseData = CaseData.builder()
+            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .totalClaimAmount(BigDecimal.valueOf(10000))
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .build())
+            .applicant1DQ(Applicant1DQ.builder()
+                              .applicant1DQRequestedCourt(
+                                  RequestedCourt.builder()
+                                      .responseCourtCode("123")
+                                      .build()
+                              )
+                              .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQRequestedCourt(
+                                   RequestedCourt.builder()
+                                       .responseCourtCode("321")
+                                       .build()
+                               )
+                               .build())
+            .respondent2(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .build())
+            .respondent2DQ(Respondent2DQ.builder()
+                               .respondent2DQRequestedCourt(RequestedCourt.builder()
+                                                                .responseCourtCode("432")
+                                                                .build())
+                               .build())
+            .respondent2ResponseDate(LocalDateTime.now())
+            .build();
+
+        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
+
+        Assertions.assertThat(court.isPresent()).isTrue();
+        Assertions.assertThat(court.get()).isEqualTo(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt());
+    }
+
+    @Test
+    public void whenLessThan1000_locationIsCcmcc() {
+        CaseData caseData = CaseData.builder()
+            .superClaimType(SuperClaimType.UNSPEC_CLAIM)
+            .claimValue(ClaimValue.builder()
+                            .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
+                            .build())
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .build())
+            .applicant1DQ(Applicant1DQ.builder()
+                              .applicant1DQRequestedCourt(
+                                  RequestedCourt.builder()
+                                      .responseCourtCode("123")
+                                      .build()
+                              )
+                              .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQRequestedCourt(
+                                   RequestedCourt.builder()
+                                       .responseCourtCode("321")
+                                       .build()
+                               )
+                               .build())
+            .build();
+
+        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
+
+        Assertions.assertThat(court.isPresent()).isTrue();
+        Assertions.assertThat(court.get().getCaseLocation())
+            .isEqualTo(CaseLocation.builder()
+                           .baseLocation(CCMCC_EPIMS)
+                           .region(CCMCC_REGION_ID).build());
+    }
+
+    @Test
+    public void whenLessThan1000_locationIsCcmccEvenUndef() {
+        CaseData caseData = CaseData.builder()
+            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .totalClaimAmount(BigDecimal.valueOf(1000))
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .build())
+            .build();
+
+        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
+
+        Assertions.assertThat(court.isPresent()).isTrue();
+        Assertions.assertThat(court.get().getCaseLocation())
+            .isEqualTo(CaseLocation.builder()
+                           .baseLocation(CCMCC_EPIMS)
+                           .region(CCMCC_REGION_ID).build());
+    }
+
+    @Test
     public void whenDefendantIsPerson_courtIsDefendants() {
         CaseData caseData = CaseData.builder()
             .superClaimType(SuperClaimType.UNSPEC_CLAIM)
+            .claimValue(ClaimValue.builder()
+                            .statementOfValueInPennies(BigDecimal.valueOf(10000_00))
+                            .build())
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
                             .build())
@@ -119,7 +206,6 @@ public class LocationHelperTest {
             .respondent1DQ(Respondent1DQ.builder()
                                .respondent1DQRequestedCourt(
                                    RequestedCourt.builder()
-                                       .requestHearingAtSpecificCourt(YesOrNo.YES)
                                        .responseCourtCode("321")
                                        .build()
                                )
@@ -133,49 +219,16 @@ public class LocationHelperTest {
     }
 
     @Test
-    public void whenDefendant2IsPersonAndFirst_courtIsDefendants() {
-        CaseData caseData = CaseData.builder()
-            .superClaimType(SuperClaimType.UNSPEC_CLAIM)
-            .respondent2ResponseDate(LocalDateTime.now())
-            .applicant1(Party.builder()
-                            .type(Party.Type.INDIVIDUAL)
-                            .build())
-            .courtLocation(CourtLocation.builder()
-                               .applicantPreferredCourt("123")
-                               .build())
-            .respondent1(Party.builder()
-                             .type(Party.Type.INDIVIDUAL)
-                             .build())
-            .respondent2(Party.builder()
-                             .type(Party.Type.INDIVIDUAL)
-                             .build())
-            .respondent2DQ(Respondent2DQ.builder()
-                               .respondent2DQRequestedCourt(
-                                   RequestedCourt.builder()
-                                       .requestHearingAtSpecificCourt(YesOrNo.YES)
-                                       .responseCourtCode("321")
-                                       .build()
-                               )
-                               .build())
-            .build();
-
-        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
-
-        Assertions.assertThat(court.isPresent()).isTrue();
-        Assertions.assertThat(court.get()).isEqualTo(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt());
-    }
-
-    @Test
     public void whenSpecDefendantIsGroup_courtIsClaimants() {
         CaseData caseData = CaseData.builder()
             .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .totalClaimAmount(BigDecimal.valueOf(10000))
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
                             .build())
             .applicant1DQ(Applicant1DQ.builder()
                               .applicant1DQRequestedCourt(
                                   RequestedCourt.builder()
-                                      .requestHearingAtSpecificCourt(YesOrNo.YES)
                                       .responseCourtCode("123")
                                       .build()
                               )
@@ -186,7 +239,6 @@ public class LocationHelperTest {
             .respondent1DQ(Respondent1DQ.builder()
                                .respondent1DQRequestedCourt(
                                    RequestedCourt.builder()
-                                       .requestHearingAtSpecificCourt(YesOrNo.YES)
                                        .responseCourtCode("321")
                                        .build()
                                )
@@ -204,6 +256,9 @@ public class LocationHelperTest {
     public void whenDefendantIsGroup_courtIsClaimants() {
         CaseData caseData = CaseData.builder()
             .superClaimType(SuperClaimType.UNSPEC_CLAIM)
+            .claimValue(ClaimValue.builder()
+                            .statementOfValueInPennies(BigDecimal.valueOf(10000_00))
+                            .build())
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
                             .build())
@@ -216,7 +271,6 @@ public class LocationHelperTest {
             .respondent1DQ(Respondent1DQ.builder()
                                .respondent1DQRequestedCourt(
                                    RequestedCourt.builder()
-                                       .requestHearingAtSpecificCourt(YesOrNo.YES)
                                        .responseCourtCode("321")
                                        .build()
                                )
