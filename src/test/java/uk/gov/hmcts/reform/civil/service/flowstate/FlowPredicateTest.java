@@ -80,11 +80,11 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.responde
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimNotified;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotifiedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimIssue;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterFullDefence;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
 
@@ -1281,13 +1281,13 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenCaseDataAtStateTakenOfflineAfterDefendantResponse() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterDefendantResponse().build();
-            assertTrue(takenOfflineByStaff.test(caseData));
+            assertTrue(takenOfflineByStaffAfterFullDefence.test(caseData));
         }
 
         @Test
         void shouldReturnFalse_whenCaseDataNotAtStateProceedsOffline() {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
-            assertFalse(takenOfflineByStaff.test(caseData));
+            assertFalse(takenOfflineByStaffAfterFullDefence.test(caseData));
         }
     }
 
