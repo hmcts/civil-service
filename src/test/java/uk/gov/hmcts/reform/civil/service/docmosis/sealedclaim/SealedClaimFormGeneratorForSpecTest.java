@@ -143,8 +143,6 @@ public class SealedClaimFormGeneratorForSpecTest {
             any(SealedClaimFormForSpec.class),
             eq(N2_1V2_SAME_SOL)
         );
-
-
     }
 
     @Test
