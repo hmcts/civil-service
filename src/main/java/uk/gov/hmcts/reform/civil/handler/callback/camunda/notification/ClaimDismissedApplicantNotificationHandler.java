@@ -10,31 +10,26 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_DISMISSED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.*;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.*;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
-
 
 @Service
 @RequiredArgsConstructor
-public class ClaimDismissedApplicantNotificationHandler extends CallbackHandler
-    implements NotificationData {
+public class ClaimDismissedApplicantNotificationHandler extends CallbackHandler implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_DISMISSED);
@@ -87,25 +82,23 @@ public class ClaimDismissedApplicantNotificationHandler extends CallbackHandler
         );
     }
 
-
     private String getSolicitorClaimDismissedProperty(CaseData caseData) {
-
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-        List<String> stateHistoryNameList = stateFlow.getStateHistory().stream().map(State::getName).collect(Collectors.toList());
-
+        List<String> stateHistoryNameList = stateFlow.getStateHistory()
+                                            .stream()
+                                            .map(State::getName)
+                                            .collect(Collectors.toList());
         //scenerio 1: Claim notification does not happen within 4 months of issue
         if (stateHistoryNameList.contains(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName())) {
-            return  notificationsProperties.getSolicitorClaimDismissedWithin4Months();
-        }//scenerio 2: Claims details notification is not completed within 14 days of the claim notification step
-        else if (stateHistoryNameList.contains(CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName())) {
+            return notificationsProperties.getSolicitorClaimDismissedWithin4Months();
+        } else if (stateHistoryNameList.contains(CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName())) {
+            //scenerio 2: Claims details notification is not completed within 14 days of the claim notification step
             return notificationsProperties.getSolicitorClaimDismissedWithin14Days();
-        }//scenerio 3 Claimant does not give their intention by the given deadline
-        else if(stateHistoryNameList.contains(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName())){
+        } else if (stateHistoryNameList.contains(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName())) {
+            //scenerio 3 Claimant does not give their intention by the given deadline
             return notificationsProperties.getSolicitorClaimDismissedWithinDeadline();
-        }
-        else{
+        } else {
             return notificationsProperties.getSolicitorClaimDismissedWithinDeadline();
         }
     }
-
 }

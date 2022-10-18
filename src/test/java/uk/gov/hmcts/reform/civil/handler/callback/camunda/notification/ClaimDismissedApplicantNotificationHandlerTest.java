@@ -43,10 +43,8 @@ class ClaimDismissedApplicantNotificationHandlerTest {
     public static final String TEMPLATE_ID_3 = "template-id-3";
     @MockBean
     private NotificationService notificationService;
-
     @MockBean
     private FeatureToggleService featureToggleService;
-
     @MockBean
     private NotificationsProperties notificationsProperties;
 
@@ -58,6 +56,7 @@ class ClaimDismissedApplicantNotificationHandlerTest {
 
         @BeforeEach
         void setup() {
+            when(notificationsProperties.getSolicitorClaimDismissedWithinDeadline()).thenReturn(TEMPLATE_ID_1);
             when(notificationsProperties.getSolicitorClaimDismissedWithin14Days()).thenReturn(TEMPLATE_ID_3);
             when(notificationsProperties.getSolicitorClaimDismissedWithin4Months()).thenReturn(TEMPLATE_ID_2);
 
@@ -67,7 +66,6 @@ class ClaimDismissedApplicantNotificationHandlerTest {
         void shouldNotifyApplicantSolicitor_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-            when(notificationsProperties.getSolicitorClaimDismissedWithinDeadline()).thenReturn(TEMPLATE_ID_1);
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -135,7 +133,6 @@ class ClaimDismissedApplicantNotificationHandlerTest {
             "claim-dismissed-applicant-notification-000DC001"
         );
     }
-
 
     @NotNull
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
