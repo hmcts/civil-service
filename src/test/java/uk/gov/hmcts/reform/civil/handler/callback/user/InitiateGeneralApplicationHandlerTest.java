@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
@@ -306,6 +307,68 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                                                 .getGeneralAppN245FormUpload()
                                                                 .getDocumentFileName(), N245_FILE_NAME))
                 .thenCallRealMethod();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
+    class MidEventForHearingDateValidation extends LocationRefSampleDataBuilder {
+
+        private static final String INVALID_DATE = "Date should be in future";
+        private static final String VALIDATE_HEARING_DATE = "ga-validate-hearing-date";
+
+        @Test
+        void shouldThrowErrorsWhenHearingDateIsPast() {
+            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
+            CaseData caseData = CaseDataBuilder
+                .builder()
+                .generalAppHearingDate(GAHearingDateGAspec.builder().hearingScheduledPreferenceYesNo(YES)
+                                           .hearingScheduledDate(LocalDate.now().minusDays(3))
+                                           .build())
+                .generalAppType(GAApplicationType.builder().types(types).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_DATE);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors().size()).isEqualTo(1);
+
+            assertThat(response.getErrors().get(0)).isEqualTo(INVALID_DATE);
+        }
+
+        @Test
+        void shouldNotCauseAnyErrorsWhenHearingDateIsPresent() {
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_JUDGEMENT);
+
+            CaseData caseData = CaseDataBuilder
+                .builder()
+                .generalAppHearingDate(GAHearingDateGAspec.builder().hearingScheduledPreferenceYesNo(YES)
+                                           .hearingScheduledDate(LocalDate.now())
+                                           .build())
+                .generalAppType(GAApplicationType.builder().types(types).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_DATE);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNotCauseAnyErrorsWhenHearingDateIsFuture() {
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_JUDGEMENT);
+
+            CaseData caseData = CaseDataBuilder
+                .builder()
+                .generalAppHearingDate(GAHearingDateGAspec.builder().hearingScheduledPreferenceYesNo(YES)
+                                           .hearingScheduledDate(LocalDate.now().plusDays(4))
+                                           .build())
+                .generalAppType(GAApplicationType.builder().types(types).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_DATE);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 

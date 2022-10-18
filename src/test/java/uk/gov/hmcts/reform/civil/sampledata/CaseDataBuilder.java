@@ -78,6 +78,7 @@ import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
@@ -302,6 +303,7 @@ public class CaseDataBuilder {
     private YesOrNo generalAppVaryJudgementType;
     private Document generalAppN245FormUpload;
     private GAApplicationType generalAppType;
+    private GAHearingDateGAspec generalAppHearingDate;
 
     //update pdf document from general applications
     private List<Element<CaseDocument>> generalOrderDocument;
@@ -318,6 +320,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder generalAppType(GAApplicationType generalAppType) {
         this.generalAppType = generalAppType;
+        return this;
+    }
+
+    public CaseDataBuilder generalAppHearingDate(GAHearingDateGAspec generalAppHearingDate) {
+        this.generalAppHearingDate = generalAppHearingDate;
         return this;
     }
 
@@ -3245,6 +3252,7 @@ public class CaseDataBuilder {
             .generalAppType(generalAppType)
             .generalAppVaryJudgementType(generalAppVaryJudgementType)
             .generalAppN245FormUpload(generalAppN245FormUpload)
+            .generalAppHearingDate(generalAppHearingDate)
             .solicitorReferences(solicitorReferences)
             .courtLocation(courtLocation)
             .claimValue(claimValue)
