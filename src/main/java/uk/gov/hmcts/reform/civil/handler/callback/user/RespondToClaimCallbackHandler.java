@@ -172,13 +172,26 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .isRespondent1(isRespondent1);
 
         if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
-            courtLocationList = courtLocationUtils.getLocationsFromList(fetchLocationData(callbackParams));
-            updatedCaseData.respondent1DQ(Respondent1DQ.builder()
-                                              .respondent1DQRequestedCourt(
-                                                  RequestedCourt.builder()
-                                                      .responseCourtLocations(courtLocationList)
-                                                      .build())
-                                              .build());
+            List<LocationRefData> locations = fetchLocationData(callbackParams);
+            courtLocationList = courtLocationUtils.getLocationsFromList(locations);
+            RequestedCourt.RequestedCourtBuilder requestedCourt1 = RequestedCourt.builder()
+                .responseCourtLocations(courtLocationList);
+            Optional.ofNullable(caseData.getCourtLocation())
+                .map(CourtLocation::getApplicantPreferredCourt)
+                .flatMap(applicantCourt -> locations.stream()
+                    .filter(locationRefData -> applicantCourt.equals(locationRefData.getCourtLocationCode()))
+                    .findFirst())
+                .ifPresent(locationRefData -> requestedCourt1
+                    .otherPartyPreferredSite(locationRefData.getCourtLocationCode()
+                                                 + " " + locationRefData.getSiteName()));
+            updatedCaseData
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQRequestedCourt(
+                                       requestedCourt1
+                                           .build())
+                                   .build())
+                .respondent2DQ(Respondent2DQ.builder()
+                                   .respondent2DQRequestedCourt(requestedCourt1.build()).build());
         }
 
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
