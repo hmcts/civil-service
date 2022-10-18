@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -307,24 +308,38 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldHandleCourtLocationData() {
                 when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
 
+                when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString()))
+                    .thenReturn(Collections.singletonList(
+                        LocationRefData.builder()
+                            .courtLocationCode("123")
+                            .siteName("Site name")
+                            .build()
+                    ));
                 when(courtLocationUtils.getLocationsFromList(any()))
                     .thenReturn(fromList(List.of("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124")));
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
+                    .build().toBuilder()
+                    .courtLocation(uk.gov.hmcts.reform.civil.model.CourtLocation.builder()
+                                       .applicantPreferredCourt("123")
+                                       .build())
                     .build();
 
                 CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
-                DynamicList dynamicList = getCaseData(response)
-                    .getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtLocations();
+                RequestedCourt respondent1DQRequestedCourt = getCaseData(response)
+                    .getRespondent1DQ().getRespondent1DQRequestedCourt();
+                DynamicList dynamicList = respondent1DQRequestedCourt.getResponseCourtLocations();
 
                 List<String> courtlist = dynamicList.getListItems().stream()
                     .map(DynamicListElement::getLabel)
                     .collect(Collectors.toList());
 
                 assertThat(courtlist).containsOnly("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124");
+                assertThat(respondent1DQRequestedCourt.getOtherPartyPreferredSite())
+                    .isEqualTo("123 Site name");
             }
 
             @Test
