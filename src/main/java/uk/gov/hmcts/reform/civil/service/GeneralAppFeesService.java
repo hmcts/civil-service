@@ -27,16 +27,10 @@ public class GeneralAppFeesService {
 
     private static final BigDecimal PENCE_PER_POUND = BigDecimal.valueOf(100);
     private static final int FREE_GA_DAYS = 14;
-    private static final String FREE_CODE = "FEEFREE";
-    private static final String FREE_VERSION = "2";
-
     private final RestTemplate restTemplate;
     private final GeneralAppFeesConfiguration feesConfiguration;
 
     public Fee getFeeForGA(CaseData caseData) {
-        if (isFreeApplication(caseData)) {
-            return freeFee();
-        }
         String queryURL = feesConfiguration.getUrl() + feesConfiguration.getEndpoint();
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
                 .queryParam("channel", feesConfiguration.getChannel())
@@ -74,15 +68,10 @@ public class GeneralAppFeesService {
         return false;
     }
 
-    private Fee freeFee() {
-        return Fee.builder()
-                .calculatedAmountInPence(BigDecimal.ZERO)
-                .version(FREE_VERSION)
-                .code(FREE_CODE)
-                .build();
-    }
-
     private String getKeyword(CaseData caseData) {
+        if (isFreeApplication(caseData)) {
+            return feesConfiguration.getFreeKeyword();
+        }
         boolean isNotified = caseData.getGeneralAppRespondentAgreement() != null
                 && NO.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
                 && caseData.getGeneralAppInformOtherParty() != null

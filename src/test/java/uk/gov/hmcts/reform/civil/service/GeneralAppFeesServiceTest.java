@@ -62,6 +62,7 @@ class GeneralAppFeesServiceTest {
         when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
         when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
         when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
+        when(feesConfiguration.getFreeKeyword()).thenReturn("GeneralAppFree");
     }
 
     @Test
@@ -150,6 +151,13 @@ class GeneralAppFeesServiceTest {
 
     @Test
     void shouldReturnFreeData_whenConsentedLateThan14DaysAdjournVacateApplicationIsBeingMade() {
+        when(restTemplate.getForObject(queryCaptor.capture(), eq(FeeLookupResponseDto.class)))
+                .thenReturn(FeeLookupResponseDto.builder()
+                        .feeAmount(TEST_FEE_AMOUNT_POUNDS_275)
+                        .code("test_fee_code")
+                        .version(1)
+                        .build());
+
         GAHearingDateGAspec gaHearingDateGAspec = GAHearingDateGAspec.builder()
                 .hearingScheduledDate(LocalDate.now().plusDays(15)).build();
         GAApplicationType gaApplicationType = GAApplicationType.builder()
@@ -163,7 +171,9 @@ class GeneralAppFeesServiceTest {
 
         Fee feeDto = feesService.getFeeForGA(caseData);
 
-        assertThat(feeDto.getCalculatedAmountInPence()).isEqualTo(BigDecimal.ZERO);
+        assertThat(queryCaptor.getValue().toString())
+                .isEqualTo("dummy_url/fees-register/fees/lookup?channel=default&event=general%20application"
+                        + "&jurisdiction1=civil&jurisdiction2=civil&service=general&keyword=GeneralAppFree");
     }
 
     @Test
