@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsPro
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 
@@ -23,9 +22,6 @@ import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_CLAIM_DISMISSED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
 @Service
@@ -84,10 +80,13 @@ public class ClaimDismissedApplicantNotificationHandler extends CallbackHandler 
     }
 
     private String getSolicitorClaimDismissedProperty(CaseData caseData) {
-          return NotificationUtils.getSolicitorClaimDismissedProperty(
-            caseData, stateFlowEngine.evaluate(caseData).getStateHistory()
+        return NotificationUtils.getSolicitorClaimDismissedProperty(
+            stateFlowEngine.evaluate(caseData)
+                .getStateHistory()
                 .stream()
                 .map(State::getName)
-                .collect(Collectors.toList()), notificationsProperties);
+                .collect(Collectors.toList()),
+            notificationsProperties
+        );
     }
 }
