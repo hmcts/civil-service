@@ -11,12 +11,17 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.service.bankholidays.PublicHolidaysCollection;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -28,6 +33,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -48,6 +54,7 @@ public class HearingScheduledHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(HEARING_SCHEDULED);
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
+    private final PublicHolidaysCollection publicHolidaysCollection;
     private final HearingReferenceNumberRepository hearingReferenceNumberRepository;
 
     @Override
@@ -57,24 +64,24 @@ public class HearingScheduledHandler extends CallbackHandler {
             .put(callbackKey(MID, "locationName"), this::locationList)
             .put(callbackKey(MID, "checkPastDate"), this::checkPastDate)
             .put(callbackKey(MID, "checkFutureDate"), this::checkFutureDate)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::getDueDateAndFee)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
 
-    private String getBody(CaseData caseData) {
+    private String getBody() {
         return format(HEARING_TASKS);
     }
 
-    private String getHeader(CaseData caseData) {
+    private String getHeader() {
         return format(HEARING_CREATED_HEADER, hearingReferenceNumberRepository.getHearingReferenceNumber());
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader(caseData))
-            .confirmationBody(getBody(caseData))
+            .confirmationHeader(getHeader())
+            .confirmationBody(getBody())
             .build();
     }
 
@@ -89,14 +96,14 @@ public class HearingScheduledHandler extends CallbackHandler {
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(objectMapper))
-                .build();
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 
     private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
         return fromList(locations.stream().map(location -> new StringBuilder().append(location.getSiteName())
-                                 .append(" - ").append(location.getCourtAddress())
-                                .append(" - ").append(location.getPostcode()).toString())
+                .append(" - ").append(location.getCourtAddress())
+                .append(" - ").append(location.getPostcode()).toString())
                             .collect(Collectors.toList()));
     }
 
@@ -104,7 +111,6 @@ public class HearingScheduledHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
 
         LocalDate dateOfApplication = caseData.getDateOfApplication();
-
         List<String> errors = (Objects.isNull(dateOfApplication)) ? null :
             isPastDate(dateOfApplication);
 
@@ -149,6 +155,45 @@ public class HearingScheduledHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse getDueDateAndFee(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        if (caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
+            if (LocalDate.now().isBefore(caseData.getHearingDate().minusWeeks(4))) {
+                caseDataBuilder.hearingDueDate(
+                    HearingUtils.addBusinessDays(
+                        LocalDate.now(), 7, publicHolidaysCollection.getPublicHolidays()));
+            } else {
+                caseDataBuilder.hearingDueDate(
+                    HearingUtils.addBusinessDays(
+                        LocalDate.now(), 20, publicHolidaysCollection.getPublicHolidays()));
+            }
+            switch (caseData.getAllocatedTrack()) {
+                case SMALL_CLAIM:
+                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
+                    break;
+                case FAST_CLAIM:
+                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(
+                        HearingUtils.getFastTrackFee(
+                            caseData.getClaimFee().getCalculatedAmountInPence().intValue())).build());
+                    break;
+                case MULTI_CLAIM:
+                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(117500)).build());
+                    break;
+                default:
+                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(0)).build());
+            }
+        }
+        if (nonNull(caseData.getHearingLocation())) {
+            DynamicList locationList = caseData.getHearingLocation();
+            locationList.setListItems(null);
+            caseDataBuilder.hearingLocation(locationList);
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
