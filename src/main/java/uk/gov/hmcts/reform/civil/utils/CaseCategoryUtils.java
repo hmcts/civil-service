@@ -12,7 +12,11 @@ public class CaseCategoryUtils {
 
     public static boolean isSpecCaseCategory(CaseData caseData, boolean isAccessProfilesEnabled) {
         if (isAccessProfilesEnabled) {
-            return CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
+            if (caseData.getSuperClaimType() == null) {
+                return CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
+            } else {
+                return SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType());
+            }
         } else {
             return SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType());
         }
