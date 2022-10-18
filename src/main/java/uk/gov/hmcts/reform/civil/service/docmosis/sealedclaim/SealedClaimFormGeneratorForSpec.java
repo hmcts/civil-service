@@ -201,13 +201,10 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     }
 
     private String getResponseDedline(CaseData caseData) {
-        LocalDate issueDate = caseData.getIssueDate();
-        if (isAfterFourPM()) {
-            issueDate = issueDate.plusDays(1);
-        }
+        LocalDate date = caseData.getIssueDate();
         var notificationDeadline = formatLocalDate(
             deadlinesCalculator
-                .calculateFirstWorkingDay(issueDate.plusDays(28)),
+                .calculateFirstWorkingDay(isAfterFourPM() ? date.plusDays(29) : date.plusDays(28)),
             DATE
         );
         return END_OF_BUSINESS_DAY + notificationDeadline;
