@@ -84,6 +84,9 @@
   <suppress until="2022-10-10">
     <cve>CVE-2021-43980</cve>
   </suppress>
+  <suppress until="2022-10-21">
+    <cve>CVE-2022-42889</cve>
+  </suppress>
   <suppress>
     <notes>Temporary Suppression
       CVE-2022-42003 refer https://tools.hmcts.net/jira/browse/CIV-5179
