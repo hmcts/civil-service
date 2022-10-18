@@ -67,8 +67,8 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         var reason = callbackParams.getRequest().getCaseDetails().getData().get("reasonNotSuitableSDO");
         if (reason.toString().length() > 158) { // set at 158, because the method adds {input=} characters
-            errors.add("Character Limit Reached: "
-                           + "Reason for not drawing Standard Directions Order cannot exceed 150 characters.");
+            errors.add("The event has not been created: "
+                           + "The 150 character limit has been exceeded.");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
