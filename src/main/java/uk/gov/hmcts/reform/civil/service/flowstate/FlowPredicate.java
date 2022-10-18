@@ -405,6 +405,10 @@ public class FlowPredicate {
     public static final Predicate<CaseData> takenOfflineByStaff = caseData ->
         caseData.getTakenOfflineByStaffDate() != null;
 
+    public static final Predicate<CaseData> takenOfflineByStaffAfterFullDefence = caseData ->
+        caseData.getTakenOfflineByStaffDate() != null
+            && !getPredicateForClaimantIntentionProceed(caseData);
+
     public static final Predicate<CaseData> takenOfflineByStaffAfterClaimIssue = caseData ->
         caseData.getTakenOfflineByStaffDate() != null
             && caseData.getClaimNotificationDate() == null
