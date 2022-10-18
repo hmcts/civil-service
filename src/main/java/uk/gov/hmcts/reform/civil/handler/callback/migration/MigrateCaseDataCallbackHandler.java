@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 
 import java.util.Collections;
 import java.util.List;
@@ -44,12 +46,12 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
 
         log.info("Migrating data for case: {}", oldCaseData.getCcdCaseReference());
 
-        //if (SuperClaimType.SPEC_CLAIM.equals(oldCaseData.getSuperClaimType())) {
-        //    caseDataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
-        //    updateOrgPolicyCaseRole(oldCaseData, caseDataBuilder);
-        //} else {
-        //    caseDataBuilder.caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
-        //}
+        if (SuperClaimType.SPEC_CLAIM.equals(oldCaseData.getSuperClaimType())) {
+            caseDataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
+            updateOrgPolicyCaseRole(oldCaseData, caseDataBuilder);
+        } else {
+            caseDataBuilder.caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
