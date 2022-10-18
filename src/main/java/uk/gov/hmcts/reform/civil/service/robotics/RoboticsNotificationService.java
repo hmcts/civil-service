@@ -127,11 +127,11 @@ public class RoboticsNotificationService {
 
     private String getRoboticsEmailRecipient(boolean isMultiParty, boolean isSpecClaim) {
         if (isSpecClaim) {
-            log.info("EMAIl:---------" + roboticsEmailConfiguration.getSpecRecipient());
+            log.info("EMAIl:---------Sending email from ROBOTICS Notification service " + roboticsEmailConfiguration.getSpecRecipient());
             return roboticsEmailConfiguration.getSpecRecipient();
         }
         return isMultiParty ? roboticsEmailConfiguration
-            .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
+            .getRecipient() : roboticsEmailConfiguration.getRecipient();
     }
 
     public static String findLatestEventTriggerReason(EventHistory eventHistory) {
