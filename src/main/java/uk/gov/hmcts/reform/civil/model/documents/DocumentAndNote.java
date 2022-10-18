@@ -3,14 +3,14 @@ package uk.gov.hmcts.reform.civil.model.documents;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder(toBuilder = true)
+@NoArgsConstructor
 @AllArgsConstructor
-@Getter
 public class DocumentAndNote {
 
-    private final Document document;
+    private Document document;
 
 }
