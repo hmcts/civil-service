@@ -85,6 +85,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
@@ -95,7 +96,6 @@ import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCatego
 public class FlowStateAllowedEventService {
 
     private final StateFlowEngine stateFlowEngine;
-
     private final CaseDetailsConverter caseDetailsConverter;
     private final FeatureToggleService toggleService;
 
@@ -519,6 +519,10 @@ public class FlowStateAllowedEventService {
         entry(
             TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED.fullName(),
             List.of(ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM)
+        ),
+        entry(
+            TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName(),
+            List.of(ADD_CASE_NOTE)
         ),
         entry(
             CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName(),

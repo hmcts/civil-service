@@ -145,10 +145,17 @@ public class Respondent1DQ implements DQ {
                 optRespond.map(RequestedCourt::getReasonForHearingAtSpecificCourt)
             ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
 
-            return RequestedCourt.builder()
+            RequestedCourt.RequestedCourtBuilder copyBuilder = RequestedCourt.builder()
                 .requestHearingAtSpecificCourt(requestHearingAtSpecificCourt)
                 .responseCourtCode(responseCourtCode)
-                .reasonForHearingAtSpecificCourt(reasonForHearingAtSpecificCourt)
+                .reasonForHearingAtSpecificCourt(reasonForHearingAtSpecificCourt);
+
+            Stream.of(
+                optRespondentDQ.map(RequestedCourt::getCaseLocation),
+                optRespond.map(RequestedCourt::getCaseLocation)
+            ).filter(Optional::isPresent).findFirst().map(Optional::get).ifPresent(copyBuilder::caseLocation);
+
+            return copyBuilder
                 .build();
         }
         return respondent1DQRequestedCourt;

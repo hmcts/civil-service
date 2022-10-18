@@ -232,6 +232,7 @@ class FlowStateAllowedEventServiceTest {
                         NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL
+
                     }
                 ),
                 of(
