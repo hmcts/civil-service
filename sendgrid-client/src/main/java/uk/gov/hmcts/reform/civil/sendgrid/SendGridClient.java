@@ -45,6 +45,8 @@ public class SendGridClient {
             request.setEndpoint("mail/send");
             request.setBody(mail.build());
 
+            log.info("sendgrid emails-----------sender emailaddress:" + sender.getEmail() + "subject: " + subject
+                         + "recipient: " + recipient.getEmail());
             Response response = sendGrid.api(request);
             if (!is2xxSuccessful(response)) {
                 throw new EmailSendFailedException(new HttpException(String.format(
@@ -52,6 +54,8 @@ public class SendGridClient {
                     response.getStatusCode(),
                     response.getBody()
                 )));
+            } else {
+                log.info("mail sent");
             }
         } catch (IOException exception) {
             throw new EmailSendFailedException(exception);
