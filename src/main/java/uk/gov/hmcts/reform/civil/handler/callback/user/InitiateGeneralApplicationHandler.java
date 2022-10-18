@@ -129,7 +129,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
 
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.getGeneralAppHearingDate().getHearingScheduledPreferenceYesNo().equals(YesOrNo.YES)) {
+        if (caseData.getGeneralAppHearingDate() != null
+            && caseData.getGeneralAppHearingDate().getHearingScheduledPreferenceYesNo().equals(YesOrNo.YES)) {
             if (caseData.getGeneralAppHearingDate().getHearingScheduledDate().isBefore(LocalDate.now())) {
                 errors.add(INVALID_DATE);
             }
