@@ -80,7 +80,6 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
                 deadlinesCalculator.plus28DaysAt4pmDeadline(LocalDateTime.now()))
             // .respondent1Represented(YES)
             .claimDismissedDate(null);
-        System.out.printf(" CCD response deadline " + deadlinesCalculator.plus28DaysAt4pmDeadline(LocalDateTime.now()));
         CaseDocument sealedClaim = sealedClaimFormGeneratorForSpec.generate(
             caseDataBuilder.build(),
             callbackParams.getParams().get(BEARER_TOKEN).toString()
