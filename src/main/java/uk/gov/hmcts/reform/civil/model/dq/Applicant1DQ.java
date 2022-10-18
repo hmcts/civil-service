@@ -110,7 +110,6 @@ public class Applicant1DQ implements DQ {
 
         if (applicant1DQRequestedCourt != null) {
             return RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(applicant1DQRequestedCourt.getRequestHearingAtSpecificCourt())
                 .responseCourtCode(applicant1DQRequestedCourt.getResponseCourtCode())
                 .reasonForHearingAtSpecificCourt(applicant1DQRequestedCourt.getReasonForHearingAtSpecificCourt())
                 .caseLocation(applicant1DQRequestedCourt.getCaseLocation())

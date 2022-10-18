@@ -45,7 +45,6 @@ abstract class DQTest {
         return RequestedCourt.builder()
             .responseCourtCode("343")
             .reasonForHearingAtSpecificCourt("reason for court")
-            .requestHearingAtSpecificCourt(YES)
             .build();
     }
 

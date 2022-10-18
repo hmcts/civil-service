@@ -52,7 +52,7 @@ dependencies {
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.8.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.8.1'
-  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.6.1'
+  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.8.1'
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.10.22'
   testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.10.22'
 
