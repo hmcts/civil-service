@@ -100,9 +100,6 @@ class TrialReadyCheckHandlerTest {
 
     @Test
     void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
-        String errorMessage = "there was an error";
-
-        doThrow(new NotFoundException(errorMessage)).when(externalTaskService).complete(mockTask);
 
         handler.execute(mockTask, externalTaskService);
 
