@@ -317,7 +317,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MidEventForHearingDateValidation extends LocationRefSampleDataBuilder {
 
-        private static final String INVALID_DATE = "Date should be in future";
+        private static final String INVALID_HEARING_DATE = "The hearing date must be in the future";
         private static final String VALIDATE_HEARING_DATE = "ga-validate-hearing-date";
 
         @Test
@@ -336,7 +336,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors().size()).isEqualTo(1);
 
-            assertThat(response.getErrors().get(0)).isEqualTo(INVALID_DATE);
+            assertThat(response.getErrors().get(0)).isEqualTo(INVALID_HEARING_DATE);
         }
 
         @Test
