@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.handler.tasks.DecisionOutcomeHandler;
 @Component
 public class DecisionOutcomeExternalTaskListener {
 
-    private static final String TOPIC = "DECISION_OUTCOME";
+    private static final String TOPIC = "MOVE_TO_DECISION_OUTCOME";
 
     @Autowired
     private DecisionOutcomeExternalTaskListener(DecisionOutcomeHandler handler, ExternalTaskClient client) {

@@ -25,7 +25,7 @@ public class DecisionOutcomeSearchService extends ElasticSearchService {
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(rangeQuery("data.hearingDate").lt("now"))
+                            .must(rangeQuery("data.hearingDate").lte("now"))
                             .must(beState(PREPARE_FOR_HEARING_CONDUCT_HEARING))),
             List.of("reference"),
             startIndex

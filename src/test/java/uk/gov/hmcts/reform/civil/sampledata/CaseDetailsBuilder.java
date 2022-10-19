@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NO
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 
 @SuppressWarnings("unchecked")
@@ -144,6 +146,16 @@ public class CaseDetailsBuilder {
             .build();
         this.data = mapper.convertValue(caseData, Map.class);
         this.state = AWAITING_APPLICANT_INTENTION.name();
+        return this;
+    }
+
+    public CaseDetailsBuilder atStateDecisionOutcome() {
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceSpec().build().toBuilder()
+            .hearingDate(LocalDate.now())
+            .ccdState(PREPARE_FOR_HEARING_CONDUCT_HEARING)
+            .build();
+        this.data = mapper.convertValue(caseData, Map.class);
+        this.state = PREPARE_FOR_HEARING_CONDUCT_HEARING.name();
         return this;
     }
 
