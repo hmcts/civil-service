@@ -69,7 +69,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final Time time;
     private final FeatureToggleService featureToggleService;
     private final LocationRefDataService locationRefDataService;
-    private final LocationHelper locationHelper = new LocationHelper();
+    private final LocationHelper locationHelper;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -194,6 +194,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams, boolean v1) {
         CaseData caseData = callbackParams.getCaseData();
+
         LocalDateTime currentTime = time.now();
 
         CaseData.CaseDataBuilder builder = caseData.toBuilder()
@@ -215,11 +216,18 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
             if (caseData.getApplicant1DQ() != null
                 && caseData.getApplicant1DQ().getApplicant1DQFileDirectionsQuestionnaire() != null) {
-                Applicant1DQ dq = caseData.getApplicant1DQ().toBuilder()
-                    .applicant1DQStatementOfTruth(statementOfTruth)
-                    .build();
+                Applicant1DQ.Applicant1DQBuilder applicant1DQBuilder = caseData.getApplicant1DQ().toBuilder();
+                applicant1DQBuilder.applicant1DQStatementOfTruth(statementOfTruth);
 
-                builder.applicant1DQ(dq);
+                if (featureToggleService.isCourtLocationDynamicListEnabled()) {
+                    applicant1DQBuilder.applicant1DQRequestedCourt(
+                            RequestedCourt.builder()
+                                .caseLocation(caseData.getCourtLocation().getCaseLocation())
+                                .responseCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                .build());
+                }
+
+                builder.applicant1DQ(applicant1DQBuilder.build());
             }
 
             if (caseData.getApplicant2DQ() != null
