@@ -135,7 +135,7 @@ public class SealedClaimFormGeneratorForSpecTest {
             .thenReturn(CASE_DOCUMENT);
 
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
-        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+        assertThat(caseDocument).isNotNull();
 
         verify(representativeService, times(2)).getRespondent1Representative(caseData);
         verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
