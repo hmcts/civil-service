@@ -70,6 +70,11 @@ genApp:
       consentedOrWithoutNotice: GeneralAppWithoutNotice
   lrd:
     endpoint: /refdata/location/court-venues
+    ccmcc:
+#      claims with value under this amount in pounds are assigned to CCMCC
+      amountPounds: 1000
+      epimsId: 192280
+      regionId: 5
   jrd:
     endpoint: /refdata/judicial/users/search
 
@@ -128,6 +133,10 @@ reference:
   database:
     enabled: true
     migration: false
+
+aca:
+  api:
+    baseurl: ${ACA_SERVICE_API_BASEURL:http://localhost:4454}
 
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
