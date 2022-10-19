@@ -17,7 +17,9 @@ import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -157,6 +159,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "Site 2 - Adr 2 - BBB 222",
                 "Site 3 - Adr 3 - CCC 333"
             );
+            assertThat(response.getData()).extracting("fastTrackMethod")
+                .isEqualTo(FastTrackMethod.fastTrackMethodInPerson.name());
+            assertThat(response.getData()).extracting("smallClaimsMethod")
+                .isEqualTo(SmallClaimsMethod.smallClaimsMethodInPerson.name());
         }
 
         /**
@@ -186,6 +192,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "Site 2 - Adr 2 - BBB 222",
                 "Site 3 - Adr 3 - CCC 333"
             );
+            assertThat(response.getData()).extracting("fastTrackMethod")
+                .isEqualTo(FastTrackMethod.fastTrackMethodInPerson.name());
+            assertThat(response.getData()).extracting("smallClaimsMethod")
+                .isEqualTo(SmallClaimsMethod.smallClaimsMethodInPerson.name());
         }
 
         /**
@@ -221,6 +231,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "Site 2 - Adr 2 - BBB 222",
                 "Site 3 - Adr 3 - CCC 333"
             );
+            assertThat(response.getData()).extracting("fastTrackMethod")
+                .isEqualTo(FastTrackMethod.fastTrackMethodInPerson.name());
+            assertThat(response.getData()).extracting("smallClaimsMethod")
+                .isEqualTo(SmallClaimsMethod.smallClaimsMethodInPerson.name());
         }
 
         /**
@@ -263,6 +277,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 "Site 3 - Adr 3 - CCC 333"
             );
             assertThat(dynamicList.getValue().getLabel()).isEqualTo("Site 3 - Adr 3 - CCC 333");
+            assertThat(response.getData()).extracting("fastTrackMethod")
+                .isEqualTo(FastTrackMethod.fastTrackMethodInPerson.name());
+            assertThat(response.getData()).extracting("smallClaimsMethod")
+                .isEqualTo(SmallClaimsMethod.smallClaimsMethodInPerson.name());
         }
     }
 
