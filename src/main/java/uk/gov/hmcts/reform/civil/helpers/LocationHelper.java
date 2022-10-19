@@ -1,11 +1,10 @@
 package uk.gov.hmcts.reform.civil.helpers;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
@@ -187,6 +186,7 @@ public class LocationHelper {
      * @param preferredCourt a preferred court
      * @return first matching location
      */
+
     private Optional<LocationRefData> getMatching(List<LocationRefData> locations, RequestedCourt preferredCourt) {
         if (preferredCourt == null) {
             return Optional.empty();
