@@ -97,6 +97,9 @@ public class NotificationsProperties {
     private String sdoOrdered;
 
     @NotEmpty
+    private String sdoOrderedSpec;
+
+    @NotEmpty
     private String claimantSolicitorConfirmsNotToProceedSpec;
 
     @NotEmpty
@@ -164,5 +167,8 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String respondentLipFullDefenceNoMediationTemplate;
+
+    @NotEmpty
+    private String respondentLipResponseSubmissionTemplate;
 
 }
