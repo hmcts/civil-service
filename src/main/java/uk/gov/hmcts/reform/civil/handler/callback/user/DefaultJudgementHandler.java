@@ -244,10 +244,10 @@ public class DefaultJudgementHandler extends CallbackHandler {
         }
         caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT));
 
-        var state = "JUDICIAL_REFERRAL";
+      //  var state = "JUDICIAL_REFERRAL";
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .state(state)
+         //   .state(state)
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
