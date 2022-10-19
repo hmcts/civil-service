@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -75,17 +76,26 @@ public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             startedDate = LocalDateTime.now();
+            startedDate = LocalDateTime.of(startedDate.getYear(), startedDate.getMonth(), startedDate.getDayOfMonth(),
+                             startedDate.getHour(), startedDate.getMinute(), startedDate.getSecond(),
+                             0);  // set to avoid elision of zeroes to cause random test errors.
+
             given(time.now()).willReturn(startedDate);
 
         }
 
+        @SuppressWarnings("unchecked")
         @Test
         void checkUnsuitableSDODate() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            String timeString = time.now().toString();
+            int lengthToCheck = "yyyy-MM-ddThh:mm:ss".length();
+            String timeString = time.now().toString().substring(0, lengthToCheck);
             assertThat(response.getData()).extracting("unsuitableSDODate")
-                .isEqualTo(timeString.substring(0, Math.min(timeString.length(), 27)));
+                .is(new Condition<>(
+                    (Object o) -> o.toString().startsWith(timeString),
+                    "Date matches"
+                ));
 
         }
     }
