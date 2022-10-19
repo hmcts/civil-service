@@ -56,7 +56,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private static final String N245_FILE_NAME = "Statement of incomings and outgoings";
     private static final String N245_FILE_NAME_ERROR = "File should be named "
         + "as \"Statement of incomings and outgoings\"";
-    private static final String INVALID_DATE = "Date should be in future";
+    private static final String INVALID_HEARING_DATE = "The hearing date must be in the future";
     private static final String SET_FEES_AND_PBA = "ga-fees-and-pba";
     private static final String POUND_SYMBOL = "£";
     private static final List<CaseEvent> EVENTS = Collections.singletonList(INITIATE_GENERAL_APPLICATION);
@@ -132,7 +132,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         if (caseData.getGeneralAppHearingDate() != null
             && caseData.getGeneralAppHearingDate().getHearingScheduledPreferenceYesNo().equals(YesOrNo.YES)
             && caseData.getGeneralAppHearingDate().getHearingScheduledDate().isBefore(LocalDate.now())) {
-            errors.add(INVALID_DATE);
+            errors.add(INVALID_HEARING_DATE);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
