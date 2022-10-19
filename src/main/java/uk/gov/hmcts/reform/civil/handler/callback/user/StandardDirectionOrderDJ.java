@@ -53,9 +53,9 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -286,6 +286,17 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                           .build());
         }
 
+        // copy of the above field to update the Hearing time field while not breaking existing cases
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            caseDataBuilder.disposalHearingFinalDisposalHearingTimeDJ(DisposalHearingFinalDisposalHearingTimeDJ
+                                                                          .builder()
+                                                                          .input("This claim will be listed for final "
+                                                                                     + "disposal before a Judge on the "
+                                                                                     + "first available date after")
+                                                                          .date(LocalDate.now().plusWeeks(16))
+                                                                          .build());
+        }
+
         caseDataBuilder.disposalHearingBundleDJ(DisposalHearingBundleDJ
                                                     .builder()
                                                     .input("The claimant must lodge at court at least 7 "
@@ -307,14 +318,14 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         if (featureToggleService.isHearingAndListingSDOEnabled()) {
             caseDataBuilder.disposalHearingOrderMadeWithoutHearingDJ(DisposalHearingOrderMadeWithoutHearingDJ
                                                    .builder()
-                                                   .input(String.format("This Order has been made without a hearing. "
-                                                              + "Each party has the right to apply to have this Order "
+                                                   .input(String.format("This order has been made without a hearing. "
+                                                              + "Each party has the right to apply to have this order "
                                                               + "set aside or varied. Any such application must be "
                                                               + "received by the Court "
                                                               + "(together with the appropriate fee) by 4pm on %s.",
                                                           deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
                                                               .format(DateTimeFormatter
-                                                                          .ofLocalizedDate(FormatStyle.LONG))))
+                                                                          .ofPattern("dd MMMM yyyy", Locale.ENGLISH))))
                                                    .build());
         }
         // populates the trial screen
