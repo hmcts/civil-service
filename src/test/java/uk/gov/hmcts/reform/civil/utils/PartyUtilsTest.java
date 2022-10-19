@@ -229,6 +229,47 @@ class PartyUtilsTest {
                          partyReferences);
         }
 
+        @Test
+        void shouldReturnRespondentReference2_when1v2DiffSolicitorCase() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .solicitorReferences(SolicitorReferences.builder()
+                                         .respondentSolicitor2Reference("defendant sol 2").build())
+                .build();
+
+            String respondentReference = PartyUtils.buildRespondentReference(caseData, true);
+
+            assertEquals("defendant sol 2",
+                         respondentReference);
+        }
+
+        @Test
+        void shouldReturnRespondentReference1_when1v2DiffSolicitorCase() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .solicitorReferences(SolicitorReferences.builder()
+                                         .respondentSolicitor1Reference("defendant sol 1").build())
+                .build();
+
+            String respondentReference = PartyUtils.buildRespondentReference(caseData, false);
+
+            assertEquals("defendant sol 1",
+                         respondentReference);
+        }
+
+        @Test
+        void shouldReturnApplicantReference1_when1v2DiffSolicitorCase() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .solicitorReferences(SolicitorReferences.builder()
+                                         .applicantSolicitor1Reference("applicant sol").build())
+                .build();
+
+            String respondentReference = PartyUtils.buildClaimantReferenceOnly(caseData);
+
+            assertEquals("applicant sol",
+                         respondentReference);
+        }
     }
 
     @Nested
