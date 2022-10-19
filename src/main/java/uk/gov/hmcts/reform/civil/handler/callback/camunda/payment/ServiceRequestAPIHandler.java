@@ -36,9 +36,14 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
 
     @Override
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return TASK_ID;
+    }
+
+    @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::makePaymentServiceReq
+            callbackKey(ABOUT_TO_SUBMIT), this::makeServiceReq
         );
     }
 
@@ -47,7 +52,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse makePaymentServiceReq(CallbackParams callbackParams) {
+    private CallbackResponse makeServiceReq(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
