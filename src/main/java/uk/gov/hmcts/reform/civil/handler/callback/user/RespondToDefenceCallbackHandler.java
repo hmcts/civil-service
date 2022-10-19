@@ -68,7 +68,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final Time time;
     private final FeatureToggleService featureToggleService;
     private final LocationRefDataService locationRefDataService;
-    private final LocationHelper locationHelper = new LocationHelper();
+    private final LocationHelper locationHelper;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -193,6 +193,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams, boolean v1) {
         CaseData caseData = callbackParams.getCaseData();
+
         LocalDateTime currentTime = time.now();
 
         CaseData.CaseDataBuilder builder = caseData.toBuilder()

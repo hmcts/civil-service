@@ -308,12 +308,8 @@ public class CaseDataBuilder {
     private DisposalHearingBundleDJ disposalHearingBundleDJ;
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private TrialHearingTrial trialHearingTrialDJ;
-    private CaseLocation caseLocation;
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
-
-    //update pdf document from general applications
-    private List<Element<CaseDocument>> generalOrderDocument;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -465,7 +461,6 @@ public class CaseDataBuilder {
             .respondent1DQExperts(Experts.builder().expertRequired(NO).build())
             .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
             .respondent1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .respondent1DQRequestedCourt(RequestedCourt.builder().requestHearingAtSpecificCourt(NO).build())
             .respondent1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
             .respondent1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
             .respondent1DQLanguage(WelshLanguageRequirements.builder().build())
@@ -499,7 +494,6 @@ public class CaseDataBuilder {
             .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
             .respondent1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .respondent1DQRequestedCourt(RequestedCourt.builder()
-                                             .requestHearingAtSpecificCourt(YES)
                                              .responseCourtCode("444")
                                              .caseLocation(CaseLocation.builder()
                                                                .baseLocation("dummy base").region("dummy region")
@@ -531,7 +525,7 @@ public class CaseDataBuilder {
             .respondent2DQExperts(Experts.builder().expertRequired(NO).build())
             .respondent2DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
             .respondent2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .respondent2DQRequestedCourt(RequestedCourt.builder().requestHearingAtSpecificCourt(NO).build())
+            .respondent2DQRequestedCourt(RequestedCourt.builder().build())
             .respondent2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
             .respondent2DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
             .respondent2DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
@@ -564,7 +558,7 @@ public class CaseDataBuilder {
             .applicant1DQExperts(Experts.builder().expertRequired(NO).build())
             .applicant1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
             .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .applicant1DQRequestedCourt(RequestedCourt.builder().requestHearingAtSpecificCourt(NO).build())
+            .applicant1DQRequestedCourt(RequestedCourt.builder().build())
             .applicant1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
             .applicant1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
             .applicant1DQLanguage(WelshLanguageRequirements.builder().build())
@@ -597,7 +591,6 @@ public class CaseDataBuilder {
             .applicant1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
             .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .applicant1DQRequestedCourt(RequestedCourt.builder()
-                                            .requestHearingAtSpecificCourt(YES)
                                             .responseCourtCode("court4")
                                             .caseLocation(CaseLocation.builder()
                                                               .baseLocation("dummy base").region("dummy region")
@@ -628,7 +621,7 @@ public class CaseDataBuilder {
             .applicant2DQExperts(Experts.builder().expertRequired(NO).build())
             .applicant2DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
             .applicant2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .applicant2DQRequestedCourt(RequestedCourt.builder().requestHearingAtSpecificCourt(NO).build())
+            .applicant2DQRequestedCourt(RequestedCourt.builder().build())
             .applicant2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
             .applicant2DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
             .applicant2DQLanguage(WelshLanguageRequirements.builder().build())

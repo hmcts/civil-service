@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
@@ -68,7 +69,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService featureToggleService;
-    private final LocationHelper locationHelper = new LocationHelper();
+    private final LocationHelper locationHelper;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -149,20 +150,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC))
             .applicant1ResponseDate(time.now());
 
-        if (callbackParams.getVersion() == V_1) {
-            locationHelper.getCaseManagementLocation(caseData)
-                .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                    builder,
-                    requestedCourt,
-                    () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
-                        CallbackParams.Params.BEARER_TOKEN).toString())
-                ));
-            if (log.isDebugEnabled()) {
-                log.debug("Case management location for " + caseData.getLegacyCaseReference()
-                              + " is " + builder.build().getCaseManagementLocation());
-            }
-        }
-
         if (caseData.getApplicant1ProceedWithClaim() == YES
             || caseData.getApplicant1ProceedWithClaimSpec2v1() == YES) {
             // moving statement of truth value to correct field, this was not possible in mid event.
@@ -171,7 +158,19 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 .applicant1DQStatementOfTruth(statementOfTruth);
             if (V_1.equals(callbackParams.getVersion())
                 && featureToggleService.isCourtLocationDynamicListEnabled()) {
+
                 handleCourtLocationData(caseData, builder, dq, callbackParams);
+                locationHelper.getCaseManagementLocation(builder.applicant1DQ(dq.build()).build())
+                    .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
+                        builder,
+                        requestedCourt,
+                        () -> locationRefDataService.getCourtLocationsForDefaultJudgments(
+                            callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString())
+                    ));
+                if (log.isDebugEnabled()) {
+                    log.debug("Case management location for " + caseData.getLegacyCaseReference()
+                                  + " is " + builder.build().getCaseManagementLocation());
+                }
             }
 
             builder.applicant1DQ(dq.build());
@@ -194,14 +193,14 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             if (Objects.nonNull(courtLocation)) {
                 dataBuilder
                     .applicant1DQ(dq.applicant1DQRequestedCourt(
-                                          caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().toBuilder()
-                                              .responseCourtLocations(null)
-                                              .caseLocation(CaseLocation.builder()
-                                                                .region(courtLocation.getRegionId())
-                                                                .baseLocation(courtLocation.getEpimmsId())
-                                                                .build())
-                                              .responseCourtCode(courtLocation.getCourtLocationCode()).build()
-                                      ).build());
+                        caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().toBuilder()
+                            .responseCourtLocations(null)
+                            .caseLocation(CaseLocation.builder()
+                                              .region(courtLocation.getRegionId())
+                                              .baseLocation(courtLocation.getEpimmsId())
+                                              .build())
+                            .responseCourtCode(courtLocation.getCourtLocationCode()).build()
+                    ).build());
             }
         }
     }
@@ -246,7 +245,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (featureToggleService.isSdoEnabled()) {
+        if (featureToggleService.isSdoEnabled() && !AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
             caseData.toBuilder().ccdState(CaseState.JUDICIAL_REFERRAL).build();
         }
 
