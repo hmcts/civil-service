@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
+import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
@@ -284,10 +285,16 @@ public class CaseDataParent implements MappableObject {
     @JsonProperty("CaseAccessCategory")
     private final CaseCategory caseAccessCategory;
 
+    private final ChangeOrganisationRequest changeOrganisationRequestField;
+    private final List<Element<ChangeOfRepresentation>> changeOfRepresentation;
+
     /**
      * Adding for PiP to citizen UI.
      */
     private final DefendantPinToPostLRspec respondent1PinToPostLRspec;
 
     private final ScheduledHearing nextHearingDetails;
+
+    private final String respondent1EmailAddress;
+
 }

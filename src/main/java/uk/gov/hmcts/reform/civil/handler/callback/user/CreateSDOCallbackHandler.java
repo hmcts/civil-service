@@ -116,7 +116,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final DeadlinesCalculator deadlinesCalculator;
     private final SdoGeneratorService sdoGeneratorService;
     private final FeatureToggleService featureToggleService;
-    private final LocationHelper locationHelper = new LocationHelper();
+    private final LocationHelper locationHelper;
 
     @Override
     protected Map<String, Callback> callbacks() {
