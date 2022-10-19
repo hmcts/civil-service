@@ -30,10 +30,6 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
-public class LocationHelper {
-
-    private final FeatureToggleService featureToggleService;
 public class LocationHelper {
 
     private final FeatureToggleService featureToggleService;
