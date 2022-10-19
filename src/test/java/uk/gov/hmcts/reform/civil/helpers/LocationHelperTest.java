@@ -4,7 +4,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
@@ -23,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class LocationHelperTest {
-
 
     private static final BigDecimal CCMCC_AMOUNT = BigDecimal.valueOf(1000);
     private static final String CCMCC_REGION_ID = "ccmccRegionId";
