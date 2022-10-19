@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +25,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -123,10 +121,6 @@ class HearingFeePaidHandlerTest {
 
     @Test
     void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
-        String errorMessage = "there was an error";
-
-        doThrow(new NotFoundException(errorMessage)).when(externalTaskService).complete(mockTask);
-
         handler.execute(mockTask, externalTaskService);
 
         verify(externalTaskService, never()).handleFailure(
