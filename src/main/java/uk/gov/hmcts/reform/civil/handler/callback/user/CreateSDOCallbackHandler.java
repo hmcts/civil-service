@@ -106,7 +106,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final SdoGeneratorService sdoGeneratorService;
-    private final LocationHelper locationHelper = new LocationHelper();
+    private final LocationHelper locationHelper;
 
     @Override
     protected Map<String, Callback> callbacks() {
