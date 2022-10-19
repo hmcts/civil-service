@@ -142,7 +142,6 @@ notifications:
   solicitorDefendantResponseCaseTakenOfflineMultiparty: "7e1e7b92-84aa-4231-92c1-a61516e93c31"
   respondentSolicitorAcknowledgeClaim: "b7ade9ca-da8b-4605-a296-ccee3d7d7a93"
   failedPayment: "b7b98d09-6794-4d8d-8550-cc219c91ee8c"
-  solicitorClaimDismissed: "e2f1d745-979e-43e6-9f50-e35bb30c88c1"
   solicitorClaimDismissedWithin4Months: "2775485e-aaeb-49c6-a2c8-07a15f628e8a"
   solicitorClaimDismissedWithin14Days: "1ca6bd16-61b9-4e3d-b7c4-ab726dc8abdd"
   solicitorClaimDismissedWithinDeadline: "847f080c-998b-4483-865f-72353f518d85"

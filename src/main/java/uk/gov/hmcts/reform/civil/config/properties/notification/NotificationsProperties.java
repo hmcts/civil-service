@@ -43,9 +43,6 @@ public class NotificationsProperties {
     private String failedPaymentForSpec;
 
     @NotEmpty
-    private String solicitorClaimDismissed; //ASTHA REMOVE THIS
-
-    @NotEmpty
     private String solicitorClaimDismissedWithin4Months;
 
     @NotEmpty
