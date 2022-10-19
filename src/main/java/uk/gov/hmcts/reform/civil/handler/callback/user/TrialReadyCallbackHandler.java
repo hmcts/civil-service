@@ -20,13 +20,13 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY;
 
 @Service
 @RequiredArgsConstructor
 public class TrialReadyCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(TRIAL_READY_CHECK);
+    private static final List<CaseEvent> EVENTS = List.of(TRIAL_READY);
 
     private final ObjectMapper mapper;
     private final Time time;
@@ -47,7 +47,7 @@ public class TrialReadyCallbackHandler extends CallbackHandler {
 
     private CallbackResponse setTrialReadyNotified(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData().toBuilder()
-            .businessProcess(BusinessProcess.ready(TRIAL_READY_CHECK))
+            .businessProcess(BusinessProcess.ready(TRIAL_READY))
             .trialReadyNotified(YesOrNo.YES)
             .build();
 
