@@ -10,11 +10,11 @@ import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
-class CaseHearingFeePaidSearchServiceTest extends ElasticSearchServiceTest {
+class HearingFeeDueSearchServiceTest extends ElasticSearchServiceTest {
 
     @BeforeEach
     void setup() {
-        searchService = new CaseHearingFeePaidSearchService(coreCaseDataService);
+        searchService = new HearingFeeDueSearchService(coreCaseDataService);
     }
 
     @Override

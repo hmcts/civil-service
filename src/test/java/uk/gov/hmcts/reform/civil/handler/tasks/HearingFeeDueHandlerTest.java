@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.event.StrikeOutEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.search.CaseHearingFeePaidSearchService;
+import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-class HearingFeePaidHandlerTest {
+class HearingFeeDueHandlerTest {
 
     @Mock
     private ExternalTask mockTask;
@@ -40,7 +40,7 @@ class HearingFeePaidHandlerTest {
     private ExternalTaskService externalTaskService;
 
     @Mock
-    private CaseHearingFeePaidSearchService searchService;
+    private HearingFeeDueSearchService searchService;
 
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
@@ -49,7 +49,7 @@ class HearingFeePaidHandlerTest {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
-    private HearingFeePaidHandler handler;
+    private HearingFeeDueHandler handler;
 
     @BeforeEach
     void init() {

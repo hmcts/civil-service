@@ -14,9 +14,9 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 
 @Service
-public class CaseHearingFeePaidSearchService extends ElasticSearchService {
+public class HearingFeeDueSearchService extends ElasticSearchService {
 
-    public CaseHearingFeePaidSearchService(CoreCaseDataService coreCaseDataService) {
+    public HearingFeeDueSearchService(CoreCaseDataService coreCaseDataService) {
         super(coreCaseDataService);
     }
 

@@ -11,16 +11,16 @@ import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.StrikeOutEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.search.CaseHearingFeePaidSearchService;
+import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
 
 import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class HearingFeePaidHandler implements BaseExternalTaskHandler {
+public class HearingFeeDueHandler implements BaseExternalTaskHandler {
 
-    private final CaseHearingFeePaidSearchService caseSearchService;
+    private final HearingFeeDueSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final CaseDetailsConverter caseDetailsConverter;
 
