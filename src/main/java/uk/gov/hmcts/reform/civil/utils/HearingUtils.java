@@ -110,11 +110,12 @@ public class HearingUtils {
     }
 
     public static String getHearingTimeFormatted(String hearingTime) {
-        if (!isEmpty(hearingTime) && hearingTime.length() == 4) {
-            StringBuilder hearingTimeBuilder = new StringBuilder(hearingTime);
-            hearingTimeBuilder.insert(2, ':');
-            return hearingTimeBuilder.toString();
+        if (isEmpty(hearingTime) || hearingTime.length() != 4 || !hearingTime.matches("[0-9]+")) {
+            return null;
         }
-        return null;
+
+        StringBuilder hearingTimeBuilder = new StringBuilder(hearingTime);
+        hearingTimeBuilder.insert(2, ':');
+        return hearingTimeBuilder.toString();
     }
 }

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
@@ -91,11 +92,11 @@ public class HearingUtilsTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {34600, 132000, 5000})
-    void shouldReturnFormattedFee_whenGivenAnyClaimFee(int amount) {
+    @CsvSource(value = {"34600;£346", "132000;£1,320", "5000;£50"}, delimiter=';')
+    void shouldReturnFormattedFee_whenGivenAnyClaimFee(int amount, String expectedOutput) {
         BigDecimal feeAmount = new BigDecimal(amount);
         assertThat(HearingUtils.formatHearingFee(
-            Fee.builder().calculatedAmountInPence(feeAmount).build())).isNotEmpty();
+            Fee.builder().calculatedAmountInPence(feeAmount).build())).isEqualTo(expectedOutput);
     }
 
     @ParameterizedTest
@@ -104,9 +105,10 @@ public class HearingUtilsTest {
         assertThat(HearingUtils.formatHearingDuration(hearingDuration)).isNotEmpty();
     }
 
-    @Test
-    void shouldReturnNull_whenNotAllowedTime() {
-        assertThat(HearingUtils.getHearingTimeFormatted("50000")).isNull();
+    @ParameterizedTest
+    @ValueSource(strings = {"000", "50000", "08:00", "8:00", "12:00", "23:00"})
+    void shouldReturnNull_whenNotAllowedTime(String input) {
+        assertThat(HearingUtils.getHearingTimeFormatted(input)).isNull();
     }
 
     @Test
@@ -114,8 +116,9 @@ public class HearingUtilsTest {
         assertThat(HearingUtils.getHearingTimeFormatted("")).isNull();
     }
 
-    @Test
-    void shouldReturnTimedFormatted_whenGivenAnyTime() {
-        assertThat(HearingUtils.getHearingTimeFormatted("0500")).isEqualTo("05:00");
+    @ParameterizedTest
+    @CsvSource(value = {"0000;00:00", "0500;05:00", "1200;12:00", "2300;23:00", "1230;12:30", "2318;23:18"}, delimiter=';')
+    void shouldReturnTimedFormatted_whenGivenAnyTime(String input, String expectedOutput) {
+        assertThat(HearingUtils.getHearingTimeFormatted(input)).isEqualTo(expectedOutput);
     }
 }
