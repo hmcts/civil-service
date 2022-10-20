@@ -36,7 +36,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_C
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
-import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSINESS_DAY;
 
 @Service
 @RequiredArgsConstructor
@@ -125,10 +124,9 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
         LocalDateTime claimDetailsNotificationDeadline = getDeadline(claimNotificationDate);
 
-            caseDataBuilder
-                .claimDetailsNotificationDeadline(claimDetailsNotificationDeadline)
-                .nextDeadline(claimDetailsNotificationDeadline.toLocalDate());
-
+        caseDataBuilder
+            .claimDetailsNotificationDeadline(claimDetailsNotificationDeadline)
+            .nextDeadline(claimDetailsNotificationDeadline.toLocalDate());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
