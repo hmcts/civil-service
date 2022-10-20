@@ -637,7 +637,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                         Respondent1DQ.builder()
                             .respondToCourtLocation(
                                 RequestedCourt.builder()
-                                    .requestHearingAtSpecificCourt(YES)
                                     .responseCourtLocations(preferredCourt)
                                     .reasonForHearingAtSpecificCourt("Reason")
                                     .build()
@@ -683,8 +682,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .isEqualTo(completePreferredLocation.getEpimmsId());
                 sent1.extracting("responseCourtCode")
                     .isEqualTo(completePreferredLocation.getCourtLocationCode());
-                sent1.extracting("requestHearingAtSpecificCourt")
-                    .isEqualTo("Yes");
                 sent1.extracting("reasonForHearingAtSpecificCourt")
                     .isEqualTo("Reason");
             }
@@ -710,7 +707,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                         Respondent1DQ.builder()
                             .respondToCourtLocation(
                                 RequestedCourt.builder()
-                                    .requestHearingAtSpecificCourt(YES)
                                     .responseCourtLocations(preferredCourt)
                                     .reasonForHearingAtSpecificCourt("Reason")
                                     .build()
@@ -721,7 +717,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                         Respondent2DQ.builder()
                             .respondToCourtLocation2(
                                 RequestedCourt.builder()
-                                    .requestHearingAtSpecificCourt(YES)
                                     .responseCourtLocations(preferredCourt)
                                     .reasonForHearingAtSpecificCourt("Reason123")
                                     .build()
@@ -767,8 +762,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .isEqualTo(completePreferredLocation.getEpimmsId());
                 sent2.extracting("responseCourtCode")
                     .isEqualTo(completePreferredLocation.getCourtLocationCode());
-                sent2.extracting("requestHearingAtSpecificCourt")
-                    .isEqualTo("Yes");
                 sent2.extracting("reasonForHearingAtSpecificCourt")
                     .isEqualTo("Reason123");
             }
