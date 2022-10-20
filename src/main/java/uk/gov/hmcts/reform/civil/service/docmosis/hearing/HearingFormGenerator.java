@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.hearing;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.hearing.HearingForm;
@@ -15,7 +16,6 @@ import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementSe
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +25,8 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARI
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_FAST_TRACK;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_SMALL_CLAIMS;
-import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingDuration;
+import static uk.gov.hmcts.reform.civil.utils.HearingUtils.formatHearingDuration;
+import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingTimeFormatted;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingType;
 
 @Service
@@ -70,7 +71,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
             .hearingTime(getHearingTimeFormatted(caseData.getHearingTimeHourMinute()))
             .hearingType(getHearingType(caseData))
             .applicationDate(getDateFormatted(caseData.getDateOfApplication()))
-            .hearingDuration(getHearingDuration(caseData))
+            .hearingDuration(formatHearingDuration(caseData.getHearingDuration()))
             .additionalInfo(caseData.getInformation())
             .feeAmount(HearingUtils.formatHearingFee(caseData.getHearingFee()))
             .hearingDueDate(getDateFormatted(caseData.getHearingDueDate()))
@@ -90,18 +91,11 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
         return String.format(template.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
 
-    private String getHearingTimeFormatted(String hearingTime) {
-        StringBuilder hearingTimeBuilder = new StringBuilder(hearingTime);
-        hearingTimeBuilder.insert(2, ':');
-        return hearingTimeBuilder.toString();
-    }
-
     private String getDateFormatted(LocalDate date) {
         if (isNull(date)) {
             return null;
-        } else {
-            return date.format(DateTimeFormatter.ofPattern("dd/MMM/yyyy"));
         }
+        return DateFormatHelper.formatLocalDate(date, "dd/MMM/yyyy");
     }
 
     private boolean checkReference(CaseData caseData) {

@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class HearingUtils {
 
@@ -73,8 +76,8 @@ public class HearingUtils {
         }
     }
 
-    public static String getHearingDuration(CaseData caseData) {
-        switch (caseData.getHearingDuration()) {
+    public static String formatHearingDuration(HearingDuration hearingDuration) {
+        switch (hearingDuration) {
             case MINUTES_30:
                 return "30 minutes";
             case MINUTES_60:
@@ -94,20 +97,24 @@ public class HearingUtils {
             case DAY_2:
                 return "2 days";
             default:
-                return "not defined";
+                return null;
         }
     }
 
     public static String formatHearingFee(Fee hearingFee) {
         if (nonNull(hearingFee) && hearingFee.getCalculatedAmountInPence().intValue() > 0) {
-            StringBuilder builder = new StringBuilder(hearingFee.getCalculatedAmountInPence().toString());
-            builder.delete(builder.length() - 2, builder.length());
-            if (builder.length() > 3) {
-                builder.insert(1, ',');
-            }
-            builder.insert(0, '£');
-            return builder.toString();
+            DecimalFormat formatter = new DecimalFormat("£#,###");
+            return formatter.format(hearingFee.getCalculatedAmountInPence().intValue() / 100);
         }
-        return "";
+        return null;
+    }
+
+    public static String getHearingTimeFormatted(String hearingTime) {
+        if (!isEmpty(hearingTime) && hearingTime.length() == 4) {
+            StringBuilder hearingTimeBuilder = new StringBuilder(hearingTime);
+            hearingTimeBuilder.insert(2, ':');
+            return hearingTimeBuilder.toString();
+        }
+        return null;
     }
 }
