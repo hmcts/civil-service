@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -113,10 +115,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
 
+    @Value("${court-location.unspecified-claim.region-id}")
+    private String regionId;
+    @Value("${court-location.unspecified-claim.epimms-id}")
+    private String epimmsId;
+
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::setSuperClaimType)
+            .put(callbackKey(V_1, ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "start-claim"), this::startClaim)
             .put(callbackKey(V_1, MID, "start-claim"), this::startClaim)
             .put(callbackKey(MID, "applicant"), this::validateApplicant1DateOfBirth)
@@ -370,6 +378,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             handleCourtLocationData(caseData, dataBuilder, callbackParams);
         }
 
+        if (V_1.equals(callbackParams.getVersion())
+            && toggleService.isAccessProfilesEnabled()) {
+            dataBuilder.caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+        }
+
         if (toggleService.isNoticeOfChangeEnabled()) {
             // LiP are not represented or registered
             if (areAnyRespondentsLitigantInPerson(caseData) == true) {
@@ -572,6 +585,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         if (Objects.nonNull(courtLocation)) {
             CourtLocation.CourtLocationBuilder courtLocationBuilder = caseData.getCourtLocation().toBuilder();
             dataBuilder
+                .caseManagementLocation(CaseLocation.builder().region(regionId).baseLocation(epimmsId).build())
                 .courtLocation(courtLocationBuilder
                                    .applicantPreferredCourt(courtLocation.getCourtLocationCode())
                                    .caseLocation(CaseLocation.builder()

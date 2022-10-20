@@ -32,16 +32,22 @@ import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
@@ -71,10 +77,14 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONESPEC;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONESPEC;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWOSPEC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
@@ -132,6 +142,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private final UserService userService;
     private final StateFlowEngine stateFlowEngine;
     private final CoreCaseUserService coreCaseUserService;
+    private final LocationRefDataService locationRefDataService;
+    private final CourtLocationUtils courtLocationUtils;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -146,15 +158,20 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::populateRespondent1Copy)
+            .put(callbackKey(V_1, ABOUT_TO_START), this::populateRespondent1Copy)
             .put(callbackKey(MID, "confirm-details"), this::validateDateOfBirth)
+            .put(callbackKey(V_1, MID, "confirm-details"), this::validateDateOfBirthV1)
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
             .put(callbackKey(MID, "experts"), this::validateRespondentExperts)
+            .put(callbackKey(V_1, MID, "experts"), this::validateRespondentExpertsV1)
             .put(callbackKey(MID, "witnesses"), this::validateRespondentWitnesses)
+            .put(callbackKey(V_1, MID, "witnesses"), this::validateRespondentWitnessesV1)
             .put(callbackKey(MID, "upload"), this::emptyCallbackResponse)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(MID, "validate-payment-date"), this::validateRespondentPaymentDate)
             .put(callbackKey(MID, "specCorrespondenceAddress"), this::validateCorrespondenceApplicantAddress)
             .put(callbackKey(MID, "determineLoggedInSolicitor"), this::determineLoggedInSolicitor)
+            .put(callbackKey(V_1, MID, "determineLoggedInSolicitor"), this::determineLoggedInSolicitorV1)
             .put(callbackKey(MID, "track"), this::handleDefendAllClaim)
             .put(callbackKey(MID, "specHandleResponseType"), this::handleRespondentResponseTypeForSpec)
             .put(callbackKey(MID, "specHandleAdmitPartClaim"), this::handleAdmitPartOfClaim)
@@ -162,8 +179,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "validate-repayment-plan"), this::validateDefendant1RepaymentPlan)
             .put(callbackKey(MID, "validate-repayment-plan-2"), this::validateDefendant2RepaymentPlan)
             .put(callbackKey(MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlag)
+            .put(callbackKey(V_1, MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlagV1)
             .put(callbackKey(MID, "set-upload-timeline-type-flag"), this::setUploadTimelineTypeFlag)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
+            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::setApplicantResponseDeadline)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -547,7 +566,232 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 updatedData.respondentClaimResponseTypeForSpecGeneric(
                     caseData.getRespondent1ClaimResponseTypeForSpec());
             }
+        }
 
+        if (ONE_V_TWO_TWO_LEGAL_REP.equals(multiPartyScenario)) {
+            if (YES.equals(caseData.getIsRespondent1())
+                && RespondentResponseTypeSpec.PART_ADMISSION.equals(
+                caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.PART_ADMISSION);
+            } else if (YES.equals(caseData.getIsRespondent2())
+                && RespondentResponseTypeSpec.PART_ADMISSION.equals(
+                caseData.getRespondent2ClaimResponseTypeForSpec())) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.PART_ADMISSION);
+            }
+        }
+
+        if (YES.equals(caseData.getIsRespondent2())) {
+            updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent2ClaimResponseTypeForSpec());
+        }
+
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == FULL_DEFENCE
+            || caseData.getClaimant1ClaimResponseTypeForSpec() == FULL_DEFENCE
+            || caseData.getClaimant2ClaimResponseTypeForSpec() == FULL_DEFENCE) {
+            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
+        }
+
+        if (YES.equals(caseData.getIsRespondent1())
+            && (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            || caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION)) {
+            updatedData.specFullAdmissionOrPartAdmission(YES);
+        } else if (YES.equals(caseData.getIsRespondent2())
+            && (caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION)) {
+            updatedData.specFullAdmissionOrPartAdmission(YES);
+        }
+        if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+        }
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            || caseData.getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
+            updatedData.specFullDefenceOrPartAdmission1V1(YES);
+        }
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            || caseData.getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION
+            || caseData.getRespondent2ClaimResponseTypeForSpec() == FULL_DEFENCE) {
+            updatedData.specFullDefenceOrPartAdmission(YES);
+        } else {
+            updatedData.specFullDefenceOrPartAdmission(NO);
+        }
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION
+            || caseData.getRespondent2ClaimResponseTypeForSpec() != RespondentResponseTypeSpec.FULL_ADMISSION) {
+            updatedData.specDefenceFullAdmittedRequired(NO);
+        }
+
+        if (YES.equals(caseData.getSpecPaidLessAmountOrDisputesOrPartAdmission())
+            && !MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART
+            .equals(caseData.getMultiPartyResponseTypeFlags())
+            && (!RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT
+            .equals(caseData.getRespondent1ClaimResponsePaymentAdmissionForSpec()))) {
+            updatedData.showHowToAddTimeLinePage(YES);
+        }
+
+        if (YES.equals(caseData.getIsRespondent1())) {
+            if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                updatedData.showHowToAddTimeLinePage(NO);
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+            } else if (RespondentResponseTypeSpec.FULL_ADMISSION
+                .equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                updatedData.showHowToAddTimeLinePage(NO);
+            }
+        } else if (YES.equals(caseData.getIsRespondent2())) {
+            if (RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+                updatedData.showHowToAddTimeLinePage(NO);
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+            } else if (RespondentResponseTypeSpec.FULL_ADMISSION
+                .equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+                updatedData.showHowToAddTimeLinePage(NO);
+            }
+        }
+
+        if (YES.equals(caseData.getIsRespondent2()) && YES.equals(caseData.getSpecDefenceAdmittedRequired())) {
+            updatedData.partAdmittedByEitherRespondents(YES);
+        } else if (YES.equals(caseData.getIsRespondent1()) && YES.equals(caseData.getSpecDefenceAdmitted2Required())) {
+            updatedData.partAdmittedByEitherRespondents(YES);
+        } else {
+            updatedData.partAdmittedByEitherRespondents(NO);
+        }
+
+        if (YES.equals(caseData.getIsRespondent2()) && YES.equals(caseData.getSpecDefenceFullAdmitted2Required())) {
+            updatedData.fullAdmissionAndFullAmountPaid(YES);
+        } else if (YES.equals(caseData.getIsRespondent1())
+            && YES.equals(caseData.getSpecDefenceFullAdmittedRequired())) {
+            updatedData.fullAdmissionAndFullAmountPaid(YES);
+        } else {
+            updatedData.fullAdmissionAndFullAmountPaid(NO);
+        }
+
+        if (YES.equals(caseData.getIsRespondent1()) && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null) {
+            updatedData.defenceAdmitPartPaymentTimeRouteGeneric(
+                caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+        } else if (YES.equals(caseData.getIsRespondent2())
+            && caseData.getDefenceAdmitPartPaymentTimeRouteRequired2() != null) {
+            updatedData.defenceAdmitPartPaymentTimeRouteGeneric(
+                caseData.getDefenceAdmitPartPaymentTimeRouteRequired2());
+        } else {
+            //workaround
+            updatedData.defenceAdmitPartPaymentTimeRouteGeneric(
+                IMMEDIATELY);
+        }
+
+        Set<DefendantResponseShowTag> updatedShowConditions = whoDisputesPartAdmission(caseData);
+        EnumSet<RespondentResponseTypeSpec> anyAdmission = EnumSet.of(
+            RespondentResponseTypeSpec.PART_ADMISSION,
+            RespondentResponseTypeSpec.FULL_ADMISSION
+        );
+        if (updatedShowConditions.contains(CAN_ANSWER_RESPONDENT_1)
+            && anyAdmission.contains(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+            updatedShowConditions.add(RESPONDENT_1_ADMITS_PART_OR_FULL);
+            if (caseData.getRespondentResponseIsSame() == YES) {
+                updatedShowConditions.add(RESPONDENT_2_ADMITS_PART_OR_FULL);
+            }
+        }
+        if (caseData.getShowConditionFlags().contains(CAN_ANSWER_RESPONDENT_2)
+            && anyAdmission.contains(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+            updatedShowConditions.add(RESPONDENT_2_ADMITS_PART_OR_FULL);
+        }
+        if (someoneDisputes(caseData)) {
+            updatedShowConditions.add(SOMEONE_DISPUTES);
+        }
+        if ((anyAdmission.contains(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && YES.equals(caseData.getIsRespondent1()))
+            || (anyAdmission.contains(caseData.getRespondent2ClaimResponseTypeForSpec())
+            && YES.equals(caseData.getIsRespondent2()))) {
+            updatedShowConditions.removeIf(EnumSet.of(
+                CURRENT_ADMITS_PART_OR_FULL
+            )::contains);
+            updatedShowConditions.add(CURRENT_ADMITS_PART_OR_FULL);
+        }
+        updatedData.showConditionFlags(updatedShowConditions);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse setGenericResponseTypeFlagV1(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> updatedData =
+            caseData.toBuilder().multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.NOT_FULL_DEFENCE);
+
+        if ((RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getClaimant1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getClaimant1ClaimResponseTypeForSpec()))
+            &&
+            (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getClaimant2ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getClaimant2ClaimResponseTypeForSpec()))) {
+            updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+        }
+        //this logic to be removed when ccd supports AND-OR combinations
+        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        if (ONE_V_ONE.equals(multiPartyScenario)) {
+            updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
+            if (caseData.getRespondent1ClaimResponseTypeForSpec() == FULL_DEFENCE) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
+            } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.COUNTER_CLAIM) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.COUNTER_ADMIT_OR_ADMIT_PART);
+            } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION
+                || caseData.getRespondent2ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_ADMISSION);
+            }
+        }
+
+        Set<RespondentResponseTypeSpec> someAdmission = EnumSet.of(PART_ADMISSION, FULL_ADMISSION);
+        if (TWO_V_ONE.equals(multiPartyScenario)
+            && someAdmission.contains(caseData.getRespondent1ClaimResponseTypeForSpec())
+            && someAdmission.contains(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+            updatedData.specFullAdmissionOrPartAdmission(YES);
+        } else {
+            updatedData.specFullAdmissionOrPartAdmission(NO);
+        }
+
+        if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario)
+            && Objects.equals(
+            caseData.getRespondent1ClaimResponseTypeForSpec(),
+            caseData.getRespondent2ClaimResponseTypeForSpec()
+        )) {
+            updatedData.respondentResponseIsSame(YES);
+            caseData = caseData.toBuilder()
+                .respondentResponseIsSame(YES)
+                .build();
+        }
+        if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario)
+            && caseData.getRespondentResponseIsSame().equals(NO)) {
+            updatedData.sameSolicitorSameResponse(NO);
+            if (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                || FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
+                updatedData.respondentClaimResponseTypeForSpecGeneric(FULL_DEFENCE);
+            }
+        } else if (ONE_V_TWO_ONE_LEGAL_REP.equals(multiPartyScenario)
+            && caseData.getRespondentResponseIsSame().equals(YES)) {
+            updatedData.sameSolicitorSameResponse(YES);
+            updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
+            if (FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
+                updatedData.multiPartyResponseTypeFlags(MultiPartyResponseTypeFlags.FULL_DEFENCE);
+            }
+        } else {
+            updatedData.respondentClaimResponseTypeForSpecGeneric(caseData.getRespondent1ClaimResponseTypeForSpec());
+        }
+
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        if (ONE_V_TWO_TWO_LEGAL_REP.equals(multiPartyScenario)) {
+            if (coreCaseUserService.userHasCaseRole(
+                caseData.getCcdCaseReference().toString(),
+                userInfo.getUid(),
+                RESPONDENTSOLICITORTWO
+            )) {
+                updatedData.respondentClaimResponseTypeForSpecGeneric(
+                    caseData.getRespondent2ClaimResponseTypeForSpec());
+            } else {
+                updatedData.respondentClaimResponseTypeForSpecGeneric(
+                    caseData.getRespondent1ClaimResponseTypeForSpec());
+            }
         }
 
         if (ONE_V_TWO_TWO_LEGAL_REP.equals(multiPartyScenario)) {
@@ -1081,13 +1325,57 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
+    private CallbackResponse determineLoggedInSolicitorV1(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+
+        var updatedCaseData = caseData.toBuilder();
+        if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONE)) {
+            updatedCaseData.isRespondent1(YES);
+            updatedCaseData.isRespondent2(NO);
+            updatedCaseData.isApplicant1(NO);
+        } else if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWO)) {
+            updatedCaseData.isRespondent1(NO);
+            updatedCaseData.isRespondent2(YES);
+            updatedCaseData.isApplicant1(NO);
+        } else if (solicitorHasCaseRole(callbackParams, APPLICANTSOLICITORONE)) {
+            updatedCaseData.isRespondent1(NO);
+            updatedCaseData.isRespondent2(NO);
+            updatedCaseData.isApplicant1(YES);
+        }
+
+        if (YES.equals(caseData.getIsRespondent2())) {
+            if (caseData.getRespondent2DetailsForClaimDetailsTab() != null
+                && ("Company".equals(caseData.getRespondent2DetailsForClaimDetailsTab().getPartyTypeDisplayValue())
+                || "Organisation".equals(
+                caseData.getRespondent2DetailsForClaimDetailsTab().getPartyTypeDisplayValue()))) {
+                updatedCaseData.neitherCompanyNorOrganisation(NO);
+            } else {
+                updatedCaseData.neitherCompanyNorOrganisation(YES);
+            }
+        } else {
+            if ((caseData.getRespondent1DetailsForClaimDetailsTab() != null
+                && ("Company".equals(caseData.getRespondent1DetailsForClaimDetailsTab().getPartyTypeDisplayValue())
+                || "Organisation".equals(
+                caseData.getRespondent1DetailsForClaimDetailsTab().getPartyTypeDisplayValue())))) {
+                updatedCaseData.neitherCompanyNorOrganisation(NO);
+            } else {
+                updatedCaseData.neitherCompanyNorOrganisation(YES);
+            }
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.build().toMap(objectMapper))
+            .build();
+    }
+
     private CallbackResponse populateRespondent1Copy(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
+        Set<DefendantResponseShowTag> initialShowTags = getInitialShowTags(callbackParams);
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
             .respondent1ClaimResponseTestForSpec(caseData.getRespondent1ClaimResponseTypeForSpec())
             .respondent2ClaimResponseTestForSpec(caseData.getRespondent2ClaimResponseTypeForSpec())
-            .showConditionFlags(getInitialShowTags(callbackParams));
+            .showConditionFlags(initialShowTags);
 
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
 
@@ -1096,9 +1384,34 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .respondent2DetailsForClaimDetailsTab(r2)
             );
 
+        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
+            DynamicList courtLocationList = courtLocationUtils.getLocationsFromList(fetchLocationData(callbackParams));
+            if (initialShowTags.contains(CAN_ANSWER_RESPONDENT_1)) {
+                updatedCaseData.respondent1DQ(Respondent1DQ.builder()
+                                                  .respondToCourtLocation(
+                                                      RequestedCourt.builder()
+                                                          .responseCourtLocations(courtLocationList)
+                                                          .build())
+                                                  .build());
+            }
+            if (initialShowTags.contains(CAN_ANSWER_RESPONDENT_2)) {
+                updatedCaseData.respondent2DQ(Respondent2DQ.builder()
+                                                  .respondToCourtLocation2(
+                                                      RequestedCourt.builder()
+                                                          .responseCourtLocations(courtLocationList)
+                                                          .build())
+                                                  .build());
+            }
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
+    }
+
+    private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 
     private Set<DefendantResponseShowTag> getInitialShowTags(CallbackParams callbackParams) {
@@ -1120,11 +1433,21 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     callbackParams.getCaseData().getCcdCaseReference().toString(),
                     userInfo.getUid()
                 );
-                if (roles.contains(RESPONDENTSOLICITORONESPEC.getFormattedName())) {
-                    set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
-                }
-                if (roles.contains(RESPONDENTSOLICITORTWOSPEC.getFormattedName())) {
-                    set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2);
+                if (V_1.equals(callbackParams.getVersion())
+                    && toggleService.isAccessProfilesEnabled()) {
+                    if (roles.contains(RESPONDENTSOLICITORONE.getFormattedName())) {
+                        set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
+                    }
+                    if (roles.contains(RESPONDENTSOLICITORTWO.getFormattedName())) {
+                        set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2);
+                    }
+                } else {
+                    if (roles.contains(RESPONDENTSOLICITORONESPEC.getFormattedName())) {
+                        set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1);
+                    }
+                    if (roles.contains(RESPONDENTSOLICITORTWOSPEC.getFormattedName())) {
+                        set.add(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2);
+                    }
                 }
                 break;
             default:
@@ -1139,6 +1462,25 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONESPEC)) {
                 return validateR1Witnesses(caseData);
             } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWOSPEC)) {
+                return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
+            } else if (respondent2HasSameLegalRep(caseData)) {
+                if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
+                    if (caseData.getRespondent2DQ() != null
+                        && caseData.getRespondent2DQ().getRespondent2DQWitnesses() != null) {
+                        return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
+                    }
+                }
+            }
+        }
+        return validateR1Witnesses(caseData);
+    }
+
+    private CallbackResponse validateRespondentWitnessesV1(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
+            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
+                return validateR1Witnesses(caseData);
+            } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
                 return validateWitnesses(callbackParams.getCaseData().getRespondent2DQ());
             } else if (respondent2HasSameLegalRep(caseData)) {
                 if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
@@ -1169,6 +1511,25 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONESPEC)) {
                 return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
             } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWOSPEC)) {
+                return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
+            } else if (respondent2HasSameLegalRep(caseData)) {
+                if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
+                    if (caseData.getRespondent2DQ() != null
+                        && caseData.getRespondent2DQ().getRespondent2DQExperts() != null) {
+                        return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
+                    }
+                }
+            }
+        }
+        return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
+    }
+
+    private CallbackResponse validateRespondentExpertsV1(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (!ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
+            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
+                return validateExperts(callbackParams.getCaseData().getRespondent1DQ());
+            } else if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)) {
                 return validateExperts(callbackParams.getCaseData().getRespondent2DQ());
             } else if (respondent2HasSameLegalRep(caseData)) {
                 if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
@@ -1243,6 +1604,39 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
+    private CallbackResponse validateDateOfBirthV1(CallbackParams callbackParams) {
+        Party respondent = callbackParams.getCaseData().getRespondent1();
+        if (respondent == null && callbackParams.getCaseData().getRespondent2() != null) {
+            respondent = callbackParams.getCaseData().getRespondent2();
+        }
+        List<String> errors = dateOfBirthValidator.validate(respondent);
+
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+        if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+            && YES.equals(caseData.getAddRespondent2())) {
+            if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWO)
+                && solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORONE)) {
+                updatedData.sameSolicitorSameResponse(YES).build();
+            } else {
+                updatedData.sameSolicitorSameResponse(NO).build();
+            }
+        } else if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+            && YES.equals(caseData.getAddRespondent2())) {
+            if (NO.equals(caseData.getRespondentResponseIsSame())) {
+                updatedData.sameSolicitorSameResponse(NO).build();
+            } else {
+                updatedData.sameSolicitorSameResponse(YES).build();
+            }
+
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedData.build().toMap(objectMapper))
+            .errors(errors)
+            .build();
+    }
+
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
@@ -1288,7 +1682,15 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
         }
 
-        if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, RESPONDENTSOLICITORTWOSPEC)) {
+        CaseRole respondentTwoCaseRoleToCheck;
+
+        if (V_1.equals(callbackParams.getVersion()) && toggleService.isAccessProfilesEnabled()) {
+            respondentTwoCaseRoleToCheck = RESPONDENTSOLICITORTWO;
+        } else {
+            respondentTwoCaseRoleToCheck = RESPONDENTSOLICITORTWOSPEC;
+        }
+
+        if (solicitorRepresentsOnlyOneOfRespondents(callbackParams, respondentTwoCaseRoleToCheck)) {
             updatedData.respondent2ResponseDate(responseDate)
                 .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_SPEC));
 
@@ -1302,11 +1704,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             // or wait for 2nd respondent response before setting deadline
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-            Respondent2DQ dq = caseData.getRespondent2DQ().toBuilder()
-                .respondent2DQStatementOfTruth(statementOfTruth)
-                .build();
-
-            updatedData.respondent2DQ(dq);
+            Respondent2DQ.Respondent2DQBuilder dq = caseData.getRespondent2DQ().toBuilder()
+                .respondent2DQStatementOfTruth(statementOfTruth);
+            if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
+                handleCourtLocationForRespondent2DQ(caseData, updatedData, dq, callbackParams);
+            }
+            updatedData.respondent2DQ(dq.build());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         } else {
@@ -1334,19 +1737,20 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
-            Respondent1DQ dq = caseData.getRespondent1DQ().toBuilder()
+            Respondent1DQ.Respondent1DQBuilder dq = caseData.getRespondent1DQ().toBuilder()
                 .respondent1DQStatementOfTruth(statementOfTruth)
                 .respondent1DQWitnesses(Witnesses.builder()
                                             .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
                                             .details(caseData.getRespondent1DQWitnessesDetailsSpec())
-                                            .build())
-                .build();
-
-            updatedData.respondent1DQ(dq);
+                                            .build());
+            if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
+                handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
+            }
+            updatedData.respondent1DQ(dq.build());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
-        if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWOSPEC)
+        if (solicitorHasCaseRole(callbackParams, respondentTwoCaseRoleToCheck)
             && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
             updatedData.defenceAdmitPartPaymentTimeRouteRequired(null);
         }
@@ -1396,6 +1800,90 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             && FULL_DEFENCE.equals(caseData.getClaimant1ClaimResponseTypeForSpec()));
     }
 
+    private void handleCourtLocationForRespondent1DQ(CaseData caseData,
+                                                     Respondent1DQ.Respondent1DQBuilder dq,
+                                                     CallbackParams callbackParams) {
+        Optional<LocationRefData> optCourtLocation = getCourtLocationDefendant1(caseData, callbackParams);
+        // data for court location
+        if (optCourtLocation.isPresent()) {
+            LocationRefData courtLocation = optCourtLocation.get();
+
+            dq.respondent1DQRequestedCourt(caseData.getRespondent1DQ()
+                                           .getRespondToCourtLocation().toBuilder()
+                                               .reasonForHearingAtSpecificCourt(
+                                                   caseData.getRespondent1DQ()
+                                                       .getRespondToCourtLocation()
+                                                       .getReasonForHearingAtSpecificCourt())
+                                               .responseCourtLocations(null)
+                                               .caseLocation(CaseLocation.builder()
+                                                                 .region(courtLocation.getRegionId())
+                                                                 .baseLocation(courtLocation.getEpimmsId())
+                                                                 .build())
+                                               .responseCourtCode(courtLocation.getCourtLocationCode()).build());
+            dq.respondToCourtLocation(RequestedCourt.builder()
+                                          .responseCourtLocations(null)
+                                          .responseCourtCode(courtLocation.getCourtLocationCode())
+
+                                          .build())
+                .responseClaimCourtLocationRequired(YES);
+        } else {
+            dq.responseClaimCourtLocationRequired(NO);
+        }
+    }
+
+    private Optional<LocationRefData> getCourtLocationDefendant1(CaseData caseData, CallbackParams callbackParams) {
+        if (caseData.getRespondent1DQ() != null
+            && caseData.getRespondent1DQ().getRespondToCourtLocation() != null) {
+            DynamicList courtLocations = caseData
+                .getRespondent1DQ().getRespondToCourtLocation().getResponseCourtLocations();
+            LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
+                fetchLocationData(callbackParams), courtLocations);
+            return Optional.ofNullable(courtLocation);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private void handleCourtLocationForRespondent2DQ(CaseData caseData, CaseData.CaseDataBuilder updatedCase,
+                                                     Respondent2DQ.Respondent2DQBuilder dq,
+                                                     CallbackParams callbackParams) {
+        Optional<LocationRefData> optCourtLocation = getCourtLocationDefendant2(caseData, callbackParams);
+        if (optCourtLocation.isPresent()) {
+            LocationRefData courtLocation = optCourtLocation.get();
+            dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ().getRespondToCourtLocation2().toBuilder()
+                                               .responseCourtLocations(null)
+                                               .caseLocation(CaseLocation.builder()
+                                                                 .region(courtLocation.getRegionId())
+                                                                 .baseLocation(courtLocation.getEpimmsId())
+                                                                 .build())
+                                               .responseCourtCode(courtLocation.getCourtLocationCode()).build())
+                .respondToCourtLocation2(RequestedCourt.builder()
+                                             .responseCourtLocations(null)
+                                             .responseCourtCode(courtLocation.getCourtLocationCode())
+                                             .reasonForHearingAtSpecificCourt(
+                                                 caseData.getRespondent2DQ().getRespondToCourtLocation2()
+                                                     .getReasonForHearingAtSpecificCourt()
+                                             )
+                                             .build());
+            updatedCase.responseClaimCourtLocation2Required(YES);
+        } else {
+            updatedCase.responseClaimCourtLocation2Required(NO);
+        }
+    }
+
+    private Optional<LocationRefData> getCourtLocationDefendant2(CaseData caseData, CallbackParams callbackParams) {
+        if (caseData.getRespondent2DQ() != null
+            && caseData.getRespondent2DQ().getRespondToCourtLocation2() != null) {
+            DynamicList courtLocations = caseData
+                .getRespondent2DQ().getRespondToCourtLocation2().getResponseCourtLocations();
+            LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
+                fetchLocationData(callbackParams), courtLocations);
+            return Optional.ofNullable(courtLocation);
+        } else {
+            return Optional.empty();
+        }
+    }
+
     private boolean solicitorRepresentsOnlyOneOfRespondents(CallbackParams callbackParams, CaseRole caseRole) {
         CaseData caseData = callbackParams.getCaseData();
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
@@ -1420,7 +1908,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private LocalDateTime getApplicant1ResponseDeadline(LocalDateTime responseDate, AllocatedTrack allocatedTrack) {
-        return deadlinesCalculator.calculateApplicantResponseDeadline(responseDate, allocatedTrack);
+        return deadlinesCalculator.calculateApplicantResponseDeadlineSpec(responseDate, allocatedTrack);
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
