@@ -31,6 +31,8 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(migrateCase);
 
+    private static final String MIGRATION_ID_VALUE = "AccessProfileMigration";
+
     private final ObjectMapper objectMapper;
 
     @Override
@@ -52,6 +54,8 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
         } else {
             caseDataBuilder.caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
         }
+
+        caseDataBuilder.migrationId(MIGRATION_ID_VALUE);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
