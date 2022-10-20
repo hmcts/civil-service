@@ -68,7 +68,7 @@ genApp:
     keywords:
       withNotice: GAOnNotice
       consentedOrWithoutNotice: GeneralAppWithoutNotice
-      free: GeneralAppFree
+      free: CopyPagesUpTo10
   lrd:
     endpoint: /refdata/location/court-venues
   jrd:

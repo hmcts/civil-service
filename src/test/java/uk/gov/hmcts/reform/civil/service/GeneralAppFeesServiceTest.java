@@ -62,7 +62,8 @@ class GeneralAppFeesServiceTest {
         when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
         when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
         when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
-        when(feesConfiguration.getFreeKeyword()).thenReturn("GeneralAppFree");
+        //TODO set to actual ga free keyword
+        when(feesConfiguration.getFreeKeyword()).thenReturn("CopyPagesUpTo10");
     }
 
     @Test
@@ -170,10 +171,10 @@ class GeneralAppFeesServiceTest {
                 .generalAppHearingDate(gaHearingDateGAspec).build();
 
         Fee feeDto = feesService.getFeeForGA(caseData);
-
+        //TODO replace keyword we have real free fee for GA
         assertThat(queryCaptor.getValue().toString())
-                .isEqualTo("dummy_url/fees-register/fees/lookup?channel=default&event=general%20application"
-                        + "&jurisdiction1=civil&jurisdiction2=civil&service=general&keyword=GeneralAppFree");
+                .isEqualTo("dummy_url/fees-register/fees/lookup?channel=default&event=copies"
+                        + "&jurisdiction1=civil&jurisdiction2=civil&service=insolvency&keyword=CopyPagesUpTo10");
     }
 
     @Test
