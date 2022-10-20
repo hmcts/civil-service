@@ -124,19 +124,11 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         setOrganisationPolicy(caseData, caseDataBuilder);
 
         LocalDateTime claimDetailsNotificationDeadline = getDeadline(claimNotificationDate);
-        LocalDateTime claimNotificationDeadline = caseData.getClaimNotificationDeadline();
 
-        if (claimDetailsNotificationDeadline.isAfter(claimNotificationDeadline)) {
-            LocalDateTime notificationDeadlineAt4pm = claimNotificationDeadline.toLocalDate()
-                .atTime(END_OF_BUSINESS_DAY);
-            caseDataBuilder
-                .claimDetailsNotificationDeadline(notificationDeadlineAt4pm)
-                .nextDeadline(notificationDeadlineAt4pm.toLocalDate());
-        } else {
             caseDataBuilder
                 .claimDetailsNotificationDeadline(claimDetailsNotificationDeadline)
                 .nextDeadline(claimDetailsNotificationDeadline.toLocalDate());
-        }
+
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
