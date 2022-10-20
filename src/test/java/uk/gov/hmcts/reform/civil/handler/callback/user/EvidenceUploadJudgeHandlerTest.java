@@ -69,7 +69,7 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
     class SubmittedCallback {
 
         @Test
-        void submittedCallback_placeholder() {
+        void shouldPopulateConfirmation_DocumentAndNote() {
             String header = "# Document uploaded and note added \n # " + REFERENCE_NUMBER;
             String body = "## You have uploaded: \n * A Fancy Name\n";
 
