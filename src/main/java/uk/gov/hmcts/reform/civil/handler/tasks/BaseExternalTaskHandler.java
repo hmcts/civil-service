@@ -33,31 +33,38 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
     @Override
     default void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
         String topicName = externalTask.getTopicName();
+        String processInstanceId = externalTask.getProcessInstanceId();
 
         try {
-            log.info("External task '{}' started", topicName);
+            log.info("External task '{}' started with processInstanceId '{}'",
+                     topicName, processInstanceId);
             handleTask(externalTask);
             completeTask(externalTask, externalTaskService);
         } catch (BpmnError e) {
             externalTaskService.handleBpmnError(externalTask, e.getErrorCode());
-            log.error("Bpmn error for external task '{}'", topicName, e);
+            log.error("Bpmn error for external task '{}' with processInstanceId '{}'",
+                      topicName, processInstanceId, e);
         } catch (Exception e) {
             handleFailure(externalTask, externalTaskService, e);
-            log.error("External task '{}' errored", topicName, e);
+            log.error("External task '{}' errored  with processInstanceId '{}'",
+                      topicName, processInstanceId, e);
         }
     }
 
     private void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService) {
         String topicName = externalTask.getTopicName();
+        String processInstanceId = externalTask.getProcessInstanceId();
 
         try {
             ofNullable(getVariableMap()).ifPresentOrElse(
                 variableMap -> externalTaskService.complete(externalTask, variableMap),
                 () -> externalTaskService.complete(externalTask)
             );
-            log.info("External task '{}' finished", topicName);
+            log.info("External task '{}' finished with processInstanceId '{}'",
+                     topicName, processInstanceId);
         } catch (Exception e) {
-            log.error("Completing external task '{}' errored", topicName, e);
+            log.error("Completing external task '{}' errored  with processInstanceId '{}'",
+                      topicName, processInstanceId, e);
         }
     }
 
