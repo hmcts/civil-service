@@ -51,6 +51,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -519,10 +520,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         if (nonNull(locations)) {
             location = fillPreferredLocationData(locations, getLocationListFromCaseData(
                 caseData.getDisposalHearingMethodInPersonDJ(), caseData.getTrialHearingMethodInPersonDJ()));
-        }
-        if (Objects.nonNull(location)) {
-            caseDataBuilder.caseManagementLocation(CaseLocation.builder().region(location.getRegionId()).baseLocation(
-                    location.getEpimmsId()).build());
+            var caseBuilder = Optional.ofNullable(location)
+                .map(value -> caseDataBuilder.caseManagementLocation(CaseLocation.builder()
+                                                                         .region(value.getRegionId())
+                                                                         .baseLocation(value.getEpimmsId())
+                                                                         .build()));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
