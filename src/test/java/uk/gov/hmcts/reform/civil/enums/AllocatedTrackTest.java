@@ -38,12 +38,12 @@ class AllocatedTrackTest {
             assertThat(toStringValueForEmail(track)).isEqualTo("Small Claim Track");
         }
 
-        @ParameterizedTest(name = "{0} has fast claim track when claim value is 1000")
+        @ParameterizedTest(name = "{0} has small claim track when claim value is 1000")
         @EnumSource(
             value = ClaimType.class,
             names = {"PROFESSIONAL_NEGLIGENCE"})
         void shouldAllocateProfessionalNegligenceClaimTypesOf1000ToFastClaim(ClaimType claimType) {
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(1000), claimType)).isEqualTo(FAST_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(1000), claimType)).isEqualTo(SMALL_CLAIM);
         }
 
         @ParameterizedTest(name = "{0} has small claim track when claim value is 1000")
@@ -54,13 +54,13 @@ class AllocatedTrackTest {
             assertThat(getAllocatedTrack(BigDecimal.valueOf(1000), claimType)).isEqualTo(SMALL_CLAIM);
         }
 
-        @ParameterizedTest(name = "{0} has fast claim track when claim value is 1000")
+        @ParameterizedTest(name = "{0} has small claim track when claim value is 1000")
         @EnumSource(
             value = ClaimType.class,
             names = {"PROFESSIONAL_NEGLIGENCE"})
         void shouldReturnCorrectTrackForEmailFastClaimTypeProfessionalNegligence(ClaimType claimType) {
             assertThat(toStringValueForEmail(getAllocatedTrack(BigDecimal.valueOf(1000), claimType)))
-                .isEqualTo("Fast Track");
+                .isEqualTo("Small Claim Track");
         }
 
         @ParameterizedTest(name = "{0} has fast claim track when claim value is 1000")
@@ -118,12 +118,12 @@ class AllocatedTrackTest {
                 .isEqualTo("Small Claim Track");
         }
 
-        @ParameterizedTest(name = "{0} has fast claim track when claim value is 10000")
+        @ParameterizedTest(name = "{0} has small claim track when claim value is 10000")
         @EnumSource(
             value = ClaimType.class,
             names = {"CONSUMER"})
         void shouldAllocateConsumerClaimTypesOf10000ToFastClaim(ClaimType claimType) {
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(10000), claimType)).isEqualTo(FAST_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(10000), claimType)).isEqualTo(SMALL_CLAIM);
         }
 
         @ParameterizedTest(name = "{0} has fast claim track when claim value is 10000")
@@ -134,13 +134,13 @@ class AllocatedTrackTest {
             assertThat(getAllocatedTrack(BigDecimal.valueOf(10000), claimType)).isEqualTo(SMALL_CLAIM);
         }
 
-        @ParameterizedTest(name = "{0} has fast claim track when claim value is 10000")
+        @ParameterizedTest(name = "{0} has small claim track when claim value is 10000")
         @EnumSource(
             value = ClaimType.class,
             names = {"CONSUMER"})
         void shouldReturnCorrectTrackForEmailFastClaimForTypeConsumer(ClaimType claimType) {
             assertThat(toStringValueForEmail(getAllocatedTrack(BigDecimal.valueOf(10000), claimType)))
-                .isEqualTo("Fast Track");
+                .isEqualTo("Small Claim Track");
         }
 
         @ParameterizedTest(name = "{0} has small claim track when claim value is 10000")

@@ -21,30 +21,12 @@ public enum AllocatedTrack {
                     } else {
                         return MULTI_CLAIM;
                     }
-                case BREACH_OF_CONTRACT:
-                case CONSUMER_CREDIT:
-                case OTHER:
+                default:
                     if (isValueSmallerThanOrEqualTo(statementOfValueInPounds, 10000)) {
                         return SMALL_CLAIM;
                     } else if (isBigDecimalValueWithinRange(statementOfValueInPounds, BigDecimal.valueOf(10000.01),
                                                             BigDecimal.valueOf(25000)
                     )) {
-                        return FAST_CLAIM;
-                    } else {
-                        return MULTI_CLAIM;
-                    }
-                default:
-                    if (claimType != null && claimType.isLowerFeeType()) { //PROFESSIONAL_NEGLIGENCE
-                        if (isValueSmallerThan(statementOfValueInPounds, 1000)) {
-                            return SMALL_CLAIM;
-                        } else if (isValueWithinRange(statementOfValueInPounds, 1000, 25000)) {
-                            return FAST_CLAIM;
-                        }
-                    }
-
-                    if (isValueSmallerThan(statementOfValueInPounds, 10000)) { //CONSUMER
-                        return SMALL_CLAIM;
-                    } else if (isValueWithinRange(statementOfValueInPounds, 10000, 25000)) {
                         return FAST_CLAIM;
                     } else {
                         return MULTI_CLAIM;
