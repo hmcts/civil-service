@@ -6,6 +6,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.event.TrialReadyEvent;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY;
 
 @Slf4j
