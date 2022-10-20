@@ -150,6 +150,18 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC))
             .applicant1ResponseDate(time.now());
 
+        locationHelper.getCaseManagementLocation(caseData)
+            .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
+                builder,
+                requestedCourt,
+                () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
+                    CallbackParams.Params.BEARER_TOKEN).toString())
+            ));
+        if (log.isDebugEnabled()) {
+            log.debug("Case management location for " + caseData.getLegacyCaseReference()
+                          + " is " + builder.build().getCaseManagementLocation());
+        }
+
         if (caseData.getApplicant1ProceedWithClaim() == YES
             || caseData.getApplicant1ProceedWithClaimSpec2v1() == YES) {
             // moving statement of truth value to correct field, this was not possible in mid event.

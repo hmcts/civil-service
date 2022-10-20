@@ -52,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
@@ -95,7 +96,8 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         var caseData = callbackParams.getCaseData();
 
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
-            .claimantResponseScenarioFlag(getMultiPartyScenario(caseData));
+            .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
+            .superClaimType(UNSPEC_CLAIM);
 
         if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
             updatedData.respondentSharedClaimResponseDocument(caseData.getRespondent1ClaimResponseDocument());
@@ -201,6 +203,18 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
             .applicant1ResponseDate(currentTime);
 
+        locationHelper.getCaseManagementLocation(caseData)
+            .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
+                builder,
+                requestedCourt,
+                () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
+                    CallbackParams.Params.BEARER_TOKEN).toString())
+            ));
+        if (log.isDebugEnabled()) {
+            log.debug("Case management location for " + caseData.getLegacyCaseReference()
+                          + " is " + builder.build().getCaseManagementLocation());
+        }
+
         if (v1) {
             updateCaseManagementLocation(callbackParams, builder);
         }
@@ -253,8 +267,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         builder.nextDeadline(null);
         AboutToStartOrSubmitCallbackResponse response = null;
 
-        if (v1 && featureToggleService.isSdoEnabled()
-            && !AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
+        if (featureToggleService.isSdoEnabled() && !AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
             response = AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder.build().toMap(objectMapper))
                 .state(CaseState.JUDICIAL_REFERRAL.name())
@@ -262,6 +275,13 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         } else {
             response = AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder.build().toMap(objectMapper))
+                .build();
+        }
+
+        if (v1 && featureToggleService.isSdoEnabled()) {
+            AboutToStartOrSubmitCallbackResponse.builder()
+                .data(builder.build().toMap(objectMapper))
+                .state(CaseState.JUDICIAL_REFERRAL.name())
                 .build();
         }
 

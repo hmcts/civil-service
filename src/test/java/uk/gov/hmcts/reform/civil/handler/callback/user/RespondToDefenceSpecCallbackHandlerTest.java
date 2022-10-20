@@ -82,7 +82,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     ValidationAutoConfiguration.class,
     UnavailableDateValidator.class,
     CaseDetailsConverter.class,
-    CourtLocationUtils.class
+    CourtLocationUtils.class,
+    LocationHelper.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
