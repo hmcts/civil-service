@@ -212,6 +212,8 @@ public class CaseDataParent implements MappableObject {
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
     private final YesOrNo setFastTrackFlag;
+    private final String eventDescriptionRTJ;
+    private final String additionalInformationRTJ;
 
     private final LocalDate nextDeadline;
     private final String allPartyNames;
