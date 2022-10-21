@@ -120,7 +120,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final SdoGeneratorService sdoGeneratorService;
-    private final LocationHelper locationHelper = new LocationHelper();
+    private final LocationHelper locationHelper;
     private final DeadlinesCalculator deadlinesCalculator;
     private final FeatureToggleService featureToggleService;
 
@@ -768,5 +768,4 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsDocumentsToggle(checkList);
         updatedData.smallClaimsWitnessStatementToggle(checkList);
     }
-
 }

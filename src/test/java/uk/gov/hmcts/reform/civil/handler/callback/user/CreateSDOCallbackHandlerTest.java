@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
@@ -21,6 +20,8 @@ import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -43,6 +44,7 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -71,7 +73,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     ClaimIssueConfiguration.class,
     MockDatabaseConfiguration.class,
     DeadlinesCalculator.class,
-    ValidationAutoConfiguration.class},
+    ValidationAutoConfiguration.class,
+    LocationHelper.class},
     properties = {"reference.database.enabled=false"})
 public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -98,7 +101,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private SdoGeneratorService sdoGeneratorService;
 
-    @Mock
+    @MockBean
     private NonWorkingDaysCollection nonWorkingDaysCollection;
 
     @MockBean
@@ -178,6 +181,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
                 .toBuilder()
                 .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .totalClaimAmount(BigDecimal.valueOf(10000))
                 .build();
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObject());
@@ -206,10 +210,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
                 .toBuilder()
                 .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .totalClaimAmount(BigDecimal.valueOf(10000))
                 .applicant1DQ(Applicant1DQ.builder()
                                   .applicant1DQRequestedCourt(
                                       RequestedCourt.builder()
-                                          .requestHearingAtSpecificCourt(YesOrNo.NO)
                                           .build()
                                   )
                                   .build())
@@ -241,10 +245,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
                 .toBuilder()
                 .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .totalClaimAmount(BigDecimal.valueOf(10000))
                 .applicant1DQ(Applicant1DQ.builder()
                                   .applicant1DQRequestedCourt(
                                       RequestedCourt.builder()
-                                          .requestHearingAtSpecificCourt(YesOrNo.YES)
                                           .responseCourtCode("court3")
                                           .caseLocation(
                                               CaseLocation.builder()
@@ -291,7 +295,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPrePopulateOrderDetailsPages() {
-            CaseData caseData = CaseDataBuilder.builder().setSuperClaimTypeToSpecClaim().atStateClaimDraft()
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateClaimDraft()
+                .totalClaimAmount(BigDecimal.valueOf(15000))
                 .applicant1DQWithLocation().build();
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObjectToSort());
@@ -802,7 +809,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void testSDOSortsLocationListThroughOrganisationPartyType() {
-            CaseData caseData = CaseDataBuilder.builder().setSuperClaimTypeToSpecClaim().atStateClaimDraft()
+            CaseData caseData = CaseDataBuilder.builder()
+                .setSuperClaimTypeToSpecClaim()
+                .atStateClaimDraft()
+                .totalClaimAmount(BigDecimal.valueOf(10000))
                 .respondent1DQWithLocation().applicant1DQWithLocation().applicant1(Party.builder()
                                                                                        .type(Party.Type.ORGANISATION)
                                                                                        .individualTitle("Mr.")
@@ -835,6 +845,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(getSampleCourLocationsRefObjectToSort());
             CaseData caseData = CaseDataBuilder.builder().respondent1DQWithLocation().applicant1DQWithLocation()
                 .setSuperClaimTypeToSpecClaim().atStateClaimDraft()
+                .totalClaimAmount(BigDecimal.valueOf(10000))
                 .build().toBuilder().orderType(OrderType.DECIDE_DAMAGES).applicant1(Party.builder()
                                                                                         .type(Party.Type.ORGANISATION)
                                                                                         .individualTitle("Mr.")

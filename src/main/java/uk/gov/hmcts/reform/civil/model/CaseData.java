@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
+import uk.gov.hmcts.reform.civil.enums.HearingNoticeList;
+import uk.gov.hmcts.reform.civil.enums.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
@@ -408,6 +410,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final LocalDateTime applicant2ResponseDate;
     private final LocalDateTime takenOfflineDate;
     private final LocalDateTime takenOfflineByStaffDate;
+    private final LocalDateTime unsuitableSDODate;
     private final LocalDateTime claimDismissedDate;
     private final String claimAmountBreakupSummaryObject;
     private final LocalDateTime respondent1LitigationFriendDate;
@@ -485,6 +488,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private LocalDate hearingDate;
     private String hearingTimeHourMinute;
     private String hearingReferenceNumber;
+    private ListingOrRelisting listingOrRelisting;
+    private HearingNoticeList hearingNoticeList;
+    private LocalDate hearingDueDate;
+    private Fee hearingFee;
 
     //default judgement SDO fields for trial/fast track
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;

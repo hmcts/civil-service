@@ -255,16 +255,6 @@ class Respondent1DQTest extends DQTest {
     class GetCourtLocation {
 
         @Test
-        void build_whenYesRequired() {
-            RequestedCourt court = buildRespondent1Dq().toBuilder()
-                .respondent1DQRequestedCourt(null)
-                .responseClaimCourtLocationRequired(YES)
-                .build().getRequestedCourt();
-
-            assertThat(court.getRequestHearingAtSpecificCourt()).isEqualTo(YES);
-        }
-
-        @Test
         void build_whenRespondToCourtLocation() {
             String reason = "reason";
             String courtCode = "123";
@@ -273,11 +263,9 @@ class Respondent1DQTest extends DQTest {
                 .respondToCourtLocation(RequestedCourt.builder()
                                             .responseCourtCode(courtCode)
                                             .reasonForHearingAtSpecificCourt(reason)
-                                            .requestHearingAtSpecificCourt(YES)
                                             .build())
                 .build().getRequestedCourt();
 
-            assertThat(court.getRequestHearingAtSpecificCourt()).isEqualTo(YES);
             assertThat(court.getResponseCourtCode()).isEqualTo(courtCode);
             assertThat(court.getReasonForHearingAtSpecificCourt()).isEqualTo(reason);
         }
