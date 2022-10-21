@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
 import java.math.BigDecimal;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,12 +71,19 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
+        String hourMinute = caseData.getHearingTimeHourMinute();
+        LocalTime time = null;
+        if (hourMinute != null) {
+            int hours = Integer.parseInt(hourMinute.substring(0, 2));
+            int minutes = Integer.parseInt(hourMinute.substring(2, 4));
+            time = LocalTime.of(hours, minutes, 0);
+        }
         return new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            HEARING_FEE, caseData.getHearingFee() == null ? "0.00" : String.valueOf(caseData.getHearingFee().toPounds()),
-            HEARING_DATE, caseData.getHearingDate().toString(),
-            HEARING_TIME, caseData.getHearingTimeHourMinute(),
-            DEADLINE_DATE, caseData.getRespondent1ResponseDeadline().toString(),
+            HEARING_FEE, caseData.getHearingFee() == null ? "£0.00" : String.valueOf(caseData.getHearingFee().formData()),
+            HEARING_DATE, caseData.getHearingDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+            HEARING_TIME, time.toString(),
+            DEADLINE_DATE, caseData.getRespondent1ResponseDeadline().toLocalDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
             CLAIMANT_REFERENCE_NUMBER, caseData.getSolicitorReferences().getApplicantSolicitor1Reference()
         ));
     }
