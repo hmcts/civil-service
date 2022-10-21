@@ -40,6 +40,8 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private final Time time;
 
+    private static final int lengthAllowed = 150;
+
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
@@ -66,9 +68,9 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     private CallbackResponse validateNotSuitableReason(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>();
         var reason = callbackParams.getRequest().getCaseDetails().getData().get("reasonNotSuitableSDO");
-        if (reason.toString().length() > 158) { // set at 158, because the method adds {input=} characters
+        if (reason.toString().length() > lengthAllowed+"{input=}".length()) {
             errors.add("Character Limit Reached: "
-                           + "Reason for not drawing Standard Directions order cannot exceed 150 characters.");
+                           + "Reason for not drawing Standard Directions order cannot exceed "+lengthAllowed+" characters.");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
