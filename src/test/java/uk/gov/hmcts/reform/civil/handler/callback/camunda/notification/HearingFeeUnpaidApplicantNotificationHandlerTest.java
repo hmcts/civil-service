@@ -22,6 +22,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HEARING_DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
 @SpringBootTest(classes = {
@@ -70,7 +72,7 @@ class HearingFeeUnpaidApplicantNotificationHandlerTest {
     private Map<String, String> getNotificationDataMap(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
-            HEARING_DATE, caseData.getHearingDate().toString()
+            HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE)
         );
     }
 
