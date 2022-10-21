@@ -442,7 +442,9 @@ public class StateFlowEngine {
                     }
                 })
                 .transitionTo(FULL_DEFENCE_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
-                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterFullDefence)
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF)
+                    .onlyIf(featureToggleService.isSdoEnabled()
+                                ? takenOfflineByStaffAfterFullDefence : takenOfflineByStaff)
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
                     .onlyIf(applicantOutOfTime)
             .state(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA)
@@ -479,6 +481,11 @@ public class StateFlowEngine {
             .state(COUNTER_CLAIM)
             .state(FULL_DEFENCE_PROCEED)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
+                    .set(flags -> {
+                        if (featureToggleService.isSdoEnabled()) {
+                            flags.put(FlowFlag.SDO_ENABLED.name(), true);
+                        }
+                    })
                 .transitionTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyIf(takenOfflineSDONotDrawn)
                     .set(flags -> {
                         if (featureToggleService.isSdoEnabled()) {
