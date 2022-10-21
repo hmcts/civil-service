@@ -37,7 +37,7 @@ public enum DocmosisTemplates {
     SDO_SMALL("CV-DAM-STD-ENG-00001.docx", "small_claims_sdo_%s.pdf"),
     SDO_FAST("CV-DAM-STD-ENG-00002.docx", "fast_track_sdo_%s.pdf"),
     SDO_DISPOSAL("CV-DAM-STD-ENG-00003.docx", "disposal_hearing_sdo_%s.pdf"),
-    PIN_IN_THE_POST_LETTER("CV-CMC-LET-ENG-PIP0001", "PIP_letter.pdf");
+    PIN_IN_THE_POST_LETTER("CV-CMC-LET-ENG-PIP0001.docx", "PIP_letter.pdf");
 
     private final String template;
     private final String documentTitle;
