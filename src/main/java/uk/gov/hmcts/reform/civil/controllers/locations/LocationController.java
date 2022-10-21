@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+
 import java.util.List;
 
 @Api
@@ -38,7 +39,7 @@ public class LocationController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 401, message = "Not Authorized")})
-    public ResponseEntity<List<DynamicListElement>>getCourtLocations(
+    public ResponseEntity<List<DynamicListElement>> getCourtLocations(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
         return new ResponseEntity<>(courtLocationUtils.getLocationsFromList(
             locationRefDataService.getCourtLocationsForDefaultJudgments(authorization)).getListItems(), HttpStatus.OK);
