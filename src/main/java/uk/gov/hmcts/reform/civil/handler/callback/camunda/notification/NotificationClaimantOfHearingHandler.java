@@ -79,12 +79,18 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
             time = LocalTime.of(hours, minutes, 0);
         }
         return new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            HEARING_FEE, caseData.getHearingFee() == null ? "£0.00" : String.valueOf(caseData.getHearingFee().formData()),
-            HEARING_DATE, caseData.getHearingDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-            HEARING_TIME, time.toString(),
-            DEADLINE_DATE, caseData.getRespondent1ResponseDeadline().toLocalDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-            CLAIMANT_REFERENCE_NUMBER, caseData.getSolicitorReferences().getApplicantSolicitor1Reference()
+            CLAIM_REFERENCE_NUMBER,
+            caseData.getLegacyCaseReference(),
+            HEARING_FEE,
+            caseData.getHearingFee() == null ? "£0.00" : String.valueOf(caseData.getHearingFee().formData()),
+            HEARING_DATE,
+            caseData.getHearingDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+            HEARING_TIME,
+            time.toString(),
+            DEADLINE_DATE,
+            caseData.getRespondent1ResponseDeadline().toLocalDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+            CLAIMANT_REFERENCE_NUMBER,
+            caseData.getSolicitorReferences().getApplicantSolicitor1Reference()
         ));
     }
 }
