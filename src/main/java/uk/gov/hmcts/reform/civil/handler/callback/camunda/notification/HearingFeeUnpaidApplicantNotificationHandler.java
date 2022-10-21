@@ -17,6 +17,8 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_HEARING_FEE_UNPAID;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -68,7 +70,7 @@ public class HearingFeeUnpaidApplicantNotificationHandler extends CallbackHandle
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            HEARING_DATE, caseData.getHearingDate().toString()
+            HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE)
 
         );
     }

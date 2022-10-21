@@ -18,6 +18,8 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_HEARING_FEE_UNPAID;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isRespondent1;
 
@@ -78,7 +80,7 @@ public class HearingFeeUnpaidRespondentNotificationHandler extends CallbackHandl
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            HEARING_DATE, caseData.getHearingDate().toString()
+            HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE)
         );
     }
 }
