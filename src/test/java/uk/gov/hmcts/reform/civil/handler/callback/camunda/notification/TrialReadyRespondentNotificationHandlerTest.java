@@ -33,6 +33,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HEARING_OR_TRIAL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.TrialReadyRespondentNotificationHandler.TASK_ID_RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.TrialReadyRespondentNotificationHandler.TASK_ID_RESPONDENT_TWO;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.addTrialOrHearing;
 
 @SpringBootTest(classes = {
@@ -115,14 +117,14 @@ class TrialReadyRespondentNotificationHandlerTest extends BaseCallbackHandlerTes
             if (isRespondentSolicitor1 == false) {
                 return Map.of(
                     HEARING_OR_TRIAL, addTrialOrHearing(caseData),
-                    HEARING_DATE, caseData.getHearingDate().toString(),
+                    HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
                     CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                     CLAIMANT_DEFENDANT_REFERENCE, caseData.getSolicitorReferences().getRespondentSolicitor2Reference()
                 );
             } else {
                 return Map.of(
                     HEARING_OR_TRIAL, addTrialOrHearing(caseData),
-                    HEARING_DATE, caseData.getHearingDate().toString(),
+                    HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
                     CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                     CLAIMANT_DEFENDANT_REFERENCE, caseData.getSolicitorReferences().getRespondentSolicitor1Reference()
                 );
