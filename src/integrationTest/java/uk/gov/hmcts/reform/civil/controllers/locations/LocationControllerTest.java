@@ -24,7 +24,8 @@ public class LocationControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldReturnCourtLocationsMVC() {
         DynamicListElement dynamicListElement = DynamicListElement.builder().label("test_label").build();
-        DynamicList dynamicList = DynamicList.builder().listItems(Collections.singletonList(dynamicListElement)).build();
+        DynamicList dynamicList = DynamicList.builder().listItems(Collections.singletonList(dynamicListElement))
+            .build();
         when(courtLocationUtils.getLocationsFromList(any())).thenReturn(dynamicList);
 
         doGet(BEARER_TOKEN, "/locations/courtLocations")
