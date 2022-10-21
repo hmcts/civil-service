@@ -134,6 +134,10 @@ reference:
     enabled: true
     migration: false
 
+aca:
+  api:
+    baseurl: ${ACA_SERVICE_API_BASEURL:http://localhost:4454}
+
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
   breathingSpaceEnterApplicantEmailTemplate: "31a06373-1eea-4faa-ba3d-4110821a65af"
