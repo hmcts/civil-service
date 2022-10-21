@@ -1,13 +1,9 @@
-
 package uk.gov.hmcts.reform.civil.controllers.locations;
 
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -21,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
-
 import java.util.List;
 
 @Api
@@ -40,9 +35,6 @@ public class LocationController {
 
     @GetMapping(path = "/courtLocations")
     @ApiOperation("Gets court locations")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "Authorization", value = "Authorization token",
-            required = true, dataType = "string", paramType = "header")})
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 401, message = "Not Authorized")})
