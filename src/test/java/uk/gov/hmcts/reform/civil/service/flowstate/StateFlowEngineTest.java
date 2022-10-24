@@ -2577,6 +2577,36 @@ class StateFlowEngineTest {
         }
 
         @Test
+        void shouldReturnProceedsWithOfflineJourney_whenCaseTakenOfflineAfterNotificationAcknowledgeExtension1v2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension1v2()
+                .build();
+
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(TAKEN_OFFLINE_BY_STAFF.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(10)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
+                );
+            verify(featureToggleService).isRpaContinuousFeedEnabled();
+            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
+                entry("RPA_CONTINUOUS_FEED", true),
+                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+            );
+        }
+
+        @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseTakenOfflineAfterDefendantResponse() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterDefendantResponse()
                 .build();

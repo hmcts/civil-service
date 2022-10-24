@@ -2018,6 +2018,13 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension1v2() {
+        atStateNotificationAcknowledgedTimeExtension_1v2DS();
+        takenOfflineByStaff();
+        takenOfflineByStaffDate = respondent1TimeExtensionDate.plusDays(1);
+        return this;
+    }
+
     public CaseDataBuilder takenOfflineByStaff() {
         claimProceedsInCaseman = ClaimProceedsInCaseman.builder()
             .date(LocalDate.now())
