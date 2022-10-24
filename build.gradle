@@ -5,7 +5,7 @@ plugins {
   id 'io.spring.dependency-management' version '1.0.12.RELEASE'
   id 'org.springframework.boot' version '2.5.14'
   id 'org.owasp.dependencycheck' version '7.2.1'
-  id 'com.github.ben-manes.versions' version '0.42.0'
+  id 'com.github.ben-manes.versions' version '0.43.0'
   id 'org.sonarqube' version '3.4.0.2513'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "5.3.3.3"
@@ -75,17 +75,17 @@ allprojects {
       dependencySet(group: 'com.google.guava', version: '31.1-jre') {
         entry 'guava'
       }
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.7.0'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.7.10'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.7.20'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk7', version: '1.7.20'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.7.10'
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.7.10'
-      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.7.0'
+      dependency group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '1.7.20'
       // CVE-2020-29582
 
       // CVE-2021-29425
       dependency group: 'commons-io', name: 'commons-io', version: '2.11.0'
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.10.0'
-      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.3'
+      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.4'
 
       // solves CVE-2022-25857
       dependencySet(
@@ -97,7 +97,7 @@ allprojects {
       // Solves CVE-2022-25647
       dependencySet(
         group: 'org.camunda.bpm',
-        version: '7.17.0'
+        version: '7.18.0'
       ) {
         entry 'camunda-engine'
       }
@@ -360,7 +360,7 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'payments-java-client', version: '1.4.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
-  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '3.17.2-RELEASE'
+  implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '3.19.0-RELEASE'
   implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.1'
 
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -378,13 +378,13 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose', version: versions.springSecurity
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core', version: versions.springSecurity
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.23'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.25.6'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'idam-client', version: '2.0.0'
 
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.18.0'
+  implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.19.0'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.19.0'
-  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.9'
+  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.10.0'
 
 
   implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.63'
@@ -394,9 +394,9 @@ dependencies {
 
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.71'
 
-  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.17.0'
+  implementation group: 'org.camunda.bpm', name: 'camunda-external-task-client', version: '7.18.0'
   implementation group: 'org.camunda.bpm.extension.rest', name: 'camunda-rest-client-spring-boot-starter', version: '0.0.4'
-  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.17.0'
+  implementation group: 'org.camunda.bpm', name: 'camunda-engine-rest-core', version: '7.18.0'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.13.4'
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.1'
@@ -404,13 +404,13 @@ dependencies {
   // JAX-B dependencies for JDK 9+
   implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
   implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.0'
-  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.0'
+  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.1'
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.10.2'
 
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.2.0'
-  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.1.0'
-  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.6.1'
+  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.8.1'
+  testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.8.1'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
