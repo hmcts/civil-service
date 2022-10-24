@@ -12,8 +12,8 @@ public class TrialReadyCheckExternalTaskListener {
     private static final String TOPIC = "TRIAL_READY_CHECK";
 
     @Autowired
-    private TrialReadyCheckExternalTaskListener(TrialReadyCheckHandler trialReadyCheckHandler, ExternalTaskClient client) {
+    private TrialReadyCheckExternalTaskListener(TrialReadyCheckHandler handler, ExternalTaskClient client) {
         TopicSubscriptionBuilder subscriptionBuilder = client.subscribe(TOPIC);
-        subscriptionBuilder.handler(trialReadyCheckHandler).open();
+        subscriptionBuilder.handler(handler).open();
     }
 }

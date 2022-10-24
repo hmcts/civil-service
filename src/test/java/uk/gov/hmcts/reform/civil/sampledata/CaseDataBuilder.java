@@ -103,6 +103,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKN
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
@@ -3106,6 +3107,13 @@ public class CaseDataBuilder {
         }
 
         return this;
+    }
+
+    public CaseDataBuilder atStateTrialReadyCheck() {
+        atStateApplicantRespondToDefenceAndProceed(ONE_V_ONE);
+        ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
+
+        return atStateApplicantRespondToDefenceAndProceed(ONE_V_ONE);
     }
 
     public CaseDataBuilder businessProcess(BusinessProcess businessProcess) {
