@@ -28,7 +28,7 @@ public class HearingFeeDueSearchService extends ElasticSearchService {
                             .must(rangeQuery("data.hearingDueDate").lt("now"))
                             .must(beState(HEARING_READINESS)))
                 .should(boolQuery()
-                            .must(rangeQuery("data.hearingFee").lte("0"))
+                            .must(rangeQuery("data.hearingFee.calculatedAmountInPence").lte("0"))
                             .must(beState(HEARING_READINESS))),
             List.of("reference"),
             startIndex
