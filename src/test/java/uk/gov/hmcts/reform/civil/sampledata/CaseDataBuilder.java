@@ -97,13 +97,7 @@ import java.util.List;
 import static java.time.LocalDate.now;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.*;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
@@ -3060,6 +3054,31 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateTakenOfflinePastApplicantResponseDeadline() {
         atStatePastApplicantResponseDeadline();
         takenOfflineDate = respondent1ResponseDate.plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateBeforeTakenOfflineSDONotDrawn() {
+
+        atStateApplicantRespondToDefenceAndProceed();
+
+        ccdState = JUDICIAL_REFERRAL;
+        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
+            .input("unforeseen complexities")
+            .build();
+        unsuitableSDODate = applicant1ResponseDate.plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateBeforeTakenOfflineSDONotDrawnOverLimit() {
+
+        atStateApplicantRespondToDefenceAndProceed();
+
+        ccdState = JUDICIAL_REFERRAL;
+        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
+            .input("This is more than 150 111111111111111111111111111111111111111111111111111111111111111111111111111" +
+                       "111111111111111111111111111111111111111111111111111111")
+            .build();
+        unsuitableSDODate = applicant1ResponseDate.plusDays(1);
         return this;
     }
 

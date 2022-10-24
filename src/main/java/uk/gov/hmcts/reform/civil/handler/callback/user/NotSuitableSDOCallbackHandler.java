@@ -68,7 +68,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         final int lettersIgnore = "{input=}".length();
 
         List<String> errors = new ArrayList<>();
-        var reason = callbackParams.getRequest().getCaseDetails().getData().get("reasonNotSuitableSDO");
+        var reason = callbackParams.getCaseData().getReasonNotSuitableSDO();
 
         if (reason.toString().length() > lengthAllowed + lettersIgnore) {
             errors.add("Character Limit Reached: "
