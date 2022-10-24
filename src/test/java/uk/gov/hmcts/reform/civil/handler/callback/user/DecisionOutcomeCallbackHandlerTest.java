@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

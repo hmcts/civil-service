@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.event;
 
 import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
 
 import org.junit.jupiter.api.Test;
