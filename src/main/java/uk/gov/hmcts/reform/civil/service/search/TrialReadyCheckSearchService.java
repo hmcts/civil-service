@@ -29,7 +29,7 @@ public class TrialReadyCheckSearchService extends ElasticSearchService {
                             .must(rangeQuery("data.hearingDate").lt(LocalDate.now().plusWeeks(3)
                                                                                                     .toString()))
                             .must(beState(PREPARE_FOR_HEARING_CONDUCT_HEARING))
-                            .mustNot(matchQuery("trialReadyChecked", "Yes"))),
+                            .mustNot(matchQuery("data.trialReadyChecked", "Yes"))),
             List.of("reference"),
             startIndex
         );
@@ -39,4 +39,5 @@ public class TrialReadyCheckSearchService extends ElasticSearchService {
         return boolQuery()
             .must(matchQuery("state", caseState.toString()));
     }
+
 }
