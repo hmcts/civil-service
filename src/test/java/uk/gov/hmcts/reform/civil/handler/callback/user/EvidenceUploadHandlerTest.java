@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +72,5 @@ public class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
 
         assertThat(registerTarget).containsExactly(entry(EVIDENCE_UPLOAD.name(), handler));
     }
-
 
 }
