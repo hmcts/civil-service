@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -24,7 +23,6 @@ import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -32,15 +30,12 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -70,10 +65,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private IdamClient idamClient;
     @MockBean
     private UserDetails userDetails;
-    @MockBean
-    private DeadlinesCalculator deadlinesCalculator;
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToStartCallback {
@@ -124,12 +115,10 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     class MidEventPrePopulateDisposalHearingPageCallback {
 
         private static final String PAGE_ID = "trial-disposal-screen";
-        private final LocalDate date = LocalDate.of(2022, 3, 29);
 
         @BeforeEach
         void setup() {
-            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
-            when(deadlinesCalculator.plusWorkingDays(any(), anyInt())).thenReturn(date);
+
             given(idamClient.getUserDetails(any()))
                 .willReturn(UserDetails.builder().forename("test").surname("judge").build());
         }
@@ -464,22 +453,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "and agreed by the parties and uploaded to the Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("trialRoadTrafficAccident").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(4).toString());
-
-            assertThat(response.getData()).extracting("disposalHearingOrderMadeWithoutHearingDJ").extracting("input")
-                .isEqualTo(String.format("This order has been made without a hearing. Each party "
-                                             + "has the right to apply to have this order "
-                                             + "set aside or varied. Any such application must be "
-                                             + "received by the Court "
-                                             + "(together with the appropriate fee) by 4pm on %s.",
-                                         date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))));
-
-            assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingTimeDJ").extracting("input")
-                .isEqualTo("This claim will be listed for final "
-                               + "disposal before a Judge on the first "
-                               + "available date after");
-
-            assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingTimeDJ").extracting("date")
-                .isEqualTo(LocalDate.now().plusWeeks(16).toString());
         }
 
         @Test
@@ -491,19 +464,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("trialHearingVariationsDirectionsDJToggle").isNotNull();
-        }
-
-        @Test
-        void shouldNotPopulateOrderMadeWithoutHearingWhenHnlSdoDisabled() {
-            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .atStateClaimIssuedTrialHearing().build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("disposalHearingOrderMadeWithoutHearingDJ").isNull();
-            assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingTimeDJ").isNull();
         }
     }
 
