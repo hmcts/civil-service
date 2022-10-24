@@ -60,6 +60,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -306,24 +307,38 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldHandleCourtLocationData() {
                 when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
 
+                when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString()))
+                    .thenReturn(Collections.singletonList(
+                        LocationRefData.builder()
+                            .courtLocationCode("123")
+                            .siteName("Site name")
+                            .build()
+                    ));
                 when(courtLocationUtils.getLocationsFromList(any()))
                     .thenReturn(fromList(List.of("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124")));
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
+                    .build().toBuilder()
+                    .courtLocation(uk.gov.hmcts.reform.civil.model.CourtLocation.builder()
+                                       .applicantPreferredCourt("123")
+                                       .build())
                     .build();
 
-                CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
+                CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_2, caseData, ABOUT_TO_START);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
-                DynamicList dynamicList = getCaseData(response)
-                    .getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtLocations();
+                RequestedCourt respondent1DQRequestedCourt = getCaseData(response)
+                    .getRespondent1DQ().getRespondent1DQRequestedCourt();
+                DynamicList dynamicList = respondent1DQRequestedCourt.getResponseCourtLocations();
 
                 List<String> courtlist = dynamicList.getListItems().stream()
                     .map(DynamicListElement::getLabel)
                     .collect(Collectors.toList());
 
                 assertThat(courtlist).containsOnly("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124");
+                assertThat(respondent1DQRequestedCourt.getOtherPartyPreferredSite())
+                    .isEqualTo("123 Site name");
             }
 
             @Test
@@ -1214,6 +1229,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
 
+                    DynamicListElement selectedCourtLocation = DynamicListElement.builder()
+                        .label("selected location label")
+                        .code(UUID.randomUUID().toString())
+                        .build();
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                         .respondent1Copy(PartyBuilder.builder().individual().build())
@@ -1265,6 +1284,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
 
+                    DynamicListElement selectedCourtLocation = DynamicListElement.builder()
+                        .label("selected location label")
+                        .code(UUID.randomUUID().toString())
+                        .build();
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimOneDefendantSolicitor()
                         .atStateRespondentFullDefence()
@@ -1316,6 +1339,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
 
+                    DynamicListElement selectedCourtLocation = DynamicListElement.builder()
+                        .label("selected location label")
+                        .code(UUID.randomUUID().toString())
+                        .build();
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimOneDefendantSolicitor()
                         .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
@@ -1391,6 +1418,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
 
+                    DynamicListElement selectedCourtLocation = DynamicListElement.builder()
+                        .label("selected location label")
+                        .code(UUID.randomUUID().toString())
+                        .build();
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
@@ -1441,6 +1472,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
 
+                    DynamicListElement selectedCourtLocation = DynamicListElement.builder()
+                        .label("selected location label")
+                        .code(UUID.randomUUID().toString())
+                        .build();
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting2ndRespondentResponse()

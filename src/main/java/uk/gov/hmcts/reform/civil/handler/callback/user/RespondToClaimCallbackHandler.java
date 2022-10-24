@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
@@ -64,6 +65,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
@@ -114,6 +116,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::populateRespondentCopyObjects)
             .put(callbackKey(V_1, ABOUT_TO_START), this::populateRespondentCopyObjects)
+            .put(callbackKey(V_2, ABOUT_TO_START), this::populateRespondentCopyObjects)
             .put(callbackKey(MID, "confirm-details"), this::validateDateOfBirth)
             .put(callbackKey(MID, "set-generic-response-type-flag"), this::setGenericResponseTypeFlag)
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
@@ -165,19 +168,41 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         }
 
         DynamicList courtLocationList = DynamicList.builder().build();
+        RequestedCourt.RequestedCourtBuilder requestedCourt1 = RequestedCourt.builder();
 
         var updatedCaseData = caseData.toBuilder()
             .respondent1Copy(caseData.getRespondent1())
             .isRespondent1(isRespondent1);
 
-        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
-            courtLocationList = courtLocationUtils.getLocationsFromList(fetchLocationData(callbackParams));
-            updatedCaseData.respondent1DQ(Respondent1DQ.builder()
-                                              .respondent1DQRequestedCourt(
-                                                  RequestedCourt.builder()
-                                                      .responseCourtLocations(courtLocationList)
-                                                      .build())
-                                              .build());
+        if ((V_1.equals(callbackParams.getVersion()) || V_2.equals(callbackParams.getVersion()))
+            && toggleService.isCourtLocationDynamicListEnabled()) {
+            List<LocationRefData> locations = fetchLocationData(callbackParams);
+            courtLocationList = courtLocationUtils.getLocationsFromList(locations);
+            requestedCourt1.responseCourtLocations(courtLocationList);
+
+            if (V_2.equals(callbackParams.getVersion())) {
+                Optional.ofNullable(caseData.getCourtLocation())
+                    .map(CourtLocation::getApplicantPreferredCourt)
+                    .flatMap(applicantCourt -> locations.stream()
+                        .filter(locationRefData -> applicantCourt.equals(locationRefData.getCourtLocationCode()))
+                        .findFirst())
+                    .ifPresent(locationRefData -> requestedCourt1
+                        .otherPartyPreferredSite(locationRefData.getCourtLocationCode()
+                                                     + " " + locationRefData.getSiteName()));
+            }
+
+            updatedCaseData
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQRequestedCourt(
+                                       requestedCourt1
+                                           .build())
+                                   .build());
+
+            if (caseData.getRespondent2() != null) {
+                updatedCaseData.respondent2DQ(
+                    Respondent2DQ.builder()
+                        .respondent2DQRequestedCourt(requestedCourt1.build()).build());
+            }
         }
 
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
@@ -186,12 +211,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             updatedCaseData
                 .respondent2Copy(caseData.getRespondent2())
                 .respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
-
-            if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
-                updatedCaseData
-                    .respondent2DQ(Respondent2DQ.builder().respondent2DQRequestedCourt(
-                        RequestedCourt.builder().responseCourtLocations(courtLocationList).build()).build());
-            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
