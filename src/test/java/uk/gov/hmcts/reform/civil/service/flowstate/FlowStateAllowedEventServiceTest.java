@@ -211,7 +211,8 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         HEARING_SCHEDULED,
-                        NotSuitable_SDO
+                        NotSuitable_SDO,
+                        EVIDENCE_UPLOAD_JUDGE
                     }
                 ),
                 of(
