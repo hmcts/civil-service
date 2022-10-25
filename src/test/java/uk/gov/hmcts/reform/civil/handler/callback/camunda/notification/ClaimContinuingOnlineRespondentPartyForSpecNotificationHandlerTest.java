@@ -143,7 +143,11 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
             CallbackParams params = getCallbackParams(caseData);
 
             handler.handle(params);
-            verify(bulkPrintService).printLetter(LETTER_CONTENT);
+            verify(bulkPrintService)
+                .printLetter(LETTER_CONTENT,
+                             caseData.getLegacyCaseReference(),
+                             caseData.getLegacyCaseReference(),
+                             "first-contact-pack");
         }
 
         private Map<String, String> getNotificationDataMap(CaseData caseData) {

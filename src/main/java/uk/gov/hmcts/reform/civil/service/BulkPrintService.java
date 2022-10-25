@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.sendletter.api.Document;
 import uk.gov.hmcts.reform.sendletter.api.Letter;
+import uk.gov.hmcts.reform.sendletter.api.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
 
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +23,9 @@ import java.util.Map;
 public class BulkPrintService {
 
     public static final String XEROX_TYPE_PARAMETER = "CMC001";
+    protected static final String ADDITIONAL_DATA_LETTER_TYPE_KEY = "letterType";
+    protected static final String ADDITIONAL_DATA_CASE_IDENTIFIER_KEY = "caseIdentifier";
+    protected static final String ADDITIONAL_DATA_CASE_REFERENCE_NUMBER_KEY = "caseReferenceNumber";
 
     private final SendLetterApi sendLetterApi;
     private final AuthTokenGenerator authTokenGenerator;
@@ -29,16 +34,23 @@ public class BulkPrintService {
         value = RuntimeException.class,
         backoff = @Backoff(delay = 200)
     )
-    public SendLetterResponse printLetter(byte[] letterContent) {
+    public SendLetterResponse printLetter(byte[] letterContent, String claimId, String claimReference, String letterType ) {
         String authorisation = authTokenGenerator.generate();
-        Letter letter = generateLetter(Map.of(), letterContent);
+        LetterWithPdfsRequest letter = generateLetter(additionalInformation(claimId, claimReference, letterType), letterContent);
         log.info("Letter json {}", letter);
         return sendLetterApi.sendLetter(authorisation, letter);
     }
 
-    private Letter generateLetter(Map<String, Object> letterParams, byte[] letterContent) {
+    private LetterWithPdfsRequest generateLetter(Map<String, Object> letterParams, byte[] letterContent) {
         String templateLetter = Base64.getEncoder().encodeToString(letterContent);
-        Document document = new Document(templateLetter, letterParams);
-        return new Letter(List.of(document), XEROX_TYPE_PARAMETER);
+        return new LetterWithPdfsRequest(List.of(templateLetter), XEROX_TYPE_PARAMETER, letterParams);
+    }
+
+    private Map<String, Object> additionalInformation(String claimId, String claimReference, String letterType) {
+        Map<String, Object> additionalData = new HashMap<>();
+        additionalData.put(ADDITIONAL_DATA_LETTER_TYPE_KEY, letterType);
+        additionalData.put(ADDITIONAL_DATA_CASE_IDENTIFIER_KEY, claimId);
+        additionalData.put(ADDITIONAL_DATA_CASE_REFERENCE_NUMBER_KEY, claimReference);
+        return additionalData;
     }
 }

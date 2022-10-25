@@ -37,6 +37,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RESPONDENT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC);
     public static final String TASK_ID_Respondent1 = "CreateClaimContinuingOnlineNotifyRespondent1ForSpec";
     private static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
+    private static final String FIRST_CONTACT_PACK_LETTER_TYPE = "first-contact-pack";
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final ObjectMapper objectMapper;
@@ -104,7 +105,8 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private void generatePIPLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         byte[] letter = pipLetterGenerator.downloadLetter(caseData);
-        bulkPrintService.printLetter(letter);
+        bulkPrintService.printLetter(letter, caseData.getLegacyCaseReference(),
+                                     caseData.getLegacyCaseReference(), FIRST_CONTACT_PACK_LETTER_TYPE);
     }
 
     private void generatePIPEmail(CaseData caseData) {
