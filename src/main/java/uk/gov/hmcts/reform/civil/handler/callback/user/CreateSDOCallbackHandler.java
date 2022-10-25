@@ -252,29 +252,27 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.disposalHearingFinalDisposalHearing(tempDisposalHearingFinalDisposalHearing).build();
 
-        if (featureToggleService.isHearingAndListingSDOEnabled()) {
-            // updated Hearing time field copy of the above field, leaving above field in as requested to not break
-            // existing cases
-            DisposalHearingHearingTime tempDisposalHearingHearingTime =
-                DisposalHearingHearingTime.builder()
-                    .input(
-                        "This claim will be listed for final disposal before a judge on the first available date after")
-                    .dateTo(LocalDate.now().plusWeeks(16))
-                    .build();
+        // updated Hearing time field copy of the above field, leaving above field in as requested to not break
+        // existing cases
+        DisposalHearingHearingTime tempDisposalHearingHearingTime =
+            DisposalHearingHearingTime.builder()
+                .input(
+                    "This claim will be listed for final disposal before a judge on the first available date after")
+                .dateTo(LocalDate.now().plusWeeks(16))
+                .build();
 
-            updatedData.disposalHearingHearingTime(tempDisposalHearingHearingTime).build();
+        updatedData.disposalHearingHearingTime(tempDisposalHearingHearingTime).build();
 
-            DisposalOrderWithoutHearing disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
-                .input(String.format(
-                    "Each party has the right to apply to have this Order set "
-                        + "aside or varied. Any such application must be received "
-                        + "by the Court (together with the appropriate fee) "
-                        + "by 4pm on %s.",
-                    deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
-                        .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))
-                )).build();
-            updatedData.disposalOrderWithoutHearing(disposalOrderWithoutHearing).build();
-        }
+        DisposalOrderWithoutHearing disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
+            .input(String.format(
+                "Each party has the right to apply to have this Order set "
+                    + "aside or varied. Any such application must be received "
+                    + "by the Court (together with the appropriate fee) "
+                    + "by 4pm on %s.",
+                deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
+                    .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))
+            )).build();
+        updatedData.disposalOrderWithoutHearing(disposalOrderWithoutHearing).build();
 
         DisposalHearingBundle tempDisposalHearingBundle = DisposalHearingBundle.builder()
             .input("At least 7 days before the disposal hearing, the claimant must upload to the Digital Portal")
