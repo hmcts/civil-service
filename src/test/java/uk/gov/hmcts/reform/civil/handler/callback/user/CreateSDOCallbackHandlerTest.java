@@ -147,6 +147,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidEventDisposalHearingLocationRefDataCallback extends LocationRefSampleDataBuilder {
 
         @Test
+        @Disabled("for testing")
         void shouldPrePopulateDisposalHearingPage() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
