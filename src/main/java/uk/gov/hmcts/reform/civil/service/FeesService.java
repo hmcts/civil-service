@@ -65,6 +65,19 @@ public class FeesService {
         );
     }
 
+    public Fee getHearingFeeDataByTotalClaimAmount(BigDecimal totalClaimAmount) {
+        FeeLookupResponseDto feeLookupResponseDto = specLookupHearingFee(totalClaimAmount);
+        return buildFeeDto(feeLookupResponseDto);
+    }
+
+    private FeeLookupResponseDto specLookupHearingFee(BigDecimal totalClaimAmount) {
+        return feesClient.lookupFee(
+            feesConfiguration.getChannel(),
+            feesConfiguration.getHearingEvent(),
+            totalClaimAmount.setScale(2)
+        );
+    }
+
     /**
      * Get a range of fees for the configured channel and event.
      *
