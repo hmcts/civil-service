@@ -31,3 +31,8 @@ node_modules/
 output/
 test-results/
 smokeTest/
+
+# Terraform
+infrastructure/.terraform/**
+infrastructure/.terraform.lock.hcl
+infrastructure/override.tf

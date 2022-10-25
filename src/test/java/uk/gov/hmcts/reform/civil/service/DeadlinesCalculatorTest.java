@@ -402,4 +402,10 @@ public class DeadlinesCalculatorTest {
         LocalDate saturday = LocalDate.of(2022, 9, 10);
         assertThat(calculator.plusWorkingDays(saturday, 3)).isWednesday();
     }
+
+    @Test
+    void testPlusWorkingDaysReturnsSameDay() {
+        LocalDate wednesday = LocalDate.of(2022, 9, 28);
+        assertThat(calculator.plusWorkingDays(wednesday, 0)).isWednesday();
+    }
 }
