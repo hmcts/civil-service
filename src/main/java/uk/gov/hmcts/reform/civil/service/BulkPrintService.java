@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BulkPrintService {
@@ -30,6 +32,7 @@ public class BulkPrintService {
     public SendLetterResponse printLetter(byte[] letterContent) {
         String authorisation = authTokenGenerator.generate();
         Letter letter = generateLetter(Map.of(), letterContent);
+        log.info("Letter json {}", letter);
         return sendLetterApi.sendLetter(authorisation, letter);
     }
 
