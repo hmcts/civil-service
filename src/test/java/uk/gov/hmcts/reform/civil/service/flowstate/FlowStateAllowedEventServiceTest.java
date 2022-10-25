@@ -65,6 +65,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITIN
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED;
@@ -500,6 +501,12 @@ class FlowStateAllowedEventServiceTest {
                     }
                 ),
                 of(
+                    CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE,
+                    new CaseEvent[]{
+                        CASE_PROCEEDS_IN_CASEMAN
+                    }
+                ),
+                of(
                     PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[]{
                         TAKE_CASE_OFFLINE, APPLICATION_OFFLINE_UPDATE_CLAIM
@@ -678,6 +685,7 @@ class FlowStateAllowedEventServiceTest {
                         NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                         CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName(),
                         CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName(),
+                        CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
                         AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()
                     }

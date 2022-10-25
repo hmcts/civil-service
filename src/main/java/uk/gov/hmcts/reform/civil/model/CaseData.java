@@ -85,6 +85,9 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingNotesDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -475,8 +478,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DisposalHearingQuestionsToExpertsDJ disposalHearingQuestionsToExpertsDJ;
     private DisposalHearingSchedulesOfLossDJ disposalHearingSchedulesOfLossDJ;
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
+    private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
     private DisposalHearingBundleDJ disposalHearingBundleDJ;
     private DisposalHearingNotesDJ disposalHearingNotesDJ;
+    private DisposalHearingHearingNotesDJ disposalHearingHearingNotesDJ;
+    private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
     private DisposalHearingMethodDJ disposalHearingMethodDJ;
     private DynamicList trialHearingMethodInPersonDJ;
     private DynamicList disposalHearingMethodInPersonDJ;
@@ -489,16 +495,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DynamicList hearingLocation;
     private LocalDate dateOfApplication;
     private LocalDate hearingDate;
+    private LocalDate hearingDueDate;
     private String hearingTimeHourMinute;
     private String hearingReferenceNumber;
     private ListingOrRelisting listingOrRelisting;
     private HearingNoticeList hearingNoticeList;
-    private LocalDate hearingDueDate;
     private Fee hearingFee;
     private HearingChannel channel;
     private HearingDuration hearingDuration;
     private String information;
     private String hearingNoticeListOther;
+    private LocalDateTime caseDismissedHearingFeeDueDate;
 
     //default judgement SDO fields for trial/fast track
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
