@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,6 +31,7 @@ public class NotifyDeadlineExtensionCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_CUI_DEADLINE_EXTENSION);
 
     private final ObjectMapper objectMapper;
+    private final Time time;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -49,6 +51,7 @@ public class NotifyDeadlineExtensionCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         caseData = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI_DEADLINE_EXTENSION))
+            .respondentSolicitor1AgreedDeadlineExtension(time.now().toLocalDate()) // TODO set up the date from CUI
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
