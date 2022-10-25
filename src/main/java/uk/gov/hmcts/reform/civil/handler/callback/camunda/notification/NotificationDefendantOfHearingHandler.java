@@ -63,9 +63,15 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
     private void sendEmail(CaseData caseData, String recipient, Boolean isFirst) {
         String defRefNumber;
         if (isFirst) {
-            defRefNumber = caseData.getSolicitorReferences().getRespondentSolicitor1Reference();
+            if (caseData.getSolicitorReferences() == null
+                || caseData.getSolicitorReferences().getRespondentSolicitor1Reference() == null) {
+                defRefNumber = "";
+            } else {
+                defRefNumber = caseData.getSolicitorReferences().getRespondentSolicitor1Reference();
+            }
         } else {
-            defRefNumber = caseData.getSolicitorReferences().getRespondentSolicitor2Reference();
+            defRefNumber = caseData.getRespondentSolicitor2Reference() == null ? "" :
+                caseData.getRespondentSolicitor2Reference();
         }
         Map<String, String> properties = addProperties(caseData);
         properties.put(DEFENDANT_REFERENCE_NUMBER, defRefNumber);
@@ -83,12 +89,9 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
         String hourMinute = caseData.getHearingTimeHourMinute();
-        LocalTime time = null;
-        if (hourMinute != null) {
-            int hours = Integer.parseInt(hourMinute.substring(0, 2));
-            int minutes = Integer.parseInt(hourMinute.substring(2, 4));
-            time = LocalTime.of(hours, minutes, 0);
-        }
+        int hours = Integer.parseInt(hourMinute.substring(0, 2));
+        int minutes = Integer.parseInt(hourMinute.substring(2, 4));
+        LocalTime time = LocalTime.of(hours, minutes, 0);
         return new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER,
             caseData.getLegacyCaseReference(),

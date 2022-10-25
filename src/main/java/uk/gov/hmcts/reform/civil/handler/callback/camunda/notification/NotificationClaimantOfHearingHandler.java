@@ -72,11 +72,15 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
         String hourMinute = caseData.getHearingTimeHourMinute();
-        LocalTime time = null;
-        if (hourMinute != null) {
-            int hours = Integer.parseInt(hourMinute.substring(0, 2));
-            int minutes = Integer.parseInt(hourMinute.substring(2, 4));
-            time = LocalTime.of(hours, minutes, 0);
+        String reference;
+        int hours = Integer.parseInt(hourMinute.substring(0, 2));
+        int minutes = Integer.parseInt(hourMinute.substring(2, 4));
+        LocalTime time = LocalTime.of(hours, minutes, 0);
+        if (caseData.getSolicitorReferences() == null
+            || caseData.getSolicitorReferences().getApplicantSolicitor1Reference() == null) {
+            reference = "";
+        } else {
+            reference = caseData.getSolicitorReferences().getApplicantSolicitor1Reference();
         }
         return new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER,
@@ -89,8 +93,8 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
             time.toString(),
             DEADLINE_DATE,
             caseData.getRespondent1ResponseDeadline().toLocalDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-            CLAIMANT_REFERENCE_NUMBER,
-            caseData.getSolicitorReferences().getApplicantSolicitor1Reference()
+            CLAIMANT_REFERENCE_NUMBER, reference
+
         ));
     }
 }

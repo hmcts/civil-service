@@ -109,8 +109,8 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YES)
                 .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Party2").build())
-                .solicitorReferences(SolicitorReferences.builder().respondentSolicitor1Reference("6789")
-                                         .respondentSolicitor2Reference("10111213").build())
+                .solicitorReferences(SolicitorReferences.builder().respondentSolicitor1Reference("6789").build())
+                .respondentSolicitor2Reference("10111213")
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT_HEARING").build()).build();
