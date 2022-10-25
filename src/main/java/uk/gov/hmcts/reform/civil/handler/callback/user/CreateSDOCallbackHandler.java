@@ -69,7 +69,6 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
