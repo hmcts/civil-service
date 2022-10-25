@@ -6,8 +6,6 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.sendletter.api.Document;
-import uk.gov.hmcts.reform.sendletter.api.Letter;
 import uk.gov.hmcts.reform.sendletter.api.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
@@ -34,9 +32,11 @@ public class BulkPrintService {
         value = RuntimeException.class,
         backoff = @Backoff(delay = 200)
     )
-    public SendLetterResponse printLetter(byte[] letterContent, String claimId, String claimReference, String letterType ) {
+    public SendLetterResponse printLetter(byte[] letterContent, String claimId,
+                                          String claimReference, String letterType) {
         String authorisation = authTokenGenerator.generate();
-        LetterWithPdfsRequest letter = generateLetter(additionalInformation(claimId, claimReference, letterType), letterContent);
+        LetterWithPdfsRequest letter =
+            generateLetter(additionalInformation(claimId, claimReference, letterType), letterContent);
         log.info("Letter json {}", letter);
         return sendLetterApi.sendLetter(authorisation, letter);
     }
