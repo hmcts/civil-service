@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
@@ -22,15 +21,11 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -138,138 +133,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(CREATE_SDO.name(), "READY");
-        }
-    }
-
-    @Nested
-    class MidEventDisposalHearingLocationRefDataCallback extends LocationRefSampleDataBuilder {
-
-        @Test
-        void shouldPrePopulateDisposalHearingPage() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
-                .willReturn(getSampleCourLocationsRefObject());
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
-
-            DynamicList dynamicList = getLocationDynamicListInPersonHearing(data);
-
-            assertThat(dynamicList).isNotNull();
-            assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
-                "Site 1 - Adr 1 - AAA 111",
-                "Site 2 - Adr 2 - BBB 222",
-                "Site 3 - Adr 3 - CCC 333"
-            );
-        }
-
-        /**
-         * spec claim, but no preferred court location.
-         */
-        @Test
-        void shouldPrePopulateDisposalHearingPageSpec1() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
-                .toBuilder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
-                .totalClaimAmount(BigDecimal.valueOf(10000))
-                .build();
-            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
-                .willReturn(getSampleCourLocationsRefObject());
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
-
-            DynamicList dynamicList = getLocationDynamicListInPersonHearing(data);
-
-            assertThat(dynamicList).isNotNull();
-            assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
-                "Site 1 - Adr 1 - AAA 111",
-                "Site 2 - Adr 2 - BBB 222",
-                "Site 3 - Adr 3 - CCC 333"
-            );
-        }
-
-        /**
-         * spec claim, specified no preference for court.
-         */
-        @Test
-        void shouldPrePopulateDisposalHearingPageSpec2() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
-                .toBuilder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
-                .totalClaimAmount(BigDecimal.valueOf(10000))
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQRequestedCourt(
-                                      RequestedCourt.builder()
-                                          .build()
-                                  )
-                                  .build())
-                .build();
-            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
-                .willReturn(getSampleCourLocationsRefObject());
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
-
-            DynamicList dynamicList = getLocationDynamicListInPersonHearing(data);
-
-            assertThat(dynamicList).isNotNull();
-            assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
-                "Site 1 - Adr 1 - AAA 111",
-                "Site 2 - Adr 2 - BBB 222",
-                "Site 3 - Adr 3 - CCC 333"
-            );
-        }
-
-        /**
-         * spec claim, preferred court specified.
-         */
-        @Test
-        void shouldPrePopulateDisposalHearingPageSpec3() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
-                .toBuilder()
-                .superClaimType(SuperClaimType.SPEC_CLAIM)
-                .totalClaimAmount(BigDecimal.valueOf(10000))
-                .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQRequestedCourt(
-                                      RequestedCourt.builder()
-                                          .responseCourtCode("court3")
-                                          .caseLocation(
-                                              CaseLocation.builder()
-                                                  .baseLocation("dummy base")
-                                                  .region("dummy region")
-                                                  .build()
-                                          ).build()
-                                  ).build()
-                ).build();
-
-            given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
-                .willReturn(getSampleCourLocationsRefObject());
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
-
-            DynamicList dynamicList = getLocationDynamicListInPersonHearing(data);
-
-            assertThat(dynamicList).isNotNull();
-            assertThat(locationsFromDynamicList(dynamicList)).containsExactly(
-                "Site 1 - Adr 1 - AAA 111",
-                "Site 2 - Adr 2 - BBB 222",
-                "Site 3 - Adr 3 - CCC 333"
-            );
-            assertThat(dynamicList.getValue().getLabel()).isEqualTo("Site 3 - Adr 3 - CCC 333");
         }
     }
 
@@ -865,19 +728,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("12.0%");
             assertThat(response.getData()).extracting("smallClaimsJudgementDeductionValue").extracting("value")
                 .isEqualTo("12.0%");
-        }
-
-        @Test
-        void shouldNotSetValuesForHnLIfToggleDisabled() {
-            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("disposalHearingHearingTime").isNull();
-            assertThat(response.getData()).extracting("disposalOrderWithoutHearing").isNull();
         }
     }
 
