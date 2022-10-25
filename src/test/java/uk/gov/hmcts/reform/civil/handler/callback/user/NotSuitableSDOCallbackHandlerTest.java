@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.config.JacksonConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -39,9 +40,10 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     ClaimIssueConfiguration.class,
+    JacksonConfiguration.class,
     MockDatabaseConfiguration.class,
     ValidationAutoConfiguration.class})
-public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
+class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private Time time;
@@ -59,23 +61,19 @@ public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToStartCallback {
 
         private CallbackParams params;
-        private CaseData caseData;
-        private String userId;
 
         private static final String EMAIL = "example@email.com";
-        private LocalDateTime startedDate;
 
         @BeforeEach
         void setup() {
-            caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             params = callbackParamsOf(caseData, ABOUT_TO_START);
-            userId = UUID.randomUUID().toString();
+            String userId = UUID.randomUUID().toString();
 
             given(idamClient.getUserDetails(any()))
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
-            startedDate = LocalDateTime.now();
-            given(time.now()).willReturn(startedDate);
+            given(time.now()).willReturn(LocalDateTime.now());
 
         }
 
@@ -83,9 +81,8 @@ public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void checkUnsuitableSDODate() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            String timeString = time.now().toString();
-            assertThat(response.getData()).extracting("unsuitableSDODate")
-                .isEqualTo(timeString.substring(0, Math.min(timeString.length(), 27)));
+            String timeString = time.now().format(JacksonConfiguration.DATE_TIME_FORMATTER);
+            assertThat(response.getData()).extracting("unsuitableSDODate").isEqualTo(timeString);
 
         }
     }
@@ -94,22 +91,19 @@ public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
 
         private CallbackParams params;
-        private CaseData caseData;
-        private String userId;
 
         private static final String EMAIL = "example@email.com";
-        private final LocalDateTime submittedDate = LocalDateTime.now();
 
         @BeforeEach
         void setup() {
-            caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            userId = UUID.randomUUID().toString();
+            String userId = UUID.randomUUID().toString();
 
             given(idamClient.getUserDetails(any()))
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
-            given(time.now()).willReturn(submittedDate);
+            given(time.now()).willReturn(LocalDateTime.now());
 
         }
 
