@@ -16,7 +16,7 @@ class HearingFeeDueSearchServiceTest extends ElasticSearchServiceTest {
     void setup() {
         searchService = new HearingFeeDueSearchService(coreCaseDataService);
     }
-
+gi
     @Override
     protected Query buildQuery(int fromValue) {
         BoolQueryBuilder query = boolQuery()

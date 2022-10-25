@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.search;
 
 import org.elasticsearch.index.query.QueryBuilder;
+import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
@@ -25,7 +26,7 @@ public class HearingFeeDueSearchService extends ElasticSearchService {
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(rangeQuery("data.hearingDueDate").lt("now"))
+                            .must(rangeQuery("data.hearingDueDate").lt(LocalDate.now().toString()))
                             .must(beState(HEARING_READINESS)))
                 .should(boolQuery()
                             .must(rangeQuery("data.hearingFee.calculatedAmountInPence").lte("0"))
