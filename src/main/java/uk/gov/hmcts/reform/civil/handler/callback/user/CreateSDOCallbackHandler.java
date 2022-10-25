@@ -86,8 +86,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_SDO);
     public static final String CONFIRMATION_HEADER = "# Your order has been issued"
-        + "<br/>%n%nClaim number"
-        + "<br/><strong>%s</strong>";
+        + "%n## Claim number: %s";
     public static final String CONFIRMATION_SUMMARY_1v1 = "<br/>The Directions Order has been sent to:"
         + "<br/>%n%n<strong>Claimant 1</strong>%n"
         + "<br/>%s"
