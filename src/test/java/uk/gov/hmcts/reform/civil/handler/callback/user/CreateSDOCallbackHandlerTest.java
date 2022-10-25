@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -41,6 +42,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
+import java.time.format.FormatStyle;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -138,6 +141,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class MidEventPrePopulateOrderDetailsPagesCallback extends LocationRefSampleDataBuilder {
+
+        private final LocalDate date = LocalDate.of(2022, 1, 5);
+
+        @BeforeEach
+        void setup() {
+            when(deadlinesCalculator.plusWorkingDays(any(), anyInt())).thenReturn(date);
+            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
+        }
 
         private final LocalDate date = LocalDate.of(2022, 1, 5);
 
@@ -638,6 +649,22 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                              + "Any such application must be received by the Court (together with the "
                                              + "appropriate fee) by 4pm on %s.",
                                          date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))));
+            assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("helpText1")
+                .isEqualTo("If either party considers that the time estimate is insufficient, "
+                               + "they must inform the court within 7 days of the date of this order.");
+            assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("helpText2")
+                .isEqualTo("Not more than seven nor less than three clear days before the trial, "
+                               + "the claimant must file at court and serve an indexed and paginated bundle of "
+                               + "documents which complies with the requirements of Rule 39.5 Civil Procedure Rules "
+                               + "and which complies with requirements of PD32. The parties must endeavour to agree "
+                               + "the contents of the bundle before it is filed. The bundle will include a case "
+                               + "summary and a chronology.");
+            assertThat(response.getData()).extracting("fastTrackOrderWithoutJudgement").extracting("input")
+                .isEqualTo(String.format("This order has been made without hearing. Each party has the right to apply "
+                                             + "to have this Order set aside or varied. Any such application must be "
+                                             + "received by the Court (together with the appropriate fee) by 4pm "
+                                             + "on %s.",
+                                         date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))));
         }
 
         @Test
@@ -728,6 +755,19 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("12.0%");
             assertThat(response.getData()).extracting("smallClaimsJudgementDeductionValue").extracting("value")
                 .isEqualTo("12.0%");
+        }
+
+        @Test
+        void shouldNotSetValuesForHnLIfToggleDisabled() {
+            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("fastTrackHearingTime").isNull();
+            assertThat(response.getData()).extracting("fastTrackOrderWithoutJudgement").isNull();
         }
     }
 
