@@ -46,7 +46,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -775,7 +774,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(String.format("Each party has the right to apply to have this Order set aside or varied. "
                                              + "Any such application must be received by the Court (together with the "
                                              + "appropriate fee) by 4pm on %s.",
-                                         date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))));
+                                         date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))));
         }
 
         @Test

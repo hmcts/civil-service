@@ -66,9 +66,9 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -271,7 +271,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "by the Court (together with the appropriate fee) "
                         + "by 4pm on %s.",
                     deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
-                        .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
+                        .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))
                 )).build();
             updatedData.disposalOrderWithoutHearing(disposalOrderWithoutHearing).build();
         }
