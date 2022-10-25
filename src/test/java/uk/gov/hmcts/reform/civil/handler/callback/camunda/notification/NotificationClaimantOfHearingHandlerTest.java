@@ -67,7 +67,7 @@ public class NotificationClaimantOfHearingHandlerTest {
                     .hearingReference("000HN001")
                     .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
                     .hearingTimeHourMinute("1530")
-                    .respondent1ResponseDeadline(LocalDateTime.of(2022, 11, 23, 14, 00, 00))
+                    .hearingDueDate(LocalDate.of(2022, 11, 23))
                     .addApplicant2(YesOrNo.NO)
                     .addRespondent2(YesOrNo.NO)
                     .build();
@@ -93,7 +93,7 @@ public class NotificationClaimantOfHearingHandlerTest {
                 .hearingReference("000HN001")
                 .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
                 .hearingTimeHourMinute("1530")
-                .respondent1ResponseDeadline(LocalDateTime.of(2022, 11, 23, 14, 00, 00))
+                .hearingDueDate(LocalDate.of(2022, 11, 23))
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.YES)
                 .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Party2").build())
@@ -118,7 +118,7 @@ public class NotificationClaimantOfHearingHandlerTest {
                 .hearingReference("000HN001")
                 .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
                 .hearingTimeHourMinute("1530")
-                .respondent1ResponseDeadline(LocalDateTime.of(2022, 11, 23, 14, 00, 00))
+                .hearingDueDate(LocalDate.of(2022, 11, 23))
                 .addApplicant2(YesOrNo.YES)
                 .addRespondent2(YesOrNo.NO)
                 .build();
@@ -141,7 +141,7 @@ public class NotificationClaimantOfHearingHandlerTest {
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .hearingReference("000HN001")
                 .hearingTimeHourMinute("0830")
-                .respondent1ResponseDeadline(LocalDateTime.of(2022, 11, 23, 14, 00, 00))
+                .hearingDueDate(LocalDate.of(2022, 11, 23))
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
                 .build();
@@ -165,7 +165,7 @@ public class NotificationClaimantOfHearingHandlerTest {
                 .respondentSolicitor2EmailAddress("respondent2email@hmcts.net")
                 .hearingReference("000HN001")
                 .hearingTimeHourMinute("0830")
-                .respondent1ResponseDeadline(LocalDateTime.of(2022, 11, 23, 14, 00, 00))
+                .hearingDueDate(LocalDate.of(2022, 11, 23))
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.YES)
                 .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Party2").build())
@@ -189,7 +189,7 @@ public class NotificationClaimantOfHearingHandlerTest {
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .hearingReference("000HN001")
                 .hearingTimeHourMinute("0830")
-                .respondent1ResponseDeadline(LocalDateTime.of(2022, 11, 23, 14, 00, 00))
+                .hearingDueDate(LocalDate.of(2022, 11, 23))
                 .addApplicant2(YesOrNo.YES)
                 .addRespondent2(YesOrNo.NO)
                 .build();
@@ -210,7 +210,7 @@ public class NotificationClaimantOfHearingHandlerTest {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             "claimantReferenceNumber", "12345", "hearingFee", "£300.00",
-            "hearingDate", "07-10-2022", "hearingTime", "15:30", "deadlineDate", "23-11-2022"
+            "hearingDate", "07-10-2022", "hearingTime", "15:30", "hearingDueDate", "23-11-2022"
         );
     }
 
@@ -219,7 +219,7 @@ public class NotificationClaimantOfHearingHandlerTest {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             "claimantReferenceNumber", "12345", "hearingFee", "£0.00",
-            "hearingDate", "07-10-2022", "hearingTime", "08:30", "deadlineDate", "23-11-2022"
+            "hearingDate", "07-10-2022", "hearingTime", "08:30", "hearingDueDate", "23-11-2022"
         );
     }
 

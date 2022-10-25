@@ -101,8 +101,8 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
             caseData.getHearingDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
             HEARING_TIME,
             time.toString(),
-            DEADLINE_DATE,
-            caseData.getRespondent1ResponseDeadline().toLocalDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+            HEARING_DUE_DATE,
+            caseData.getHearingDueDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
         ));
     }
 }

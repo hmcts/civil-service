@@ -56,7 +56,7 @@ public interface NotificationData {
     String HEARING_FEE = "hearingFee";
     String HEARING_DATE = "hearingDate";
     String HEARING_TIME = "hearingTime";
-    String DEADLINE_DATE = "deadlineDate";
+    String HEARING_DUE_DATE = "hearingDueDate";
     String CLAIMANT_REFERENCE_NUMBER = "claimantReferenceNumber";
     String DEFENDANT_REFERENCE_NUMBER = "defendantReferenceNumber";
 
