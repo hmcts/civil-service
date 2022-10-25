@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.search;
 
 import org.elasticsearch.index.query.QueryBuilder;
-import org.joda.time.LocalDate;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
