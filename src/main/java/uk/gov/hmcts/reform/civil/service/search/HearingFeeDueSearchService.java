@@ -26,7 +26,7 @@ public class HearingFeeDueSearchService extends ElasticSearchService {
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(rangeQuery("data.hearingDueDate").lt(LocalDate.now().toString()))
+                            .must(rangeQuery("data.hearingDueDate").lt("now"))
                             .must(beState(HEARING_READINESS)))
                 .should(boolQuery()
                             .must(rangeQuery("data.hearingFee.calculatedAmountInPence").lte("0"))
