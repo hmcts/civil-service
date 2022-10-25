@@ -188,6 +188,8 @@ notifications:
   standardDirectionOrderDJTemplate: "1518a883-d035-46c8-9dc0-a52538ca4545"
   interimJudgmentRequestedDefendant: "d9e33565-ecdc-4475-a77b-e50cd4c07b61"
   interimJudgmentApprovalDefendant: "2e98fa16-ba9e-4229-b99f-fc72d40303f8"
+  respondentDeadlineExtension: "13514e8a-8621-4d3a-a317-8fd0ba7a184f"
+  claimantDeadlineExtension: "74e33576-487f-4c63-bdef-fe12c4279faa"
   respondentChangeOfAddressNotificationTemplate: "174a9566-6ce2-4df5-9ffd-265bbd4787cc"
   respondentLipFullAdmitOrPartAdmitTemplate: "d41a95de-ab84-4442-b6d1-33db03b5e1b0"
   respondentLipFullDefenceWithMediationTemplate: "2177f3b0-3833-4788-bd7f-a473e32950af"
