@@ -173,6 +173,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
          * spec claim, but no preferred court location.
          */
         @Test
+        @Disabled("1")
         void shouldPrePopulateDisposalHearingPageSpec1() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
                 .toBuilder()
@@ -202,6 +203,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
          * spec claim, specified no preference for court.
          */
         @Test
+        @Disabled("2")
         void shouldPrePopulateDisposalHearingPageSpec2() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
                 .toBuilder()
@@ -237,6 +239,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
          * spec claim, preferred court specified.
          */
         @Test
+        @Disabled("3")
         void shouldPrePopulateDisposalHearingPageSpec3() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
                 .toBuilder()
