@@ -29,7 +29,7 @@ public class LocationHelperTest {
     private final FeatureToggleService featureToggleService = Mockito.mock(FeatureToggleService.class);
     private final LocationHelper helper = new LocationHelper(
         featureToggleService,
-        CCMCC_AMOUNT, CCMCC_REGION_ID, CCMCC_EPIMS);
+        CCMCC_AMOUNT, CCMCC_EPIMS, CCMCC_REGION_ID);
 
     @Test
     public void thereIsAMatchingLocation() {

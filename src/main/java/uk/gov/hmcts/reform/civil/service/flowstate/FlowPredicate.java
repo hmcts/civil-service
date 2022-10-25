@@ -558,6 +558,9 @@ public class FlowPredicate {
     public static final Predicate<CaseData> claimDismissedByCamunda = caseData ->
         caseData.getClaimDismissedDate() != null;
 
+    public static final Predicate<CaseData> caseDismissedPastHearingFeeDue = caseData ->
+        caseData.getCaseDismissedHearingFeeDueDate() != null;
+
     public static final Predicate<CaseData> fullAdmissionSpec = caseData ->
         getPredicateForResponseTypeSpec(caseData, RespondentResponseTypeSpec.FULL_ADMISSION);
 
