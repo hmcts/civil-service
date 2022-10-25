@@ -38,10 +38,13 @@ class BulkPrintServiceTest {
     private final Map<String, Object> additionalInformation =
         Map.of(ADDITIONAL_DATA_LETTER_TYPE_KEY, letterType,
                ADDITIONAL_DATA_CASE_IDENTIFIER_KEY, claimId,
-               ADDITIONAL_DATA_CASE_REFERENCE_NUMBER_KEY, claimId);
+               ADDITIONAL_DATA_CASE_REFERENCE_NUMBER_KEY, claimId
+        );
     private final byte[] letterTemplate = new byte[]{1, 2, 3};
     private final LetterWithPdfsRequest letter =
-        new LetterWithPdfsRequest(List.of(Base64.getEncoder().encodeToString(letterTemplate)), XEROX_TYPE_PARAMETER, additionalInformation);
+        new LetterWithPdfsRequest(List.of(Base64.getEncoder().encodeToString(letterTemplate)),
+                                  XEROX_TYPE_PARAMETER, additionalInformation
+        );
 
     @Test
     void shouldSendLetterToBulkPrintSuccessfully() {
