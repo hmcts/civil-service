@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -886,6 +887,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        @Disabled("Just for testing")
         void shouldNotSetValuesForHnLIfToggleDisabled() {
             when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
