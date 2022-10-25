@@ -19,6 +19,11 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
@@ -45,12 +50,18 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OTHER_SUPPORT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_UNAVAILABILITY_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.TRIAL_DATE_FROM_REQUIRED;
@@ -71,7 +82,30 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
     private static final LocalDateTime weekdayDate = LocalDate.of(2022, 2, 15).atTime(12, 0);
-
+    private static final Applicant1DQ applicant1DQ =
+            Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
+                    .responseCourtCode("applicant1DQRequestedCourt")
+                                                                  .caseLocation(CaseLocation.builder()
+                                                                                    .region("2")
+                                                                                    .baseLocation("00000")
+                                                                                    .build())
+                                                                  .build()).build();
+    private static final Respondent1DQ respondent1DQ =
+            Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
+                    .responseCourtCode("respondent1DQRequestedCourt")
+                                                                    .caseLocation(CaseLocation.builder()
+                                                                                      .region("2")
+                                                                                      .baseLocation("11111")
+                                                                                      .build())
+                                                                    .build()).build();
+    private static final Respondent2DQ respondent2DQ =
+        Respondent2DQ.builder().respondent2DQRequestedCourt(RequestedCourt.builder()
+                                                                .responseCourtCode("respondent2DQRequestedCourt")
+                                                                .caseLocation(CaseLocation.builder()
+                                                                                  .region("3")
+                                                                                  .baseLocation("22222")
+                                                                                  .build())
+                                                                .build()).build();
     @Autowired
     private InitiateGeneralApplicationService service;
 
@@ -94,10 +128,10 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     private CrossAccessUserConfiguration crossAccessUserConfiguration;
 
     @MockBean
-    private AuthTokenGenerator authTokenGenerator;
+    private LocationRefDataService locationRefDataService;
 
     @MockBean
-    private LocationRefDataService locationRefDataService;
+    private AuthTokenGenerator authTokenGenerator;
 
     @MockBean
     private FeatureToggleService featureToggleService;
@@ -801,6 +835,232 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppRespondentSolicitors()
                        .stream().filter(e -> STRING_NUM_CONSTANT.equals(e.getValue().getId())).count()).isEqualTo(0);
+    }
+
+    @Test
+    void shouldPopulateWorkAllocationLocationOnAboutToSubmit_beforeSDOHasBeenMade() {
+        when(locationRefDataService.getCcmccLocation(any()))
+                .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").build());
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getCaseDataForWorkAllocation(CASE_ISSUED, null, INDIVIDUAL, applicant1DQ, respondent1DQ,
+                                              respondent2DQ);
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+                .isEqualTo("574546");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getRegion())
+                .isEqualTo("9");
+        assertThat(result.getGeneralApplications().get(0).getValue().getIsCcmccLocation()).isEqualTo(YES);
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementCategory().getValue().getLabel())
+                .isEqualTo("Civil");
+    }
+
+    @Test
+    void shouldPopulateWorkAllocationLocationOnAboutToSubmit_afterSDOHasBeenMadeForUnspecIndividualResp() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getCaseDataForWorkAllocation(null, null, INDIVIDUAL, applicant1DQ, respondent1DQ,
+                                             respondent2DQ);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+                .isEqualTo("11111");
+    }
+
+    @Test
+    void shouldPopulateWorkAllocationLocationOnAboutToSubmit_afterSDOHasBeenMadeForSpecIndividualClaimant() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getCaseDataForWorkAllocation(null, SPEC_CLAIM, INDIVIDUAL, applicant1DQ, respondent1DQ,
+                                              Respondent2DQ.builder().build());
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+                .isEqualTo("11111");
+    }
+
+    @Test
+    void shouldPopulateWorkAllocationLocationOnAboutToSubmit_afterSDOHasBeenMade1V1IndividualResp() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getCaseDataForWorkAllocation1V1(null, SPEC_CLAIM, INDIVIDUAL, applicant1DQ, respondent1DQ);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("11111");
+    }
+
+    @Test
+    void shouldPopulateWorkAllocationLocationOnAboutToSubmit_afterSDOHasBeenMade1V1CompanyResp() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getCaseDataForWorkAllocation1V1(null, SPEC_CLAIM, COMPANY, applicant1DQ, respondent1DQ);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("00000");
+    }
+
+    @Test
+    void shouldPopulateWorkAllocationLocationOnAboutToSubmit_afterSDOHasBeenMade1V1SoleTraderDefType() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getCaseDataForWorkAllocation1V1(null, SPEC_CLAIM, SOLE_TRADER, applicant1DQ, respondent1DQ);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("11111");
+    }
+
+    @Test
+    void shouldPopulateWorkAllocationLocationOnAboutToSubmit_afterSDOHasBeenMade1V1OrgDefType() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getCaseDataForWorkAllocation1V1(null, SPEC_CLAIM, ORGANISATION, applicant1DQ, respondent1DQ);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("00000");
+    }
+
+    @Test
+    void shouldPopulateWorkAllocationLocationOnAboutToSubmit_afterSDOHasBeenMadeForSpecSoleTraderClaimant() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getCaseDataForWorkAllocation(null, SPEC_CLAIM, SOLE_TRADER, applicant1DQ, respondent1DQ,
+                                               respondent2DQ);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+                .isEqualTo("11111");
+    }
+
+    @Test
+    void shouldPopulateWorkAllocationLocationOnAboutToSubmit_afterSDOHasBeenMadeForSpecCompanyClaimant() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getCaseDataForWorkAllocation(null, SPEC_CLAIM, COMPANY, applicant1DQ, respondent1DQ,
+                                              respondent2DQ);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+                .isEqualTo("00000");
+    }
+
+    @Test
+    void shouldPopulateWorkAllocationLocationOnAboutToSubmit_afterSDOHasBeenMadeForSpecOrgClaimant() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getCaseDataForWorkAllocation(null, SPEC_CLAIM, ORGANISATION, applicant1DQ, respondent1DQ,
+                                              respondent2DQ);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+                .isEqualTo("00000");
+    }
+
+    @Test
+    void shouldThrowException_whenApplicationMadeAfterSDOHasBeenMadeForSpecIndClaimantWithoutCourtDetails1() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getCaseDataForWorkAllocation(null, SPEC_CLAIM, INDIVIDUAL, null, respondent1DQ,
+                                              respondent2DQ);
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+                .isEqualTo("11111");
+    }
+
+    @Test
+    void shouldThrowException_whenApplicationMadeAfterSDOHasBeenMadeForSpecIndClaimantWithRespondent1FirstResponded() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getMultiCaseDataForWorkAllocationForOne_V_Two(null, SPEC_CLAIM, INDIVIDUAL,
+                        Applicant1DQ.builder().build(), respondent1DQ, respondent2DQ);
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("22222");
+    }
+
+    @Test
+    void shouldThrowException_whenApplicationMadeAfterSDOHasBeenMadeForSpecIndClaimantWithoutCourtDetails3() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getCaseDataForWorkAllocation(null, SPEC_CLAIM, INDIVIDUAL, Applicant1DQ.builder()
+                        .applicant1DQRequestedCourt(RequestedCourt.builder().build()).build(), respondent1DQ,
+                                              respondent2DQ);
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+                .isEqualTo("11111");
+    }
+
+    @Test
+    void shouldThrowException_whenApplicationMadeAfterSDOHasBeenMadeWhenRespondentTypeIsOrg() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getCaseDataForWorkAllocation(null, SPEC_CLAIM, ORGANISATION, applicant1DQ, null,
+                                              null);
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+                .isEqualTo("00000");
+    }
+
+    @Test
+    void shouldThrowException_whenApplicationMadeAfterSDOHasBeenMadeWhenRespondentTypeIsIndividual() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getCaseDataForWorkAllocation(null, SPEC_CLAIM, INDIVIDUAL, applicant1DQ, null,
+                                          null);
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isNull();
+    }
+
+    @Test
+    void shouldThrowException_whenApplicationMadeAfterSDOHasBeenMadeWhenRespondentTypeIsCompany() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getCaseDataForWorkAllocation(null, SPEC_CLAIM, ORGANISATION, Applicant1DQ.builder()
+                                              .applicant1DQRequestedCourt(RequestedCourt.builder().build()).build(),
+                                          null,
+                                          null);
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("00000");
+    }
+
+    @Test
+    void shouldThrowException_whenApplicationMadeAfterSDOHasBeenMadeForMultiClaimantWithCourtDetails() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getCaseDataForWorkAllocation(null, SPEC_CLAIM, ORGANISATION, applicant1DQ,
+                                          Respondent1DQ.builder().build(), Respondent2DQ.builder().build());
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("00000");
+    }
+
+    @Test
+    void shouldThrowException_whenApplicationMadeAfterSDOHasBeenMadeForMultiDefendantWithRespondent1RespondedFirst() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getCaseDataForWorkAllocation(null, SPEC_CLAIM, INDIVIDUAL, applicant1DQ,
+                                          respondent1DQ, respondent2DQ);
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("11111");
+    }
+
+    @Test
+    void shouldThrowException_whenApplicationMadeAfterSDOHasBeenMadeForOne_V_TwoWhereSecondDefRespondedFirst() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getMultiCaseDataForWorkAllocationForOne_V_Two(null, SPEC_CLAIM, SOLE_TRADER, applicant1DQ,
+                        Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder().build()).build(),
+                        respondent2DQ);
+
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+                .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+                .isEqualTo("22222");
     }
 
     private void assertCaseDateEntries(CaseData caseData) {
