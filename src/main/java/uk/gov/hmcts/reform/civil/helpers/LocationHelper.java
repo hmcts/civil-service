@@ -39,8 +39,8 @@ public class LocationHelper {
     public LocationHelper(
         FeatureToggleService featureToggleService,
         @Value("${genApp.lrd.ccmcc.amountPounds}") BigDecimal ccmccAmount,
-        @Value("${genApp.lrd.ccmcc.epimsId}") String ccmccRegionId,
-        @Value("${genApp.lrd.ccmcc.regionId}") String ccmccEpimsId) {
+        @Value("${genApp.lrd.ccmcc.epimsId}") String ccmccEpimsId,
+        @Value("${genApp.lrd.ccmcc.regionId}") String ccmccRegionId) {
         this.featureToggleService = featureToggleService;
         this.ccmccAmount = ccmccAmount;
         this.ccmccRegionId = ccmccRegionId;

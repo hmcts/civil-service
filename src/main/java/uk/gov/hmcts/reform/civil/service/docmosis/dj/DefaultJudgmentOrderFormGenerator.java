@@ -111,7 +111,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .disposalHearingSchedulesOfLossDJAddSection(nonNull(caseData.getDisposalHearingSchedulesOfLossDJ()))
             .disposalHearingClaimSettlingAddSection(getToggleValue(caseData.getDisposalHearingClaimSettlingDJToggle()))
             .disposalHearingCostsAddSection(getToggleValue(caseData.getDisposalHearingCostsDJToggle()))
-            .applicant(caseData.getApplicant1().getPartyName().toUpperCase())
+            .applicant(checkApplicantPartyName(caseData)
+                            ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
             .respondent(checkDefendantRequested(caseData).toUpperCase()).build();
     }
 
@@ -160,7 +161,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialHearingMethodInPersonAddSection(checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ()))
             .trialHearingLocation(checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ())
                                       ? caseData.getTrialHearingMethodInPersonDJ().getValue().getLabel() : null)
-            .applicant(caseData.getApplicant1().getPartyName().toUpperCase())
+            .applicant(checkApplicantPartyName(caseData)
+                            ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
             .respondent(checkDefendantRequested(caseData).toUpperCase()).build();
     }
 
@@ -285,5 +287,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         return nonNull(list) && list.contains(OrderTypeTrialAdditionalDirectionsEmployersLiability);
     }
 
+    private boolean checkApplicantPartyName(CaseData casedata) {
+        return nonNull(casedata.getApplicant1()) && nonNull(casedata.getApplicant1().getPartyName());
+    }
 }
 
