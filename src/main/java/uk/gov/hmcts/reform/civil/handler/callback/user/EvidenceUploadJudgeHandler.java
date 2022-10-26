@@ -30,6 +30,7 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(EVIDENCE_UPLOAD_JUDGE);
     private final ObjectMapper objectMapper;
     public static final String EVIDENCE_UPLOAD_HEADER_TWO = "# Document uploaded \n # %s";
+    public static final String EVIDENCE_UPLOAD_HEADER_ONE = "# Document uploaded and note added \n # %s";
     public static final String EVIDENCE_UPLOAD_BODY_ONE = "## You have uploaded: \n %s";
 
     @Override
@@ -59,6 +60,9 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
         if (null != caseData.getCaseNoteType() && caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_ONLY)) {
             return format(EVIDENCE_UPLOAD_HEADER_TWO, caseData.getLegacyCaseReference());
         }
+        if (caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_AND_NOTE)) {
+            return format(EVIDENCE_UPLOAD_HEADER_ONE, caseData.getLegacyCaseReference());
+        }
         return null;
     }
 
@@ -68,9 +72,22 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
             IntStream.range(0, caseData.getDocumentOnly()
                 .size()).forEachOrdered(i -> stringBuilder.append("* ").append(
                 caseData.getDocumentOnly().get(i).getValue().getDocument().getDocumentFileName()).append("\n"));
+                
+            return format(EVIDENCE_UPLOAD_BODY_ONE, stringBuilder);
+        }
+        if (caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_AND_NOTE)) {
+            IntStream.range(0, caseData.getDocumentAndNote()
+                .size()).forEachOrdered(i -> stringBuilder.append("* ").append(
+                caseData.getDocumentAndNote().get(i)
+                    .getValue()
+                    .getDocument()
+                    .getDocumentFileName()).append("\n"));
+
             return format(EVIDENCE_UPLOAD_BODY_ONE, stringBuilder);
         }
         return null;
     }
 
 }
+
+

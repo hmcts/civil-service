@@ -40,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SP
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
@@ -157,7 +158,9 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 HEARING_SCHEDULED,
-                NotSuitable_SDO
+                NotSuitable_SDO,
+                EVIDENCE_UPLOAD_JUDGE,
+                EVIDENCE_UPLOAD
             )
         ),
 
@@ -183,7 +186,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                EVIDENCE_UPLOAD_JUDGE
+                EVIDENCE_UPLOAD_JUDGE,
+                EVIDENCE_UPLOAD
             )
         ),
 
@@ -210,7 +214,9 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 TAKE_CASE_OFFLINE,
                 EVIDENCE_UPLOAD_JUDGE,
-                HEARING_SCHEDULED
+                HEARING_SCHEDULED,
+                EVIDENCE_UPLOAD
+
             )
         ),
 
@@ -587,7 +593,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 HEARING_SCHEDULED,
                 NotSuitable_SDO,
-                EVIDENCE_UPLOAD_JUDGE
+                EVIDENCE_UPLOAD_JUDGE,
+                EVIDENCE_UPLOAD
             )
         ),
         entry(
@@ -612,7 +619,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                EVIDENCE_UPLOAD_JUDGE
+                EVIDENCE_UPLOAD_JUDGE,
+                EVIDENCE_UPLOAD
             )
         ),
         entry(

@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentAndNote;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
@@ -69,11 +70,31 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
     class SubmittedCallback {
 
         @Test
-        void submittedCallback_placeholder() {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        void shouldPopulateConfirmation_DocumentAndNote() {
+            String header = "# Document uploaded and note added \n # " + REFERENCE_NUMBER;
+            String body = "## You have uploaded: \n * A Fancy Name\n";
+
+            Document testDocument = new Document("testurl",
+                                                 "testBinUrl",
+                                                 "A Fancy Name",
+                                                 "hash");
+            var documentAndNote = DocumentAndNote.builder().document(testDocument).build();
+
+            List<Element<DocumentAndNote>> documentList = new ArrayList<>();
+            documentList.add(Element.<DocumentAndNote>builder().value(documentAndNote).build());
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .documentAndNote(documentList)
+                .caseNoteType(CaseNoteType.DOCUMENT_AND_NOTE)
+                .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
+                                                                      .confirmationHeader(header)
+                                                                      .confirmationBody(String.format(body))
+                                                                      .build());
 
         }
 
