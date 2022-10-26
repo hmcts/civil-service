@@ -1971,6 +1971,17 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimDetailsNotifiedTimeExtension1v2() {
+        atStateClaimDetailsNotified();
+        respondent2ResponseDeadline = RESPONSE_DEADLINE;
+        respondent2TimeExtensionDate = claimDetailsNotificationDate.plusDays(1);
+        respondentSolicitor2AgreedDeadlineExtension = LocalDate.now();
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        respondent1TimeExtensionDate = claimDetailsNotificationDate.plusDays(1);
+        respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
+        return this;
+    }
+
     public CaseDataBuilder atStateTakenOfflineByStaff() {
         atStateClaimIssued();
         takenOfflineByStaff();
@@ -2019,9 +2030,10 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension1v2() {
-        atStateNotificationAcknowledgedTimeExtension_1v2DS();
-        takenOfflineByStaff();
-        takenOfflineByStaffDate = respondent1TimeExtensionDate.plusDays(1);
+        atStateNotificationAcknowledged1v2SameSolicitor();
+        atStateClaimDetailsNotifiedTimeExtension1v2();
+        multiPartyClaimTwoDefendantSolicitors();
+        atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension1v2();
         return this;
     }
 
