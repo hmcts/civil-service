@@ -55,31 +55,28 @@ public class NotificationClaimantOfHearingHandlerTest {
                 .thenReturn("test-template-no-fee-claimant-id");
         }
 
-        @Nested
-        class OneVsOneScenario {
-            @Test
-            void shouldNotifyApplicantSolicitor_whenInvokedWithFeeAnd1v1() {
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                    .hearingDate(LocalDate.of(2022, 10, 07))
-                    .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
-                    .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
-                    .hearingReference("000HN001")
-                    .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
-                    .hearingTimeHourMinute("1530")
-                    .hearingDueDate(LocalDate.of(2022, 11, 23))
-                    .addApplicant2(YesOrNo.NO)
-                    .addRespondent2(YesOrNo.NO)
-                    .build();
-                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-                    .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
-                handler.handle(params);
-                verify(notificationService).sendMail(
-                    "applicantemail@hmcts.net",
-                    "test-template-fee-claimant-id",
-                    getNotificationFeeDataMap(caseData),
-                    "notification-of-hearing-000HN001"
-                );
-            }
+        @Test
+        void shouldNotifyApplicantSolicitor_whenInvokedWithFeeAnd1v1() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .hearingDate(LocalDate.of(2022, 10, 07))
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
+                .hearingReference("000HN001")
+                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
+                .hearingTimeHourMinute("1530")
+                .hearingDueDate(LocalDate.of(2022, 11, 23))
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
+            handler.handle(params);
+            verify(notificationService).sendMail(
+                "applicantemail@hmcts.net",
+                "test-template-fee-claimant-id",
+                getNotificationFeeDataMap(caseData),
+                "notification-of-hearing-000HN001"
+            );
         }
 
         @Test

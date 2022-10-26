@@ -69,30 +69,27 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .thenReturn("test-template-no-fee-defendant-id");
         }
 
-        @Nested
-        class OneVsOneScenario {
-            @Test
-            void shouldNotifyRespondentSolicitor_whenInvokedNoFeeAnd1v1() {
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                    .hearingDate(LocalDate.of(2022, 10, 07))
-                    .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
-                    .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
-                    .hearingReference("000HN001")
-                    .hearingTimeHourMinute("1530")
-                    .hearingDueDate(LocalDate.of(2022, 11, 23))
-                    .addApplicant2(YesOrNo.NO)
-                    .addRespondent2(YesOrNo.NO)
-                    .build();
-                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-                    .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT_HEARING").build()).build();
-                handler.handle(params);
-                verify(notificationService).sendMail(
-                    "respondent1email@hmcts.net",
-                    "test-template-no-fee-defendant-id",
-                    getNotificationDataMap(caseData),
-                    "notification-of-hearing-000HN001"
-                );
-            }
+        @Test
+        void shouldNotifyRespondentSolicitor_whenInvokedNoFeeAnd1v1() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .hearingDate(LocalDate.of(2022, 10, 07))
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
+                .hearingReference("000HN001")
+                .hearingTimeHourMinute("1530")
+                .hearingDueDate(LocalDate.of(2022, 11, 23))
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT_HEARING").build()).build();
+            handler.handle(params);
+            verify(notificationService).sendMail(
+                "respondent1email@hmcts.net",
+                "test-template-no-fee-defendant-id",
+                getNotificationDataMap(caseData),
+                "notification-of-hearing-000HN001"
+            );
         }
 
         @Test

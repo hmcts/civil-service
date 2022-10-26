@@ -60,7 +60,7 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
             .build();
     }
 
-    private void sendEmail(CaseData caseData, String recipient, Boolean isFirst) {
+    private void sendEmail(CaseData caseData, String recipient, boolean isFirst) {
         String defRefNumber;
         if (isFirst) {
             if (caseData.getSolicitorReferences() == null
