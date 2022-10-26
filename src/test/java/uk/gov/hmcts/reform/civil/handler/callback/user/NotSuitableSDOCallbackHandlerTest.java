@@ -10,15 +10,15 @@ import org.springframework.boot.autoconfigure.validation.ValidationAutoConfigura
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.config.JacksonConfiguration;
+import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -32,6 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 
@@ -39,8 +40,11 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
     NotSuitableSDOCallbackHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
+    ClaimIssueConfiguration.class,
+    JacksonConfiguration.class,
+    MockDatabaseConfiguration.class,
     ValidationAutoConfiguration.class})
-public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
+class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private Time time;
@@ -57,15 +61,71 @@ public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToStartCallback {
 
+        private CallbackParams params;
+
+        private static final String EMAIL = "example@email.com";
+
+        @BeforeEach
+        void setup() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            params = callbackParamsOf(caseData, ABOUT_TO_START);
+            String userId = UUID.randomUUID().toString();
+
+            given(idamClient.getUserDetails(any()))
+                .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
+
+            given(time.now()).willReturn(LocalDateTime.now());
+
+        }
+
         @Test
-        void shouldReturnNoError_WhenAboutToSubmitIsInvoked() {
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStatePendingClaimIssued().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseDetails).build();
+        void checkUnsuitableSDODate() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            String timeString = time.now().format(JacksonConfiguration.DATE_TIME_FORMATTER);
+            assertThat(response.getData()).extracting("unsuitableSDODate").isEqualTo(timeString);
 
-            assertThat(response.getErrors()).isNull();
+        }
+    }
+
+    @Nested
+    class MidCallback {
+
+        private CallbackParams params;
+        private CaseData caseData;
+
+        @MockBean
+        private CallbackParams callbackParams;
+
+        @Test
+        void shouldValidateReasonLessThan150_whenInvoked() {
+
+            final String PAGE_ID = "not-suitable-reason";
+
+            caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
+            params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+
+        }
+
+        @Test
+        void shouldValidateReasonMoreThan150_whenInvoked() {
+
+            final String PAGE_ID = "not-suitable-reason";
+            final int lengthALlowed = 150;
+
+            caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawnOverLimit().build();
+            params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors().get(0)).isEqualTo("Character Limit Reached: "
+                                                   + "Reason for not drawing Standard Directions order cannot exceed "
+                                                   + lengthALlowed + " characters.");
+
         }
     }
 
@@ -73,22 +133,20 @@ public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
 
         private CallbackParams params;
-        private CaseData caseData;
-        private String userId;
 
         private static final String EMAIL = "example@email.com";
-        private final LocalDateTime submittedDate = LocalDateTime.now();
 
         @BeforeEach
         void setup() {
-            caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            userId = UUID.randomUUID().toString();
+            String userId = UUID.randomUUID().toString();
 
             given(idamClient.getUserDetails(any()))
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
-            given(time.now()).willReturn(submittedDate);
+            given(time.now()).willReturn(LocalDateTime.now());
+
         }
 
         @Test
@@ -99,6 +157,7 @@ public class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(NotSuitable_SDO.name(), "READY");
+
         }
     }
 

@@ -34,6 +34,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UPDATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
@@ -45,9 +48,12 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
@@ -68,6 +74,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_I
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
@@ -179,6 +186,8 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     CLAIM_ISSUED_PAYMENT_SUCCESSFUL,
                     new CaseEvent[]{
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
@@ -188,6 +197,8 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     CLAIM_ISSUED,
                     new CaseEvent[]{
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         NOTIFY_DEFENDANT_OF_CLAIM,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         CASE_PROCEEDS_IN_CASEMAN,
@@ -207,6 +218,8 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     CLAIM_NOTIFIED,
                     new CaseEvent[]{
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         NOTIFY_DEFENDANT_OF_CLAIM_DETAILS,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         CASE_PROCEEDS_IN_CASEMAN,
@@ -220,12 +233,16 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
-                        CHANGE_SOLICITOR_EMAIL
+                        CHANGE_SOLICITOR_EMAIL,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        EVIDENCE_UPLOAD
                     }
                 ),
                 of(
                     CLAIM_DETAILS_NOTIFIED,
                     new CaseEvent[]{
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ACKNOWLEDGE_CLAIM,
                         DEFENDANT_RESPONSE,
                         INFORM_AGREED_EXTENSION_DATE,
@@ -242,13 +259,17 @@ class FlowStateAllowedEventServiceTest {
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL,
                         STANDARD_DIRECTION_ORDER_DJ,
+                        TAKE_CASE_OFFLINE,
+                        EVIDENCE_UPLOAD_JUDGE,
                         HEARING_SCHEDULED,
-                        TAKE_CASE_OFFLINE
+                        EVIDENCE_UPLOAD
                     }
                 ),
                 of(
                     CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION,
                     new CaseEvent[]{
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ACKNOWLEDGE_CLAIM,
                         DEFENDANT_RESPONSE,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -270,6 +291,8 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     NOTIFICATION_ACKNOWLEDGED,
                     new CaseEvent[]{
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ACKNOWLEDGE_CLAIM,
                         DEFENDANT_RESPONSE,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -290,6 +313,8 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION,
                     new CaseEvent[]{
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ACKNOWLEDGE_CLAIM,
                         DEFENDANT_RESPONSE,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -310,6 +335,8 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED,
                     new CaseEvent[]{
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         DEFENDANT_RESPONSE,
                         ACKNOWLEDGE_CLAIM,
                         INFORM_AGREED_EXTENSION_DATE,
@@ -329,6 +356,8 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED,
                     new CaseEvent[]{
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         DEFENDANT_RESPONSE,
                         ACKNOWLEDGE_CLAIM,
                         INFORM_AGREED_EXTENSION_DATE,
@@ -348,6 +377,8 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     FULL_DEFENCE,
                     new CaseEvent[]{
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         CLAIMANT_RESPONSE,
                         WITHDRAW_CLAIM,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -359,7 +390,8 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO
+                        NotSuitable_SDO,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
@@ -374,7 +406,8 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO
+                        NotSuitable_SDO,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
@@ -389,7 +422,8 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO
+                        NotSuitable_SDO,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
@@ -404,12 +438,21 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO
+                        NotSuitable_SDO,
+                        APPLICATION_OFFLINE_UPDATE_CLAIM
+                    }
+                ),
+                of(
+                    DIVERGENT_RESPOND_GO_OFFLINE,
+                    new CaseEvent[]{
+                        APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
                     FULL_DEFENCE_PROCEED,
                     new CaseEvent[]{
+                        NOC_REQUEST,
+                        APPLY_NOC_DECISION,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         WITHDRAW_CLAIM,
                         DISCONTINUE_CLAIM,
@@ -444,7 +487,8 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO
+                        NotSuitable_SDO,
+                        APPLICATION_CLOSED_UPDATE_CLAIM,
                     }
                 ),
                 of(
@@ -454,13 +498,14 @@ class FlowStateAllowedEventServiceTest {
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        NotSuitable_SDO
+                        NotSuitable_SDO,
+                        APPLICATION_CLOSED_UPDATE_CLAIM,
                     }
                 ),
                 of(
                     PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[]{
-                        TAKE_CASE_OFFLINE
+                        TAKE_CASE_OFFLINE, APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
@@ -492,43 +537,43 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     TAKEN_OFFLINE_BY_STAFF,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_UNREGISTERED_DEFENDANT,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 ),
                 of(
                     TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED,
                     new CaseEvent[] {
-                        ADD_CASE_NOTE
+                        ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM
                     }
                 )
             );

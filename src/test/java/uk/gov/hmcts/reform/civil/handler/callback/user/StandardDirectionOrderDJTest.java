@@ -36,6 +36,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -128,11 +129,10 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-
-            given(idamClient.getUserDetails(any()))
-                .willReturn(UserDetails.builder().forename("test").surname("judge").build());
             when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
             when(deadlinesCalculator.plusWorkingDays(any(), anyInt())).thenReturn(date);
+            given(idamClient.getUserDetails(any()))
+                .willReturn(UserDetails.builder().forename("test").surname("judge").build());
         }
 
         @Test
@@ -465,6 +465,22 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "and agreed by the parties and uploaded to the Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("trialRoadTrafficAccident").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(4).toString());
+
+            assertThat(response.getData()).extracting("disposalHearingOrderMadeWithoutHearingDJ").extracting("input")
+                .isEqualTo(String.format("This order has been made without a hearing. Each party "
+                                             + "has the right to apply to have this order "
+                                             + "set aside or varied. Any such application must be "
+                                             + "received by the Court "
+                                             + "(together with the appropriate fee) by 4pm on %s.",
+                                         date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))));
+
+            assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingTimeDJ").extracting("input")
+                .isEqualTo("This claim will be listed for final "
+                               + "disposal before a Judge on the first "
+                               + "available date after");
+
+            assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingTimeDJ").extracting("date")
+                .isEqualTo(LocalDate.now().plusWeeks(16).toString());
 
             assertThat(response.getData()).extracting("trialHearingTimeDJ").extracting("helpText1")
                 .isEqualTo("If either party considers that the time estimate is insufficient, "

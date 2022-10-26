@@ -43,6 +43,9 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -53,9 +56,11 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -81,6 +86,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     private final LocationRefDataService locationRefDataService;
+    private final FeatureToggleService featureToggleService;
     String participantString;
     public static final String DISPOSAL_HEARING = "DISPOSAL_HEARING";
     public static final String ORDER_1_CLAI = "The directions order has been sent to: "
@@ -275,6 +281,28 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                   .date(LocalDate.now().plusWeeks(16))
                                                                   .build());
 
+        // copy of the above field to update the Hearing time field while not breaking existing cases
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            caseDataBuilder.disposalHearingFinalDisposalHearingTimeDJ(DisposalHearingFinalDisposalHearingTimeDJ
+                                                                          .builder()
+                                                                          .input("This claim be listed for final "
+                                                                                     + "disposal before a Judge on the "
+                                                                                     + "first available date after")
+                                                                          .date(LocalDate.now().plusWeeks(16))
+                                                                          .build());
+        }
+
+        // copy of the above field to update the Hearing time field while not breaking existing cases
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            caseDataBuilder.disposalHearingFinalDisposalHearingTimeDJ(DisposalHearingFinalDisposalHearingTimeDJ
+                                                                          .builder()
+                                                                          .input("This claim will be listed for final "
+                                                                                     + "disposal before a Judge on the "
+                                                                                     + "first available date after")
+                                                                          .date(LocalDate.now().plusWeeks(16))
+                                                                          .build());
+        }
+
         caseDataBuilder.disposalHearingBundleDJ(DisposalHearingBundleDJ
                                                     .builder()
                                                     .input("The claimant must lodge at court at least 7 "
@@ -291,6 +319,21 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                  .date(LocalDate.now().plusWeeks(1))
                                                  .build());
 
+        // copy of disposalHearingNotesDJ field to update order made without hearing field without breaking
+        // existing cases
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            caseDataBuilder.disposalHearingOrderMadeWithoutHearingDJ(DisposalHearingOrderMadeWithoutHearingDJ
+                                                   .builder()
+                                                   .input(String.format("This order has been made without a hearing. "
+                                                              + "Each party has the right to apply to have this order "
+                                                              + "set aside or varied. Any such application must be "
+                                                              + "received by the Court "
+                                                              + "(together with the appropriate fee) by 4pm on %s.",
+                                                          deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
+                                                              .format(DateTimeFormatter
+                                                                          .ofPattern("dd MMMM yyyy", Locale.ENGLISH))))
+                                                   .build());
+        }
         // populates the trial screen
         caseDataBuilder
             .trialHearingJudgesRecitalDJ(TrialHearingJudgesRecital

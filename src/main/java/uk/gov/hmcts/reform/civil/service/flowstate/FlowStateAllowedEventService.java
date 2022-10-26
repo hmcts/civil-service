@@ -22,6 +22,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_DEFENDANT_LITIGATION_FRIEND;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_OR_AMEND_CLAIM_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UPDATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
@@ -37,11 +40,14 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SP
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
@@ -54,6 +60,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITIN
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED_PAYMENT_FAILED;
@@ -61,6 +68,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_I
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.COUNTER_CLAIM;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
@@ -79,6 +87,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
@@ -89,7 +98,6 @@ import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCatego
 public class FlowStateAllowedEventService {
 
     private final StateFlowEngine stateFlowEngine;
-
     private final CaseDetailsConverter caseDetailsConverter;
     private final FeatureToggleService toggleService;
 
@@ -127,13 +135,16 @@ public class FlowStateAllowedEventService {
 
         entry(
             CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-            List.of(ADD_CASE_NOTE, INITIATE_GENERAL_APPLICATION, CREATE_SDO,
+            List.of(NOC_REQUEST,
+                    APPLY_NOC_DECISION, ADD_CASE_NOTE, INITIATE_GENERAL_APPLICATION, CREATE_SDO,
                     NotSuitable_SDO)
         ),
 
         entry(
             CLAIM_ISSUED.fullName(),
             List.of(
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
                 NOTIFY_DEFENDANT_OF_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,
@@ -154,6 +165,8 @@ public class FlowStateAllowedEventService {
         entry(
             CLAIM_NOTIFIED.fullName(),
             List.of(
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
                 NOTIFY_DEFENDANT_OF_CLAIM_DETAILS,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,
@@ -170,13 +183,17 @@ public class FlowStateAllowedEventService {
 
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                NotSuitable_SDO
+                NotSuitable_SDO,
+                EVIDENCE_UPLOAD_JUDGE,
+                EVIDENCE_UPLOAD
             )
         ),
 
         entry(
             CLAIM_DETAILS_NOTIFIED.fullName(),
             List.of(
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
                 ACKNOWLEDGE_CLAIM,
                 DEFENDANT_RESPONSE,
                 INFORM_AGREED_EXTENSION_DATE,
@@ -193,13 +210,19 @@ public class FlowStateAllowedEventService {
                 STANDARD_DIRECTION_ORDER_DJ,
                 CREATE_SDO,
                 NotSuitable_SDO,
+                TAKE_CASE_OFFLINE,
+                EVIDENCE_UPLOAD_JUDGE,
                 HEARING_SCHEDULED,
-                TAKE_CASE_OFFLINE
+                EVIDENCE_UPLOAD
+
             )
         ),
+
         entry(
             CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
             List.of(
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
                 ACKNOWLEDGE_CLAIM,
                 DEFENDANT_RESPONSE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -221,6 +244,8 @@ public class FlowStateAllowedEventService {
         entry(
             NOTIFICATION_ACKNOWLEDGED.fullName(),
             List.of(
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
                 ACKNOWLEDGE_CLAIM,
                 DEFENDANT_RESPONSE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -242,6 +267,8 @@ public class FlowStateAllowedEventService {
         entry(
             NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
             List.of(
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
                 ACKNOWLEDGE_CLAIM,
                 DEFENDANT_RESPONSE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -263,6 +290,8 @@ public class FlowStateAllowedEventService {
         entry(
             AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
             List.of(
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
                 DEFENDANT_RESPONSE,
                 ACKNOWLEDGE_CLAIM,
                 INFORM_AGREED_EXTENSION_DATE,
@@ -283,6 +312,8 @@ public class FlowStateAllowedEventService {
         entry(
             AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName(),
             List.of(
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
                 DEFENDANT_RESPONSE,
                 ACKNOWLEDGE_CLAIM,
                 INFORM_AGREED_EXTENSION_DATE,
@@ -303,6 +334,8 @@ public class FlowStateAllowedEventService {
         entry(
             FULL_DEFENCE.fullName(),
             List.of(
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
                 CLAIMANT_RESPONSE,
                 WITHDRAW_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -310,6 +343,7 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
                 TAKE_CASE_OFFLINE,
+                APPLICATION_OFFLINE_UPDATE_CLAIM,
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
@@ -330,7 +364,8 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                NotSuitable_SDO
+                NotSuitable_SDO,
+                APPLICATION_OFFLINE_UPDATE_CLAIM
             )
         ),
 
@@ -345,8 +380,9 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
+                NotSuitable_SDO,
                 CREATE_SDO,
-                NotSuitable_SDO
+                APPLICATION_OFFLINE_UPDATE_CLAIM
             )
         ),
 
@@ -362,13 +398,23 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                NotSuitable_SDO
+                NotSuitable_SDO,
+                APPLICATION_OFFLINE_UPDATE_CLAIM
+            )
+        ),
+
+        entry(
+            DIVERGENT_RESPOND_GO_OFFLINE.fullName(),
+            List.of(
+                APPLICATION_OFFLINE_UPDATE_CLAIM
             )
         ),
 
         entry(
             FULL_DEFENCE_PROCEED.fullName(),
             List.of(
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
@@ -404,7 +450,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                NotSuitable_SDO
+                NotSuitable_SDO,
+                APPLICATION_CLOSED_UPDATE_CLAIM
             )
         ),
         entry(
@@ -413,17 +460,19 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
+                NotSuitable_SDO,
                 CREATE_SDO,
-                NotSuitable_SDO
+                APPLICATION_CLOSED_UPDATE_CLAIM
             )
         ),
         entry(
             PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
-            List.of(TAKE_CASE_OFFLINE)
+            List.of(NOC_REQUEST,
+                    APPLY_NOC_DECISION, TAKE_CASE_OFFLINE, APPLICATION_OFFLINE_UPDATE_CLAIM)
         ),
         entry(
             PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA.fullName(),
-            List.of(TAKE_CASE_OFFLINE)
+            List.of(TAKE_CASE_OFFLINE, APPLICATION_OFFLINE_UPDATE_CLAIM)
         ),
         entry(
             PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName(),
@@ -453,31 +502,39 @@ public class FlowStateAllowedEventService {
         ),
         entry(
             TAKEN_OFFLINE_BY_STAFF.fullName(),
-            List.of(ADD_CASE_NOTE)
+            List.of(ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM)
         ),
         entry(
             TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName(),
-            List.of(ADD_CASE_NOTE)
+            List.of(ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM)
         ),
         entry(
             TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName(),
-            List.of(ADD_CASE_NOTE)
+            List.of(ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM)
         ),
         entry(
             TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName(),
-            List.of(ADD_CASE_NOTE)
+            List.of(ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM)
         ),
         entry(
             TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE.fullName(),
-            List.of(ADD_CASE_NOTE)
+            List.of(ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM)
         ),
         entry(
             TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED.fullName(),
-            List.of(ADD_CASE_NOTE)
+            List.of(ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM)
         ),
         entry(
             TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED.fullName(),
+            List.of(ADD_CASE_NOTE, APPLICATION_OFFLINE_UPDATE_CLAIM)
+        ),
+        entry(
+            TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName(),
             List.of(ADD_CASE_NOTE)
+        ),
+        entry(
+            CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName(),
+            List.of(APPLICATION_CLOSED_UPDATE_CLAIM)
         )
     );
 
@@ -533,7 +590,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 HEARING_SCHEDULED,
-                NotSuitable_SDO
+                NotSuitable_SDO,
+                EVIDENCE_UPLOAD_JUDGE
             )
         ),
         entry(
@@ -557,7 +615,8 @@ public class FlowStateAllowedEventService {
                 DEFAULT_JUDGEMENT_SPEC,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                NotSuitable_SDO
+                NotSuitable_SDO,
+                EVIDENCE_UPLOAD
             )
         ),
         entry(
@@ -612,6 +671,7 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 AMEND_PARTY_DETAILS,
                 TAKE_CASE_OFFLINE,
+                APPLICATION_OFFLINE_UPDATE_CLAIM,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO
@@ -631,7 +691,8 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                NotSuitable_SDO
+                NotSuitable_SDO,
+                APPLICATION_OFFLINE_UPDATE_CLAIM
             )
         ),
 
@@ -648,7 +709,15 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
-                NotSuitable_SDO
+                NotSuitable_SDO,
+                APPLICATION_OFFLINE_UPDATE_CLAIM
+            )
+        ),
+
+        entry(
+            DIVERGENT_RESPOND_GO_OFFLINE.fullName(),
+            List.of(
+                APPLICATION_OFFLINE_UPDATE_CLAIM
             )
         ),
 
@@ -709,7 +778,7 @@ public class FlowStateAllowedEventService {
         ),
         entry(
             PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA.fullName(),
-            List.of(TAKE_CASE_OFFLINE)
+            List.of(TAKE_CASE_OFFLINE, APPLICATION_OFFLINE_UPDATE_CLAIM)
         ),
         entry(
             PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName(),
