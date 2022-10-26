@@ -149,7 +149,9 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 HEARING_SCHEDULED,
-                NotSuitable_SDO
+                NotSuitable_SDO,
+                EVIDENCE_UPLOAD_JUDGE,
+                EVIDENCE_UPLOAD
             )
         ),
 
@@ -542,7 +544,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 HEARING_SCHEDULED,
                 NotSuitable_SDO,
-                EVIDENCE_UPLOAD_JUDGE
+                EVIDENCE_UPLOAD_JUDGE,
+                EVIDENCE_UPLOAD
             )
         ),
         entry(
@@ -567,6 +570,7 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
+                EVIDENCE_UPLOAD_JUDGE,
                 EVIDENCE_UPLOAD
             )
         ),
