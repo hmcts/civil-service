@@ -45,7 +45,6 @@ import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -56,8 +55,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -95,7 +92,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
     private final IdamClient idamClient;
-    private final FeatureToggleService featureToggleService;
 
     @Autowired
     private final DeadlinesCalculator deadlinesCalculator;
@@ -446,10 +442,10 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                        + "set aside or varied. Any such application must be "
                                                        + "received by the Court "
                                                        + "(together with the appropriate fee) by 4pm on %s.",
-                                                   deadlinesCalculator.plusWorkingDays(
-                                                           LocalDate.now(), 5)
-                                                       .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
-                                               ))
+                                                   deadlinesCalculator
+                                                       .plusWorkingDays(LocalDate.now(), 5)
+                                                       .format(DateTimeFormatter
+                                                                   .ofPattern("dd MMMM yyyy", Locale.ENGLISH))))
                                                .build());
         }
 

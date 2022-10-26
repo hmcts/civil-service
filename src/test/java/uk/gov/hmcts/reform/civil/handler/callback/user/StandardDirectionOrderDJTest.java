@@ -33,7 +33,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -498,7 +497,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                              + "apply to have this Order set aside or varied. Any such application "
                                              + "must be received by the Court (together with the appropriate fee) "
                                              + "by 4pm on %s.",
-                                         date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))));
+                                         date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))));
         }
 
         @Test
