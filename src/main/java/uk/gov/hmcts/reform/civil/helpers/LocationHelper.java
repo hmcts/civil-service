@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils;
 
-import javax.servlet.http.Part;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumSet;
