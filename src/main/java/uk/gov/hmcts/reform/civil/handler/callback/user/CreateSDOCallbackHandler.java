@@ -42,10 +42,12 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
@@ -86,8 +88,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_SDO);
     public static final String CONFIRMATION_HEADER = "# Your order has been issued"
-        + "<br/>%n%nClaim number"
-        + "<br/><strong>%s</strong>";
+        + "%n## Claim number: %s";
     public static final String CONFIRMATION_SUMMARY_1v1 = "<br/>The Directions Order has been sent to:"
         + "<br/>%n%n<strong>Claimant 1</strong>%n"
         + "<br/>%s"
@@ -369,6 +370,20 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.fastTrackTrial(tempFastTrackTrial).build();
 
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            FastTrackHearingTime tempFastTrackHearingTime = FastTrackHearingTime.builder()
+                .helpText1("If either party considers that the time estimate is insufficient, "
+                               + "they must inform the court within 7 days of the date of this order.")
+                .helpText2("Not more than seven nor less than three clear days before the trial, "
+                               + "the claimant must file at court and serve an indexed and paginated bundle of "
+                               + "documents which complies with the requirements of Rule 39.5 Civil Procedure Rules "
+                               + "and which complies with requirements of PD32. The parties must endeavour to agree "
+                               + "the contents of the bundle before it is filed. The bundle will include a case "
+                               + "summary and a chronology.")
+                .build();
+            updatedData.fastTrackHearingTime(tempFastTrackHearingTime);
+        }
+
         FastTrackNotes tempFastTrackNotes = FastTrackNotes.builder()
             .input("This Order has been made without a hearing. Each party has the right to apply to have this Order "
                        + "set aside or varied. Any application must be received by the Court, "
@@ -377,6 +392,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
 
         updatedData.fastTrackNotes(tempFastTrackNotes).build();
+
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            FastTrackOrderWithoutJudgement tempFastTrackOrderWithoutJudgement = FastTrackOrderWithoutJudgement.builder()
+                .input(String.format("This order has been made without hearing. Each party has the right to apply "
+                                         + "to have this Order set aside or varied. Any such application must be "
+                                         + "received by the Court (together with the appropriate fee) by 4pm "
+                                         + "on %s.",
+                                     deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
+                                         .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))))
+                .build();
+
+            updatedData.fastTrackOrderWithoutJudgement(tempFastTrackOrderWithoutJudgement);
+        }
 
         FastTrackBuildingDispute tempFastTrackBuildingDispute = FastTrackBuildingDispute.builder()
             .input1("The claimant must prepare a Scott Schedule of the defects, items of damage, "
