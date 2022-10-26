@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.defaultjudgments.DefaultJudgmentSpecEmailConfiguration;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.config.properties.robotics.RoboticsEmailConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeesService;
@@ -40,6 +41,7 @@ public class DJCaseworkerReceivedNotificationHandler extends CallbackHandler imp
     private final InterestCalculator interestCalculator;
     private final FeesService feesService;
     private final DefaultJudgmentSpecEmailConfiguration defaultJudgmentSpecEmailConfiguration;
+    private final RoboticsEmailConfiguration roboticsEmailConfiguration;
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CASEWORKER_DJ_RECEIVED);
     private static final String REFERENCE_TEMPLATE_CASEWORKER = "default-judgment-caseworker-received-notification-%s";
     public static final String TASK_ID = "NotifyCaseworkerDJReceived";
@@ -58,6 +60,8 @@ public class DJCaseworkerReceivedNotificationHandler extends CallbackHandler imp
 
     private CallbackResponse notifyDJApprovedCaseworker(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        log.info("Robotics MultipartyRecipient sent to: " + roboticsEmailConfiguration.getMultipartyrecipient());
+        log.info("Robotics Recipient sent to: " + roboticsEmailConfiguration.getRecipient());
         log.info("Default Judgment Spec email sent to: " + defaultJudgmentSpecEmailConfiguration.getReceiver());
         notificationService.sendMail(defaultJudgmentSpecEmailConfiguration.getReceiver(),
                                      notificationsProperties.getCaseworkerDefaultJudgmentRequested(),
