@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
@@ -205,7 +204,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (v1 && featureToggleService.isSdoEnabled()) {
             if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
                 if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE))
-                || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
+                    || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
                     response.state(CaseState.JUDICIAL_REFERRAL.name());
                 } else if (multiPartyScenario.equals(ONE_V_TWO_TWO_LEGAL_REP)) {
                     if (caseData.getRespondent2ClaimResponseTypeForSpec()
