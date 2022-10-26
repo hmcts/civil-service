@@ -32,6 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 
@@ -83,6 +84,47 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             String timeString = time.now().format(JacksonConfiguration.DATE_TIME_FORMATTER);
             assertThat(response.getData()).extracting("unsuitableSDODate").isEqualTo(timeString);
+
+        }
+    }
+
+    @Nested
+    class MidCallback {
+
+        private CallbackParams params;
+        private CaseData caseData;
+
+        @MockBean
+        private CallbackParams callbackParams;
+
+        @Test
+        void shouldValidateReasonLessThan150_whenInvoked() {
+
+            final String PAGE_ID = "not-suitable-reason";
+
+            caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
+            params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+
+        }
+
+        @Test
+        void shouldValidateReasonMoreThan150_whenInvoked() {
+
+            final String PAGE_ID = "not-suitable-reason";
+            final int lengthALlowed = 150;
+
+            caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawnOverLimit().build();
+            params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors().get(0)).isEqualTo("Character Limit Reached: "
+                                                   + "Reason for not drawing Standard Directions order cannot exceed "
+                                                   + lengthALlowed + " characters.");
 
         }
     }
