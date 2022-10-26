@@ -213,7 +213,8 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         HEARING_SCHEDULED,
                         NotSuitable_SDO,
-                        EVIDENCE_UPLOAD_JUDGE
+                        EVIDENCE_UPLOAD_JUDGE,
+                        EVIDENCE_UPLOAD
                     }
                 ),
                 of(
