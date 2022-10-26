@@ -7,3 +7,11 @@ provider "azurerm" {
   subscription_id = var.send_grid_subscription
   features {}
 }
+
+provider "azurerm" {
+  features {}
+}
+
+provider "azuread" {
+  features {}
+}
