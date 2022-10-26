@@ -2577,12 +2577,19 @@ class StateFlowEngineTest {
         }
 
         @Test
-        void shouldReturnProceedsWithOfflineJourney_whenCaseTakenOfflineAfterNotificationAcknowledgeExtension1v2() {
+        void shouldAwaitResponse_1v2DiffSol_whenFirstResponseIsFullDefenceAfterAcknowledgeClaimAndTimeExtension1v2() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension1v2()
                 .build();
 
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
             assertThat(stateFlow.getState())
                 .extracting(State::getName)
                 .isNotNull()
