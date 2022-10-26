@@ -2216,10 +2216,6 @@ class StateFlowEngineTest {
             );
         }
 
-
-
-
-
         @Test
         void shouldReturnProceedsWithOfflineJourney_whenCaseDataIsCaseProceedsInCaseman() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff().build();
