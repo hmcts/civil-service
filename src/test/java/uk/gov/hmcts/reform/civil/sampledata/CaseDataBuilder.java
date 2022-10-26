@@ -2499,10 +2499,10 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addEnterBreathingSpace() {
         this.enter = BreathingSpaceEnterInfo.builder()
-            .type(BreathingSpaceType.STANDARD)
-            .reference("12345")
-            .start(LocalDate.now())
-            .build();
+                    .type(BreathingSpaceType.STANDARD)
+                    .reference("12345")
+                    .start(LocalDate.now())
+                    .build();
 
         this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
 
@@ -2511,10 +2511,10 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addEnterMentalHealthBreathingSpace() {
         this.enter = BreathingSpaceEnterInfo.builder()
-            .type(BreathingSpaceType.MENTAL_HEALTH)
-            .reference("12345")
-            .start(LocalDate.now())
-            .build();
+                    .type(BreathingSpaceType.MENTAL_HEALTH)
+                    .reference("12345")
+                    .start(LocalDate.now())
+                    .build();
 
         this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
 
@@ -3095,8 +3095,8 @@ public class CaseDataBuilder {
 
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input("unforeseen complexities")
-            .build();
+                                                   .input("unforeseen complexities")
+                                                   .build();
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
         return this;
     }
