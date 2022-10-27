@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder(toBuilder = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -22,5 +24,8 @@ public class OrganisationPolicy {
 
     @JsonProperty("OrgPolicyCaseAssignedRole")
     private String orgPolicyCaseAssignedRole;
+
+    @JsonProperty("PreviousOrganisations")
+    private List<PreviousOrganisationCollectionItem> previousOrganisations;
 
 }

@@ -287,7 +287,7 @@ public class CaseDataParent implements MappableObject {
     private final CaseCategory caseAccessCategory;
 
     private final ChangeOrganisationRequest changeOrganisationRequestField;
-    private final List<Element<ChangeOfRepresentation>> changeOfRepresentation;
+    private final ChangeOfRepresentation changeOfRepresentation;
 
     /**
      * Adding for PiP to citizen UI.
