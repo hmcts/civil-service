@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.helpers.sdo;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingBundleType;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
@@ -19,7 +20,9 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class SdoHelper {
 
@@ -231,17 +234,18 @@ public class SdoHelper {
         FastTrackTrial fastTrackTrial = caseData.getFastTrackTrial();
 
         if (fastTrackTrial != null) {
-            List<FastTrackTrialBundleType> types = fastTrackTrial.getType();
+            List<FastTrackTrialBundleType> types = Optional.ofNullable(fastTrackTrial.getType())
+                .orElseGet(Collections::emptyList);
             StringBuilder stringBuilder = new StringBuilder();
 
-            if (fastTrackTrial.getType().size() == 3) {
+            if (types.size() == 3) {
                 stringBuilder.append(FastTrackTrialBundleType.DOCUMENTS.getLabel());
                 stringBuilder.append(" / " + FastTrackTrialBundleType.ELECTRONIC.getLabel());
                 stringBuilder.append(" / " + FastTrackTrialBundleType.SUMMARY.getLabel());
-            } else if (fastTrackTrial.getType().size() == 2) {
+            } else if (types.size() == 2) {
                 stringBuilder.append(types.get(0).getLabel());
                 stringBuilder.append(" / " + types.get(1).getLabel());
-            } else {
+            } else if (!types.isEmpty()) {
                 stringBuilder.append(types.get(0).getLabel());
             }
 
@@ -252,14 +256,10 @@ public class SdoHelper {
     }
 
     public static String getDisposalHearingFinalDisposalHearingTimeLabel(CaseData caseData) {
-        DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearing =
-            caseData.getDisposalHearingFinalDisposalHearing();
-
-        if (disposalHearingFinalDisposalHearing != null) {
-            return disposalHearingFinalDisposalHearing.getTime().getLabel();
-        }
-
-        return "";
+        return Optional.ofNullable(caseData.getDisposalHearingFinalDisposalHearing())
+            .map(DisposalHearingFinalDisposalHearing::getTime)
+            .map(DisposalHearingFinalDisposalHearingTimeEstimate::getLabel)
+            .orElse("");
     }
 
     public static String getDisposalHearingMethodTelephoneHearingLabel(CaseData caseData) {
@@ -288,17 +288,18 @@ public class SdoHelper {
         DisposalHearingBundle disposalHearingBundle = caseData.getDisposalHearingBundle();
 
         if (disposalHearingBundle != null) {
-            List<DisposalHearingBundleType> types = disposalHearingBundle.getType();
+            List<DisposalHearingBundleType> types = Optional.ofNullable(disposalHearingBundle.getType())
+                .orElseGet(Collections::emptyList);
             StringBuilder stringBuilder = new StringBuilder();
 
-            if (disposalHearingBundle.getType().size() == 3) {
+            if (types.size() == 3) {
                 stringBuilder.append(DisposalHearingBundleType.DOCUMENTS.getLabel());
                 stringBuilder.append(" / " + DisposalHearingBundleType.ELECTRONIC.getLabel());
                 stringBuilder.append(" / " + DisposalHearingBundleType.SUMMARY.getLabel());
-            } else if (disposalHearingBundle.getType().size() == 2) {
+            } else if (types.size() == 2) {
                 stringBuilder.append(types.get(0).getLabel());
                 stringBuilder.append(" / " + types.get(1).getLabel());
-            } else {
+            } else if (!types.isEmpty()) {
                 stringBuilder.append(types.get(0).getLabel());
             }
 
