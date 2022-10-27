@@ -46,7 +46,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -766,7 +765,16 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("Photographs and/or a place of the accident location shall be prepared and agreed by the "
                                + "parties and uploaded to the Digital Portal no later than 14 days before the "
                                + "hearing.");
-
+            assertThat(response.getData()).extracting("disposalHearingHearingTime").extracting("input")
+                .isEqualTo("This claim will be listed for final disposal before a judge on the first available date "
+                               + "after");
+            assertThat(response.getData()).extracting("disposalHearingHearingTime").extracting("dateTo")
+                .isEqualTo(LocalDate.now().plusWeeks(16).toString());
+            assertThat(response.getData()).extracting("disposalOrderWithoutHearing").extracting("input")
+                .isEqualTo(String.format("Each party has the right to apply to have this Order set aside or varied. "
+                                             + "Any such application must be received by the Court (together with the "
+                                             + "appropriate fee) by 4pm on %s.",
+                                         date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))));
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("helpText1")
                 .isEqualTo("If either party considers that the time estimate is insufficient, "
                                + "they must inform the court within 7 days of the date of this order.");
@@ -782,7 +790,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                              + "to have this Order set aside or varied. Any such application must be "
                                              + "received by the Court (together with the appropriate fee) by 4pm "
                                              + "on %s.",
-                                         date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))));
+                                         date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))));
+
         }
 
         @Test
@@ -884,6 +893,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            assertThat(response.getData()).extracting("disposalHearingHearingTime").isNull();
+            assertThat(response.getData()).extracting("disposalOrderWithoutHearing").isNull();
             assertThat(response.getData()).extracting("fastTrackHearingTime").isNull();
             assertThat(response.getData()).extracting("fastTrackOrderWithoutJudgement").isNull();
         }
