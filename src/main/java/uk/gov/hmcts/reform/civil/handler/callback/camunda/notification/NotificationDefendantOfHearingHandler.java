@@ -95,8 +95,6 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
         return new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER,
             caseData.getLegacyCaseReference(),
-            HEARING_FEE,
-            caseData.getHearingFee() == null ? "£0.00" : String.valueOf(caseData.getHearingFee().formData()),
             HEARING_DATE,
             caseData.getHearingDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
             HEARING_TIME,
