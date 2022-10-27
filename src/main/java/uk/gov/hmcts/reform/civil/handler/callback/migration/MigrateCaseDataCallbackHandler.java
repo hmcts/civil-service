@@ -12,10 +12,10 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Collections;
 import java.util.List;
