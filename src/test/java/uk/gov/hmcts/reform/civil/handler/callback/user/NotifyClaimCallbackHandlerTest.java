@@ -172,11 +172,9 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 ).build();
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-                LocalDateTime expectedTime = claimNotificationDeadline.toLocalDate().atTime(END_OF_BUSINESS_DAY);
-
                 assertThat(response.getData())
-                    .containsEntry("claimDetailsNotificationDeadline", expectedTime.format(ISO_DATE_TIME))
-                    .containsEntry("nextDeadline", expectedTime.format(ISO_DATE));
+                    .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME))
+                    .containsEntry("nextDeadline", deadline.format(ISO_DATE));
             }
 
             @Test
