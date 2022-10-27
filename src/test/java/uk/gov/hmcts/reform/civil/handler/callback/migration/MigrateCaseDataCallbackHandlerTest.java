@@ -7,6 +7,8 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -26,7 +28,7 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
     private MigrateCaseDataCallbackHandler handler;
 
     @Test
-    void shouldReturnNoError_WhenAboutToSubmitIsInvoked() {
+    void shouldReturnNoError_whenAboutToSubmitIsInvoked() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
             .build();
@@ -36,5 +38,31 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
             .handle(params);
 
         assertThat(response.getErrors()).isNull();
+    }
+
+    @Test
+    void shouldMigrateData_whenSpecClaim() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .setSuperClaimTypeToSpecClaim()
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        CaseData newCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+        assertThat(newCaseData.getCaseAccessCategory())
+            .isEqualTo(CaseCategory.SPEC_CLAIM);
+
+        assertThat(newCaseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole())
+            .isEqualTo(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
+
+        assertThat(newCaseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole())
+            .isEqualTo(CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
+
+        assertThat(newCaseData.getRespondent2OrganisationPolicy().getOrgPolicyCaseAssignedRole())
+            .isEqualTo(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
     }
 }
