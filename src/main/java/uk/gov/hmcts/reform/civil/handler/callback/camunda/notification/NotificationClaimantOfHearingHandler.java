@@ -71,40 +71,30 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
-        Map<String, String> varMap = new HashMap<>();
-        varMap.put(
-            CLAIM_REFERENCE_NUMBER,
-            caseData.getLegacyCaseReference()
-        );
-        varMap.put(
-            HEARING_FEE,
-            caseData.getHearingFee() == null ? "£0.00" : String.valueOf(caseData.getHearingFee().formData())
-        );
-        varMap.put(
-            HEARING_DATE,
-            caseData.getHearingDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
-        );
         String hourMinute = caseData.getHearingTimeHourMinute();
+        String reference;
         int hours = Integer.parseInt(hourMinute.substring(0, 2));
         int minutes = Integer.parseInt(hourMinute.substring(2, 4));
         LocalTime time = LocalTime.of(hours, minutes, 0);
-        varMap.put(
-            HEARING_TIME,
-            time.toString()
-        );
-        varMap.put(
-            HEARING_DUE_DATE,
-            caseData.getHearingDueDate() == null ? null : caseData.getHearingDueDate()
-                .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
-        );
-        String reference;
         if (caseData.getSolicitorReferences() == null
             || caseData.getSolicitorReferences().getApplicantSolicitor1Reference() == null) {
             reference = "";
         } else {
             reference = caseData.getSolicitorReferences().getApplicantSolicitor1Reference();
         }
-        varMap.put(CLAIMANT_REFERENCE_NUMBER, reference);
-        return varMap;
+        return new HashMap<>(Map.of(
+            CLAIM_REFERENCE_NUMBER,
+            caseData.getLegacyCaseReference(),
+            HEARING_FEE,
+            caseData.getHearingFee() == null ? "£0.00" : String.valueOf(caseData.getHearingFee().formData()),
+            HEARING_DATE,
+            caseData.getHearingDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+            HEARING_TIME,
+            time.toString(),
+            HEARING_DUE_DATE,
+            caseData.getHearingDueDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+            CLAIMANT_REFERENCE_NUMBER, reference
+
+        ));
     }
 }
