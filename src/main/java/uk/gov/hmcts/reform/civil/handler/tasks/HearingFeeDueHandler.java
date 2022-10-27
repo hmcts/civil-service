@@ -11,8 +11,11 @@ import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.StrikeOutEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -22,6 +25,7 @@ public class HearingFeeDueHandler implements BaseExternalTaskHandler {
 
     private final HearingFeeDueSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
@@ -31,14 +35,16 @@ public class HearingFeeDueHandler implements BaseExternalTaskHandler {
 
         cases.forEach(caseDetails -> {
             try {
-                CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+                CaseDetails detailsWithData = coreCaseDataService.getCase(caseDetails.getId());
+                CaseData caseData = caseDetailsConverter.toCaseData(detailsWithData);
+                PaymentDetails hearingFeePaymentDetails = caseData.getHearingFeePaymentDetails();
 
                 if (caseData.getHearingDueDate() == null
-                    || caseData.getHearingFeePaymentDetails().getStatus() == PaymentStatus.SUCCESS) {
+                    || (hearingFeePaymentDetails != null && hearingFeePaymentDetails.getStatus() == PaymentStatus.SUCCESS)) {
                     log.info("Current case status '{}'", caseDetails.getState());
                     applicationEventPublisher.publishEvent(new StrikeOutEvent(caseDetails.getId()));
-                } else if (caseData.getHearingFeePaymentDetails().getStatus() == null
-                            || caseData.getHearingFeePaymentDetails().getStatus() == PaymentStatus.FAILED) {
+                } else if (hearingFeePaymentDetails == null
+                            || hearingFeePaymentDetails.getStatus() == PaymentStatus.FAILED) {
                     log.info("Current case status '{}'", caseDetails.getState());
                     applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
                 }
