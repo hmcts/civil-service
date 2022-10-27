@@ -90,11 +90,11 @@ public class DeadlinesCalculator {
             .orElse(null);
     }
 
-    public LocalDate plusWorkingDays(LocalDate date, int workingDays) {
-        LocalDate current = date;
-        for (int i = 0; i < workingDays; i++) {
-            current = workingDayIndicator.getNextWorkingDay(current.plusDays(1));
+    public LocalDate plusWorkingDays(LocalDate date, int workingDaysForward) {
+        LocalDate currentDate = date;
+        for (int i = 0; i < workingDaysForward; i++) {
+            currentDate = workingDayIndicator.getNextWorkingDay(currentDate.plusDays(1));
         }
-        return current;
+        return currentDate;
     }
 }

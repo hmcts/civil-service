@@ -394,4 +394,30 @@ public class DeadlinesCalculatorTest {
         String input = ResourceReader.readString("/bank-holidays.json");
         return new ObjectMapper().readValue(input, BankHolidays.class);
     }
+
+    @Test
+    void testPlusWorkingDaysIgnoresWeekends() {
+        LocalDate friday = LocalDate.of(2022, 9, 9);
+        assertThat(calculator.plusWorkingDays(friday, 1))
+            .isTheSame(LocalDate.of(2022, 9, 12));
+    }
+
+    @Test
+    void testPlusWorkingDaysMidWeek() {
+        LocalDate wednesday = LocalDate.of(2022, 9, 7);
+        assertThat(calculator.plusWorkingDays(wednesday, 1))
+            .isTheSame(LocalDate.of(2022, 9, 8));
+    }
+
+    @Test
+    void testPlusWorkingDaysIgnoresStartingWeekend() {
+        LocalDate saturday = LocalDate.of(2022, 9, 10);
+        assertThat(calculator.plusWorkingDays(saturday, 3)).isWednesday();
+    }
+
+    @Test
+    void testPlusWorkingDaysReturnsSameDay() {
+        LocalDate wednesday = LocalDate.of(2022, 9, 28);
+        assertThat(calculator.plusWorkingDays(wednesday, 0)).isWednesday();
+    }
 }
