@@ -194,7 +194,9 @@ public class HearingScheduledHandler extends CallbackHandler {
             caseDataBuilder.hearingLocation(locationList);
         }
         caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
+        var state = "HEARING_READINESS";
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .state(state)
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
