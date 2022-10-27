@@ -99,7 +99,7 @@ public class SealedClaimFormGeneratorForSpecTest {
         CaseData caseData = caseBuilder
             .build();
 
-        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(14)))
+        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(28)))
             .thenReturn(caseData.getIssueDate().plusDays(17));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2)))
             .thenReturn(new DocmosisDocument(N2.getDocumentTitle(), bytes));
@@ -126,8 +126,8 @@ public class SealedClaimFormGeneratorForSpecTest {
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .build();
 
-        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(14)))
-            .thenReturn(caseData.getIssueDate().plusDays(17));
+        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(28)))
+            .thenReturn(caseData.getIssueDate().plusDays(28));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_1V2_SAME_SOL)))
             .thenReturn(new DocmosisDocument(N2_1V2_SAME_SOL.getDocumentTitle(), bytes));
 
@@ -135,7 +135,7 @@ public class SealedClaimFormGeneratorForSpecTest {
             .thenReturn(CASE_DOCUMENT);
 
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
-        assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+        assertThat(caseDocument).isNotNull();
 
         verify(representativeService, times(2)).getRespondent1Representative(caseData);
         verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
@@ -155,8 +155,8 @@ public class SealedClaimFormGeneratorForSpecTest {
                              .build())
             .build();
 
-        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(14)))
-            .thenReturn(caseData.getIssueDate().plusDays(17));
+        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(28)))
+            .thenReturn(caseData.getIssueDate().plusDays(28));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_1V2_DIFFERENT_SOL)))
             .thenReturn(new DocmosisDocument(N2_1V2_DIFFERENT_SOL.getDocumentTitle(), bytes));
 
@@ -185,8 +185,8 @@ public class SealedClaimFormGeneratorForSpecTest {
                             .build())
             .build();
 
-        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(14)))
-            .thenReturn(caseData.getIssueDate().plusDays(17));
+        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(28)))
+            .thenReturn(caseData.getIssueDate().plusDays(28));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_2V1)))
             .thenReturn(new DocmosisDocument(N2_2V1.getDocumentTitle(), bytes));
 
