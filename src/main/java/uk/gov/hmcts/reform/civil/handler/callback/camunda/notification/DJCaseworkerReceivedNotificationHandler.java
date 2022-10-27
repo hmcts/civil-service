@@ -59,10 +59,10 @@ public class DJCaseworkerReceivedNotificationHandler extends CallbackHandler imp
     }
 
     private CallbackResponse notifyDJApprovedCaseworker(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
         log.info("Robotics MultipartyRecipient sent to: " + roboticsEmailConfiguration.getMultipartyrecipient());
         log.info("Robotics Recipient sent to: " + roboticsEmailConfiguration.getRecipient());
         log.info("Default Judgment Spec email sent to: " + defaultJudgmentSpecEmailConfiguration.getReceiver());
+        CaseData caseData = callbackParams.getCaseData();
         notificationService.sendMail(defaultJudgmentSpecEmailConfiguration.getReceiver(),
                                      notificationsProperties.getCaseworkerDefaultJudgmentRequested(),
                                              addProperties(caseData),
