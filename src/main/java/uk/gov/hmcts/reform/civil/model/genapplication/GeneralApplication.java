@@ -54,6 +54,7 @@ public class GeneralApplication implements MappableObject {
     private final String locationName;
     private final LocalDateTime applicationClosedDate;
     private final LocalDateTime applicationTakenOfflineDate;
+    private final String caseNameHmctsInternal;
 
     @JsonCreator
     GeneralApplication(@JsonProperty("generalApplicationState") String generalApplicationState,
@@ -90,8 +91,8 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("CaseAccessCategory") CaseCategory caseAccessCategory,
                        @JsonProperty("locationName") String locationName,
                        @JsonProperty("applicationClosedDate") LocalDateTime applicationClosedDate,
-                       @JsonProperty("applicationTakenOfflineDate") LocalDateTime applicationTakenOfflineDate
-                       ) {
+                       @JsonProperty("applicationTakenOfflineDate") LocalDateTime applicationTakenOfflineDate,
+                       @JsonProperty("caseNameHmctsInternal") String caseNameHmctsInternal) {
         this.generalApplicationState = generalApplicationState;
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
@@ -125,5 +126,6 @@ public class GeneralApplication implements MappableObject {
         this.locationName = locationName;
         this.applicationClosedDate = applicationClosedDate;
         this.applicationTakenOfflineDate = applicationTakenOfflineDate;
+        this.caseNameHmctsInternal = caseNameHmctsInternal;
     }
 }

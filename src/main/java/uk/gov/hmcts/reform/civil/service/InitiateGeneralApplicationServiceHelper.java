@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -22,6 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -51,6 +53,30 @@ public class InitiateGeneralApplicationServiceHelper {
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
             userDetails
         );
+    }
+
+    public StringBuilder caseParticipants(GeneralApplication.GeneralApplicationBuilder applicationBuilder) {
+        StringBuilder participantString = new StringBuilder();
+        MultiPartyScenario multiPartyScenario  = getMultiPartyScenario(caseData);
+        if (multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+            || multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)) {
+            participantString.append(applicationBuilder.generalAppApplnSolicitor.().getPartyName())
+                .append(" v ").append(caseData.getRespondent1().getPartyName())
+                .append(" and ").append(caseData.getRespondent2().getPartyName());
+
+        } else if (multiPartyScenario.equals(MultiPartyScenario.TWO_V_ONE)) {
+            participantString.append(caseData.getApplicant1().getPartyName())
+                .append(" and ").append(caseData.getApplicant2().getPartyName()).append(" v ")
+                .append(caseData.getRespondent1()
+                            .getPartyName());
+
+        } else {
+            participantString.append(caseData.getApplicant1().getPartyName()).append(" v ")
+                .append(caseData.getRespondent1()
+                            .getPartyName());
+        }
+        return participantString;
+
     }
 
     public GeneralApplication setRespondentDetailsIfPresent(GeneralApplication generalApplication,
@@ -96,16 +122,19 @@ public class InitiateGeneralApplicationServiceHelper {
 
                         specBuilder.organisationIdentifier(caseData.getApplicant1OrganisationPolicy()
                                                                .getOrganisation().getOrganisationID());
+                        specBuilder.partyName(caseData.getApplicant1().getPartyName());
                         /*Populate the GA respondent solicitor details in accordance with civil case Respondent
                         Solicitor 1 details if caserole of collected user matches with caserole Respondent Solicitor 1*/
                     } else if (respSol.getCaseRole().equals(respondent1OrgCaseRole)) {
                         specBuilder.email(caseData.getRespondentSolicitor1EmailAddress());
                         specBuilder.organisationIdentifier(getRespondent1SolicitorOrgId(caseData));
+                        specBuilder.partyName(caseData.getRespondent1().getPartyName());
                         /*Populate the GA respondent solicitor details in accordance with civil case Respondent
                         Solicitor 2 details if it's 1 V 2 Different Solicitor scenario*/
                     } else {
                         specBuilder.email(caseData.getRespondentSolicitor2EmailAddress());
                         specBuilder.organisationIdentifier(getRespondent2SolicitorOrgId(caseData));
+                        specBuilder.partyName(caseData.getRespondent2().getPartyName())
                     }
                     /*Set the GA Respondent solicitor details to Empty if above checks are failed*/
                 } else {
@@ -123,6 +152,9 @@ public class InitiateGeneralApplicationServiceHelper {
             applicationBuilder.applicantPartyName(getApplicantPartyName(userRoles, userDetails, caseData));
             applicationBuilder.generalAppRespondentSolicitors(respondentSols);
         }
+
+        //set casename
+        applicationBuilder.caseNameHmctsInternal(caseParticipants(applicationBuilder).toString());
 
         return applicationBuilder
             .parentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant

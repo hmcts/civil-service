@@ -18,18 +18,21 @@ public class GASolicitorDetailsGAspec {
     private final String forename;
     private final Optional<String> surname;
     private final String organisationIdentifier;
+    private final String partyName;
 
     @JsonCreator
     GASolicitorDetailsGAspec(@JsonProperty("email") String email,
                  @JsonProperty("id") String id,
                  @JsonProperty("forename") String forename,
                  @JsonProperty("surname") Optional<String> surname,
-                 @JsonProperty("organisationIdentifier") String organisationIdentifier) {
+                 @JsonProperty("organisationIdentifier") String organisationIdentifier,
+                 @JsonProperty("partyName") String partyName) {
 
         this.email = email;
         this.id = id;
         this.forename = forename;
         this.surname = surname;
         this.organisationIdentifier = organisationIdentifier;
+        this.partyName = partyName;
     }
 }
