@@ -101,6 +101,8 @@ public class SealedClaimFormGeneratorForSpecTest {
 
         when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(28)))
             .thenReturn(caseData.getIssueDate().plusDays(17));
+        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(29)))
+            .thenReturn(caseData.getIssueDate().plusDays(18));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2)))
             .thenReturn(new DocmosisDocument(N2.getDocumentTitle(), bytes));
 
@@ -159,6 +161,8 @@ public class SealedClaimFormGeneratorForSpecTest {
 
         when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(28)))
             .thenReturn(caseData.getIssueDate().plusDays(28));
+        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(29)))
+            .thenReturn(caseData.getIssueDate().plusDays(29));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_1V2_DIFFERENT_SOL)))
             .thenReturn(new DocmosisDocument(N2_1V2_DIFFERENT_SOL.getDocumentTitle(), bytes));
 
@@ -189,6 +193,8 @@ public class SealedClaimFormGeneratorForSpecTest {
 
         when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(28)))
             .thenReturn(caseData.getIssueDate().plusDays(28));
+        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(29)))
+            .thenReturn(caseData.getIssueDate().plusDays(29));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_2V1)))
             .thenReturn(new DocmosisDocument(N2_2V1.getDocumentTitle(), bytes));
 
