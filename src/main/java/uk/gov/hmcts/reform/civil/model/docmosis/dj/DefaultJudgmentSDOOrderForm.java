@@ -56,6 +56,7 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private final DisposalHearingNotesDJ disposalHearingNotesDJ;
     private final List<Element<DisposalHearingAddNewDirectionsDJ>> disposalHearingAddNewDirectionsDJ;
     private final boolean hasNewDirections;
+    private final String disposalHearingOrderMadeWithoutHearingDJ;
 
     //default judgement SDO fields for trial
     private final TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;

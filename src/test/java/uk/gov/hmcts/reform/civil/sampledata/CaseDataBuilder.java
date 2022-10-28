@@ -85,6 +85,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
@@ -315,6 +316,9 @@ public class CaseDataBuilder {
     private TrialHearingTrial trialHearingTrialDJ;
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
+    private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
+    private CaseLocation caseManagementLocation;
+
 
     private List<Element<ChangeOfRepresentation>> changeOfRepresentation;
     private ChangeOrganisationRequest changeOrganisationRequest;
@@ -2962,6 +2966,17 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateDisposalHearingOrderMadeWithoutHearing() {
+        disposalHearingOrderMadeWithoutHearingDJ =
+            DisposalHearingOrderMadeWithoutHearingDJ.builder().input("test").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateCaseManagementLocation() {
+        caseManagementLocation = CaseLocation.builder().baseLocation("base location").build();
+        return this;
+    }
+
     public CaseDataBuilder atStateNotificationAcknowledged_1v2_BothDefendants() {
         atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors();
         respondent1ClaimResponseIntentionType = FULL_DEFENCE;
@@ -3637,6 +3652,8 @@ public class CaseDataBuilder {
             .changeOrganisationRequestField(changeOrganisationRequest)
             .unassignedCaseListDisplayOrganisationReferences(unassignedCaseListDisplayOrganisationReferences)
             .caseListDisplayDefendantSolicitorReferences(caseListDisplayDefendantSolicitorReferences)
+            .disposalHearingOrderMadeWithoutHearingDJ(disposalHearingOrderMadeWithoutHearingDJ)
+            .caseManagementLocation(caseManagementLocation)
             //Unsuitable for SDO
             .reasonNotSuitableSDO(reasonNotSuitableSDO)
             .build();

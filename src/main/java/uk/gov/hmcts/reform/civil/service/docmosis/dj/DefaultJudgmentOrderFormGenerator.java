@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTim
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
@@ -38,6 +40,9 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     private final DocumentGeneratorService documentGeneratorService;
     private static final String BOTH_DEFENDANTS = "Both Defendants";
     public static final String DISPOSAL_HEARING = "DISPOSAL_HEARING";
+
+    @Autowired
+    private FeatureToggleService featureToggleService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         DefaultJudgmentSDOOrderForm templateData = getDefaultJudgmentForms(caseData);
@@ -113,7 +118,11 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .disposalHearingCostsAddSection(getToggleValue(caseData.getDisposalHearingCostsDJToggle()))
             .applicant(checkApplicantPartyName(caseData)
                             ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
-            .respondent(checkDefendantRequested(caseData).toUpperCase()).build();
+            .respondent(checkDefendantRequested(caseData).toUpperCase())
+            .disposalHearingOrderMadeWithoutHearingDJ(featureToggleService.isHearingAndListingSDOEnabled()
+                                                          ? caseData.getDisposalHearingOrderMadeWithoutHearingDJ()
+                .getInput() : null )
+            .build();
     }
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormTrial(CaseData caseData) {
@@ -163,7 +172,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
                                       ? caseData.getTrialHearingMethodInPersonDJ().getValue().getLabel() : null)
             .applicant(checkApplicantPartyName(caseData)
                             ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
-            .respondent(checkDefendantRequested(caseData).toUpperCase()).build();
+            .respondent(checkDefendantRequested(caseData).toUpperCase())
+            .build();
     }
 
     private DocmosisTemplates getDocmosisTemplate() {
@@ -226,6 +236,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     private String getCourt(CaseData caseData) {
         if (caseData.getDisposalHearingMethodInPersonDJ() != null) {
             return caseData.getDisposalHearingMethodInPersonDJ().getValue().getLabel();
+        } else if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            return caseData.getCaseManagementLocation().getBaseLocation();
         }
         return null;
     }
