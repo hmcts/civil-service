@@ -203,9 +203,12 @@ public class HearingScheduledHandler extends CallbackHandler {
         LocalDate now = time.now().toLocalDate();
         Set<LocalDate> holidays = publicHolidaysCollection.getPublicHolidays();
         if (now.isBefore(caseData.getHearingDate().minusWeeks(4))) {
-            calculatedHearingDueDate = HearingUtils.addBusinessDays(now, 7, holidays);
-        } else {
             calculatedHearingDueDate = HearingUtils.addBusinessDays(now, 20, holidays);
+        } else {
+            calculatedHearingDueDate = HearingUtils.addBusinessDays(now, 7, holidays);
+        }
+        if(calculatedHearingDueDate.isAfter(caseData.getHearingDate())) {
+            calculatedHearingDueDate = caseData.getHearingDate();
         }
         caseDataBuilder.hearingDueDate(calculatedHearingDueDate);
     }

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -33,9 +34,11 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -81,6 +84,34 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         given(publicHolidaysCollection.getPublicHolidays()).willReturn(publicHolidays);
 
     }
+
+    @ParameterizedTest
+    @CsvSource({
+        // current date,hearing date,expected
+        "2022-10-25 10:00,2022-11-04,2022-11-04",   // based on bug report
+        "2022-10-01 10:00,2022-11-14,2022-10-28",   // hearing date more than 4 weeks away -> expect in 4 weeks time
+        "2022-10-01 10:00,2022-10-14,2022-10-11",   // hearing date less than 4 weeks away -> expect in 7 business days
+        "2022-10-01 10:00,2022-10-10,2022-10-10"    // hearing date less than 7 days away -> expect by the hearing day
+
+    })
+    void shouldApplyAppropriateDate_whenHearingDateIsSetToSpecificValues(
+        String currentDate, String hearingDate, String expectedPaymentDate) {
+        // Given
+        final DateTimeFormatter FORMAT_DATETIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm", Locale.UK);
+        final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.UK);
+
+        given(time.now()).willReturn(LocalDateTime.parse(currentDate, FORMAT_DATETIME));
+        CaseData caseData = CaseData.builder().hearingDate(LocalDate.parse(hearingDate, FORMAT)).build();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        // When
+        handler.calculateAndApplyDueDate(caseData, caseDataBuilder);
+
+        // Then
+        assertThat(caseDataBuilder.build().getHearingDueDate()).isEqualTo(LocalDate.parse(expectedPaymentDate, FORMAT));
+
+    }
+
 
     @ParameterizedTest
     @ValueSource(strings = { "locationName" })
