@@ -218,6 +218,7 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 TAKE_CASE_OFFLINE,
                 EVIDENCE_UPLOAD_JUDGE,
+                HEARING_FEE_UNPAID,
                 HEARING_SCHEDULED,
                 EVIDENCE_UPLOAD
 

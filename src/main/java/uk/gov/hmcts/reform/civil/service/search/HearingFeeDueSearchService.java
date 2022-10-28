@@ -6,6 +6,9 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -25,7 +28,7 @@ public class HearingFeeDueSearchService extends ElasticSearchService {
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(rangeQuery("data.hearingDueDate").lt("now"))
+                            .must(rangeQuery("data.hearingDueDate").lt(LocalDate.now().atTime(LocalTime.MIN).toString()))
                             .must(beState(HEARING_READINESS)))
                 .should(boolQuery()
                             .must(rangeQuery("data.hearingFee.calculatedAmountInPence").lte("0"))
