@@ -74,18 +74,28 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @BeforeEach
     public void prepareTest() {
         given(time.now()).willReturn(LocalDateTime.now());
+
+        Set<LocalDate> publicHolidays = new HashSet<>();
+        publicHolidays.add(time.now().toLocalDate().plusDays(3));
+        given(publicHolidaysCollection.getPublicHolidays()).willReturn(publicHolidays);
+
     }
 
     @ParameterizedTest
     @ValueSource(strings = { "locationName" })
     void shouldReturnLocationList_whenLocationsAreQueried(String pageId) {
+        // Given
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(LocationRefData.builder().siteName("Site Name").courtAddress("Address").postcode("28000")
                           .build());
-        when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+        given(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).willReturn(locations);
+
+        // When
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         CallbackParams params = callbackParamsOf(caseData, MID, pageId);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
         assertThat(((Map)((ArrayList)((Map)(response.getData().get("hearingLocation"))).get("list_items")).get(0))
                        .get("label")).isEqualTo("Site Name - Address - 28000");
     }
@@ -93,72 +103,86 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @ValueSource(strings = { "checkPastDate" })
     void shouldReturnError_whenDateFromDateEqualToPresentDateProvided(String pageId) {
+        // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .dateOfApplication(LocalDate.now())
+            .dateOfApplication(time.now().toLocalDate())
             .build();
         CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+
+        // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
         assertThat(response.getErrors().get(0)).isEqualTo("The Date must be in the past");
     }
 
     @ParameterizedTest
     @ValueSource(strings = { "checkPastDate" })
     void shouldReturnOk_whenDateFromDateNotGreaterThanPresentDateProvided(String pageId) {
+        // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .dateOfApplication(LocalDate.now().minusDays(1))
+            .dateOfApplication(time.now().toLocalDate().minusDays(1))
             .build();
         CallbackParams params = callbackParamsOf(caseData, MID, pageId);
+
+        // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
         assertThat(response.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
     @ValueSource(strings = { "checkFutureDate" })
     void shouldReturnError_whenDateFromDateNotTwentyFourHoursAfterPresentDateProvided(String pageId) {
-        LocalDateTime localDateTime = LocalDateTime.now();
-        String hours = "0" + (localDateTime.getHour());
-        String minutes = "0" + localDateTime.getMinute();
-        hours = hours.substring(hours.length() - 2);
-        minutes = minutes.substring(minutes.length() - 2);
+        // Given
+        LocalDateTime localDateTime = time.now();
+        String hhmm = prepareHHmmString(localDateTime);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .hearingDate(LocalDate.from(localDateTime)).hearingTimeHourMinute(hours + minutes).build();
+            .hearingDate(LocalDate.from(localDateTime)).hearingTimeHourMinute(hhmm).build();
 
         CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
+        // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
         assertThat(response.getErrors().get(0)).isEqualTo("The Date & Time must be 24hs in advance from now");
     }
 
     @ParameterizedTest
     @ValueSource(strings = { "checkFutureDate" })
     void shouldNotReturnError_whenDateFromDateIsTwentyFourHoursAfterOfPresentDateProvided(String pageId) {
-        LocalDateTime localDateTime = LocalDateTime.now().plusHours(24).plusMinutes(1);
-        String hours = "0" + (localDateTime.getHour());
-        String minutes = "0" + String.valueOf(localDateTime.getMinute());
-        hours = hours.substring(hours.length() - 2);
-        minutes = minutes.substring(minutes.length() - 2);
+        // Given
+        LocalDateTime localDateTime = time.now().plusHours(24).plusMinutes(1);
+        String hhmm = prepareHHmmString(localDateTime);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .hearingDate(LocalDate.from(localDateTime)).hearingTimeHourMinute(hours + minutes).build();
+            .hearingDate(LocalDate.from(localDateTime)).hearingTimeHourMinute(hhmm).build();
         CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
+        // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
         assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
     void shouldGetDueDateAndFeeSmallClaim_whenAboutToSubmit() {
+        // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .addRespondent2(NO)
             .listingOrRelisting(ListingOrRelisting.LISTING)
-            .hearingDate(LocalDate.now().plusWeeks(2))
+            .hearingDate(time.now().toLocalDate().plusWeeks(2))
             .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        Set<LocalDate> publicHolidays = new HashSet<>();
-        publicHolidays.add(LocalDate.now().plusDays(3));
-        when(publicHolidaysCollection.getPublicHolidays()).thenReturn(publicHolidays);
+
+        // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getHearingFee()).isEqualTo(
             Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
@@ -166,18 +190,20 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldGetDueDateAndFeeMultiClaim_whenAboutToSubmit() {
+        // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .addRespondent2(NO)
             .listingOrRelisting(ListingOrRelisting.LISTING)
-            .hearingDate(LocalDate.now().plusWeeks(5))
+            .hearingDate(time.now().toLocalDate().plusWeeks(5))
             .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        Set<LocalDate> publicHolidays = new HashSet<>();
-        publicHolidays.add(LocalDate.now().plusDays(3));
-        when(publicHolidaysCollection.getPublicHolidays()).thenReturn(publicHolidays);
+
+        // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getHearingFee()).isEqualTo(
             Fee.builder().calculatedAmountInPence(new BigDecimal(117500)).build());
@@ -185,18 +211,20 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldGetDueDateAndFeeFastClaim_whenAboutToSubmit() {
+        // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .addRespondent2(NO)
             .listingOrRelisting(ListingOrRelisting.LISTING)
-            .hearingDate(LocalDate.now().plusWeeks(5))
+            .hearingDate(time.now().toLocalDate().plusWeeks(5))
             .allocatedTrack(AllocatedTrack.FAST_CLAIM)
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        Set<LocalDate> publicHolidays = new HashSet<>();
-        publicHolidays.add(LocalDate.now().plusDays(3));
-        when(publicHolidaysCollection.getPublicHolidays()).thenReturn(publicHolidays);
+
+        // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getHearingFee()).isEqualTo(
             Fee.builder().calculatedAmountInPence(new BigDecimal(2700)).build());
@@ -204,7 +232,8 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldReturnHearingNoticeCreated_WhenSubmitted() {
-        when(hearingReferenceNumberRepository.getHearingReferenceNumber()).thenReturn("000HN001");
+        // Given
+        given(hearingReferenceNumberRepository.getHearingReferenceNumber()).willReturn("000HN001");
 
         String header = "# Hearing notice created\n"
             + "# Your reference number\n" + "# 000HN001";
@@ -216,10 +245,22 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+        // When
         SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+        // Then
         assertThat(response).usingRecursiveComparison().isEqualTo(SubmittedCallbackResponse.builder()
                                                                       .confirmationHeader(header)
                                                                       .confirmationBody(String.format(body))
                                                                       .build());
+    }
+
+    private String prepareHHmmString(LocalDateTime localDateTime) {
+        String hours = "0" + (localDateTime.getHour());
+        String minutes = "0" + localDateTime.getMinute();
+        hours = hours.substring(hours.length() - 2);
+        minutes = minutes.substring(minutes.length() - 2);
+        return hours + minutes;
     }
 }
