@@ -53,7 +53,7 @@ public interface NotificationData {
     String FRONTEND_URL = "frontendBaseUrl";
 
     //Case Progression
-    String HEARING_DATE = "hearing/trial date";
+    String HEARING_DATE = "hearingDate";
 
     Map<String, String> addProperties(CaseData caseData);
 
