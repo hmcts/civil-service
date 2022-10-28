@@ -56,6 +56,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 })
 public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
 
+    static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.UK);
+
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
@@ -69,7 +71,6 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private Time time;
-
 
     @BeforeEach
     public void prepareTest() {
@@ -90,13 +91,12 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         "2022-10-01,2022-10-10,2022-10-10"    // should never happen. If it does the deadline is the hearing day
     })
     void shouldApplyAppropriateDate_whenHearingDateIsSetToSpecificValues(
-        String sCurrentDate, String sHearingDate, String sExpectedHearingDueDate) {
+        String strCurrentDate, String strHearingDate, String strExpectedHearingDueDate) {
         // Given
-        final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.UK);
 
-        LocalDate currentDate = LocalDate.parse(sCurrentDate, FORMAT);
-        LocalDate hearingDate = LocalDate.parse(sHearingDate, FORMAT);
-        LocalDate expectedHearingDueDate = LocalDate.parse(sExpectedHearingDueDate, FORMAT);
+        LocalDate currentDate = LocalDate.parse(strCurrentDate, DATE_FORMAT);
+        LocalDate hearingDate = LocalDate.parse(strHearingDate, DATE_FORMAT);
+        LocalDate expectedHearingDueDate = LocalDate.parse(strExpectedHearingDueDate, DATE_FORMAT);
         Set<LocalDate> holidays = publicHolidaysCollection.getPublicHolidays();
 
         // When
@@ -106,7 +106,6 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         assertThat(actualHearingDueDate).isEqualTo(expectedHearingDueDate);
 
     }
-
 
     @ParameterizedTest
     @ValueSource(strings = { "locationName" })
