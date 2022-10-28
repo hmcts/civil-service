@@ -196,11 +196,11 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .applicantRepresentativeOrganisationName(representativeService.getApplicantRepresentative(caseData)
                                                          .getOrganisationName())
             .defendantResponseDeadlineDate(YesOrNo.YES.equals(caseData.getRespondent1Represented())
-                                               ? getResponseDedline(caseData) : "")
+                                               ? getResponseDeadline(caseData) : "")
             .build();
     }
 
-    private String getResponseDedline(CaseData caseData) {
+    private String getResponseDeadline(CaseData caseData) {
         LocalDate date = caseData.getIssueDate();
         var notificationDeadline = formatLocalDate(
             deadlinesCalculator
