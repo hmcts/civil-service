@@ -1,5 +1,17 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
@@ -17,20 +29,10 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.bankholidays.PublicHolidaysCollection;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -56,6 +58,8 @@ public class HearingScheduledHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final PublicHolidaysCollection publicHolidaysCollection;
     private final HearingReferenceNumberRepository hearingReferenceNumberRepository;
+
+    private final Time time;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -194,16 +198,16 @@ public class HearingScheduledHandler extends CallbackHandler {
         }
     }
 
-    private void calculateAndApplyDueDate(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        if (LocalDate.now().isBefore(caseData.getHearingDate().minusWeeks(4))) {
-            caseDataBuilder.hearingDueDate(
-                HearingUtils.addBusinessDays(
-                    LocalDate.now(), 7, publicHolidaysCollection.getPublicHolidays()));
+    void calculateAndApplyDueDate(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        LocalDate calculatedHearingDueDate;
+        LocalDate now = time.now().toLocalDate();
+        Set<LocalDate> holidays = publicHolidaysCollection.getPublicHolidays();
+        if (now.isBefore(caseData.getHearingDate().minusWeeks(4))) {
+            calculatedHearingDueDate = HearingUtils.addBusinessDays(now, 7, holidays);
         } else {
-            caseDataBuilder.hearingDueDate(
-                HearingUtils.addBusinessDays(
-                    LocalDate.now(), 20, publicHolidaysCollection.getPublicHolidays()));
+            calculatedHearingDueDate = HearingUtils.addBusinessDays(now, 20, holidays);
         }
+        caseDataBuilder.hearingDueDate(calculatedHearingDueDate);
     }
 
     private List<String> isFutureDate(LocalDateTime hearingDateTime) {
