@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -96,8 +97,12 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         // Then
-        assertThat(((Map)((ArrayList)((Map)(response.getData().get("hearingLocation"))).get("list_items")).get(0))
-                       .get("label")).isEqualTo("Site Name - Address - 28000");
+        assertThat(response.getData())
+            .extracting("hearingLocation")
+            .extracting("list_items")
+            .asList().first()//item 0
+            .extracting("label")
+            .isEqualTo("Site Name - Address - 28000");
     }
 
     @ParameterizedTest
