@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -40,7 +39,8 @@ public class HearingFeeDueHandler implements BaseExternalTaskHandler {
                 PaymentDetails hearingFeePaymentDetails = caseData.getHearingFeePaymentDetails();
 
                 if (caseData.getHearingDueDate() == null
-                    || (hearingFeePaymentDetails != null && hearingFeePaymentDetails.getStatus() == PaymentStatus.SUCCESS)) {
+                    || (hearingFeePaymentDetails != null
+                        && hearingFeePaymentDetails.getStatus() == PaymentStatus.SUCCESS)) {
                     log.info("Current case status '{}'", caseDetails.getState());
                     applicationEventPublisher.publishEvent(new StrikeOutEvent(caseDetails.getId()));
                 } else if (hearingFeePaymentDetails == null

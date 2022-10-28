@@ -12,7 +12,6 @@ import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
-import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 
 @Service
 public class HearingFeeDueSearchService extends ElasticSearchService {
