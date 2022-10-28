@@ -166,7 +166,8 @@ public class HearingScheduledHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
-            caseDataBuilder.hearingDueDate(calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate(), publicHolidaysCollection.getPublicHolidays()));
+            caseDataBuilder.hearingDueDate(calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate(),
+                                                                   publicHolidaysCollection.getPublicHolidays()));
             calculateAndApplyFee(caseData, caseDataBuilder);
         }
         if (nonNull(caseData.getHearingLocation())) {
@@ -205,9 +206,11 @@ public class HearingScheduledHandler extends CallbackHandler {
         } else {
             calculatedHearingDueDate = HearingUtils.addBusinessDays(now, 7, holidays);
         }
-        if(calculatedHearingDueDate.isAfter(hearingDate)) {
+
+        if (calculatedHearingDueDate.isAfter(hearingDate)) {
             calculatedHearingDueDate = hearingDate;
         }
+
         return calculatedHearingDueDate;
     }
 
