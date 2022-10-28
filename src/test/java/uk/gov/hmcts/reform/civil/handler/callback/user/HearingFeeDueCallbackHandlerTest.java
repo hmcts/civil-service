@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDateTime;
@@ -33,6 +34,9 @@ class HearingFeeDueCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private Time time;
+
+    @MockBean
+    private CoreCaseDataService coreCaseDataService;
 
     @Autowired
     private HearingFeeUnpaidCallbackHandler handler;
@@ -54,7 +58,6 @@ class HearingFeeDueCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUpdateBusinessProcessToReadyWithEvent_whenInvoked() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
             assertThat(response.getData())
                 .containsEntry("businessProcess", Map.of(
                     "status", "READY",

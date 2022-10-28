@@ -11,8 +11,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.Time;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +29,8 @@ public class HearingFeeUnpaidCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(HEARING_FEE_UNPAID);
 
     private final ObjectMapper mapper;
+
+    private final Time time;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -47,7 +49,7 @@ public class HearingFeeUnpaidCallbackHandler extends CallbackHandler {
     private CallbackResponse setCaseDismissedHearingFeeDueDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData().toBuilder()
             .businessProcess(BusinessProcess.ready(HEARING_FEE_UNPAID))
-            .caseDismissedHearingFeeDueDate(LocalDateTime.now())
+            .caseDismissedHearingFeeDueDate(time.now())
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()

@@ -48,8 +48,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
@@ -211,8 +211,9 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        HEARING_SCHEDULED,
-                        NotSuitable_SDO
+                        NotSuitable_SDO,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        EVIDENCE_UPLOAD
                     }
                 ),
                 of(
@@ -234,7 +235,8 @@ class FlowStateAllowedEventServiceTest {
                         NotSuitable_SDO,
                         DEFAULT_JUDGEMENT,
                         CHANGE_SOLICITOR_EMAIL,
-                        EVIDENCE_UPLOAD_JUDGE
+                        EVIDENCE_UPLOAD_JUDGE,
+                        EVIDENCE_UPLOAD
                     }
                 ),
                 of(
@@ -260,7 +262,7 @@ class FlowStateAllowedEventServiceTest {
                         STANDARD_DIRECTION_ORDER_DJ,
                         TAKE_CASE_OFFLINE,
                         EVIDENCE_UPLOAD_JUDGE,
-                        HEARING_SCHEDULED
+                        EVIDENCE_UPLOAD
                     }
                 ),
                 of(

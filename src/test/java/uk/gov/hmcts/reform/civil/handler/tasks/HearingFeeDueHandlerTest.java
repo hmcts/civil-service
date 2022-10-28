@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.event.StrikeOutEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
 
 import java.util.List;
@@ -46,6 +47,9 @@ class HearingFeeDueHandlerTest {
     private CaseDetailsConverter caseDetailsConverter;
 
     @Mock
+    private CoreCaseDataService coreCaseDataService;
+
+    @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
@@ -55,6 +59,7 @@ class HearingFeeDueHandlerTest {
     void init() {
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
+
     }
 
     @Test
@@ -65,6 +70,7 @@ class HearingFeeDueHandlerTest {
         List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
+        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.get(0));
         when(caseDetailsConverter.toCaseData(caseDetails.get(0))).thenReturn(caseData);
 
         handler.execute(mockTask, externalTaskService);
@@ -81,6 +87,7 @@ class HearingFeeDueHandlerTest {
         List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
 
         when(searchService.getCases()).thenReturn(caseDetails);
+        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.get(0));
         when(caseDetailsConverter.toCaseData(caseDetails.get(0))).thenReturn(caseData);
 
         handler.execute(mockTask, externalTaskService);

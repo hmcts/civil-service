@@ -91,7 +91,6 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,6 +103,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKN
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
@@ -1001,8 +1001,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimDismissedPastHearingFeeDueDeadline() {
         atStateHearingFeeDueUnpaid();
         ccdState = CASE_DISMISSED;
-        caseDismissedHearingFeeDueDate = hearingDueDate.plusDays(1).atTime(LocalTime.now());
-        //Not yet present in Case Data Builder, but present here.
+        caseDismissedHearingFeeDueDate = LocalDateTime.now();
         hearingDate = hearingDueDate.plusWeeks(2);
         return this;
     }
@@ -3087,9 +3086,34 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateHearingFeeDuePaid() {
         atStateApplicantRespondToDefenceAndProceed();
-        hearingDueDate = now().minusDays(1);
+        hearingDueDate = LocalDate.now().minusDays(1);
         hearingFeePaymentDetails = PaymentDetails.builder().status(SUCCESS).build();
         ccdState = HEARING_READINESS;
+        return this;
+    }
+
+    public CaseDataBuilder atStateBeforeTakenOfflineSDONotDrawn() {
+
+        atStateApplicantRespondToDefenceAndProceed();
+
+        ccdState = JUDICIAL_REFERRAL;
+        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
+            .input("unforeseen complexities")
+            .build();
+        unsuitableSDODate = applicant1ResponseDate.plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateBeforeTakenOfflineSDONotDrawnOverLimit() {
+
+        atStateApplicantRespondToDefenceAndProceed();
+
+        ccdState = JUDICIAL_REFERRAL;
+        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
+            .input("This is more than 150 111111111111111111111111111111111111111111111111111111111111111111111111111"
+                       + "111111111111111111111111111111111111111111111111111111")
+            .build();
+        unsuitableSDODate = applicant1ResponseDate.plusDays(1);
         return this;
     }
 
