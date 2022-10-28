@@ -166,7 +166,7 @@ public class HearingScheduledHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
-            calculateAndApplyDueDate(caseData, caseDataBuilder);
+            caseDataBuilder.hearingDueDate(calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate(), publicHolidaysCollection.getPublicHolidays()));
             calculateAndApplyFee(caseData, caseDataBuilder);
         }
         if (nonNull(caseData.getHearingLocation())) {
@@ -198,19 +198,17 @@ public class HearingScheduledHandler extends CallbackHandler {
         }
     }
 
-    void calculateAndApplyDueDate(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    LocalDate calculateHearingDueDate(LocalDate now, LocalDate hearingDate, Set<LocalDate> holidays) {
         LocalDate calculatedHearingDueDate;
-        LocalDate now = time.now().toLocalDate();
-        Set<LocalDate> holidays = publicHolidaysCollection.getPublicHolidays();
-        if (now.isBefore(caseData.getHearingDate().minusWeeks(4))) {
+        if (now.isBefore(hearingDate.minusWeeks(4))) {
             calculatedHearingDueDate = HearingUtils.addBusinessDays(now, 20, holidays);
         } else {
             calculatedHearingDueDate = HearingUtils.addBusinessDays(now, 7, holidays);
         }
-        if(calculatedHearingDueDate.isAfter(caseData.getHearingDate())) {
-            calculatedHearingDueDate = caseData.getHearingDate();
+        if(calculatedHearingDueDate.isAfter(hearingDate)) {
+            calculatedHearingDueDate = hearingDate;
         }
-        caseDataBuilder.hearingDueDate(calculatedHearingDueDate);
+        return calculatedHearingDueDate;
     }
 
     private List<String> isFutureDate(LocalDateTime hearingDateTime) {

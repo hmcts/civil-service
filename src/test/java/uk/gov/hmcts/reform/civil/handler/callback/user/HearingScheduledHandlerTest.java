@@ -84,26 +84,26 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @CsvSource({
         // current date,hearing date,expected
-        "2022-10-27 10:00,2022-11-04,2022-11-04",   // based on bug report: on the boundary of exactly 7 days
-        "2022-10-01 10:00,2022-11-14,2022-10-28",   // hearing date more than 4 weeks away -> expect in 4 weeks time
-        "2022-10-01 10:00,2022-10-14,2022-10-11",   // hearing date less than 4 weeks away -> expect in 7 business days
-        "2022-10-01 10:00,2022-10-10,2022-10-10"    // should never happen. If it does the deadline is the hearing day
+        "2022-10-27,2022-11-04,2022-11-04",   // based on bug report: on the boundary of exactly 7 days
+        "2022-10-01,2022-11-14,2022-10-28",   // hearing date more than 4 weeks away -> expect in 4 weeks time
+        "2022-10-01,2022-10-14,2022-10-11",   // hearing date less than 4 weeks away -> expect in 7 business days
+        "2022-10-01,2022-10-10,2022-10-10"    // should never happen. If it does the deadline is the hearing day
     })
     void shouldApplyAppropriateDate_whenHearingDateIsSetToSpecificValues(
-        String currentDate, String hearingDate, String expectedPaymentDate) {
+        String sCurrentDate, String sHearingDate, String sExpectedHearingDueDate) {
         // Given
-        final DateTimeFormatter FORMAT_DATETIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm", Locale.UK);
         final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.UK);
 
-        given(time.now()).willReturn(LocalDateTime.parse(currentDate, FORMAT_DATETIME));
-        CaseData caseData = CaseData.builder().hearingDate(LocalDate.parse(hearingDate, FORMAT)).build();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        LocalDate currentDate = LocalDate.parse(sCurrentDate, FORMAT);
+        LocalDate hearingDate = LocalDate.parse(sHearingDate, FORMAT);
+        LocalDate expectedHearingDueDate = LocalDate.parse(sExpectedHearingDueDate, FORMAT);
+        Set<LocalDate> holidays = publicHolidaysCollection.getPublicHolidays();
 
         // When
-        handler.calculateAndApplyDueDate(caseData, caseDataBuilder);
+        LocalDate actualHearingDueDate = handler.calculateHearingDueDate(currentDate, hearingDate, holidays);
 
         // Then
-        assertThat(caseDataBuilder.build().getHearingDueDate()).isEqualTo(LocalDate.parse(expectedPaymentDate, FORMAT));
+        assertThat(actualHearingDueDate).isEqualTo(expectedHearingDueDate);
 
     }
 
