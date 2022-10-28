@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantRespon
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
@@ -219,6 +220,10 @@ public class CaseDataParent implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> smallClaimsWitnessStatementToggle;
 
     private Document sdoOrderDocument;
+    /**
+     * temporary holder to be able of adding to system generated documents on submit
+     */
+    private CaseDocument sdoOrderDocumentWhole;
 
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
