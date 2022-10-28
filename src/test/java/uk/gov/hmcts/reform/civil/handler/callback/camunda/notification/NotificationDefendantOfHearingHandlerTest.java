@@ -77,7 +77,6 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .hearingReference("000HN001")
                 .hearingTimeHourMinute("1530")
-                .hearingDueDate(LocalDate.of(2022, 11, 23))
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
                 .build();
@@ -101,7 +100,6 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .respondentSolicitor2EmailAddress("respondent2email@hmcts.net")
                 .hearingReference("000HN001")
                 .hearingTimeHourMinute("1530")
-                .hearingDueDate(LocalDate.of(2022, 11, 23))
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YES)
                 .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Party2").build())
@@ -135,7 +133,6 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .hearingReference("000HN001")
                 .hearingTimeHourMinute("1530")
-                .hearingDueDate(LocalDate.of(2022, 11, 23))
                 .addApplicant2(YesOrNo.YES)
                 .addRespondent2(YesOrNo.NO)
                 .build();
@@ -156,7 +153,7 @@ public class NotificationDefendantOfHearingHandlerTest {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             "defendantReferenceNumber", "6789", "hearingDate", "07-10-2022",
-            "hearingTime", "15:30", "hearingDueDate", "23-11-2022"
+            "hearingTime", "15:30"
         );
     }
 
@@ -165,7 +162,7 @@ public class NotificationDefendantOfHearingHandlerTest {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             "defendantReferenceNumber", "10111213", "hearingDate", "07-10-2022",
-            "hearingTime", "15:30", "hearingDueDate", "23-11-2022"
+            "hearingTime", "15:30"
         );
     }
 
