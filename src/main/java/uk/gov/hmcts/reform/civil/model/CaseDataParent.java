@@ -219,11 +219,7 @@ public class CaseDataParent implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> smallClaimsDocumentsToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsWitnessStatementToggle;
 
-    private Document sdoOrderDocument;
-    /**
-     * temporary holder to be able of adding to system generated documents on submit
-     */
-    private CaseDocument sdoOrderDocumentWhole;
+    private CaseDocument sdoOrderDocument;
 
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;

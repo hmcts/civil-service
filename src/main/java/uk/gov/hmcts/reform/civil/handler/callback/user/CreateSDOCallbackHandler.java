@@ -712,8 +712,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         );
 
         if (document != null) {
-            updatedData.sdoOrderDocument(document.getDocumentLink())
-                .sdoOrderDocumentWhole(document);
+            updatedData.sdoOrderDocument(document);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -724,12 +723,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
 
-        CaseDocument document = callbackParams.getCaseData().getSdoOrderDocumentWhole();
+        CaseDocument document = callbackParams.getCaseData().getSdoOrderDocument();
         if (document != null) {
             List<Element<CaseDocument>> generatedDocuments = callbackParams.getCaseData().getSystemGeneratedCaseDocuments();
             generatedDocuments.add(element(document));
-            dataBuilder.systemGeneratedCaseDocuments(generatedDocuments)
-                .sdoOrderDocumentWhole(null);
+            dataBuilder.systemGeneratedCaseDocuments(generatedDocuments);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
