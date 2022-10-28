@@ -725,7 +725,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         CaseDocument document = callbackParams.getCaseData().getSdoOrderDocument();
         if (document != null) {
-            List<Element<CaseDocument>> generatedDocuments = callbackParams.getCaseData().getSystemGeneratedCaseDocuments();
+            List<Element<CaseDocument>> generatedDocuments = callbackParams.getCaseData()
+                .getSystemGeneratedCaseDocuments();
             generatedDocuments.add(element(document));
             dataBuilder.systemGeneratedCaseDocuments(generatedDocuments);
         }
