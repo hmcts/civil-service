@@ -1,5 +1,16 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
+import java.math.BigDecimal;
+import java.net.URI;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -30,17 +41,6 @@ import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementSe
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
-
-import java.math.BigDecimal;
-import java.net.URI;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -196,11 +196,11 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .applicantRepresentativeOrganisationName(representativeService.getApplicantRepresentative(caseData)
                                                          .getOrganisationName())
             .defendantResponseDeadlineDate(YesOrNo.YES.equals(caseData.getRespondent1Represented())
-                                               ? getResponseDedline(caseData) : "")
+                                               ? getResponseDeadline(caseData) : "")
             .build();
     }
 
-    private String getResponseDedline(CaseData caseData) {
+    private String getResponseDeadline(CaseData caseData) {
         LocalDate date = caseData.getIssueDate();
         var notificationDeadline = formatLocalDate(
             deadlinesCalculator
