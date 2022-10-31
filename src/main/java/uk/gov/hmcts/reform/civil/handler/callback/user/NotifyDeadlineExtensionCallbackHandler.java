@@ -48,14 +48,13 @@ public class NotifyDeadlineExtensionCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        caseData = caseData.toBuilder()
+        CaseData updatedCaseData = callbackParams.getCaseData().toBuilder()
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI_DEADLINE_EXTENSION))
             .respondentSolicitor1AgreedDeadlineExtension(time.now().toLocalDate()) // TODO set up the date from CUI
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
+            .data(updatedCaseData.toMap(objectMapper))
             .build();
     }
 }
