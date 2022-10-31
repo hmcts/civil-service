@@ -52,6 +52,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     @Retryable(value = {DocumentUploadException.class}, backoff = @Backoff(delay = 200))
     @Override
     public CaseDocument uploadDocument(String authorisation, PDF pdf) {
+        System.out.println("inside SecuredDocumentManagemenatService's upload Documents method ");
         String originalFileName = pdf.getFileBaseName();
         log.info("Uploading file {}", originalFileName);
         try {
@@ -75,7 +76,7 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
             Document document = response.getDocuments().stream()
                 .findFirst()
                 .orElseThrow(() -> new DocumentUploadException(originalFileName));
-
+            System.out.println("end of Secure management file before return");
             return CaseDocument.builder()
                 .documentLink(uk.gov.hmcts.reform.civil.model.documents.Document.builder()
                                   .documentUrl(document.links.self.href)
