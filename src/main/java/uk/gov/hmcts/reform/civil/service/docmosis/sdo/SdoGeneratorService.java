@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -28,6 +29,8 @@ public class SdoGeneratorService {
     private final DocumentManagementService documentManagementService;
     private final IdamClient idamClient;
 
+    private final FeatureToggleService featuretoggleService;
+
     public CaseDocument generate(CaseData caseData, String authorisation) {
         MappableObject templateData;
         DocmosisTemplates docmosisTemplate;
@@ -39,7 +42,8 @@ public class SdoGeneratorService {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
             templateData = getTemplateDataSmall(caseData, judgeName);
         } else if (SdoHelper.isFastTrack(caseData)) {
-            docmosisTemplate = DocmosisTemplates.SDO_FAST;
+            docmosisTemplate = featuretoggleService.isHearingAndListingSDOEnabled() ?
+                DocmosisTemplates.SDO_FAST : DocmosisTemplates.SDO_FAST_OLD;
             templateData = getTemplateDataFast(caseData, judgeName);
         } else {
             docmosisTemplate = DocmosisTemplates.SDO_DISPOSAL;
@@ -142,7 +146,7 @@ public class SdoGeneratorService {
     }
 
     private SdoDocumentFormFast getTemplateDataFast(CaseData caseData, String judgeName) {
-        return SdoDocumentFormFast.builder()
+        var sdoDocumentFormBuilder = SdoDocumentFormFast.builder()
             .currentDate(LocalDate.now())
             .judgeName(judgeName)
             .caseNumber(caseData.getLegacyCaseReference())
@@ -234,8 +238,18 @@ public class SdoGeneratorService {
             )
             .fastTrackMethodToggle(
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")
-            )
-            .build();
+            );
+
+        if(featuretoggleService.isHearingAndListingSDOEnabled()) {
+            sdoDocumentFormBuilder
+                .fastTrackOrderWithoutJudgement(caseData.getFastTrackOrderWithoutJudgement())
+                .hearingLocation(caseData.getLocationName())
+                .fastTrackHearingTime(caseData.getFastTrackHearingTime())
+                .fastTrackHearingTimeText("The time provisionally allowed for this trial is")
+                .fastTrackHearingTimeEstimate(caseData.getFastTrackHearingTime().getHearingDuration().getLabel());
+        }
+
+        return sdoDocumentFormBuilder.build();
     }
 
     private SdoDocumentFormSmall getTemplateDataSmall(CaseData caseData, String judgeName) {

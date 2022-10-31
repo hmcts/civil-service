@@ -395,7 +395,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         if (featureToggleService.isHearingAndListingSDOEnabled()) {
             FastTrackOrderWithoutJudgement tempFastTrackOrderWithoutJudgement = FastTrackOrderWithoutJudgement.builder()
-                .input(String.format("This order has been made without hearing. Each party has the right to apply "
+                .input(String.format("Each party has the right to apply "
                                          + "to have this Order set aside or varied. Any such application must be "
                                          + "received by the Court (together with the appropriate fee) by 4pm "
                                          + "on %s.",
