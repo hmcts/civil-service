@@ -121,7 +121,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .respondent(checkDefendantRequested(caseData).toUpperCase())
             .disposalHearingOrderMadeWithoutHearingDJ(featureToggleService.isHearingAndListingSDOEnabled()
                                                           ? caseData.getDisposalHearingOrderMadeWithoutHearingDJ()
-                .getInput() : null )
+                .getInput() : null)
             .build();
     }
 

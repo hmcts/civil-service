@@ -319,7 +319,6 @@ public class CaseDataBuilder {
     private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
     private CaseLocation caseManagementLocation;
 
-
     private List<Element<ChangeOfRepresentation>> changeOfRepresentation;
     private ChangeOrganisationRequest changeOrganisationRequest;
 
