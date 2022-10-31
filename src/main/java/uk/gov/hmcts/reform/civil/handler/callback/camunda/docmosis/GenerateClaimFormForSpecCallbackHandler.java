@@ -73,6 +73,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse generateClaimFormForSpec(CallbackParams callbackParams) {
+        //System.out.println(" Inside GenerateClaimFor class's generateClaimForSpec method");
         CaseData caseData = callbackParams.getCaseData();
         LocalDate issueDate = time.now().toLocalDate();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder().issueDate(issueDate)
@@ -87,7 +88,9 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
 
         List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, sealedClaim,
                                                                                  caseDataBuilder, callbackParams);
+        System.out.println(" size of attached doc " + documentMetaDataList);
         if (documentMetaDataList.size() > 1) {
+            //System.out.println(" documentMetaDataList > 1");
             CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
                 documentMetaDataList,
                 callbackParams.getParams().get(BEARER_TOKEN).toString(),
@@ -97,6 +100,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
             );
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(stitchedDocument));
         } else {
+            //System.out.println(" documentMetaDataList <1 ");
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
         }
 
