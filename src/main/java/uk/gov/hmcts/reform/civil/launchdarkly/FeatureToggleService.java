@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -65,7 +66,13 @@ public class FeatureToggleService {
     }
 
     public boolean isGeneralApplicationsEnabled() {
-        return internalClient.boolVariation("general_applications_enabled", createLDUser().build(), false);
+        String runningEnv = System.getenv("ENVIRONMENT");
+        List<String> gaSupportedEnvs = List.of("preview", "demo");
+        if(gaSupportedEnvs.contains(runningEnv)) {
+            return internalClient.boolVariation("general_applications_enabled", createLDUser().build(), false);
+        } else {
+            return false;
+        }
     }
 
     public LDUser.Builder createLDUser() {
