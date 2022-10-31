@@ -5,6 +5,7 @@ import com.launchdarkly.sdk.server.interfaces.LDClientInterface;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -17,10 +18,15 @@ public class FeatureToggleService {
     private final LDClientInterface internalClient;
     private final String environment;
 
+    private final Environment systemEnvironment;
+
     @Autowired
-    public FeatureToggleService(LDClientInterface internalClient, @Value("${launchdarkly.env}") String environment) {
+    public FeatureToggleService(LDClientInterface internalClient,
+                                @Value("${launchdarkly.env}") String environment,
+                                Environment systemEnvironment) {
         this.internalClient = internalClient;
         this.environment = environment;
+        this.systemEnvironment = systemEnvironment;
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
     }
 
@@ -66,7 +72,7 @@ public class FeatureToggleService {
     }
 
     public boolean isGeneralApplicationsEnabled() {
-        String runningEnv = System.getenv("ENVIRONMENT");
+        String runningEnv = systemEnvironment.getProperty("ENVIRONMENT");
         List<String> gaSupportedEnvs = List.of("preview", "demo");
         if (gaSupportedEnvs.contains(runningEnv)) {
             return internalClient.boolVariation("general_applications_enabled", createLDUser().build(), false);

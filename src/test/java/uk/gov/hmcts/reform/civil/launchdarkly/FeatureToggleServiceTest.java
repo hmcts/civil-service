@@ -13,8 +13,11 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.env.Environment;
+import org.springframework.mock.env.MockEnvironment;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,9 +40,12 @@ class FeatureToggleServiceTest {
 
     private FeatureToggleService featureToggleService;
 
+    @Mock
+    private Environment mockEnvironment;
+
     @BeforeEach
     void setUp() {
-        featureToggleService = new FeatureToggleService(ldClient, FAKE_ENVIRONMENT);
+        featureToggleService = new FeatureToggleService(ldClient, FAKE_ENVIRONMENT, mockEnvironment);
     }
 
     @ParameterizedTest
@@ -105,12 +111,20 @@ class FeatureToggleServiceTest {
     }
 
     @Test
-    void shouldCallBoolVariation_whenIsGeneralApplicationsEnabledInvoked() {
+    void shouldCallBoolVariation_whenIsGeneralApplicationsEnabledInvoked_true() {
         var generalApplicationsKey = "general_applications_enabled";
         givenToggle(generalApplicationsKey, true);
+        when(mockEnvironment.getProperty("ENVIRONMENT")).thenReturn("preview");
 
         assertThat(featureToggleService.isGeneralApplicationsEnabled()).isTrue();
         verifyBoolVariationCalled(generalApplicationsKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
+    void shouldCallBoolVariation_whenIsGeneralApplicationsEnabledInvoked_fail() {
+        when(mockEnvironment.getProperty("ENVIRONMENT")).thenReturn("aat");
+
+        assertThat(featureToggleService.isGeneralApplicationsEnabled()).isFalse();
     }
 
     @Test
