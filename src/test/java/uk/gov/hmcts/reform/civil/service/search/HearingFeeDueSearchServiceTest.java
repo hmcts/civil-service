@@ -4,6 +4,8 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -22,7 +24,9 @@ class HearingFeeDueSearchServiceTest extends ElasticSearchServiceTest {
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                        .must(rangeQuery("data.hearingDueDate").lt("now"))
+                        .must(rangeQuery("data.hearingDueDate").lt(LocalDate.now()
+                                                                       .atTime(LocalTime.MIN)
+                                                                       .toString()))
                         .must(boolQuery().must(matchQuery("state", "HEARING_READINESS"))))
             .should(boolQuery()
                         .must(rangeQuery("data.hearingFee.calculatedAmountInPence").lte("0"))
