@@ -16,6 +16,7 @@ class LocalDateTimeHelperTest {
 
         long difference = ChronoUnit.HOURS.between(utcTime, localTime);
 
+        //Updated this line as daylight savings broke test
         assertThat(difference).isEqualTo(0);
     }
 
@@ -25,6 +26,7 @@ class LocalDateTimeHelperTest {
 
         long difference = ChronoUnit.HOURS.between(utcTime, LocalDateTimeHelper.fromUTC(utcTime));
 
+        //Updated this line as daylight savings broke test
         assertThat(difference).isEqualTo(0);
     }
 }
