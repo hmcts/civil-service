@@ -14,6 +14,8 @@ import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakupDetails;
@@ -30,6 +32,7 @@ import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
@@ -48,8 +51,11 @@ import static uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions.
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_DIFFERENT_SOL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_DIFFERENT_SOL_LIP;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1_LIP;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_LIP;
 
 @Service
 @RequiredArgsConstructor
@@ -62,6 +68,8 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     public LocalDateTime localDateTime = LocalDateTime.now();
     private static final String END_OF_BUSINESS_DAY = "4pm, ";
     private final DeadlinesCalculator deadlinesCalculator;
+    private final UserService userService;
+    private final SystemUpdateUserConfiguration userConfig;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         SealedClaimFormForSpec templateData = getTemplateData(caseData);
@@ -77,6 +85,11 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         );
     }
 
+    public byte[] downloadDocument(CaseDocument caseDocument) {
+        String authorisation = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        return downloadDocument(caseDocument, authorisation);
+    }
+
     public byte[] downloadDocument(CaseDocument caseDocument, String authorisation) {
         String documentPath = URI.create(caseDocument.getDocumentLink().getDocumentUrl()).getPath();
 
@@ -89,16 +102,28 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     private DocmosisTemplates getSealedDocmosisTemplate(CaseData caseData) {
         DocmosisTemplates sealedTemplate;
         if (caseData.getApplicant2() != null) {
-            sealedTemplate = N2_2V1;
+            if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
+                sealedTemplate = N2_2V1_LIP;
+            } else {
+                sealedTemplate = N2_2V1;
+            }
         } else if (caseData.getRespondent2() != null) {
             if (caseData.getRespondent2SameLegalRepresentative() != null
                 && caseData.getRespondent2SameLegalRepresentative() == YES) {
                 sealedTemplate = N2_1V2_SAME_SOL;
             } else {
-                sealedTemplate = N2_1V2_DIFFERENT_SOL;
+                if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
+                    sealedTemplate = N2_1V2_DIFFERENT_SOL_LIP;
+                } else {
+                    sealedTemplate = N2_1V2_DIFFERENT_SOL;
+                }
             }
         } else {
-            sealedTemplate = N2;
+            if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
+                sealedTemplate = N2_LIP;
+            } else {
+                sealedTemplate = N2;
+            }
         }
         return sealedTemplate;
     }
@@ -170,11 +195,12 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .descriptionOfClaim(caseData.getDetailsOfClaim())
             .applicantRepresentativeOrganisationName(representativeService.getApplicantRepresentative(caseData)
                                                          .getOrganisationName())
-            .defendantResponseDeadlineDate(getResponseDedline(caseData))
+            .defendantResponseDeadlineDate(YesOrNo.YES.equals(caseData.getRespondent1Represented())
+                                               ? getResponseDeadline(caseData) : "")
             .build();
     }
 
-    private String getResponseDedline(CaseData caseData) {
+    private String getResponseDeadline(CaseData caseData) {
         LocalDate date = caseData.getIssueDate();
         var notificationDeadline = formatLocalDate(
             deadlinesCalculator
