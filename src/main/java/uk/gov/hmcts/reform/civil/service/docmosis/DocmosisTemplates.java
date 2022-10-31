@@ -36,9 +36,9 @@ public enum DocmosisTemplates {
     CLAIMANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01062.docx", "%s_directions_questionnaire_form_%s.pdf"),
     SDO_SMALL("CV-DAM-STD-ENG-00001.docx", "small_claims_sdo_%s.pdf"),
     SDO_FAST("CV-DAM-STD-ENG-00002.docx", "fast_track_sdo_%s.pdf"),
-    SDO_FAST_OLD("CV-DAM-STD-ENG-00002-OLD.docx", "fast_track_sdo_%s.pdf"),
-    SDO_DISPOSAL("CV-DAM-STD-ENG-00003.docx", "disposal_hearing_sdo_%s.pdf");
-
+    SDO_HNL_FAST("CV-DAM-STD-ENG-00002-HNL.docx", "fast_track_sdo_%s.pdf"),
+    SDO_DISPOSAL("CV-DAM-STD-ENG-00003.docx", "disposal_hearing_sdo_%s.pdf"),
+    SDO_HNL_DISPOSAL("CV-DAM-STD-ENG-00003-HNL.docx", "disposal_hearing_sdo_%s.pdf");
 
     private final String template;
     private final String documentTitle;

@@ -20,7 +20,9 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 
 import java.time.LocalDate;
@@ -57,6 +59,9 @@ public class SdoDocumentFormDisposal implements MappableObject {
     private final DisposalHearingSchedulesOfLoss disposalHearingSchedulesOfLoss;
     private final DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearing;
     private final String disposalHearingFinalDisposalHearingTime;
+    private final DisposalOrderWithoutHearing disposalOrderWithoutHearing;
+    private final DisposalHearingHearingTime disposalHearingTime;
+    private final String disposalHearingTimeEstimate;
 
     private final DisposalHearingMethod disposalHearingMethod;
     private final DynamicList disposalHearingMethodInPerson;
@@ -70,6 +75,8 @@ public class SdoDocumentFormDisposal implements MappableObject {
     private final List<Element<DisposalHearingAddNewDirections>> disposalHearingAddNewDirections;
 
     private final DisposalHearingNotes disposalHearingNotes;
+
+    private final String hearingLocation;
 
     private final boolean disposalHearingDisclosureOfDocumentsToggle;
     private final boolean disposalHearingWitnessOfFactToggle;

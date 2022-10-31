@@ -42,11 +42,12 @@ public class SdoGeneratorService {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
             templateData = getTemplateDataSmall(caseData, judgeName);
         } else if (SdoHelper.isFastTrack(caseData)) {
-            docmosisTemplate = featuretoggleService.isHearingAndListingSDOEnabled() ?
-                DocmosisTemplates.SDO_FAST : DocmosisTemplates.SDO_FAST_OLD;
+            docmosisTemplate = featuretoggleService.isHearingAndListingSDOEnabled()
+                ? DocmosisTemplates.SDO_HNL_FAST : DocmosisTemplates.SDO_FAST;
             templateData = getTemplateDataFast(caseData, judgeName);
         } else {
-            docmosisTemplate = DocmosisTemplates.SDO_DISPOSAL;
+            docmosisTemplate = featuretoggleService.isHearingAndListingSDOEnabled()
+                ? DocmosisTemplates.SDO_HNL_DISPOSAL : DocmosisTemplates.SDO_DISPOSAL;
             templateData = getTemplateDataDisposal(caseData, judgeName);
         }
 
@@ -69,7 +70,7 @@ public class SdoGeneratorService {
     }
 
     private SdoDocumentFormDisposal getTemplateDataDisposal(CaseData caseData, String judgeName) {
-        return SdoDocumentFormDisposal.builder()
+        var sdoDocumentBuilder = SdoDocumentFormDisposal.builder()
             .currentDate(LocalDate.now())
             .judgeName(judgeName)
             .caseNumber(caseData.getLegacyCaseReference())
@@ -141,8 +142,17 @@ public class SdoGeneratorService {
             )
             .disposalHearingCostsToggle(
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingCostsToggle")
-            )
-            .build();
+            );
+
+        if (featuretoggleService.isHearingAndListingSDOEnabled()) {
+            sdoDocumentBuilder
+                .disposalOrderWithoutHearing(caseData.getDisposalOrderWithoutHearing())
+                .disposalHearingTime(caseData.getDisposalHearingHearingTime())
+                .disposalHearingTimeEstimate(caseData.getDisposalHearingHearingTime().getTime().getLabel())
+                .hearingLocation(caseData.getLocationName());
+        }
+
+        return sdoDocumentBuilder.build();
     }
 
     private SdoDocumentFormFast getTemplateDataFast(CaseData caseData, String judgeName) {
@@ -240,12 +250,11 @@ public class SdoGeneratorService {
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")
             );
 
-        if(featuretoggleService.isHearingAndListingSDOEnabled()) {
+        if (featuretoggleService.isHearingAndListingSDOEnabled()) {
             sdoDocumentFormBuilder
                 .fastTrackOrderWithoutJudgement(caseData.getFastTrackOrderWithoutJudgement())
                 .hearingLocation(caseData.getLocationName())
                 .fastTrackHearingTime(caseData.getFastTrackHearingTime())
-                .fastTrackHearingTimeText("The time provisionally allowed for this trial is")
                 .fastTrackHearingTimeEstimate(caseData.getFastTrackHearingTime().getHearingDuration().getLabel());
         }
 

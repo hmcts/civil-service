@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum FastTrackHearingTimeEstimate {
 
     ONE_HOUR("1 hour"),
-    ONE_AND_A_HALF_HOURS("1.5 hours"),
+    ONE_AND_HALF_HOUR("1.5 hours"),
     TWO_HOURS("2 hours"),
     THREE_HOURS("3 hours"),
     FOUR_HOURS("4 hours"),

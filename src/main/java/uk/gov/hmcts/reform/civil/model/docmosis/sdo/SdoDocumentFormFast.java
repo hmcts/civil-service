@@ -13,7 +13,22 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.sdo.*;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -59,7 +74,6 @@ public class SdoDocumentFormFast implements MappableObject {
     private final FastTrackSchedulesOfLoss fastTrackSchedulesOfLoss;
     private final FastTrackTrial fastTrackTrial;
     private final FastTrackHearingTime fastTrackHearingTime;
-    private final String fastTrackHearingTimeText;
     private final String fastTrackHearingTimeEstimate;
     private final String fastTrackTrialBundleTypeText;
 
@@ -80,7 +94,6 @@ public class SdoDocumentFormFast implements MappableObject {
 
     private FastTrackNotes fastTrackNotes;
     private FastTrackOrderWithoutJudgement fastTrackOrderWithoutJudgement;
-
 
     private final boolean fastTrackAltDisputeResolutionToggle;
     private final boolean fastTrackVariationOfDirectionsToggle;
