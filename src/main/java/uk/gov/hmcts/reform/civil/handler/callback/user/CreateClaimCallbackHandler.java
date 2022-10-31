@@ -36,7 +36,12 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
-import uk.gov.hmcts.reform.civil.service.*;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeesService;
+import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -64,9 +69,10 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.*;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -137,6 +143,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
+            .put(callbackKey(MID, "populateClaimantSolicitor"), this::populateClaimantSolicitor)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
@@ -151,7 +158,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private CallbackResponse startClaim(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
         caseDataBuilder.claimStarted(YES);
-        populateClaimantLegalRepresentative(callbackParams);
         if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);
 
@@ -164,7 +170,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
-    private CaseData.CaseDataBuilder populateClaimantLegalRepresentative(CallbackParams callbackParams) {
+
+    private CallbackResponse populateClaimantSolicitor(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
@@ -176,8 +183,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                              .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
                              .build());
 
-        return caseDataBuilder;
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
+
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
@@ -217,7 +226,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         YesOrNo respondent1OrgRegistered = caseData.getRespondent1OrgRegistered();
         List<String> errors;
         errors = orgPolicyValidator.validate(respondent1OrganisationPolicy, respondent1OrgRegistered);
-        errors.addAll(orgPolicyValidator.validateSolicitorOrganisations(caseData));
+        if (errors.isEmpty()) {
+            errors = orgPolicyValidator.validateSolicitorOrganisations(caseData);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
@@ -228,7 +239,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         OrganisationPolicy respondent2OrganisationPolicy = caseData.getRespondent2OrganisationPolicy();
         YesOrNo respondent2OrgRegistered = caseData.getRespondent2OrgRegistered();
         List<String> errors = orgPolicyValidator.validate(respondent2OrganisationPolicy, respondent2OrgRegistered);
-        errors.addAll(orgPolicyValidator.validateSolicitorOrganisations(caseData));
+        if (errors.isEmpty()) {
+            errors = orgPolicyValidator.validateSolicitorOrganisations(caseData);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
