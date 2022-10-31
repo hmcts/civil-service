@@ -3466,8 +3466,10 @@ public class CaseDataBuilder {
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
             .hearingFeeServiceRequestDetails(
                 HearingFeeServiceRequestDetails.builder()
-                    .paymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 01, 01),
-                                                            LocalTime.of(12, 00, 00)))
+                    .paymentSuccessfulDate(LocalDateTime.of(
+                        LocalDate.of(2020, 01, 01),
+                        LocalTime.of(12, 00, 00)
+                    ))
                     .paymentDetails(PaymentDetails.builder()
                                         .status(PaymentStatus.SUCCESS)
                                         .reference("RC-1234-1234-1234-1234")
@@ -3482,6 +3484,7 @@ public class CaseDataBuilder {
                     .serviceRequestReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .build();
+    }
 
     public CaseDataBuilder setUnassignedCaseListDisplayOrganisationReferences() {
         this.unassignedCaseListDisplayOrganisationReferences = "Organisation references String";
