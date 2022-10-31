@@ -68,7 +68,7 @@ public class FeatureToggleService {
     public boolean isGeneralApplicationsEnabled() {
         String runningEnv = System.getenv("ENVIRONMENT");
         List<String> gaSupportedEnvs = List.of("preview", "demo");
-        if(gaSupportedEnvs.contains(runningEnv)) {
+        if (gaSupportedEnvs.contains(runningEnv)) {
             return internalClient.boolVariation("general_applications_enabled", createLDUser().build(), false);
         } else {
             return false;
