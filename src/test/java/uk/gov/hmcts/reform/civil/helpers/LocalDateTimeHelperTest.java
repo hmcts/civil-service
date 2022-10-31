@@ -16,7 +16,8 @@ class LocalDateTimeHelperTest {
 
         long difference = ChronoUnit.HOURS.between(utcTime, localTime);
 
-        assertThat(difference).isEqualTo(1);
+        //Just a comment to allow for new commit.
+        assertThat(difference).isEqualTo(0);
     }
 
     @Test
@@ -25,6 +26,6 @@ class LocalDateTimeHelperTest {
 
         long difference = ChronoUnit.HOURS.between(utcTime, LocalDateTimeHelper.fromUTC(utcTime));
 
-        assertThat(difference).isEqualTo(1);
+        assertThat(difference).isEqualTo(0);
     }
 }
