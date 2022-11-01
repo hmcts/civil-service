@@ -494,7 +494,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private HearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceHearingDJ;
 
-    //Hearing Scheduled
+    //Hearing Scheduled (& related)
     private DynamicList hearingLocation;
     private LocalDate dateOfApplication;
     private LocalDate hearingDate;
