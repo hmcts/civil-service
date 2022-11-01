@@ -329,7 +329,10 @@ public class SdoGeneratorService {
     }
 
     private String getHearingLocationAddress(String auth, String empimmsId) {
+        System.out.printf("Grabbing location using getCaseManagementLocation epimms");
         var location = locationRefDataService.getCourtLocation(auth, empimmsId);
+        System.out.printf(
+            String.format("%s-%s-%s", location.getSiteName(), location.getCourtAddress(), location.getPostcode()));
         return String.format("%s-%s-%s", location.getSiteName(), location.getCourtAddress(), location.getPostcode());
     }
 }
