@@ -49,6 +49,9 @@ cmc-claim-store:
   api:
     url: ${CLAIM_STORE_URL:http://localhost:8765}
 
+send-letter:
+  url: ${SEND_LETTER_URL:http://localhost:8765}
+
 fees:
   api:
     service: civil money claims
@@ -56,6 +59,7 @@ fees:
     jurisdiction2: county court
     channel: default
     event: issue
+    hearingEvent: hearing
 
 genApp:
   fee:
@@ -75,15 +79,15 @@ genApp:
 #      claims with value under this amount in pounds are assigned to CCMCC
       amountPounds: 1000
       epimsId: 192280
-      regionId: 5
+      regionId: 4
   jrd:
     endpoint: /refdata/judicial/users/search
 
 pin-in-post:
-  money-claims:
-    url: https://moneyclaims.aat.platform.hmcts.net/first-contact/start
+  cui-respond-to-claim:
+    url: ${CUI_URL_RESPOND_TO_CLAIM:http://localhost:3001/first-contact/start}
   cui-front-end:
-    url: https://cmc-citizen-frontend-staging.service.core-compute-aat.internal
+    url: ${CUI_URL:http://localhost:3001}
 
 payments:
   api:
