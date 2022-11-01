@@ -56,12 +56,14 @@ public class LocationRefDataService {
                 new ParameterizedTypeReference<List<LocationRefData>>() {
                 }
             );
-            return (responseEntity.getBody().stream().filter(location -> location.getEpimmsId().equals(epimsId)).findFirst().get());
+            return (responseEntity.getBody().stream().filter(
+                location -> location.getEpimmsId().equals(epimsId)).findFirst().get());
         } catch (Exception e) {
             log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
             return null;
         }
     }
+
     public LocationRefData getCcmccLocation(String authToken) {
         try {
             ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(

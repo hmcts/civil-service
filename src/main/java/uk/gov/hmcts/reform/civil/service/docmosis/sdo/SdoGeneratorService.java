@@ -152,7 +152,8 @@ public class SdoGeneratorService {
                 .disposalOrderWithoutHearing(caseData.getDisposalOrderWithoutHearing())
                 .disposalHearingTime(caseData.getDisposalHearingHearingTime())
                 .disposalHearingTimeEstimate(caseData.getDisposalHearingHearingTime().getTime().getLabel())
-                .hearingLocation(getHearingLocationAddress(auth, caseData.getCaseManagementLocation().getBaseLocation()));
+                .hearingLocation(getHearingLocationAddress(auth, caseData.getCaseManagementLocation()
+                    .getBaseLocation()));
         }
 
         return sdoDocumentBuilder.build();
@@ -256,7 +257,8 @@ public class SdoGeneratorService {
         if (featuretoggleService.isHearingAndListingSDOEnabled()) {
             sdoDocumentFormBuilder
                 .fastTrackOrderWithoutJudgement(caseData.getFastTrackOrderWithoutJudgement())
-                .hearingLocation(getHearingLocationAddress(auth, caseData.getCaseManagementLocation().getBaseLocation()))
+                .hearingLocation(getHearingLocationAddress(auth, caseData.getCaseManagementLocation()
+                    .getBaseLocation()))
                 .fastTrackHearingTime(caseData.getFastTrackHearingTime())
                 .fastTrackHearingTimeEstimate(caseData.getFastTrackHearingTime().getHearingDuration().getLabel());
         }
@@ -328,6 +330,6 @@ public class SdoGeneratorService {
 
     private String getHearingLocationAddress(String auth, String empimmsId) {
         var location = locationRefDataService.getCourtLocation(auth, empimmsId);
-        return String.format("%s-%s-%s", location.getSiteName(),location.getCourtAddress(), location.getPostcode());
+        return String.format("%s-%s-%s", location.getSiteName(), location.getCourtAddress(), location.getPostcode());
     }
 }
