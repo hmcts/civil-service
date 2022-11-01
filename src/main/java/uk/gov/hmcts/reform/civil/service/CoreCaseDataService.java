@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -10,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
+import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
@@ -31,6 +34,8 @@ public class CoreCaseDataService {
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseDetailsConverter caseDetailsConverter;
     private final UserService userService;
+
+    Logger log = LoggerFactory.getLogger(CoreCaseDataService.class);
 
     public void triggerEvent(Long caseId, CaseEvent eventName) {
         triggerEvent(caseId, eventName, Map.of());
@@ -132,14 +137,13 @@ public class CoreCaseDataService {
     }
 
     private UserAuthContent getSystemUpdateUser() {
-        try {
+            log.info("Before getting token");
             String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+            log.info("After getting token");
             String userId = userService.getUserInfo(userToken).getUid();
+            log.info("UserId '{}'",userId);
             return UserAuthContent.builder().userToken(userToken).userId(userId).build();
-        }catch(Exception e){
-            e.printStackTrace();
-            return null;
-        }
+
 
     }
 
