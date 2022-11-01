@@ -682,8 +682,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors()).containsExactly
-                ("The legal representative details for the claimant and defendant are the same.  "
+            assertThat(response.getErrors()).containsExactly(
+                "The legal representative details for the claimant and defendant are the same.  "
                      + "Please amend accordingly.");
         }
     }
@@ -775,8 +775,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors()).containsExactly
-                ("The legal representative details for the claimant and defendant are the same.  "
+            assertThat(response.getErrors()).containsExactly(
+                "The legal representative details for the claimant and defendant are the same.  "
                      + "Please amend accordingly.");
         }
 
@@ -798,8 +798,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors()).containsExactly
-                ("The legal representative details for the claimant and defendant are the same.  "
+            assertThat(response.getErrors()).containsExactly(
+                "The legal representative details for the claimant and defendant are the same.  "
                      + "Please amend accordingly.");
         }
     }
