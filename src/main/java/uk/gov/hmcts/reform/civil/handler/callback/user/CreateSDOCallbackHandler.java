@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
@@ -36,6 +37,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
@@ -66,9 +68,9 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -86,8 +88,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_SDO);
     public static final String CONFIRMATION_HEADER = "# Your order has been issued"
-        + "<br/>%n%nClaim number"
-        + "<br/><strong>%s</strong>";
+        + "%n## Claim number: %s";
     public static final String CONFIRMATION_SUMMARY_1v1 = "<br/>The Directions Order has been sent to:"
         + "<br/>%n%n<strong>Claimant 1</strong>%n"
         + "<br/>%s"
@@ -110,13 +111,13 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private static final String UPON_CONSIDERING =
         "Upon considering the claim form, particulars of claim, statements of case and Directions questionnaires";
 
-    private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
-    private final SdoGeneratorService sdoGeneratorService;
-    private final LocationHelper locationHelper;
-    private final FeatureToggleService featureToggleService;
+    private final LocationRefDataService locationRefDataService;
     @Autowired
     private final DeadlinesCalculator deadlinesCalculator;
+    private final SdoGeneratorService sdoGeneratorService;
+    private final FeatureToggleService featureToggleService;
+    private final LocationHelper locationHelper;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -252,6 +253,30 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.disposalHearingFinalDisposalHearing(tempDisposalHearingFinalDisposalHearing).build();
 
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            // updated Hearing time field copy of the above field, leaving above field in as requested to not break
+            // existing cases
+            DisposalHearingHearingTime tempDisposalHearingHearingTime =
+                DisposalHearingHearingTime.builder()
+                    .input(
+                        "This claim will be listed for final disposal before a judge on the first available date after")
+                    .dateTo(LocalDate.now().plusWeeks(16))
+                    .build();
+
+            updatedData.disposalHearingHearingTime(tempDisposalHearingHearingTime).build();
+
+            DisposalOrderWithoutHearing disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
+                .input(String.format(
+                    "Each party has the right to apply to have this Order set "
+                        + "aside or varied. Any such application must be received "
+                        + "by the Court (together with the appropriate fee) "
+                        + "by 4pm on %s.",
+                    deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
+                        .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))
+                )).build();
+            updatedData.disposalOrderWithoutHearing(disposalOrderWithoutHearing).build();
+        }
+
         DisposalHearingBundle tempDisposalHearingBundle = DisposalHearingBundle.builder()
             .input("At least 7 days before the disposal hearing, the claimant must upload to the Digital Portal")
             .build();
@@ -375,7 +400,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                          + "received by the Court (together with the appropriate fee) by 4pm "
                                          + "on %s.",
                                      deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
-                                         .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))))
+                                         .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))))
                 .build();
 
             updatedData.fastTrackOrderWithoutJudgement(tempFastTrackOrderWithoutJudgement);
