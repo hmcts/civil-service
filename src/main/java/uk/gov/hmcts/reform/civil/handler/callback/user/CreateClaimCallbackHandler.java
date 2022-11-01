@@ -39,7 +39,6 @@ import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
-import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
@@ -117,8 +116,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
 
-    private final InitiateGeneralApplicationService initiateGeneralApplicationService;
-
     @Value("${court-location.unspecified-claim.region-id}")
     private String regionId;
     @Value("${court-location.unspecified-claim.epimms-id}")
@@ -175,14 +172,13 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        Optional<Organisation> organisation = initiateGeneralApplicationService.findOrganisation(authToken);
-        caseDataBuilder.applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                             .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                             .organisationID(organisation.get().getOrganisationIdentifier()).build())
-                             .orgPolicyReference(null)
-                             .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
-                             .build());
-
+        Optional<Organisation> organisation = organisationService.findOrganisation(authToken);
+        organisation.ifPresent(value -> caseDataBuilder.applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                 .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                 .organisationID(value.getOrganisationIdentifier()).build())
+                 .orgPolicyReference(null)
+                 .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
+                 .build()));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper)).build();
     }

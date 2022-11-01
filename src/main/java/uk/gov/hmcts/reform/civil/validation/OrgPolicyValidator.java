@@ -17,7 +17,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 @Component
 public class OrgPolicyValidator {
 
-    public static final String WARNING_SAME_SOLICITOR_ORGANISATION =
+    public static final String ERROR_SAME_SOLICITOR_ORGANISATION =
         "The legal representative details for the claimant and defendant are the same.  "
             + "Please amend accordingly.";
 
@@ -36,29 +36,30 @@ public class OrgPolicyValidator {
     public List<String> validateSolicitorOrganisations(CaseData caseData) {
         List<String> errors = new ArrayList<>();
 
-        if (ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
-            || ONE_V_TWO_ONE_LEGAL_REP.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
-            || TWO_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
-            if (caseData.getRespondent1OrganisationPolicy() != null
-                && caseData.getApplicant1OrganisationPolicy() != null
-                && caseData.getRespondent1Represented() == YesOrNo.YES
-                && caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID().equals(
-                caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())) {
-                errors.add(WARNING_SAME_SOLICITOR_ORGANISATION);
+            if (ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
+                || ONE_V_TWO_ONE_LEGAL_REP.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
+                || TWO_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
+                if (caseData.getRespondent1OrganisationPolicy() != null
+                    && caseData.getApplicant1OrganisationPolicy() != null
+                    && caseData.getRespondent1Represented() == YesOrNo.YES
+                    && caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID().equals(
+                    caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())) {
+                    errors.add(ERROR_SAME_SOLICITOR_ORGANISATION);
+                }
             }
-        }
-        if (ONE_V_TWO_TWO_LEGAL_REP.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
-            if (caseData.getApplicant1OrganisationPolicy() != null
-                && ((caseData.getRespondent1OrganisationPolicy() != null
-                && caseData.getRespondent1Represented() == YesOrNo.YES
-                && caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID().equals(
-                caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID()))
-                || (caseData.getRespondent2OrganisationPolicy() != null
-                && caseData.getRespondent2Represented() == YesOrNo.YES
-                && caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID().equals(
-                caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())))) {
-                errors.add(WARNING_SAME_SOLICITOR_ORGANISATION);
-            }
+            if (ONE_V_TWO_TWO_LEGAL_REP.equals(MultiPartyScenario.getMultiPartyScenario(caseData))) {
+                if (caseData.getApplicant1OrganisationPolicy() != null
+                    && ((caseData.getRespondent1OrganisationPolicy() != null
+                    && caseData.getRespondent1Represented() == YesOrNo.YES
+                    && caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID().equals(
+                    caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID()))
+                    || (caseData.getRespondent2OrganisationPolicy() != null
+                    && caseData.getRespondent2Represented() == YesOrNo.YES
+                    && caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID().equals(
+                    caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())))) {
+                    errors.add(ERROR_SAME_SOLICITOR_ORGANISATION);
+                }
+
         }
         return errors;
     }
