@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseProgression.UploadEvidenceDate;
 import uk.gov.hmcts.reform.civil.model.caseProgression.UploadEvidenceExpert4;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.PartyNameService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -26,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -33,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -41,8 +42,8 @@ public class EvidenceUploadHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(EVIDENCE_UPLOAD);
     private final ObjectMapper objectMapper;
     private final IdamClient idamClient;
-    private final PartyNameService populateName;
     private String otherPartyName;
+    private UploadEvidenceExpert4 uploadEvidenceExpert4;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -73,16 +74,14 @@ public class EvidenceUploadHandler extends CallbackHandler {
             .equals(userDetails.getEmail())) {
             otherPartyName = ApplicantOtherParticipants(caseData).toString();
         }
+        var partyName = UploadEvidenceExpert4.builder()
+                                                                .expertOption4OtherName(otherPartyName).build();
 
-        var name = populateName.buildPartyName(callbackParams
-                                                   .getParams()
-                                                   .get(BEARER_TOKEN)
-                                                   .toString(), otherPartyName);
+        List<Element<UploadEvidenceExpert4>> updatedPartyName = newArrayList();
+        updatedPartyName.add(0, element(partyName));
 
-        List<Element<UploadEvidenceExpert4>> partyName = populateName.addPartyToTextField(name,
-                                                                                   caseData.getDocumentUploadExpert4());
         CaseData updatedCaseData = caseData.toBuilder()
-            .documentUploadExpert4(partyName)
+            .documentUploadExpert4(updatedPartyName)
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
