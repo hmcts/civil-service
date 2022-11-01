@@ -17,7 +17,7 @@ import static java.lang.String.format;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-@ConditionalOnExpression("${polling.event.emitter.enabled:true}")
+@ConditionalOnExpression("${polling.event.emitter.enabled:false}")
 public class PollingEventEmitterHandler implements BaseExternalTaskHandler {
 
     private final CaseReadyBusinessProcessSearchService caseSearchService;

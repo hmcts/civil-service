@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.handler.tasks.PollingEventEmitterHandler;
 
 @Component
-@ConditionalOnExpression("${polling.event.emitter.enabled:true}")
+@ConditionalOnExpression("${polling.event.emitter.enabled:false}")
 public class PollingEventEmitterExternalTaskListener {
 
     private static final String TOPIC = "POLLING_EVENT_EMITTER";
