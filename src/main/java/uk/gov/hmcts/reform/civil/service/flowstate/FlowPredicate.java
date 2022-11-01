@@ -479,10 +479,26 @@ public class FlowPredicate {
     }
 
     public static final Predicate<CaseData> takenOfflineByStaffAfterNotificationAcknowledged = caseData ->
-        caseData.getTakenOfflineByStaffDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() != null
-            && caseData.getRespondent1TimeExtensionDate() == null
-            && caseData.getRespondent1ResponseDate() == null;
+        getPredicateTakenOfflineByStaffAfterNotificationAcknowledged(caseData);
+
+    public static final boolean getPredicateTakenOfflineByStaffAfterNotificationAcknowledged(CaseData caseData) {
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP:
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                return (caseData.getTakenOfflineByStaffDate() != null
+                    && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                    && caseData.getRespondent1TimeExtensionDate() == null
+                    && caseData.getRespondent1ResponseDate() == null
+                    && caseData.getRespondent2AcknowledgeNotificationDate() != null
+                    && caseData.getRespondent2TimeExtensionDate() == null
+                    && caseData.getRespondent2ResponseDate() == null);
+            default:
+                return (caseData.getTakenOfflineByStaffDate() != null
+                    && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                    && caseData.getRespondent1TimeExtensionDate() == null
+                    && caseData.getRespondent1ResponseDate() == null);
+        }
+    }
 
     public static final Predicate<CaseData> caseDismissedAfterDetailNotified = caseData ->
         caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
