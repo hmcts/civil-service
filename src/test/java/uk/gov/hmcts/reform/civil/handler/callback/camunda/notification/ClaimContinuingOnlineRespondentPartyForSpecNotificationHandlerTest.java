@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,10 +21,12 @@ import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDate;
@@ -35,8 +35,12 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -70,20 +74,26 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
     @MockBean
     private FeatureToggleService toggleService;
     @MockBean
-    private Time time;
-    @MockBean
     private PinInPostConfiguration pinInPostConfiguration;
+    @MockBean
+    private BulkPrintService bulkPrintService;
+    @MockBean
+    private PiPLetterGenerator pipLetterGenerator;
+
+    @MockBean
+    private Time time;
 
     @Autowired
     private ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler handler;
 
     public static final String TASK_ID_Respondent1 = "CreateClaimContinuingOnlineNotifyRespondent1ForSpec";
+    private static final byte[] LETTER_CONTENT = new byte[]{1, 2, 3, 4};
 
     @org.junit.Test
     public void ldBlock() {
-        Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assert.assertTrue(handler.handledEvents().isEmpty());
-        Assert.assertFalse(handler.handledEvents().isEmpty());
+        when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
+        assertTrue(handler.handledEvents().isEmpty());
+        assertFalse(handler.handledEvents().isEmpty());
     }
 
     @Nested
@@ -98,27 +108,14 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("test solicitor").build()));
             when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
-            when(pinInPostConfiguration.getMoneyClaimUrl()).thenReturn("dummy_respond_to_claim_url");
+            when(pinInPostConfiguration.getRespondToClaimUrl()).thenReturn("dummy_respond_to_claim_url");
             when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
         }
 
         @Test
         void shouldNotifyRespondent1Solicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
-                                 .partyEmail("testorg@email.com")
-                                 .build())
-                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
-                                                   .accessCode("TEST1234")
-                                                   .expiryDate(LocalDate.now().plusDays(180))
-                                                   .build())
-                .claimDetailsNotificationDate(LocalDateTime.now())
-                .respondent1ResponseDeadline(LocalDateTime.now())
-                .addRespondent2(YesOrNo.NO)
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC")
-                    .build()).build();
+            CaseData caseData = getCaseData("testorg@email.com");
+            CallbackParams params = getCallbackParams(caseData);
 
             handler.handle(params);
 
@@ -131,23 +128,26 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
         }
 
         @Test
-        void shouldNotNotifyRespondent1Solicitor_whenNoEmailIsEntered() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
-                                 .build())
-                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
-                                                   .accessCode("TEST1234")
-                                                   .expiryDate(LocalDate.now().plusDays(180))
-                                                   .build())
-                .claimDetailsNotificationDate(LocalDateTime.now())
-                .respondent1ResponseDeadline(LocalDateTime.now())
-                .addRespondent2(YesOrNo.NO)
-                .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC")
-                    .build()).build();
+        void shouldNotNotifyRespondent1Solicitor_whenNoEmailiIsEntered() {
+            CaseData caseData = getCaseData(null);
+            CallbackParams params = getCallbackParams(caseData);
 
             handler.handle(params);
+            verify(notificationService, never()).sendMail(any(), any(), any(), any());
+        }
+
+        @Test
+        void shouldGenerateAndPrintLetterSuccessfully() {
+            given(pipLetterGenerator.downloadLetter(any())).willReturn(LETTER_CONTENT);
+            CaseData caseData = getCaseData("testorg@email.com");
+            CallbackParams params = getCallbackParams(caseData);
+
+            handler.handle(params);
+            verify(bulkPrintService)
+                .printLetter(LETTER_CONTENT,
+                             caseData.getLegacyCaseReference(),
+                             caseData.getLegacyCaseReference(),
+                             "first-contact-pack");
         }
 
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
@@ -172,4 +172,28 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
                 "NOTIFY_RESPONDENT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC").build())
                                                  .build())).isEqualTo(TASK_ID_Respondent1);
     }
+
+    private CallbackParams getCallbackParams(CaseData caseData) {
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackRequest.builder().eventId("NOTIFY_RESPONDENT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC")
+                .build()).build();
+        return params;
+    }
+
+    private CaseData getCaseData(String email) {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
+            .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
+                             .partyEmail(email)
+                             .build())
+            .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
+                                               .accessCode("TEST1234")
+                                               .expiryDate(LocalDate.now().plusDays(180))
+                                               .build())
+            .claimDetailsNotificationDate(LocalDateTime.now())
+            .respondent1ResponseDeadline(LocalDateTime.now())
+            .addRespondent2(YesOrNo.NO)
+            .build();
+        return caseData;
+    }
+
 }
