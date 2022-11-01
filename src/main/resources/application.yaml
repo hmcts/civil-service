@@ -285,7 +285,7 @@ idam:
     url: http://localhost:4502
     totp_secret: AABBCCDDEEFFGGHH
   client:
-    
+
     id: civil
     redirect_uri: https://localhost:9000/oauth2/callback
     secret: OOOOOOOOOOOOOOOO
