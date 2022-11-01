@@ -132,8 +132,12 @@ public class CoreCaseDataService {
     }
 
     private UserAuthContent getSystemUpdateUser() {
-        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
-        String userId = userService.getUserInfo(userToken).getUid();
+        try {
+            String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+            String userId = userService.getUserInfo(userToken).getUid();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
         return UserAuthContent.builder().userToken(userToken).userId(userId).build();
     }
 
