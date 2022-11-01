@@ -9,14 +9,18 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.util.ArrayList;
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.*;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 
 @Component
 public class OrgPolicyValidator {
 
     public static final String WARNING_SAME_SOLICITOR_ORGANISATION =
-        "The legal representative details for the claimant and defendant are the same.  " +
-            "Please amend accordingly.";
+        "The legal representative details for the claimant and defendant are the same.  "
+            + "Please amend accordingly.";
+
     public List<String> validate(OrganisationPolicy organisationPolicy, YesOrNo solicitorFirmRegistered) {
         List<String> errors = new ArrayList<>();
 
@@ -51,9 +55,8 @@ public class OrgPolicyValidator {
                 caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID()))
                 || (caseData.getRespondent2OrganisationPolicy() != null
                 && caseData.getRespondent2Represented() == YesOrNo.YES
-                && caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID().equals
-                (caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID()))
-            )) {
+                && caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID().equals(
+                caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())))) {
                 errors.add(WARNING_SAME_SOLICITOR_ORGANISATION);
             }
         }
