@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.documents.PDF;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -28,6 +29,8 @@ public class SdoGeneratorService {
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
     private final IdamClient idamClient;
+
+    private final LocationRefDataService locationRefDataService;
 
     private final FeatureToggleService featuretoggleService;
 
@@ -44,11 +47,11 @@ public class SdoGeneratorService {
         } else if (SdoHelper.isFastTrack(caseData)) {
             docmosisTemplate = featuretoggleService.isHearingAndListingSDOEnabled()
                 ? DocmosisTemplates.SDO_HNL_FAST : DocmosisTemplates.SDO_FAST;
-            templateData = getTemplateDataFast(caseData, judgeName);
+            templateData = getTemplateDataFast(caseData, judgeName, authorisation);
         } else {
             docmosisTemplate = featuretoggleService.isHearingAndListingSDOEnabled()
                 ? DocmosisTemplates.SDO_HNL_DISPOSAL : DocmosisTemplates.SDO_DISPOSAL;
-            templateData = getTemplateDataDisposal(caseData, judgeName);
+            templateData = getTemplateDataDisposal(caseData, judgeName, authorisation);
         }
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
@@ -69,7 +72,7 @@ public class SdoGeneratorService {
         return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
 
-    private SdoDocumentFormDisposal getTemplateDataDisposal(CaseData caseData, String judgeName) {
+    private SdoDocumentFormDisposal getTemplateDataDisposal(CaseData caseData, String judgeName, String auth) {
         var sdoDocumentBuilder = SdoDocumentFormDisposal.builder()
             .currentDate(LocalDate.now())
             .judgeName(judgeName)
@@ -149,13 +152,13 @@ public class SdoGeneratorService {
                 .disposalOrderWithoutHearing(caseData.getDisposalOrderWithoutHearing())
                 .disposalHearingTime(caseData.getDisposalHearingHearingTime())
                 .disposalHearingTimeEstimate(caseData.getDisposalHearingHearingTime().getTime().getLabel())
-                .hearingLocation(caseData.getLocationName());
+                .hearingLocation(getHearingLocationAddress(auth, caseData.getCaseManagementLocation().getBaseLocation()));
         }
 
         return sdoDocumentBuilder.build();
     }
 
-    private SdoDocumentFormFast getTemplateDataFast(CaseData caseData, String judgeName) {
+    private SdoDocumentFormFast getTemplateDataFast(CaseData caseData, String judgeName, String auth) {
         var sdoDocumentFormBuilder = SdoDocumentFormFast.builder()
             .currentDate(LocalDate.now())
             .judgeName(judgeName)
@@ -253,7 +256,7 @@ public class SdoGeneratorService {
         if (featuretoggleService.isHearingAndListingSDOEnabled()) {
             sdoDocumentFormBuilder
                 .fastTrackOrderWithoutJudgement(caseData.getFastTrackOrderWithoutJudgement())
-                .hearingLocation(caseData.getLocationName())
+                .hearingLocation(getHearingLocationAddress(auth, caseData.getCaseManagementLocation().getBaseLocation()))
                 .fastTrackHearingTime(caseData.getFastTrackHearingTime())
                 .fastTrackHearingTimeEstimate(caseData.getFastTrackHearingTime().getHearingDuration().getLabel());
         }
@@ -321,5 +324,10 @@ public class SdoGeneratorService {
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle")
             )
             .build();
+    }
+
+    private String getHearingLocationAddress(String auth, String empimmsId) {
+        var location = locationRefDataService.getCourtLocation(auth, empimmsId);
+        return String.format("%s-%s-%s", location.getSiteName(),location.getCourtAddress(), location.getPostcode());
     }
 }
