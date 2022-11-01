@@ -11,7 +11,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
-import uk.gov.hmcts.reform.civil.event.StrikeOutEvent;
+import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -75,7 +75,7 @@ class HearingFeeDueHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(applicationEventPublisher).publishEvent(new StrikeOutEvent(caseId));
+        verify(applicationEventPublisher).publishEvent(new HearingFeePaidEvent(caseId));
         verify(externalTaskService).complete(mockTask);
     }
 
