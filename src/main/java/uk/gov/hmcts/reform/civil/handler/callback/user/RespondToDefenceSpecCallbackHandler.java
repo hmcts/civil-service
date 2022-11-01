@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
+import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
@@ -100,7 +100,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             SmallClaimHearing smallClaimHearing = caseData.getApplicant1DQ().getApplicant1DQSmallClaimHearing();
             errors = unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing);
         } else {
-            HearingLRspec hearingLRspec = caseData.getApplicant1DQ().getApplicant1DQHearingLRspec();
+            Hearing hearingLRspec = caseData.getApplicant1DQ().getApplicant1DQHearingLRspec();
             errors = unavailableDateValidator.validateFastClaimHearing(hearingLRspec);
         }
 

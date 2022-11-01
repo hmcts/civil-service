@@ -35,7 +35,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
-import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
+import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
@@ -195,7 +195,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .ccdState(AWAITING_APPLICANT_INTENTION)
                 .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
                 .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQHearingLRspec(HearingLRspec.builder()
+                                  .applicant1DQHearingLRspec(Hearing.builder()
                                                                  .build())
                                   .build())
                 .build();

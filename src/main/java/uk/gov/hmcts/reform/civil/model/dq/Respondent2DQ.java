@@ -44,7 +44,7 @@ public class Respondent2DQ implements DQ {
     private List<Element<AccountSimple>> respondent2BankAccountList;
     private HomeDetails respondent2DQHomeDetails;
     private FutureApplications respondent2DQFutureApplications;
-    private HearingLRspec respondent2DQHearingFastClaim;
+    private Hearing respondent2DQHearingFastClaim;
     private RequestedCourt respondToCourtLocation2;
 
     @Override
