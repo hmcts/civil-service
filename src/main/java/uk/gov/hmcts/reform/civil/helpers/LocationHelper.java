@@ -2,27 +2,49 @@ package uk.gov.hmcts.reform.civil.helpers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
-
 @Slf4j
+@Component
 public class LocationHelper {
+
+    private final FeatureToggleService featureToggleService;
+    private final BigDecimal ccmccAmount;
+    private final String ccmccRegionId;
+    private final String ccmccEpimsId;
+
+    public LocationHelper(
+        FeatureToggleService featureToggleService,
+        @Value("${genApp.lrd.ccmcc.amountPounds}") BigDecimal ccmccAmount,
+        @Value("${genApp.lrd.ccmcc.epimsId}") String ccmccEpimsId,
+        @Value("${genApp.lrd.ccmcc.regionId}") String ccmccRegionId) {
+        this.featureToggleService = featureToggleService;
+        this.ccmccAmount = ccmccAmount;
+        this.ccmccRegionId = ccmccRegionId;
+        this.ccmccEpimsId = ccmccEpimsId;
+    }
 
     /**
      * If the defendant is individual or sole trader, their preferred court is the case's court.
@@ -56,7 +78,7 @@ public class LocationHelper {
                 caseData.getLegacyCaseReference()
             );
             getDefendantCourt.get()
-                .filter(requestedCourt -> requestedCourt.getRequestHearingAtSpecificCourt() == YesOrNo.YES)
+                .filter(this::hasInfo)
                 .ifPresent(requestedCourt -> {
                     log.debug("Case {}, Defendant has requested a court", caseData.getLegacyCaseReference());
                     prioritized.add(requestedCourt);
@@ -71,7 +93,7 @@ public class LocationHelper {
                 caseData.getLegacyCaseReference()
             );
             getClaimantRequestedCourt(caseData)
-                .filter(requestedCourt -> requestedCourt.getRequestHearingAtSpecificCourt() == YesOrNo.YES)
+                .filter(this::hasInfo)
                 .ifPresent(requestedCourt -> {
                     log.debug("Case {}, Claimant has requested a court", caseData.getLegacyCaseReference());
                     prioritized.add(requestedCourt);
@@ -82,7 +104,37 @@ public class LocationHelper {
             });
         }
 
-        return prioritized.stream().findFirst();
+        Optional<RequestedCourt> byParties = prioritized.stream().findFirst();
+        if (ccmccAmount.compareTo(getClaimValue(caseData)) >= 0) {
+            return Optional.of(byParties.map(requestedCourt -> requestedCourt.toBuilder()
+                    .caseLocation(getCcmccCaseLocation()).build())
+                                   .orElseGet(() -> RequestedCourt.builder()
+                                       .caseLocation(getCcmccCaseLocation())
+                                       .build()));
+        } else {
+            return byParties;
+        }
+    }
+
+    private boolean hasInfo(RequestedCourt requestedCourt) {
+        return StringUtils.isNotBlank(requestedCourt.getResponseCourtCode())
+            || Optional.ofNullable(requestedCourt.getResponseCourtLocations())
+            .map(DynamicList::getValue).isPresent();
+    }
+
+    private BigDecimal getClaimValue(CaseData caseData) {
+        // super claim type is not always loaded
+        return Stream.of(
+                caseData.getTotalClaimAmount(),
+                Optional.ofNullable(caseData.getClaimValue()).map(ClaimValue::toPounds).orElse(null)
+            )
+            .filter(Objects::nonNull)
+            .findFirst()
+            .orElse(BigDecimal.ZERO);
+    }
+
+    private CaseLocation getCcmccCaseLocation() {
+        return CaseLocation.builder().baseLocation(ccmccEpimsId).region(ccmccRegionId).build();
     }
 
     /**
@@ -104,17 +156,24 @@ public class LocationHelper {
      * @return requested court object for the lead claimant
      */
     private Optional<RequestedCourt> getClaimantRequestedCourt(CaseData caseData) {
-        if (caseData.getSuperClaimType() == SPEC_CLAIM) {
-            return Optional.ofNullable(caseData.getApplicant1DQ())
-                .map(Applicant1DQ::getApplicant1DQRequestedCourt);
+        if (CaseCategoryUtils.isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+            return getSpecClaimantRequestedCourt(caseData);
         } else {
-            return Optional.ofNullable(caseData.getCourtLocation())
-                .map(courtLocation -> RequestedCourt.builder()
-                    .requestHearingAtSpecificCourt(YesOrNo.YES)
-                    .responseCourtCode(courtLocation.getApplicantPreferredCourt())
-                    .caseLocation(courtLocation.getCaseLocation())
-                    .build());
+            return getUnspecClaimantRequestedCourt(caseData);
         }
+    }
+
+    private Optional<RequestedCourt> getSpecClaimantRequestedCourt(CaseData caseData) {
+        return Optional.ofNullable(caseData.getApplicant1DQ())
+            .map(Applicant1DQ::getApplicant1DQRequestedCourt);
+    }
+
+    private Optional<RequestedCourt> getUnspecClaimantRequestedCourt(CaseData caseData) {
+        return Optional.ofNullable(caseData.getCourtLocation())
+            .map(courtLocation -> RequestedCourt.builder()
+                .responseCourtCode(courtLocation.getApplicantPreferredCourt())
+                .caseLocation(courtLocation.getCaseLocation())
+                .build());
     }
 
     /**
