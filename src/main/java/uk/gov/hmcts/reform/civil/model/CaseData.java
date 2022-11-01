@@ -34,6 +34,8 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+import uk.gov.hmcts.reform.civil.model.caseProgression.UploadEvidenceDate;
+import uk.gov.hmcts.reform.civil.model.caseProgression.UploadEvidenceExpert4;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -565,6 +567,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<DocumentWithName>> documentOnly;
     private final List<Element<DocumentAndNote>> documentAndNote;
     private final CaseNoteType caseNoteType;
+    private final List<Element<UploadEvidenceDate>> documentUploadWitness1;
+    private final List<Element<UploadEvidenceDate>> documentUploadWitness3;
+    private final List<Element<UploadEvidenceDate>> documentUploadExpert1;
+    private final List<Element<UploadEvidenceDate>> documentUploadExpert2;
+    private final List<Element<UploadEvidenceDate>> documentUploadExpert3;
+    private final List<Element<UploadEvidenceExpert4>> documentUploadExpert4;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
