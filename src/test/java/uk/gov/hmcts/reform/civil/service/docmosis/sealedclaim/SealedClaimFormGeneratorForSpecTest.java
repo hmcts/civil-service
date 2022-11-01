@@ -128,6 +128,8 @@ public class SealedClaimFormGeneratorForSpecTest {
 
         when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(28)))
             .thenReturn(caseData.getIssueDate().plusDays(28));
+        when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(29)))
+            .thenReturn(caseData.getIssueDate().plusDays(29));
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_1V2_SAME_SOL)))
             .thenReturn(new DocmosisDocument(N2_1V2_SAME_SOL.getDocumentTitle(), bytes));
 
