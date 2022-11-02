@@ -253,7 +253,8 @@ public class SdoGeneratorService {
             sdoDocumentFormBuilder
                 .fastTrackOrderWithoutJudgement(caseData.getFastTrackOrderWithoutJudgement())
                 .fastTrackHearingTime(caseData.getFastTrackHearingTime())
-                .fastTrackHearingTimeEstimate(caseData.getFastTrackHearingTime().getHearingDuration().getLabel());
+                .fastTrackHearingTimeEstimate(
+                    caseData.getFastTrackHearingTime().getHearingDuration().getLabel());
         }
 
         return sdoDocumentFormBuilder.build();
