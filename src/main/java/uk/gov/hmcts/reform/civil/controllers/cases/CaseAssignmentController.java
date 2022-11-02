@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService;
 
@@ -30,6 +33,7 @@ public class CaseAssignmentController {
 
     private final CaseLegacyReferenceSearchService caseByLegacyReferenceSearchService;
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
+    private final PiPLetterGenerator piPLetterGenerator;
 
     @PostMapping(path = {
         "/reference/{caseReference}"
@@ -45,5 +49,11 @@ public class CaseAssignmentController {
         CaseDetails caseDetails = caseByLegacyReferenceSearchService.getCaseDataByLegacyReference(caseReference);
         defendantPinToPostLRspecService.validatePin(caseDetails, pin);
         return new ResponseEntity<>(caseDetails, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/pipLetter", produces = MediaType.APPLICATION_PDF_VALUE)
+    public @ResponseBody
+    byte[] downloadLetter(@RequestBody CaseData caseData) {
+        return piPLetterGenerator.downloadLetter(caseData);
     }
 }
