@@ -35,7 +35,7 @@ class JacksonConfigurationTest {
         // When
         Map<String, LocalDateTime> parsed = mapper.readValue(
             "{ \"date\": \"" + inputValue + "\" }",
-            new TypeReference<Map<String, LocalDateTime>>() {}
+            new TypeReference<>() {}
         );
         LocalDateTime actualResult = parsed.get("date");
 
@@ -43,7 +43,5 @@ class JacksonConfigurationTest {
         assertThat(actualResult.format(DateTimeFormatter
                                            .ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS", Locale.UK)))
             .isEqualTo(expectedResult);
-
-
     }
 }
