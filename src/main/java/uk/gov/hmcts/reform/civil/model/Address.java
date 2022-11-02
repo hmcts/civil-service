@@ -3,8 +3,10 @@ package uk.gov.hmcts.reform.civil.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.utils.ObjectUtils;
 import uk.gov.hmcts.reform.prd.model.ContactInformation;
 
@@ -13,15 +15,17 @@ import static uk.gov.hmcts.reform.civil.utils.StringUtils.joinNonNull;
 @Data
 @Builder(toBuilder = true)
 @JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
+@NoArgsConstructor
+@AllArgsConstructor
 public class Address {
 
-    private final String addressLine1;
-    private final String addressLine2;
-    private final String addressLine3;
-    private final String postTown;
-    private final String county;
-    private final String country;
-    private final String postCode;
+    private String addressLine1;
+    private String addressLine2;
+    private String addressLine3;
+    private String postTown;
+    private String county;
+    private String country;
+    private String postCode;
 
     @JsonIgnore
     public String firstNonNull() {

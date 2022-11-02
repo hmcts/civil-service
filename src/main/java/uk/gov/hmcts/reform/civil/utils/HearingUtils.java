@@ -41,17 +41,17 @@ public class HearingUtils {
         if (claimFee == 0) {
             return new BigDecimal(0);
         } else if (claimFee < 300_00) {
-            return new BigDecimal(27);
+            return new BigDecimal(2700);
         } else if (claimFee < 500_00) {
-            return new BigDecimal(59);
+            return new BigDecimal(5900);
         } else if (claimFee < 1000_00) {
-            return new BigDecimal(85);
+            return new BigDecimal(8500);
         } else if (claimFee < 1500_00) {
-            return new BigDecimal(123);
+            return new BigDecimal(12300);
         } else if (claimFee < 3000_00) {
-            return new BigDecimal(181);
+            return new BigDecimal(18100);
         } else {
-            return new BigDecimal(346);
+            return new BigDecimal(34600);
         }
     }
 }
