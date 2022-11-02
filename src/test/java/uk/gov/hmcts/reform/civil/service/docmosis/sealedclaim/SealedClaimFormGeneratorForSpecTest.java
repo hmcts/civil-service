@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
+import java.math.BigDecimal;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,8 +26,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
-
-import java.math.BigDecimal;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -102,7 +102,8 @@ public class SealedClaimFormGeneratorForSpecTest {
         when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(28)))
             .thenReturn(caseData.getIssueDate().plusDays(17));
         when(deadlinesCalculator.calculateFirstWorkingDay(caseData.getIssueDate().plusDays(29)))
-            .thenReturn(caseData.getIssueDate().plusDays(18));
+            .thenReturn(caseData.getIssueDate().plusDays(17));
+
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2)))
             .thenReturn(new DocmosisDocument(N2.getDocumentTitle(), bytes));
 
