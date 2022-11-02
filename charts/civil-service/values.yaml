@@ -55,7 +55,7 @@ java:
     SOME_ENV_VARIABLE: true
     DOCUMENT_MANAGEMENT_SECURED: true
     REST_TEMPLATE_TIMEOUT: 30000
-    polling.event.emitter.enabled: false
+    POLLING_EVENT_EMITTER_ENABLED: false
 
   keyVaults:
     civil:
