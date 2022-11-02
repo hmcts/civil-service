@@ -305,4 +305,6 @@ public class CaseDataParent implements MappableObject {
 
     private final String respondent1EmailAddress;
 
+    private final String migrationId;
+
 }

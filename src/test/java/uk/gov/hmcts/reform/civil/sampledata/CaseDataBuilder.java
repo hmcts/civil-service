@@ -64,6 +64,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesReci
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
@@ -80,6 +81,8 @@ import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
@@ -315,6 +318,10 @@ public class CaseDataBuilder {
     private TrialHearingTrial trialHearingTrialDJ;
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
+    private YesOrNo generalAppVaryJudgementType;
+    private Document generalAppN245FormUpload;
+    private GAApplicationType generalAppType;
+    private GAHearingDateGAspec generalAppHearingDate;
 
     private List<Element<ChangeOfRepresentation>> changeOfRepresentation;
     private ChangeOrganisationRequest changeOrganisationRequest;
@@ -324,6 +331,26 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
+        return this;
+    }
+
+    public CaseDataBuilder generalAppVaryJudgementType(YesOrNo generalAppVaryJudgementType) {
+        this.generalAppVaryJudgementType = generalAppVaryJudgementType;
+        return this;
+    }
+
+    public CaseDataBuilder generalAppType(GAApplicationType generalAppType) {
+        this.generalAppType = generalAppType;
+        return this;
+    }
+
+    public CaseDataBuilder generalAppHearingDate(GAHearingDateGAspec generalAppHearingDate) {
+        this.generalAppHearingDate = generalAppHearingDate;
+        return this;
+    }
+
+    public CaseDataBuilder generalAppN245FormUpload(Document generalAppN245FormUpload) {
+        this.generalAppN245FormUpload = generalAppN245FormUpload;
         return this;
     }
 
@@ -1972,6 +1999,17 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimDetailsNotifiedTimeExtension1v2() {
+        atStateClaimDetailsNotified();
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        respondent1TimeExtensionDate = claimDetailsNotificationDate.plusDays(1);
+        respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
+        respondent2ResponseDeadline = RESPONSE_DEADLINE;
+        respondent2TimeExtensionDate = claimDetailsNotificationDate.plusDays(1);
+        respondentSolicitor2AgreedDeadlineExtension = LocalDate.now();
+        return this;
+    }
+
     public CaseDataBuilder atStateTakenOfflineByStaff() {
         atStateClaimIssued();
         takenOfflineByStaff();
@@ -2014,6 +2052,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension() {
         atStateNotificationAcknowledgedRespondent1TimeExtension();
+        takenOfflineByStaff();
+        takenOfflineByStaffDate = respondent1TimeExtensionDate.plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension1v2() {
+        atStateNotificationAcknowledged1v2SameSolicitor();
+        atStateClaimDetailsNotifiedTimeExtension1v2();
+        multiPartyClaimTwoDefendantSolicitors();
+        atStateNotificationAcknowledgedTimeExtension_1v2DS();
         takenOfflineByStaff();
         takenOfflineByStaffDate = respondent1TimeExtensionDate.plusDays(1);
         return this;
@@ -2462,7 +2510,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atState1v2DivergentResponseSpec(RespondentResponseTypeSpec respondent1Response,
-                                                       RespondentResponseTypeSpec respondent2Response) {
+                                                           RespondentResponseTypeSpec respondent2Response) {
         respondent1ClaimResponseTypeForSpec = respondent1Response;
         respondent1ResponseDate = LocalDateTime.now().plusDays(1);
         respondent2RespondsSpec(respondent2Response);
@@ -2788,8 +2836,8 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atState1v2DifferentSolicitorDivergentResponseSpec(
-                                                                    RespondentResponseTypeSpec respondent1Response,
-                                                                    RespondentResponseTypeSpec respondent2Response) {
+        RespondentResponseTypeSpec respondent1Response,
+        RespondentResponseTypeSpec respondent2Response) {
         atStateNotificationAcknowledged();
         respondent1ClaimResponseTypeForSpec = respondent1Response;
         respondent2RespondsSpec(respondent2Response);
@@ -3124,8 +3172,10 @@ public class CaseDataBuilder {
             atStateRespondentFullDefenceSpec();
         } else if (mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2();
-            atState1v2DifferentSolicitorDivergentResponseSpec(RespondentResponseTypeSpec.FULL_DEFENCE,
-                                                              RespondentResponseTypeSpec.FULL_DEFENCE);
+            atState1v2DifferentSolicitorDivergentResponseSpec(
+                RespondentResponseTypeSpec.FULL_DEFENCE,
+                RespondentResponseTypeSpec.FULL_DEFENCE
+            );
         } else if (mpScenario == TWO_V_ONE) {
             applicant1ProceedWithClaimSpec2v1 = YES;
             atStateBothApplicantsRespondToDefenceAndProceed_2v1_SPEC();
@@ -3380,7 +3430,7 @@ public class CaseDataBuilder {
         atStateRespondentFullDefence();
         this.hearingFeePaymentDetails = PaymentDetails.builder()
             .customerReference("RC-1604-0739-2145-4711")
-        .build();
+            .build();
 
         return this;
     }
@@ -3453,6 +3503,10 @@ public class CaseDataBuilder {
             // Create Claim
             .legacyCaseReference(legacyCaseReference)
             .allocatedTrack(allocatedTrack)
+            .generalAppType(generalAppType)
+            .generalAppVaryJudgementType(generalAppVaryJudgementType)
+            .generalAppN245FormUpload(generalAppN245FormUpload)
+            .generalAppHearingDate(generalAppHearingDate)
             .solicitorReferences(solicitorReferences)
             .courtLocation(courtLocation)
             .claimValue(claimValue)
