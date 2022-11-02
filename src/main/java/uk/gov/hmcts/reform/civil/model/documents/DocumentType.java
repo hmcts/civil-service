@@ -14,6 +14,7 @@ public enum DocumentType {
     LITIGANT_IN_PERSON_CLAIM_FORM,
     SDO_ORDER,
     HEARING_FORM,
+    PIP_LETTER,
 
     //General Application Document Type
     GENERAL_ORDER,
