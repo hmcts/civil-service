@@ -141,10 +141,12 @@ public class CoreCaseDataService {
             String userId = userService.getUserInfo(userToken).getUid();
             log.info("UserId '{}'", userId);
             return UserAuthContent.builder().userToken(userToken).userId(userId).build();
-        }catch (Exception exception) {
+
+        } catch (Exception exception) {
             // Adding it for debuggin purpose that can be removed alter
             log.info("Exception in getSystemUpdateUser");
             exception.printStackTrace();
+
         }
         return null;
 
