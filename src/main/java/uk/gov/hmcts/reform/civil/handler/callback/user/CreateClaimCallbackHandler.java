@@ -164,10 +164,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
             //TESTING LOCATION CALL
             System.out.printf("Grabbing location using epimms: " + locations.get(0).getEpimmsId());
+            log.debug("Grabbing location using epimms: " + locations.get(0).getEpimmsId());
+            log.info("Grabbing location using epimms: " + locations.get(0).getEpimmsId());
             var location = locationRefDataService.getCourtLocation(
                 callbackParams.getParams().get(BEARER_TOKEN).toString(), locations.get(0).getEpimmsId());
             System.out.printf(
                 String.format("%s-%s-%s", location.getSiteName(), location.getCourtAddress(), location.getPostcode()));
+            log.debug(String.format("%s-%s-%s", location.getSiteName(), location.getCourtAddress(),
+                                    location.getPostcode()));
+            log.info(String.format("%s-%s-%s", location.getSiteName(), location.getCourtAddress(),
+                                   location.getPostcode()));
             //===================================================================================================
         }
 
