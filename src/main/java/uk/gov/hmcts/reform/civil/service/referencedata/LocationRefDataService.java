@@ -47,6 +47,30 @@ public class LocationRefDataService {
         return new ArrayList<>();
     }
 
+    public LocationRefData getCourtLocation(String authToken, String epimsId) {
+        try {
+            ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
+                buildURI(),
+                HttpMethod.GET,
+                getHeaders(authToken),
+                new ParameterizedTypeReference<List<LocationRefData>>() {
+                }
+            );
+            var response = responseEntity.getBody();
+            if (response == null || response.isEmpty()) {
+                log.warn("Location Reference Data Lookup did not return any location");
+                return null;
+            } else {
+                var locations = response.stream()
+                    .filter(l -> l.getEpimmsId().equals(epimsId)).collect(Collectors.toList());
+                return locations.get(0);
+            }
+        } catch (Exception e) {
+            log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
+            return null;
+        }
+    }
+
     public LocationRefData getCcmccLocation(String authToken) {
         try {
             ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(

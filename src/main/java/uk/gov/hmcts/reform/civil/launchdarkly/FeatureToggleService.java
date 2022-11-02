@@ -83,7 +83,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCourtLocationDynamicListEnabled() {
-        return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), false);
+        return true;
     }
 
     public boolean isPinInPostEnabled() {
