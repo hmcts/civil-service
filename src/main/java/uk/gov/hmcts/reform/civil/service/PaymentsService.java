@@ -8,7 +8,8 @@ import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-import uk.gov.hmcts.reform.civil.model.hearing.HearingFeeServiceRequestDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
+import uk.gov.hmcts.reform.civil.model.hearing.HFPbaDetails;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.CasePaymentRequestDto;
@@ -16,8 +17,12 @@ import uk.gov.hmcts.reform.payments.client.models.FeeDto;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.request.CreateServiceRequestDTO;
 import uk.gov.hmcts.reform.payments.request.CreditAccountPaymentRequest;
+import uk.gov.hmcts.reform.payments.request.PBAServiceRequestDTO;
+import uk.gov.hmcts.reform.payments.response.PBAServiceRequestResponse;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 import uk.gov.hmcts.reform.prd.model.Organisation;
+
+import java.util.UUID;
 
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -38,13 +43,13 @@ public class PaymentsService {
 
     public void validateRequest(CaseData caseData) {
         String error = null;
-        HearingFeeServiceRequestDetails hearingFeeServiceRequestDetails = caseData.getHearingFeeServiceRequestDetails();
-        if (hearingFeeServiceRequestDetails == null) {
+        HFPbaDetails hearingFeePBADetails = caseData.getHearingFeePBADetails();
+        if (hearingFeePBADetails == null) {
             error = "Hearing Fee details not received.";
-        } else if (hearingFeeServiceRequestDetails.getFee() == null
-            || hearingFeeServiceRequestDetails.getFee().getCalculatedAmountInPence() == null
-            || isBlank(hearingFeeServiceRequestDetails.getFee().getVersion())
-            || isBlank(hearingFeeServiceRequestDetails.getFee().getCode())) {
+        } else if (hearingFeePBADetails.getFee() == null
+            || hearingFeePBADetails.getFee().getCalculatedAmountInPence() == null
+            || isBlank(hearingFeePBADetails.getFee().getVersion())
+            || isBlank(hearingFeePBADetails.getFee().getCode())) {
             error = "Fees are not set correctly.";
         }
         if (!isBlank(error)) {
@@ -98,17 +103,22 @@ public class PaymentsService {
         return creditAccountPaymentRequest;
     }
 
+    public PBAServiceRequestResponse createHFCreditAccountPayment(CaseData caseData, String authToken) {
+        String serviceReqReference = caseData.getHearingFeePBADetails().getServiceReqReference();
+        return paymentsClient.createPbaPayment(serviceReqReference, authToken, buildPBARequest(caseData));
+    }
+
     public PaymentServiceResponse createServiceRequest(CaseData caseData, String authToken) {
         return paymentsClient.createServiceRequest(authToken, buildServiceRequest(caseData));
     }
 
     private CreateServiceRequestDTO buildServiceRequest(CaseData caseData) {
-        HearingFeeServiceRequestDetails hearingFeeServiceRequestDetails = caseData.getHearingFeeServiceRequestDetails();
-        FeeDto feeResponse = hearingFeeServiceRequestDetails.getFee().toFeeDto();
+        HFPbaDetails hearingFeePBADetails = caseData.getHearingFeePBADetails();
+        FeeDto feeResponse = hearingFeePBADetails.getFee().toFeeDto();
         String siteId = paymentsConfiguration.getSpecSiteId();
 
         return CreateServiceRequestDTO.builder()
-            .caseReference(caseData.getCcdCaseReference().toString())
+            .caseReference(caseData.getLegacyCaseReference())
             .ccdCaseNumber(caseData.getCcdCaseReference().toString())
             .hmctsOrgId(siteId)
             .callBackUrl(callBackUrl)
@@ -120,6 +130,24 @@ public class PaymentsService {
             .casePaymentRequest(CasePaymentRequestDto.builder()
                                     .action(PAYMENT_ACTION)
                                     .responsibleParty(caseData.getApplicantPartyName()).build())
+            .build();
+    }
+
+    private PBAServiceRequestDTO buildPBARequest(CaseData caseData) {
+        HFPbaDetails hearingFeePBADetails = caseData.getHearingFeePBADetails();
+        FeeDto claimFee = hearingFeePBADetails.getFee().toFeeDto();
+        var organisationId = caseData.getGeneralAppApplnSolicitor().getOrganisationIdentifier();
+        var organisationName = organisationService.findOrganisationById(organisationId)
+            .map(Organisation::getName)
+            .orElseThrow(RuntimeException::new);
+
+        return PBAServiceRequestDTO.builder()
+            .accountNumber(hearingFeePBADetails.getApplicantsPbaAccounts()
+                               .getValue().getLabel())
+            .amount(claimFee.getCalculatedAmount())
+            .customerReference(hearingFeePBADetails.getPbaReference())
+            .organisationName(organisationName)
+            .idempotencyKey(String.valueOf(UUID.randomUUID()))
             .build();
     }
 }

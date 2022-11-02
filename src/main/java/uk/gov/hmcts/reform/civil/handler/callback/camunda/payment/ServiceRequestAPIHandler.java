@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.model.hearing.HearingFeeServiceRequestDetails;
+import uk.gov.hmcts.reform.civil.model.hearing.HFPbaDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 
 import java.util.ArrayList;
@@ -36,6 +36,11 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
 
     @Override
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return TASK_ID;
+    }
+
+    @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT), this::makePaymentServiceReq
@@ -55,11 +60,13 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
             log.info("calling payment service request " + caseData.getCcdCaseReference());
             var serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
                 .getServiceRequestReference();
-            HearingFeeServiceRequestDetails hearingFeeDetails = caseData.getHearingFeeServiceRequestDetails();
+            HFPbaDetails pbaDetails = caseData.getHearingFeePBADetails();
             caseData = caseData.toBuilder()
-                .hearingFeeServiceRequestDetails(hearingFeeDetails.toBuilder()
-                                          .fee(caseData.getHearingFeeServiceRequestDetails().getFee())
-                                          .serviceRequestReference(serviceRequestReference).build())
+                .hearingFeePBADetails(pbaDetails.toBuilder()
+                                          .applicantsPbaAccounts(caseData.getHearingFeePBADetails()
+                                                                     .getApplicantsPbaAccounts())
+                                          .fee(caseData.getHearingFeePBADetails().getFee())
+                                          .serviceReqReference(serviceRequestReference).build())
                 .build();
 
         } catch (FeignException e) {

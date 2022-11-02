@@ -77,7 +77,7 @@ import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
-import uk.gov.hmcts.reform.civil.model.hearing.HearingFeeServiceRequestDetails;
+import uk.gov.hmcts.reform.civil.model.hearing.HFPbaDetails;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
@@ -262,7 +262,7 @@ public class CaseDataBuilder {
     protected LocalDateTime respondent1LitigationFriendCreatedDate;
     protected LocalDateTime respondent2LitigationFriendCreatedDate;
 
-    public HearingFeeServiceRequestDetails hearingFeeServiceRequestDetails;
+    public HFPbaDetails hfPbaDetails;
 
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
     protected SolicitorOrganisationDetails respondentSolicitor2OrganisationDetails;
@@ -3154,15 +3154,15 @@ public class CaseDataBuilder {
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
-            .hearingFeeServiceRequestDetails(
-                HearingFeeServiceRequestDetails.builder()
+            .hearingFeePBADetails(
+                HFPbaDetails.builder()
                         .fee(
                         Fee.builder()
                             .code("FE203")
                             .calculatedAmountInPence(BigDecimal.valueOf(27500))
                             .version("1")
                             .build())
-                    .serviceRequestReference(CUSTOMER_REFERENCE).build())
+                    .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .build();
     }
@@ -3176,8 +3176,8 @@ public class CaseDataBuilder {
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-            .hearingFeeServiceRequestDetails(
-                HearingFeeServiceRequestDetails.builder()
+            .hearingFeePBADetails(
+                HFPbaDetails.builder()
                     .paymentDetails(PaymentDetails.builder()
                                         .status(PaymentStatus.FAILED)
                                         .reference("RC-1658-4258-2679-9795")
@@ -3189,7 +3189,7 @@ public class CaseDataBuilder {
                             .calculatedAmountInPence(BigDecimal.valueOf(27500))
                             .version("1")
                             .build())
-                    .serviceRequestReference(CUSTOMER_REFERENCE).build())
+                    .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .build();
     }
@@ -3203,8 +3203,8 @@ public class CaseDataBuilder {
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-            .hearingFeeServiceRequestDetails(
-                HearingFeeServiceRequestDetails.builder()
+            .hearingFeePBADetails(
+                HFPbaDetails.builder()
                     .paymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 01, 01),
                                                             LocalTime.of(12, 00, 00)))
                     .paymentDetails(PaymentDetails.builder()
@@ -3218,7 +3218,7 @@ public class CaseDataBuilder {
                             .calculatedAmountInPence(BigDecimal.valueOf(27500))
                             .version("1")
                             .build())
-                    .serviceRequestReference(CUSTOMER_REFERENCE).build())
+                    .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .build();
     }
@@ -3405,7 +3405,7 @@ public class CaseDataBuilder {
             .trialHearingTrialDJ(trialHearingTrialDJ)
             .disposalHearingJudgesRecitalDJ(disposalHearingJudgesRecitalDJ)
             .trialHearingJudgesRecitalDJ(trialHearingJudgesRecitalDJ)
-            .hearingFeeServiceRequestDetails(hearingFeeServiceRequestDetails)
+            .hearingFeePBADetails(hfPbaDetails)
             .build();
     }
 }

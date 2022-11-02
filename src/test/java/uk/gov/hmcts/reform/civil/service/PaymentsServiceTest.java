@@ -14,13 +14,15 @@ import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.hearing.HearingFeeServiceRequestDetails;
+import uk.gov.hmcts.reform.civil.model.hearing.HFPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.FeeDto;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.request.CreditAccountPaymentRequest;
+import uk.gov.hmcts.reform.payments.request.PBAServiceRequestDTO;
+import uk.gov.hmcts.reform.payments.response.PBAServiceRequestResponse;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.prd.model.Organisation;
@@ -183,7 +185,7 @@ class PaymentsServiceTest {
         @Test
         void validateRequestShouldThrowAnError_whenFeeDetailsNotProvided() {
             CaseData caseData = CaseData.builder()
-                .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder().build())
+                .hearingFeePBADetails(HFPbaDetails.builder().build())
                 .build();
 
             Exception exception = assertThrows(
@@ -196,7 +198,7 @@ class PaymentsServiceTest {
         @Test
         void validateRequestShouldThrowAnError_whenFeeDetailsDoNotHaveFeeCode() {
             CaseData caseData = CaseData.builder()
-                .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder()
+                .hearingFeePBADetails(HFPbaDetails.builder()
                                                      .fee(Fee.builder()
                                                               .calculatedAmountInPence(BigDecimal.valueOf(10800))
                                                               .version("1")
@@ -214,7 +216,7 @@ class PaymentsServiceTest {
         @Test
         void validateRequestShouldThrowAnError_whenFeeDetailsDoNotHaveFeeVersion() {
             CaseData caseData = CaseData.builder()
-                .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder()
+                .hearingFeePBADetails(HFPbaDetails.builder()
                                                      .fee(Fee.builder()
                                                               .calculatedAmountInPence(BigDecimal.valueOf(10800))
                                                               .code("FEE0442")
@@ -232,7 +234,7 @@ class PaymentsServiceTest {
         @Test
         void validateRequestShouldThrowAnError_whenFeeDetailsDoNotHaveFeeAmount() {
             CaseData caseData = CaseData.builder()
-                .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder()
+                .hearingFeePBADetails(HFPbaDetails.builder()
                                                      .fee(Fee.builder()
                                                               .code("FEE0442")
                                                               .version("1")
@@ -254,6 +256,28 @@ class PaymentsServiceTest {
             PaymentServiceResponse serviceRequestResponse = paymentsService.createServiceRequest(caseData, AUTH_TOKEN);
             assertThat(serviceRequestResponse).isEqualTo(PAYMENT_SERVICE_RESPONSE);
 
+        }
+
+        @Test
+        void shouldCreateCreditAccountPayment_whenValidCaseDetails() {
+            CaseData caseData = CaseDataBuilder.builder().buildMakePaymentsCaseData();
+
+            var expectedCreditAccountPaymentRequest = getExpectedCreditAccountPaymentRequest(caseData);
+
+            PBAServiceRequestResponse paymentResponse = paymentsService.createHFCreditAccountPayment(caseData, AUTH_TOKEN);
+
+            verify(organisationService).findOrganisationById("OrgId");
+            assertThat(paymentResponse).isEqualTo(PAYMENT_DTO);
+        }
+
+        private PBAServiceRequestDTO getExpectedCreditAccountPaymentRequest(CaseData caseData) {
+            return PBAServiceRequestDTO.builder()
+                .accountNumber("PBA0078095")
+                .amount(caseData.getGeneralAppPBADetails().getFee().toFeeDto().getCalculatedAmount())
+                .customerReference(CUSTOMER_REFERENCE)
+                .organisationName(ORGANISATION.getName())
+                .idempotencyKey("2634946490")
+                .build();
         }
     }
 }
