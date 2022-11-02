@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
@@ -395,12 +396,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         if (featureToggleService.isHearingAndListingSDOEnabled()) {
             FastTrackOrderWithoutJudgement tempFastTrackOrderWithoutJudgement = FastTrackOrderWithoutJudgement.builder()
-                .input(String.format("This order has been made without hearing. Each party has the right to apply "
-                                         + "to have this Order set aside or varied. Any such application must be "
-                                         + "received by the Court (together with the appropriate fee) by 4pm "
-                                         + "on %s.",
-                                     deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
-                                         .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))))
+                .input(String.format(
+                    "This order has been made without hearing. Each party has the right to apply "
+                        + "to have this Order set aside or varied. Any such application must be "
+                        + "received by the Court (together with the appropriate fee) by 4pm "
+                        + "on %s.",
+                    deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
+                        .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))
+                ))
                 .build();
 
             updatedData.fastTrackOrderWithoutJudgement(tempFastTrackOrderWithoutJudgement);
@@ -720,6 +723,28 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
+        CaseData caseData = callbackParams.getCaseData();
+
+        String hearingInPersonLocation = null;
+        if (caseData.getDisposalHearingMethod() == DisposalHearingMethod.disposalHearingMethodInPerson
+            && Optional.ofNullable(caseData.getDisposalHearingMethodInPerson())
+            .map(DynamicList::getValue).isPresent()) {
+            hearingInPersonLocation = caseData.getDisposalHearingMethodInPerson().getValue().getLabel();
+        } else if (caseData.getFastTrackMethod() == FastTrackMethod.fastTrackMethodInPerson
+            && Optional.ofNullable(caseData.getFastTrackMethodInPerson())
+            .map(DynamicList::getValue).isPresent()) {
+            hearingInPersonLocation = caseData.getFastTrackMethodInPerson().getValue().getLabel();
+        } else if (caseData.getSmallClaimsMethod() == SmallClaimsMethod.smallClaimsMethodInPerson
+            && Optional.ofNullable(caseData.getSmallClaimsMethodInPerson())
+            .map(DynamicList::getValue).isPresent()) {
+            hearingInPersonLocation = caseData.getSmallClaimsMethodInPerson().getValue().getLabel();
+        }
+        locationRefDataService.getLocationMatchingLabel(
+                hearingInPersonLocation,
+                callbackParams.getParams().get(BEARER_TOKEN).toString()
+            )
+            .map(LocationRefDataService::buildCaseLocation)
+            .ifPresent(dataBuilder::caseManagementLocation);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
