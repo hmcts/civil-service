@@ -52,8 +52,6 @@ public class SdoDocumentFormFast implements MappableObject {
     private final Party applicant2;
     private final boolean hasRespondent2;
     private final Party respondent2;
-    private final String hearingLocation;
-
     private final YesOrNo drawDirectionsOrderRequired;
     private final JudgementSum drawDirectionsOrder;
     private final ClaimsTrack claimsTrack;

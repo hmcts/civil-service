@@ -148,8 +148,7 @@ public class SdoGeneratorService {
             sdoDocumentBuilder
                 .disposalOrderWithoutHearing(caseData.getDisposalOrderWithoutHearing())
                 .disposalHearingTime(caseData.getDisposalHearingHearingTime())
-                .disposalHearingTimeEstimate(caseData.getDisposalHearingHearingTime().getTime().getLabel())
-                .hearingLocation(caseData.getLocationName());
+                .disposalHearingTimeEstimate(caseData.getDisposalHearingHearingTime().getTime().getLabel());
         }
 
         return sdoDocumentBuilder.build();
@@ -253,7 +252,6 @@ public class SdoGeneratorService {
         if (featuretoggleService.isHearingAndListingSDOEnabled()) {
             sdoDocumentFormBuilder
                 .fastTrackOrderWithoutJudgement(caseData.getFastTrackOrderWithoutJudgement())
-                .hearingLocation(caseData.getLocationName())
                 .fastTrackHearingTime(caseData.getFastTrackHearingTime())
                 .fastTrackHearingTimeEstimate(caseData.getFastTrackHearingTime().getHearingDuration().getLabel());
         }
