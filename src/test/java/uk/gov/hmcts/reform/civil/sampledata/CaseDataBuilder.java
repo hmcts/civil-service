@@ -65,6 +65,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesReci
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
@@ -81,6 +82,8 @@ import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
@@ -323,6 +326,10 @@ public class CaseDataBuilder {
     private TrialHearingTrial trialHearingTrialDJ;
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
+    private YesOrNo generalAppVaryJudgementType;
+    private Document generalAppN245FormUpload;
+    private GAApplicationType generalAppType;
+    private GAHearingDateGAspec generalAppHearingDate;
 
     private List<Element<ChangeOfRepresentation>> changeOfRepresentation;
     private ChangeOrganisationRequest changeOrganisationRequest;
@@ -338,6 +345,26 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
+        return this;
+    }
+
+    public CaseDataBuilder generalAppVaryJudgementType(YesOrNo generalAppVaryJudgementType) {
+        this.generalAppVaryJudgementType = generalAppVaryJudgementType;
+        return this;
+    }
+
+    public CaseDataBuilder generalAppType(GAApplicationType generalAppType) {
+        this.generalAppType = generalAppType;
+        return this;
+    }
+
+    public CaseDataBuilder generalAppHearingDate(GAHearingDateGAspec generalAppHearingDate) {
+        this.generalAppHearingDate = generalAppHearingDate;
+        return this;
+    }
+
+    public CaseDataBuilder generalAppN245FormUpload(Document generalAppN245FormUpload) {
+        this.generalAppN245FormUpload = generalAppN245FormUpload;
         return this;
     }
 
@@ -3531,6 +3558,10 @@ public class CaseDataBuilder {
             // Create Claim
             .legacyCaseReference(legacyCaseReference)
             .allocatedTrack(allocatedTrack)
+            .generalAppType(generalAppType)
+            .generalAppVaryJudgementType(generalAppVaryJudgementType)
+            .generalAppN245FormUpload(generalAppN245FormUpload)
+            .generalAppHearingDate(generalAppHearingDate)
             .solicitorReferences(solicitorReferences)
             .courtLocation(courtLocation)
             .claimValue(claimValue)
