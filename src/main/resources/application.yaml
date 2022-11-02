@@ -408,4 +408,4 @@ idam:
 polling:
   event:
     emitter:
-      enabled: ${POLLING_EVENT_EMITTER_ENABLED:true}
+      enabled: ${POLLING_EVENT_EMITTER_ENABLED:false}
