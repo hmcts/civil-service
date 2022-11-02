@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -22,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATI
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.JURISDICTION;
 import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataContentFromStartEventResponse;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CoreCaseDataService {
@@ -132,9 +134,20 @@ public class CoreCaseDataService {
     }
 
     private UserAuthContent getSystemUpdateUser() {
-        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
-        String userId = userService.getUserInfo(userToken).getUid();
-        return UserAuthContent.builder().userToken(userToken).userId(userId).build();
+        try {
+            log.info("Before getting token");
+            String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+            log.info("After getting token");
+            String userId = userService.getUserInfo(userToken).getUid();
+            log.info("UserId '{}'", userId);
+            return UserAuthContent.builder().userToken(userToken).userId(userId).build();
+        }catch (Exception exception) {
+            // Adding it for debuggin purpose that can be removed alter
+            log.info("Exception in getSystemUpdateUser");
+            exception.printStackTrace();
+        }
+        return null;
+
     }
 
     public CaseDetails setSupplementaryData(Long caseId, Map<String, Map<String,
