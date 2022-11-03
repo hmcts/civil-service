@@ -40,31 +40,27 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SP
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_OTHER_PARTY;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
@@ -171,12 +167,12 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
+                HEARING_SCHEDULED,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
-                EVIDENCE_UPLOAD_APPLICANT,
+                EVIDENCE_UPLOAD,
                 migrateCase,
-                EVIDENCE_UPLOAD_RESPONDENT,
-                EVIDENCE_UPLOAD_OTHER_PARTY
+                EVIDENCE_UPLOAD_NOTIFICATION
             )
         ),
 
@@ -200,10 +196,9 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
-                EVIDENCE_UPLOAD_APPLICANT,
+                EVIDENCE_UPLOAD,
                 migrateCase,
-                EVIDENCE_UPLOAD_RESPONDENT,
-                EVIDENCE_UPLOAD_OTHER_PARTY
+                EVIDENCE_UPLOAD_NOTIFICATION
             )
         ),
 
@@ -230,12 +225,10 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 TAKE_CASE_OFFLINE,
                 EVIDENCE_UPLOAD_JUDGE,
-                HEARING_FEE_UNPAID,
                 HEARING_SCHEDULED,
-                EVIDENCE_UPLOAD_APPLICANT,
+                EVIDENCE_UPLOAD,
                 migrateCase,
-                EVIDENCE_UPLOAD_RESPONDENT,
-                EVIDENCE_UPLOAD_OTHER_PARTY
+                EVIDENCE_UPLOAD_NOTIFICATION
             )
         ),
 
@@ -456,11 +449,7 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                HEARING_SCHEDULED,
-                HEARING_FEE_UNPAID,
-                REFER_TO_JUDGE,
-                migrateCase,
-                TAKE_CASE_OFFLINE
+                migrateCase
             )
         ),
 
@@ -477,7 +466,6 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                REFER_TO_JUDGE,
                 migrateCase
             )
         ),
@@ -490,7 +478,6 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 APPLICATION_CLOSED_UPDATE_CLAIM,
-                REFER_TO_JUDGE,
                 migrateCase
             )
         ),
@@ -500,17 +487,10 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
-                CREATE_SDO,
                 NotSuitable_SDO,
-                REFER_TO_JUDGE,
+                CREATE_SDO,
                 APPLICATION_CLOSED_UPDATE_CLAIM,
                 migrateCase
-            )
-        ),
-        entry(
-            CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName(),
-            List.of(
-                CASE_PROCEEDS_IN_CASEMAN
             )
         ),
         entry(
@@ -519,7 +499,6 @@ public class FlowStateAllowedEventService {
                 NOC_REQUEST,
                     APPLY_NOC_DECISION,
                     TAKE_CASE_OFFLINE,
-                    NOTIFY_DEFENDANT_OF_CLAIM,
                     APPLICATION_OFFLINE_UPDATE_CLAIM,
                     migrateCase
             )
@@ -540,7 +519,6 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                REFER_TO_JUDGE,
                 migrateCase
             )
         ),
@@ -552,7 +530,6 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                REFER_TO_JUDGE,
                 migrateCase
             )
         ),
@@ -692,10 +669,9 @@ public class FlowStateAllowedEventService {
                 HEARING_SCHEDULED,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
-                EVIDENCE_UPLOAD_APPLICANT,
+                EVIDENCE_UPLOAD,
                 migrateCase,
-                EVIDENCE_UPLOAD_RESPONDENT,
-                EVIDENCE_UPLOAD_OTHER_PARTY
+                EVIDENCE_UPLOAD_NOTIFICATION
             )
         ),
         entry(
@@ -720,12 +696,10 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                HEARING_SCHEDULED,
                 EVIDENCE_UPLOAD_JUDGE,
-                EVIDENCE_UPLOAD_APPLICANT,
+                EVIDENCE_UPLOAD,
                 migrateCase,
-                EVIDENCE_UPLOAD_RESPONDENT,
-                EVIDENCE_UPLOAD_OTHER_PARTY
+                EVIDENCE_UPLOAD_NOTIFICATION
             )
         ),
         entry(
@@ -866,11 +840,7 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                HEARING_SCHEDULED,
-                HEARING_FEE_UNPAID,
-                REFER_TO_JUDGE,
-                migrateCase,
-                TAKE_CASE_OFFLINE
+                migrateCase
             )
         ),
 
@@ -887,7 +857,6 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                REFER_TO_JUDGE,
                 migrateCase
             )
         ),
@@ -990,10 +959,6 @@ public class FlowStateAllowedEventService {
 
     public boolean isAllowed(CaseDetails caseDetails, CaseEvent caseEvent) {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
-
-        if (caseEvent.equals(migrateCase)) {
-            return true;
-        }
 
         if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())
             || CREATE_CLAIM_SPEC.equals(caseEvent)) {
