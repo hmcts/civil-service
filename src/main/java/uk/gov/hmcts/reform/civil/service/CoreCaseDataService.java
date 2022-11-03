@@ -145,6 +145,8 @@ public class CoreCaseDataService {
         } catch (NotificationException ex) {
             log.info("Exception during user token call  '{}' ", ex.getMessage());
         }
+        log.info("After Exception block to info");
+
         return UserAuthContent.builder().build();
     }
 
