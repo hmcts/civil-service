@@ -62,8 +62,8 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
                 .getServiceRequestReference();
             HearingFeeServiceRequestDetails hearingFeeDetails = caseData.getHearingFeeServiceRequestDetails();
             caseData = caseData.toBuilder()
-                .hearingFeeServiceRequestDetails(hearingFeeDetails.toBuilder()
-                                          .fee(caseData.getHearingFeeServiceRequestDetails().getFee())
+                .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder()
+                                          .fee(caseData.getHearingFee())
                                           .serviceRequestReference(serviceRequestReference).build())
                 .build();
 
