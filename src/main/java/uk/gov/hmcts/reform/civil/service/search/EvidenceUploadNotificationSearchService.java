@@ -23,49 +23,25 @@ public class EvidenceUploadNotificationSearchService extends ElasticSearchServic
     }
 
     public Query query(int startIndex) {
+
         return new Query(
             boolQuery()
-                .must(boolQuery()
-                            .should(rangeQuery("data.documentUploadDisclosure1.value.createdDatetime").lt("now").gt(
+                .minimumShouldMatch(1)
+                .should(boolQuery()
+                            .must(rangeQuery("data.caseDocumentUploadDate").lt("now").gt(
                                 "now-1d"))
-                            .should(rangeQuery("data.documentUploadDisclosure2.value.createdDatetime").lt("now").gt(
+                            .must(beState(CASE_PROGRESSION)))
+                .should(boolQuery()
+                            .must(rangeQuery("data.caseDocumentUploadDate").lt("now").gt(
                                 "now-1d"))
-                            .should(rangeQuery("data.documentUploadWitness1.value.createdDatetime").lt("now").gt(
+                            .must(beState(HEARING_READINESS)))
+                .should(boolQuery()
+                            .must(rangeQuery("data.caseDocumentUploadDate").lt("now").gt(
                                 "now-1d"))
-                            .should(rangeQuery("data.documentUploadWitness2.value.createdDatetime").lt("now").gt(
-                                "now-1d"))
-                            .should(rangeQuery("data.documentUploadWitness3.value.createdDatetime").lt("now").gt(
-                                "now-1d"))
-                            .should(rangeQuery("data.documentUploadWitness4.value.createdDatetime").lt("now").gt(
-                                "now-1d"))
-                            .should(rangeQuery("data.documentUploadExpert1.value.createdDatetime").lt("now").gt(
-                                "now-1d"))
-                            .should(rangeQuery("data.documentUploadExpert2.value.createdDatetime").lt("now").gt(
-                                "now-1d"))
-                            .should(rangeQuery("data.documentUploadExpert3.value.createdDatetime").lt("now").gt(
-                                "now-1d"))
-                            .should(rangeQuery("data.documentUploadExpert4.value.createdDatetime").lt("now").gt(
-                                "now-1d"))
-                            .should(rangeQuery("data.documentUploadTrial1.value.createdDatetime").lt("now").gt(
-                        "now-1d"))
-                            .should(rangeQuery("data.documentUploadTrial2.value.createdDatetime").lt("now").gt(
-                                "now-1d"))
-                            .should(rangeQuery("data.documentUploadTrial3.value.createdDatetime").lt("now").gt(
-                                "now-1d"))
-                            .should(rangeQuery("data.documentUploadTrial4.value.createdDatetime").lt("now").gt(
-                        "now-1d"))
-                            .minimumShouldMatch(1)
-                )
-                .must(boolQuery()
-                          .should(beState(CASE_PROGRESSION))
-                          .should(beState(HEARING_READINESS))
-                          .should(beState(PREPARE_FOR_HEARING_CONDUCT_HEARING))
-                          .minimumShouldMatch(1)
-                ),
+                            .must(beState(PREPARE_FOR_HEARING_CONDUCT_HEARING))),
             List.of("reference"),
             startIndex
         );
-
     }
 
     public BoolQueryBuilder beState(CaseState state) {
