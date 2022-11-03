@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -416,6 +417,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             log.info("Case management equals: " + caseData.getCaseManagementCategory());
             log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
         }
+
+        dataBuilder.ccdState(CaseState.PENDING_CASE_ISSUED);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
