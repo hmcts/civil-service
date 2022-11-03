@@ -39,7 +39,6 @@ class DefendantPinToPostLRspecServiceTest {
     @Autowired
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
 
-
     @MockBean
     private CoreCaseDataService coreCaseDataService;
 
