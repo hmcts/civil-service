@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
@@ -181,11 +182,11 @@ public class LocationHelper {
     private Optional<RequestedCourt> getUnspecClaimantRequestedCourt(CaseData caseData) {
         return Optional.ofNullable(caseData.getCourtLocation())
             .map(courtLocation -> RequestedCourt.builder()
+                .requestHearingAtSpecificCourt(YesOrNo.YES)
                 .responseCourtCode(courtLocation.getApplicantPreferredCourt())
                 .caseLocation(courtLocation.getCaseLocation())
                 .build());
     }
-
     /**
      * We say that a locationRefData matches a RequestedCourt if the court code is the same or if
      * (a) the court's case location has region equal to locationRefData.regionId and (b) base location
@@ -195,6 +196,7 @@ public class LocationHelper {
      * @param preferredCourt a preferred court
      * @return first matching location
      */
+
     private Optional<LocationRefData> getMatching(List<LocationRefData> locations, RequestedCourt preferredCourt) {
         if (preferredCourt == null) {
             return Optional.empty();
