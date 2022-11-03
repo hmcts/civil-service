@@ -11,13 +11,17 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
 
 import java.math.BigDecimal;
 import java.net.URI;
+import java.time.LocalDate;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
@@ -25,6 +29,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.ADJOURN_VACATE_HEARING;
 
 @SpringBootTest(classes = {GeneralAppFeesService.class, RestTemplate.class, GeneralAppFeesConfiguration.class})
 class GeneralAppFeesServiceTest {
@@ -57,6 +62,8 @@ class GeneralAppFeesServiceTest {
         when(feesConfiguration.getJurisdiction2()).thenReturn("civil");
         when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
         when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
+        //TODO set to actual ga free keyword
+        when(feesConfiguration.getFreeKeyword()).thenReturn("CopyPagesUpTo10");
     }
 
     @Test
@@ -141,6 +148,69 @@ class GeneralAppFeesServiceTest {
         assertThat(queryCaptor.getValue().toString())
                 .isEqualTo("dummy_url/fees-register/fees/lookup?channel=default&event=general%20application"
                         + "&jurisdiction1=civil&jurisdiction2=civil&service=general&keyword=GAOnNotice");
+    }
+
+    @Test
+    void shouldReturnFreeData_whenConsentedLateThan14DaysAdjournVacateApplicationIsBeingMade() {
+        when(restTemplate.getForObject(queryCaptor.capture(), eq(FeeLookupResponseDto.class)))
+                .thenReturn(FeeLookupResponseDto.builder()
+                        .feeAmount(TEST_FEE_AMOUNT_POUNDS_275)
+                        .code("test_fee_code")
+                        .version(1)
+                        .build());
+
+        GAHearingDateGAspec gaHearingDateGAspec = GAHearingDateGAspec.builder()
+                .hearingScheduledDate(LocalDate.now().plusDays(15)).build();
+        GAApplicationType gaApplicationType = GAApplicationType.builder()
+                .types(singletonList(ADJOURN_VACATE_HEARING))
+                .build();
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
+                CaseDataBuilder.builder().build(), true, false);
+        caseData = caseData.toBuilder()
+                .generalAppType(gaApplicationType)
+                .generalAppHearingDate(gaHearingDateGAspec).build();
+
+        Fee feeDto = feesService.getFeeForGA(caseData);
+        //TODO replace keyword we have real free fee for GA
+        assertThat(queryCaptor.getValue().toString())
+                .isEqualTo("dummy_url/fees-register/fees/lookup?channel=default&event=copies"
+                        + "&jurisdiction1=civil&jurisdiction2=civil&service=insolvency&keyword=CopyPagesUpTo10");
+    }
+
+    @Test
+    void shouldPay_whenConsentedWithin14DaysAdjournVacateApplicationIsBeingMade() {
+        when(restTemplate.getForObject(queryCaptor.capture(), eq(FeeLookupResponseDto.class)))
+                .thenReturn(FeeLookupResponseDto.builder()
+                        .feeAmount(TEST_FEE_AMOUNT_POUNDS_108)
+                        .code("test_fee_code")
+                        .version(1)
+                        .build());
+
+        GAHearingDateGAspec gaHearingDateGAspec = GAHearingDateGAspec.builder()
+                .hearingScheduledDate(LocalDate.now().plusDays(14)).build();
+        GAApplicationType gaApplicationType = GAApplicationType.builder()
+                .types(singletonList(ADJOURN_VACATE_HEARING))
+                .build();
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder().getTestCaseDataForApplicationFee(
+                CaseDataBuilder.builder().build(), true, false);
+        caseData = caseData.toBuilder()
+                .generalAppType(gaApplicationType)
+                .generalAppHearingDate(gaHearingDateGAspec).build();
+
+        Fee expectedFeeDto = Fee.builder()
+                .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_108)
+                .code("test_fee_code")
+                .version("1")
+                .build();
+
+        Fee feeDto = feesService.getFeeForGA(caseData);
+
+        assertThat(feeDto).isEqualTo(expectedFeeDto);
+        verify(feesConfiguration, times(1)).getConsentedOrWithoutNoticeKeyword();
+        verify(feesConfiguration, never()).getWithNoticeKeyword();
+        assertThat(queryCaptor.getValue().toString())
+                .isEqualTo("dummy_url/fees-register/fees/lookup?channel=default&event=general%20application"
+                        + "&jurisdiction1=civil&jurisdiction2=civil&service=general&keyword=GeneralAppWithoutNotice");
     }
 
     @Test
