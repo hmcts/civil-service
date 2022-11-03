@@ -103,8 +103,7 @@ public class PaymentsService {
     }
 
     private CreateServiceRequestDTO buildServiceRequest(CaseData caseData) {
-        HearingFeeServiceRequestDetails hearingFeeServiceRequestDetails = caseData.getHearingFeeServiceRequestDetails();
-        FeeDto feeResponse = hearingFeeServiceRequestDetails.getFee().toFeeDto();
+        FeeDto feeResponse = caseData.getHearingFee().toFeeDto();
         String siteId = paymentsConfiguration.getSpecSiteId();
 
         return CreateServiceRequestDTO.builder()
