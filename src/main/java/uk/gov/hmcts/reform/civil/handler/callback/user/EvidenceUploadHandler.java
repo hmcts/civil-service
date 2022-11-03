@@ -11,10 +11,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.caseProgression.UploadEvidenceDate;
-import uk.gov.hmcts.reform.civil.model.caseProgression.UploadEvidenceExpert4;
+import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDate;
+import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert4;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -42,8 +43,6 @@ public class EvidenceUploadHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(EVIDENCE_UPLOAD);
     private final ObjectMapper objectMapper;
     private final IdamClient idamClient;
-    private String otherPartyName;
-    private UploadEvidenceExpert4 uploadEvidenceExpert4;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -62,26 +61,34 @@ public class EvidenceUploadHandler extends CallbackHandler {
 
     private CallbackResponse populateValues(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        var respondent1Email = caseData.getRespondentSolicitor1EmailAddress();
-        var respondent2Email = caseData.getRespondentSolicitor2EmailAddress();
-        var applicant1Email = caseData.getApplicantSolicitor1UserDetails().getEmail();
+        String respondent1Email = caseData.getRespondentSolicitor1EmailAddress();
+        String respondent2Email = caseData.getRespondentSolicitor2EmailAddress();
+        String applicant1Email = caseData.getApplicantSolicitor1UserDetails().getEmail();
+        List<String> listData = new ArrayList<>();
 
         if (applicant1Email.equals(userDetails.getEmail())) {
-            otherPartyName = RespondentOtherParticipants(caseData).toString();
-        } else if (respondent1Email.equals(userDetails.getEmail()) || respondent2Email
-            .equals(userDetails.getEmail())) {
-            otherPartyName = ApplicantOtherParticipants(caseData).toString();
+            listData = respondentOtherParticipants(caseData);
+
+        } else if (nonNull(respondent1Email.equals(userDetails.getEmail())) || nonNull(respondent2Email
+            .equals(userDetails.getEmail()))) {
+            listData = applicantOtherParticipants(caseData);
         }
-        var partyName = UploadEvidenceExpert4.builder()
-                                                                .expertOption4OtherName(otherPartyName).build();
+
+        UploadEvidenceExpert4 partyName = UploadEvidenceExpert4.builder()
+            .expertOption4OtherName4(DynamicList.fromList(listData)).build();
+        UploadEvidenceDate partyName2 = UploadEvidenceDate.builder()
+            .expertOption3OtherName3(DynamicList.fromList(listData)).build();
 
         List<Element<UploadEvidenceExpert4>> updatedPartyName = newArrayList();
         updatedPartyName.add(0, element(partyName));
 
+        List<Element<UploadEvidenceDate>> updatedPartyName2 = newArrayList();
+        updatedPartyName2.add(0, element(partyName2));
+
         CaseData updatedCaseData = caseData.toBuilder()
             .documentUploadExpert4(updatedPartyName)
+            .documentUploadExpert3(updatedPartyName2)
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -152,32 +159,33 @@ public class EvidenceUploadHandler extends CallbackHandler {
             .build();
     }
 
-    public StringBuilder RespondentOtherParticipants(CaseData caseData) {
-        StringBuilder otherParticipantString = new StringBuilder();
+    public List<String> respondentOtherParticipants(CaseData caseData) {
+        List<String> listData = new ArrayList<>();
         MultiPartyScenario multiPartyScenario  = getMultiPartyScenario(caseData);
         if (multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
             || multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)) {
-            otherParticipantString.append(caseData.getRespondent1().getPartyName())
-                .append(" and ").append(caseData.getRespondent2().getPartyName());
+            listData.add(caseData.getRespondent1().getPartyName());
+            listData.add(caseData.getRespondent2().getPartyName());
+            listData.add("Both");
 
         } else {
-            otherParticipantString.append(caseData.getRespondent1()
-                                              .getPartyName());
+            listData.add(caseData.getRespondent1().getPartyName());
         }
-        return otherParticipantString;
+        return listData;
     }
 
-    public StringBuilder ApplicantOtherParticipants(CaseData caseData) {
-        StringBuilder otherParticipantString = new StringBuilder();
+    public List<String> applicantOtherParticipants(CaseData caseData) {
+        List<String> listData = new ArrayList<>();
         MultiPartyScenario multiPartyScenario  = getMultiPartyScenario(caseData);
         if (multiPartyScenario.equals(MultiPartyScenario.TWO_V_ONE)) {
-            otherParticipantString.append(caseData.getApplicant1().getPartyName())
-                .append(caseData.getApplicant2().getPartyName());
+            listData.add(caseData.getApplicant1().getPartyName());
+            listData.add(caseData.getApplicant2().getPartyName());
+            listData.add("Both");
+
         } else {
-            otherParticipantString.append(caseData.getApplicant1()
-                                              .getPartyName());
+            listData.add(caseData.getApplicant1().getPartyName());
         }
-        return otherParticipantString;
+        return listData;
     }
 
 }
