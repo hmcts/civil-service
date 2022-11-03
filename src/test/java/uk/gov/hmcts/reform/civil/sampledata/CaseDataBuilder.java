@@ -3283,6 +3283,15 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder multiPartyClaimTwoDefendantSolicitorsForSdoMP() {
+        this.addRespondent2 = YES;
+        this.respondent2 = PartyBuilder.builder().individual().build();
+        this.respondent2SameLegalRepresentative = NO;
+        this.respondentSolicitor2Reference = "01234";
+        respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
+        return this;
+    }
+
     public CaseDataBuilder multiPartyClaimOneDefendantSolicitor() {
         this.addRespondent2 = YES;
         this.respondent2 = PartyBuilder.builder().individual().build();

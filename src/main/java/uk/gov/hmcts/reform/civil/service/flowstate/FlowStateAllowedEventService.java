@@ -53,6 +53,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
@@ -449,6 +450,7 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 HEARING_SCHEDULED,
                 HEARING_FEE_UNPAID,
+                REFER_TO_JUDGE,
                 migrateCase
             )
         ),
@@ -466,6 +468,7 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
+                REFER_TO_JUDGE,
                 migrateCase
             )
         ),
@@ -478,6 +481,7 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 APPLICATION_CLOSED_UPDATE_CLAIM,
+                REFER_TO_JUDGE,
                 migrateCase
             )
         ),
@@ -487,8 +491,9 @@ public class FlowStateAllowedEventService {
                 CASE_PROCEEDS_IN_CASEMAN,
                 ADD_CASE_NOTE,
                 INITIATE_GENERAL_APPLICATION,
-                NotSuitable_SDO,
                 CREATE_SDO,
+                NotSuitable_SDO,
+                REFER_TO_JUDGE,
                 APPLICATION_CLOSED_UPDATE_CLAIM,
                 migrateCase
             )
@@ -525,6 +530,7 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
+                REFER_TO_JUDGE,
                 migrateCase
             )
         ),
@@ -536,6 +542,7 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
+                REFER_TO_JUDGE,
                 migrateCase
             )
         ),
@@ -847,6 +854,7 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 HEARING_SCHEDULED,
                 HEARING_FEE_UNPAID,
+                REFER_TO_JUDGE,
                 migrateCase
             )
         ),
@@ -864,6 +872,7 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
+                REFER_TO_JUDGE,
                 migrateCase
             )
         ),
