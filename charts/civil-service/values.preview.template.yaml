@@ -60,8 +60,9 @@ java:
         CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
         CREATE DATABASE "camunda" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
         CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-    postgresqlUsername: ${POSTGRES_USER}
-    postgresqlPassword: ${POSTGRES_PASSWORD}
+    auth:
+      username: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
     persistence:
       enabled: false
 idam-pr:
