@@ -55,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
@@ -83,6 +84,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::populateClaimantResponseScenarioFlag,
+            callbackKey(V_1, ABOUT_TO_START), this::populateClaimantResponseScenarioFlag,
             callbackKey(MID, "set-applicants-proceed-intention"), this::setApplicantsProceedIntention,
             callbackKey(MID, "experts"), this::validateApplicantExperts,
             callbackKey(MID, "witnesses"), this::validateApplicantWitnesses,
@@ -96,10 +98,16 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private CallbackResponse populateClaimantResponseScenarioFlag(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
 
-        CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
-            .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+        if (V_1.equals(callbackParams.getVersion())
+            && featureToggleService.isAccessProfilesEnabled()) {
+            updatedData.claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+        } else {
+            updatedData.claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
+                .superClaimType(UNSPEC_CLAIM);
+        }
 
         if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
             updatedData.respondentSharedClaimResponseDocument(caseData.getRespondent1ClaimResponseDocument());
