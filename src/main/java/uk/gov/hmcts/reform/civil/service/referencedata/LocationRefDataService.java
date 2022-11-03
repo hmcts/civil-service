@@ -134,6 +134,7 @@ public class LocationRefDataService {
         if (StringUtils.isBlank(label)) {
             return Optional.empty();
         }
+
         List<LocationRefData> locations = getCourtLocationsForDefaultJudgments(bearerToken);
         return locations.stream().filter(loc -> LocationRefDataService.getDisplayEntry(loc)
                 .equals(label))
