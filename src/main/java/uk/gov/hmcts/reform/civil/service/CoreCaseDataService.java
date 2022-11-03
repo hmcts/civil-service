@@ -144,7 +144,7 @@ public class CoreCaseDataService {
         } catch (NotificationException ex) {
             log.info("Exception during user token call  '{}' ", ex.getMessage());
         }
-        return null;
+        return getSystemUpdateUser();
     }
 
     public CaseDetails setSupplementaryData(Long caseId, Map<String, Map<String,
