@@ -142,7 +142,7 @@ public class CoreCaseDataService {
             log.info("UserId '{}'", userId);
             return UserAuthContent.builder().userToken(userToken).userId(userId).build();
         } catch (Exception ex) {
-            ex.info("Exception during user token call  '{}' ", ex.getMessage());
+            log.info("Exception during user token call  '{}' ", ex.getMessage());
         }
         return null;
     }
