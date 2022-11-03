@@ -134,13 +134,17 @@ public class CoreCaseDataService {
     }
 
     private UserAuthContent getSystemUpdateUser() {
-        log.info("Before getting token '{}' ",userConfig.getUserName());
-        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
-        log.info("After getting token");
-        String userId = userService.getUserInfo(userToken).getUid();
-        log.info("UserId '{}'", userId);
-        return UserAuthContent.builder().userToken(userToken).userId(userId).build();
-
+        try {
+            log.info("Before getting token '{}' ", userConfig.getUserName());
+            String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+            log.info("After getting token");
+            String userId = userService.getUserInfo(userToken).getUid();
+            log.info("UserId '{}'", userId);
+            return UserAuthContent.builder().userToken(userToken).userId(userId).build();
+        } catch (Exception ex) {
+            ex.info("Exception during user token call  '{}' ", e.getMessage());
+        }
+        return null;
     }
 
     public CaseDetails setSupplementaryData(Long caseId, Map<String, Map<String,
