@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -77,6 +78,11 @@ class EvidenceUploadNotificationCallbackHandlerTest extends BaseCallbackHandlerT
                 .extracting("businessProcess")
                 .extracting("status")
                 .isEqualTo("READY");
+        }
+
+        @Test
+        void shouldReturnCorrectEvent_whenInvoked() {
+            assertThat(handler.handledEvents()).isEqualTo(List.of(EVIDENCE_UPLOAD_NOTIFICATION));
         }
     }
 }
