@@ -50,6 +50,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
@@ -220,7 +221,8 @@ class FlowStateAllowedEventServiceTest {
                         NotSuitable_SDO,
                         EVIDENCE_UPLOAD_JUDGE,
                         EVIDENCE_UPLOAD,
-                        migrateCase
+                        migrateCase,
+                        EVIDENCE_UPLOAD_NOTIFICATION
                     }
                 ),
                 of(
@@ -244,7 +246,8 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         EVIDENCE_UPLOAD_JUDGE,
                         EVIDENCE_UPLOAD,
-                        migrateCase
+                        migrateCase,
+                        EVIDENCE_UPLOAD_NOTIFICATION
                     }
                 ),
                 of(
@@ -272,7 +275,8 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_JUDGE,
                         HEARING_SCHEDULED,
                         EVIDENCE_UPLOAD,
-                        migrateCase
+                        migrateCase,
+                        EVIDENCE_UPLOAD_NOTIFICATION
                     }
                 ),
                 of(
