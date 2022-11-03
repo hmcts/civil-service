@@ -20,44 +20,19 @@ class EvidenceUploadNotificationSearchServiceTest extends ElasticSearchServiceTe
     @Override
     protected Query buildQuery(int fromValue) {
         BoolQueryBuilder query = boolQuery()
-                .must(boolQuery()
-                          .should(rangeQuery("data.documentUploadDisclosure1.value.createdDatetime").lt("now").gt(
-                              "now-1d"))
-                          .should(rangeQuery("data.documentUploadDisclosure2.value.createdDatetime").lt("now").gt(
-                              "now-1d"))
-                          .should(rangeQuery("data.documentUploadWitness1.value.createdDatetime").lt("now").gt(
-                              "now-1d"))
-                          .should(rangeQuery("data.documentUploadWitness2.value.createdDatetime").lt("now").gt(
-                              "now-1d"))
-                          .should(rangeQuery("data.documentUploadWitness3.value.createdDatetime").lt("now").gt(
-                              "now-1d"))
-                          .should(rangeQuery("data.documentUploadWitness4.value.createdDatetime").lt("now").gt(
-                              "now-1d"))
-                          .should(rangeQuery("data.documentUploadExpert1.value.createdDatetime").lt("now").gt(
-                              "now-1d"))
-                          .should(rangeQuery("data.documentUploadExpert2.value.createdDatetime").lt("now").gt(
-                              "now-1d"))
-                          .should(rangeQuery("data.documentUploadExpert3.value.createdDatetime").lt("now").gt(
-                              "now-1d"))
-                          .should(rangeQuery("data.documentUploadExpert4.value.createdDatetime").lt("now").gt(
-                              "now-1d"))
-                          .should(rangeQuery("data.documentUploadTrial1.value.createdDatetime").lt("now").gt(
-                              "now-1d"))
-                          .should(rangeQuery("data.documentUploadTrial2.value.createdDatetime").lt("now").gt(
-                              "now-1d"))
-                          .should(rangeQuery("data.documentUploadTrial3.value.createdDatetime").lt("now").gt(
-                              "now-1d"))
-                          .should(rangeQuery("data.documentUploadTrial4.value.createdDatetime").lt("now").gt(
-                              "now-1d"))
-                          .minimumShouldMatch(1)
-                )
-                .must(boolQuery()
-                          .should(boolQuery().must(matchQuery("state", "CASE_PROGRESSION")))
-                          .should(boolQuery().must(matchQuery("state", "HEARING_READINESS")))
-                          .should(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING")))
-                          .minimumShouldMatch(1)
-                );
-
+            .minimumShouldMatch(1)
+            .should(boolQuery()
+                        .must(rangeQuery("data.caseDocumentUploadDate").lt("now").gt(
+                    "now-1d"))
+                        .must(boolQuery().must(matchQuery("state", "CASE_PROGRESSION"))))
+            .should(boolQuery()
+                        .must(rangeQuery("data.caseDocumentUploadDate").lt("now").gt(
+                            "now-1d"))
+                        .must(boolQuery().must(matchQuery("state", "HEARING_READINESS"))))
+            .should(boolQuery()
+                        .must(rangeQuery("data.caseDocumentUploadDate").lt("now").gt(
+                            "now-1d"))
+                        .must(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING"))));
         return new Query(query, List.of("reference"), fromValue);
     }
 }
