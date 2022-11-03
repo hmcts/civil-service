@@ -42,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
@@ -160,7 +161,8 @@ public class FlowStateAllowedEventService {
                 HEARING_SCHEDULED,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
-                EVIDENCE_UPLOAD
+                EVIDENCE_UPLOAD,
+                EVIDENCE_UPLOAD_NOTIFICATION
             )
         ),
 
@@ -187,7 +189,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
-                EVIDENCE_UPLOAD
+                EVIDENCE_UPLOAD,
+                EVIDENCE_UPLOAD_NOTIFICATION
             )
         ),
 
@@ -215,7 +218,8 @@ public class FlowStateAllowedEventService {
                 TAKE_CASE_OFFLINE,
                 EVIDENCE_UPLOAD_JUDGE,
                 HEARING_SCHEDULED,
-                EVIDENCE_UPLOAD
+                EVIDENCE_UPLOAD,
+                EVIDENCE_UPLOAD_NOTIFICATION
 
             )
         ),
@@ -594,7 +598,8 @@ public class FlowStateAllowedEventService {
                 HEARING_SCHEDULED,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
-                EVIDENCE_UPLOAD
+                EVIDENCE_UPLOAD,
+                EVIDENCE_UPLOAD_NOTIFICATION
             )
         ),
         entry(
@@ -620,7 +625,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
-                EVIDENCE_UPLOAD
+                EVIDENCE_UPLOAD,
+                EVIDENCE_UPLOAD_NOTIFICATION
             )
         ),
         entry(

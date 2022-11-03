@@ -171,4 +171,7 @@ public class NotificationsProperties {
     @NotEmpty
     private String respondentLipResponseSubmissionTemplate;
 
+    @NotEmpty
+    private String evidenceUploadTemplate;
+
 }

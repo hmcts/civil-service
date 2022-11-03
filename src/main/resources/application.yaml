@@ -194,7 +194,7 @@ notifications:
   respondentLipFullDefenceWithMediationTemplate: "2177f3b0-3833-4788-bd7f-a473e32950af"
   respondentLipFullDefenceNoMediationTemplate: "8825e67e-44a2-444d-afd0-3fa6c34af373"
   respondentLipResponseSubmissionTemplate: "1f6f1053-02f5-4b44-a1f8-90e78930c10a"
-
+  evidenceUploadTemplate: "bd1c9ee5-92a4-49a9-a61f-ff671960b029"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
