@@ -3,15 +3,10 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
-<<<<<<< HEAD
-import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-=======
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.EvidenceUploadNotificationEvent;
->>>>>>> feat/CIV-2898
 import uk.gov.hmcts.reform.civil.service.search.EvidenceUploadNotificationSearchService;
 
 import java.util.List;
