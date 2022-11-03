@@ -127,7 +127,6 @@ public class DefaultJudgmentOrderFormGeneratorTest {
             .atStateClaimIssuedDisposalSDOVideoCall()
             .atStateClaimIssuedDisposalHearingInPerson()
             .atStateDisposalHearingOrderMadeWithoutHearing()
-            .atStateCaseManagementLocation()
             .build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 

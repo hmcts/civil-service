@@ -237,9 +237,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     private String getCourt(CaseData caseData) {
         if (caseData.getDisposalHearingMethodInPersonDJ() != null) {
             return caseData.getDisposalHearingMethodInPersonDJ().getValue().getLabel();
-        } else if (featureToggleService.isHearingAndListingSDOEnabled()) {
-            return caseData.getCaseManagementLocation().getBaseLocation();
         }
+
         return null;
     }
 

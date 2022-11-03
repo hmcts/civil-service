@@ -2992,11 +2992,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateCaseManagementLocation() {
-        caseManagementLocation = CaseLocation.builder().baseLocation("base location").build();
-        return this;
-    }
-
     public CaseDataBuilder atStateNotificationAcknowledged_1v2_BothDefendants() {
         atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors();
         respondent1ClaimResponseIntentionType = FULL_DEFENCE;
