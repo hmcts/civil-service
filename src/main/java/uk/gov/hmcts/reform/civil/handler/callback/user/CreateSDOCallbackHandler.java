@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
@@ -721,24 +722,50 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    private String getHearingInPersonSmall(CaseData caseData) {
+        if (caseData.getSmallClaimsMethod() == SmallClaimsMethod.smallClaimsMethodInPerson
+            && Optional.ofNullable(caseData.getSmallClaimsMethodInPerson())
+            .map(DynamicList::getValue).isPresent()) {
+            return caseData.getSmallClaimsMethodInPerson().getValue().getLabel();
+        }
+        return null;
+    }
+
+    private String getHearingInPersonFast(CaseData caseData) {
+        if (caseData.getFastTrackMethod() == FastTrackMethod.fastTrackMethodInPerson
+            && Optional.ofNullable(caseData.getFastTrackMethodInPerson())
+            .map(DynamicList::getValue).isPresent()) {
+            return caseData.getFastTrackMethodInPerson().getValue().getLabel();
+        }
+        return null;
+    }
+
+    private String getHearingInPersonLocation(CaseData caseData) {
+        if (caseData.getDrawDirectionsOrderRequired() == YesOrNo.YES) {
+            if (caseData.getDrawDirectionsOrderSmallClaims() == YesOrNo.YES) {
+                return getHearingInPersonSmall(caseData);
+            } else {
+                return getHearingInPersonFast(caseData);
+            }
+        } else if (caseData.getClaimsTrack() == ClaimsTrack.fastTrack) {
+            return getHearingInPersonFast(caseData);
+        } else if (caseData.getClaimsTrack() == ClaimsTrack.smallClaimsTrack) {
+            return getHearingInPersonSmall(caseData);
+        } else if (Optional.ofNullable(caseData.getDisposalHearingMethodToggle())
+                .map(c -> c.contains(OrderDetailsPagesSectionsToggle.SHOW)).orElse(Boolean.FALSE)
+            && caseData.getDisposalHearingMethod() == DisposalHearingMethod.disposalHearingMethodInPerson
+            && Optional.ofNullable(caseData.getDisposalHearingMethodInPerson())
+            .map(DynamicList::getValue).isPresent()) {
+            return caseData.getDisposalHearingMethodInPerson().getValue().getLabel();
+        }
+        return null;
+    }
+
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
         CaseData caseData = callbackParams.getCaseData();
 
-        String hearingInPersonLocation = null;
-        if (caseData.getDisposalHearingMethod() == DisposalHearingMethod.disposalHearingMethodInPerson
-            && Optional.ofNullable(caseData.getDisposalHearingMethodInPerson())
-            .map(DynamicList::getValue).isPresent()) {
-            hearingInPersonLocation = caseData.getDisposalHearingMethodInPerson().getValue().getLabel();
-        } else if (caseData.getFastTrackMethod() == FastTrackMethod.fastTrackMethodInPerson
-            && Optional.ofNullable(caseData.getFastTrackMethodInPerson())
-            .map(DynamicList::getValue).isPresent()) {
-            hearingInPersonLocation = caseData.getFastTrackMethodInPerson().getValue().getLabel();
-        } else if (caseData.getSmallClaimsMethod() == SmallClaimsMethod.smallClaimsMethodInPerson
-            && Optional.ofNullable(caseData.getSmallClaimsMethodInPerson())
-            .map(DynamicList::getValue).isPresent()) {
-            hearingInPersonLocation = caseData.getSmallClaimsMethodInPerson().getValue().getLabel();
-        }
+        String hearingInPersonLocation = getHearingInPersonLocation(caseData);
         locationRefDataService.getLocationMatchingLabel(
                 hearingInPersonLocation,
                 callbackParams.getParams().get(BEARER_TOKEN).toString()
