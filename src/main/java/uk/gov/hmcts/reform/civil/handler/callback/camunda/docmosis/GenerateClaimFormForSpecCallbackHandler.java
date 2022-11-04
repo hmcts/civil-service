@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -87,6 +88,32 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
 
         List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, sealedClaim,
                                                                                  caseDataBuilder, callbackParams);
+
+        if (caseData.getSpecClaimDetailsDocumentFiles() != null &&
+            caseData.getSpecClaimTemplateDocumentFiles() != null)
+        {
+            ServedDocumentFiles.builder().particularsOfClaimDocument(wrapElements(
+                caseData.getSpecClaimDetailsDocumentFiles()))
+                .timelineEventUpload(wrapElements(caseData.getSpecClaimTemplateDocumentFiles()))
+                .build();
+            caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().particularsOfClaimDocument
+                    (wrapElements(caseData.getSpecClaimDetailsDocumentFiles()))
+                         .timelineEventUpload(wrapElements(caseData.getSpecClaimTemplateDocumentFiles()))
+                                                    .build());
+
+        } else if (caseData.getSpecClaimTemplateDocumentFiles() != null ) {
+            ServedDocumentFiles.builder().timelineEventUpload(wrapElements
+                                          (caseData.getSpecClaimTemplateDocumentFiles())).build();
+            caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().timelineEventUpload
+                (wrapElements(caseData.getSpecClaimTemplateDocumentFiles())).build());
+
+        } else if (caseData.getSpecClaimDetailsDocumentFiles() != null) {
+            ServedDocumentFiles.builder().particularsOfClaimDocument(wrapElements(
+                caseData.getSpecClaimDetailsDocumentFiles())).build();
+            caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().particularsOfClaimDocument(
+                wrapElements(caseData.getSpecClaimDetailsDocumentFiles())).build());
+        }
+
         if (documentMetaDataList.size() > 1) {
             CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
                 documentMetaDataList,
@@ -99,7 +126,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
         }
-
+        System.out.println("end of the method ");
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
