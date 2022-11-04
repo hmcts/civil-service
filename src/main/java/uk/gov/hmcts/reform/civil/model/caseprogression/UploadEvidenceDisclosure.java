@@ -4,17 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-
-import java.time.LocalDate;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class UploadEvidenceExpert4 {
+public class UploadEvidenceDisclosure {
 
-    private DynamicList expertOption4OtherName4;
-    private LocalDate expertOption4UploadDate;
-
+    private Document disclosureOption1;
+    private Document disclosureOption2;
 }

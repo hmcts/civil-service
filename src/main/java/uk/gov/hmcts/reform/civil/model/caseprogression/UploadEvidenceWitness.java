@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 
 import java.time.LocalDate;
 
@@ -12,13 +12,19 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class UploadEvidenceDate {
+public class UploadEvidenceWitness {
 
+    private String witnessOption1Name;
     private LocalDate witnessOption1UploadDate;
+    private Document witnessOption1;
+
+    private String witnessOption2Name;
+    private Document witnessOption2;
+
+    private String witnessOption3Name;
     private LocalDate witnessOption3UploadDate;
-    private LocalDate expertOption1UploadDate;
-    private LocalDate expertOption2UploadDate;
-    private LocalDate expertOption3UploadDate;
-    private DynamicList expertOption3OtherName3;
+    private Document witnessOption3;
+
+    private Document witnessOption4;
 
 }
