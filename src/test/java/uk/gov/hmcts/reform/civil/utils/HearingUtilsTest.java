@@ -33,31 +33,35 @@ public class HearingUtilsTest {
 
     @Test
     void shouldReturnFee2_whenGivenAnyClaimFee() {
-        assertThat(HearingUtils.getFastTrackFee(15000)).isEqualTo(new BigDecimal(27));
+
+        assertThat(HearingUtils.getFastTrackFee(15000)).isEqualTo(new BigDecimal(2700));
+
     }
 
     @Test
     void shouldReturnFee3_whenGivenAnyClaimFee() {
-        assertThat(HearingUtils.getFastTrackFee(35000)).isEqualTo(new BigDecimal(59));
+        assertThat(HearingUtils.getFastTrackFee(35000)).isEqualTo(new BigDecimal(5900));
+
     }
 
     @Test
     void shouldReturnFee4_whenGivenAnyClaimFee() {
-        assertThat(HearingUtils.getFastTrackFee(90000)).isEqualTo(new BigDecimal(85));
+        assertThat(HearingUtils.getFastTrackFee(90000)).isEqualTo(new BigDecimal(8500));
+
     }
 
     @Test
     void shouldReturnFee5_whenGivenAnyClaimFee() {
-        assertThat(HearingUtils.getFastTrackFee(140000)).isEqualTo(new BigDecimal(123));
+        assertThat(HearingUtils.getFastTrackFee(140000)).isEqualTo(new BigDecimal(12300));
     }
 
     @Test
     void shouldReturnFee6_whenGivenAnyClaimFee() {
-        assertThat(HearingUtils.getFastTrackFee(290000)).isEqualTo(new BigDecimal(181));
+        assertThat(HearingUtils.getFastTrackFee(290000)).isEqualTo(new BigDecimal(18100));
     }
 
     @Test
     void shouldReturnFee7_whenGivenAnyClaimFee() {
-        assertThat(HearingUtils.getFastTrackFee(500000)).isEqualTo(new BigDecimal(346));
+        assertThat(HearingUtils.getFastTrackFee(500000)).isEqualTo(new BigDecimal(34600));
     }
 }
