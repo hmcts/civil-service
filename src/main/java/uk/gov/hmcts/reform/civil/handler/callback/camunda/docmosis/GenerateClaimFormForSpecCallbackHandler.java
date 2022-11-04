@@ -126,7 +126,6 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         } else {
             caseDataBuilder.systemGeneratedCaseDocuments(wrapElements(sealedClaim));
         }
-        System.out.println("end of the method ");
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
