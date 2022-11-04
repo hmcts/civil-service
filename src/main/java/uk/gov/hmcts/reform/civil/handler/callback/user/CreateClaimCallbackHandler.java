@@ -420,9 +420,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         if (V_1.equals(callbackParams.getVersion()) && toggleService.isCertificateOfServiceEnabled()) {
             if (caseData.getRespondent1Represented().equals(NO)){
                 dataBuilder.defendant1LIPAtClaimIssued(YES);
+            }else{
+                dataBuilder.defendant1LIPAtClaimIssued(NO);
             }
-            if(YES.equals(caseData.getAddRespondent2()) && (caseData.getRespondent2Represented() == NO)){
-                dataBuilder.defendant2LIPAtClaimIssued(YES);
+            if(YES.equals(caseData.getAddRespondent2())) {
+               if (caseData.getRespondent2Represented() == NO){
+                   dataBuilder.defendant2LIPAtClaimIssued(YES);
+               }
+               else{
+                   dataBuilder.defendant2LIPAtClaimIssued(NO);
+               }
             }
         }
 

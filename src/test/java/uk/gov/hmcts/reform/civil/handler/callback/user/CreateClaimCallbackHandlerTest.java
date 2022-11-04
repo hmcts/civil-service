@@ -1114,6 +1114,65 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Nested
+        class DefendantLipAtClaimIssued {
+            @Test
+            void shouldSetDefend1LipAtClaimIssued_when_defendant1LitigantParty() {
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+                caseData = CaseDataBuilder.builder().atStateClaimSubmitted1v1AndNoRespondentRepresented().build();
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData()).extracting("defendant1LIPAtClaimIssued")
+                    .isEqualTo("Yes");
+                assertThat(response.getData()).extracting("defendant2LIPAtClaimIssued")
+                    .isEqualTo("No");
+            }
+
+            @Test
+            void shouldSetDefend1LipAtClaimIssued_1v2_defendant2LitigantParty_whenInvoked() {
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+                caseData = CaseDataBuilder.builder().atStateClaimSubmitted1v2AndOnlyFirstRespondentIsRepresented().build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData()).extracting("defendant1LIPAtClaimIssued")
+                    .isEqualTo("No");
+                assertThat(response.getData()).extracting("defendant2LIPAtClaimIssued")
+                    .isEqualTo("Yes");
+            }
+
+            @Test
+            void shouldSetDefend1LipAtClaimIssued_1v2_defendant1LitigantParty_whenInvoked() {
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+                caseData = CaseDataBuilder.builder().atStateClaimSubmitted1v2AndOnlySecondRespondentIsRepresented().build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData()).extracting("defendant1LIPAtClaimIssued")
+                    .isEqualTo("Yes");
+                assertThat(response.getData()).extracting("defendant2LIPAtClaimIssued")
+                    .isEqualTo("No");
+            }
+
+            @Test
+            void shouldSetAddLegalRepDeadline_1v2_BothDefendantLitigantParty_whenInvoked() {
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+                caseData = CaseDataBuilder.builder().atStateClaimSubmittedNoRespondentRepresented().build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData()).extracting("defendant1LIPAtClaimIssued")
+                    .isEqualTo("Yes");
+                assertThat(response.getData()).extracting("defendant2LIPAtClaimIssued")
+                    .isEqualTo("Yes");
+            }
+
+        }
+
+        @Nested
         class IdamEmail {
 
             @BeforeEach
