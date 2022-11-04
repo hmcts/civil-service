@@ -34,6 +34,8 @@ public class DocumentGeneratorService {
     public DocmosisDocument generateDocmosisDocument(Map<String, Object> templateData, DocmosisTemplates template) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        log.info("Docmosis access key {}", configuration.getAccessKey());
+        log.info(configuration.getUrl());
 
         DocmosisRequest requestBody = DocmosisRequest.builder()
             .templateName(template.getTemplate())
