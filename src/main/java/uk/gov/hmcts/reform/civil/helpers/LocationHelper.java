@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils;
 
 import java.math.BigDecimal;
@@ -171,11 +173,11 @@ public class LocationHelper {
     private Optional<RequestedCourt> getUnspecClaimantRequestedCourt(CaseData caseData) {
         return Optional.ofNullable(caseData.getCourtLocation())
             .map(courtLocation -> RequestedCourt.builder()
+                .requestHearingAtSpecificCourt(YesOrNo.YES)
                 .responseCourtCode(courtLocation.getApplicantPreferredCourt())
                 .caseLocation(courtLocation.getCaseLocation())
                 .build());
     }
-
     /**
      * We say that a locationRefData matches a RequestedCourt if the court code is the same or if
      * (a) the court's case location has region equal to locationRefData.regionId and (b) base location
@@ -185,6 +187,7 @@ public class LocationHelper {
      * @param preferredCourt a preferred court
      * @return first matching location
      */
+
     private Optional<LocationRefData> getMatching(List<LocationRefData> locations, RequestedCourt preferredCourt) {
         if (preferredCourt == null) {
             return Optional.empty();
@@ -230,12 +233,7 @@ public class LocationHelper {
         updatedData
             .caseManagementLocation(Stream.of(
                     Optional.ofNullable(requestedCourt).map(RequestedCourt::getCaseLocation),
-                    matchingLocation.map(location ->
-                                             CaseLocation.builder()
-                                                 .region(location.getRegionId())
-                                                 .baseLocation(location.getEpimmsId())
-                                                 .build()
-                    )
+                    matchingLocation.map(LocationRefDataService::buildCaseLocation)
                 ).filter(Optional::isPresent)
                                         .map(Optional::get)
                                         .filter(this::isValidCaseLocation)
