@@ -3485,7 +3485,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-
     public CaseData buildMakePaymentsCaseData() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
@@ -3562,6 +3561,7 @@ public class CaseDataBuilder {
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .build();
     }
+
     public CaseDataBuilder setUnassignedCaseListDisplayOrganisationReferences() {
         this.unassignedCaseListDisplayOrganisationReferences = "Organisation references String";
         return this;
