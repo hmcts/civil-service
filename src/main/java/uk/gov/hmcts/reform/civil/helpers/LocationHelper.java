@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils;
 
 import java.math.BigDecimal;
@@ -232,12 +233,7 @@ public class LocationHelper {
         updatedData
             .caseManagementLocation(Stream.of(
                     Optional.ofNullable(requestedCourt).map(RequestedCourt::getCaseLocation),
-                    matchingLocation.map(location ->
-                                             CaseLocation.builder()
-                                                 .region(location.getRegionId())
-                                                 .baseLocation(location.getEpimmsId())
-                                                 .build()
-                    )
+                    matchingLocation.map(LocationRefDataService::buildCaseLocation)
                 ).filter(Optional::isPresent)
                                         .map(Optional::get)
                                         .filter(this::isValidCaseLocation)

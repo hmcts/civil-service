@@ -33,7 +33,6 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -1815,10 +1814,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                                        .getRespondToCourtLocation()
                                                        .getReasonForHearingAtSpecificCourt())
                                                .responseCourtLocations(null)
-                                               .caseLocation(CaseLocation.builder()
-                                                                 .region(courtLocation.getRegionId())
-                                                                 .baseLocation(courtLocation.getEpimmsId())
-                                                                 .build())
+                                               .caseLocation(LocationRefDataService.buildCaseLocation(courtLocation))
                                                .responseCourtCode(courtLocation.getCourtLocationCode()).build());
             dq.respondToCourtLocation(RequestedCourt.builder()
                                           .responseCourtLocations(null)
@@ -1852,10 +1848,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             LocationRefData courtLocation = optCourtLocation.get();
             dq.respondent2DQRequestedCourt(caseData.getRespondent2DQ().getRespondToCourtLocation2().toBuilder()
                                                .responseCourtLocations(null)
-                                               .caseLocation(CaseLocation.builder()
-                                                                 .region(courtLocation.getRegionId())
-                                                                 .baseLocation(courtLocation.getEpimmsId())
-                                                                 .build())
+                                               .caseLocation(LocationRefDataService.buildCaseLocation(courtLocation))
                                                .responseCourtCode(courtLocation.getCourtLocationCode()).build())
                 .respondToCourtLocation2(RequestedCourt.builder()
                                              .responseCourtLocations(null)

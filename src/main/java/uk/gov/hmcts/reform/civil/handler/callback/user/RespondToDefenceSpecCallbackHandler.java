@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -231,10 +230,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                     .applicant1DQ(dq.applicant1DQRequestedCourt(
                         caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().toBuilder()
                             .responseCourtLocations(null)
-                            .caseLocation(CaseLocation.builder()
-                                              .region(courtLocation.getRegionId())
-                                              .baseLocation(courtLocation.getEpimmsId())
-                                              .build())
+                            .caseLocation(LocationRefDataService.buildCaseLocation(courtLocation))
                             .responseCourtCode(courtLocation.getCourtLocationCode()).build()
                     ).build());
             }
