@@ -97,6 +97,66 @@ public class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldReturnError_whenExpertOption2UploadDateFuture() {
+            List<Element<UploadEvidenceExpert>> date = newArrayList();
+            date.add(0, element(uploadEvidenceDate.toBuilder()
+                                    .expertOption2UploadDate(LocalDate.now().plusWeeks(1)).build()));
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .documentUploadExpert2(date)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains("Invalid date: date entered must not be in the future.");
+        }
+
+        @Test
+        void shouldReturnError_whenExpertOption3UploadDateFuture() {
+            List<Element<UploadEvidenceExpert>> date = newArrayList();
+            date.add(0, element(uploadEvidenceDate.toBuilder()
+                                    .expertOption3UploadDate(LocalDate.now().plusWeeks(1)).build()));
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .documentUploadExpert3(date)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains("Invalid date: date entered must not be in the future.");
+        }
+
+        @Test
+        void shouldReturnError_whenExpertOption4UploadDateFuture() {
+            List<Element<UploadEvidenceExpert>> date = newArrayList();
+            date.add(0, element(uploadEvidenceDate.toBuilder()
+                                    .expertOption4UploadDate(LocalDate.now().plusWeeks(1)).build()));
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .documentUploadExpert4(date)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains("Invalid date: date entered must not be in the future.");
+        }
+
+        @Test
+        void shouldReturnError_whenWitnessOption3UploadDateInFuture() {
+            List<Element<UploadEvidenceWitness>> date = newArrayList();
+            date.add(0, element(uploadEvidenceDate2.toBuilder()
+                                    .witnessOption3UploadDate(LocalDate.now().plusWeeks(1)).build()));
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .documentUploadWitness3(date)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains("Invalid date: date entered must not be in the future.");
+        }
+
+        @Test
         void shouldReturnError_whenOneDateIsInFuture() {
             //documentUploadWitness1 represents a collection so can have multiple dates entered at any time,
             // these dates should all should be in past, otherwise an error will be populated
