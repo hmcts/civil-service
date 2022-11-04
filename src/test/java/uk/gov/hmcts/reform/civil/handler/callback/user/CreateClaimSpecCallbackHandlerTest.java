@@ -1136,6 +1136,36 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("region", "baseLocation")
                 .containsExactly("2", "420219");
         }
+
+        @Test
+        void shouldAddMissingRespondent1OrgPolicyWithCaseRole_whenInvoked() {
+            var callbackParams = params.toBuilder()
+                .caseData(params.getCaseData().toBuilder()
+                              .respondent1OrganisationPolicy(null)
+                              .build())
+                .build();
+            when(toggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+
+            assertThat(response.getData())
+                .extracting("respondent1OrganisationPolicy")
+                .extracting("OrgPolicyCaseAssignedRole").isEqualTo("[RESPONDENTSOLICITORONE]");
+        }
+
+        @Test
+        void shouldAddMissingRespondent2OrgPolicyWithCaseRole_whenInvoked() {
+            var callbackParams = params.toBuilder()
+                .caseData(params.getCaseData().toBuilder().build())
+                .build();
+            when(toggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+
+            assertThat(response.getData())
+                .extracting("respondent2OrganisationPolicy")
+                .extracting("OrgPolicyCaseAssignedRole").isEqualTo("[RESPONDENTSOLICITORTWO]");
+        }
     }
 
     @Nested
