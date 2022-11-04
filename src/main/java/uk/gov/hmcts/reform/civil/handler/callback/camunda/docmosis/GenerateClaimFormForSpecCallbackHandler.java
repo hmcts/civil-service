@@ -89,23 +89,22 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, sealedClaim,
                                                                                  caseDataBuilder, callbackParams);
 
-        if (caseData.getSpecClaimDetailsDocumentFiles() != null &&
-            caseData.getSpecClaimTemplateDocumentFiles() != null)
-        {
+        if (caseData.getSpecClaimDetailsDocumentFiles() != null
+            && caseData.getSpecClaimTemplateDocumentFiles() != null) {
             ServedDocumentFiles.builder().particularsOfClaimDocument(wrapElements(
                 caseData.getSpecClaimDetailsDocumentFiles()))
                 .timelineEventUpload(wrapElements(caseData.getSpecClaimTemplateDocumentFiles()))
                 .build();
-            caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().particularsOfClaimDocument
-                    (wrapElements(caseData.getSpecClaimDetailsDocumentFiles()))
+            caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().particularsOfClaimDocument(
+                    wrapElements(caseData.getSpecClaimDetailsDocumentFiles()))
                          .timelineEventUpload(wrapElements(caseData.getSpecClaimTemplateDocumentFiles()))
                                                     .build());
 
-        } else if (caseData.getSpecClaimTemplateDocumentFiles() != null ) {
-            ServedDocumentFiles.builder().timelineEventUpload(wrapElements
-                                          (caseData.getSpecClaimTemplateDocumentFiles())).build();
-            caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().timelineEventUpload
-                (wrapElements(caseData.getSpecClaimTemplateDocumentFiles())).build());
+        } else if (caseData.getSpecClaimTemplateDocumentFiles() != null) {
+            ServedDocumentFiles.builder().timelineEventUpload(wrapElements(
+                                          caseData.getSpecClaimTemplateDocumentFiles())).build();
+            caseDataBuilder.servedDocumentFiles(ServedDocumentFiles.builder().timelineEventUpload(
+                wrapElements(caseData.getSpecClaimTemplateDocumentFiles())).build());
 
         } else if (caseData.getSpecClaimDetailsDocumentFiles() != null) {
             ServedDocumentFiles.builder().particularsOfClaimDocument(wrapElements(
