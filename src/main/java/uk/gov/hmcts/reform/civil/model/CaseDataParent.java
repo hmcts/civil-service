@@ -308,4 +308,10 @@ public class CaseDataParent implements MappableObject {
 
     private final String migrationId;
 
+    /**
+     * Adding for Certificate of Service
+     */
+    private final YesOrNo defendant1LIPAtClaimIssued;
+    private final YesOrNo defendant2LIPAtClaimIssued;
+
 }

@@ -416,6 +416,15 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             log.info("Case management equals: " + caseData.getCaseManagementCategory());
             log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
         }
+        //Adding variables for feature Certificate of Service
+        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCertificateOfServiceEnabled()) {
+            if (caseData.getRespondent1Represented().equals(NO)){
+                dataBuilder.defendant1LIPAtClaimIssued(YES);
+            }
+            if(YES.equals(caseData.getAddRespondent2()) && (caseData.getRespondent2Represented() == NO)){
+                dataBuilder.defendant2LIPAtClaimIssued(YES);
+            }
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
