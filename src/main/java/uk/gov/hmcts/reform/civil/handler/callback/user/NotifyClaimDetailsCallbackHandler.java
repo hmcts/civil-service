@@ -56,6 +56,9 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     public static final String WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR =
         "Your claim will progress offline if you only notify one Defendant of the claim details.";
 
+    public static final String DOC_SERVED_DATE_IN_FUTURE =
+            "Date you served the documents must be today or in the past";
+
     private final ExitSurveyContentService exitSurveyContentService;
     private final ObjectMapper objectMapper;
     private final Time time;
@@ -67,6 +70,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             callbackKey(ABOUT_TO_START), this::prepareDefendantSolicitorOptions,
             callbackKey(MID, "validateNotificationOption"), this::validateNotificationOption,
             callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim,
+            callbackKey(MID, "cos1"), this::validateCertificateOfService,
+            callbackKey(MID, "cos2"), this::validateCertificateOfService,
             callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
             callbackKey(SUBMITTED), this::buildConfirmationWithSolicitorOptions
         );
@@ -193,5 +198,20 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             .map(DynamicListElement::getLabel)
             .orElse("")
             .equalsIgnoreCase("Both");
+    }
+
+    private CallbackResponse validateCertificateOfService(final CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        ArrayList<String> errors = new ArrayList<>();
+        if (true) {
+            errors.add(DOC_SERVED_DATE_IN_FUTURE);
+        }
+
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .errors(errors)
+                .build();
     }
 }
