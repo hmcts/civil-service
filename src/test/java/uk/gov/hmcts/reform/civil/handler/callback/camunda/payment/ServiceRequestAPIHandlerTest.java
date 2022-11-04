@@ -79,7 +79,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
-            assertThat(extractPaymentDetailsFromResponse(response).getServiceRequestReference())
+            assertThat(extractPaymentDetailsFromResponse(response).getServiceReqReference())
                 .isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
         }
 
@@ -92,6 +92,6 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
     private HFPbaDetails
         extractPaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-        return responseCaseData.getHearingFeeServiceRequestDetails();
+        return responseCaseData.getHearingFeePBADetails();
     }
 }

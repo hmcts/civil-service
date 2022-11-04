@@ -82,7 +82,8 @@ public class PaymentsHFCallbackHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         try {
             log.info("processing payment for case " + caseData.getCcdCaseReference());
-            var paymentReference = paymentsService.createHFCreditAccountPayment(caseData, authToken).getPaymentReference();
+            var paymentReference = paymentsService.createHFCreditAccountPayment(caseData, authToken)
+                .getPaymentReference();
             HFPbaDetails pbaDetails = caseData.getHearingFeePBADetails();
             PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
                 .map(PaymentDetails::toBuilder)

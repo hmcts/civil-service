@@ -262,9 +262,11 @@ class PaymentsServiceTest {
         void shouldCreateCreditAccountPayment_whenValidCaseDetails() {
             CaseData caseData = CaseDataBuilder.builder().buildMakePaymentsCaseData();
 
-            var expectedCreditAccountPaymentRequest = getExpectedCreditAccountPaymentRequest(caseData);
+            var expectedCreditAccountPaymentRequest =
+                getExpectedCreditAccountPaymentRequest(caseData);
 
-            PBAServiceRequestResponse paymentResponse = paymentsService.createHFCreditAccountPayment(caseData, AUTH_TOKEN);
+            PBAServiceRequestResponse paymentResponse = paymentsService
+                .createHFCreditAccountPayment(caseData, AUTH_TOKEN);
 
             verify(organisationService).findOrganisationById("OrgId");
             assertThat(paymentResponse).isEqualTo(PAYMENT_DTO);

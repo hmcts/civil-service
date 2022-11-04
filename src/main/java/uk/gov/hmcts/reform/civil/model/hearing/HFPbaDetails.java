@@ -23,7 +23,6 @@ public class HFPbaDetails {
     private final LocalDateTime paymentSuccessfulDate;
     private final String serviceReqReference;
 
-
     @JsonCreator
     HFPbaDetails(@JsonProperty("applicantsPbaAccounts") DynamicList applicantsPbaAccounts,
                  @JsonProperty("pbaReference") String pbaReference,
