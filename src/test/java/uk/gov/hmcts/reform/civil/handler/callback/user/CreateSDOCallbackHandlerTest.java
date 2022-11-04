@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
@@ -17,11 +18,14 @@ import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -46,6 +50,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -138,6 +144,157 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(CREATE_SDO.name(), "READY");
+        }
+    }
+
+    @Nested
+    class AboutToSubmitCallbackVariableCase {
+
+        private String userId;
+
+        private static final String EMAIL = "example@email.com";
+        private final LocalDateTime submittedDate = LocalDateTime.now();
+
+        @BeforeEach
+        void setup() {
+            userId = UUID.randomUUID().toString();
+
+            given(idamClient.getUserDetails(any()))
+                .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
+
+            given(time.now()).willReturn(submittedDate);
+        }
+
+        @Test
+        void shouldUpdateCaseLocation_whenDisposal() {
+            List<String> items = List.of("label 1", "label 2", "label 3");
+            DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
+                .disposalHearingMethodInPerson(options)
+                .disposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            LocationRefData matching = LocationRefData.builder()
+                .regionId("region id")
+                .epimmsId("epimms id")
+                .build();
+            Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
+                CallbackParams.Params.BEARER_TOKEN).toString()))
+                .thenReturn(Optional.of(matching));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsOnly(matching.getRegionId(), matching.getEpimmsId());
+        }
+
+        @Test
+        void shouldUpdateCaseLocation_whenFastTrack() {
+            List<String> items = List.of("label 1", "label 2", "label 3");
+            DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
+                .fastTrackMethodInPerson(options)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            LocationRefData matching = LocationRefData.builder()
+                .regionId("region id")
+                .epimmsId("epimms id")
+                .build();
+            Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
+                    CallbackParams.Params.BEARER_TOKEN).toString()))
+                .thenReturn(Optional.of(matching));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsOnly(matching.getRegionId(), matching.getEpimmsId());
+        }
+
+        @Test
+        void shouldUpdateCaseLocation_whenSmallClaims() {
+            List<String> items = List.of("label 1", "label 2", "label 3");
+            DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
+                .smallClaimsMethodInPerson(options)
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            LocationRefData matching = LocationRefData.builder()
+                .regionId("region id")
+                .epimmsId("epimms id")
+                .build();
+            Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
+                    CallbackParams.Params.BEARER_TOKEN).toString()))
+                .thenReturn(Optional.of(matching));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsOnly(matching.getRegionId(), matching.getEpimmsId());
+        }
+
+        @Test
+        void shouldUpdateCaseLocation_whenFastTrackAndOrderRequired() {
+            List<String> items = List.of("label 1", "label 2", "label 3");
+            DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
+                .fastTrackMethodInPerson(options)
+                .drawDirectionsOrderRequired(YesOrNo.YES)
+                .drawDirectionsOrderSmallClaims(YesOrNo.NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            LocationRefData matching = LocationRefData.builder()
+                .regionId("region id")
+                .epimmsId("epimms id")
+                .build();
+            Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
+                    CallbackParams.Params.BEARER_TOKEN).toString()))
+                .thenReturn(Optional.of(matching));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsOnly(matching.getRegionId(), matching.getEpimmsId());
+        }
+
+        @Test
+        void shouldUpdateCaseLocation_whenSmallClaimsAndOrderRequired() {
+            List<String> items = List.of("label 1", "label 2", "label 3");
+            DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
+                .smallClaimsMethodInPerson(options)
+                .drawDirectionsOrderRequired(YesOrNo.YES)
+                .drawDirectionsOrderSmallClaims(YesOrNo.YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            LocationRefData matching = LocationRefData.builder()
+                .regionId("region id")
+                .epimmsId("epimms id")
+                .build();
+            Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
+                    CallbackParams.Params.BEARER_TOKEN).toString()))
+                .thenReturn(Optional.of(matching));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsOnly(matching.getRegionId(), matching.getEpimmsId());
         }
     }
 
