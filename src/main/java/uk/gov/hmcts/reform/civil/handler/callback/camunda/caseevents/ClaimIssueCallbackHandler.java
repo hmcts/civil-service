@@ -82,8 +82,7 @@ public class ClaimIssueCallbackHandler extends CallbackHandler {
             );
         }
 
-        if (NO.equals(caseData.getRespondent2SameLegalRepresentative())
-            && YES.equals(caseData.getRespondent2OrgRegistered())) {
+        if (NO.equals(caseData.getRespondent2SameLegalRepresentative())) {
             caseDataBuilder.respondent2OrganisationIDCopy(
                 caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID());
 
