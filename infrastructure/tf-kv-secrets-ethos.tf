@@ -1,6 +1,6 @@
 data "azurerm_key_vault" "ethos_vault" {
-  name                = "et-cos-${var.env}"
-  resource_group_name = "et-cos-${var.env}"
+    name                = "ethos-${var.env}"
+    resource_group_name = "ethos-repl-docmosis-backend-${var.env}"
 }
 
 data "azurerm_key_vault_secret" "tornado_access_secret" {
