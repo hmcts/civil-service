@@ -21,8 +21,6 @@ import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.FeeDto;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.request.CreditAccountPaymentRequest;
-import uk.gov.hmcts.reform.payments.request.PBAServiceRequestDTO;
-import uk.gov.hmcts.reform.payments.response.PBAServiceRequestResponse;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.prd.model.Organisation;
@@ -256,30 +254,6 @@ class PaymentsServiceTest {
             PaymentServiceResponse serviceRequestResponse = paymentsService.createServiceRequest(caseData, AUTH_TOKEN);
             assertThat(serviceRequestResponse).isEqualTo(PAYMENT_SERVICE_RESPONSE);
 
-        }
-
-        @Test
-        void shouldCreateCreditAccountPayment_whenValidCaseDetails() {
-            CaseData caseData = CaseDataBuilder.builder().buildMakePaymentsCaseData();
-
-            var expectedCreditAccountPaymentRequest =
-                getExpectedCreditAccountPaymentRequest(caseData);
-
-            PBAServiceRequestResponse paymentResponse = paymentsService
-                .createHFCreditAccountPayment(caseData, AUTH_TOKEN);
-
-            verify(organisationService).findOrganisationById("OrgId");
-            assertThat(paymentResponse).isEqualTo(PAYMENT_DTO);
-        }
-
-        private PBAServiceRequestDTO getExpectedCreditAccountPaymentRequest(CaseData caseData) {
-            return PBAServiceRequestDTO.builder()
-                .accountNumber("PBA0078095")
-                .amount(caseData.getGeneralAppPBADetails().getFee().toFeeDto().getCalculatedAmount())
-                .customerReference(CUSTOMER_REFERENCE)
-                .organisationName(ORGANISATION.getName())
-                .idempotencyKey("2634946490")
-                .build();
         }
     }
 }
