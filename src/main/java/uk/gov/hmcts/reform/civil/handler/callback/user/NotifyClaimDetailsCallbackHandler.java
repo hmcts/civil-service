@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -204,7 +205,12 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         CaseData caseData = callbackParams.getCaseData();
 
         ArrayList<String> errors = new ArrayList<>();
-        if (true) {
+        if ((Objects.nonNull(caseData.getCosNotifyClaimDetails1())
+            && LocalDate.now().isBefore(
+                    caseData.getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant())) ||
+                (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
+                        && LocalDate.now().isBefore(
+                        caseData.getCosNotifyClaimDetails2().getCosDateOfServiceForDefendant()))) {
             errors.add(DOC_SERVED_DATE_IN_FUTURE);
         }
 
