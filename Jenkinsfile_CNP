@@ -55,11 +55,14 @@ def publishRpaContract() {
   sh """ ./gradlew pactPublish """
 }
 
+def branchesToSync = ['perftest','demo','ithc']
+
 withPipeline(type, product, component) {
   pipelineConf = config
   disableLegacyDeployment()
   enableAksStagingDeployment()
   enableSlackNotifications('#civil_notifications')
+  syncBranchesWithMaster(branchesToSync)
 
   onPR {
     env.ENVIRONMENT = "preview"
