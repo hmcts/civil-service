@@ -1,14 +1,16 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import java.util.Collections;
+import java.util.List;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -24,12 +26,9 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
-import java.util.Collections;
-import java.util.List;
-
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     AcknowledgeOfServiceCallbackHandler.class,
+    JacksonAutoConfiguration.class,
     ExitSurveyContentService.class,
     DateOfBirthValidator.class,
     DeadlinesCalculator.class,
@@ -37,7 +36,7 @@ import java.util.List;
     PostcodeValidator.class,
     Time.class
 })
-public class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
+class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private AcknowledgeOfServiceCallbackHandler handler;
@@ -48,8 +47,6 @@ public class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandler
     private DateOfBirthValidator dateOfBirthValidator;
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
-    @MockBean
-    private ObjectMapper objectMapper;
     @MockBean
     private PostcodeValidator postcodeValidator;
     @MockBean
