@@ -56,13 +56,19 @@ public class EvidenceUploadHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
-        checkDateCorrectness(errors, caseData.getDocumentUploadWitness1(), date -> date.getValue().getWitnessOption1UploadDate(), "Invalid date: witness statement date entered must not be in the future (1).");
-        checkDateCorrectness(errors, caseData.getDocumentUploadWitness3(), date -> date.getValue().getWitnessOption3UploadDate(), "Invalid date: witness statement date entered must not be in the future (2).");
+        checkDateCorrectness(errors, caseData.getDocumentUploadWitness1(), date -> date.getValue().getWitnessOption1UploadDate(),
+                             "Invalid date: witness statement date entered must not be in the future (1).");
+        checkDateCorrectness(errors, caseData.getDocumentUploadWitness3(), date -> date.getValue().getWitnessOption3UploadDate(),
+                             "Invalid date: witness statement date entered must not be in the future (2).");
 
-        checkDateCorrectness(errors, caseData.getDocumentUploadExpert1(), date -> date.getValue().getExpertOption1UploadDate(), "Invalid date: expert statement date entered must not be in the future (3).");
-        checkDateCorrectness(errors, caseData.getDocumentUploadExpert2(), date -> date.getValue().getExpertOption2UploadDate(), "Invalid date: expert statement date entered must not be in the future (4).");
-        checkDateCorrectness(errors, caseData.getDocumentUploadExpert3(), date -> date.getValue().getExpertOption3UploadDate(), "Invalid date: expert statement date entered must not be in the future (5).");
-        checkDateCorrectness(errors, caseData.getDocumentUploadExpert4(), date -> date.getValue().getExpertOption4UploadDate(), "Invalid date: expert statement date entered must not be in the future (6).");
+        checkDateCorrectness(errors, caseData.getDocumentUploadExpert1(), date -> date.getValue().getExpertOption1UploadDate(),
+                             "Invalid date: expert statement date entered must not be in the future (3).");
+        checkDateCorrectness(errors, caseData.getDocumentUploadExpert2(), date -> date.getValue().getExpertOption2UploadDate(),
+                             "Invalid date: expert statement date entered must not be in the future (4).");
+        checkDateCorrectness(errors, caseData.getDocumentUploadExpert3(), date -> date.getValue().getExpertOption3UploadDate(),
+                             "Invalid date: expert statement date entered must not be in the future (5).");
+        checkDateCorrectness(errors, caseData.getDocumentUploadExpert4(), date -> date.getValue().getExpertOption4UploadDate(),
+                             "Invalid date: expert statement date entered must not be in the future (6).");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
