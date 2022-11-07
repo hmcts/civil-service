@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.FeeDto;
-import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.request.CreditAccountPaymentRequest;
 import uk.gov.hmcts.reform.payments.response.PBAServiceRequestResponse;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
@@ -49,7 +48,8 @@ class PaymentsServiceTest {
     private static final String SPEC_SERVICE = "spec_service";
     private static final String SPEC_SITE_ID = "spec_site_id";
     private static final String AUTH_TOKEN = "Bearer token";
-    private static final PBAServiceRequestResponse PAYMENT_DTO = PBAServiceRequestResponse.builder().paymentReference("RC-1234-1234-1234-1234").build();
+    private static final PBAServiceRequestResponse PAYMENT_DTO = PBAServiceRequestResponse.builder()
+        .paymentReference("RC-1234-1234-1234-1234").build();
     private static final PaymentServiceResponse PAYMENT_SERVICE_RESPONSE = PaymentServiceResponse.builder()
         .serviceRequestReference("RC-1234-1234-1234-1234").build();
     private static final Organisation ORGANISATION = Organisation.builder()
@@ -101,9 +101,11 @@ class PaymentsServiceTest {
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
                 .build();
 
-            var expectedCreditAccountPaymentRequest = getExpectedCreditAccountPaymentRequest(caseData);
+            var expectedCreditAccountPaymentRequest =
+                getExpectedCreditAccountPaymentRequest(caseData);
 
-            PBAServiceRequestResponse paymentResponse = paymentsService.createCreditAccountPayment(caseData, AUTH_TOKEN);
+            PBAServiceRequestResponse paymentResponse = paymentsService
+                .createCreditAccountPayment(caseData, AUTH_TOKEN);
 
             verify(organisationService).findOrganisationById("OrgId");
             verify(paymentsClient).createCreditAccountPayment(AUTH_TOKEN, expectedCreditAccountPaymentRequest);
@@ -147,9 +149,11 @@ class PaymentsServiceTest {
                 .build();
             caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM).build();
 
-            var expectedCreditAccountPaymentRequest = getExpectedCreditAccountPaymentRequest(caseData);
+            var expectedCreditAccountPaymentRequest =
+                getExpectedCreditAccountPaymentRequest(caseData);
 
-            PBAServiceRequestResponse paymentResponse = paymentsService.createCreditAccountPayment(caseData, AUTH_TOKEN);
+            PBAServiceRequestResponse paymentResponse = paymentsService
+                .createCreditAccountPayment(caseData, AUTH_TOKEN);
 
             verify(organisationService).findOrganisationById("OrgId");
             verify(paymentsClient).createCreditAccountPayment(AUTH_TOKEN, expectedCreditAccountPaymentRequest);

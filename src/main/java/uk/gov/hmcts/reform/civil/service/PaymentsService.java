@@ -1,21 +1,17 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.hearing.HFPbaDetails;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.CasePaymentRequestDto;
 import uk.gov.hmcts.reform.payments.client.models.FeeDto;
-import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.request.CreateServiceRequestDTO;
-import uk.gov.hmcts.reform.payments.request.CreditAccountPaymentRequest;
 import uk.gov.hmcts.reform.payments.request.PBAServiceRequestDTO;
 import uk.gov.hmcts.reform.payments.response.PBAServiceRequestResponse;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
@@ -23,7 +19,6 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.util.UUID;
 
-import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
@@ -63,9 +58,9 @@ public class PaymentsService {
         var organisationName = organisationService.findOrganisationById(organisationId)
             .map(Organisation::getName)
             .orElseThrow(RuntimeException::new);
-        PBAServiceRequestDTO pBAServiceRequestDTO = null;
+        PBAServiceRequestDTO pbaServiceRequestDTO = null;
         if (!isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled()))  {
-            pBAServiceRequestDTO = PBAServiceRequestDTO.builder()
+            pbaServiceRequestDTO = PBAServiceRequestDTO.builder()
                 .accountNumber(hearingFeePBADetails.getApplicantsPbaAccounts()
                                    .getValue().getLabel())
                 .amount(claimFee.getCalculatedAmount())
@@ -74,7 +69,7 @@ public class PaymentsService {
                 .idempotencyKey(String.valueOf(UUID.randomUUID()))
                 .build();
         } else if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
-            pBAServiceRequestDTO = PBAServiceRequestDTO.builder()
+            pbaServiceRequestDTO = PBAServiceRequestDTO.builder()
                 .accountNumber(hearingFeePBADetails.getApplicantsPbaAccounts()
                                    .getValue().getLabel())
                 .amount(claimFee.getCalculatedAmount())
@@ -83,7 +78,7 @@ public class PaymentsService {
                 .idempotencyKey(String.valueOf(UUID.randomUUID()))
                 .build();
         }
-        return pBAServiceRequestDTO;
+        return pbaServiceRequestDTO;
     }
 
     public PBAServiceRequestResponse createCreditAccountPayment(CaseData caseData, String authToken) {
@@ -99,7 +94,6 @@ public class PaymentsService {
         HFPbaDetails hearingFeePBADetails = caseData.getHearingFeePBADetails();
         FeeDto feeResponse = hearingFeePBADetails.getFee().toFeeDto();
         String siteId = paymentsConfiguration.getSpecSiteId();
-
         return CreateServiceRequestDTO.builder()
             .caseReference(caseData.getLegacyCaseReference())
             .ccdCaseNumber(caseData.getCcdCaseReference().toString())
@@ -115,6 +109,4 @@ public class PaymentsService {
                                     .responsibleParty(caseData.getApplicantPartyName()).build())
             .build();
     }
-
-
 }
