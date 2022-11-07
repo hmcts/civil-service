@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.client.models.StatusHistoryDto;
+import uk.gov.hmcts.reform.payments.response.PBAServiceRequestResponse;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -86,7 +87,7 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldMakePbaPayment_whenInvoked() {
             when(paymentsService.createCreditAccountPayment(any(), any()))
-                .thenReturn(PaymentDto.builder().reference(SUCCESSFUL_PAYMENT_REFERENCE).build());
+                .thenReturn(PBAServiceRequestResponse.builder().paymentReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 

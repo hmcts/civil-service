@@ -173,7 +173,9 @@ public class HearingScheduledHandler extends CallbackHandler {
             }
             switch (caseData.getAllocatedTrack()) {
                 case SMALL_CLAIM:
+
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
+
                     break;
                 case FAST_CLAIM:
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(
@@ -181,7 +183,9 @@ public class HearingScheduledHandler extends CallbackHandler {
                             caseData.getClaimFee().getCalculatedAmountInPence().intValue())).build());
                     break;
                 case MULTI_CLAIM:
+
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(117500)).build());
+
                     break;
                 default:
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(0)).build());
@@ -192,6 +196,7 @@ public class HearingScheduledHandler extends CallbackHandler {
             locationList.setListItems(null);
             caseDataBuilder.hearingLocation(locationList);
         }
+
         var state = "HEARING_READINESS";
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(state)

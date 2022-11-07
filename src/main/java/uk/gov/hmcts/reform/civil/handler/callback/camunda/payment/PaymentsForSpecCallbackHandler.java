@@ -80,7 +80,8 @@ public class PaymentsForSpecCallbackHandler extends CallbackHandler {
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         try {
-            var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken).getReference();
+            var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken)
+                .getPaymentReference();
             PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
                 .map(PaymentDetails::toBuilder)
                 .orElse(PaymentDetails.builder())
