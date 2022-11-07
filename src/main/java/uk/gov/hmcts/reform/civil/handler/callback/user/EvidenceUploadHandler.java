@@ -1,5 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
@@ -12,16 +19,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
-import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import uk.gov.hmcts.reform.civil.service.Time;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -35,6 +34,8 @@ public class EvidenceUploadHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(EVIDENCE_UPLOAD);
     private final ObjectMapper objectMapper;
+
+    private final Time time;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -55,69 +56,35 @@ public class EvidenceUploadHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
-        if (caseData.getDocumentUploadWitness1() != null) {
-            List<Element<UploadEvidenceWitness>> dateList = caseData.getDocumentUploadWitness1();
-            dateList.forEach(date -> {
-                if (date.getValue().getWitnessOption1UploadDate().isAfter(LocalDate.now())) {
-                    errors.add("Invalid date: date entered must not be in the future.");
-                }
-            });
-        }
+        checkDateCorrectness(errors, caseData.getDocumentUploadWitness1(), date -> date.getValue().getWitnessOption1UploadDate(), "Invalid date: witness statement date entered must not be in the future (1).");
+        checkDateCorrectness(errors, caseData.getDocumentUploadWitness3(), date -> date.getValue().getWitnessOption3UploadDate(), "Invalid date: witness statement date entered must not be in the future (2).");
 
-        if (caseData.getDocumentUploadWitness3() != null) {
-            List<Element<UploadEvidenceWitness>> dateList = caseData.getDocumentUploadWitness3();
-            dateList.forEach(date -> {
-                if (date.getValue().getWitnessOption3UploadDate().isAfter(LocalDate.now())) {
-                    errors.add("Invalid date: date entered must not be in the future.");
-                }
-            });
-        }
-
-        if (caseData.getDocumentUploadExpert1() != null) {
-            List<Element<UploadEvidenceExpert>> dateList = caseData.getDocumentUploadExpert1();
-            dateList.forEach(date -> {
-                if (date.getValue().getExpertOption1UploadDate().isAfter(LocalDate.now())) {
-                    errors.add("Invalid date: date entered must not be in the future.");
-                }
-            });
-        }
-
-        if (caseData.getDocumentUploadExpert2() != null) {
-            List<Element<UploadEvidenceExpert>> dateList = caseData.getDocumentUploadExpert2();
-            dateList.forEach(date -> {
-                if (date.getValue().getExpertOption2UploadDate().isAfter(LocalDate.now())) {
-                    errors.add("Invalid date: date entered must not be in the future.");
-                }
-            });
-        }
-
-        if (caseData.getDocumentUploadExpert3() != null) {
-            List<Element<UploadEvidenceExpert>> dateList = caseData.getDocumentUploadExpert3();
-            dateList.forEach(date -> {
-                if (date.getValue().getExpertOption3UploadDate().isAfter(LocalDate.now())) {
-                    errors.add("Invalid date: date entered must not be in the future.");
-                }
-            });
-        }
-
-        if (caseData.getDocumentUploadExpert4() != null) {
-            List<Element<UploadEvidenceExpert>> dateList = caseData.getDocumentUploadExpert4();
-            dateList.forEach(date -> {
-                if (date.getValue().getExpertOption4UploadDate().isAfter(LocalDate.now())) {
-                    errors.add("Invalid date: date entered must not be in the future.");
-                }
-            });
-        }
+        checkDateCorrectness(errors, caseData.getDocumentUploadExpert1(), date -> date.getValue().getExpertOption1UploadDate(), "Invalid date: expert statement date entered must not be in the future (3).");
+        checkDateCorrectness(errors, caseData.getDocumentUploadExpert2(), date -> date.getValue().getExpertOption2UploadDate(), "Invalid date: expert statement date entered must not be in the future (4).");
+        checkDateCorrectness(errors, caseData.getDocumentUploadExpert3(), date -> date.getValue().getExpertOption3UploadDate(), "Invalid date: expert statement date entered must not be in the future (5).");
+        checkDateCorrectness(errors, caseData.getDocumentUploadExpert4(), date -> date.getValue().getExpertOption4UploadDate(), "Invalid date: expert statement date entered must not be in the future (6).");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
     }
 
+    <T> void checkDateCorrectness(List<String> errors, List<Element<T>> documentUploadWitness, Function<Element<T>, LocalDate> dateExtractor, String errorMessage) {
+        if (documentUploadWitness == null) {
+            return;
+        }
+        documentUploadWitness.forEach(date -> {
+            LocalDate dateToCheck = dateExtractor.apply(date);
+            if (dateToCheck.isAfter(time.now().toLocalDate())) {
+                errors.add(errorMessage);
+            }
+        });
+    }
+
     private CallbackResponse documentUploadTime(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.caseDocumentUploadDate(LocalDateTime.now());
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.caseDocumentUploadDate(time.now());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
