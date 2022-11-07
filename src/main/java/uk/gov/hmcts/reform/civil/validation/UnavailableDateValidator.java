@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
-import uk.gov.hmcts.reform.civil.validation.groups.UnavailableDateGroup;
 import uk.gov.hmcts.reform.civil.validation.interfaces.IsPresentOrEqualToOrLessThanOneYearInTheFuture;
 
 import java.time.LocalDate;
@@ -28,7 +27,7 @@ public class UnavailableDateValidator implements
 
     private final Validator validator;
 
-@Override
+    @Override
     public boolean isValid(UnavailableDate value, ConstraintValidatorContext context) {
         LocalDate date = value.getDate();
 
