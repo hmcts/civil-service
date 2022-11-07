@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
@@ -52,6 +53,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -71,6 +73,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -593,6 +596,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         CaseDocument document = defaultJudgmentOrderFormGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.orderSDODocumentDJ(document.getDocumentLink());
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
+        systemGeneratedCaseDocuments.add(element(document));
+        caseDataBuilder.orderSDODocumentDJCollection(systemGeneratedCaseDocuments);
         caseDataBuilder.disposalHearingMethodInPersonDJ(deleteLocationList(
             caseData.getDisposalHearingMethodInPersonDJ()));
         caseDataBuilder.trialHearingMethodInPersonDJ(deleteLocationList(

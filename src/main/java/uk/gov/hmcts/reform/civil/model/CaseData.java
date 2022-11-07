@@ -526,6 +526,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> orderSDODocumentDJCollection = new ArrayList<>();
     /**
      * RTJ = Refer To Judge.
      */
