@@ -56,15 +56,16 @@ public class PaymentsService {
         }
     }
 
-     private PBAServiceRequestDTO buildRequest(CaseData caseData) {
+    private PBAServiceRequestDTO buildRequest(CaseData caseData) {
         HFPbaDetails hearingFeePBADetails = caseData.getHearingFeePBADetails();
         FeeDto claimFee = caseData.getClaimFee().toFeeDto();
         var organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
         var organisationName = organisationService.findOrganisationById(organisationId)
             .map(Organisation::getName)
             .orElseThrow(RuntimeException::new);
-
-            return PBAServiceRequestDTO.builder()
+        PBAServiceRequestDTO pBAServiceRequestDTO = null;
+        if (!isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled()))  {
+            pBAServiceRequestDTO = PBAServiceRequestDTO.builder()
                 .accountNumber(hearingFeePBADetails.getApplicantsPbaAccounts()
                                    .getValue().getLabel())
                 .amount(claimFee.getCalculatedAmount())
@@ -72,6 +73,17 @@ public class PaymentsService {
                 .organisationName(organisationName)
                 .idempotencyKey(String.valueOf(UUID.randomUUID()))
                 .build();
+        } else if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+            pBAServiceRequestDTO = PBAServiceRequestDTO.builder()
+                .accountNumber(hearingFeePBADetails.getApplicantsPbaAccounts()
+                                   .getValue().getLabel())
+                .amount(claimFee.getCalculatedAmount())
+                .customerReference(hearingFeePBADetails.getPbaReference())
+                .organisationName(organisationName)
+                .idempotencyKey(String.valueOf(UUID.randomUUID()))
+                .build();
+        }
+        return pBAServiceRequestDTO;
     }
 
     public PBAServiceRequestResponse createCreditAccountPayment(CaseData caseData, String authToken) {
