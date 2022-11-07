@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
@@ -17,7 +18,11 @@ import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -34,6 +39,7 @@ import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
@@ -43,12 +49,16 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -88,6 +98,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     protected LocationRefDataService locationRefDataService;
+
+    @MockBean
+    private DeadlinesCalculator deadlinesCalculator;
 
     @MockBean
     private SdoGeneratorService sdoGeneratorService;
@@ -131,6 +144,157 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(CREATE_SDO.name(), "READY");
+        }
+    }
+
+    @Nested
+    class AboutToSubmitCallbackVariableCase {
+
+        private String userId;
+
+        private static final String EMAIL = "example@email.com";
+        private final LocalDateTime submittedDate = LocalDateTime.now();
+
+        @BeforeEach
+        void setup() {
+            userId = UUID.randomUUID().toString();
+
+            given(idamClient.getUserDetails(any()))
+                .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
+
+            given(time.now()).willReturn(submittedDate);
+        }
+
+        @Test
+        void shouldUpdateCaseLocation_whenDisposal() {
+            List<String> items = List.of("label 1", "label 2", "label 3");
+            DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
+                .disposalHearingMethodInPerson(options)
+                .disposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            LocationRefData matching = LocationRefData.builder()
+                .regionId("region id")
+                .epimmsId("epimms id")
+                .build();
+            Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
+                CallbackParams.Params.BEARER_TOKEN).toString()))
+                .thenReturn(Optional.of(matching));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsOnly(matching.getRegionId(), matching.getEpimmsId());
+        }
+
+        @Test
+        void shouldUpdateCaseLocation_whenFastTrack() {
+            List<String> items = List.of("label 1", "label 2", "label 3");
+            DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
+                .fastTrackMethodInPerson(options)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            LocationRefData matching = LocationRefData.builder()
+                .regionId("region id")
+                .epimmsId("epimms id")
+                .build();
+            Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
+                    CallbackParams.Params.BEARER_TOKEN).toString()))
+                .thenReturn(Optional.of(matching));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsOnly(matching.getRegionId(), matching.getEpimmsId());
+        }
+
+        @Test
+        void shouldUpdateCaseLocation_whenSmallClaims() {
+            List<String> items = List.of("label 1", "label 2", "label 3");
+            DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
+                .smallClaimsMethodInPerson(options)
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            LocationRefData matching = LocationRefData.builder()
+                .regionId("region id")
+                .epimmsId("epimms id")
+                .build();
+            Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
+                    CallbackParams.Params.BEARER_TOKEN).toString()))
+                .thenReturn(Optional.of(matching));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsOnly(matching.getRegionId(), matching.getEpimmsId());
+        }
+
+        @Test
+        void shouldUpdateCaseLocation_whenFastTrackAndOrderRequired() {
+            List<String> items = List.of("label 1", "label 2", "label 3");
+            DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
+                .fastTrackMethodInPerson(options)
+                .drawDirectionsOrderRequired(YesOrNo.YES)
+                .drawDirectionsOrderSmallClaims(YesOrNo.NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            LocationRefData matching = LocationRefData.builder()
+                .regionId("region id")
+                .epimmsId("epimms id")
+                .build();
+            Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
+                    CallbackParams.Params.BEARER_TOKEN).toString()))
+                .thenReturn(Optional.of(matching));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsOnly(matching.getRegionId(), matching.getEpimmsId());
+        }
+
+        @Test
+        void shouldUpdateCaseLocation_whenSmallClaimsAndOrderRequired() {
+            List<String> items = List.of("label 1", "label 2", "label 3");
+            DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
+                .smallClaimsMethodInPerson(options)
+                .drawDirectionsOrderRequired(YesOrNo.YES)
+                .drawDirectionsOrderSmallClaims(YesOrNo.YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            LocationRefData matching = LocationRefData.builder()
+                .regionId("region id")
+                .epimmsId("epimms id")
+                .build();
+            Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
+                    CallbackParams.Params.BEARER_TOKEN).toString()))
+                .thenReturn(Optional.of(matching));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsOnly(matching.getRegionId(), matching.getEpimmsId());
         }
     }
 
@@ -268,6 +432,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class MidEventPrePopulateOrderDetailsPagesCallback extends LocationRefSampleDataBuilder {
+
+        private final LocalDate date = LocalDate.of(2022, 1, 5);
+
+        @BeforeEach
+        void setup() {
+            when(deadlinesCalculator.plusWorkingDays(any(), anyInt())).thenReturn(date);
+            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
+        }
 
         @Test
         void shouldPrePopulateOrderDetailsPages() {
@@ -750,6 +922,33 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("Photographs and/or a place of the accident location shall be prepared and agreed by the "
                                + "parties and uploaded to the Digital Portal no later than 14 days before the "
                                + "hearing.");
+            assertThat(response.getData()).extracting("disposalHearingHearingTime").extracting("input")
+                .isEqualTo("This claim will be listed for final disposal before a judge on the first available date "
+                               + "after");
+            assertThat(response.getData()).extracting("disposalHearingHearingTime").extracting("dateTo")
+                .isEqualTo(LocalDate.now().plusWeeks(16).toString());
+            assertThat(response.getData()).extracting("disposalOrderWithoutHearing").extracting("input")
+                .isEqualTo(String.format("Each party has the right to apply to have this Order set aside or varied. "
+                                             + "Any such application must be received by the Court (together with the "
+                                             + "appropriate fee) by 4pm on %s.",
+                                         date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))));
+            assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("helpText1")
+                .isEqualTo("If either party considers that the time estimate is insufficient, "
+                               + "they must inform the court within 7 days of the date of this order.");
+            assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("helpText2")
+                .isEqualTo("Not more than seven nor less than three clear days before the trial, "
+                               + "the claimant must file at court and serve an indexed and paginated bundle of "
+                               + "documents which complies with the requirements of Rule 39.5 Civil Procedure Rules "
+                               + "and which complies with requirements of PD32. The parties must endeavour to agree "
+                               + "the contents of the bundle before it is filed. The bundle will include a case "
+                               + "summary and a chronology.");
+            assertThat(response.getData()).extracting("fastTrackOrderWithoutJudgement").extracting("input")
+                .isEqualTo(String.format("This order has been made without hearing. Each party has the right to apply "
+                                             + "to have this Order set aside or varied. Any such application must be "
+                                             + "received by the Court (together with the appropriate fee) by 4pm "
+                                             + "on %s.",
+                                         date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))));
+
         }
 
         @Test
@@ -840,6 +1039,21 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("12.0%");
             assertThat(response.getData()).extracting("smallClaimsJudgementDeductionValue").extracting("value")
                 .isEqualTo("12.0%");
+        }
+
+        @Test
+        void shouldNotSetValuesForHnLIfToggleDisabled() {
+            when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("disposalHearingHearingTime").isNull();
+            assertThat(response.getData()).extracting("disposalOrderWithoutHearing").isNull();
+            assertThat(response.getData()).extracting("fastTrackHearingTime").isNull();
+            assertThat(response.getData()).extracting("fastTrackOrderWithoutJudgement").isNull();
         }
     }
 

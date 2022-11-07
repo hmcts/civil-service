@@ -42,7 +42,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_API;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
@@ -177,9 +176,7 @@ public class HearingScheduledHandler extends CallbackHandler {
             }
             switch (caseData.getAllocatedTrack()) {
                 case SMALL_CLAIM:
-
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
-
                     break;
                 case FAST_CLAIM:
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(
@@ -187,9 +184,7 @@ public class HearingScheduledHandler extends CallbackHandler {
                             caseData.getClaimFee().getCalculatedAmountInPence().intValue())).build());
                     break;
                 case MULTI_CLAIM:
-
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(117500)).build());
-
                     break;
                 default:
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(0)).build());
@@ -203,7 +198,9 @@ public class HearingScheduledHandler extends CallbackHandler {
 
         caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
 
+        var state = "HEARING_READINESS";
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .state(state)
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }

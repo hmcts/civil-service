@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantRespon
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
@@ -39,6 +40,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
@@ -47,15 +49,19 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
@@ -137,8 +143,11 @@ public class CaseDataParent implements MappableObject {
     private DisposalHearingSchedulesOfLoss disposalHearingSchedulesOfLoss;
     private DisposalHearingStandardDisposalOrder disposalHearingStandardDisposalOrder;
     private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearing;
+    private DisposalHearingHearingTime disposalHearingHearingTime;
     private DisposalHearingBundle disposalHearingBundle;
     private DisposalHearingNotes disposalHearingNotes;
+    private String disposalHearingHearingNotes;
+    private DisposalOrderWithoutHearing disposalOrderWithoutHearing;
     private final DisposalHearingMethod disposalHearingMethod;
     private final DisposalHearingMethodTelephoneHearing disposalHearingMethodTelephoneHearing;
     private final DisposalHearingMethodVideoConferenceHearing disposalHearingMethodVideoConferenceHearing;
@@ -163,7 +172,10 @@ public class CaseDataParent implements MappableObject {
     private FastTrackWitnessOfFact fastTrackWitnessOfFact;
     private FastTrackSchedulesOfLoss fastTrackSchedulesOfLoss;
     private FastTrackTrial fastTrackTrial;
+    private FastTrackHearingTime fastTrackHearingTime;
     private FastTrackNotes fastTrackNotes;
+    private FastTrackHearingNotes fastTrackHearingNotes;
+    private FastTrackOrderWithoutJudgement fastTrackOrderWithoutJudgement;
     private final List<FastTrack> fastClaims;
     private final FastTrackMethod fastTrackMethod;
     private final FastTrackMethodTelephoneHearing fastTrackMethodTelephoneHearing;
@@ -207,11 +219,13 @@ public class CaseDataParent implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> smallClaimsDocumentsToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsWitnessStatementToggle;
 
-    private Document sdoOrderDocument;
+    private CaseDocument sdoOrderDocument;
 
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
     private final YesOrNo setFastTrackFlag;
+    private final String eventDescriptionRTJ;
+    private final String additionalInformationRTJ;
 
     private final LocalDate nextDeadline;
     private final String allPartyNames;
@@ -291,5 +305,7 @@ public class CaseDataParent implements MappableObject {
     private final ScheduledHearing nextHearingDetails;
 
     private final String respondent1EmailAddress;
+
+    private final String migrationId;
 
 }

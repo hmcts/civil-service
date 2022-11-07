@@ -85,7 +85,10 @@ allprojects {
       // CVE-2021-29425
       dependency group: 'commons-io', name: 'commons-io', version: '2.11.0'
       dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.10.0'
-      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.4'
+      dependency group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.5'
+
+      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.4.2'
+      dependency group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.13.4'
 
       // solves CVE-2022-25857
       dependencySet(
@@ -300,7 +303,7 @@ def versions = [
   springfoxSwagger   : '2.9.2',
   lombok             : '1.18.24',
   pact               : '3.5.24',
-  springSecurity     : '5.7.1'
+  springSecurity     : '5.7.5'
 ]
 
 ext.libraries = [
@@ -356,6 +359,7 @@ dependencies {
 
   implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.8.6'
   implementation group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
+  implementation group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.3'
   implementation group: 'com.github.hmcts', name: 'fees-java-client', version: '0.0.6'
   implementation group: 'com.github.hmcts', name: 'payments-java-client', version: '1.5.2'
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
@@ -387,8 +391,8 @@ dependencies {
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.10.0'
 
 
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.63'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.0-M16'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.68'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.1'
 
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.15.2'
 

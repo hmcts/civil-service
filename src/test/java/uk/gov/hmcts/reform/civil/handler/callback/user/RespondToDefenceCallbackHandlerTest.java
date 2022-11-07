@@ -518,6 +518,50 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("applicant2DQStatementOfTruth").isNotNull();
         }
 
+        @ParameterizedTest
+        @EnumSource(value = FlowState.Main.class,
+            names = {"FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED"},
+            mode = EnumSource.Mode.INCLUDE)
+        void shouldUpdateBusinessProcess_whenAtFullDefenceStateV1ForSDO(FlowState.Main flowState) {
+            var params = callbackParamsOf(
+                CallbackVersion.V_1,
+                CaseDataBuilder.builder().atState(flowState).build(),
+                ABOUT_TO_SUBMIT
+            );
+
+            when(featureToggleService.isSdoEnabled()).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("status", "camundaEvent")
+                .containsExactly(READY.name(), CLAIMANT_RESPONSE.name());
+
+            assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = FlowState.Main.class,
+            names = {"FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED"},
+            mode = EnumSource.Mode.INCLUDE)
+        void shouldUpdateBusinessProcess_whenAtFullDefenceStateV1ForSdoMP(FlowState.Main flowState) {
+
+            var params = callbackParamsOf(
+                CallbackVersion.V_1,
+                CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
+                    .multiPartyClaimTwoDefendantSolicitorsForSdoMP().build(),
+                ABOUT_TO_SUBMIT
+            );
+
+            when(featureToggleService.isSdoEnabled()).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("status", "camundaEvent")
+                .containsExactly(READY.name(), CLAIMANT_RESPONSE.name());
+
+            assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
+        }
+
         @Test
         void shouldAssembleClaimantResponseDocuments() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
