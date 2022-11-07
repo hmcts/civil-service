@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.FeeDto;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.request.CreditAccountPaymentRequest;
+import uk.gov.hmcts.reform.payments.response.PBAServiceRequestResponse;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.prd.model.Organisation;
@@ -48,7 +49,7 @@ class PaymentsServiceTest {
     private static final String SPEC_SERVICE = "spec_service";
     private static final String SPEC_SITE_ID = "spec_site_id";
     private static final String AUTH_TOKEN = "Bearer token";
-    private static final PaymentDto PAYMENT_DTO = PaymentDto.builder().reference("RC-1234-1234-1234-1234").build();
+    private static final PBAServiceRequestResponse PAYMENT_DTO = PBAServiceRequestResponse.builder().paymentReference("RC-1234-1234-1234-1234").build();
     private static final PaymentServiceResponse PAYMENT_SERVICE_RESPONSE = PaymentServiceResponse.builder()
         .serviceRequestReference("RC-1234-1234-1234-1234").build();
     private static final Organisation ORGANISATION = Organisation.builder()
@@ -77,10 +78,18 @@ class PaymentsServiceTest {
     class Unspecified {
         @BeforeEach
         void setUp() {
-            given(paymentsClient.createCreditAccountPayment(any(), any())).willReturn(PAYMENT_DTO);
+            given(paymentsClient.createServiceRequest(any(), any())).willReturn(PAYMENT_SERVICE_RESPONSE);
             given(paymentsConfiguration.getService()).willReturn(SERVICE);
             given(paymentsConfiguration.getSiteId()).willReturn(SITE_ID);
+            given(paymentsClient.createPbaPayment(any(), any(), any())).willReturn(PAYMENT_DTO);
             given(organisationService.findOrganisationById(any())).willReturn(Optional.of(ORGANISATION));
+        }
+
+        @Test
+        void validateRequestShouldNotThrowAnError_whenValidCaseDataIsProvided() {
+            CaseData caseData = CaseDataBuilder.builder().buildMakePaymentsCaseData();
+            paymentsService.validateRequest(caseData);
+            assertThat(caseData).isNotNull();
         }
 
         @Test
@@ -94,7 +103,7 @@ class PaymentsServiceTest {
 
             var expectedCreditAccountPaymentRequest = getExpectedCreditAccountPaymentRequest(caseData);
 
-            PaymentDto paymentResponse = paymentsService.createCreditAccountPayment(caseData, AUTH_TOKEN);
+            PBAServiceRequestResponse paymentResponse = paymentsService.createCreditAccountPayment(caseData, AUTH_TOKEN);
 
             verify(organisationService).findOrganisationById("OrgId");
             verify(paymentsClient).createCreditAccountPayment(AUTH_TOKEN, expectedCreditAccountPaymentRequest);
@@ -121,9 +130,10 @@ class PaymentsServiceTest {
     class Specified {
         @BeforeEach
         void setUp() {
-            given(paymentsClient.createCreditAccountPayment(any(), any())).willReturn(PAYMENT_DTO);
+            given(paymentsClient.createServiceRequest(any(), any())).willReturn(PAYMENT_SERVICE_RESPONSE);
             given(paymentsConfiguration.getSpecService()).willReturn(SPEC_SERVICE);
             given(paymentsConfiguration.getSpecSiteId()).willReturn(SPEC_SITE_ID);
+            given(paymentsClient.createPbaPayment(any(), any(), any())).willReturn(PAYMENT_DTO);
             given(organisationService.findOrganisationById(any())).willReturn(Optional.of(ORGANISATION));
         }
 
@@ -139,7 +149,7 @@ class PaymentsServiceTest {
 
             var expectedCreditAccountPaymentRequest = getExpectedCreditAccountPaymentRequest(caseData);
 
-            PaymentDto paymentResponse = paymentsService.createCreditAccountPayment(caseData, AUTH_TOKEN);
+            PBAServiceRequestResponse paymentResponse = paymentsService.createCreditAccountPayment(caseData, AUTH_TOKEN);
 
             verify(organisationService).findOrganisationById("OrgId");
             verify(paymentsClient).createCreditAccountPayment(AUTH_TOKEN, expectedCreditAccountPaymentRequest);
@@ -167,7 +177,7 @@ class PaymentsServiceTest {
         @BeforeEach
         void setUp() {
             given(paymentsClient.createServiceRequest(any(), any())).willReturn(PAYMENT_SERVICE_RESPONSE);
-            given(paymentsClient.createCreditAccountPayment(any(), any())).willReturn(PAYMENT_DTO);
+            given(paymentsClient.createPbaPayment(any(), any(), any())).willReturn(PAYMENT_DTO);
             given(paymentsConfiguration.getSpecService()).willReturn(SPEC_SERVICE);
             given(paymentsConfiguration.getSpecSiteId()).willReturn(SPEC_SITE_ID);
             given(organisationService.findOrganisationById(any())).willReturn(Optional.of(ORGANISATION));

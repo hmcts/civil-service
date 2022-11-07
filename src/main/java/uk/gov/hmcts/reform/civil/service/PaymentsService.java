@@ -56,55 +56,27 @@ public class PaymentsService {
         }
     }
 
-    public PaymentDto createCreditAccountPayment(CaseData caseData, String authToken) throws FeignException {
-        return paymentsClient.createCreditAccountPayment(authToken, buildRequest(caseData));
-    }
-
-    private CreditAccountPaymentRequest buildRequest(CaseData caseData) {
+     private PBAServiceRequestDTO buildRequest(CaseData caseData) {
+        HFPbaDetails hearingFeePBADetails = caseData.getHearingFeePBADetails();
         FeeDto claimFee = caseData.getClaimFee().toFeeDto();
         var organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
         var organisationName = organisationService.findOrganisationById(organisationId)
             .map(Organisation::getName)
             .orElseThrow(RuntimeException::new);
 
-        String customerReference = ofNullable(caseData.getClaimIssuedPaymentDetails())
-            .map(PaymentDetails::getCustomerReference)
-            .orElse(caseData.getPaymentReference());
-        CreditAccountPaymentRequest creditAccountPaymentRequest = null;
-
-        if (!isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled()))  {
-            creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
-                .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
+            return PBAServiceRequestDTO.builder()
+                .accountNumber(hearingFeePBADetails.getApplicantsPbaAccounts()
+                                   .getValue().getLabel())
                 .amount(claimFee.getCalculatedAmount())
-                .caseReference(caseData.getLegacyCaseReference())
-                .ccdCaseNumber(caseData.getCcdCaseReference().toString())
-                .customerReference(customerReference)
-                .description("Claim issue payment")
+                .customerReference(hearingFeePBADetails.getPbaReference())
                 .organisationName(organisationName)
-                .service(paymentsConfiguration.getService())
-                .siteId(paymentsConfiguration.getSiteId())
-                .fees(new FeeDto[]{claimFee})
+                .idempotencyKey(String.valueOf(UUID.randomUUID()))
                 .build();
-        } else if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
-            creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
-                .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
-                .amount(claimFee.getCalculatedAmount())
-                .caseReference(caseData.getLegacyCaseReference())
-                .ccdCaseNumber(caseData.getCcdCaseReference().toString())
-                .customerReference(customerReference)
-                .description("Claim issue payment")
-                .organisationName(organisationName)
-                .service(paymentsConfiguration.getSpecService())
-                .siteId(paymentsConfiguration.getSpecSiteId())
-                .fees(new FeeDto[]{claimFee})
-                .build();
-        }
-        return creditAccountPaymentRequest;
     }
 
-    public PBAServiceRequestResponse createHFCreditAccountPayment(CaseData caseData, String authToken) {
+    public PBAServiceRequestResponse createCreditAccountPayment(CaseData caseData, String authToken) {
         String serviceReqReference = caseData.getHearingFeePBADetails().getServiceReqReference();
-        return paymentsClient.createPbaPayment(serviceReqReference, authToken, buildPBARequest(caseData));
+        return paymentsClient.createPbaPayment(serviceReqReference, authToken, buildRequest(caseData));
     }
 
     public PaymentServiceResponse createServiceRequest(CaseData caseData, String authToken) {
@@ -132,21 +104,5 @@ public class PaymentsService {
             .build();
     }
 
-    private PBAServiceRequestDTO buildPBARequest(CaseData caseData) {
-        HFPbaDetails hearingFeePBADetails = caseData.getHearingFeePBADetails();
-        FeeDto claimFee = hearingFeePBADetails.getFee().toFeeDto();
-        var organisationId = caseData.getGeneralAppApplnSolicitor().getOrganisationIdentifier();
-        var organisationName = organisationService.findOrganisationById(organisationId)
-            .map(Organisation::getName)
-            .orElseThrow(RuntimeException::new);
 
-        return PBAServiceRequestDTO.builder()
-            .accountNumber(hearingFeePBADetails.getApplicantsPbaAccounts()
-                               .getValue().getLabel())
-            .amount(claimFee.getCalculatedAmount())
-            .customerReference(hearingFeePBADetails.getPbaReference())
-            .organisationName(organisationName)
-            .idempotencyKey(String.valueOf(UUID.randomUUID()))
-            .build();
-    }
 }

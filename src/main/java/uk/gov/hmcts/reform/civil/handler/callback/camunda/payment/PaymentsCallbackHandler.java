@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.hearing.HFPbaDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
@@ -81,7 +82,9 @@ public class PaymentsCallbackHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         try {
             log.info("processing payment for case " + caseData.getCcdCaseReference());
-            var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken).getReference();
+            var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken)
+                .getPaymentReference();
+            HFPbaDetails pbaDetails = caseData.getHearingFeePBADetails();
             PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
                 .map(PaymentDetails::toBuilder)
                 .orElse(PaymentDetails.builder())
