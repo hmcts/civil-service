@@ -137,4 +137,41 @@ public class LocationRefDataService {
             location.getPostcode()
         );
     }
+
+    public LocationRefData getCourtLocation(String authToken, String threeDigitCode) {
+        try {
+            ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
+                buildURIforCourtCode(threeDigitCode),
+                HttpMethod.GET,
+                getHeaders(authToken),
+                new ParameterizedTypeReference<List<LocationRefData>>() {
+                }
+            );
+            List<LocationRefData> locations = responseEntity.getBody();
+            if (locations == null || locations.isEmpty()) {
+                return LocationRefData.builder().build();
+            } else {
+                if (locations.size() > 1) {
+                    log.warn("Location Reference Data Lookup returned more than one CCMCC location");
+                }
+                return locations.get(0);
+            }
+        } catch (Exception e) {
+            log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
+        }
+        return LocationRefData.builder().build();
+    }
+
+    private URI buildURIforCourtCode(String courtCode) {
+        String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
+            .queryParam("court_type_id", "10")
+            .queryParam("is_case_management_location", "Y")
+            .queryParam("court_location_code", courtCode)
+            .queryParam("court_status", "Open");
+
+
+        return builder.buildAndExpand(new HashMap<>()).toUri();
+    }
+
 }
