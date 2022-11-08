@@ -67,6 +67,7 @@ public class GenAppStateHelperService {
 
         List<Element<GeneralApplicationsDetails>> gaDetails = caseData.getGeneralApplicationsDetails();
         List<Element<GADetailsRespondentSol>> respondentSpecficGADetails = caseData.getGaDetailsRespondentSol();
+        List<Element<GADetailsRespondentSol>> respondentTwoSpecficGADetails = caseData.getGaDetailsRespondentSolTwo();
 
         Map<Long, GeneralApplication> generalApplicationMap = getLatestStatusOfGeneralApplication(caseData);
 
@@ -81,6 +82,14 @@ public class GenAppStateHelperService {
             respondentSpecficGADetails.forEach(respondentSolElement -> {
                 if (applicationFilterCriteria(respondentSolElement.getValue(), generalApplicationMap, gaFlow)) {
                     respondentSolElement.getValue().setCaseState(updatedState);
+                }
+            });
+        }
+
+        if (!isEmpty(respondentTwoSpecficGADetails)) {
+            respondentTwoSpecficGADetails.forEach(respondentTwoSolElement -> {
+                if (applicationFilterCriteria(respondentTwoSolElement.getValue(), generalApplicationMap, gaFlow)) {
+                    respondentTwoSolElement.getValue().setCaseState(updatedState);
                 }
             });
         }
