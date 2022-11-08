@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static java.lang.String.format;
@@ -304,4 +306,32 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+    @Test
+    void shouldPassValidateCertificateOfService_whenDateIsPast() {
+        LocalDate past = LocalDate.now().minusDays(1);
+        CaseData caseData = CaseDataBuilder.builder()
+                //todo change to lips
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                .setCoSClaimDetailsWithDate(true, false, past, null)
+                .build();
+        CallbackParams params = callbackParamsOf(caseData, MID, "cos1");
+        AboutToStartOrSubmitCallbackResponse successResponse =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(successResponse.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldFailValidateCertificateOfService_whenDateIsPast() {
+        LocalDate past = LocalDate.now().minusDays(1);
+        LocalDate future = LocalDate.now().plusDays(1);
+        CaseData caseData = CaseDataBuilder.builder()
+                //todo change to lips
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                .setCoSClaimDetailsWithDate(true, true, past, future)
+                .build();
+        CallbackParams params = callbackParamsOf(caseData, MID, "cos2");
+        AboutToStartOrSubmitCallbackResponse successResponse =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(successResponse.getErrors().size()).isEqualTo(1);
+    }
 }

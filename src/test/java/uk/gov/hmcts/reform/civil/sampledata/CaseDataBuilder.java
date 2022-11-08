@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
+import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
@@ -328,6 +329,8 @@ public class CaseDataBuilder {
 
     private String unassignedCaseListDisplayOrganisationReferences;
     private String caseListDisplayDefendantSolicitorReferences;
+    private CertificateOfService cosNotifyClaimDetails1;
+    private CertificateOfService cosNotifyClaimDetails2;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -3503,6 +3506,21 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder setCoSClaimDetailsWithDate(boolean setCos1, boolean setCos2,
+                                                      LocalDate cos1Date, LocalDate cos2Date) {
+        if(setCos1) {
+            CertificateOfService cos1 = CertificateOfService.builder()
+                    .cosDateOfServiceForDefendant(cos1Date).build();
+            this.cosNotifyClaimDetails1 = cos1;
+        }
+        if(setCos2) {
+            CertificateOfService cos2 = CertificateOfService.builder()
+                    .cosDateOfServiceForDefendant(cos2Date).build();
+            this.cosNotifyClaimDetails2 = cos2;
+        }
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -3702,6 +3720,9 @@ public class CaseDataBuilder {
             .caseListDisplayDefendantSolicitorReferences(caseListDisplayDefendantSolicitorReferences)
             //Unsuitable for SDO
             .reasonNotSuitableSDO(reasonNotSuitableSDO)
+            //Certificate of Service
+            .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
+            .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
             .build();
     }
 }

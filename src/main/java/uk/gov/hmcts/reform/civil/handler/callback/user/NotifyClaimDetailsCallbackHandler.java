@@ -50,6 +50,12 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         + " been notified of the claim details.%n%n"
         + "They must respond by %s. Your account will be updated and you will be sent an email.";
 
+    private static final String CONFIRMATION_COS_HEADER =
+            "<br />Certificate of Service - notify claim details";
+
+    private static final String CONFIRMATION_COS_SUMMARY =
+            "<br />Certificate of Service - claim details submitted";
+
     public static final String NOTIFICATION_ONE_PARTY_SUMMARY = "<br />Notification of claim details sent to "
         + "1 Defendant legal representative only.%n%n"
         + "Your claim will proceed offline.";
@@ -157,6 +163,15 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             ))
             .confirmationBody(body)
             .build();
+//TODO if else with cos flag
+//        String body = format(CONFIRMATION_COS_SUMMARY, formattedDeadline) + exitSurveyContentService.applicantSurvey();
+//        return SubmittedCallbackResponse.builder()
+//                .confirmationHeader(String.format(
+//                        CONFIRMATION_COS_HEADER + "%n#: %s",
+//                        caseData.getLegacyCaseReference()
+//                ))
+//                .confirmationBody(body)
+//                .build();
     }
 
     private CallbackResponse prepareDefendantSolicitorOptions(CallbackParams callbackParams) {

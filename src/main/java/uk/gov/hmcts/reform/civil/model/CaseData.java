@@ -566,10 +566,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<DocumentAndNote>> documentAndNote;
     private final CaseNoteType caseNoteType;
 
-    //Certificate of Service
-    private final CertificateOfService cosNotifyClaimDetails1;
-    private final CertificateOfService cosNotifyClaimDetails2;
-
     /**
      * There are several fields that can hold the I2P of applicant1 depending
      * on multiparty scenario, which complicates all conditions depending on it.
