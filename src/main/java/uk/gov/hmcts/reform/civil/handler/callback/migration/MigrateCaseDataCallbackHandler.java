@@ -7,11 +7,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -33,13 +37,13 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(migrateCase);
 
-    private static final String MIGRATION_ID_VALUE = "GSMigration";
+    private static final String MIGRATION_ID_VALUE = "AccessProfileMigration";
 
     private final ObjectMapper objectMapper;
 
+    private final PaymentsConfiguration paymentsConfiguration;
     private final CoreCaseDataService coreCaseDataService;
     private final LocationRefDataService locationRefDataService;
-
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
@@ -52,19 +56,19 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
 
         log.info("Migrating data for case: {}", oldCaseData.getCcdCaseReference());
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
-        CaseLocation caseLocation = CaseLocation.builder().baseLocation("420219").region("2").build();
-        if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
-            CaseMigratonUtility.migrateGS(oldCaseData, "AAA7",
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        CaseLocation caseLocation = null;
+        if (SuperClaimType.SPEC_CLAIM.equals(oldCaseData.getSuperClaimType())) {
+            CaseMigratonUtility.migrateGS(oldCaseData, paymentsConfiguration.getSpecSiteId(),
                                           caseDataBuilder, coreCaseDataService
             );
-
+            caseLocation = CaseLocation.builder().baseLocation("420219").region("2").build();
             CaseMigratonUtility.migrateCaseManagementLocation(caseDataBuilder, caseLocation);
         } else {
             caseLocation = CaseLocation.builder().baseLocation("192280").region("4").build();
             CaseMigratonUtility.migrateCaseManagementLocation(caseDataBuilder, caseLocation);
-            CaseMigratonUtility.migrateGS(oldCaseData, "AAA6",
+            CaseMigratonUtility.migrateGS(oldCaseData, paymentsConfiguration.getSiteId(),
                                           caseDataBuilder, coreCaseDataService
             );
 
@@ -75,9 +79,9 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
         }
 
         CaseMigratonUtility.migrateRespondentAndApplicantDQ(authToken, oldCaseData, caseDataBuilder,
-                                                            locationRefDataService, caseLocation
+                                                            locationRefDataService
         );
-        caseDataBuilder.migrationId(MIGRATION_ID_VALUE);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
