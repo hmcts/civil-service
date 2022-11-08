@@ -32,7 +32,7 @@ public class CaseIssuedAfterFeePaidCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-                callbackKey(ABOUT_TO_SUBMIT), this::changeApplicationState
+                callbackKey(ABOUT_TO_SUBMIT), this::changeStateToCaseIssued
         );
     }
 
@@ -41,7 +41,7 @@ public class CaseIssuedAfterFeePaidCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse changeApplicationState(CallbackParams callbackParams) {
+    private CallbackResponse changeStateToCaseIssued(CallbackParams callbackParams) {
         Long caseId = callbackParams.getCaseData().getCcdCaseReference();
         CaseData caseData = callbackParams.getCaseData();
         log.info("Changing state to {} for caseId: {}", state, caseId);
