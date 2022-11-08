@@ -12,15 +12,21 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseMigratonUtility;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 
@@ -35,6 +41,9 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
 
+    private final PaymentsConfiguration paymentsConfiguration;
+    private final CoreCaseDataService coreCaseDataService;
+    private final LocationRefDataService locationRefDataService;
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
@@ -43,6 +52,41 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse migrateCaseData(CallbackParams callbackParams) {
+        CaseData oldCaseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
+
+        log.info("Migrating data for case: {}", oldCaseData.getCcdCaseReference());
+
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        CaseLocation caseLocation = null;
+        if (SuperClaimType.SPEC_CLAIM.equals(oldCaseData.getSuperClaimType())) {
+            CaseMigratonUtility.migrateGS(oldCaseData, paymentsConfiguration.getSpecSiteId(),
+                                          caseDataBuilder, coreCaseDataService
+            );
+            caseLocation = CaseLocation.builder().baseLocation("420219").region("2").build();
+            CaseMigratonUtility.migrateCaseManagementLocation(caseDataBuilder, caseLocation);
+        } else {
+            caseLocation = CaseLocation.builder().baseLocation("192280").region("4").build();
+            CaseMigratonUtility.migrateCaseManagementLocation(caseDataBuilder, caseLocation);
+            CaseMigratonUtility.migrateGS(oldCaseData, paymentsConfiguration.getSiteId(),
+                                          caseDataBuilder, coreCaseDataService
+            );
+
+            CaseMigratonUtility.migrateUnspecCoutLocation(authToken, oldCaseData, caseDataBuilder,
+                                                          locationRefDataService
+            );
+
+        }
+
+        CaseMigratonUtility.migrateRespondentAndApplicantDQ(authToken, oldCaseData, caseDataBuilder,
+                                                            locationRefDataService
+        );
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+    /*private CallbackResponse migrateCaseData(CallbackParams callbackParams) {
         CaseData oldCaseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
 
@@ -89,7 +133,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
                             .build());
         }
     }
-
+*/
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
