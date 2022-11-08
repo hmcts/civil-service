@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI_DEADLINE_EXTENSION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -84,7 +84,7 @@ class NotifyDeadlineExtensionCallbackHandlerTest extends BaseCallbackHandlerTest
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
-                .isEqualTo(DEFENDANT_RESPONSE_CUI_DEADLINE_EXTENSION.name());
+                .isEqualTo(INFORM_AGREED_EXTENSION_DATE_SPEC.name());
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("status")

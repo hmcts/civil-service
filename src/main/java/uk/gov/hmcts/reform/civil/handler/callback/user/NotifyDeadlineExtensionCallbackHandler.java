@@ -21,14 +21,14 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI_DEADLINE_EXTENSION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotifyDeadlineExtensionCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_CUI_DEADLINE_EXTENSION);
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(INFORM_AGREED_EXTENSION_DATE_SPEC);
 
     private final ObjectMapper objectMapper;
     private final Time time;
@@ -49,7 +49,7 @@ public class NotifyDeadlineExtensionCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData updatedCaseData = callbackParams.getCaseData().toBuilder()
-            .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI_DEADLINE_EXTENSION))
+            .businessProcess(BusinessProcess.ready(INFORM_AGREED_EXTENSION_DATE_SPEC))
             .respondentSolicitor1AgreedDeadlineExtension(time.now().toLocalDate()) // TODO set up the date from CUI
             .build();
 
