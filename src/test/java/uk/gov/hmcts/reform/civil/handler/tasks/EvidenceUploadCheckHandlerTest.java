@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.client.exception.NotFoundException;
+import org.camunda.bpm.client.exception.RestException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,36 +57,36 @@ class EvidenceUploadCheckHandlerTest {
 
     @Test
     void shouldEmitEvidenceUploadCheckEvent_whenCasesFound() {
-        // Given
+        // Given: one case found from search service
         long caseId = 1L;
         Map<String, Object> data = Map.of("data", "some data");
         List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
 
         given(searchService.getCases()).willReturn(caseDetails);
 
-        // When
+        // When: handler is called
         handler.execute(mockTask, externalTaskService);
 
-        // Then
+        // Then: task should be completed
         verify(applicationEventPublisher).publishEvent(new EvidenceUploadNotificationEvent(caseId));
         verify(externalTaskService).complete(mockTask);
     }
 
     @Test
     void shouldNotEmitEvidenceUploadCheckEvent_WhenNoCasesFound() {
-        // Given
+        // Given: no case found from search service
         when(searchService.getCases()).thenReturn(List.of());
 
-        // When
+        // When: handler is called
         handler.execute(mockTask, externalTaskService);
 
-        // Then
+        // Then: publish event should not get called
         verifyNoInteractions(applicationEventPublisher);
     }
 
     @Test
     void shouldCallHandleFailureMethod_whenExceptionFromBusinessLogic() {
-        // Given
+        // Given: error is returned from search service
         String errorMessage = "there was an error";
 
         when(mockTask.getRetries()).thenReturn(null);
@@ -92,10 +94,10 @@ class EvidenceUploadCheckHandlerTest {
             throw new Exception(errorMessage);
         });
 
-        // When
+        // When: handler is called
         handler.execute(mockTask, externalTaskService);
 
-        // Then
+        // Then: error should be handled
         verify(externalTaskService, never()).complete(mockTask);
         verify(externalTaskService).handleFailure(
             eq(mockTask),
@@ -108,10 +110,16 @@ class EvidenceUploadCheckHandlerTest {
 
     @Test
     void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
-        // When
+        //Given: exception thrown on task complete
+        String errorMessage = "there was an error";
+
+        doThrow(new NotFoundException(errorMessage, new RestException(errorMessage, new Exception())))
+            .when(externalTaskService).complete(mockTask);
+
+        // When: handler is called
         handler.execute(mockTask, externalTaskService);
 
-        // Then
+        // Then: handle failure should not get called
         verify(externalTaskService, never()).handleFailure(
             any(ExternalTask.class),
             anyString(),
@@ -123,7 +131,7 @@ class EvidenceUploadCheckHandlerTest {
 
     @Test
     void shouldHandleExceptionAndContinue_whenOneCaseErrors() {
-        // Given
+        // Given: search service returns two cases and returns error in publish event
         long caseId = 1L;
         long otherId = 2L;
         Map<String, Object> data = Map.of("data", "some data");
@@ -138,10 +146,10 @@ class EvidenceUploadCheckHandlerTest {
         doThrow(new NullPointerException(errorMessage))
             .when(applicationEventPublisher).publishEvent(new EvidenceUploadNotificationEvent(caseId));
 
-        // When
+        // When: handler is called
         handler.execute(mockTask, externalTaskService);
 
-        // Then
+        // Then: handle failure should not get called
         verify(externalTaskService, never()).handleFailure(
             any(ExternalTask.class),
             anyString(),
@@ -150,6 +158,7 @@ class EvidenceUploadCheckHandlerTest {
             anyLong()
         );
 
+        //Then: publish event should be called for all cases
         verify(applicationEventPublisher, times(2)).publishEvent(any(EvidenceUploadNotificationEvent.class));
         verify(applicationEventPublisher).publishEvent(new EvidenceUploadNotificationEvent(caseId));
         verify(applicationEventPublisher).publishEvent(new EvidenceUploadNotificationEvent(otherId));
