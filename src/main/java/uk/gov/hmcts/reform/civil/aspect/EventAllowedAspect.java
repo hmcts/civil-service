@@ -51,7 +51,7 @@ public class EventAllowedAspect {
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
         CaseData caseData = callbackParams.getCaseData();
         StringBuilder stateHistoryBuilder = new StringBuilder();
-        FlowState flowState = FlowState.fromFullName("migrating case");
+        FlowState flowState = FlowState.fromFullName("MAIN.DRAFT");
         if (!caseEvent.equals(CaseEvent.migrateCase)) {
             flowState = flowStateAllowedEventService.getFlowState(caseData);
             stateFlowEngine.evaluate(caseData).getStateHistory().forEach(s -> {

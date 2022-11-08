@@ -41,7 +41,7 @@ public class NoOngoingBusinessProcessAspect {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         CaseData caseData = callbackParams.getCaseData();
         StringBuilder stateHistoryBuilder = new StringBuilder();
-        FlowState flowState = FlowState.fromFullName("migrating case");
+        FlowState flowState = FlowState.fromFullName("MAIN.DRAFT");
         if (!caseEvent.equals(CaseEvent.migrateCase)) {
             flowState = flowStateAllowedEventService.getFlowState(caseData);
             stateFlowEngine.evaluate(caseData).getStateHistory().forEach(s -> {
