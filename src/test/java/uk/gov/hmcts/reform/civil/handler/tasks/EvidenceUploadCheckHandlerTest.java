@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,14 +16,12 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.EvidenceUploadNotificationEvent;
 import uk.gov.hmcts.reform.civil.service.search.EvidenceUploadNotificationSearchService;
 
-import java.util.List;
-import java.util.Map;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -29,7 +30,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-public class EvidenceUploadCheckHandlerTest {
+class EvidenceUploadCheckHandlerTest {
 
     @Mock
     private ExternalTask mockTask;
@@ -54,29 +55,36 @@ public class EvidenceUploadCheckHandlerTest {
 
     @Test
     void shouldEmitEvidenceUploadCheckEvent_whenCasesFound() {
+        // Given
         long caseId = 1L;
         Map<String, Object> data = Map.of("data", "some data");
         List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
 
-        when(searchService.getCases()).thenReturn(caseDetails);
+        given(searchService.getCases()).willReturn(caseDetails);
 
+        // When
         handler.execute(mockTask, externalTaskService);
 
+        // Then
         verify(applicationEventPublisher).publishEvent(new EvidenceUploadNotificationEvent(caseId));
         verify(externalTaskService).complete(mockTask);
     }
 
     @Test
     void shouldNotEmitEvidenceUploadCheckEvent_WhenNoCasesFound() {
+        // Given
         when(searchService.getCases()).thenReturn(List.of());
 
+        // When
         handler.execute(mockTask, externalTaskService);
 
+        // Then
         verifyNoInteractions(applicationEventPublisher);
     }
 
     @Test
     void shouldCallHandleFailureMethod_whenExceptionFromBusinessLogic() {
+        // Given
         String errorMessage = "there was an error";
 
         when(mockTask.getRetries()).thenReturn(null);
@@ -84,8 +92,10 @@ public class EvidenceUploadCheckHandlerTest {
             throw new Exception(errorMessage);
         });
 
+        // When
         handler.execute(mockTask, externalTaskService);
 
+        // Then
         verify(externalTaskService, never()).complete(mockTask);
         verify(externalTaskService).handleFailure(
             eq(mockTask),
@@ -98,9 +108,10 @@ public class EvidenceUploadCheckHandlerTest {
 
     @Test
     void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
-
+        // When
         handler.execute(mockTask, externalTaskService);
 
+        // Then
         verify(externalTaskService, never()).handleFailure(
             any(ExternalTask.class),
             anyString(),
@@ -112,6 +123,7 @@ public class EvidenceUploadCheckHandlerTest {
 
     @Test
     void shouldHandleExceptionAndContinue_whenOneCaseErrors() {
+        // Given
         long caseId = 1L;
         long otherId = 2L;
         Map<String, Object> data = Map.of("data", "some data");
@@ -119,15 +131,17 @@ public class EvidenceUploadCheckHandlerTest {
             CaseDetails.builder().id(caseId).data(data).build(),
             CaseDetails.builder().id(otherId).data(data).build());
 
-        when(searchService.getCases()).thenReturn(caseDetails);
+        given(searchService.getCases()).willReturn(caseDetails);
 
         String errorMessage = "there was an error";
 
         doThrow(new NullPointerException(errorMessage))
-            .when(applicationEventPublisher).publishEvent(eq(new EvidenceUploadNotificationEvent(caseId)));
+            .when(applicationEventPublisher).publishEvent(new EvidenceUploadNotificationEvent(caseId));
 
+        // When
         handler.execute(mockTask, externalTaskService);
 
+        // Then
         verify(externalTaskService, never()).handleFailure(
             any(ExternalTask.class),
             anyString(),
