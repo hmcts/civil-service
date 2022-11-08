@@ -290,6 +290,7 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
         // Then
         assertThat(response.getErrors()).contains(errorMessage);
     }
+
     @Test
     void shouldCallExternalTask_whenAboutToSubmit() {
         // Given
