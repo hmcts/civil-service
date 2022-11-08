@@ -56,9 +56,7 @@ public class EventAllowedAspect {
             stateHistoryBuilder.append(s.getName());
             stateHistoryBuilder.append(", ");
         });
-        if (flowStateAllowedEventService.isAllowed(caseDetails, caseEvent)
-                || caseEvent.equals(CaseEvent.migrateCase)
-        ) {
+        if (flowStateAllowedEventService.isAllowed(caseDetails, caseEvent)) {
             return joinPoint.proceed();
         } else {
             log.info(format(
