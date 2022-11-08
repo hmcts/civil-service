@@ -37,7 +37,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(migrateCase);
 
-    private static final String MIGRATION_ID_VALUE = "AccessProfileMigration";
+    private static final String MIGRATION_ID_VALUE = "GSMigration";
 
     private final ObjectMapper objectMapper;
 
@@ -59,7 +59,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         CaseLocation caseLocation = null;
-        if (SuperClaimType.SPEC_CLAIM.equals(oldCaseData.getSuperClaimType())) {
+        if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
             CaseMigratonUtility.migrateGS(oldCaseData, paymentsConfiguration.getSpecSiteId(),
                                           caseDataBuilder, coreCaseDataService
             );
@@ -81,7 +81,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
         CaseMigratonUtility.migrateRespondentAndApplicantDQ(authToken, oldCaseData, caseDataBuilder,
                                                             locationRefDataService
         );
-
+        caseDataBuilder.migrationId(MIGRATION_ID_VALUE);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
