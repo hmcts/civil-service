@@ -423,9 +423,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         }
 
+        dataBuilder.ccdState(PENDING_CASE_ISSUED);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
-            .state(PENDING_CASE_ISSUED.toString())
             .build();
     }
 
