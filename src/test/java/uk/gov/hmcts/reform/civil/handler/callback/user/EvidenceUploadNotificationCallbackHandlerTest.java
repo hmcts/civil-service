@@ -43,11 +43,14 @@ class EvidenceUploadNotificationCallbackHandlerTest extends BaseCallbackHandlerT
 
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
+            //Given: case data
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
+            //When: handler is called with about to start
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            //Then: no error should be returned
             assertThat(response.getErrors()).isNull();
         }
     }
@@ -63,12 +66,15 @@ class EvidenceUploadNotificationCallbackHandlerTest extends BaseCallbackHandlerT
         }
 
         @Test
-        void shouldReturnNotified_WhenInvoked() {
+        void shouldReturnReady_WhenInvoked() {
+            //Given: case data
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+            //When: handler is called with about to submit
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            //Then: correct camunda business process should get called and should be in ready state
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent")

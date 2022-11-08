@@ -51,11 +51,14 @@ class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandler
 
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
+            //given: case where applicant solicitor has email as applicantsolicitor@example.com
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
+            //when: about to submit is called for callback handler
             handler.handle(params);
 
+            //then: email should be sent to applicant solicitor
             verify(notificationService).sendMail(
                     "applicantsolicitor@example.com",
                     "template-id",

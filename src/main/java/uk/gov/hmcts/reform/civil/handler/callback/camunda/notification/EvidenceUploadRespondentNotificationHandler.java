@@ -17,16 +17,19 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR_FOR_EVIDENCE_UPLOAD;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_EVIDENCE_UPLOAD;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_EVIDENCE_UPLOAD;
 
 @Service
 @RequiredArgsConstructor
 public class EvidenceUploadRespondentNotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RESPONDENT_SOLICITOR_FOR_EVIDENCE_UPLOAD);
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RESPONDENT_SOLICITOR1_FOR_EVIDENCE_UPLOAD,
+                                                          NOTIFY_RESPONDENT_SOLICITOR2_FOR_EVIDENCE_UPLOAD);
 
     private static final String REFERENCE_TEMPLATE = "evidence-upload-notification-%s";
-    public static final String TASK_ID = "EvidenceUploadNotifyRespondentSolicitors";
+    public static final String TASK_ID_RESPONDENT1 = "EvidenceUploadNotifyRespondentSolicitor1";
+    public static final String TASK_ID_RESPONDENT2 = "EvidenceUploadNotifyRespondentSolicitor2";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -40,7 +43,7 @@ public class EvidenceUploadRespondentNotificationHandler extends CallbackHandler
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        return isForRespondentSolicitor1(callbackParams) ? TASK_ID_RESPONDENT1 : TASK_ID_RESPONDENT2;
     }
 
     @Override
@@ -50,8 +53,20 @@ public class EvidenceUploadRespondentNotificationHandler extends CallbackHandler
 
     private CallbackResponse notifyRespondentEvidenceUpload(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        String email = null;
+        boolean isRespondent1 =  isForRespondentSolicitor1(callbackParams);
+        if (isRespondent1) {
+            email = caseData.getRespondentSolicitor1EmailAddress();
+        } else {
+            if (caseData.getAddRespondent2() != null
+                && caseData.getAddRespondent2().equals(YesOrNo.YES)
+                && caseData.getRespondentSolicitor2EmailAddress() != null) {
+                email = caseData.getRespondentSolicitor2EmailAddress();
+            }
+        }
+
         notificationService.sendMail(
-            caseData.getRespondentSolicitor1EmailAddress(),
+            email,
             notificationsProperties.getEvidenceUploadTemplate(),
             addProperties(caseData),
             String.format(
@@ -59,22 +74,12 @@ public class EvidenceUploadRespondentNotificationHandler extends CallbackHandler
                 caseData.getLegacyCaseReference()
             )
         );
-        //send email to respondent2
-        if (caseData.getAddRespondent2() != null
-            && caseData.getAddRespondent2().equals(YesOrNo.YES)
-            && caseData.getRespondentSolicitor2EmailAddress() != null) {
-
-            notificationService.sendMail(
-                caseData.getRespondentSolicitor2EmailAddress(),
-                notificationsProperties.getEvidenceUploadTemplate(),
-                addProperties(caseData),
-                String.format(
-                    REFERENCE_TEMPLATE,
-                    caseData.getLegacyCaseReference()
-                )
-            );
-        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private boolean isForRespondentSolicitor1(CallbackParams callbackParams) {
+        return callbackParams.getRequest().getEventId()
+            .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_EVIDENCE_UPLOAD.name());
     }
 
     @Override
