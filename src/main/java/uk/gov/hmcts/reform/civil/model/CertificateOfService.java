@@ -23,6 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class CertificateOfService {
+
     @JsonProperty("cosDateOfServiceForDefendant")
     private LocalDate cosDateOfServiceForDefendant;
     @JsonProperty("cosServedDocumentFiles")
@@ -45,4 +46,6 @@ public class CertificateOfService {
     private String cosSender;
     @JsonProperty("cosSenderFirm")
     private String cosSenderFirm;
+    @JsonProperty("cosSenderStatementOfTruthLabel")
+    private List<String> cosSenderStatementOfTruthLabel;
 }

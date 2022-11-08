@@ -3508,12 +3508,12 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder setCoSClaimDetailsWithDate(boolean setCos1, boolean setCos2,
                                                       LocalDate cos1Date, LocalDate cos2Date) {
-        if(setCos1) {
+        if (setCos1) {
             CertificateOfService cos1 = CertificateOfService.builder()
                     .cosDateOfServiceForDefendant(cos1Date).build();
             this.cosNotifyClaimDetails1 = cos1;
         }
-        if(setCos2) {
+        if (setCos2) {
             CertificateOfService cos2 = CertificateOfService.builder()
                     .cosDateOfServiceForDefendant(cos2Date).build();
             this.cosNotifyClaimDetails2 = cos2;

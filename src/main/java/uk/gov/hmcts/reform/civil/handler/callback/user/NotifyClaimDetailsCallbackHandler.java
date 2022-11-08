@@ -164,7 +164,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             .confirmationBody(body)
             .build();
 //TODO if else with cos flag
-//        String body = format(CONFIRMATION_COS_SUMMARY, formattedDeadline) + exitSurveyContentService.applicantSurvey();
+//        String body = format(CONFIRMATION_COS_SUMMARY, formattedDeadline)
+//        + exitSurveyContentService.applicantSurvey();
 //        return SubmittedCallbackResponse.builder()
 //                .confirmationHeader(String.format(
 //                        CONFIRMATION_COS_HEADER + "%n#: %s",
@@ -222,8 +223,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         ArrayList<String> errors = new ArrayList<>();
         if ((Objects.nonNull(caseData.getCosNotifyClaimDetails1())
             && LocalDate.now().isBefore(
-                    caseData.getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant())) ||
-                (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
+                    caseData.getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant()))
+                || (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
                         && LocalDate.now().isBefore(
                         caseData.getCosNotifyClaimDetails2().getCosDateOfServiceForDefendant()))) {
             errors.add(DOC_SERVED_DATE_IN_FUTURE);

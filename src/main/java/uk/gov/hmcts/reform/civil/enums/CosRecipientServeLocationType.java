@@ -8,7 +8,8 @@ import lombok.RequiredArgsConstructor;
 public enum CosRecipientServeLocationType {
     USUAL_RESIDENCE("Usual Residence"),
     LAST_KNOWN_RESIDENCE("Last known residence"),
-    PLACE_OF_BUSINESS_WITH_CONNECTION("Place of business of the partnership/company/corporation within the jurisdiction with a connection to claim"),
+    PLACE_OF_BUSINESS_WITH_CONNECTION("Place of business of the "
+            + "partnership/company/corporation within the jurisdiction with a connection to claim"),
     PRINCIPAL_OFFICE_COMPANY("Principal office of the company"),
     PRINCIPAL_OFFICE_CORPORATION("Principal office of the corporation"),
     PRINCIPAL_OFFICE_PARTNERSHIP("Principal office of the partnership"),
