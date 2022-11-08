@@ -51,11 +51,14 @@ public class EventAllowedAspect {
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
         CaseData caseData = callbackParams.getCaseData();
         StringBuilder stateHistoryBuilder = new StringBuilder();
-        FlowState flowState = flowStateAllowedEventService.getFlowState(caseData);
-        stateFlowEngine.evaluate(caseData).getStateHistory().forEach(s -> {
-            stateHistoryBuilder.append(s.getName());
-            stateHistoryBuilder.append(", ");
-        });
+        FlowState flowState = FlowState.fromFullName("migrating case");
+        if (!caseEvent.equals(CaseEvent.migrateCase)) {
+            flowState = flowStateAllowedEventService.getFlowState(caseData);
+            stateFlowEngine.evaluate(caseData).getStateHistory().forEach(s -> {
+                stateHistoryBuilder.append(s.getName());
+                stateHistoryBuilder.append(", ");
+            });
+        }
         if (flowStateAllowedEventService.isAllowed(caseDetails, caseEvent)) {
             return joinPoint.proceed();
         } else {
