@@ -82,7 +82,7 @@ class PaymentRequestUpdateCallbackServiceTest {
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID));
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID),"hearingFees");
 
         verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
         verify(coreCaseDataService, times(1)).startUpdate(any(), any());
@@ -114,7 +114,7 @@ class PaymentRequestUpdateCallbackServiceTest {
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID));
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID),"hearingFees");
 
         verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
         verify(coreCaseDataService, times(1)).startUpdate(any(), any());
@@ -135,7 +135,7 @@ class PaymentRequestUpdateCallbackServiceTest {
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(NOT_PAID));
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(NOT_PAID),"hearingFees");
 
         verify(coreCaseDataService, never()).getCase(Long.valueOf(CASE_ID));
         verify(coreCaseDataService, never()).startUpdate(any(), any());

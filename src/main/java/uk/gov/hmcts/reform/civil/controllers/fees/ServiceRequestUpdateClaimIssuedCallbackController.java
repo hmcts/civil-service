@@ -18,18 +18,18 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class ServiceRequestUpdateCallbackController {
+public class ServiceRequestUpdateClaimIssuedCallbackController {
 
     private final PaymentRequestUpdateCallbackService requestUpdateCallbackService;
 
-    @PutMapping(path = "/service-request-update", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
+    @PutMapping(path = "/service-request-update-claim-issued", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
     @ApiOperation(value = "Ways to pay will call this API and send the status of payment with other details")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Callback processed.", response = CallbackResponse.class),
         @ApiResponse(code = 400, message = "Bad Request")})
     public void serviceRequestUpdate(@RequestBody ServiceRequestUpdateDto serviceRequestUpdateDto) {
         try {
-            requestUpdateCallbackService.processCallback(serviceRequestUpdateDto, FeeType.HEARING.name());
+            requestUpdateCallbackService.processCallback(serviceRequestUpdateDto, FeeType.CLAIMISSUED.name());
         } catch (Exception ex) {
             log.error(
                 "Payment callback is unsuccessful for the CaseID: {}",

@@ -36,6 +36,7 @@ java:
     FEIGN_CLIENT_CONFIG_REMOTEEXTERNALTASKSERVICE_URL: http://${SERVICE_NAME}-camunda/engine-rest/
     FEIGN_CLIENT_CONFIG_REMOTEREPOSITORYSERVICE_URL: http://${SERVICE_NAME}-camunda/engine-rest/
     SERVICE_REQUEST_UPDATE: http://${SERVICE_FQDN}/service-request-update
+    SERVICE_REQUEST_UPDATE_CLAIM_ISSUED: http://${SERVICE_FQDN}/service-request-update-claim-issued
     TESTING_SUPPORT_ENABLED: true
     POLLING_EVENT_EMITTER_ENABLED: false
     LAUNCH_DARKLY_ENV: service-staging

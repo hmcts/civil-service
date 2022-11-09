@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -36,7 +37,7 @@ public class PaymentRequestUpdateCallbackService {
 
     private CaseData data;
 
-    public void processCallback(ServiceRequestUpdateDto serviceRequestUpdateDto) {
+    public void processCallback(ServiceRequestUpdateDto serviceRequestUpdateDto , String feeType) {
         log.info("Processing the callback for the caseId {} with status {}", serviceRequestUpdateDto.getCcdCaseNumber(),
                  serviceRequestUpdateDto.getServiceRequestStatus());
 
@@ -46,7 +47,7 @@ public class PaymentRequestUpdateCallbackService {
             CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(serviceRequestUpdateDto
                                                                                    .getCcdCaseNumber()));
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
-            caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData);
+            caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
             createEvent(caseData, SERVICE_REQUEST_RECEIVED,
                         serviceRequestUpdateDto.getCcdCaseNumber()
             );
@@ -78,9 +79,13 @@ public class PaymentRequestUpdateCallbackService {
     }
 
     private CaseData updateCaseDataWithStateAndPaymentDetails(ServiceRequestUpdateDto serviceRequestUpdateDto,
-                                                              CaseData caseData) {
-
-        PaymentDetails pbaDetails = caseData.getHearingFeePaymentDetails();
+                                                              CaseData caseData, String feeType) {
+        PaymentDetails pbaDetails = null;
+        if(feeType.equals(FeeType.HEARING.name())) {
+            pbaDetails = caseData.getHearingFeePaymentDetails();
+        } else if (feeType.equals(FeeType.CLAIMISSUED.name())) {
+            pbaDetails = caseData.getClaimIssuedPaymentDetails();
+        }
         String customerReference = ofNullable(serviceRequestUpdateDto.getPayment())
             .map(PaymentDto::getCustomerReference)
             .orElse(pbaDetails.getCustomerReference());
@@ -95,10 +100,15 @@ public class PaymentRequestUpdateCallbackService {
             .errorMessage(null)
             .build();
 
-        caseData = caseData.toBuilder()
-            .hearingFeePaymentDetails(paymentDetails)
-            .build();
-
+        if(feeType.equals(FeeType.HEARING)) {
+            caseData = caseData.toBuilder()
+                .hearingFeePaymentDetails(paymentDetails)
+                .build();
+        } else{
+            caseData = caseData.toBuilder()
+                .claimIssuedPaymentDetails(paymentDetails)
+                .build();
+        }
         return caseData;
     }
 
