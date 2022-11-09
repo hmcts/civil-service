@@ -3,6 +3,7 @@ resource "azurerm_application_insights" "appinsights" {
   location            = var.appinsights_location
   resource_group_name = azurerm_resource_group.rg.name
   application_type    = "web"
+  tags                = var.common_tags
 }
 
 resource "azurerm_key_vault_secret" "app_insights_key" {

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,9 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
@@ -409,5 +412,41 @@ class LocationRefDataServiceTest {
             assertThat(courtLocations.getEpimmsId()).isNull();
         }
 
+    }
+
+    @Nested
+    class LocationRefMatchingLabel {
+
+        @Test
+        public void whenEmpty_empty() {
+            String bearer = "bearer";
+            Assertions.assertTrue(refDataService.getLocationMatchingLabel(null, bearer).isEmpty());
+            Assertions.assertTrue(refDataService.getLocationMatchingLabel("", bearer).isEmpty());
+        }
+
+        @Test
+        public void whenMatching_match() {
+            LocationRefData el1 = LocationRefData.builder()
+                .siteName("site name")
+                .courtAddress("court address")
+                .postcode("postcode")
+                .build();
+            String bearer = "bearer";
+            when(restTemplate.exchange(
+                uriCaptor.capture(),
+                httpMethodCaptor.capture(),
+                httpEntityCaptor.capture(),
+                ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
+                .thenReturn(ResponseEntity.ok(Collections.singletonList(el1)));
+
+            Optional<LocationRefData> opt = refDataService.getLocationMatchingLabel(
+                LocationRefDataService.getDisplayEntry(el1),
+                bearer
+            );
+            Assertions.assertTrue(opt.isPresent());
+            Assertions.assertEquals(el1.getSiteName(), opt.get().getSiteName());
+            Assertions.assertEquals(el1.getCourtAddress(), opt.get().getCourtAddress());
+            Assertions.assertEquals(el1.getPostcode(), opt.get().getPostcode());
+        }
     }
 }

@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
@@ -24,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
@@ -82,6 +85,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 
 @Service
@@ -407,12 +411,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         if (featureToggleService.isHearingAndListingSDOEnabled()) {
             FastTrackOrderWithoutJudgement tempFastTrackOrderWithoutJudgement = FastTrackOrderWithoutJudgement.builder()
-                .input(String.format("This order has been made without hearing. Each party has the right to apply "
-                                         + "to have this Order set aside or varied. Any such application must be "
-                                         + "received by the Court (together with the appropriate fee) by 4pm "
-                                         + "on %s.",
-                                     deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
-                                         .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))))
+                .input(String.format(
+                    "This order has been made without hearing. Each party has the right to apply "
+                        + "to have this Order set aside or varied. Any such application must be "
+                        + "received by the Court (together with the appropriate fee) by 4pm "
+                        + "on %s.",
+                    deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
+                        .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH))
+                ))
                 .build();
 
             updatedData.fastTrackOrderWithoutJudgement(tempFastTrackOrderWithoutJudgement);
@@ -729,7 +735,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         );
 
         if (document != null) {
-            updatedData.sdoOrderDocument(document.getDocumentLink());
+            updatedData.sdoOrderDocument(document);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -737,16 +743,74 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    private String getHearingInPersonSmall(CaseData caseData) {
+        if (caseData.getSmallClaimsMethod() == SmallClaimsMethod.smallClaimsMethodInPerson
+            && Optional.ofNullable(caseData.getSmallClaimsMethodInPerson())
+            .map(DynamicList::getValue).isPresent()) {
+            return caseData.getSmallClaimsMethodInPerson().getValue().getLabel();
+        }
+        return null;
+    }
+
+    private String getHearingInPersonFast(CaseData caseData) {
+        if (caseData.getFastTrackMethod() == FastTrackMethod.fastTrackMethodInPerson
+            && Optional.ofNullable(caseData.getFastTrackMethodInPerson())
+            .map(DynamicList::getValue).isPresent()) {
+            return caseData.getFastTrackMethodInPerson().getValue().getLabel();
+        }
+        return null;
+    }
+
+    private String getHearingInPersonLocation(CaseData caseData) {
+        if (caseData.getDrawDirectionsOrderRequired() == YesOrNo.YES) {
+            if (caseData.getDrawDirectionsOrderSmallClaims() == YesOrNo.YES) {
+                return getHearingInPersonSmall(caseData);
+            } else {
+                return getHearingInPersonFast(caseData);
+            }
+        } else if (caseData.getClaimsTrack() == ClaimsTrack.fastTrack) {
+            return getHearingInPersonFast(caseData);
+        } else if (caseData.getClaimsTrack() == ClaimsTrack.smallClaimsTrack) {
+            return getHearingInPersonSmall(caseData);
+        } else if (Optional.ofNullable(caseData.getDisposalHearingMethodToggle())
+                .map(c -> c.contains(OrderDetailsPagesSectionsToggle.SHOW)).orElse(Boolean.FALSE)
+            && caseData.getDisposalHearingMethod() == DisposalHearingMethod.disposalHearingMethodInPerson
+            && Optional.ofNullable(caseData.getDisposalHearingMethodInPerson())
+            .map(DynamicList::getValue).isPresent()) {
+            return caseData.getDisposalHearingMethodInPerson().getValue().getLabel();
+        }
+        return null;
+    }
+
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
+        CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
+
+        CaseData caseData = callbackParams.getCaseData();
+
+        String hearingInPersonLocation = getHearingInPersonLocation(caseData);
+        locationRefDataService.getLocationMatchingLabel(
+                hearingInPersonLocation,
+                callbackParams.getParams().get(BEARER_TOKEN).toString()
+            )
+            .map(LocationRefDataService::buildCaseLocation)
+            .ifPresent(dataBuilder::caseManagementLocation);
+
+        CaseDocument document = caseData.getSdoOrderDocument();
+        if (document != null) {
+            List<Element<CaseDocument>> generatedDocuments = callbackParams.getCaseData()
+                .getSystemGeneratedCaseDocuments();
+            generatedDocuments.add(element(document));
+            dataBuilder.systemGeneratedCaseDocuments(generatedDocuments);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
     }
 
-    private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
+    private CaseData.CaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> dataBuilder = caseData.toBuilder();
 
         dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SDO));
 
