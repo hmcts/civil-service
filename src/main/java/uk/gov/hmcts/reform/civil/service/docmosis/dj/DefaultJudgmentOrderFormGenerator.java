@@ -11,13 +11,11 @@ import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
-import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
@@ -33,6 +31,8 @@ import static uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ.disposa
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_DISPOSAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_HNL_TRIAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_TRIAL;
+import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getDynamicListValueLabel;
+import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getHearingTimeEstimateLabel;
 
 @Service
 @RequiredArgsConstructor
@@ -303,15 +303,6 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
     private boolean checkApplicantPartyName(CaseData casedata) {
         return nonNull(casedata.getApplicant1()) && nonNull(casedata.getApplicant1().getPartyName());
-    }
-
-    private String getDynamicListValueLabel(DynamicList dynamicList) {
-        return nonNull(dynamicList) && nonNull(dynamicList.getValue()) ? dynamicList.getValue().getLabel() : null;
-    }
-
-    private String getHearingTimeEstimateLabel(TrialHearingTimeDJ hearingTime) {
-        return nonNull(hearingTime) && nonNull(hearingTime.getHearingTimeEstimate())
-            ? hearingTime.getHearingTimeEstimate().getLabel() : null;
     }
 }
 
