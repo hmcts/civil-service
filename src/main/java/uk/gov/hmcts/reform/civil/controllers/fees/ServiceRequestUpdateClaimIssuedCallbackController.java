@@ -29,7 +29,7 @@ public class ServiceRequestUpdateClaimIssuedCallbackController {
         @ApiResponse(code = 400, message = "Bad Request")})
     public void serviceRequestUpdate(@RequestBody ServiceRequestUpdateDto serviceRequestUpdateDto) {
         try {
-            requestUpdateCallbackService.processCallback(serviceRequestUpdateDto, FeeType.CLAIMISSUED.name()7);
+            requestUpdateCallbackService.processCallback(serviceRequestUpdateDto, FeeType.CLAIMISSUED.name());
         } catch (Exception ex) {
             log.error(
                 "Payment callback is unsuccessful for the CaseID: {}",
