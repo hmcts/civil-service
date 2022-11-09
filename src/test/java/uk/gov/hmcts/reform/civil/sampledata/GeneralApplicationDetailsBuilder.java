@@ -317,7 +317,10 @@ public class GeneralApplicationDetailsBuilder {
         if (withGADetailsResp) {
             caseDataBuilder.gaDetailsRespondentSol(wrapElements(gaDetailsRespo.toArray(new GADetailsRespondentSol[0])));
         }
-
+        if (withGADetailsResp2) {
+            caseDataBuilder.gaDetailsRespondentSolTwo(wrapElements(gaDetailsRespo
+                                                                       .toArray(new GADetailsRespondentSol[0])));
+        }
         return caseDataBuilder.build();
     }
 
