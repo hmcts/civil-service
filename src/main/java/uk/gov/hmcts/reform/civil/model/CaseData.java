@@ -94,6 +94,9 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingHearingNotesDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -516,7 +519,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private TrialHearingWitnessOfFact trialHearingWitnessOfFactDJ;
     private TrialHearingSchedulesOfLoss trialHearingSchedulesOfLossDJ;
     private TrialHearingTrial trialHearingTrialDJ;
+    private TrialHearingTimeDJ trialHearingTimeDJ;
     private TrialHearingNotes trialHearingNotesDJ;
+    private TrialHearingHearingNotesDJ trialHearingHearingNotesDJ;
+    private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
     private TrialBuildingDispute trialBuildingDispute;
     private TrialClinicalNegligence trialClinicalNegligence;
     private TrialCreditHire trialCreditHire;
