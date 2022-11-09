@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -80,9 +81,9 @@ public class PaymentRequestUpdateCallbackService {
     private CaseData updateCaseDataWithStateAndPaymentDetails(ServiceRequestUpdateDto serviceRequestUpdateDto,
                                                               CaseData caseData, String feeType) {
         PaymentDetails pbaDetails = null;
-        if(feeType.equals("hearingFees")) {
+        if(feeType.equals(FeeType.HEARING.name())) {
             pbaDetails = caseData.getHearingFeePaymentDetails();
-        } else if (feeType.equals("claimIssued")) {
+        } else if (feeType.equals(FeeType.CLAIMISSUED.name())) {
             pbaDetails = caseData.getClaimIssuedPaymentDetails();
         }
         String customerReference = ofNullable(serviceRequestUpdateDto.getPayment())
@@ -99,7 +100,7 @@ public class PaymentRequestUpdateCallbackService {
             .errorMessage(null)
             .build();
 
-        if(feeType.equals("hearingFees")) {
+        if(feeType.equals(FeeType.HEARING)) {
             caseData = caseData.toBuilder()
                 .hearingFeePaymentDetails(paymentDetails)
                 .build();
