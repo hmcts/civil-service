@@ -72,7 +72,7 @@ public class FlowPredicate {
         && caseData.getDefendant1LIPAtClaimIssued() == YES)
             ||
             (caseData.getDefendant2LIPAtClaimIssued() != null
-            && caseData.getDefendant2LIPAtClaimIssued() == YES) ;
+            && caseData.getDefendant2LIPAtClaimIssued() == YES);
 
     public static final Predicate<CaseData> claimSubmittedBothRespondentUnrepresented = caseData ->
         caseData.getSubmittedDate() != null
