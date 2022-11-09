@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils;
 
 import java.math.BigDecimal;
@@ -23,6 +25,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -30,6 +33,7 @@ import java.util.stream.Stream;
 @Component
 public class LocationHelper {
 
+    private static final Set<Party.Type> PEOPLE = EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER);
     private final FeatureToggleService featureToggleService;
     private final BigDecimal ccmccAmount;
     private final String ccmccRegionId;
@@ -144,9 +148,17 @@ public class LocationHelper {
      * @return true if defendant 1 is lead defendant
      */
     private boolean leadDefendantIs1(CaseData caseData) {
-        return caseData.getRespondent2ResponseDate() == null
-            || (caseData.getRespondent1ResponseDate() != null
-            && !caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate()));
+        if (caseData.getRespondent2ResponseDate() == null) {
+            return true;
+        }
+        boolean isPeople1 = PEOPLE.contains(caseData.getRespondent1().getType());
+        boolean isPeople2 = PEOPLE.contains(caseData.getRespondent2().getType());
+        if (isPeople1 == isPeople2) {
+            return caseData.getRespondent1ResponseDate() != null
+                && !caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate());
+        } else {
+            return isPeople1;
+        }
     }
 
     /**
@@ -171,11 +183,11 @@ public class LocationHelper {
     private Optional<RequestedCourt> getUnspecClaimantRequestedCourt(CaseData caseData) {
         return Optional.ofNullable(caseData.getCourtLocation())
             .map(courtLocation -> RequestedCourt.builder()
+                .requestHearingAtSpecificCourt(YesOrNo.YES)
                 .responseCourtCode(courtLocation.getApplicantPreferredCourt())
                 .caseLocation(courtLocation.getCaseLocation())
                 .build());
     }
-
     /**
      * We say that a locationRefData matches a RequestedCourt if the court code is the same or if
      * (a) the court's case location has region equal to locationRefData.regionId and (b) base location
@@ -185,6 +197,7 @@ public class LocationHelper {
      * @param preferredCourt a preferred court
      * @return first matching location
      */
+
     private Optional<LocationRefData> getMatching(List<LocationRefData> locations, RequestedCourt preferredCourt) {
         if (preferredCourt == null) {
             return Optional.empty();
@@ -230,12 +243,7 @@ public class LocationHelper {
         updatedData
             .caseManagementLocation(Stream.of(
                     Optional.ofNullable(requestedCourt).map(RequestedCourt::getCaseLocation),
-                    matchingLocation.map(location ->
-                                             CaseLocation.builder()
-                                                 .region(location.getRegionId())
-                                                 .baseLocation(location.getEpimmsId())
-                                                 .build()
-                    )
+                    matchingLocation.map(LocationRefDataService::buildCaseLocation)
                 ).filter(Optional::isPresent)
                                         .map(Optional::get)
                                         .filter(this::isValidCaseLocation)

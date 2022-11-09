@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
@@ -604,11 +603,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         if (nonNull(locations)) {
             location = fillPreferredLocationData(locations, getLocationListFromCaseData(
                 caseData.getDisposalHearingMethodInPersonDJ(), caseData.getTrialHearingMethodInPersonDJ()));
-            var caseBuilder = Optional.ofNullable(location)
-                .map(value -> caseDataBuilder.caseManagementLocation(CaseLocation.builder()
-                                                                         .region(value.getRegionId())
-                                                                         .baseLocation(value.getEpimmsId())
-                                                                         .build()));
+            Optional.ofNullable(location)
+                .map(LocationRefDataService::buildCaseLocation)
+                .ifPresent(caseDataBuilder::caseManagementLocation);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
