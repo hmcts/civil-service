@@ -1479,6 +1479,16 @@ public class CaseDataBuilder {
         respondent2SameLegalRepresentative = NO;
         respondent1Represented = NO;
         respondent2Represented = NO;
+        respondent2 = PartyBuilder.builder().individual().build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmitted1v1AndNoRespondentRepresented() {
+        atStateClaimSubmitted();
+        addRespondent2 = NO;
+        respondent2SameLegalRepresentative = NO;
+        respondent1Represented = NO;
+        respondent2Represented = NO;
         return this;
     }
 
@@ -1489,6 +1499,7 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2Represented = NO;
+        respondent2 = PartyBuilder.builder().individual().build();
         return this;
     }
 
@@ -1499,6 +1510,7 @@ public class CaseDataBuilder {
         respondent1Represented = NO;
         respondent2Represented = YES;
         respondent2OrgRegistered = YES;
+        respondent2 = PartyBuilder.builder().individual().build();
         return this;
     }
 

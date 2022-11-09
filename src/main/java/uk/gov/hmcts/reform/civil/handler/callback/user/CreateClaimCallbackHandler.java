@@ -99,6 +99,20 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         + "%n%nOnce you have served the claim, send the Certificate of Service and supporting documents to the County"
         + " Court Claims Centre.";
 
+    public static final String LIP_CONFIRMATION_BODY_COF = "<br />[Download the sealed claim form](%s)"
+        + "%n%n Your claim will not be issued until payment is confirmed."
+        + " Once payment is confirmed you will receive an email. The email will also include the date when you need"
+        + " to notify the Defendant of the Claim.%n%nYou must notify the Defendant of the claim"
+        + " within 4 months of the claim being issued.%n%nIf the defendant(s) include a litigant in person you must"
+        + " serve the claim outside of the digital portal using the claim form PDF provided on the link above."
+        + " This includes an information page for litigants in person. The claim will remain in the digital portal to"
+        + " allow the litigant in person time to appoint a legal representative who can respond to the claim via the "
+        + " portal.%n%nIf service of the claim and claim details are processed outside the of the digital portal you "
+        + " must complete the next steps option 'confirm service' for both the service of the claim form and the claim"
+        + "  details. %n%nIf notification of the claim is processed in the digital portal, the exact date"
+        + " when you must notify the claim details will be provided when you first notify the defendant legal"
+        + " representative of the claim.";
+
     private final ClaimIssueConfiguration claimIssueConfiguration;
     private final ExitSurveyContentService exitSurveyContentService;
     private final ReferenceNumberRepository referenceNumberRepository;
@@ -416,6 +430,21 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             log.info("Case management equals: " + caseData.getCaseManagementCategory());
             log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
         }
+        //Adding variables for feature Certificate of Service
+        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCertificateOfServiceEnabled()) {
+            if (caseData.getRespondent1Represented().equals(NO)) {
+                dataBuilder.defendant1LIPAtClaimIssued(YES);
+            } else {
+                dataBuilder.defendant1LIPAtClaimIssued(NO);
+            }
+            if (YES.equals(caseData.getAddRespondent2())) {
+                if (caseData.getRespondent2Represented() == NO) {
+                    dataBuilder.defendant2LIPAtClaimIssued(YES);
+                } else {
+                    dataBuilder.defendant2LIPAtClaimIssued(NO);
+                }
+            }
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
@@ -483,14 +512,20 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private String getHeader(CaseData caseData) {
+
         if (areRespondentsRepresentedAndRegistered(caseData)) {
             return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
         }
 
-        return format(
-            "# Your claim has been received and will progress offline%n## Claim number: %s",
-            caseData.getLegacyCaseReference()
-        );
+        if (toggleService.isCertificateOfServiceEnabled()) {
+            return format(
+                "# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
+        } else {
+            return format(
+                "# Your claim has been received and will progress offline%n## Claim number: %s",
+                caseData.getLegacyCaseReference()
+            );
+        }
     }
 
     private boolean areRespondentsRepresentedAndRegistered(CaseData caseData) {
@@ -506,13 +541,23 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private String getBody(CaseData caseData) {
-        return format(
-            areRespondentsRepresentedAndRegistered(caseData)
-                ? CONFIRMATION_SUMMARY
-                : LIP_CONFIRMATION_BODY,
-            format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
-            claimIssueConfiguration.getResponsePackLink()
-        ) + exitSurveyContentService.applicantSurvey();
+        if (toggleService.isCertificateOfServiceEnabled()) {
+            return format(
+                areRespondentsRepresentedAndRegistered(caseData)
+                    ? CONFIRMATION_SUMMARY
+                    : LIP_CONFIRMATION_BODY_COF,
+                format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
+                claimIssueConfiguration.getResponsePackLink()
+            ) + exitSurveyContentService.applicantSurvey();
+        } else {
+            return format(
+                areRespondentsRepresentedAndRegistered(caseData)
+                    ? CONFIRMATION_SUMMARY
+                    : LIP_CONFIRMATION_BODY,
+                format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
+                claimIssueConfiguration.getResponsePackLink()
+            ) + exitSurveyContentService.applicantSurvey();
+        }
     }
 
     private List<String> validateCourtChoice(CaseData caseData) {
