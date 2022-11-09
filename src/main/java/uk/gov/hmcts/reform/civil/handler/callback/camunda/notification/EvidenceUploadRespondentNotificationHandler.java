@@ -54,15 +54,12 @@ public class EvidenceUploadRespondentNotificationHandler extends CallbackHandler
     private CallbackResponse notifyRespondentEvidenceUpload(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String email = null;
-        boolean isRespondent1 =  isForRespondentSolicitor1(callbackParams);
-        if (isRespondent1) {
+        if (isForRespondentSolicitor1(callbackParams)) {
             email = caseData.getRespondentSolicitor1EmailAddress();
-        } else {
-            if (caseData.getAddRespondent2() != null
+        } else if (caseData.getAddRespondent2() != null
                 && caseData.getAddRespondent2().equals(YesOrNo.YES)
                 && caseData.getRespondentSolicitor2EmailAddress() != null) {
-                email = caseData.getRespondentSolicitor2EmailAddress();
-            }
+            email = caseData.getRespondentSolicitor2EmailAddress();
         }
 
         notificationService.sendMail(
