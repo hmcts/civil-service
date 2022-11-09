@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,8 +18,6 @@ import uk.gov.hmcts.reform.payments.request.PBAServiceRequestDTO;
 import uk.gov.hmcts.reform.payments.response.PBAServiceRequestResponse;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 import uk.gov.hmcts.reform.prd.model.Organisation;
-
-import java.util.UUID;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
@@ -36,18 +36,14 @@ public class PaymentsService {
     String callBackUrl;
 
     public void validateRequest(CaseData caseData) {
-        String error = null;
         HFPbaDetails hearingFeePBADetails = caseData.getHearingFeePBADetails();
         if (hearingFeePBADetails == null) {
-            error = "Hearing Fee details not received.";
+            throw new InvalidPaymentRequestException("Hearing Fee details not received.");
         } else if (hearingFeePBADetails.getFee() == null
             || hearingFeePBADetails.getFee().getCalculatedAmountInPence() == null
             || isBlank(hearingFeePBADetails.getFee().getVersion())
             || isBlank(hearingFeePBADetails.getFee().getCode())) {
-            error = "Fees are not set correctly.";
-        }
-        if (!isBlank(error)) {
-            throw new InvalidPaymentRequestException(error);
+            throw new InvalidPaymentRequestException("Fees are not set correctly.");
         }
     }
 

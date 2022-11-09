@@ -1,5 +1,16 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
@@ -20,17 +31,6 @@ import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.bankholidays.PublicHolidaysCollection;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -78,7 +78,6 @@ public class HearingScheduledHandler extends CallbackHandler {
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        var caseData = callbackParams.getCaseData();
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(getHeader())
             .confirmationBody(getBody())
@@ -173,9 +172,7 @@ public class HearingScheduledHandler extends CallbackHandler {
             }
             switch (caseData.getAllocatedTrack()) {
                 case SMALL_CLAIM:
-
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
-
                     break;
                 case FAST_CLAIM:
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(
@@ -183,9 +180,7 @@ public class HearingScheduledHandler extends CallbackHandler {
                             caseData.getClaimFee().getCalculatedAmountInPence().intValue())).build());
                     break;
                 case MULTI_CLAIM:
-
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(117500)).build());
-
                     break;
                 default:
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(0)).build());

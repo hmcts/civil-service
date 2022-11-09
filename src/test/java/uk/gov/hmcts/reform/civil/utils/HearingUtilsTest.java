@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.civil.utils;
 
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -33,21 +33,17 @@ public class HearingUtilsTest {
 
     @Test
     void shouldReturnFee2_whenGivenAnyClaimFee() {
-
         assertThat(HearingUtils.getFastTrackFee(15000)).isEqualTo(new BigDecimal(2700));
-
     }
 
     @Test
     void shouldReturnFee3_whenGivenAnyClaimFee() {
         assertThat(HearingUtils.getFastTrackFee(35000)).isEqualTo(new BigDecimal(5900));
-
     }
 
     @Test
     void shouldReturnFee4_whenGivenAnyClaimFee() {
         assertThat(HearingUtils.getFastTrackFee(90000)).isEqualTo(new BigDecimal(8500));
-
     }
 
     @Test

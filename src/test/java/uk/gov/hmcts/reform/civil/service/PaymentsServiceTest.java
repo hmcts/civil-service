@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,6 +18,8 @@ import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.hearing.HFPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
@@ -25,13 +31,10 @@ import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
@@ -97,18 +100,26 @@ class PaymentsServiceTest {
             uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                 .organisationID("OrgId").build();
 
+            HFPbaDetails hfPbaDetails = HFPbaDetails.builder()
+                .serviceReqReference("request-reference")
+                .applicantsPbaAccounts(DynamicList.builder()
+                                           .value(DynamicListElement
+                                                      .builder().label("account-no")
+                                                      .build()
+                                           ).build()
+                )
+                .build();
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
                 .build();
-
-            var expectedCreditAccountPaymentRequest =
-                getExpectedCreditAccountPaymentRequest(caseData);
+            caseData = caseData.toBuilder().hearingFeePBADetails(hfPbaDetails).build();
 
             PBAServiceRequestResponse paymentResponse = paymentsService
                 .createCreditAccountPayment(caseData, AUTH_TOKEN);
 
             verify(organisationService).findOrganisationById("OrgId");
-            verify(paymentsClient).createCreditAccountPayment(AUTH_TOKEN, expectedCreditAccountPaymentRequest);
+            verify(paymentsClient).createPbaPayment(eq("request-reference"), eq(AUTH_TOKEN), any());
             assertThat(paymentResponse).isEqualTo(PAYMENT_DTO);
         }
 
@@ -141,22 +152,35 @@ class PaymentsServiceTest {
 
         @Test
         void shouldCreateCreditAccountPayment_whenValidCaseDetails() {
+            // Given
             uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                 .organisationID("OrgId").build();
+
+            HFPbaDetails hfPbaDetails = HFPbaDetails.builder()
+                .serviceReqReference("request-reference")
+                .applicantsPbaAccounts(DynamicList.builder()
+                                           .value(DynamicListElement
+                                                      .builder().label("account-no")
+                                                      .build()
+                                           ).build()
+                )
+                .build();
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
                 .build();
-            caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM).build();
+            caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM).hearingFeePBADetails(hfPbaDetails).build();
 
             var expectedCreditAccountPaymentRequest =
                 getExpectedCreditAccountPaymentRequest(caseData);
 
+            // When
             PBAServiceRequestResponse paymentResponse = paymentsService
                 .createCreditAccountPayment(caseData, AUTH_TOKEN);
 
+            // Then
             verify(organisationService).findOrganisationById("OrgId");
-            verify(paymentsClient).createCreditAccountPayment(AUTH_TOKEN, expectedCreditAccountPaymentRequest);
+            verify(paymentsClient).createPbaPayment(eq("request-reference"), eq(AUTH_TOKEN), any());
             assertThat(paymentResponse).isEqualTo(PAYMENT_DTO);
         }
 

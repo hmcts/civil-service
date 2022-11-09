@@ -1,5 +1,10 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +18,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.hearing.HFPbaDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -57,7 +57,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         try {
-            log.info("calling payment service request " + caseData.getCcdCaseReference());
+            log.info("calling payment service request {}", caseData.getCcdCaseReference());
             var serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
                 .getServiceRequestReference();
             HFPbaDetails pbaDetails = caseData.getHearingFeePBADetails();
@@ -70,7 +70,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
                 .build();
 
         } catch (FeignException e) {
-            log.info(String.format("Http Status %s ", e.status()), e);
+            log.warn("Http Status {}", e.status(), e);
             errors.add(ERROR_MESSAGE);
         }
 

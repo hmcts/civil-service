@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,10 +22,9 @@ import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 
-import java.time.LocalDateTime;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -33,7 +35,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUES
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class
 })
-public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
+class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
     private static final String SUCCESSFUL_PAYMENT_REFERENCE = "2022-1655915218557";
 
@@ -71,22 +73,50 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldMakePaymentServiceRequest_whenInvoked() throws Exception {
-            when(paymentsService.createServiceRequest(any(), any()))
-                .thenReturn(paymentServiceResponse.builder()
+        void shouldMakePaymentServiceRequest_whenInvoked() {
+            // Given
+            given(paymentsService.createServiceRequest(any(), any()))
+                .willReturn(PaymentServiceResponse.builder()
                             .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
 
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            // Then
             verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
             assertThat(extractPaymentDetailsFromResponse(response).getServiceReqReference())
                 .isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
         }
 
         @Test
+        void shouldReturnError_whenPaymentsServiceThrowsException() {
+            // Given
+            given(paymentsService.createServiceRequest(any(), any()))
+                .willThrow(FeignException.class);
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isNotEmpty();
+        }
+
+        @Test
         void handleEventsReturnsTheExpectedCallbackEvent() {
             assertThat(handler.handledEvents()).contains(CREATE_SERVICE_REQUEST_API);
         }
+    }
+
+    @Test
+    void shouldHaveCorrectCamundaActivityId() {
+        // Given
+        CallbackParams params = CallbackParams.builder().build();
+
+        // When
+        String activityId = handler.camundaActivityId(params);
+
+        // Then
+        assertThat(activityId).isEqualTo("ServiceRequestAPI");
     }
 
     private HFPbaDetails
