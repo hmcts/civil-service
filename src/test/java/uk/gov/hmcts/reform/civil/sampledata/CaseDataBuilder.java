@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
+import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -89,6 +90,8 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
 import java.math.BigDecimal;
@@ -329,6 +332,9 @@ public class CaseDataBuilder {
 
     private String unassignedCaseListDisplayOrganisationReferences;
     private String caseListDisplayDefendantSolicitorReferences;
+
+    private TrialHearingTimeDJ trialHearingTimeDJ;
+    private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1593,6 +1599,30 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimIssuedCaseManagementLocationInPerson() {
         caseManagementLocation = CaseLocation.builder().baseLocation("0123").region("0321").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateSdoTrialDj() {
+        trialHearingTimeDJ = TrialHearingTimeDJ.builder()
+            .helpText1("If either party considers that the time estimate is insufficient, "
+                           + "they must inform the court within 7 days of the date of this order.")
+            .helpText2("Not more than seven nor less than three clear days before the trial, "
+                           + "the claimant must file at court and serve an indexed and paginated bundle of "
+                           + "documents which complies with the requirements of Rule 39.5 Civil Procedure Rules "
+                           + "and which complies with requirements of PD32. The parties must endeavour to agree "
+                           + "the contents of the bundle before it is filed. The bundle will include a case "
+                           + "summary and a chronology.")
+            .hearingTimeEstimate(TrialHearingTimeEstimateDJ.ONE_HOUR)
+            .date1(LocalDate.parse("2022-01-01"))
+            .date2(LocalDate.parse("2022-01-02"))
+            .build();
+        trialOrderMadeWithoutHearingDJ = TrialOrderMadeWithoutHearingDJ.builder()
+            .input("This order has been made without a hearing. "
+                    + "Each party has the right to apply to have this Order "
+                    + "set aside or varied. Any such application must be "
+                    + "received by the Court "
+                    + "(together with the appropriate fee) by 4pm on 01 12 2022.")
+            .build();
         return this;
     }
 
@@ -3709,6 +3739,8 @@ public class CaseDataBuilder {
             .caseManagementLocation(caseManagementLocation)
             //Unsuitable for SDO
             .reasonNotSuitableSDO(reasonNotSuitableSDO)
+            .trialHearingTimeDJ(trialHearingTimeDJ)
+            .trialOrderMadeWithoutHearingDJ(trialOrderMadeWithoutHearingDJ)
             .build();
     }
 }

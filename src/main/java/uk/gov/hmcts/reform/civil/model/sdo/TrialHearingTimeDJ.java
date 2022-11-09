@@ -14,9 +14,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class TrialHearingTimeDJ {
 
-    private LocalDate dateFrom;
-    private LocalDate dateTo;
-    private TrialHearingTimeEstimateDJ hearingDuration;
+    private LocalDate date1;
+    private LocalDate date2;
+    private TrialHearingTimeEstimateDJ hearingTimeEstimate;
     private String helpText1;
     private String helpText2;
 }

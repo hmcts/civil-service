@@ -11,11 +11,13 @@ import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
@@ -29,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional.O
 import static uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle.SHOW;
 import static uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ.disposalHearingMethodInPerson;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_DISPOSAL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_HNL_TRIAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_TRIAL;
 
 @Service
@@ -119,7 +122,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormTrial(CaseData caseData) {
-        return DefaultJudgmentSDOOrderForm.builder()
+        var djTrialTemplateBuilder = DefaultJudgmentSDOOrderForm.builder()
             .judgeNameTitle(caseData.getTrialHearingJudgesRecitalDJ().getJudgeNameTitle())
             .caseNumber(caseData.getLegacyCaseReference())
             .trialBuildingDispute(caseData.getTrialBuildingDispute())
@@ -161,13 +164,20 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialHousingDisrepair(caseData.getTrialHousingDisrepair())
             .trialHousingDisrepairAddSection(nonNull(caseData.getTrialHousingDisrepair()))
             .trialHearingMethodInPersonAddSection(checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ()))
+            .trialHearingMethodInPersonAddSection(checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ()))
             .trialHearingLocation(checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ())
-                                      ? featureToggleService.isHearingAndListingSDOEnabled()
-                ? caseData.getCaseManagementLocation().getBaseLocation()
-                : caseData.getTrialHearingMethodInPersonDJ().getValue().getLabel() : null)
-            .applicant(checkApplicantPartyName(caseData)
-                            ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
-            .respondent(checkDefendantRequested(caseData).toUpperCase()).build();
+                                      ? getDynamicListValueLabel(caseData.getTrialHearingMethodInPersonDJ()) : null)
+            .applicant(caseData.getApplicant1().getPartyName().toUpperCase())
+            .respondent(checkDefendantRequested(caseData).toUpperCase());
+
+        if (featureToggleService.isNoticeOfChangeEnabled()) {
+            djTrialTemplateBuilder
+                .trialHearingTimeDJ(caseData.getTrialHearingTimeDJ())
+                .trialOrderMadeWithoutHearingDJ(caseData.getTrialOrderMadeWithoutHearingDJ())
+                .trialHearingTimeEstimateDJ(getHearingTimeEstimateLabel(caseData.getTrialHearingTimeDJ()));
+        }
+
+        return djTrialTemplateBuilder.build();
     }
 
     private DocmosisTemplates getDocmosisTemplate() {
@@ -175,7 +185,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     private DocmosisTemplates getDocmosisTemplateTrial() {
-        return DJ_SDO_TRIAL;
+        return featureToggleService.isHearingAndListingSDOEnabled() ? DJ_SDO_HNL_TRIAL : DJ_SDO_TRIAL;
     }
 
     private String checkDefendantRequested(final CaseData caseData) {
@@ -293,6 +303,15 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
     private boolean checkApplicantPartyName(CaseData casedata) {
         return nonNull(casedata.getApplicant1()) && nonNull(casedata.getApplicant1().getPartyName());
+    }
+
+    private String getDynamicListValueLabel(DynamicList dynamicList) {
+        return nonNull(dynamicList) && nonNull(dynamicList.getValue()) ? dynamicList.getValue().getLabel() : null;
+    }
+
+    private String getHearingTimeEstimateLabel(TrialHearingTimeDJ hearingTime) {
+        return nonNull(hearingTime) && nonNull(hearingTime.getHearingTimeEstimate())
+            ? hearingTime.getHearingTimeEstimate().getLabel() : null;
     }
 }
 
