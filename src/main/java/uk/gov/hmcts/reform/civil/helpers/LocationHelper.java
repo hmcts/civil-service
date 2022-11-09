@@ -25,6 +25,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -32,6 +33,7 @@ import java.util.stream.Stream;
 @Component
 public class LocationHelper {
 
+    private static final Set<Party.Type> PEOPLE = EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER);
     private final FeatureToggleService featureToggleService;
     private final BigDecimal ccmccAmount;
     private final String ccmccRegionId;
@@ -146,9 +148,17 @@ public class LocationHelper {
      * @return true if defendant 1 is lead defendant
      */
     private boolean leadDefendantIs1(CaseData caseData) {
-        return caseData.getRespondent2ResponseDate() == null
-            || (caseData.getRespondent1ResponseDate() != null
-            && !caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate()));
+        if (caseData.getRespondent2ResponseDate() == null) {
+            return true;
+        }
+        boolean isPeople1 = PEOPLE.contains(caseData.getRespondent1().getType());
+        boolean isPeople2 = PEOPLE.contains(caseData.getRespondent2().getType());
+        if (isPeople1 == isPeople2) {
+            return caseData.getRespondent1ResponseDate() != null
+                && !caseData.getRespondent1ResponseDate().isAfter(caseData.getRespondent2ResponseDate());
+        } else {
+            return isPeople1;
+        }
     }
 
     /**
