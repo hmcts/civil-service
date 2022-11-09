@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.businessprocess;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -19,6 +20,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.START_BUSINESS_PROCESS;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class StartBusinessProcessCallbackHandler extends CallbackHandler {
 
@@ -38,14 +40,19 @@ public class StartBusinessProcessCallbackHandler extends CallbackHandler {
     private final CaseDetailsConverter caseDetailsConverter;
 
     private CallbackResponse startBusinessProcess(CallbackParams callbackParams) {
+        log.info("Starting callback for start business process. Time started {}:", System.nanoTime());
+
         CaseData data = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+        log.info("Case data extracted. Time {}:", System.nanoTime());
         BusinessProcess businessProcess = data.getBusinessProcess();
 
+        log.info("Switching business process. Time {}:", System.nanoTime());
         switch (businessProcess.getStatusOrDefault()) {
             case READY:
             case DISPATCHED:
                 return evaluateReady(callbackParams, businessProcess);
             default:
+                log.info("Finishing callback for start business process. Time finished {}:", System.nanoTime());
                 return AboutToStartOrSubmitCallbackResponse.builder()
                     .errors(List.of("Concurrency Error"))
                     .build();
@@ -54,9 +61,11 @@ public class StartBusinessProcessCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse evaluateReady(CallbackParams callbackParams, BusinessProcess businessProcess) {
+        log.info("Inside evaluateReady method. Time {}:", System.nanoTime());
         Map<String, Object> output = callbackParams.getRequest().getCaseDetails().getData();
         output.put(BUSINESS_PROCESS, businessProcess.start());
 
+        log.info("Finishing callback for start business process. Time finished {}:", System.nanoTime());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(output)
             .build();
