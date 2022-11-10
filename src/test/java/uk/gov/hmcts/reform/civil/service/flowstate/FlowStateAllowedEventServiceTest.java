@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -919,5 +920,14 @@ class FlowStateAllowedEventServiceTest {
             assertThat(flowStateAllowedEventService.isAllowed(caseDetails, caseEvent))
                 .isEqualTo(expected);
         }
+    }
+
+    @Test
+    void shouldReturnTrue_whenCaseEventIsMigrateCase() {
+        CaseDetails caseDetails =
+            CaseDetailsBuilder.builder()
+            .atStateAwaitingCaseDetailsNotification().build();
+        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, migrateCase))
+            .isEqualTo(true);
     }
 }
