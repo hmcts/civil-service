@@ -244,7 +244,6 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         if (caseData.getDisposalHearingMethodInPersonDJ() != null) {
             return caseData.getDisposalHearingMethodInPersonDJ().getValue().getLabel();
         }
-
         return null;
     }
 
