@@ -250,7 +250,8 @@ class PaymentsServiceTest {
         @Test
         void shouldCreatePaymentServiceRequest_whenValidCaseDetails() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildMakePaymentsCaseData();
+            CaseData caseData = CaseDataBuilder.builder().buildMakePaymentsCaseData().toBuilder().hearingFee(
+                Fee.builder().calculatedAmountInPence(new BigDecimal(300)).build()).build();
             PaymentServiceResponse serviceRequestResponse = paymentsService.createServiceRequest(caseData, AUTH_TOKEN);
             assertThat(serviceRequestResponse).isEqualTo(PAYMENT_SERVICE_RESPONSE);
 
