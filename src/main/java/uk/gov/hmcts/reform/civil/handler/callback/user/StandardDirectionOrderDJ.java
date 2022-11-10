@@ -608,7 +608,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 caseData.getDisposalHearingMethodInPersonDJ(), caseData.getTrialHearingMethodInPersonDJ()));
             Optional.ofNullable(location)
                 .map(LocationRefDataService::buildCaseLocation)
-                .ifPresent(caseDataBuilder::caseManagementLocation) ;
+                .ifPresent(caseDataBuilder::caseManagementLocation);
             Optional.ofNullable(location)
                 .map(value -> value.getSiteName())
                 .ifPresent(caseDataBuilder::locationName);
