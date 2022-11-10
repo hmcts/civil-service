@@ -45,6 +45,8 @@ import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
@@ -414,6 +416,40 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                 .input3("At least 7 days before the trial, the claimant must"
                                                             + " upload to the Digital Portal ")
                                                 .build());
+
+        // copy of above method as to not break existing cases
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            caseDataBuilder.trialHearingTimeDJ(TrialHearingTimeDJ.builder()
+                                               .helpText1(
+                                                   "If either party considers that the time estimate is insufficient, "
+                                                       + "they must inform the court within 7 days of the date of "
+                                                       + "this order.")
+                                               .helpText2(
+                                                   "Not more than seven nor less than three clear days before the "
+                                                       + "trial, the claimant must file at court and serve an indexed "
+                                                       + "and paginated bundle of documents which complies with the "
+                                                       + "requirements of Rule 39.5 Civil Procedure Rules "
+                                                       + "and which complies with requirements of PD32. The parties "
+                                                       + "must endeavour to agree the contents of the bundle before it "
+                                                       + "is filed. The bundle will include a case summary and a "
+                                                       + "chronology.")
+                                               .build());
+        }
+
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            caseDataBuilder.trialOrderMadeWithoutHearingDJ(TrialOrderMadeWithoutHearingDJ.builder()
+                                               .input(String.format(
+                                                   "This order has been made without a hearing. "
+                                                       + "Each party has the right to apply to have this Order "
+                                                       + "set aside or varied. Any such application must be "
+                                                       + "received by the Court "
+                                                       + "(together with the appropriate fee) by 4pm on %s.",
+                                                   deadlinesCalculator
+                                                       .plusWorkingDays(LocalDate.now(), 5)
+                                                       .format(DateTimeFormatter
+                                                                   .ofPattern("dd MMMM yyyy", Locale.ENGLISH))))
+                                               .build());
+        }
 
         caseDataBuilder.trialHearingNotesDJ(TrialHearingNotes
                                                 .builder()
