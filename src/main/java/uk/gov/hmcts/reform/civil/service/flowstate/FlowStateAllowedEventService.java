@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
@@ -171,7 +172,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
                 EVIDENCE_UPLOAD,
-                migrateCase
+                migrateCase,
+                CREATE_CLAIM_SPEC_AFTER_PAYMENT
             )
         ),
 
@@ -673,7 +675,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
                 EVIDENCE_UPLOAD,
-                migrateCase
+                migrateCase,
+                CREATE_CLAIM_SPEC_AFTER_PAYMENT
             )
         ),
         entry(
