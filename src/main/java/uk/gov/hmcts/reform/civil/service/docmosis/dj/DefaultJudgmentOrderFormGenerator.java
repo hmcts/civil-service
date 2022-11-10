@@ -78,7 +78,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormHearing(CaseData caseData) {
-        return DefaultJudgmentSDOOrderForm.builder()
+        var djOrderFormBuilder = DefaultJudgmentSDOOrderForm.builder()
             .judgeNameTitle(caseData.getDisposalHearingJudgesRecitalDJ().getJudgeNameTitle())
             .caseNumber(caseData.getLegacyCaseReference())
             .disposalHearingBundleDJ(caseData.getDisposalHearingBundleDJ())
@@ -119,11 +119,17 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .disposalHearingCostsAddSection(getToggleValue(caseData.getDisposalHearingCostsDJToggle()))
             .applicant(checkApplicantPartyName(caseData)
                             ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
-            .respondent(checkDefendantRequested(caseData).toUpperCase())
-            .disposalHearingOrderMadeWithoutHearingDJ(featureToggleService.isHearingAndListingSDOEnabled()
-                                                          ? caseData.getDisposalHearingOrderMadeWithoutHearingDJ()
-                .getInput() : null)
-            .build();
+            .respondent(checkDefendantRequested(caseData).toUpperCase());
+
+        if (featureToggleService.isNoticeOfChangeEnabled()) {
+            djOrderFormBuilder
+                .disposalHearingOrderMadeWithoutHearingDJ(caseData.getDisposalHearingOrderMadeWithoutHearingDJ())
+                .disposalHearingFinalDisposalHearingTimeDJ(caseData.getDisposalHearingFinalDisposalHearingTimeDJ())
+                .disposalHearingTimeEstimateDJ(caseData.getDisposalHearingFinalDisposalHearingTimeDJ()
+                                                   .getTime().getLabel());
+        }
+
+        return djOrderFormBuilder.build();
     }
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormTrial(CaseData caseData) {
@@ -172,7 +178,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialHearingLocation(checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ())
                                       ? caseData.getTrialHearingMethodInPersonDJ().getValue().getLabel() : null)
             .applicant(checkApplicantPartyName(caseData)
-                            ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
+                           ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
             .respondent(checkDefendantRequested(caseData).toUpperCase())
             .build();
     }
