@@ -164,10 +164,10 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialHousingDisrepair(caseData.getTrialHousingDisrepair())
             .trialHousingDisrepairAddSection(nonNull(caseData.getTrialHousingDisrepair()))
             .trialHearingMethodInPersonAddSection(checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ()))
-            .trialHearingMethodInPersonAddSection(checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ()))
             .trialHearingLocation(checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ())
                                       ? getDynamicListValueLabel(caseData.getTrialHearingMethodInPersonDJ()) : null)
-            .applicant(caseData.getApplicant1().getPartyName().toUpperCase())
+            .applicant(checkApplicantPartyName(caseData)
+                           ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
             .respondent(checkDefendantRequested(caseData).toUpperCase());
 
         if (featureToggleService.isNoticeOfChangeEnabled()) {
