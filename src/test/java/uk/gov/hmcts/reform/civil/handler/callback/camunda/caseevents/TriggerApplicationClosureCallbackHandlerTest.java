@@ -54,7 +54,7 @@ class TriggerApplicationClosureCallbackHandlerTest extends BaseCallbackHandlerTe
                 .getTestCaseDataWithDetails(CaseData.builder().build(),
                         true,
                         true,
-                        true,
+                        true, true,
                         getOriginalStatusOfGeneralApplication());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -83,7 +83,7 @@ class TriggerApplicationClosureCallbackHandlerTest extends BaseCallbackHandlerTe
                 .getTestCaseDataWithDetails(CaseData.builder().ccdCaseReference(1234L).build(),
                         true,
                         true,
-                        true,
+                        true, true,
                         getOriginalStatusOfGeneralApplication());
         String expectedErrorMessage = "Could not trigger event to close application under case: "
                 + caseData.getCcdCaseReference();

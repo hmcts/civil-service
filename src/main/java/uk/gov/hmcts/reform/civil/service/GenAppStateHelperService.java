@@ -66,11 +66,22 @@ public class GenAppStateHelperService {
                                                      RequiredState gaFlow) {
 
         List<Element<GeneralApplicationsDetails>> gaDetails = caseData.getGeneralApplicationsDetails();
-        List<Element<GADetailsRespondentSol>> respondentSpecficGADetails = caseData.getGaDetailsRespondentSol();
-        List<Element<GADetailsRespondentSol>> respondentTwoSpecficGADetails = caseData.getGaDetailsRespondentSolTwo();
+        List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection = caseData.getGaDetailsMasterCollection();
 
         Map<Long, GeneralApplication> generalApplicationMap = getLatestStatusOfGeneralApplication(caseData);
-
+        /*
+        * Master GA collection for Judge, case worker, legal adviser etc..
+        * */
+        if (!isEmpty(gaDetailsMasterCollection)) {
+            gaDetailsMasterCollection.forEach(gaMasterColl -> {
+                if (applicationFilterCriteria(gaMasterColl.getValue(), generalApplicationMap, gaFlow)) {
+                    gaMasterColl.getValue().setCaseState(updatedState);
+                }
+            });
+        }
+        /*
+        * Claimant GA Collection
+        * */
         if (!isEmpty(gaDetails)) {
             gaDetails.forEach(gaDetails1 -> {
                 if (applicationFilterCriteria(gaDetails1.getValue(), generalApplicationMap, gaFlow)) {
@@ -78,6 +89,12 @@ public class GenAppStateHelperService {
                 }
             });
         }
+
+        /*
+        * Respondent one GA collection
+        * */
+        List<Element<GADetailsRespondentSol>> respondentSpecficGADetails = caseData.getGaDetailsRespondentSol();
+
         if (!isEmpty(respondentSpecficGADetails)) {
             respondentSpecficGADetails.forEach(respondentSolElement -> {
                 if (applicationFilterCriteria(respondentSolElement.getValue(), generalApplicationMap, gaFlow)) {
@@ -85,6 +102,11 @@ public class GenAppStateHelperService {
                 }
             });
         }
+
+        /*
+        * Respondent two GA collection
+        * */
+        List<Element<GADetailsRespondentSol>> respondentTwoSpecficGADetails = caseData.getGaDetailsRespondentSolTwo();
 
         if (!isEmpty(respondentTwoSpecficGADetails)) {
             respondentTwoSpecficGADetails.forEach(respondentTwoSolElement -> {

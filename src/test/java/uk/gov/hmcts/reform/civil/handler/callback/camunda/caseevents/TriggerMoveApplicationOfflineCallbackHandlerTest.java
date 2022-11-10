@@ -54,7 +54,7 @@ class TriggerMoveApplicationOfflineCallbackHandlerTest extends BaseCallbackHandl
                 .getTestCaseDataWithDetails(CaseData.builder().build(),
                         true,
                         true,
-                        true,
+                        true, true,
                         getOriginalStatusOfGeneralApplication());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -83,7 +83,7 @@ class TriggerMoveApplicationOfflineCallbackHandlerTest extends BaseCallbackHandl
                 .getTestCaseDataWithDetails(CaseData.builder().ccdCaseReference(1234L).build(),
                         true,
                         true,
-                        true,
+                        true, true,
                         getOriginalStatusOfGeneralApplication());
         String expectedErrorMessage = "Could not trigger event to take application offline under the case: "
                 + caseData.getCcdCaseReference();

@@ -126,7 +126,7 @@ class GenAppStateHelperServiceTest {
                     .getTestCaseDataWithDetails(CaseData.builder().build(),
                             true,
                             true,
-                            true,
+                            true, true,
                             getOriginalStatusOfGeneralApplication_applicationClosed());
 
             CaseData updatedData = service.updateApplicationDetailsInClaim(
@@ -152,7 +152,7 @@ class GenAppStateHelperServiceTest {
                     .getTestCaseDataWithDetails(CaseData.builder().build(),
                             false,
                             false,
-                            false,
+                            false, false,
                             Map.of());
 
             CaseData response = service.updateApplicationDetailsInClaim(
@@ -179,7 +179,7 @@ class GenAppStateHelperServiceTest {
                     .getTestCaseDataWithDetails(CaseData.builder().build(),
                             true,
                             true,
-                            true,
+                            true, true,
                             applications);
             CaseData updatedData = service.updateApplicationDetailsInClaim(
                     caseData,
@@ -196,7 +196,7 @@ class GenAppStateHelperServiceTest {
                     .getTestCaseDataWithDetails(CaseData.builder().build(),
                             true,
                             true,
-                            true,
+                            true, true,
                             getOriginalStatusOfGeneralApplication_applicationOffline());
 
             CaseData updatedData = service.updateApplicationDetailsInClaim(
@@ -223,7 +223,7 @@ class GenAppStateHelperServiceTest {
                     .getTestCaseDataWithDetails(CaseData.builder().build(),
                             false,
                             false,
-                            false,
+                            false, false,
                             Map.of());
 
             CaseData response = service.updateApplicationDetailsInClaim(
@@ -250,7 +250,7 @@ class GenAppStateHelperServiceTest {
                     .getTestCaseDataWithDetails(CaseData.builder().build(),
                             true,
                             true,
-                            true,
+                            true, true,
                             applications);
             CaseData updatedData = service.updateApplicationDetailsInClaim(
                     caseData,
@@ -379,7 +379,7 @@ class GenAppStateHelperServiceTest {
                     .getTestCaseDataWithDetails(CaseData.builder().build(),
                             true,
                             true,
-                            true,
+                            true, true,
                             getOriginalStatusOfGeneralApplication());
 
             service.triggerEvent(caseData, MAIN_CASE_CLOSED);

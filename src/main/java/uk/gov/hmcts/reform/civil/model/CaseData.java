@@ -136,6 +136,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<GeneralApplication>> generalApplications = new ArrayList<>();
 
     private final List<Element<GeneralApplicationsDetails>> generalApplicationsDetails;
+    private final List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection;
     private final List<Element<GADetailsRespondentSol>> gaDetailsRespondentSol;
     private final List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolTwo;
     private final SolicitorReferences solicitorReferences;
