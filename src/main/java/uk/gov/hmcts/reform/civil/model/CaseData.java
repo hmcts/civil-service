@@ -575,25 +575,38 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<DocumentWithName>> documentOnly;
     private final List<Element<DocumentAndNote>> documentAndNote;
     private final CaseNoteType caseNoteType;
-
+    //applicant
     private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure1;
     private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure2;
-
     private final List<Element<UploadEvidenceWitness>> documentUploadWitness1;
     private final List<Element<UploadEvidenceWitness>> documentUploadWitness2;
     private final List<Element<UploadEvidenceWitness>> documentUploadWitness3;
     private final List<Element<UploadEvidenceWitness>> documentUploadWitness4;
-
     private final List<Element<UploadEvidenceExpert>> documentUploadExpert1;
     private final List<Element<UploadEvidenceExpert>> documentUploadExpert2;
     private final List<Element<UploadEvidenceExpert>> documentUploadExpert3;
     private final List<Element<UploadEvidenceExpert>> documentUploadExpert4;
-
     private final List<Element<DocumentUploadTrial>> documentUploadTrial1;
     private final List<Element<DocumentUploadTrial>> documentUploadTrial2;
     private final List<Element<DocumentUploadTrial>> documentUploadTrial3;
     private final List<Element<DocumentUploadTrial>> documentUploadTrial4;
     private final LocalDateTime caseDocumentUploadDate;
+    //respondent
+    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure1Res;
+    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure2Res;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness1Res;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness2Res;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness3Res;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness4Res;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert1Res;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert2Res;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert3Res;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert4Res;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial1Res;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial2Res;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial3Res;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial4Res;
+    private final LocalDateTime caseDocumentUploadDateRes;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
