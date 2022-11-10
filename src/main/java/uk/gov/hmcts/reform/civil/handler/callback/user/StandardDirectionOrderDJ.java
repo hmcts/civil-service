@@ -610,7 +610,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 .map(LocationRefDataService::buildCaseLocation)
                 .ifPresent(caseDataBuilder::caseManagementLocation)
                        ;
-            Optional.ofNullable(location).map(value -> value.getSiteName() ).map(caseDataBuilder::locationName);
+            Optional.ofNullable(location)
+                .map(value -> value.getSiteName())
+                .map(caseDataBuilder::locationName);
 
         }
 
