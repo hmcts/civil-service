@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
     ClaimIssueForSpecCallbackHandler.class,
     JacksonAutoConfiguration.class
 })
-public class ClaimIssueForSpecHandlerTest {
+class ClaimIssueForSpecHandlerTest {
 
     @Autowired
     private ClaimIssueForSpecCallbackHandler handler;
@@ -26,9 +26,9 @@ public class ClaimIssueForSpecHandlerTest {
     private FeatureToggleService toggleService;
 
     @Test
-    public void ldBlock() {
+    void ldBlock() {
         Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assert.assertTrue(handler.handledEvents().isEmpty());
-        Assert.assertFalse(handler.handledEvents().isEmpty());
+        Assertions.assertTrue(handler.handledEvents().isEmpty());
+        Assertions.assertFalse(handler.handledEvents().isEmpty());
     }
 }

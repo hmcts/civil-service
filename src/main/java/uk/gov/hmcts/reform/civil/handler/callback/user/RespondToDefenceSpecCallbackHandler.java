@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -57,6 +56,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
@@ -230,10 +230,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                     .applicant1DQ(dq.applicant1DQRequestedCourt(
                         caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().toBuilder()
                             .responseCourtLocations(null)
-                            .caseLocation(CaseLocation.builder()
-                                              .region(courtLocation.getRegionId())
-                                              .baseLocation(courtLocation.getEpimmsId())
-                                              .build())
+                            .caseLocation(LocationRefDataService.buildCaseLocation(courtLocation))
                             .responseCourtCode(courtLocation.getCourtLocationCode()).build()
                     ).build());
             }
@@ -248,11 +245,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (V_1.equals(callbackParams.getVersion())
             && featureToggleService.isAccessProfilesEnabled()) {
             updatedCaseData.respondent1Copy(caseData.getRespondent1())
-                .claimantResponseScenarioFlag(getMultiPartyScenario(caseData));
+                .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM);
+
         } else {
             updatedCaseData.respondent1Copy(caseData.getRespondent1())
                 .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-                .caseAccessCategory(CaseCategory.SPEC_CLAIM);
+                .superClaimType(SPEC_CLAIM);
         }
 
         if (V_1.equals(callbackParams.getVersion()) && featureToggleService.isCourtLocationDynamicListEnabled()) {

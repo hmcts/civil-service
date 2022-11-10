@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +52,7 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest {
     @Test
     void ldBlock() {
         Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assert.assertTrue(handler.handledEvents().isEmpty());
-        Assert.assertFalse(handler.handledEvents().isEmpty());
+        Assertions.assertTrue(handler.handledEvents().isEmpty());
+        Assertions.assertFalse(handler.handledEvents().isEmpty());
     }
 }
