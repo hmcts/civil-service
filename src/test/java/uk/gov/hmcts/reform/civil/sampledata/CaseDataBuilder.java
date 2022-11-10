@@ -319,6 +319,7 @@ public class CaseDataBuilder {
     private TrialHearingTrial trialHearingTrialDJ;
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
+    private CaseLocation caseManagementLocation;
     private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
     private YesOrNo generalAppVaryJudgementType;
     private Document generalAppN245FormUpload;
@@ -1589,6 +1590,11 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimIssuedTrialLocationInPerson() {
         trialHearingMethodInPersonDJ = DynamicList.builder().value(
             DynamicListElement.builder().label("Court 1").build()).build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimIssuedCaseManagementLocationInPerson() {
+        caseManagementLocation = CaseLocation.builder().baseLocation("0123").region("0321").build();
         return this;
     }
 
@@ -3263,6 +3269,15 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder multiPartyClaimTwoDefendantSolicitorsForSdoMP() {
+        this.addRespondent2 = YES;
+        this.respondent2 = PartyBuilder.builder().individual().build();
+        this.respondent2SameLegalRepresentative = NO;
+        this.respondentSolicitor2Reference = "01234";
+        respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
+        return this;
+    }
+
     public CaseDataBuilder multiPartyClaimOneDefendantSolicitor() {
         this.addRespondent2 = YES;
         this.respondent2 = PartyBuilder.builder().individual().build();
@@ -3699,6 +3714,7 @@ public class CaseDataBuilder {
             .changeOrganisationRequestField(changeOrganisationRequest)
             .unassignedCaseListDisplayOrganisationReferences(unassignedCaseListDisplayOrganisationReferences)
             .caseListDisplayDefendantSolicitorReferences(caseListDisplayDefendantSolicitorReferences)
+            .caseManagementLocation(caseManagementLocation)
             .disposalHearingOrderMadeWithoutHearingDJ(disposalHearingOrderMadeWithoutHearingDJ)
             //Unsuitable for SDO
             .reasonNotSuitableSDO(reasonNotSuitableSDO)

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -57,6 +58,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
@@ -483,6 +485,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REFER_TO_JUDGE,
                         migrateCase
                     }
                 ),
@@ -499,6 +502,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REFER_TO_JUDGE,
                         migrateCase
                     }
                 ),
@@ -511,6 +515,7 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         APPLICATION_CLOSED_UPDATE_CLAIM,
+                        REFER_TO_JUDGE,
                         migrateCase
                     }
                 ),
@@ -520,8 +525,9 @@ class FlowStateAllowedEventServiceTest {
                         CASE_PROCEEDS_IN_CASEMAN,
                         ADD_CASE_NOTE,
                         INITIATE_GENERAL_APPLICATION,
-                        CREATE_SDO,
                         NotSuitable_SDO,
+                        CREATE_SDO,
+                        REFER_TO_JUDGE,
                         APPLICATION_CLOSED_UPDATE_CLAIM,
                         migrateCase
                     }
@@ -541,6 +547,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REFER_TO_JUDGE,
                         migrateCase
                     }
                 ),
@@ -552,6 +559,7 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        REFER_TO_JUDGE,
                         migrateCase
                     }
                 ),
@@ -912,5 +920,14 @@ class FlowStateAllowedEventServiceTest {
             assertThat(flowStateAllowedEventService.isAllowed(caseDetails, caseEvent))
                 .isEqualTo(expected);
         }
+    }
+
+    @Test
+    void shouldReturnTrue_whenCaseEventIsMigrateCase() {
+        CaseDetails caseDetails =
+            CaseDetailsBuilder.builder()
+            .atStateAwaitingCaseDetailsNotification().build();
+        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, migrateCase))
+            .isEqualTo(true);
     }
 }

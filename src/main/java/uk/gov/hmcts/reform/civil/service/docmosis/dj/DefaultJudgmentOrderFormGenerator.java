@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
@@ -39,11 +38,10 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
+    private final FeatureToggleService featureToggleService;
     private static final String BOTH_DEFENDANTS = "Both Defendants";
     public static final String DISPOSAL_HEARING = "DISPOSAL_HEARING";
 
-    @Autowired
-    private FeatureToggleService featureToggleService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         DefaultJudgmentSDOOrderForm templateData = getDefaultJudgmentForms(caseData);
@@ -176,7 +174,9 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .trialHousingDisrepairAddSection(nonNull(caseData.getTrialHousingDisrepair()))
             .trialHearingMethodInPersonAddSection(checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ()))
             .trialHearingLocation(checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ())
-                                      ? caseData.getTrialHearingMethodInPersonDJ().getValue().getLabel() : null)
+                                      ? featureToggleService.isHearingAndListingSDOEnabled()
+                ? caseData.getCaseManagementLocation().getBaseLocation()
+                : caseData.getTrialHearingMethodInPersonDJ().getValue().getLabel() : null)
             .applicant(checkApplicantPartyName(caseData)
                            ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
             .respondent(checkDefendantRequested(caseData).toUpperCase())
