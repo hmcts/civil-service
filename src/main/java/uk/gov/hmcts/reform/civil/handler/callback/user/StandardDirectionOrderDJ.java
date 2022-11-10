@@ -153,7 +153,10 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
                     .getPartyName() + " and " + caseData.getRespondent2().getPartyName());
                 break;
-
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
+                    .getPartyName() + " and " + caseData.getRespondent2().getPartyName());
+                break;
             case TWO_V_ONE:
                 participantString = (caseData.getApplicant1().getPartyName() + " and " + caseData.getApplicant2()
                     .getPartyName() + " v " + caseData.getRespondent1().getPartyName());
@@ -605,7 +608,10 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 caseData.getDisposalHearingMethodInPersonDJ(), caseData.getTrialHearingMethodInPersonDJ()));
             Optional.ofNullable(location)
                 .map(LocationRefDataService::buildCaseLocation)
-                .ifPresent(caseDataBuilder::caseManagementLocation);
+                .ifPresent(caseDataBuilder::caseManagementLocation)
+                       ;
+            Optional.ofNullable(location).map(value -> value.getSiteName() ).map(caseDataBuilder::locationName);
+
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
