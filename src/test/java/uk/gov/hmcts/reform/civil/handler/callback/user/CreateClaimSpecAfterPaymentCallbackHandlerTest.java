@@ -11,18 +11,18 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_ISSUED_AFTER_FEE_PAID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMI
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 
 @SpringBootTest(classes = {
-    CaseIssuedAfterFeePaidCallbackHandler.class,
+    CreateClaimSpecAfterPaymentCallbackHandler.class,
     JacksonAutoConfiguration.class,
 })
-class CaseIssuedAfterFeePaidCallbackHandlerTest extends BaseCallbackHandlerTest {
+class CreateClaimSpecAfterPaymentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
-    private CaseIssuedAfterFeePaidCallbackHandler handler;
+    private CreateClaimSpecAfterPaymentCallbackHandler handler;
 
     @Test
     void shouldRespondWithStateChanged() {
@@ -37,6 +37,6 @@ class CaseIssuedAfterFeePaidCallbackHandlerTest extends BaseCallbackHandlerTest 
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(CASE_ISSUED_AFTER_FEE_PAID);
+        assertThat(handler.handledEvents()).contains(CREATE_CLAIM_SPEC_AFTER_PAYMENT);
     }
 }
