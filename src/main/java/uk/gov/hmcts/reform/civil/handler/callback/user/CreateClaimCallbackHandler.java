@@ -154,14 +154,14 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
         caseDataBuilder.claimStarted(YES);
 
-        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
-            List<LocationRefData> locations = fetchLocationData(callbackParams);
 
-            caseDataBuilder
-                .courtLocation(CourtLocation.builder()
-                   .applicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations))
-                   .build());
-        }
+        List<LocationRefData> locations = fetchLocationData(callbackParams);
+
+        caseDataBuilder
+            .courtLocation(CourtLocation.builder()
+               .applicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations))
+               .build());
+
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper)).build();
