@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.hearing.HearingFeeServiceRequestDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 
@@ -56,22 +57,23 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
-        try {
-            log.info("calling payment service request " + caseData.getCcdCaseReference());
-            var serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
-                .getServiceRequestReference();
-            HearingFeeServiceRequestDetails hearingFeeDetails = caseData.getHearingFeeServiceRequestDetails();
-            caseData = caseData.toBuilder()
-                .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder()
-                                          .fee(caseData.getHearingFee())
-                                          .serviceRequestReference(serviceRequestReference).build())
-                .build();
+        if (caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
+            try {
+                log.info("calling payment service request " + caseData.getCcdCaseReference());
+                var serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
+                    .getServiceRequestReference();
+                HearingFeeServiceRequestDetails hearingFeeDetails = caseData.getHearingFeeServiceRequestDetails();
+                caseData = caseData.toBuilder()
+                    .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder()
+                                                         .fee(caseData.getHearingFee())
+                                                         .serviceRequestReference(serviceRequestReference).build())
+                    .build();
 
-        } catch (FeignException e) {
-            log.info(String.format("Http Status %s ", e.status()), e);
-            errors.add(ERROR_MESSAGE);
+            } catch (FeignException e) {
+                log.info(String.format("Http Status %s ", e.status()), e);
+                errors.add(ERROR_MESSAGE);
+            }
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .errors(errors)
