@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 
@@ -27,7 +28,7 @@ class CreateClaimSpecAfterPaymentCallbackHandlerTest extends BaseCallbackHandler
     @Test
     void shouldRespondWithStateChanged() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 

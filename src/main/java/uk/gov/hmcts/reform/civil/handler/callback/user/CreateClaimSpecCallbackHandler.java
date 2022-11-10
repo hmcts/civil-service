@@ -448,7 +448,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         if (null != callbackParams.getRequest().getEventId()) {
             dataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
-            if(!featureToggleService.isPbaV3Enabled()) {
+            if (!featureToggleService.isPbaV3Enabled()) {
                 dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
             } else {
                 dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC_BEFORE_PAYMENT));

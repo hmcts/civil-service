@@ -39,7 +39,7 @@ public class PaymentRequestUpdateCallbackService {
 
     private CaseData data;
 
-    public void processCallback(ServiceRequestUpdateDto serviceRequestUpdateDto , String feeType) {
+    public void processCallback(ServiceRequestUpdateDto serviceRequestUpdateDto, String feeType) {
         log.info("Processing the callback for the caseId {} with status {}", serviceRequestUpdateDto.getCcdCaseNumber(),
                  serviceRequestUpdateDto.getServiceRequestStatus());
 
@@ -50,7 +50,7 @@ public class PaymentRequestUpdateCallbackService {
                                                                                    .getCcdCaseNumber()));
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
             caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
-            if(feeType.equals(HEARING.name())) {
+            if (feeType.equals(HEARING.name())) {
                 createEvent(caseData, SERVICE_REQUEST_RECEIVED,
                             serviceRequestUpdateDto.getCcdCaseNumber()
                 );
@@ -67,10 +67,10 @@ public class PaymentRequestUpdateCallbackService {
         }
     }
 
-    private void createEvent(CaseData caseData, CaseEvent eventName, String CaseId) {
+    private void createEvent(CaseData caseData, CaseEvent eventName, String caseId) {
 
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
-            CaseId,
+            caseId,
             eventName
         );
 
@@ -82,13 +82,13 @@ public class PaymentRequestUpdateCallbackService {
             businessProcess
         );
 
-        coreCaseDataService.submitUpdate(CaseId, caseDataContent);
+        coreCaseDataService.submitUpdate(caseId, caseDataContent);
     }
 
     private CaseData updateCaseDataWithStateAndPaymentDetails(ServiceRequestUpdateDto serviceRequestUpdateDto,
                                                               CaseData caseData, String feeType) {
         PaymentDetails pbaDetails = null;
-        if(feeType.equals(HEARING.name())) {
+        if (feeType.equals(HEARING.name())) {
             pbaDetails = caseData.getHearingFeePaymentDetails();
         } else if (feeType.equals(CLAIMISSUED.name())) {
             pbaDetails = caseData.getClaimIssuedPaymentDetails();
@@ -107,11 +107,11 @@ public class PaymentRequestUpdateCallbackService {
             .errorMessage(null)
             .build();
 
-        if(feeType.equals(HEARING)) {
+        if (feeType.equals(HEARING)) {
             caseData = caseData.toBuilder()
                 .hearingFeePaymentDetails(paymentDetails)
                 .build();
-        } else if (feeType.equals(CLAIMISSUED)){
+        } else if (feeType.equals(CLAIMISSUED)) {
             caseData = caseData.toBuilder()
                 .claimIssuedPaymentDetails(paymentDetails)
                 .build();
