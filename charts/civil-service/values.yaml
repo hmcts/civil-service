@@ -1,5 +1,3 @@
-tags:
-  civil-ccd-stack: false
 postgresql:
   enabled: false
 idam-pr:
@@ -10,7 +8,8 @@ xui-webapp:
 
 camunda-bpm:
   enabled: false
-
+ccd:
+  enabled: false
 java:
   applicationPort: 4000
   image: 'hmctspublic.azurecr.io/civil/service:latest'
