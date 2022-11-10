@@ -40,15 +40,7 @@ public class NoOngoingBusinessProcessAspect {
     ) throws Throwable {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         CaseData caseData = callbackParams.getCaseData();
-        StringBuilder stateHistoryBuilder = new StringBuilder();
-        FlowState flowState = FlowState.fromFullName("MAIN.DRAFT");
-        if (!caseEvent.equals(CaseEvent.migrateCase)) {
-            flowState = flowStateAllowedEventService.getFlowState(caseData);
-            stateFlowEngine.evaluate(caseData).getStateHistory().forEach(s -> {
-                stateHistoryBuilder.append(s.getName());
-                stateHistoryBuilder.append(", ");
-            });
-        }
+
         if (callbackParams.getType() == SUBMITTED
             || caseEvent.isCamundaEvent()
             || caseData.hasNoOngoingBusinessProcess()
@@ -57,6 +49,12 @@ public class NoOngoingBusinessProcessAspect {
         ) {
             return joinPoint.proceed();
         }
+        StringBuilder stateHistoryBuilder = new StringBuilder();
+        FlowState flowState = flowStateAllowedEventService.getFlowState(caseData);
+        stateFlowEngine.evaluate(caseData).getStateHistory().forEach(s -> {
+            stateHistoryBuilder.append(s.getName());
+            stateHistoryBuilder.append(", ");
+        });
         log.info(format(
             "%s is not allowed on the case %s due to ongoing business process, current FlowState: %s, "
                 + "stateFlowHistory: %s",
