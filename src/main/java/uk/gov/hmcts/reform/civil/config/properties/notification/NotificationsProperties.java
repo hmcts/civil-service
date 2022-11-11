@@ -45,6 +45,8 @@ public class NotificationsProperties {
     @NotEmpty
     private String solicitorClaimDismissed;
 
+    @NotEmpty String solicitorHearingFeeUnpaid;
+
     @NotEmpty
     private String claimantSolicitorCaseWillProgressOffline;
 
