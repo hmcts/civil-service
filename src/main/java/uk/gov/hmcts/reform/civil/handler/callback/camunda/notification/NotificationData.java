@@ -35,7 +35,6 @@ public interface NotificationData {
     //Default judgment
     String LEGAL_ORG_SPECIFIED = "legalOrg";
     String CLAIM_NUMBER = "claimnumber";
-
     String DEFENDANT_NAME = "DefendantName";
     String BOTH_DEFENDANTS = "Both Defendants";
     String CLAIM_NUMBER_INTERIM = "Claim number";
@@ -51,9 +50,6 @@ public interface NotificationData {
     String RESPOND_URL = "respondToClaimUrl";
     String PIN = "pin";
     String FRONTEND_URL = "frontendBaseUrl";
-
-    //Case Progression
-    String HEARING_DATE = "hearingDate";
 
     Map<String, String> addProperties(CaseData caseData);
 
