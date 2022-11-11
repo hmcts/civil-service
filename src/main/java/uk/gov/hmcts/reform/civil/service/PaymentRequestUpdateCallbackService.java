@@ -94,7 +94,7 @@ public class PaymentRequestUpdateCallbackService {
 
         String customerReference = ofNullable(serviceRequestUpdateDto.getPayment())
             .map(PaymentDto::getCustomerReference)
-            .orElse(pbaDetails.getCustomerReference());
+            .orElse(ofNullable(pbaDetails).map(PaymentDetails::getCustomerReference).orElse(null));
 
         PaymentDetails paymentDetails = ofNullable(pbaDetails)
             .map(PaymentDetails::toBuilder)
