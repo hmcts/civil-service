@@ -30,8 +30,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.*;
+import static uk.gov.hmcts.reform.civil.enums.FeeType.CLAIMISSUED;
 import static uk.gov.hmcts.reform.civil.enums.FeeType.HEARING;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 
@@ -71,7 +71,7 @@ class PaymentRequestUpdateCallbackServiceTest {
     }
 
     @Test
-    public void shouldStartAndSubmitEventWithCaseDetails() {
+    public void shouldStartAndSubmitEventWithCaseDetails_Hearing() {
 
         CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
         caseData = caseData.toBuilder()
@@ -96,7 +96,7 @@ class PaymentRequestUpdateCallbackServiceTest {
     }
 
     @Test
-    public void shouldProceed_WhenAdditionalPaymentExist_WithPaymentFail() {
+    public void shouldProceed_WhenAdditionalPaymentExist_WithPaymentFail_Hearing() {
 
         CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
         caseData = caseData.toBuilder()
@@ -128,7 +128,7 @@ class PaymentRequestUpdateCallbackServiceTest {
     }
 
     @Test
-    public void shouldNotProceed_WhenPaymentFailed() {
+    public void shouldNotProceed_WhenPaymentFailed_Hearing() {
         CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
         caseData = caseData.toBuilder().ccdState(CASE_PROGRESSION).build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
@@ -145,6 +145,83 @@ class PaymentRequestUpdateCallbackServiceTest {
         verify(coreCaseDataService, never()).startUpdate(any(), any());
         verify(coreCaseDataService, never()).submitUpdate(any(), any());
     }
+
+    @Test
+    public void shouldStartAndSubmitEventWithCaseDetails_ClaimIssued() {
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSpec().build();
+        caseData = caseData.toBuilder()
+            .ccdState(PENDING_CASE_ISSUED)
+            .businessProcess(BusinessProcess.builder()
+                                 .status(BusinessProcessStatus.READY)
+                                 .camundaEvent(BUSINESS_PROCESS)
+                                 .build())
+            .build();
+        CaseDetails caseDetails = buildCaseDetails(caseData);
+
+        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails));
+        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
+
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), CLAIMISSUED.name());
+
+        verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
+        verify(coreCaseDataService, times(1)).startUpdate(any(), any());
+        verify(coreCaseDataService, times(1)).submitUpdate(any(), any());
+    }
+
+    @Test
+    public void shouldProceed_WhenAdditionalPaymentExist_WithPaymentFail_ClaimIssued() {
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSpec().build();
+        caseData = caseData.toBuilder()
+            .ccdState(PENDING_CASE_ISSUED)
+            .hearingFeePaymentDetails(PaymentDetails.builder()
+                                          .status(FAILED)
+                                          .reference("REFERENCE")
+                                          .build())
+            .businessProcess(BusinessProcess.builder()
+                                 .status(BusinessProcessStatus.READY)
+                                 .camundaEvent(BUSINESS_PROCESS)
+                                 .build())
+            .build();
+
+        CaseDetails caseDetails = buildCaseDetails(caseData);
+
+        when(coreCaseDataService.getCase(Long.valueOf(CASE_ID))).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails))
+            .thenReturn(caseData);
+        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails));
+        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
+
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), CLAIMISSUED.name());
+
+        verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
+        verify(coreCaseDataService, times(1)).startUpdate(any(), any());
+        verify(coreCaseDataService, times(1)).submitUpdate(any(), any());
+
+    }
+
+    @Test
+    public void shouldNotProceed_WhenPaymentFailed_ClaimIssued() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSpec().build();
+        caseData = caseData.toBuilder().ccdState(PENDING_CASE_ISSUED).build();
+        CaseDetails caseDetails = buildCaseDetails(caseData);
+
+        when(coreCaseDataService.getCase(Long.valueOf(CASE_ID))).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails))
+            .thenReturn(caseData);
+        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails));
+        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
+
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(NOT_PAID), CLAIMISSUED.name());
+
+        verify(coreCaseDataService, never()).getCase(Long.valueOf(CASE_ID));
+        verify(coreCaseDataService, never()).startUpdate(any(), any());
+        verify(coreCaseDataService, never()).submitUpdate(any(), any());
+    }
+
 
     private CaseDetails buildCaseDetails(CaseData caseData) {
         return CaseDetails.builder()

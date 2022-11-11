@@ -90,7 +90,7 @@ public class PaymentRequestUpdateCallbackService {
 
     private CaseData updateCaseDataWithStateAndPaymentDetails(ServiceRequestUpdateDto serviceRequestUpdateDto,
                                                               CaseData caseData, String feeType) {
-        PaymentDetails pbaDetails = null;
+        PaymentDetails pbaDetails = PaymentDetails.builder().build();
         if (feeType.equals(HEARING.name())) {
             pbaDetails = caseData.getHearingFeePaymentDetails();
         } else if (feeType.equals(CLAIMISSUED.name())) {
@@ -110,11 +110,11 @@ public class PaymentRequestUpdateCallbackService {
             .errorMessage(null)
             .build();
 
-        if (feeType.equals(HEARING)) {
+        if (feeType.equals(HEARING.name())) {
             caseData = caseData.toBuilder()
                 .hearingFeePaymentDetails(paymentDetails)
                 .build();
-        } else if (feeType.equals(CLAIMISSUED)) {
+        } else if (feeType.equals(CLAIMISSUED.name())) {
             caseData = caseData.toBuilder()
                 .claimIssuedPaymentDetails(paymentDetails)
                 .build();
