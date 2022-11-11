@@ -118,7 +118,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
                             ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
             .respondent(checkDefendantRequested(caseData).toUpperCase());
 
-        if (featureToggleService.isNoticeOfChangeEnabled()) {
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
             djOrderFormBuilder
                 .disposalHearingOrderMadeWithoutHearingDJ(caseData.getDisposalHearingOrderMadeWithoutHearingDJ())
                 .disposalHearingFinalDisposalHearingTimeDJ(caseData.getDisposalHearingFinalDisposalHearingTimeDJ())
