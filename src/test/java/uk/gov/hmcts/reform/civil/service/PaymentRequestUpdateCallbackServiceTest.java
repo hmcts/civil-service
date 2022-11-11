@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -31,11 +32,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
+import static uk.gov.hmcts.reform.civil.enums.FeeType.HEARING;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 
 @SpringBootTest(classes = {
     PaymentRequestUpdateCallbackService.class,
-    JacksonAutoConfiguration.class,
+    JacksonAutoConfiguration.class
 
 })
 class PaymentRequestUpdateCallbackServiceTest {
@@ -57,11 +59,15 @@ class PaymentRequestUpdateCallbackServiceTest {
     @Autowired
     PaymentRequestUpdateCallbackService paymentRequestUpdateCallbackService;
     @MockBean
+    FeatureToggleService featureToggleService;
+    @MockBean
     CaseDetailsConverter caseDetailsConverter;
 
     @BeforeEach
     public void setup() {
+
         when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
+        when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
     }
 
     @Test
@@ -82,12 +88,11 @@ class PaymentRequestUpdateCallbackServiceTest {
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), "hearingFees");
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), HEARING.name());
 
         verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
         verify(coreCaseDataService, times(1)).startUpdate(any(), any());
         verify(coreCaseDataService, times(1)).submitUpdate(any(), any());
-        verify(coreCaseDataService, times(1)).triggerEvent(any(), any());
     }
 
     @Test
@@ -114,12 +119,11 @@ class PaymentRequestUpdateCallbackServiceTest {
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), "hearingFees");
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), HEARING.name());
 
         verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
         verify(coreCaseDataService, times(1)).startUpdate(any(), any());
         verify(coreCaseDataService, times(1)).submitUpdate(any(), any());
-        verify(coreCaseDataService, times(1)).triggerEvent(any(), any());
 
     }
 
@@ -135,12 +139,11 @@ class PaymentRequestUpdateCallbackServiceTest {
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(NOT_PAID), "hearingFees");
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(NOT_PAID), HEARING.name());
 
         verify(coreCaseDataService, never()).getCase(Long.valueOf(CASE_ID));
         verify(coreCaseDataService, never()).startUpdate(any(), any());
         verify(coreCaseDataService, never()).submitUpdate(any(), any());
-        verify(coreCaseDataService, never()).triggerEvent(any(), any());
     }
 
     private CaseDetails buildCaseDetails(CaseData caseData) {

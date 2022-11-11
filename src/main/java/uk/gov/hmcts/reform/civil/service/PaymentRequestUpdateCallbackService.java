@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -61,8 +60,8 @@ public class PaymentRequestUpdateCallbackService {
 
             } else if (feeType.equals(CLAIMISSUED.name())
                 && isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled() ? true : false)) {
-                    createEvent(caseData, CREATE_CLAIM_SPEC_AFTER_PAYMENT,
-                                serviceRequestUpdateDto.getCcdCaseNumber());
+
+                createEvent(caseData, CREATE_CLAIM_SPEC_AFTER_PAYMENT, serviceRequestUpdateDto.getCcdCaseNumber());
             }
 
         } else {
