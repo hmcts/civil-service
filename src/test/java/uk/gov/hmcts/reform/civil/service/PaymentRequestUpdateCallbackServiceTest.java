@@ -30,7 +30,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.*;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.FeeType.CLAIMISSUED;
 import static uk.gov.hmcts.reform.civil.enums.FeeType.HEARING;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
@@ -221,8 +222,7 @@ class PaymentRequestUpdateCallbackServiceTest {
         verify(coreCaseDataService, never()).startUpdate(any(), any());
         verify(coreCaseDataService, never()).submitUpdate(any(), any());
     }
-
-
+    
     private CaseDetails buildCaseDetails(CaseData caseData) {
         return CaseDetails.builder()
             .data(objectMapper.convertValue(caseData,
