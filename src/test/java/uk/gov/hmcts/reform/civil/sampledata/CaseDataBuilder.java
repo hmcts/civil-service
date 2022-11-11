@@ -105,7 +105,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NO
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
@@ -259,8 +258,6 @@ public class CaseDataBuilder {
     protected LocalDateTime takenOfflineByStaffDate;
     protected LocalDateTime unsuitableSDODate;
     protected LocalDateTime claimDismissedDate;
-    protected LocalDateTime caseDismissedHearingFeeDueDate;
-    protected LocalDate hearingDate;
     private InterestClaimOptions interestClaimOptions;
     private YesOrNo claimInterest;
     private SameRateInterestSelection sameRateInterestSelection;
@@ -321,10 +318,7 @@ public class CaseDataBuilder {
     private TrialHearingTrial trialHearingTrialDJ;
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
-    private LocalDate hearingDueDate;
-
     private CaseLocation caseManagementLocation;
-
     private YesOrNo generalAppVaryJudgementType;
     private Document generalAppN245FormUpload;
     private GAApplicationType generalAppType;
@@ -1025,14 +1019,6 @@ public class CaseDataBuilder {
         atStateClaimPastClaimDetailsNotificationDeadline();
         ccdState = CASE_DISMISSED;
         claimDismissedDate = claimNotificationDate.plusDays(1);
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimDismissedPastHearingFeeDueDeadline() {
-        atStateHearingFeeDueUnpaid();
-        ccdState = CASE_DISMISSED;
-        caseDismissedHearingFeeDueDate = LocalDateTime.now();
-        hearingDate = hearingDueDate.plusWeeks(2);
         return this;
     }
 
@@ -3132,22 +3118,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateHearingFeeDueUnpaid() {
-        atStateApplicantRespondToDefenceAndProceed();
-        hearingDueDate = LocalDate.now().minusDays(1);
-        hearingFeePaymentDetails = PaymentDetails.builder().status(FAILED).build();
-        ccdState = HEARING_READINESS;
-        return this;
-    }
-
-    public CaseDataBuilder atStateHearingFeeDuePaid() {
-        atStateApplicantRespondToDefenceAndProceed();
-        hearingDueDate = LocalDate.now().minusDays(1);
-        hearingFeePaymentDetails = PaymentDetails.builder().status(SUCCESS).build();
-        ccdState = HEARING_READINESS;
-        return this;
-    }
-
     public CaseDataBuilder atStateBeforeTakenOfflineSDONotDrawn() {
 
         atStateApplicantRespondToDefenceAndProceed();
@@ -3574,7 +3544,6 @@ public class CaseDataBuilder {
             .applicantSolicitor1ClaimStatementOfTruth(applicantSolicitor1ClaimStatementOfTruth)
             .claimIssuedPaymentDetails(claimIssuedPaymentDetails)
             .claimFee(claimFee)
-            .hearingFeePaymentDetails(hearingFeePaymentDetails)
             .paymentReference(paymentReference)
             .applicantSolicitor1CheckEmail(applicantSolicitor1CheckEmail)
             .applicantSolicitor1UserDetails(applicantSolicitor1UserDetails)
@@ -3662,7 +3631,6 @@ public class CaseDataBuilder {
             .takenOfflineByStaffDate(takenOfflineByStaffDate)
             .unsuitableSDODate(unsuitableSDODate)
             .claimDismissedDate(claimDismissedDate)
-            .caseDismissedHearingFeeDueDate(caseDismissedHearingFeeDueDate)
             .addLegalRepDeadline(addLegalRepDeadline)
             .applicantSolicitor1ServiceAddress(applicantSolicitor1ServiceAddress)
             .respondentSolicitor1ServiceAddress(respondentSolicitor1ServiceAddress)
@@ -3672,8 +3640,6 @@ public class CaseDataBuilder {
             .defendantSolicitorNotifyClaimDetailsOptions(defendantSolicitorNotifyClaimDetailsOptions)
             .selectLitigationFriend(selectLitigationFriend)
             .caseNotes(caseNotes)
-            .hearingDueDate(hearingDueDate)
-            .hearingDate(hearingDate)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)
             .superClaimType(superClaimType == null ? UNSPEC_CLAIM : superClaimType)
@@ -3745,5 +3711,4 @@ public class CaseDataBuilder {
             .reasonNotSuitableSDO(reasonNotSuitableSDO)
             .build();
     }
-
 }
