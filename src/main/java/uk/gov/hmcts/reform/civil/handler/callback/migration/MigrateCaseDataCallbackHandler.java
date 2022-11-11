@@ -7,15 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -41,7 +37,6 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
 
-    private final PaymentsConfiguration paymentsConfiguration;
     private final CoreCaseDataService coreCaseDataService;
     private final LocationRefDataService locationRefDataService;
     @Override
@@ -60,7 +55,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         CaseLocation caseLocation = null;
         if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
-            CaseMigratonUtility.migrateGS(oldCaseData, paymentsConfiguration.getSpecSiteId(),
+            CaseMigratonUtility.migrateGS(oldCaseData, "AAA7",
                                           caseDataBuilder, coreCaseDataService
             );
             caseLocation = CaseLocation.builder().baseLocation("420219").region("2").build();
@@ -68,7 +63,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
         } else {
             caseLocation = CaseLocation.builder().baseLocation("192280").region("4").build();
             CaseMigratonUtility.migrateCaseManagementLocation(caseDataBuilder, caseLocation);
-            CaseMigratonUtility.migrateGS(oldCaseData, paymentsConfiguration.getSiteId(),
+            CaseMigratonUtility.migrateGS(oldCaseData, "AAA6",
                                           caseDataBuilder, coreCaseDataService
             );
 
