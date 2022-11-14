@@ -157,8 +157,6 @@ public class NotificationsProperties {
     private String standardDirectionOrderDJTemplate;
 
     @NotEmpty
-    private String caseworkerDefaultJudgmentRequested;
-
     private String respondentChangeOfAddressNotificationTemplate;
 
     @NotEmpty
