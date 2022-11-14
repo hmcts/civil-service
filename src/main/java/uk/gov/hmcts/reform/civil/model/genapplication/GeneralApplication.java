@@ -54,6 +54,9 @@ public class GeneralApplication implements MappableObject {
     private final String locationName;
     private final LocalDateTime applicationClosedDate;
     private final LocalDateTime applicationTakenOfflineDate;
+    private final YesOrNo generalAppVaryJudgementType;
+    private final Document generalAppN245FormUpload;
+    private final GAHearingDateGAspec generalAppHearingDate;
 
     @JsonCreator
     GeneralApplication(@JsonProperty("generalApplicationState") String generalApplicationState,
@@ -90,8 +93,11 @@ public class GeneralApplication implements MappableObject {
                        @JsonProperty("CaseAccessCategory") CaseCategory caseAccessCategory,
                        @JsonProperty("locationName") String locationName,
                        @JsonProperty("applicationClosedDate") LocalDateTime applicationClosedDate,
-                       @JsonProperty("applicationTakenOfflineDate") LocalDateTime applicationTakenOfflineDate
-                       ) {
+                       @JsonProperty("applicationTakenOfflineDate") LocalDateTime applicationTakenOfflineDate,
+                       @JsonProperty("generalAppVaryJudgementType") YesOrNo generalAppVaryJudgementType,
+                       @JsonProperty("generalAppN245FormUpload") Document generalAppN245FormUpload,
+                       @JsonProperty("generalAppHearingDate") GAHearingDateGAspec generalAppHearingDate) {
+
         this.generalApplicationState = generalApplicationState;
         this.generalAppType = generalAppType;
         this.generalAppRespondentAgreement = generalAppRespondentAgreement;
@@ -125,5 +131,8 @@ public class GeneralApplication implements MappableObject {
         this.locationName = locationName;
         this.applicationClosedDate = applicationClosedDate;
         this.applicationTakenOfflineDate = applicationTakenOfflineDate;
+        this.generalAppVaryJudgementType = generalAppVaryJudgementType;
+        this.generalAppN245FormUpload = generalAppN245FormUpload;
+        this.generalAppHearingDate = generalAppHearingDate;
     }
 }

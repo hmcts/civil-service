@@ -73,6 +73,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -89,6 +90,9 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingHearingNotesDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -121,6 +125,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final GAStatementOfTruth generalAppStatementOfTruth;
     private final GAHearingDetails generalAppHearingDetails;
     private final GASolicitorDetailsGAspec generalAppApplnSolicitor;
+    private final YesOrNo generalAppVaryJudgementType;
+    private final GAHearingDateGAspec generalAppHearingDate;
+    private final Document generalAppN245FormUpload;
 
     @Builder.Default
     private final List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors = new ArrayList<>();
@@ -508,7 +515,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private TrialHearingWitnessOfFact trialHearingWitnessOfFactDJ;
     private TrialHearingSchedulesOfLoss trialHearingSchedulesOfLossDJ;
     private TrialHearingTrial trialHearingTrialDJ;
+    private TrialHearingTimeDJ trialHearingTimeDJ;
     private TrialHearingNotes trialHearingNotesDJ;
+    private TrialHearingHearingNotesDJ trialHearingHearingNotesDJ;
+    private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
     private TrialBuildingDispute trialBuildingDispute;
     private TrialClinicalNegligence trialClinicalNegligence;
     private TrialCreditHire trialCreditHire;
@@ -522,6 +532,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
+    /**
+     * RTJ = Refer To Judge.
+     */
+    private final String eventDescriptionRTJ;
+    /**
+     * RTJ = Refer To Judge.
+     */
+    private final String additionalInformationRTJ;
 
     private List<DisposalAndTrialHearingDJToggle> disposalHearingDisclosureOfDocumentsDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingWitnessOfFactDJToggle;
@@ -573,15 +591,19 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     public YesOrNo getRespondent1Represented() {
-        return Stream.of(respondent1Represented,
-                         specRespondent1Represented)
+        return Stream.of(
+                respondent1Represented,
+                specRespondent1Represented
+            )
             .filter(Objects::nonNull)
             .findFirst().orElse(null);
     }
 
     public YesOrNo getRespondent2Represented() {
-        return Stream.of(respondent2Represented,
-                         specRespondent2Represented)
+        return Stream.of(
+                respondent2Represented,
+                specRespondent2Represented
+            )
             .filter(Objects::nonNull)
             .findFirst().orElse(null);
     }
