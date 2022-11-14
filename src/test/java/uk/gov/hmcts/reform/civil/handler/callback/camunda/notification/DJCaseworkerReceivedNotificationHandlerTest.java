@@ -69,7 +69,7 @@ public class DJCaseworkerReceivedNotificationHandlerTest {
         void setup() {
             when(notificationsProperties.getCaseworkerDefaultJudgmentRequested())
                 .thenReturn("test-template-received-id");
-            when(defaultJudgmentSpecEmailConfiguration.getReceiver())
+            when(defaultJudgmentSpecEmailConfiguration.getSpecReceiver())
                 .thenReturn("caseworker@hmcts.net");
 
         }
