@@ -57,9 +57,9 @@ public class DJCaseworkerReceivedNotificationHandler extends CallbackHandler imp
     }
 
     private CallbackResponse notifyDJApprovedCaseworker(CallbackParams callbackParams) {
-        log.info("Default Judgment Spec email sent to: " + defaultJudgmentSpecEmailConfiguration.getReceiver());
+        log.info("Default Judgment Spec email sent to: " + defaultJudgmentSpecEmailConfiguration.getSpecReceiver());
         CaseData caseData = callbackParams.getCaseData();
-        notificationService.sendMail(defaultJudgmentSpecEmailConfiguration.getReceiver(),
+        notificationService.sendMail(defaultJudgmentSpecEmailConfiguration.getSpecReceiver(),
                                      notificationsProperties.getCaseworkerDefaultJudgmentRequested(),
                                              addProperties(caseData),
                                              String.format(REFERENCE_TEMPLATE_CASEWORKER,
