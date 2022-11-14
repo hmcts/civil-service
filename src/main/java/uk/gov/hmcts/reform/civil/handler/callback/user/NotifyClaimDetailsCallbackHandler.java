@@ -159,6 +159,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
     private String getConfirmationBody(CaseData caseData) {
         String confirmationTextLR = isNotificationDetailsToBothSolicitors(caseData)
+                || caseData.getDefendantSolicitorNotifyClaimDetailsOptions() == null
                 ? CONFIRMATION_SUMMARY
                 : NOTIFICATION_ONE_PARTY_SUMMARY;
         if (toggleService.isCertificateOfServiceEnabled()) {
