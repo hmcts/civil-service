@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "notification.caseworker.spec")
+@ConfigurationProperties(prefix = "notification.caseworker")
 public class DefaultJudgmentSpecEmailConfiguration {
 
-    private String receiver;
+    private String specReceiver;
 }

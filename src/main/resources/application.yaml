@@ -324,8 +324,7 @@ robotics:
 
 notification:
   caseworker:
-    spec:
-      receiver: civilmoneyclaimsdemo@gmail.com
+    specReceiver: civilmoneyclaimsdemo@gmail.com
 ---
 
 spring:
