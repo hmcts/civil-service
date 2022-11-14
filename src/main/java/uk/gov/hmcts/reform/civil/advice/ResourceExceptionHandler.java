@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.advice;
 
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,18 @@ public class ResourceExceptionHandler {
     public ResponseEntity<Object> incorrectStateFlow(Exception exception) {
         log.debug(exception.getMessage(), exception);
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.PRECONDITION_FAILED);
+    }
+
+    @ExceptionHandler(value =  FeignException.Unauthorized.class)
+    public ResponseEntity<Object> unauthorizedFeign(Exception exception) {
+        log.debug(exception.getMessage(), exception);
+        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(value =  FeignException.Forbidden.class)
+    public ResponseEntity<Object> forbiddenFeign(Exception exception) {
+        log.debug(exception.getMessage(), exception);
+        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN);
     }
 
 }

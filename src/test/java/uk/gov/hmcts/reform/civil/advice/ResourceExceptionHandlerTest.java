@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.advice;
 
+import feign.FeignException;
+import feign.Request;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -14,10 +16,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ResourceExceptionHandlerTest {
 
     private ResourceExceptionHandler handler;
+    private FeignException feignException;
+    private Request Request;
+    private FeignException feignException;
 
     @BeforeEach
     void setUp() {
         handler = new ResourceExceptionHandler();
+        feignException = new FeignException();
+
     }
 
     @Test
@@ -40,6 +47,28 @@ class ResourceExceptionHandlerTest {
         );
     }
 
+    @Test
+    void shouldReturnForbidden_whenFeignExceptionForbiddenExceptionThrown() {
+        testTemplateA(
+            "expected exception for missing callback handler",
+            FeignException.Unauthorized::new,
+            handler::forbiddenFeign,
+            HttpStatus.FORBIDDEN
+        );
+    }
+
+   /* @Test
+    void shouldReturnUnauthorized_whenFeignExceptionUnauthorizedExceptionThrown() {
+        testTemplate(
+            "expected exception for missing callback handler",
+            RuntimeException::new,
+            handler::unauthorizedFeign,
+            HttpStatus.UNAUTHORIZED
+        );
+    }*/
+
+
+
     private <E extends Exception> void testTemplate(
         String message,
         Function<String, E> exceptionBuilder,
@@ -52,4 +81,22 @@ class ResourceExceptionHandlerTest {
         assertThat(result.getBody()).isNotNull()
             .extracting(Object::toString).asString().contains(message);
     }
+
+    private <E extends Exception> void testTemplateA(
+        String message,
+        FeignException.Unauthorized e,
+        Function<E, ResponseEntity<?>> method,
+        HttpStatus expectedStatus
+    ) {
+        //E exception = exceptionBuilder.apply(message);
+        int i= 200;
+       // FeignException exception = new FeignException.Unauthorized(message, request, body) ;
+        ResponseEntity<?> result = method.apply((E) e);
+        assertThat(result.getStatusCode()).isSameAs(expectedStatus);
+        assertThat(result.getBody()).isNotNull()
+            .extracting(Object::toString).asString().contains(message);
+    }
+
 }
+
+
