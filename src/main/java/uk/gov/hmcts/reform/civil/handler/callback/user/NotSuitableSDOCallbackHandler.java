@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.Time;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import java.util.Map;
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 
@@ -42,6 +44,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::addUnsuitableSDODate)
+            .put(callbackKey(MID, "not-suitable-reason"), this::validateNotSuitableReason)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitNotSuitableSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -57,6 +60,22 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse validateNotSuitableReason(CallbackParams callbackParams) {
+        final int lengthAllowed = 150;
+
+        List<String> errors = new ArrayList<>();
+        var reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
+
+        if (reason.length() > lengthAllowed) {
+            errors.add("Character Limit Reached: "
+                           + "Reason for not drawing Standard Directions order cannot exceed "
+                           + lengthAllowed + " characters.");
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
             .build();
     }
 

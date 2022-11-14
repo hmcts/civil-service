@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -14,10 +15,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
@@ -41,14 +42,21 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -74,6 +82,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     private final LocationRefDataService locationRefDataService;
+    private final FeatureToggleService featureToggleService;
     String participantString;
     public static final String DISPOSAL_HEARING = "DISPOSAL_HEARING";
     public static final String ORDER_1_CLAI = "The directions order has been sent to: "
@@ -82,6 +91,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
     private final IdamClient idamClient;
+
+    @Autowired
+    private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -141,7 +153,10 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
                     .getPartyName() + " and " + caseData.getRespondent2().getPartyName());
                 break;
-
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
+                    .getPartyName() + " and " + caseData.getRespondent2().getPartyName());
+                break;
             case TWO_V_ONE:
                 participantString = (caseData.getApplicant1().getPartyName() + " and " + caseData.getApplicant2()
                     .getPartyName() + " v " + caseData.getRespondent1().getPartyName());
@@ -264,6 +279,28 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                   .date(LocalDate.now().plusWeeks(16))
                                                                   .build());
 
+        // copy of the above field to update the Hearing time field while not breaking existing cases
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            caseDataBuilder.disposalHearingFinalDisposalHearingTimeDJ(DisposalHearingFinalDisposalHearingTimeDJ
+                                                                          .builder()
+                                                                          .input("This claim be listed for final "
+                                                                                     + "disposal before a Judge on the "
+                                                                                     + "first available date after")
+                                                                          .date(LocalDate.now().plusWeeks(16))
+                                                                          .build());
+        }
+
+        // copy of the above field to update the Hearing time field while not breaking existing cases
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            caseDataBuilder.disposalHearingFinalDisposalHearingTimeDJ(DisposalHearingFinalDisposalHearingTimeDJ
+                                                                          .builder()
+                                                                          .input("This claim will be listed for final "
+                                                                                     + "disposal before a Judge on the "
+                                                                                     + "first available date after")
+                                                                          .date(LocalDate.now().plusWeeks(16))
+                                                                          .build());
+        }
+
         caseDataBuilder.disposalHearingBundleDJ(DisposalHearingBundleDJ
                                                     .builder()
                                                     .input("The claimant must lodge at court at least 7 "
@@ -280,6 +317,21 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                  .date(LocalDate.now().plusWeeks(1))
                                                  .build());
 
+        // copy of disposalHearingNotesDJ field to update order made without hearing field without breaking
+        // existing cases
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            caseDataBuilder.disposalHearingOrderMadeWithoutHearingDJ(DisposalHearingOrderMadeWithoutHearingDJ
+                                                   .builder()
+                                                   .input(String.format("This order has been made without a hearing. "
+                                                              + "Each party has the right to apply to have this order "
+                                                              + "set aside or varied. Any such application must be "
+                                                              + "received by the Court "
+                                                              + "(together with the appropriate fee) by 4pm on %s.",
+                                                          deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
+                                                              .format(DateTimeFormatter
+                                                                          .ofPattern("dd MMMM yyyy", Locale.ENGLISH))))
+                                                   .build());
+        }
         // populates the trial screen
         caseDataBuilder
             .trialHearingJudgesRecitalDJ(TrialHearingJudgesRecital
@@ -364,6 +416,40 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                 .input3("At least 7 days before the trial, the claimant must"
                                                             + " upload to the Digital Portal ")
                                                 .build());
+
+        // copy of above method as to not break existing cases
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            caseDataBuilder.trialHearingTimeDJ(TrialHearingTimeDJ.builder()
+                                               .helpText1(
+                                                   "If either party considers that the time estimate is insufficient, "
+                                                       + "they must inform the court within 7 days of the date of "
+                                                       + "this order.")
+                                               .helpText2(
+                                                   "Not more than seven nor less than three clear days before the "
+                                                       + "trial, the claimant must file at court and serve an indexed "
+                                                       + "and paginated bundle of documents which complies with the "
+                                                       + "requirements of Rule 39.5 Civil Procedure Rules "
+                                                       + "and which complies with requirements of PD32. The parties "
+                                                       + "must endeavour to agree the contents of the bundle before it "
+                                                       + "is filed. The bundle will include a case summary and a "
+                                                       + "chronology.")
+                                               .build());
+        }
+
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            caseDataBuilder.trialOrderMadeWithoutHearingDJ(TrialOrderMadeWithoutHearingDJ.builder()
+                                               .input(String.format(
+                                                   "This order has been made without a hearing. "
+                                                       + "Each party has the right to apply to have this Order "
+                                                       + "set aside or varied. Any such application must be "
+                                                       + "received by the Court "
+                                                       + "(together with the appropriate fee) by 4pm on %s.",
+                                                   deadlinesCalculator
+                                                       .plusWorkingDays(LocalDate.now(), 5)
+                                                       .format(DateTimeFormatter
+                                                                   .ofPattern("dd MMMM yyyy", Locale.ENGLISH))))
+                                               .build());
+        }
 
         caseDataBuilder.trialHearingNotesDJ(TrialHearingNotes
                                                 .builder()
@@ -520,11 +606,13 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         if (nonNull(locations)) {
             location = fillPreferredLocationData(locations, getLocationListFromCaseData(
                 caseData.getDisposalHearingMethodInPersonDJ(), caseData.getTrialHearingMethodInPersonDJ()));
-            var caseBuilder = Optional.ofNullable(location)
-                .map(value -> caseDataBuilder.caseManagementLocation(CaseLocation.builder()
-                                                                         .region(value.getRegionId())
-                                                                         .baseLocation(value.getEpimmsId())
-                                                                         .build()));
+            Optional.ofNullable(location)
+                .map(LocationRefDataService::buildCaseLocation)
+                .ifPresent(caseDataBuilder::caseManagementLocation);
+            Optional.ofNullable(location)
+                .map(value -> value.getSiteName())
+                .ifPresent(caseDataBuilder::locationName);
+
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
