@@ -87,7 +87,10 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
                                          String.format(REFERENCE_TEMPLATE_APPROVAL_DEF,
                                                        caseData.getLegacyCaseReference()));
         }
+
+        var state = "JUDICIAL_REFERRAL";
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .state(state)
             .data(caseData.toMap(objectMapper))
             .build();
     }

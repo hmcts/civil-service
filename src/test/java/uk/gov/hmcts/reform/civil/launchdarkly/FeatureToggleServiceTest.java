@@ -132,6 +132,15 @@ class FeatureToggleServiceTest {
     }
 
     @Test
+    void shouldCallBoolVariation_whenIsSDOEnabledInvoked() {
+        var enableSDOKey = "enableSDO";
+        givenToggle(enableSDOKey, true);
+
+        assertThat(featureToggleService.isSDOEnabled()).isTrue();
+        verifyBoolVariationCalled(enableSDOKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
     void shouldCallBoolVariation_whenIsOrganisationOnboardedInvoked() {
         var organisationOnboardedFeatureKey = "isOrganisationOnboarded";
         givenToggle(organisationOnboardedFeatureKey, true);
@@ -178,5 +187,14 @@ class FeatureToggleServiceTest {
             any(LDUser.class),
             eq(false)
         );
+    }
+
+    @Test
+    void shouldCallBoolVariation_whenIsPbaV3EnabledInvoked() {
+        var pbaV3Key = "pba-version-3-ways-to-pay";
+        givenToggle(pbaV3Key, true);
+
+        assertThat(featureToggleService.isPbaV3Enabled()).isTrue();
+        verifyBoolVariationCalled(pbaV3Key, List.of("timestamp", "environment"));
     }
 }

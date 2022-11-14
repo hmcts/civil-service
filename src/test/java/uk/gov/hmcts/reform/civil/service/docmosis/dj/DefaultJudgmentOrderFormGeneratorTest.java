@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -52,6 +53,9 @@ public class DefaultJudgmentOrderFormGeneratorTest {
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
 
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
     @Autowired
     private DefaultJudgmentOrderFormGenerator generator;
 
@@ -83,6 +87,8 @@ public class DefaultJudgmentOrderFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_TRIAL);
+        when(featureToggleService.isHearingAndListingSDOEnabled())
+            .thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .atStateClaimIssuedTrialHearing()
@@ -90,6 +96,31 @@ public class DefaultJudgmentOrderFormGeneratorTest {
             .atStateClaimIssuedTrialSDOInPersonHearing()
             .atStateClaimIssuedTrialLocationInPerson()
             .atStateClaimIssuedTrialHearingInfo()
+            .build();
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
+    }
+
+    @Test
+    void shouldDefaultJudgmentTrialOrderFormGeneratorHNLisEnabled_whenValidDataIsProvided() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
+            .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_TRIAL);
+        when(featureToggleService.isHearingAndListingSDOEnabled())
+            .thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .atStateClaimIssuedTrialHearing()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .atStateClaimIssuedTrialSDOInPersonHearing()
+            .atStateClaimIssuedTrialLocationInPerson()
+            .atStateClaimIssuedTrialHearingInfo()
+            .atStateClaimIssuedCaseManagementLocationInPerson()
             .build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 

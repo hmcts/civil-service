@@ -77,7 +77,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         LocalDate issueDate = time.now().toLocalDate();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder().issueDate(issueDate)
             .respondent1ResponseDeadline(
-                deadlinesCalculator.plus14DaysAt4pmDeadline(LocalDateTime.now()))
+                deadlinesCalculator.plus28DaysAt4pmDeadline(LocalDateTime.now()))
             // .respondent1Represented(YES)
             .claimDismissedDate(null);
         CaseDocument sealedClaim = sealedClaimFormGeneratorForSpec.generate(

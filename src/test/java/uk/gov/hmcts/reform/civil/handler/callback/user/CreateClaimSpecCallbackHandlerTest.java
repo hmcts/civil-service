@@ -1124,6 +1124,18 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .containsEntry("CaseAccessCategory", CaseCategory.SPEC_CLAIM.toString());
         }
+
+        // TODO: move this test case to AboutToSubmitCallbackV0 after release
+        @Test
+        void shouldUpdateCaseManagementLocation_whenInvoked() {
+            when(toggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData())
+                .extracting("caseManagementLocation")
+                .extracting("region", "baseLocation")
+                .containsExactly("2", "420219");
+        }
     }
 
     @Nested
