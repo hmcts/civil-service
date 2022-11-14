@@ -21,6 +21,7 @@ java:
         - robotics-notification-recipient-spec
         - robotics-notification-multipartyrecipient
         - ordnance-survey-api-key
+        - notification-caseworker-spec-receiver
         - launch-darkly-sdk-key
   environment:
     CORE_CASE_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
