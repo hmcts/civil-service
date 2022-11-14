@@ -88,7 +88,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
 
         List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, sealedClaim,
                                                                                  caseDataBuilder, callbackParams);
-
+        System.out.println("---");
         if (caseData.getSpecClaimDetailsDocumentFiles() != null
             && caseData.getSpecClaimTemplateDocumentFiles() != null) {
             ServedDocumentFiles.builder().particularsOfClaimDocument(wrapElements(
