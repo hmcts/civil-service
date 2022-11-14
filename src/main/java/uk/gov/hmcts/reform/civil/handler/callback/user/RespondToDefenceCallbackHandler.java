@@ -304,6 +304,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         } else {
             response = AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder.build().toMap(objectMapper))
+                .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
                 .build();
         }
 
