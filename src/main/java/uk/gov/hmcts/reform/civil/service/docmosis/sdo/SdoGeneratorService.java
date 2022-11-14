@@ -30,7 +30,6 @@ public class SdoGeneratorService {
     private final IdamClient idamClient;
     private final FeatureToggleService toggleService;
 
-
     public CaseDocument generate(CaseData caseData, String authorisation) {
         MappableObject templateData;
         DocmosisTemplates docmosisTemplate;
@@ -41,7 +40,7 @@ public class SdoGeneratorService {
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
 
-            if(toggleService.isHearingAndListingSDOEnabled()){
+            if (toggleService.isHearingAndListingSDOEnabled()) {
                 docmosisTemplate = DocmosisTemplates.SDO_SMALL_HNL;
             }
             templateData = getTemplateDataSmall(caseData, judgeName);
