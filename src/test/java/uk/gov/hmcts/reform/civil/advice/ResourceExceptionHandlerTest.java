@@ -83,7 +83,6 @@ class ResourceExceptionHandlerTest {
             .extracting(Object::toString).asString().contains(message);
     }
 
-
 }
 
 
