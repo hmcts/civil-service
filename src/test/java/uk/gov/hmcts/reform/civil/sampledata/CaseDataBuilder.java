@@ -1428,6 +1428,21 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder multiPartyClaimTwoDefendantLips() {
+        //TODO replace with LIPS data
+        atStateClaimDraft();
+        respondent1OrganisationPolicy = null;
+        respondent1Represented = NO;
+        respondent1OrgRegistered = NO;
+
+        addRespondent2 = YES;
+        respondent2OrganisationPolicy = null;
+        respondent2Represented = NO;
+        respondent2OrgRegistered = NO;
+        respondent2SameLegalRepresentative = NO;
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimSubmitted() {
         atStateClaimDraft();
         legacyCaseReference = LEGACY_CASE_REFERENCE;
@@ -3483,6 +3498,12 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atSpecAoSRespondent2HomeAddressDetails(Address specAoSRespondent2HomeAddressDetails) {
         this.specAoSRespondent2HomeAddressDetails = specAoSRespondent2HomeAddressDetails;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotified_1v2_andNotifyBothCoS() {
+        atStateClaimDetailsNotified();
+        multiPartyClaimTwoDefendantLips();
         return this;
     }
 
