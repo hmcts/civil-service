@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -375,11 +376,48 @@ public class DeadlinesCalculatorTest {
         }
     }
 
+    @Nested
+    class PlusWorkingsDays {
+        @Test
+        void plusWorkingDays() {
+            LocalDate start = LocalDate.of(2022, 9, 12);
+            when(nonWorkingDaysCollection.contains(start.plusDays(7))).thenReturn(true);
+            int days = 10;
+            Assertions.assertEquals(start.plusDays(15), calculator.plusWorkingDays(start, days));
+        }
+    }
+
     /**
      * The fixture is taken from the real bank holidays API.
      */
     private BankHolidays loadFixture() throws IOException {
         String input = ResourceReader.readString("/bank-holidays.json");
         return new ObjectMapper().readValue(input, BankHolidays.class);
+    }
+
+    @Test
+    void testPlusWorkingDaysIgnoresWeekends() {
+        LocalDate friday = LocalDate.of(2022, 9, 9);
+        assertThat(calculator.plusWorkingDays(friday, 1))
+            .isTheSame(LocalDate.of(2022, 9, 12));
+    }
+
+    @Test
+    void testPlusWorkingDaysMidWeek() {
+        LocalDate wednesday = LocalDate.of(2022, 9, 7);
+        assertThat(calculator.plusWorkingDays(wednesday, 1))
+            .isTheSame(LocalDate.of(2022, 9, 8));
+    }
+
+    @Test
+    void testPlusWorkingDaysIgnoresStartingWeekend() {
+        LocalDate saturday = LocalDate.of(2022, 9, 10);
+        assertThat(calculator.plusWorkingDays(saturday, 3)).isWednesday();
+    }
+
+    @Test
+    void testPlusWorkingDaysReturnsSameDay() {
+        LocalDate wednesday = LocalDate.of(2022, 9, 28);
+        assertThat(calculator.plusWorkingDays(wednesday, 0)).isWednesday();
     }
 }

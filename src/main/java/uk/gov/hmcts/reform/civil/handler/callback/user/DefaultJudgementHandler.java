@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
@@ -125,8 +124,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
             caseDataBuilder.hearingSupportRequirementsDJ(caseData.getHearingSupportRequirementsDJ().toBuilder()
                         .hearingPreferredLocation(caseData.getHearingSupportRequirementsDJ()
                                 .getHearingTemporaryLocation().getValue().getLabel()).build())
-                .caseManagementLocation(CaseLocation.builder().region(location.getRegionId()).baseLocation(
-                    location.getEpimmsId()).build());
+                .caseManagementLocation(LocationRefDataService.buildCaseLocation(location));
             caseDataBuilder.locationName(location.getSiteName());
         }
 
@@ -244,10 +242,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         }
         caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT));
 
-        var state = "JUDICIAL_REFERRAL";
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .state(state)
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
