@@ -50,12 +50,7 @@ public class EventAllowedAspect {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
         CaseData caseData = callbackParams.getCaseData();
-        StringBuilder stateHistoryBuilder = new StringBuilder();
-        FlowState flowState = flowStateAllowedEventService.getFlowState(caseData);
-        stateFlowEngine.evaluate(caseData).getStateHistory().forEach(s -> {
-            stateHistoryBuilder.append(s.getName());
-            stateHistoryBuilder.append(", ");
-        });
+
         if (flowStateAllowedEventService.isAllowed(caseDetails, caseEvent)) {
             log.info(format(
                 "%s is ****allowed****** on the case id %s, current FlowState: %s, stateFlowHistory: %s",
@@ -63,6 +58,12 @@ public class EventAllowedAspect {
             ));
             return joinPoint.proceed();
         } else {
+            StringBuilder stateHistoryBuilder = new StringBuilder();
+            FlowState flowState = flowStateAllowedEventService.getFlowState(caseData);
+            stateFlowEngine.evaluate(caseData).getStateHistory().forEach(s -> {
+                stateHistoryBuilder.append(s.getName());
+                stateHistoryBuilder.append(", ");
+            });
             log.info(format(
                 "%s is not allowed on the case id %s, current FlowState: %s, stateFlowHistory: %s",
                 caseEvent.name(), caseDetails.getId(), flowState, stateHistoryBuilder.toString()
