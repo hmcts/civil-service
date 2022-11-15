@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.DEFAULT_JUDGMENT_SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_DISPOSAL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_HNL_TRIAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DJ_SDO_TRIAL;
 
 @ExtendWith(SpringExtension.class)
@@ -106,8 +107,8 @@ public class DefaultJudgmentOrderFormGeneratorTest {
 
     @Test
     void shouldDefaultJudgmentTrialOrderFormGeneratorHNLisEnabled_whenValidDataIsProvided() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
-            .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_HNL_TRIAL)))
+            .thenReturn(new DocmosisDocument(DJ_SDO_HNL_TRIAL.getDocumentTitle(), bytes));
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_TRIAL);
@@ -119,8 +120,7 @@ public class DefaultJudgmentOrderFormGeneratorTest {
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
             .atStateClaimIssuedTrialSDOInPersonHearing()
             .atStateClaimIssuedTrialLocationInPerson()
-            .atStateClaimIssuedTrialHearingInfo()
-            .atStateClaimIssuedCaseManagementLocationInPerson()
+            .atStateSdoTrialDj()
             .build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
