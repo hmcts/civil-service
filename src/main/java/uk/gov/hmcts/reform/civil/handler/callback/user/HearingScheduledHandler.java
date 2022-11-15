@@ -162,7 +162,8 @@ public class HearingScheduledHandler extends CallbackHandler {
     private CallbackResponse getDueDateAndFee(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        if (caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
+        if (nonNull(caseData.getListingOrRelisting())
+            && caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
             if (LocalDate.now().isBefore(caseData.getHearingDate().minusWeeks(4))) {
                 caseDataBuilder.hearingDueDate(
                     HearingUtils.addBusinessDays(
