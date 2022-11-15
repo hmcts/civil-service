@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 import java.util.UUID;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Service
@@ -30,7 +31,6 @@ public class PaymentsService {
     private final PaymentsClient paymentsClient;
     private final PaymentsConfiguration paymentsConfiguration;
     private final OrganisationService organisationService;
-    private final FeatureToggleService featureToggleService;
 
     @Value("${serviceRequest.api.callback-url}")
     String callBackUrl;
@@ -59,8 +59,7 @@ public class PaymentsService {
             .map(Organisation::getName)
             .orElseThrow(RuntimeException::new);
         PBAServiceRequestDTO pbaServiceRequestDTO = null;
-        if (!isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled()))  {
-            pbaServiceRequestDTO = PBAServiceRequestDTO.builder()
+        pbaServiceRequestDTO = PBAServiceRequestDTO.builder()
                 .accountNumber(hearingFeePBADetails.getApplicantsPbaAccounts()
                                    .getValue().getLabel())
                 .amount(claimFee.getCalculatedAmount())
@@ -68,20 +67,10 @@ public class PaymentsService {
                 .organisationName(organisationName)
                 .idempotencyKey(String.valueOf(UUID.randomUUID()))
                 .build();
-        } else if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
-            pbaServiceRequestDTO = PBAServiceRequestDTO.builder()
-                .accountNumber(hearingFeePBADetails.getApplicantsPbaAccounts()
-                                   .getValue().getLabel())
-                .amount(claimFee.getCalculatedAmount())
-                .customerReference(hearingFeePBADetails.getPbaReference())
-                .organisationName(organisationName)
-                .idempotencyKey(String.valueOf(UUID.randomUUID()))
-                .build();
-        }
         return pbaServiceRequestDTO;
     }
 
-    public PBAServiceRequestResponse createCreditAccountPayment(CaseData caseData, String authToken) {
+        public PBAServiceRequestResponse createCreditAccountPayment(CaseData caseData, String authToken) {
         String serviceReqReference = caseData.getHearingFeePBADetails().getServiceReqReference();
         return paymentsClient.createPbaPayment(serviceReqReference, authToken, buildRequest(caseData));
     }
@@ -93,7 +82,8 @@ public class PaymentsService {
     private CreateServiceRequestDTO buildServiceRequest(CaseData caseData) {
         HFPbaDetails hearingFeePBADetails = caseData.getHearingFeePBADetails();
         FeeDto feeResponse = hearingFeePBADetails.getFee().toFeeDto();
-        String siteId = paymentsConfiguration.getSpecSiteId();
+        String siteId = caseData.getSuperClaimType().equals(SPEC_CLAIM)
+            ? paymentsConfiguration.getSpecSiteId() : paymentsConfiguration.getSiteId();
         return CreateServiceRequestDTO.builder()
             .caseReference(caseData.getLegacyCaseReference())
             .ccdCaseNumber(caseData.getCcdCaseReference().toString())
