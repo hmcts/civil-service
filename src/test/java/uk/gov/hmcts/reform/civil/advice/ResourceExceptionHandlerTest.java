@@ -40,6 +40,16 @@ class ResourceExceptionHandlerTest {
         );
     }
 
+    @Test
+    void shouldReturnPreconditionFailed_whenIllegalArgumentExceptionThrown() {
+        testTemplate(
+            "expected exception for missing callback handler",
+            IllegalArgumentException::new,
+            handler::illegalArgument,
+            HttpStatus.PRECONDITION_FAILED
+        );
+    }
+
     private <E extends Exception> void testTemplate(
         String message,
         Function<String, E> exceptionBuilder,
