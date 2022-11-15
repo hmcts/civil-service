@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -30,8 +31,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.FeeType.CLAIMISSUED;
 import static uk.gov.hmcts.reform.civil.enums.FeeType.HEARING;
@@ -87,7 +89,8 @@ class PaymentRequestUpdateCallbackServiceTest {
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails));
+        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails,
+                                                                                          SERVICE_REQUEST_RECEIVED));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
         paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), HEARING.name());
@@ -118,7 +121,8 @@ class PaymentRequestUpdateCallbackServiceTest {
         when(coreCaseDataService.getCase(Long.valueOf(CASE_ID))).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails))
             .thenReturn(caseData);
-        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails));
+        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails,
+                                                                                          SERVICE_REQUEST_RECEIVED));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
         paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), HEARING.name());
@@ -138,7 +142,8 @@ class PaymentRequestUpdateCallbackServiceTest {
         when(coreCaseDataService.getCase(Long.valueOf(CASE_ID))).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails))
             .thenReturn(caseData);
-        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails));
+        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails,
+                                                                                          SERVICE_REQUEST_RECEIVED));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
         paymentRequestUpdateCallbackService.processCallback(buildServiceDto(NOT_PAID), HEARING.name());
@@ -163,7 +168,9 @@ class PaymentRequestUpdateCallbackServiceTest {
 
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails));
+        when(coreCaseDataService.startUpdate(any(), any()))
+                                                    .thenReturn(startEventResponse(caseDetails,
+                                                                                   CREATE_CLAIM_SPEC_AFTER_PAYMENT));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
         paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), CLAIMISSUED.name());
@@ -194,7 +201,9 @@ class PaymentRequestUpdateCallbackServiceTest {
         when(coreCaseDataService.getCase(Long.valueOf(CASE_ID))).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails))
             .thenReturn(caseData);
-        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails));
+        when(coreCaseDataService.startUpdate(any(), any()))
+                                                    .thenReturn(startEventResponse(caseDetails,
+                                                                                   CREATE_CLAIM_SPEC_AFTER_PAYMENT));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
         paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), CLAIMISSUED.name());
@@ -214,7 +223,9 @@ class PaymentRequestUpdateCallbackServiceTest {
         when(coreCaseDataService.getCase(Long.valueOf(CASE_ID))).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails))
             .thenReturn(caseData);
-        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails));
+        when(coreCaseDataService.startUpdate(any(), any()))
+                                                    .thenReturn(startEventResponse(caseDetails,
+                                                                                   CREATE_CLAIM_SPEC_AFTER_PAYMENT));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
         paymentRequestUpdateCallbackService.processCallback(buildServiceDto(NOT_PAID), CLAIMISSUED.name());
@@ -244,10 +255,10 @@ class PaymentRequestUpdateCallbackServiceTest {
             .build();
     }
 
-    private StartEventResponse startEventResponse(CaseDetails caseDetails) {
+    private StartEventResponse startEventResponse(CaseDetails caseDetails, CaseEvent event) {
         return StartEventResponse.builder()
             .token(TOKEN)
-            .eventId(HEARING_READINESS.name())
+            .eventId(event.name())
             .caseDetails(caseDetails)
             .build();
     }
