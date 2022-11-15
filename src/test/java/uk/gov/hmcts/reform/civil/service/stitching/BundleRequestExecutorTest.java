@@ -39,7 +39,8 @@ class BundleRequestExecutorTest {
 
     @BeforeEach
     void setup() {
-        bundleRequestExecutor = new BundleRequestExecutor(restTemplate, serviceAuthTokenGenerator, caseDetailsConverter, new ObjectMapper());
+        bundleRequestExecutor = new BundleRequestExecutor(restTemplate, serviceAuthTokenGenerator, caseDetailsConverter,
+                                                          new ObjectMapper());
     }
 
     @Test
@@ -50,7 +51,8 @@ class BundleRequestExecutorTest {
         CaseDetails responseCaseDetails = CaseDetails.builder().build();
         ResponseEntity<CaseDetails> responseEntity = new ResponseEntity<>(responseCaseDetails, HttpStatus.OK);
         given(caseDetailsConverter.toCaseData(responseCaseDetails)).willReturn(expectedCaseData);
-        given(restTemplate.exchange(eq(endpoint), eq(HttpMethod.POST), any(), eq(CaseDetails.class))).willReturn(responseEntity);
+        given(restTemplate.exchange(eq(endpoint), eq(HttpMethod.POST), any(), eq(CaseDetails.class)))
+            .willReturn(responseEntity);
 
         // When
         BundleRequest request = BundleRequest.builder().build();
@@ -64,8 +66,14 @@ class BundleRequestExecutorTest {
     void whenPostIsCalledAndEndpointFails_thenReturnsNull() {
         // Given
         String endpoint = "some url";
-        String errorData = "{\"data\":{\"respondentClaimResponseTypeForSpecGeneric\":\"FULL_ADMISSION\"},\"errors\":[\"Stitching failed: prl-ccd-definitions-pr-662-cdam executing GET http://prl-ccd-definitions-pr-662-cdam/cases/documents/5ce8143a-9a0a-45f2-9735-6b6f9236e4d3/binary\"],\"warnings\":[],\"documentTaskId\":0}";
-        given(restTemplate.exchange(eq(endpoint), eq(HttpMethod.POST), any(), eq(CaseDetails.class))).willThrow(new RestClientResponseException("random exception", 500, "Internal server error", HttpHeaders.EMPTY, errorData.getBytes(), Charset.defaultCharset()));
+        String errorData = "{\"data\":{\"respondentClaimResponseTypeForSpecGeneric\":\"FULL_ADMISSION\"},\"errors\":"
+            + "[\"Stitching failed: prl-ccd-definitions-pr-662-cdam executing GET "
+            + "http://prl-ccd-definitions-pr-662-cdam/cases/documents/5ce8143a-9a0a-45f2-9735-6b6f9236e4d3/binary\"],"
+            + "\"warnings\":[],\"documentTaskId\":0}";
+        given(restTemplate.exchange(eq(endpoint), eq(HttpMethod.POST), any(), eq(CaseDetails.class)))
+            .willThrow(new RestClientResponseException("random exception", 500, "Internal server error",
+                                                       HttpHeaders.EMPTY, errorData.getBytes(),
+                                                       Charset.defaultCharset()));
         BundleRequest request = BundleRequest.builder().build();
 
         // When
@@ -80,8 +88,10 @@ class BundleRequestExecutorTest {
         // Given
         String endpoint = "some url";
         CaseDetails responseCaseDetails = CaseDetails.builder().build();
-        ResponseEntity<CaseDetails> responseEntity = new ResponseEntity<>(responseCaseDetails, HttpStatus.NOT_ACCEPTABLE);
-        given(restTemplate.exchange(eq(endpoint), eq(HttpMethod.POST), any(), eq(CaseDetails.class))).willReturn(responseEntity);
+        ResponseEntity<CaseDetails> responseEntity = new ResponseEntity<>(responseCaseDetails,
+                                                                          HttpStatus.NOT_ACCEPTABLE);
+        given(restTemplate.exchange(eq(endpoint), eq(HttpMethod.POST), any(), eq(CaseDetails.class)))
+            .willReturn(responseEntity);
 
         // When
         BundleRequest request = BundleRequest.builder().build();
