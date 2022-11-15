@@ -74,8 +74,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_BEFORE_PAYMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -451,7 +450,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             if (!featureToggleService.isPbaV3Enabled()) {
                 dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
             } else {
-                dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC_BEFORE_PAYMENT));
+                dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST));
             }
         }
 
