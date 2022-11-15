@@ -12,13 +12,17 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +38,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 @Service
@@ -52,17 +58,27 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
     public static final String WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR =
         "Your claim will progress offline if you only notify one Defendant of the claim details.";
+    private static final String CONFIRMATION_COS_HEADER = "# Certificate of Service - notify claim successful %n## %s";
 
+    private static final String CONFIRMATION_SUMMARY_COS = "<br />What happens next <br /> You must serve the claim "
+        + "details and complete the certificate of service notify claim details next step by 4:00pm on %s. "
+        + "This is a new online process-you dont need to file any further documents to the court";
+
+    public static final String DOC_SERVED_DATE_IN_FUTURE =
+        "Date you served the documents must be today or in the past";
     private final ExitSurveyContentService exitSurveyContentService;
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
     private final Time time;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::prepareDefendantSolicitorOptions,
             callbackKey(MID, "validateNotificationOption"), this::validateNotificationOption,
+            callbackKey(MID, "validateCosNotifyClaimDef1"), this::validateCosDefendant1,
+            callbackKey(MID, "validateCosNotifyClaimDef2"), this::validateCosDefendant2,
             callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
             callbackKey(SUBMITTED), this::buildConfirmationWithSolicitorOptions
         );
@@ -107,6 +123,40 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .warnings(warnings)
+            .build();
+    }
+
+    private CallbackResponse validateCosDefendant1(final CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        ArrayList<String> errors = new ArrayList<>();
+        if (Objects.nonNull(caseData.getCosNotifyClaimDefendant1())
+            && isCosDefendantNotifyDateFutureDate(caseData.getCosNotifyClaimDefendant1())) {
+
+            errors.add(DOC_SERVED_DATE_IN_FUTURE);
+        }
+
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse validateCosDefendant2(final CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        ArrayList<String> errors = new ArrayList<>();
+        if ((Objects.nonNull(caseData.getCosNotifyClaimDefendant2()))
+            && isCosDefendantNotifyDateFutureDate(caseData.getCosNotifyClaimDefendant2())) {
+
+            errors.add(DOC_SERVED_DATE_IN_FUTURE);
+        }
+
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .errors(errors)
             .build();
     }
 
@@ -161,15 +211,26 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String formattedDeadline = formatLocalDateTime(caseData.getClaimDetailsNotificationDeadline(), DATE_TIME_AT);
 
-        String body = format(CONFIRMATION_SUMMARY, formattedDeadline) + exitSurveyContentService.applicantSurvey();
+        String header = "";
+        String body = "";
+
+        if (featureToggleService.isCertificateOfServiceEnabled() && isConfirmationForLip(caseData)) {
+            String formattedDeadline = formatLocalDate(caseData.getClaimDetailsNotificationDeadline().toLocalDate(),
+                                                       DATE);
+            header = String.format(CONFIRMATION_COS_HEADER, caseData.getLegacyCaseReference());
+            body = format(CONFIRMATION_SUMMARY_COS, formattedDeadline) + exitSurveyContentService.applicantSurvey();
+
+        } else {
+            String formattedDeadline = formatLocalDateTime(caseData
+                                                               .getClaimDetailsNotificationDeadline(), DATE_TIME_AT);
+            header = String.format("# Notification of claim sent%n## Claim number: %s",
+                                   caseData.getLegacyCaseReference());
+            body = format(CONFIRMATION_SUMMARY, formattedDeadline) + exitSurveyContentService.applicantSurvey();
+        }
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(String.format(
-                "# Notification of claim sent%n## Claim number: %s",
-                caseData.getLegacyCaseReference()
-            ))
+            .confirmationHeader(header)
             .confirmationBody(body)
             .build();
     }
@@ -202,5 +263,17 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
     protected boolean notifyBothRespondentSolicitors(CaseData caseData) {
         return Objects.equals("Both", caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel());
+    }
+
+    private boolean isCosDefendantNotifyDateFutureDate(CertificateOfService cosNotifyClaimDefendant) {
+        return LocalDate.now().isBefore(cosNotifyClaimDefendant.getCosDateOfServiceForDefendant());
+    }
+
+    private boolean isConfirmationForLip(CaseData caseData) {
+        return (caseData.getDefendant1LIPAtClaimIssued() != null
+            && caseData.getDefendant1LIPAtClaimIssued() == YesOrNo.YES)
+            || (caseData.getDefendant2LIPAtClaimIssued() != null
+            && caseData.getDefendant2LIPAtClaimIssued() == YesOrNo.YES);
+
     }
 }

@@ -72,6 +72,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CL
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
@@ -325,7 +326,11 @@ class StateFlowEngineTest {
             // 1v1 Unrepresented
             @Test
             void shouldReturnProceedsWithOfflineJourney_1v1_whenCaseDataAtStateClaimDraftIssuedAndResUnrepresented() {
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant().build();
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssued1v1UnrepresentedDefendant()
+                    .defendant1LIPAtClaimIssued(NO)
+                    .defendant2LIPAtClaimIssued(null)
+                    .build();
 
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -354,7 +359,11 @@ class StateFlowEngineTest {
             // 1. Both def1 and def2 unrepresented
             @Test
             void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedRespondentsNotRepresented() {
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssuedUnrepresentedDefendants()
+                    .defendant1LIPAtClaimIssued(NO)
+                    .defendant2LIPAtClaimIssued(null)
+                    .build();
 
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -382,7 +391,10 @@ class StateFlowEngineTest {
             // 2. Def1 unrepresented, Def2 registered
             @Test
             void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedRespondent1NotRepresented() {
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().build();
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssuedUnrepresentedDefendant1()
+                    .defendant1LIPAtClaimIssued(null)
+                    .build();
 
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -407,10 +419,44 @@ class StateFlowEngineTest {
             }
 
             // Unrepresented
+            // 2. Def1 unrepresented, Def2 registered
+            // Cos Service activated
+            @Test
+            void shouldProceedsWithOffline_cos_whenCaseDataAtStateClaimDraftIssuedRespondent1NotRepresented() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssuedUnrepresentedDefendant1()
+                    .build();
+
+                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+                assertThat(stateFlow.getState())
+                    .extracting(State::getName)
+                    .isNotNull()
+                    .isEqualTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName());
+                assertThat(stateFlow.getStateHistory())
+                    .hasSize(5)
+                    .extracting(State::getName)
+                    .containsExactly(
+                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                        PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COF.fullName(),
+                        TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
+                    );
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
+                    entry("RPA_CONTINUOUS_FEED", true),
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                );
+            }
+
+            // Unrepresented
             // 3. Def1 registered, Def 2 unrepresented
             @Test
             void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedRespondent2NotRepresented() {
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant2().build();
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssuedUnrepresentedDefendant2()
+                    .defendant2LIPAtClaimIssued(null)
+                    .build();
 
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -441,6 +487,8 @@ class StateFlowEngineTest {
             void shouldGoOffline_whenDeadlinePassed() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendants()
+                    .defendant2LIPAtClaimIssued(null)
+                    .defendant1LIPAtClaimIssued(null)
                     .addLegalRepDeadline(LocalDateTime.now().minusHours(4))
                     .build();
 
@@ -469,13 +517,48 @@ class StateFlowEngineTest {
                 );
             }
 
+            //With cos service activated
+            @Test
+            void shouldGoOffline_cos_whenDeadlinePassed() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssuedUnrepresentedDefendants()
+                    .addLegalRepDeadline(LocalDateTime.now().minusHours(4))
+                    .build();
+
+                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+                assertThat(stateFlow.getState())
+                    .extracting(State::getName)
+                    .isNotNull()
+                    .isEqualTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName());
+                assertThat(stateFlow.getStateHistory())
+                    .hasSize(5)
+                    .extracting(State::getName)
+                    .containsExactly(
+                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                        PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COF.fullName(),
+                        TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
+                    );
+                verify(featureToggleService).isRpaContinuousFeedEnabled();
+                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                    entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
+                    entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
+                    entry(FlowFlag.RPA_CONTINUOUS_FEED.name(), true),
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                );
+            }
+
             // 1v1
-            // Unrepresented
+            // Unrepresented cos service not activated
             @Test
             void shouldContinueOnline_1v1_whenDefendantIsUnrepresented() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued1v1UnrepresentedDefendant()
                     .addLegalRepDeadline(LocalDateTime.now().plusDays(14))
+                    .defendant1LIPAtClaimIssued(null)
+                    .defendant2LIPAtClaimIssued(null)
                     .build();
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -489,6 +572,36 @@ class StateFlowEngineTest {
                     .containsExactly(
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
+                    );
+                verify(featureToggleService).isRpaContinuousFeedEnabled();
+                assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                    entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
+                    entry(FlowFlag.RPA_CONTINUOUS_FEED.name(), true),
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                );
+            }
+
+            // Unrepresented cos service activated
+            @Test
+            void shouldContinueOnline_1v1_cos_whenDefendantIsUnrepresented() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssued1v1UnrepresentedDefendant()
+                    .addLegalRepDeadline(LocalDateTime.now().plusDays(14))
+                    .build();
+                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+                assertThat(stateFlow.getState())
+                    .extracting(State::getName)
+                    .isNotNull()
+                    .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COF.fullName());
+                assertThat(stateFlow.getStateHistory())
+                    .hasSize(4)
+                    .extracting(State::getName)
+                    .containsExactly(
+                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                        PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COF.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
                 assertThat(stateFlow.getFlags()).hasSize(5).contains(
@@ -540,6 +653,8 @@ class StateFlowEngineTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendants()
                     .addLegalRepDeadline(LocalDateTime.now().plusDays(14))
+                    .defendant1LIPAtClaimIssued(null)
+                    .defendant2LIPAtClaimIssued(null)
                     .build();
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -566,12 +681,13 @@ class StateFlowEngineTest {
             }
 
             // Unrepresented
-            // 2. Def1 unrepresented, Def2 registered
+            // 2. Def1 unrepresented, Def2 registered when cos service is not activated
             @Test
             void shouldContinueOnline_WhenCaseDataAtStateClaimDraftIssuedAndRespondent1NotRepresented() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant1()
                     .addLegalRepDeadline(LocalDateTime.now().plusDays(14))
+                    .defendant1LIPAtClaimIssued(null)
                     .build();
 
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -599,12 +715,46 @@ class StateFlowEngineTest {
             }
 
             // Unrepresented
-            // 3. Def1 registered, Def 2 unrepresented
+            // 2. Def1 unrepresented, Def2 registered
+            @Test
+            void shouldContinueOnline_Cos_WhenCaseDataAtStateClaimDraftIssuedAndRespondent1NotRepresented() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssuedUnrepresentedDefendant1()
+                    .addLegalRepDeadline(LocalDateTime.now().plusDays(14))
+                    .build();
+
+                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+                assertThat(stateFlow.getState())
+                    .extracting(State::getName)
+                    .isNotNull()
+                    .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COF.fullName());
+                assertThat(stateFlow.getStateHistory())
+                    .hasSize(4)
+                    .extracting(State::getName)
+                    .containsExactly(
+                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                        PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COF.fullName()
+                    );
+                verify(featureToggleService).isRpaContinuousFeedEnabled();
+                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                    entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
+                    entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false),
+                    entry(FlowFlag.RPA_CONTINUOUS_FEED.name(), true),
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                );
+            }
+
+            // Unrepresented
+            // 3. Def1 registered, Def 2 unrepresented when Cos service not activated
             @Test
             void shouldContinueOnline_WhenCaseDataAtStateClaimDraftIssuedAndRespondent2NotRepresented() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant2()
                     .addLegalRepDeadline(LocalDateTime.now().plusDays(14))
+                    .defendant2LIPAtClaimIssued(null)
                     .build();
 
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -631,6 +781,39 @@ class StateFlowEngineTest {
                 );
             }
 
+            // Unrepresented
+            // 3. Def1 registered, Def 2 unrepresented when Cos service activated
+            @Test
+            void shouldContinueOnline_Cos_WhenCaseDataAtStateClaimDraftIssuedAndRespondent2NotRepresented() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssuedUnrepresentedDefendant2()
+                    .addLegalRepDeadline(LocalDateTime.now().plusDays(14))
+                    .build();
+
+                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+                assertThat(stateFlow.getState())
+                    .extracting(State::getName)
+                    .isNotNull()
+                    .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COF.fullName());
+                assertThat(stateFlow.getStateHistory())
+                    .hasSize(4)
+                    .extracting(State::getName)
+                    .containsExactly(
+                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                        PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COF.fullName()
+                    );
+                verify(featureToggleService).isRpaContinuousFeedEnabled();
+                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                    entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false),
+                    entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
+                    entry(FlowFlag.RPA_CONTINUOUS_FEED.name(), true),
+                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                    entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false)
+                );
+            }
+
             // 1v2 spec
             // Unrepresented
             // 3. Def1 registered, Def 2 unrepresented
@@ -638,7 +821,9 @@ class StateFlowEngineTest {
             void shouldContinueOnline_WhenCaseDataAtStateClaimDraftIssuedAndRespondent2NotRepresentedSpec() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant2()
+                    .defendant2LIPAtClaimIssued(null)
                     .addLegalRepDeadline(LocalDateTime.now().plusDays(14))
+
                     .build().toBuilder()
                     .superClaimType(SuperClaimType.SPEC_CLAIM).build();
 

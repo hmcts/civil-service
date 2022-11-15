@@ -57,6 +57,10 @@ public class EventAllowedAspect {
             stateHistoryBuilder.append(", ");
         });
         if (flowStateAllowedEventService.isAllowed(caseDetails, caseEvent)) {
+            log.info(format(
+                "%s is ****allowed****** on the case id %s, current FlowState: %s, stateFlowHistory: %s",
+                caseEvent.name(), caseDetails.getId(), flowState, stateHistoryBuilder.toString()
+            ));
             return joinPoint.proceed();
         } else {
             log.info(format(

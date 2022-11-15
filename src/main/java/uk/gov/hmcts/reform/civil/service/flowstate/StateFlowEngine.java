@@ -306,7 +306,14 @@ public class StateFlowEngine {
                 .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued)
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
                 .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT)
-                    .onlyIf(takenOfflineBySystem.and(pastAddLegalRepDeadline))
+                    .onlyIf(takenOfflineBySystem
+                                .and(pastAddLegalRepDeadline)
+                                .and(not(certificateOfServiceEnabled)))
+            .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COF)
+                .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT)
+                    .onlyIf(takenOfflineBySystem
+                                .and(pastAddLegalRepDeadline)
+                                .and(certificateOfServiceEnabled))
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC)
                 .transitionTo(CLAIM_ISSUED)
                     .onlyIf(claimIssued.and(pinInPostEnabledAndLiP))
