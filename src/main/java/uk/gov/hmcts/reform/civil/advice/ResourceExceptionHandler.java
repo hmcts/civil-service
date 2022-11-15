@@ -25,4 +25,10 @@ public class ResourceExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.PRECONDITION_FAILED);
     }
 
+    @ExceptionHandler(value = NoSuchMethodError.class)
+    public ResponseEntity<Object> noSuchMethodError(Throwable error) {
+        log.debug(error.getMessage(), error);
+        return new ResponseEntity<>(error.getMessage(), new HttpHeaders(), HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
 }

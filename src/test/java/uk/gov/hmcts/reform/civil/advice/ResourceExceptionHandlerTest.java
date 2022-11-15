@@ -40,7 +40,17 @@ class ResourceExceptionHandlerTest {
         );
     }
 
-    private <E extends Exception> void testTemplate(
+    @Test
+    void shouldReturnMethodNotAllowed_whenNoSuchMethodErrorThrown() {
+        testTemplate(
+            "expected exception for missing callback handler",
+            NoSuchMethodError::new,
+            handler::noSuchMethodError,
+            HttpStatus.METHOD_NOT_ALLOWED
+        );
+    }
+
+    private <E extends Throwable> void testTemplate(
         String message,
         Function<String, E> exceptionBuilder,
         Function<E, ResponseEntity<?>> method,
@@ -52,4 +62,5 @@ class ResourceExceptionHandlerTest {
         assertThat(result.getBody()).isNotNull()
             .extracting(Object::toString).asString().contains(message);
     }
+
 }
