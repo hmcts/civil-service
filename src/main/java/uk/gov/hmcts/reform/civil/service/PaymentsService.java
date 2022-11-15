@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.hearing.HFPbaDetails;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
@@ -21,7 +20,6 @@ import java.util.UUID;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Service
 @RequiredArgsConstructor
@@ -70,7 +68,7 @@ public class PaymentsService {
         return pbaServiceRequestDTO;
     }
 
-        public PBAServiceRequestResponse createCreditAccountPayment(CaseData caseData, String authToken) {
+    public PBAServiceRequestResponse createCreditAccountPayment(CaseData caseData, String authToken) {
         String serviceReqReference = caseData.getHearingFeePBADetails().getServiceReqReference();
         return paymentsClient.createPbaPayment(serviceReqReference, authToken, buildRequest(caseData));
     }
