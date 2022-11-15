@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-branchName=CIV-5174
+branchName=$1
 
 #Checkout specific branch pf  civil camunda bpmn definition
 git clone https://github.com/hmcts/civil-ccd-definition.git
