@@ -56,18 +56,20 @@ public class CaseMigratonUtility {
 
     public static void migrateRespondentAndApplicantDQ(String authToken, CaseData oldCaseData,
                                                        CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                                                       LocationRefDataService locationRefDataService) {
-        migrateRespondent1DQ(authToken, oldCaseData, caseDataBuilder, locationRefDataService);
-        migrateRespondent2DQ(authToken, oldCaseData, caseDataBuilder, locationRefDataService);
-        migrateApplicant1DQ(authToken, oldCaseData, caseDataBuilder, locationRefDataService);
-        migrateApplicant2DQ(authToken, oldCaseData, caseDataBuilder, locationRefDataService);
+                                                       LocationRefDataService locationRefDataService,
+                                                       CaseLocation caseLocation) {
+        migrateRespondent1DQ(authToken, oldCaseData, caseDataBuilder, locationRefDataService, caseLocation);
+        migrateRespondent2DQ(authToken, oldCaseData, caseDataBuilder, locationRefDataService, caseLocation);
+        migrateApplicant1DQ(authToken, oldCaseData, caseDataBuilder, locationRefDataService, caseLocation);
+        migrateApplicant2DQ(authToken, oldCaseData, caseDataBuilder, locationRefDataService, caseLocation);
 
     }
 
     // Applicable for Respondent1 and Respondent2
     private static void migrateRespondent1DQ(String authToken, CaseData oldCaseData,
                                              CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                                             LocationRefDataService locationRefDataService) {
+                                             LocationRefDataService locationRefDataService,
+                                             CaseLocation caseLocation) {
 
         Respondent1DQ respondent1DQ = oldCaseData.getRespondent1DQ();
         if (ofNullable(respondent1DQ).isPresent()
@@ -95,12 +97,20 @@ public class CaseMigratonUtility {
                                                                                                  .build())
                                                                                .build()).build());
 
+        } else {
+            caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
+                                              .respondent1DQRequestedCourt(respondent1DQ
+                                                                               .getRespondent1DQRequestedCourt()
+                                                                               .toBuilder()
+                                                                               .caseLocation(caseLocation)
+                                                                               .build()).build());
         }
     }
 
     private static void migrateRespondent2DQ(String authToken, CaseData oldCaseData,
                                              CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                                             LocationRefDataService locationRefDataService) {
+                                             LocationRefDataService locationRefDataService,
+                                             CaseLocation caseLocation) {
 
         Respondent2DQ respondent2DQ = oldCaseData.getRespondent2DQ();
         if (ofNullable(respondent2DQ).isPresent()
@@ -148,13 +158,21 @@ public class CaseMigratonUtility {
                                                                                                  .build())
                                                                                .build()).build());
 
+        } else {
+            caseDataBuilder.respondent2DQ(respondent2DQ.toBuilder()
+                                             .respondent2DQRequestedCourt(respondent2DQ
+                                                                             .getRespondent2DQRequestedCourt()
+                                                                             .toBuilder()
+                                                                             .caseLocation(caseLocation)
+                                                                             .build()).build());
         }
     }
 
     // Applicable for Respondent1 and Respondent2
     private static void migrateApplicant1DQ(String authToken, CaseData oldCaseData,
                                             CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                                            LocationRefDataService locationRefDataService) {
+                                            LocationRefDataService locationRefDataService,
+                                            CaseLocation caseLocation) {
 
         Applicant1DQ applicant1DQ = oldCaseData.getApplicant1DQ();
 
@@ -181,6 +199,13 @@ public class CaseMigratonUtility {
                                                                                                            .getRegion())
                                                                                                .build())
                                                                              .build()).build());
+        } else {
+            caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
+                                             .applicant1DQRequestedCourt(applicant1DQ
+                                                                             .getApplicant1DQRequestedCourt()
+                                                                             .toBuilder()
+                                                                             .caseLocation(caseLocation)
+                                                                             .build()).build());
         }
 
     }
@@ -188,7 +213,8 @@ public class CaseMigratonUtility {
     // Applicable for Respondent1 and Respondent2
     private static void migrateApplicant2DQ(String authToken, CaseData oldCaseData,
                                             CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                                            LocationRefDataService locationRefDataService) {
+                                            LocationRefDataService locationRefDataService,
+                                            CaseLocation caseLocation) {
 
         Applicant2DQ applicant2DQ = oldCaseData.getApplicant2DQ();
         if (ofNullable(applicant2DQ).isPresent()
@@ -214,6 +240,13 @@ public class CaseMigratonUtility {
                                                                                                .build())
                                                                              .build()).build());
 
+        } else {
+            caseDataBuilder.applicant2DQ(applicant2DQ.toBuilder()
+                                             .applicant2DQRequestedCourt(applicant2DQ
+                                                                             .getApplicant2DQRequestedCourt()
+                                                                             .toBuilder()
+                                                                             .caseLocation(caseLocation)
+                                                                             .build()).build());
         }
     }
 

@@ -51,14 +51,13 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
 
         log.info("Migrating data for case: {}", oldCaseData.getCcdCaseReference());
-
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        CaseLocation caseLocation = null;
+        CaseLocation caseLocation = CaseLocation.builder().baseLocation("420219").region("2").build();
         if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
             CaseMigratonUtility.migrateGS(oldCaseData, "AAA7",
                                           caseDataBuilder, coreCaseDataService
             );
-            caseLocation = CaseLocation.builder().baseLocation("420219").region("2").build();
+
             CaseMigratonUtility.migrateCaseManagementLocation(caseDataBuilder, caseLocation);
         } else {
             caseLocation = CaseLocation.builder().baseLocation("192280").region("4").build();
@@ -74,7 +73,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
         }
 
         CaseMigratonUtility.migrateRespondentAndApplicantDQ(authToken, oldCaseData, caseDataBuilder,
-                                                            locationRefDataService
+                                                            locationRefDataService, caseLocation
         );
         caseDataBuilder.migrationId(MIGRATION_ID_VALUE);
         return AboutToStartOrSubmitCallbackResponse.builder()
