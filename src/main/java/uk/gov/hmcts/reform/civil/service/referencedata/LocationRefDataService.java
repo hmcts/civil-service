@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.referencedata.LRDConfiguration;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 
 import java.net.URI;

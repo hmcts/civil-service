@@ -795,13 +795,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     }
 
     private Optional<CaseLocation> buildWithMatching(LocationRefData courtLocation) {
-        if (courtLocation == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(CaseLocation.builder()
-                                   .region(courtLocation.getRegionId())
-                                   .baseLocation(courtLocation.getEpimmsId())
-                                   .build());
-        }
+        return Optional.ofNullable(courtLocation).map(LocationRefDataService::buildCaseLocation);
     }
 }
