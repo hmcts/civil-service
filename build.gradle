@@ -111,7 +111,7 @@ allprojects {
       ) {
         entry 'camunda-engine'
       }
-      // Solves CVE-2022-31159
+      // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
         version: '1.12.261'
