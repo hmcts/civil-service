@@ -34,15 +34,14 @@ public class EvidenceUploadRespondentHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(EVIDENCE_UPLOAD_RESPONDENT);
     private final ObjectMapper objectMapper;
-
     private final Time time;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
-            .put(callbackKey(MID, "validateValues"), this::validateValues)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::documentUploadTime)
+            .put(callbackKey(MID, "validateValuesRespondent"), this::validateValuesRespondent)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::documentUploadTimeRespondent)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -52,32 +51,32 @@ public class EvidenceUploadRespondentHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse validateValues(CallbackParams callbackParams) {
+    private CallbackResponse validateValuesRespondent(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
-        checkDateCorrectness(errors, caseData.getDocumentUploadWitness1Res(), date -> date.getValue()
+        respondentCheckDateCorrectness(errors, caseData.getDocumentUploadWitness1Res(), date -> date.getValue()
                                  .getWitnessOption1UploadDate(),
                              "Invalid date: \"witness statement\" "
                                  + "date entered must not be in the future (1).");
-        checkDateCorrectness(errors, caseData.getDocumentUploadWitness3Res(), date -> date.getValue()
+        respondentCheckDateCorrectness(errors, caseData.getDocumentUploadWitness3Res(), date -> date.getValue()
                                  .getWitnessOption3UploadDate(),
                              "Invalid date: \"Notice of the intention to rely on hearsay evidence\" "
                                  + "date entered must not be in the future (2).");
 
-        checkDateCorrectness(errors, caseData.getDocumentUploadExpert1Res(), date -> date.getValue()
+        respondentCheckDateCorrectness(errors, caseData.getDocumentUploadExpert1Res(), date -> date.getValue()
                                  .getExpertOption1UploadDate(),
                              "Invalid date: \"Expert's report\""
                                  + " date entered must not be in the future (3).");
-        checkDateCorrectness(errors, caseData.getDocumentUploadExpert2Res(), date -> date.getValue()
+        respondentCheckDateCorrectness(errors, caseData.getDocumentUploadExpert2Res(), date -> date.getValue()
                                  .getExpertOption2UploadDate(),
                              "Invalid date: \"Joint statement of experts\" "
                                  + "date entered must not be in the future (4).");
-        checkDateCorrectness(errors, caseData.getDocumentUploadExpert3Res(), date -> date.getValue()
+        respondentCheckDateCorrectness(errors, caseData.getDocumentUploadExpert3Res(), date -> date.getValue()
                                  .getExpertOption3UploadDate(),
                              "Invalid date: \"Questions for other party's expert or joint experts\" "
                                  + "expert statement date entered must not be in the future (5).");
-        checkDateCorrectness(errors, caseData.getDocumentUploadExpert4Res(), date -> date.getValue()
+        respondentCheckDateCorrectness(errors, caseData.getDocumentUploadExpert4Res(), date -> date.getValue()
                                  .getExpertOption4UploadDate(),
                              "Invalid date: \"Answers to questions asked by the other party\" "
                                  + "date entered must not be in the future (6).");
@@ -87,20 +86,20 @@ public class EvidenceUploadRespondentHandler extends CallbackHandler {
             .build();
     }
 
-    <T> void checkDateCorrectness(List<String> errors, List<Element<T>> documentUploadWitness,
+    <T> void respondentCheckDateCorrectness(List<String> errors, List<Element<T>> documentUploadRespondent,
                                   Function<Element<T>, LocalDate> dateExtractor, String errorMessage) {
-        if (documentUploadWitness == null) {
+        if (documentUploadRespondent == null) {
             return;
         }
-        documentUploadWitness.forEach(date -> {
-            LocalDate dateToCheck = dateExtractor.apply(date);
-            if (dateToCheck.isAfter(time.now().toLocalDate())) {
+        documentUploadRespondent.forEach(date -> {
+            LocalDate dateToCheckRespondent = dateExtractor.apply(date);
+            if (dateToCheckRespondent.isAfter(time.now().toLocalDate())) {
                 errors.add(errorMessage);
             }
         });
     }
 
-    private CallbackResponse documentUploadTime(CallbackParams callbackParams) {
+    private CallbackResponse documentUploadTimeRespondent(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.caseDocumentUploadDateRes(time.now());

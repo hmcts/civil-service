@@ -60,7 +60,7 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
     private final UploadEvidenceExpert uploadEvidenceDate = new UploadEvidenceExpert();
     private final UploadEvidenceWitness uploadEvidenceDate2 = new UploadEvidenceWitness();
 
-    private static final String PAGE_ID = "validateValues";
+    private static final String PAGE_ID = "validateValuesApplicant";
 
     @BeforeEach
     void setup() {
