@@ -55,7 +55,9 @@ public class LocationRefDataService {
                 buildURIforCcmcc(),
                 HttpMethod.GET,
                 getHeaders(authToken),
-                new ParameterizedTypeReference<List<LocationRefData>>() {});
+                new ParameterizedTypeReference<List<LocationRefData>>() {
+                }
+            );
             List<LocationRefData> ccmccLocations = responseEntity.getBody();
             if (ccmccLocations == null || ccmccLocations.isEmpty()) {
                 log.warn("Location Reference Data Lookup did not return any CCMCC location");
@@ -199,6 +201,19 @@ public class LocationRefDataService {
         return builder.buildAndExpand(new HashMap<>()).toUri();
     }
 
+
+    /**
+     * Centralized creation of CaseLocation from LocationRefData to reduce the places it can be done.
+     *
+     * @param location mandatory
+     * @return case location built from location
+     */
+    public static CaseLocation buildCaseLocation(LocationRefData location) {
+        return CaseLocation.builder()
+            .region(location.getRegionId())
+            .baseLocation(location.getEpimmsId())
+            .build();
+    }
 
     public LocationRefData getCourtLocation(String authToken, String threeDigitCode) {
         try {
