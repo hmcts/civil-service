@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.ListingOrRelisting;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -194,7 +193,6 @@ public class HearingScheduledHandler extends CallbackHandler {
             caseDataBuilder.hearingLocation(locationList);
         }
         var state = "HEARING_READINESS";
-        caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(state)
             .data(caseDataBuilder.build().toMap(objectMapper))
