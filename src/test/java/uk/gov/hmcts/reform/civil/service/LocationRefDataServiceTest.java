@@ -159,7 +159,6 @@ class LocationRefDataServiceTest {
                 .thenReturn(getAllLocationsRefDataResponse());
 
             List<String> courtLocations = refDataService.getCourtLocations("user_token");
-
             assertThat(courtLocations.size()).isEqualTo(10);
             assertThat(courtLocations).containsOnly("site_name_01 - court address 1111 - AA0 0BB",
                                                     "site_name_02 - court address 2222 - AA0 0BB",
@@ -334,6 +333,28 @@ class LocationRefDataServiceTest {
             assertThat(result.getEpimmsId()).isEqualTo("192280");
             assertThat(result.getRegionId()).isEqualTo("4");
         }
+
+        @Test
+        void shouldReturnLocations_whenLRDReturnsOneThreeDigitLocations() {
+            LocationRefData ccmccLocation = LocationRefData.builder().courtVenueId("9263").epimmsId("192280")
+                .siteName("site_name").regionId("4").region("North West").courtType("County Court")
+                .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
+                .venueName("CCMCC").build();
+            ResponseEntity<List<LocationRefData>> mockedResponse = new ResponseEntity<>(List.of(ccmccLocation), OK);
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(restTemplate.exchange(
+                uriCaptor.capture(),
+                httpMethodCaptor.capture(),
+                httpEntityCaptor.capture(),
+                ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
+                .thenReturn(mockedResponse);
+            LocationRefData result = refDataService.getCourtLocation("user_token","123");
+
+           // LocationRefData result = refDataService.getCcmccLocation("user_token");
+
+            verify(lrdConfiguration, times(1)).getUrl();
+            verify(lrdConfiguration, times(1)).getEndpoint();
+            }
 
         @Test
         void shouldReturnLocations_whenLRDReturnsNullBody() {
