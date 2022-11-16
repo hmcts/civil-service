@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
-import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -65,7 +64,6 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesReci
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
@@ -82,16 +80,12 @@ import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
-import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
-import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
 import java.math.BigDecimal;
@@ -108,7 +102,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NO
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
@@ -262,8 +255,6 @@ public class CaseDataBuilder {
     protected LocalDateTime takenOfflineByStaffDate;
     protected LocalDateTime unsuitableSDODate;
     protected LocalDateTime claimDismissedDate;
-    protected LocalDateTime caseDismissedHearingFeeDueDate;
-    protected LocalDate hearingDate;
     private InterestClaimOptions interestClaimOptions;
     private YesOrNo claimInterest;
     private SameRateInterestSelection sameRateInterestSelection;
@@ -324,14 +315,6 @@ public class CaseDataBuilder {
     private TrialHearingTrial trialHearingTrialDJ;
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
-    private LocalDate hearingDueDate;
-
-    private CaseLocation caseManagementLocation;
-
-    private YesOrNo generalAppVaryJudgementType;
-    private Document generalAppN245FormUpload;
-    private GAApplicationType generalAppType;
-    private GAHearingDateGAspec generalAppHearingDate;
 
     private List<Element<ChangeOfRepresentation>> changeOfRepresentation;
     private ChangeOrganisationRequest changeOrganisationRequest;
@@ -339,31 +322,8 @@ public class CaseDataBuilder {
     private String unassignedCaseListDisplayOrganisationReferences;
     private String caseListDisplayDefendantSolicitorReferences;
 
-    private TrialHearingTimeDJ trialHearingTimeDJ;
-    private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
-
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
-        return this;
-    }
-
-    public CaseDataBuilder generalAppVaryJudgementType(YesOrNo generalAppVaryJudgementType) {
-        this.generalAppVaryJudgementType = generalAppVaryJudgementType;
-        return this;
-    }
-
-    public CaseDataBuilder generalAppType(GAApplicationType generalAppType) {
-        this.generalAppType = generalAppType;
-        return this;
-    }
-
-    public CaseDataBuilder generalAppHearingDate(GAHearingDateGAspec generalAppHearingDate) {
-        this.generalAppHearingDate = generalAppHearingDate;
-        return this;
-    }
-
-    public CaseDataBuilder generalAppN245FormUpload(Document generalAppN245FormUpload) {
-        this.generalAppN245FormUpload = generalAppN245FormUpload;
         return this;
     }
 
@@ -1034,14 +994,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimDismissedPastHearingFeeDueDeadline() {
-        atStateHearingFeeDueUnpaid();
-        ccdState = CASE_DISMISSED;
-        caseDismissedHearingFeeDueDate = LocalDateTime.now();
-        hearingDate = hearingDueDate.plusWeeks(2);
-        return this;
-    }
-
     public CaseDataBuilder atStateClaimIssuedUnrepresentedDefendants() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
         respondent2 = PartyBuilder.builder().individual().build();
@@ -1608,35 +1560,6 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimIssuedTrialLocationInPerson() {
         trialHearingMethodInPersonDJ = DynamicList.builder().value(
             DynamicListElement.builder().label("Court 1").build()).build();
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedCaseManagementLocationInPerson() {
-        caseManagementLocation = CaseLocation.builder().baseLocation("0123").region("0321").build();
-        return this;
-    }
-
-    public CaseDataBuilder atStateSdoTrialDj() {
-        trialHearingTimeDJ = TrialHearingTimeDJ.builder()
-            .helpText1("If either party considers that the time estimate is insufficient, "
-                           + "they must inform the court within 7 days of the date of this order.")
-            .helpText2("Not more than seven nor less than three clear days before the trial, "
-                           + "the claimant must file at court and serve an indexed and paginated bundle of "
-                           + "documents which complies with the requirements of Rule 39.5 Civil Procedure Rules "
-                           + "and which complies with requirements of PD32. The parties must endeavour to agree "
-                           + "the contents of the bundle before it is filed. The bundle will include a case "
-                           + "summary and a chronology.")
-            .hearingTimeEstimate(TrialHearingTimeEstimateDJ.ONE_HOUR)
-            .date1(LocalDate.parse("2022-01-01"))
-            .date2(LocalDate.parse("2022-01-02"))
-            .build();
-        trialOrderMadeWithoutHearingDJ = TrialOrderMadeWithoutHearingDJ.builder()
-            .input("This order has been made without a hearing. "
-                    + "Each party has the right to apply to have this Order "
-                    + "set aside or varied. Any such application must be "
-                    + "received by the Court "
-                    + "(together with the appropriate fee) by 4pm on 01 12 2022.")
-            .build();
         return this;
     }
 
@@ -3162,22 +3085,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateHearingFeeDueUnpaid() {
-        atStateApplicantRespondToDefenceAndProceed();
-        hearingDueDate = LocalDate.now().minusDays(1);
-        hearingFeePaymentDetails = PaymentDetails.builder().status(FAILED).build();
-        ccdState = HEARING_READINESS;
-        return this;
-    }
-
-    public CaseDataBuilder atStateHearingFeeDuePaid() {
-        atStateApplicantRespondToDefenceAndProceed();
-        hearingDueDate = LocalDate.now().minusDays(1);
-        hearingFeePaymentDetails = PaymentDetails.builder().status(SUCCESS).build();
-        ccdState = HEARING_READINESS;
-        return this;
-    }
-
     public CaseDataBuilder atStateBeforeTakenOfflineSDONotDrawn() {
 
         atStateApplicantRespondToDefenceAndProceed();
@@ -3318,15 +3225,6 @@ public class CaseDataBuilder {
         this.respondent2 = PartyBuilder.builder().individual().build();
         this.respondent2SameLegalRepresentative = NO;
         this.respondentSolicitor2Reference = "01234";
-        return this;
-    }
-
-    public CaseDataBuilder multiPartyClaimTwoDefendantSolicitorsForSdoMP() {
-        this.addRespondent2 = YES;
-        this.respondent2 = PartyBuilder.builder().individual().build();
-        this.respondent2SameLegalRepresentative = NO;
-        this.respondentSolicitor2Reference = "01234";
-        respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
         return this;
     }
 
@@ -3578,10 +3476,6 @@ public class CaseDataBuilder {
             // Create Claim
             .legacyCaseReference(legacyCaseReference)
             .allocatedTrack(allocatedTrack)
-            .generalAppType(generalAppType)
-            .generalAppVaryJudgementType(generalAppVaryJudgementType)
-            .generalAppN245FormUpload(generalAppN245FormUpload)
-            .generalAppHearingDate(generalAppHearingDate)
             .solicitorReferences(solicitorReferences)
             .courtLocation(courtLocation)
             .claimValue(claimValue)
@@ -3604,7 +3498,6 @@ public class CaseDataBuilder {
             .applicantSolicitor1ClaimStatementOfTruth(applicantSolicitor1ClaimStatementOfTruth)
             .claimIssuedPaymentDetails(claimIssuedPaymentDetails)
             .claimFee(claimFee)
-            .hearingFeePaymentDetails(hearingFeePaymentDetails)
             .paymentReference(paymentReference)
             .applicantSolicitor1CheckEmail(applicantSolicitor1CheckEmail)
             .applicantSolicitor1UserDetails(applicantSolicitor1UserDetails)
@@ -3692,7 +3585,6 @@ public class CaseDataBuilder {
             .takenOfflineByStaffDate(takenOfflineByStaffDate)
             .unsuitableSDODate(unsuitableSDODate)
             .claimDismissedDate(claimDismissedDate)
-            .caseDismissedHearingFeeDueDate(caseDismissedHearingFeeDueDate)
             .addLegalRepDeadline(addLegalRepDeadline)
             .applicantSolicitor1ServiceAddress(applicantSolicitor1ServiceAddress)
             .respondentSolicitor1ServiceAddress(respondentSolicitor1ServiceAddress)
@@ -3702,8 +3594,6 @@ public class CaseDataBuilder {
             .defendantSolicitorNotifyClaimDetailsOptions(defendantSolicitorNotifyClaimDetailsOptions)
             .selectLitigationFriend(selectLitigationFriend)
             .caseNotes(caseNotes)
-            .hearingDueDate(hearingDueDate)
-            .hearingDate(hearingDate)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)
             .superClaimType(superClaimType == null ? UNSPEC_CLAIM : superClaimType)
@@ -3770,12 +3660,8 @@ public class CaseDataBuilder {
             .changeOrganisationRequestField(changeOrganisationRequest)
             .unassignedCaseListDisplayOrganisationReferences(unassignedCaseListDisplayOrganisationReferences)
             .caseListDisplayDefendantSolicitorReferences(caseListDisplayDefendantSolicitorReferences)
-            .caseManagementLocation(caseManagementLocation)
             //Unsuitable for SDO
             .reasonNotSuitableSDO(reasonNotSuitableSDO)
-            .trialHearingTimeDJ(trialHearingTimeDJ)
-            .trialOrderMadeWithoutHearingDJ(trialOrderMadeWithoutHearingDJ)
             .build();
     }
-
 }

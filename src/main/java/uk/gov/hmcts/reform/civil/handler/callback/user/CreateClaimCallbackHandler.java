@@ -588,7 +588,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 .caseManagementLocation(CaseLocation.builder().region(regionId).baseLocation(epimmsId).build())
                 .courtLocation(courtLocationBuilder
                                    .applicantPreferredCourt(courtLocation.getCourtLocationCode())
-                                   .caseLocation(LocationRefDataService.buildCaseLocation(courtLocation))
+                                   .caseLocation(CaseLocation.builder()
+                                                     .region(courtLocation.getRegionId())
+                                                     .baseLocation(courtLocation.getEpimmsId()).build())
                                    //to clear list of court locations from caseData
                                    .applicantPreferredCourtLocationList(null)
                                    .build());

@@ -11,11 +11,8 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -50,12 +47,10 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
@@ -84,7 +79,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::populateClaimantResponseScenarioFlag,
-            callbackKey(V_1, ABOUT_TO_START), this::populateClaimantResponseScenarioFlag,
             callbackKey(MID, "set-applicants-proceed-intention"), this::setApplicantsProceedIntention,
             callbackKey(MID, "experts"), this::validateApplicantExperts,
             callbackKey(MID, "witnesses"), this::validateApplicantWitnesses,
@@ -98,16 +92,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private CallbackResponse populateClaimantResponseScenarioFlag(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
 
-        if (V_1.equals(callbackParams.getVersion())
-            && featureToggleService.isAccessProfilesEnabled()) {
-            updatedData.claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
-        } else {
-            updatedData.claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-                .superClaimType(UNSPEC_CLAIM);
-        }
+        CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
+            .claimantResponseScenarioFlag(getMultiPartyScenario(caseData));
 
         if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
             updatedData.respondentSharedClaimResponseDocument(caseData.getRespondent1ClaimResponseDocument());
@@ -213,11 +200,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
             .applicant1ResponseDate(currentTime);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Case management location for " + caseData.getLegacyCaseReference()
-                          + " is " + builder.build().getCaseManagementLocation());
-        }
-
         if (v1) {
             updateCaseManagementLocation(callbackParams, builder);
         }
@@ -268,42 +250,16 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         //Set to null because there are no more deadlines
         builder.nextDeadline(null);
-        AboutToStartOrSubmitCallbackResponse response = null;
 
-        if (v1 && featureToggleService.isSdoEnabled()
-            && !AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
-            if (caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
-                if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE))
-                    || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
-                    response = AboutToStartOrSubmitCallbackResponse.builder()
-                    .data(builder.build().toMap(objectMapper))
-                    .state(CaseState.JUDICIAL_REFERRAL.name())
-                    .build();
-                } else if (multiPartyScenario.equals(ONE_V_TWO_TWO_LEGAL_REP)) {
-                    if (caseData.getRespondent2ClaimResponseType()
-                        .equals(RespondentResponseType.FULL_DEFENCE)) {
-                        response = AboutToStartOrSubmitCallbackResponse.builder()
-                            .data(builder.build().toMap(objectMapper))
-                            .state(CaseState.JUDICIAL_REFERRAL.name())
-                            .build();
-                    }
-                } else {
-                    response = AboutToStartOrSubmitCallbackResponse.builder()
-                        .data(builder.build().toMap(objectMapper))
-                        .build();
-                }
-            } else {
-                response = AboutToStartOrSubmitCallbackResponse.builder()
-                    .data(builder.build().toMap(objectMapper))
-                    .build();
-            }
-        } else {
-            response = AboutToStartOrSubmitCallbackResponse.builder()
-                .data(builder.build().toMap(objectMapper))
-                .build();
+        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
+            AboutToStartOrSubmitCallbackResponse.builder()
+                .data(builder.build().toMap(objectMapper));
+
+        if (v1 && featureToggleService.isSdoEnabled()) {
+            response.state(CaseState.JUDICIAL_REFERRAL.name());
         }
 
-        return response;
+        return response.build();
     }
 
     private void updateCaseManagementLocation(CallbackParams callbackParams,

@@ -1,12 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -16,11 +18,11 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.validation.DeadlineExtensionValidator;
 
+@RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
-    InformAgreedExtensionDateForSpecCallbackHandler.class,
-    JacksonAutoConfiguration.class
+    InformAgreedExtensionDateForSpecCallbackHandler.class
 })
-class InformAgreedExtensionDateForSpecCallbackHandlerTest {
+public class InformAgreedExtensionDateForSpecCallbackHandlerTest {
 
     @Autowired
     private InformAgreedExtensionDateForSpecCallbackHandler handler;
@@ -30,6 +32,9 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest {
 
     @MockBean
     private DeadlineExtensionValidator validator;
+
+    @MockBean
+    private ObjectMapper objectMapper;
 
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
@@ -50,9 +55,9 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest {
     private FeatureToggleService toggleService;
 
     @Test
-    void ldBlock() {
+    public void ldBlock() {
         Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assertions.assertTrue(handler.handledEvents().isEmpty());
-        Assertions.assertFalse(handler.handledEvents().isEmpty());
+        Assert.assertTrue(handler.handledEvents().isEmpty());
+        Assert.assertFalse(handler.handledEvents().isEmpty());
     }
 }

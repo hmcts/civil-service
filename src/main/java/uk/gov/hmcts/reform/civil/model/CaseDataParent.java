@@ -32,7 +32,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantRespon
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
@@ -156,7 +155,6 @@ public class CaseDataParent implements MappableObject {
     private final DynamicList disposalHearingMethodInPerson;
     private final DynamicList fastTrackMethodInPerson;
     private final DynamicList smallClaimsMethodInPerson;
-    private final DynamicList hearingMethod;
     private final YesOrNo drawDirectionsOrderRequired;
     private final YesOrNo drawDirectionsOrderSmallClaims;
     private final ClaimsTrack claimsTrack;
@@ -190,7 +188,6 @@ public class CaseDataParent implements MappableObject {
     private SmallClaimsJudgesRecital smallClaimsJudgesRecital;
     private SmallClaimsNotes smallClaimsNotes;
     private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
-    private SDOHearingNotes sdoHearingNotes;
     private ReasonNotSuitableSDO reasonNotSuitableSDO;
     private final List<SmallTrack> smallClaims;
     private final SmallClaimsMethod smallClaimsMethod;
@@ -221,13 +218,11 @@ public class CaseDataParent implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> smallClaimsDocumentsToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsWitnessStatementToggle;
 
-    private CaseDocument sdoOrderDocument;
+    private Document sdoOrderDocument;
 
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
     private final YesOrNo setFastTrackFlag;
-    private final String eventDescriptionRTJ;
-    private final String additionalInformationRTJ;
 
     private final LocalDate nextDeadline;
     private final String allPartyNames;

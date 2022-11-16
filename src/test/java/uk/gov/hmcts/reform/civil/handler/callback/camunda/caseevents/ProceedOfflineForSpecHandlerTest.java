@@ -1,30 +1,35 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 
+@RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
-    ProceedOfflineForSpecCallbackHandler.class,
-    JacksonAutoConfiguration.class
+    ProceedOfflineForSpecCallbackHandler.class
 })
-class ProceedOfflineForSpecHandlerTest {
+public class ProceedOfflineForSpecHandlerTest {
 
     @Autowired
     private ProceedOfflineForSpecCallbackHandler handler;
 
     @MockBean
+    private ObjectMapper objectMapper;
+
+    @MockBean
     private FeatureToggleService toggleService;
 
     @Test
-    void ldBlock() {
+    public void ldBlock() {
         Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assertions.assertTrue(handler.handledEvents().isEmpty());
-        Assertions.assertFalse(handler.handledEvents().isEmpty());
+        Assert.assertTrue(handler.handledEvents().isEmpty());
+        Assert.assertFalse(handler.handledEvents().isEmpty());
     }
 }

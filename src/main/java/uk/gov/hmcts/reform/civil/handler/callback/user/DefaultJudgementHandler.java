@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
@@ -124,7 +125,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
             caseDataBuilder.hearingSupportRequirementsDJ(caseData.getHearingSupportRequirementsDJ().toBuilder()
                         .hearingPreferredLocation(caseData.getHearingSupportRequirementsDJ()
                                 .getHearingTemporaryLocation().getValue().getLabel()).build())
-                .caseManagementLocation(LocationRefDataService.buildCaseLocation(location));
+                .caseManagementLocation(CaseLocation.builder().region(location.getRegionId()).baseLocation(
+                    location.getEpimmsId()).build());
             caseDataBuilder.locationName(location.getSiteName());
         }
 

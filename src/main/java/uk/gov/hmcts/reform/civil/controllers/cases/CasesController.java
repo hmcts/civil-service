@@ -143,7 +143,6 @@ public class CasesController {
             .event(eventDto.getEvent())
             .updates(eventDto.getCaseDataUpdate())
             .build();
-        log.info(eventDto.getCaseDataUpdate().toString());
         CaseData caseData = caseDetailsConverter
             .toCaseData(caseEventService.submitEvent(params));
         return new ResponseEntity<>(caseData, HttpStatus.OK);

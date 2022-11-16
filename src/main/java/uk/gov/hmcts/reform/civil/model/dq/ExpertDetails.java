@@ -11,11 +11,6 @@ import java.math.BigDecimal;
 public class ExpertDetails {
 
     private final String expertName;
-    private final String firstName;
-    private final String lastName;
-    private final String phoneNumber;
-    private final String emailAddress;
-    private final String whyRequired;
     private final String fieldofExpertise;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal estimatedCost;

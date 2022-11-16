@@ -1,13 +1,9 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -22,6 +18,10 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
@@ -29,15 +29,18 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 
 @SpringBootTest(classes = {
-    DefendantPinToPostLRspecService.class,
-    JacksonAutoConfiguration.class
+    DefendantPinToPostLRspecService.class
 })
+
 class DefendantPinToPostLRspecServiceTest {
 
     private static final String CASE_ID = "1";
 
     @Autowired
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
+
+    @MockBean
+    private ObjectMapper objectMapper;
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;

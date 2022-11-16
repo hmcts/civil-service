@@ -25,12 +25,4 @@ public class NotificationService {
             throw new NotificationException(e);
         }
     }
-
-    public void sendLetter(String letterTemplate, Map<String, ?> personalisation, String reference) {
-        try {
-            notificationClient.sendLetter(letterTemplate, personalisation, reference);
-        } catch (NotificationClientException e) {
-            throw new NotificationException(e);
-        }
-    }
 }
