@@ -27,7 +27,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 public class CaseMigratonUtility {
 
-
     private CaseMigratonUtility() {
         //NO-OP
     }
@@ -98,7 +97,7 @@ public class CaseMigratonUtility {
                                                                                                  .build())
                                                                                .build()).build());
 
-        } else  if(ofNullable(respondent1DQ).isPresent()) {
+        } else  if (ofNullable(respondent1DQ).isPresent()) {
             caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
                                               .respondent1DQRequestedCourt(respondent1DQ
                                                                                .getRespondent1DQRequestedCourt()
@@ -121,11 +120,10 @@ public class CaseMigratonUtility {
             LocationRefData refdata = locationRefDataService.getCourtLocation(
                 authToken,
                 respondent2DQ.getRespondent2DQRequestedCourt()
-                    .getResponseCourtCode() );
+                    .getResponseCourtCode());
 
             CaseLocation location = CaseLocation.builder().baseLocation(refdata.getEpimmsId())
                 .region(refdata.getRegion()).build();
-
 
             caseDataBuilder.respondent2DQ(respondent2DQ.builder()
                                               .respondent2DQRequestedCourt(respondent2DQ
@@ -140,8 +138,6 @@ public class CaseMigratonUtility {
                                                                                                          .getRegion())
                                                                                                  .build())
                                                                                .build()).build());
-
-
             caseDataBuilder.respondent2DQ(respondent2DQ.toBuilder()
                                               .respondent2DQRequestedCourt(respondent2DQ
                                                                                .getRespondent2DQRequestedCourt()
@@ -228,13 +224,14 @@ public class CaseMigratonUtility {
                                                                              .toBuilder()
                                                                              .caseLocation(CaseLocation.builder()
                                                                                                .baseLocation(
-                                                                                                   refdata.getEpimmsId())
+                                                                                                   refdata
+                                                                                                       .getEpimmsId())
                                                                                                .region(
                                                                                                    refdata.getRegion())
                                                                                                .build())
                                                                              .build()).build());
 
-        } else if(ofNullable(applicant2DQ).isPresent())  {
+        } else if (ofNullable(applicant2DQ).isPresent())  {
             caseDataBuilder.applicant2DQ(applicant2DQ.toBuilder()
                                              .applicant2DQRequestedCourt(applicant2DQ
                                                                              .getApplicant2DQRequestedCourt()
