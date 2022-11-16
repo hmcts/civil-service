@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -28,7 +27,6 @@ public class SdoGeneratorService {
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
     private final IdamClient idamClient;
-    private final FeatureToggleService toggleService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         MappableObject templateData;
@@ -39,10 +37,6 @@ public class SdoGeneratorService {
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
-
-            if (toggleService.isHearingAndListingSDOEnabled()) {
-                docmosisTemplate = DocmosisTemplates.SDO_SMALL_HNL;
-            }
             templateData = getTemplateDataSmall(caseData, judgeName);
         } else if (SdoHelper.isFastTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_FAST;
@@ -275,8 +269,6 @@ public class SdoGeneratorService {
                 SdoHelper.getSmallClaimsHearingTimeLabel(caseData)
             )
             .smallClaimsMethod(caseData.getSmallClaimsMethod())
-            // CIV-5514: smallClaimsMethodInPerson, smallClaimsMethodTelephoneHearing and
-            // smallClaimsMethodVideoConferenceHearing can be removed after HNL is live
             .smallClaimsMethodInPerson(caseData.getSmallClaimsMethodInPerson())
             .smallClaimsMethodTelephoneHearing(
                 SdoHelper.getSmallClaimsMethodTelephoneHearingLabel(caseData)
