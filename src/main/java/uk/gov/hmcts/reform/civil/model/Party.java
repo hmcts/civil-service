@@ -44,9 +44,6 @@ public class Party {
     private String partyEmail;
     private String partyPhone;
 
-    private final String partyEmail;
-    private final String partyPhone;
-
     public enum Type {
         INDIVIDUAL,
         COMPANY,
