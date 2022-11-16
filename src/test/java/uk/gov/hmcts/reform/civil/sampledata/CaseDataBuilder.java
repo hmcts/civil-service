@@ -91,6 +91,8 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
 import java.math.BigDecimal;
@@ -107,6 +109,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NO
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
@@ -260,6 +263,8 @@ public class CaseDataBuilder {
     protected LocalDateTime takenOfflineByStaffDate;
     protected LocalDateTime unsuitableSDODate;
     protected LocalDateTime claimDismissedDate;
+    protected LocalDateTime caseDismissedHearingFeeDueDate;
+    protected LocalDate hearingDate;
     private InterestClaimOptions interestClaimOptions;
     private YesOrNo claimInterest;
     private SameRateInterestSelection sameRateInterestSelection;
@@ -320,7 +325,10 @@ public class CaseDataBuilder {
     private TrialHearingTrial trialHearingTrialDJ;
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
+    private LocalDate hearingDueDate;
+
     private CaseLocation caseManagementLocation;
+
     private YesOrNo generalAppVaryJudgementType;
     private Document generalAppN245FormUpload;
     private GAApplicationType generalAppType;
