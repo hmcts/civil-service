@@ -591,6 +591,7 @@ public class CaseDataBuilder {
             .build();
         return this;
     }
+
     public CaseDataBuilder respondent2DQ() {
         respondent2DQ = Respondent2DQ.builder()
             .respondent2DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
@@ -3608,10 +3609,12 @@ public class CaseDataBuilder {
         this.respondent1DQWitnessesDetailsSpec = respondent1DQWitnessesDetailsSpec;
         return this;
     }
+
     public CaseDataBuilder caseAccessCategory(CaseCategory caseAccessCategory) {
         this.caseAccessCategory = caseAccessCategory;
         return this;
     }
+
     public CaseDataBuilder removeSolicitorReferences() {
         this.solicitorReferences = null;
         this.respondentSolicitor2Reference = null;
