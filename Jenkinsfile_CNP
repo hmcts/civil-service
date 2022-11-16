@@ -7,8 +7,8 @@ import uk.gov.hmcts.contino.AppPipelineDsl
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdDefBranch = "CIV-2356-COS-NotifyClaimScreen"
-def camundaBranch = "CIV-2356-COS-NotifyClaimScreen"
+def ccdDefBranch = "cosintegration"
+def camundaBranch = "cosintegration"
 
 AppPipelineConfig pipelineConf
 
