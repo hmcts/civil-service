@@ -484,9 +484,10 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             + "been notified and granted access to this claim.%n%n"
             + "You must notify the defendant with the claim details by %s";
 
-        private static final String CONFIRMATION_SUMMARY_COS = "<br />What happens next <br /> You must serve the claim"
-            + " details and complete the certificate of service notify claim details next step by 4:00pm on %s. "
-            + "This is a new online process-you dont need to file any further documents to the court";
+        private static final String CONFIRMATION_SUMMARY_COS = "<br /><h2 class=\"govuk-heading-m\">What happens"
+            +" next</h2> %n%n You must serve the claim details and complete the certificate of service notify claim"
+            +" details next step by 4:00pm on %s.%n%nThis is a new online process-you dont need to file any"
+            +" further documents to the court";
         public static final String CONFIRMATION_NOTIFICATION_ONE_PARTY_SUMMARY = "<br />Notification of claim sent to "
             + "1 Defendant legal representative only.%n%n"
             + "Your claim will proceed offline.";
