@@ -35,6 +35,7 @@ public interface NotificationData {
     //Default judgment
     String LEGAL_ORG_SPECIFIED = "legalOrg";
     String CLAIM_NUMBER = "claimnumber";
+
     String DEFENDANT_NAME = "DefendantName";
     String BOTH_DEFENDANTS = "Both Defendants";
     String CLAIM_NUMBER_INTERIM = "Claim number";
@@ -56,7 +57,7 @@ public interface NotificationData {
     String PIN = "pin";
     String FRONTEND_URL = "frontendBaseUrl";
 
-    //Hearing notification
+    //Case Progression
     String EMAIL_ADDRESS = "emailAddress";
     String HEARING_FEE = "hearingFee";
     String HEARING_DATE = "hearingDate";
