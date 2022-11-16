@@ -190,6 +190,7 @@ public class LocationRefDataService {
         }
         return LocationRefData.builder().build();
     }
+
     private URI buildURIforCourtCode(String courtCode) {
         String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
@@ -197,7 +198,6 @@ public class LocationRefDataService {
             .queryParam("is_case_management_location", "Y")
             .queryParam("court_location_code", courtCode)
             .queryParam("court_status", "Open");
-
 
         return builder.buildAndExpand(new HashMap<>()).toUri();
     }
