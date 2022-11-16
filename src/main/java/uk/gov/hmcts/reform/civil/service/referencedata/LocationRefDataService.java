@@ -20,6 +20,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.apache.logging.log4j.util.Strings.concat;
@@ -55,7 +56,9 @@ public class LocationRefDataService {
                 buildURIforCcmcc(),
                 HttpMethod.GET,
                 getHeaders(authToken),
-                new ParameterizedTypeReference<List<LocationRefData>>() {});
+                new ParameterizedTypeReference<List<LocationRefData>>() {
+                }
+            );
             List<LocationRefData> ccmccLocations = responseEntity.getBody();
             if (ccmccLocations == null || ccmccLocations.isEmpty()) {
                 log.warn("Location Reference Data Lookup did not return any CCMCC location");
@@ -187,7 +190,6 @@ public class LocationRefDataService {
         }
         return LocationRefData.builder().build();
     }
-
     private URI buildURIforCourtCode(String courtCode) {
         String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
