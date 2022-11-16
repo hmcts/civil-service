@@ -5,15 +5,24 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CourtLocation;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @SpringBootTest(classes = {
@@ -27,12 +36,35 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
     @Autowired
     private MigrateCaseDataCallbackHandler handler;
 
+    @MockBean
+    private CoreCaseDataService coreCaseDataService;
+
+    @MockBean
+    private  LocationRefDataService locationRefDataService;
+
+    private static final String USER_AUTH_TOKEN = "Bearer user-xyz";
+
+
     @Test
-    void shouldReturnNoError_whenAboutToSubmitIsInvoked() {
+    void shouldReturnNoError_whenAboutToSubmitIsInvoked_UNSPEC() {
+        //CourtLocation location = CourtLocation.builder().applicantPreferredCourt("123").build();
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
+            .courtLocation()
+            .respondent1DQWithLocation()
+         //   .respondent1DQWithLocation()
+            .applicant1DQWithLocation()
+           // .applicant2DQ()
             .build();
+
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+       // params.getParams().put(BEARER_TOKEN,USER_AUTH_TOKEN);
+        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "444")).thenReturn(
+            LocationRefData.builder().epimmsId("1234").region("1").build());
+        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "court4")).thenReturn(
+            LocationRefData.builder().epimmsId("1234").region("1").build());
+        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "127")).thenReturn(
+            LocationRefData.builder().epimmsId("1234").region("1").build());
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
@@ -41,28 +73,31 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
     }
 
     @Test
-    void shouldMigrateData_whenSpecClaim() {
+    void shouldReturnNoError_whenAboutToSubmitIsInvoked_SPEC() {
+        //CourtLocation location = CourtLocation.builder().applicantPreferredCourt("123").build();
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued()
-            .setSuperClaimTypeToSpecClaim()
+            .atStatePendingClaimIssued()
+            .courtLocation()
+            .respondent1DQWithLocation()
+            .respondent2DQWithLocation()
+            .applicant1DQWithLocation()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+            .applicant2DQWithLocation()
             .build();
+
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // params.getParams().put(BEARER_TOKEN,USER_AUTH_TOKEN);
+        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "444")).thenReturn(
+            LocationRefData.builder().epimmsId("1234").region("1").build());
+        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "court4")).thenReturn(
+            LocationRefData.builder().epimmsId("1234").region("1").build());
+        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "127")).thenReturn(
+            LocationRefData.builder().epimmsId("1234").region("1").build());
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
 
-        CaseData newCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-        assertThat(newCaseData.getCaseAccessCategory())
-            .isEqualTo(CaseCategory.SPEC_CLAIM);
-
-        assertThat(newCaseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole())
-            .isEqualTo(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
-
-        assertThat(newCaseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole())
-            .isEqualTo(CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
-
-        assertThat(newCaseData.getRespondent2OrganisationPolicy().getOrgPolicyCaseAssignedRole())
-            .isEqualTo(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
+        assertThat(response.getErrors()).isNull();
     }
+
 }

@@ -52,6 +52,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
 
         log.info("Migrating data for case: {}", oldCaseData.getCcdCaseReference());
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+
         CaseLocation caseLocation = CaseLocation.builder().baseLocation("420219").region("2").build();
         if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
             CaseMigratonUtility.migrateGS(oldCaseData, "AAA7",
