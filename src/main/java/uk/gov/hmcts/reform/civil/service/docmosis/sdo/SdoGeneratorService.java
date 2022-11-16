@@ -28,6 +28,7 @@ public class SdoGeneratorService {
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
     private final IdamClient idamClient;
+    private final FeatureToggleService toggleService;
 
     private final FeatureToggleService featuretoggleService;
 
@@ -40,6 +41,10 @@ public class SdoGeneratorService {
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
+
+            if (toggleService.isHearingAndListingSDOEnabled()) {
+                docmosisTemplate = DocmosisTemplates.SDO_SMALL_HNL;
+            }
             templateData = getTemplateDataSmall(caseData, judgeName);
         } else if (SdoHelper.isFastTrack(caseData)) {
             docmosisTemplate = featuretoggleService.isHearingAndListingSDOEnabled()
@@ -291,6 +296,8 @@ public class SdoGeneratorService {
                 SdoHelper.getSmallClaimsHearingTimeLabel(caseData)
             )
             .smallClaimsMethod(caseData.getSmallClaimsMethod())
+            // CIV-5514: smallClaimsMethodInPerson, smallClaimsMethodTelephoneHearing and
+            // smallClaimsMethodVideoConferenceHearing can be removed after HNL is live
             .smallClaimsMethodInPerson(caseData.getSmallClaimsMethodInPerson())
             .smallClaimsMethodTelephoneHearing(
                 SdoHelper.getSmallClaimsMethodTelephoneHearingLabel(caseData)
