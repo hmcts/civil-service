@@ -106,7 +106,6 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
                                                                  .responseCourtCode(null).build())
                                                          .build()).build();
 
-
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // params.getParams().put(BEARER_TOKEN,USER_AUTH_TOKEN);
         when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "444")).thenReturn(

@@ -346,15 +346,13 @@ class LocationRefDataServiceTest {
                 uriCaptor.capture(),
                 httpMethodCaptor.capture(),
                 httpEntityCaptor.capture(),
-                ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
+                ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()
+            ))
                 .thenReturn(mockedResponse);
-            LocationRefData result = refDataService.getCourtLocation("user_token","123");
-
-           // LocationRefData result = refDataService.getCcmccLocation("user_token");
-
+            LocationRefData result = refDataService.getCourtLocation("user_token", "123");
             verify(lrdConfiguration, times(1)).getUrl();
             verify(lrdConfiguration, times(1)).getEndpoint();
-            }
+        }
 
         @Test
         void shouldReturnLocations_whenLRDReturnsNullBody() {
