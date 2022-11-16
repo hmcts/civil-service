@@ -129,8 +129,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isNotNull();
             assertThat(response.getData()).extracting("claimantResponseScenarioFlag")
                 .isNotNull();
-            assertThat(response.getData()).extracting("superClaimType")
-                .isNotNull();
         }
 
         @Test

@@ -13,9 +13,10 @@ import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -36,14 +37,15 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RESPONDENT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC);
     public static final String TASK_ID_Respondent1 = "CreateClaimContinuingOnlineNotifyRespondent1ForSpec";
     private static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
-
-    private final DeadlinesCalculator deadlinesCalculator;
+    private static final String FIRST_CONTACT_PACK_LETTER_TYPE = "first-contact-pack";
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final ObjectMapper objectMapper;
     private final Time time;
     private final FeatureToggleService toggleService;
     private final PinInPostConfiguration pipInPostConfiguration;
+    private final PiPLetterGenerator pipLetterGenerator;
+    private final BulkPrintService bulkPrintService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -77,7 +79,6 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
             generatePIPEmail(caseData);
         }
 
-        // TODO Set Up for sending Mail
         generatePIPLetter(callbackParams);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -92,7 +93,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
-            RESPOND_URL, pipInPostConfiguration.getMoneyClaimUrl(),
+            RESPOND_URL, pipInPostConfiguration.getRespondToClaimUrl(),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             PIN, caseData.getRespondent1PinToPostLRspec().getAccessCode(),
             RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline()
@@ -103,7 +104,9 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
 
     private void generatePIPLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        byte[] letter = pipLetterGenerator.downloadLetter(caseData);
+        bulkPrintService.printLetter(letter, caseData.getLegacyCaseReference(),
+                                     caseData.getLegacyCaseReference(), FIRST_CONTACT_PACK_LETTER_TYPE);
     }
 
     private void generatePIPEmail(CaseData caseData) {
