@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Long.parseLong;
@@ -58,7 +59,8 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             .ofNullable(civilCaseData.getGeneralOrderDocument())
             .orElse(newArrayList());
 
-        if (generalAppCaseData.getGeneralOrderDocument() != null) {
+        if (generalAppCaseData.getGeneralOrderDocument() != null
+            && checkIfDocumentExists(generalOrderDocument, generalAppCaseData.getGeneralOrderDocument()) < 1) {
             generalOrderDocument.addAll(generalAppCaseData.getGeneralOrderDocument());
         }
 
@@ -66,7 +68,8 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             .ofNullable(civilCaseData.getDismissalOrderDocument())
             .orElse(newArrayList());
 
-        if (generalAppCaseData.getDismissalOrderDocument() != null) {
+        if (generalAppCaseData.getDismissalOrderDocument() != null
+            && checkIfDocumentExists(dismissalOrderDocument, generalAppCaseData.getDismissalOrderDocument()) < 1) {
             dismissalOrderDocument.addAll(generalAppCaseData.getDismissalOrderDocument());
         }
 
@@ -74,7 +77,8 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             .ofNullable(civilCaseData.getDirectionOrderDocument())
             .orElse(newArrayList());
 
-        if (generalAppCaseData.getDirectionOrderDocument() != null) {
+        if (generalAppCaseData.getDirectionOrderDocument() != null
+            && checkIfDocumentExists(directionOrderDocument, generalAppCaseData.getDirectionOrderDocument()) < 1) {
             directionOrderDocument.addAll(generalAppCaseData.getDirectionOrderDocument());
         }
 
@@ -84,5 +88,12 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         output.put("directionOrderDocument", directionOrderDocument.isEmpty() ? null : directionOrderDocument);
 
         return output;
+    }
+
+    private int checkIfDocumentExists(List<Element<CaseDocument>> civilCaseDocumentList,
+                                      List<Element<CaseDocument>> gaCaseDocumentlist) {
+        return civilCaseDocumentList.stream().filter(civilDocument -> gaCaseDocumentlist
+              .parallelStream().anyMatch(gaDocument -> gaDocument.getId().equals(civilDocument.getId())))
+            .collect(Collectors.toList()).size();
     }
 }
