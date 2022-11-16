@@ -39,6 +39,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
 
     private final CoreCaseDataService coreCaseDataService;
     private final LocationRefDataService locationRefDataService;
+
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
