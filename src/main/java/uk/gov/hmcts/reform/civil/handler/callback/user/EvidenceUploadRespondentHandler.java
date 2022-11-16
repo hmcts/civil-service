@@ -26,13 +26,13 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 
 @Service
 @RequiredArgsConstructor
-public class EvidenceUploadHandler extends CallbackHandler {
+public class EvidenceUploadRespondentHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(EVIDENCE_UPLOAD_APPLICANT);
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(EVIDENCE_UPLOAD_RESPONDENT);
     private final ObjectMapper objectMapper;
     private final Time time;
 
@@ -40,8 +40,8 @@ public class EvidenceUploadHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
-            .put(callbackKey(MID, "validateValuesApplicant"), this::validateValuesApplicant)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::documentUploadTimeApplicant)
+            .put(callbackKey(MID, "validateValuesRespondent"), this::validateValuesRespondent)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::documentUploadTimeRespondent)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -51,32 +51,32 @@ public class EvidenceUploadHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse validateValuesApplicant(CallbackParams callbackParams) {
+    private CallbackResponse validateValuesRespondent(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
-        applicantCheckDateCorrectness(errors, caseData.getDocumentUploadWitness1(), date -> date.getValue()
+        respondentCheckDateCorrectness(errors, caseData.getDocumentUploadWitness1Res(), date -> date.getValue()
                                  .getWitnessOption1UploadDate(),
                              "Invalid date: \"witness statement\" "
                                  + "date entered must not be in the future (1).");
-        applicantCheckDateCorrectness(errors, caseData.getDocumentUploadWitness3(), date -> date.getValue()
+        respondentCheckDateCorrectness(errors, caseData.getDocumentUploadWitness3Res(), date -> date.getValue()
                                  .getWitnessOption3UploadDate(),
                              "Invalid date: \"Notice of the intention to rely on hearsay evidence\" "
                                  + "date entered must not be in the future (2).");
 
-        applicantCheckDateCorrectness(errors, caseData.getDocumentUploadExpert1(), date -> date.getValue()
+        respondentCheckDateCorrectness(errors, caseData.getDocumentUploadExpert1Res(), date -> date.getValue()
                                  .getExpertOption1UploadDate(),
                              "Invalid date: \"Expert's report\""
                                  + " date entered must not be in the future (3).");
-        applicantCheckDateCorrectness(errors, caseData.getDocumentUploadExpert2(), date -> date.getValue()
+        respondentCheckDateCorrectness(errors, caseData.getDocumentUploadExpert2Res(), date -> date.getValue()
                                  .getExpertOption2UploadDate(),
                              "Invalid date: \"Joint statement of experts\" "
                                  + "date entered must not be in the future (4).");
-        applicantCheckDateCorrectness(errors, caseData.getDocumentUploadExpert3(), date -> date.getValue()
+        respondentCheckDateCorrectness(errors, caseData.getDocumentUploadExpert3Res(), date -> date.getValue()
                                  .getExpertOption3UploadDate(),
                              "Invalid date: \"Questions for other party's expert or joint experts\" "
                                  + "expert statement date entered must not be in the future (5).");
-        applicantCheckDateCorrectness(errors, caseData.getDocumentUploadExpert4(), date -> date.getValue()
+        respondentCheckDateCorrectness(errors, caseData.getDocumentUploadExpert4Res(), date -> date.getValue()
                                  .getExpertOption4UploadDate(),
                              "Invalid date: \"Answers to questions asked by the other party\" "
                                  + "date entered must not be in the future (6).");
@@ -86,23 +86,23 @@ public class EvidenceUploadHandler extends CallbackHandler {
             .build();
     }
 
-    <T> void applicantCheckDateCorrectness(List<String> errors, List<Element<T>> documentUploadApplicant,
+    <T> void respondentCheckDateCorrectness(List<String> errors, List<Element<T>> documentUploadRespondent,
                                   Function<Element<T>, LocalDate> dateExtractor, String errorMessage) {
-        if (documentUploadApplicant == null) {
+        if (documentUploadRespondent == null) {
             return;
         }
-        documentUploadApplicant.forEach(date -> {
-            LocalDate dateToCheckApplicant = dateExtractor.apply(date);
-            if (dateToCheckApplicant.isAfter(time.now().toLocalDate())) {
+        documentUploadRespondent.forEach(date -> {
+            LocalDate dateToCheckRespondent = dateExtractor.apply(date);
+            if (dateToCheckRespondent.isAfter(time.now().toLocalDate())) {
                 errors.add(errorMessage);
             }
         });
     }
 
-    private CallbackResponse documentUploadTimeApplicant(CallbackParams callbackParams) {
+    private CallbackResponse documentUploadTimeRespondent(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.caseDocumentUploadDate(time.now());
+        caseDataBuilder.caseDocumentUploadDateRes(time.now());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();

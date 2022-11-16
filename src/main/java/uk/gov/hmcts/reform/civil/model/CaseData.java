@@ -591,6 +591,54 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<DocumentWithName>> documentOnly;
     private final List<Element<DocumentAndNote>> documentAndNote;
     private final CaseNoteType caseNoteType;
+    //applicant
+    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure1;
+    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure2;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness1;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness2;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness3;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness4;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert1;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert2;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert3;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert4;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial1;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial2;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial3;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial4;
+    private final LocalDateTime caseDocumentUploadDate;
+    //respondent
+    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure1Res;
+    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure2Res;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness1Res;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness2Res;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness3Res;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness4Res;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert1Res;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert2Res;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert3Res;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert4Res;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial1Res;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial2Res;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial3Res;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial4Res;
+    private final LocalDateTime caseDocumentUploadDateRes;
+    //respondent
+    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure1Other;
+    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure2Other;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness1Other;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness2Other;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness3Other;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness4Other;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert1Other;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert2Other;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert3Other;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert4Other;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial1Other;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial2Other;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial3Other;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial4Other;
+    private final LocalDateTime caseDocumentUploadDateOther;
 
     private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure1;
     private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure2;
