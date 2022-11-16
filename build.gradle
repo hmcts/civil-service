@@ -120,6 +120,13 @@ allprojects {
         entry 'aws-java-sdk-kms'
         entry 'aws-java-sdk-s3'
       }
+      // Solves CVE-2020-17521
+      dependencySet(
+        group: 'org.codehaus.groovy',
+        version: '2.4.21'
+      ) {
+        entry 'groovy-all'
+      }
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2020.0.4'
