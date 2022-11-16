@@ -58,7 +58,7 @@ public class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
 
     @MockBean
-    private  SpecReferenceNumberRepository specReferenceNumberRepository;
+    private SpecReferenceNumberRepository specReferenceNumberRepository;
 
     @MockBean
     private Time time;
@@ -73,7 +73,7 @@ public class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToStatCallback {
 
         @Test
-        void shouldNotHaveErrors_whenAboutToStart(){
+        void shouldNotHaveErrors_whenAboutToStart() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssued()
                 .build();

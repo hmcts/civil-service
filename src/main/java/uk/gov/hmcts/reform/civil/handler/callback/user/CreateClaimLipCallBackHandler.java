@@ -63,8 +63,8 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
             .build();
     }
 
-    private CallbackResponse submitClaim(CallbackParams callbackParams){
-        CaseData.CaseDataBuilder caseDataBuilder =  callbackParams.getCaseData().toBuilder();
+    private CallbackResponse submitClaim(CallbackParams callbackParams) {
+        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
         caseDataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         caseDataBuilder.submittedDate(time.now());
         if (null != callbackParams.getRequest().getEventId()) {
@@ -75,7 +75,6 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
-
 
 
 }
