@@ -27,11 +27,15 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 public class CaseMigratonUtility {
 
+
+    private CaseMigratonUtility() {
+        //NO-OP
+    }
+
     // Applicable for both spec and unspec
     public static void migrateCaseManagementLocation(CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                                      CaseLocation caseLocation) {
         caseDataBuilder.caseManagementLocation(caseLocation);
-
     }
 
     public static void migrateUnspecCoutLocation(String authToken, CaseData oldCaseData,
@@ -50,7 +54,6 @@ public class CaseMigratonUtility {
                                           .applicantPreferredCourtLocationList(
                                               location.getApplicantPreferredCourtLocationList())
                                           .applicantPreferredCourt(location.getApplicantPreferredCourt()).build());
-
 
     }
 
@@ -79,9 +82,7 @@ public class CaseMigratonUtility {
             LocationRefData refdata = locationRefDataService.getCourtLocation(
                 authToken,
                 respondent1DQ.getRespondent1DQRequestedCourt()
-                    .getResponseCourtCode()
-
-            );
+                    .getResponseCourtCode());
 
             caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
                                               .respondent1DQRequestedCourt(respondent1DQ
@@ -120,10 +121,7 @@ public class CaseMigratonUtility {
             LocationRefData refdata = locationRefDataService.getCourtLocation(
                 authToken,
                 respondent2DQ.getRespondent2DQRequestedCourt()
-                    .getResponseCourtCode()
-
-            );
-
+                    .getResponseCourtCode() );
 
             CaseLocation location = CaseLocation.builder().baseLocation(refdata.getEpimmsId())
                 .region(refdata.getRegion()).build();
@@ -183,9 +181,7 @@ public class CaseMigratonUtility {
             LocationRefData refdata = locationRefDataService.getCourtLocation(
                 authToken,
                 applicant1DQ.getApplicant1DQRequestedCourt()
-                    .getResponseCourtCode()
-
-            );
+                    .getResponseCourtCode());
 
             caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
                                              .applicant1DQRequestedCourt(applicant1DQ
@@ -199,7 +195,7 @@ public class CaseMigratonUtility {
                                                                                                            .getRegion())
                                                                                                .build())
                                                                              .build()).build());
-        } else if(ofNullable(applicant1DQ).isPresent()) {
+        } else if (ofNullable(applicant1DQ).isPresent()) {
             caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
                                              .applicant1DQRequestedCourt(applicant1DQ
                                                                              .getApplicant1DQRequestedCourt()
@@ -224,9 +220,7 @@ public class CaseMigratonUtility {
             LocationRefData refdata = locationRefDataService.getCourtLocation(
                 authToken,
                 applicant2DQ.getApplicant2DQRequestedCourt()
-                    .getResponseCourtCode()
-
-            );
+                    .getResponseCourtCode());
 
             caseDataBuilder.applicant2DQ(applicant2DQ.toBuilder()
                                              .applicant2DQRequestedCourt(applicant2DQ
