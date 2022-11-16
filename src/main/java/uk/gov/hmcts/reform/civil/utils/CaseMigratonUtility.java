@@ -97,7 +97,7 @@ public class CaseMigratonUtility {
                                                                                                  .build())
                                                                                .build()).build());
 
-        } else {
+        } else  if(ofNullable(respondent1DQ).isPresent()) {
             caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
                                               .respondent1DQRequestedCourt(respondent1DQ
                                                                                .getRespondent1DQRequestedCourt()
@@ -158,7 +158,7 @@ public class CaseMigratonUtility {
                                                                                                  .build())
                                                                                .build()).build());
 
-        } else {
+        } else  if (ofNullable(respondent2DQ).isPresent()) {
             caseDataBuilder.respondent2DQ(respondent2DQ.toBuilder()
                                              .respondent2DQRequestedCourt(respondent2DQ
                                                                              .getRespondent2DQRequestedCourt()
@@ -199,7 +199,7 @@ public class CaseMigratonUtility {
                                                                                                            .getRegion())
                                                                                                .build())
                                                                              .build()).build());
-        } else {
+        } else if(ofNullable(applicant1DQ).isPresent()) {
             caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
                                              .applicant1DQRequestedCourt(applicant1DQ
                                                                              .getApplicant1DQRequestedCourt()
@@ -240,7 +240,7 @@ public class CaseMigratonUtility {
                                                                                                .build())
                                                                              .build()).build());
 
-        } else {
+        } else if(ofNullable(applicant2DQ).isPresent())  {
             caseDataBuilder.applicant2DQ(applicant2DQ.toBuilder()
                                              .applicant2DQRequestedCourt(applicant2DQ
                                                                              .getApplicant2DQRequestedCourt()
