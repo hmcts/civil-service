@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
+import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -332,6 +333,9 @@ public class CaseDataBuilder {
     private String caseListDisplayDefendantSolicitorReferences;
     private CertificateOfService cosNotifyClaimDetails1;
     private CertificateOfService cosNotifyClaimDetails2;
+
+    private TrialHearingTimeDJ trialHearingTimeDJ;
+    private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1025,6 +1029,14 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimDismissedPastHearingFeeDueDeadline() {
+        atStateHearingFeeDueUnpaid();
+        ccdState = CASE_DISMISSED;
+        caseDismissedHearingFeeDueDate = LocalDateTime.now();
+        hearingDate = hearingDueDate.plusWeeks(2);
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimIssuedUnrepresentedDefendants() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
         respondent2 = PartyBuilder.builder().individual().build();
@@ -1623,6 +1635,30 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimIssuedCaseManagementLocationInPerson() {
         caseManagementLocation = CaseLocation.builder().baseLocation("0123").region("0321").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateSdoTrialDj() {
+        trialHearingTimeDJ = TrialHearingTimeDJ.builder()
+            .helpText1("If either party considers that the time estimate is insufficient, "
+                           + "they must inform the court within 7 days of the date of this order.")
+            .helpText2("Not more than seven nor less than three clear days before the trial, "
+                           + "the claimant must file at court and serve an indexed and paginated bundle of "
+                           + "documents which complies with the requirements of Rule 39.5 Civil Procedure Rules "
+                           + "and which complies with requirements of PD32. The parties must endeavour to agree "
+                           + "the contents of the bundle before it is filed. The bundle will include a case "
+                           + "summary and a chronology.")
+            .hearingTimeEstimate(TrialHearingTimeEstimateDJ.ONE_HOUR)
+            .date1(LocalDate.parse("2022-01-01"))
+            .date2(LocalDate.parse("2022-01-02"))
+            .build();
+        trialOrderMadeWithoutHearingDJ = TrialOrderMadeWithoutHearingDJ.builder()
+            .input("This order has been made without a hearing. "
+                    + "Each party has the right to apply to have this Order "
+                    + "set aside or varied. Any such application must be "
+                    + "received by the Court "
+                    + "(together with the appropriate fee) by 4pm on 01 12 2022.")
+            .build();
         return this;
     }
 
@@ -3148,6 +3184,22 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateHearingFeeDueUnpaid() {
+        atStateApplicantRespondToDefenceAndProceed();
+        hearingDueDate = LocalDate.now().minusDays(1);
+        hearingFeePaymentDetails = PaymentDetails.builder().status(FAILED).build();
+        ccdState = HEARING_READINESS;
+        return this;
+    }
+
+    public CaseDataBuilder atStateHearingFeeDuePaid() {
+        atStateApplicantRespondToDefenceAndProceed();
+        hearingDueDate = LocalDate.now().minusDays(1);
+        hearingFeePaymentDetails = PaymentDetails.builder().status(SUCCESS).build();
+        ccdState = HEARING_READINESS;
+        return this;
+    }
+
     public CaseDataBuilder atStateBeforeTakenOfflineSDONotDrawn() {
 
         atStateApplicantRespondToDefenceAndProceed();
@@ -3595,6 +3647,7 @@ public class CaseDataBuilder {
             .applicantSolicitor1ClaimStatementOfTruth(applicantSolicitor1ClaimStatementOfTruth)
             .claimIssuedPaymentDetails(claimIssuedPaymentDetails)
             .claimFee(claimFee)
+            .hearingFeePaymentDetails(hearingFeePaymentDetails)
             .paymentReference(paymentReference)
             .applicantSolicitor1CheckEmail(applicantSolicitor1CheckEmail)
             .applicantSolicitor1UserDetails(applicantSolicitor1UserDetails)
@@ -3682,6 +3735,7 @@ public class CaseDataBuilder {
             .takenOfflineByStaffDate(takenOfflineByStaffDate)
             .unsuitableSDODate(unsuitableSDODate)
             .claimDismissedDate(claimDismissedDate)
+            .caseDismissedHearingFeeDueDate(caseDismissedHearingFeeDueDate)
             .addLegalRepDeadline(addLegalRepDeadline)
             .applicantSolicitor1ServiceAddress(applicantSolicitor1ServiceAddress)
             .respondentSolicitor1ServiceAddress(respondentSolicitor1ServiceAddress)
@@ -3691,6 +3745,8 @@ public class CaseDataBuilder {
             .defendantSolicitorNotifyClaimDetailsOptions(defendantSolicitorNotifyClaimDetailsOptions)
             .selectLitigationFriend(selectLitigationFriend)
             .caseNotes(caseNotes)
+            .hearingDueDate(hearingDueDate)
+            .hearingDate(hearingDate)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)
             .superClaimType(superClaimType == null ? UNSPEC_CLAIM : superClaimType)
@@ -3760,9 +3816,11 @@ public class CaseDataBuilder {
             .caseManagementLocation(caseManagementLocation)
             //Unsuitable for SDO
             .reasonNotSuitableSDO(reasonNotSuitableSDO)
-            //Certificate of Service
-            .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
-            .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
+            .trialHearingTimeDJ(trialHearingTimeDJ)
+            .trialOrderMadeWithoutHearingDJ(trialOrderMadeWithoutHearingDJ)
+                //Certificate of Service
+                .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
+                .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
             .build();
     }
 }
