@@ -11,7 +11,10 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 
 import java.util.Collections;
@@ -21,6 +24,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 
 @Slf4j
@@ -29,13 +33,15 @@ import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 public class CreateClaimLipCallBackHandler extends CallbackHandler {
 
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
+    private final SpecReferenceNumberRepository specReferenceNumberRepository;
+    private final Time time;
     private final ObjectMapper objectMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::setSuperClaimType)
-            .put(callbackKey(V_1, ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_START), this::lipClaimInitialState)
+            .put(callbackKey(V_1, ABOUT_TO_START), this::lipClaimInitialState)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
             .build();
@@ -48,7 +54,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         );
     }
 
-    private CallbackResponse setSuperClaimType(CallbackParams callbackParams) {
+    private CallbackResponse lipClaimInitialState(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.superClaimType(SPEC_CLAIM);
@@ -60,6 +66,11 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     private CallbackResponse submitClaim(CallbackParams callbackParams){
         CaseData.CaseDataBuilder caseDataBuilder =  callbackParams.getCaseData().toBuilder();
         caseDataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
+        caseDataBuilder.submittedDate(time.now());
+        if (null != callbackParams.getRequest().getEventId()) {
+            caseDataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
+            caseDataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
