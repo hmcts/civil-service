@@ -61,9 +61,9 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     private static final String CONFIRMATION_COS_HEADER = "# Certificate of Service - notify claim successful %n## %s";
 
     private static final String CONFIRMATION_SUMMARY_COS = "<br /><h2 class=\"govuk-heading-m\">What happens next</h2>"
-        +" %n%n You must serve the claim details and complete the certificate of service notify claim details next" +
-        " step by 4:00pm on %s.%n%nThis is a new online process-you dont need to file any further documents"
-        +" to the court";
+        + " %n%n You must serve the claim details and complete the certificate of service notify claim details next"
+        + " step by 4:00pm on %s.%n%nThis is a new online process-you dont need to file any further documents"
+        + " to the court";
 
     public static final String DOC_SERVED_DATE_IN_FUTURE =
         "Date you served the documents must be today or in the past";
