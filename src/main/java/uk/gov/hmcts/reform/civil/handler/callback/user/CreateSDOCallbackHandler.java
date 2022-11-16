@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
+import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -85,6 +86,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 
 @Service
 @RequiredArgsConstructor
@@ -114,6 +116,16 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         + "<br/>%s";
     private static final String UPON_CONSIDERING =
         "Upon considering the claim form, particulars of claim, statements of case and Directions questionnaires";
+    public static final String HEARING_TIME_TEXT_AFTER =
+        "The claimant must by no later than 14 days before the hearing date, pay the court the "
+            + "required hearing fee or submit a fully completed application for Help with Fees. If the "
+            + "claimant fails to pay the fee or obtain a fee exemption by that time the claim will be "
+            + "struck without further order.";
+    public static final String HEARING_TIME_TEXT_AFTER_HNL =
+        "The claimant must by no later than 4 weeks before the hearing date, pay the court the "
+            + "required hearing fee or submit a fully completed application for Help with Fees. If the "
+            + "claimant fails to pay the fee or obtain a fee exemption by that time the claim will be "
+            + "struck without further order.";
 
     private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
@@ -581,22 +593,29 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         SmallClaimsHearing tempSmallClaimsHearing = SmallClaimsHearing.builder()
             .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
                         + "The hearing will have a time estimate of")
-            .input2("The claimant must by no later than 14 days before the hearing date, pay the court the "
-                        + "required hearing fee or submit a fully completed application for Help with Fees. If the "
-                        + "claimant fails to pay the fee or obtain a fee exemption by that time the claim will be "
-                        + "struck without further order.")
+            .input2(featureToggleService.isHearingAndListingSDOEnabled() ? HEARING_TIME_TEXT_AFTER_HNL
+                        : HEARING_TIME_TEXT_AFTER)
             .build();
 
         updatedData.smallClaimsHearing(tempSmallClaimsHearing).build();
 
-        SmallClaimsNotes tempSmallClaimsNotes = SmallClaimsNotes.builder()
-            .input("This Order has been made without a hearing. Each party has the right to apply to have this Order "
-                       + "set aside or varied. Any such application must be received by the Court, "
-                       + "together with the appropriate fee by 4pm on")
-            .date(LocalDate.now().plusWeeks(1))
-            .build();
+        SmallClaimsNotes.SmallClaimsNotesBuilder tempSmallClaimsNotes = SmallClaimsNotes.builder();
+        if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            tempSmallClaimsNotes.input("Each party has the right to apply to have this Order set aside or varied. "
+                    + "Any such application must be received by the Court "
+                    + "(together with the appropriate fee) by 4pm on "
+                    + DateFormatHelper.formatLocalDate(
+                    deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5), DATE)
+            );
+        } else {
+            tempSmallClaimsNotes.input(
+                    "This Order has been made without a hearing. Each party has the right to apply to have this Order "
+                        + "set aside or varied. Any such application must be received by the Court, "
+                        + "together with the appropriate fee by 4pm on")
+                .date(LocalDate.now().plusWeeks(1));
+        }
 
-        updatedData.smallClaimsNotes(tempSmallClaimsNotes).build();
+        updatedData.smallClaimsNotes(tempSmallClaimsNotes.build()).build();
 
         SmallClaimsCreditHire tempSmallClaimsCreditHire = SmallClaimsCreditHire.builder()
             .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
@@ -870,4 +889,5 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsDocumentsToggle(checkList);
         updatedData.smallClaimsWitnessStatementToggle(checkList);
     }
+
 }

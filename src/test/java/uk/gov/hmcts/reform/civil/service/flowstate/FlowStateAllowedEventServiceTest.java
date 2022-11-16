@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -50,6 +51,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
@@ -68,6 +70,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITIN
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_ISSUED;
@@ -217,7 +220,6 @@ class FlowStateAllowedEventServiceTest {
                         CHANGE_SOLICITOR_EMAIL,
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
-                        HEARING_SCHEDULED,
                         NotSuitable_SDO,
                         EVIDENCE_UPLOAD_JUDGE,
                         EVIDENCE_UPLOAD,
@@ -271,6 +273,7 @@ class FlowStateAllowedEventServiceTest {
                         STANDARD_DIRECTION_ORDER_DJ,
                         TAKE_CASE_OFFLINE,
                         EVIDENCE_UPLOAD_JUDGE,
+                        HEARING_FEE_UNPAID,
                         HEARING_SCHEDULED,
                         EVIDENCE_UPLOAD,
                         migrateCase
@@ -484,6 +487,8 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
+                        HEARING_SCHEDULED,
+                        HEARING_FEE_UNPAID,
                         REFER_TO_JUDGE,
                         migrateCase
                     }
@@ -529,6 +534,12 @@ class FlowStateAllowedEventServiceTest {
                         REFER_TO_JUDGE,
                         APPLICATION_CLOSED_UPDATE_CLAIM,
                         migrateCase
+                    }
+                ),
+                of(
+                    CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE,
+                    new CaseEvent[]{
+                        CASE_PROCEEDS_IN_CASEMAN
                     }
                 ),
                 of(
@@ -723,6 +734,7 @@ class FlowStateAllowedEventServiceTest {
                         NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(),
                         CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName(),
                         CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName(),
+                        CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName(),
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
                         AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()
                     }
@@ -919,5 +931,14 @@ class FlowStateAllowedEventServiceTest {
             assertThat(flowStateAllowedEventService.isAllowed(caseDetails, caseEvent))
                 .isEqualTo(expected);
         }
+    }
+
+    @Test
+    void shouldReturnTrue_whenCaseEventIsMigrateCase() {
+        CaseDetails caseDetails =
+            CaseDetailsBuilder.builder()
+            .atStateAwaitingCaseDetailsNotification().build();
+        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, migrateCase))
+            .isEqualTo(true);
     }
 }
