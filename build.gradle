@@ -111,6 +111,15 @@ allprojects {
       ) {
         entry 'camunda-engine'
       }
+      // Solves CVE-2022-31159
+      dependencySet(
+        group: 'com.amazonaws',
+        version: '1.12.261'
+      ) {
+        entry 'aws-java-sdk-core'
+        entry 'aws-java-sdk-kms'
+        entry 'aws-java-sdk-s3'
+      }
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2020.0.4'
