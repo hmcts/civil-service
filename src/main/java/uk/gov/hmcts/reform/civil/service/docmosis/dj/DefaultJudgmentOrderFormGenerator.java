@@ -179,8 +179,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
                                       ? getDynamicListValueLabel(caseData.getTrialHearingMethodInPersonDJ()) : null)
             .applicant(checkApplicantPartyName(caseData)
                            ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
-            .respondent(checkDefendantRequested(caseData).toUpperCase())
-            .build();
+            .respondent(checkDefendantRequested(caseData).toUpperCase());
 
         if (featureToggleService.isNoticeOfChangeEnabled()) {
             djTrialTemplateBuilder
