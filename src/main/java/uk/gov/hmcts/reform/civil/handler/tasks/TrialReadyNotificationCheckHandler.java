@@ -6,17 +6,17 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.event.TrialReadyEvent;
-import uk.gov.hmcts.reform.civil.service.search.TrialReadySearchService;
+import uk.gov.hmcts.reform.civil.event.TrialReadyNotificationEvent;
+import uk.gov.hmcts.reform.civil.service.search.TrialReadyNotificationSearchService;
 
 import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class TrialReadyCheckHandler implements BaseExternalTaskHandler {
+public class TrialReadyNotificationCheckHandler implements BaseExternalTaskHandler {
 
-    private final TrialReadySearchService caseSearchService;
+    private final TrialReadyNotificationSearchService caseSearchService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
@@ -26,7 +26,7 @@ public class TrialReadyCheckHandler implements BaseExternalTaskHandler {
 
         cases.forEach(caseDetails -> {
             try {
-                applicationEventPublisher.publishEvent(new TrialReadyEvent(caseDetails.getId()));
+                applicationEventPublisher.publishEvent(new TrialReadyNotificationEvent(caseDetails.getId()));
             } catch (Exception e) {
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }

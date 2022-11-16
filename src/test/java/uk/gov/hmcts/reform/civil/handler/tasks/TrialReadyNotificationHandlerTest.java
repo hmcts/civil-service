@@ -11,8 +11,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.event.TakeCaseOfflineEvent;
-import uk.gov.hmcts.reform.civil.event.TrialReadyEvent;
-import uk.gov.hmcts.reform.civil.service.search.TrialReadySearchService;
+import uk.gov.hmcts.reform.civil.event.TrialReadyNotificationEvent;
+import uk.gov.hmcts.reform.civil.service.search.TrialReadyNotificationSearchService;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
-class TrialReadyCheckHandlerTest {
+class TrialReadyNotificationHandlerTest {
 
     @Mock
     private ExternalTask mockTask;
@@ -39,13 +39,13 @@ class TrialReadyCheckHandlerTest {
     private ExternalTaskService externalTaskService;
 
     @Mock
-    private TrialReadySearchService searchService;
+    private TrialReadyNotificationSearchService searchService;
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
-    private TrialReadyCheckHandler handler;
+    private TrialReadyNotificationCheckHandler handler;
 
     @BeforeEach
     void init() {
@@ -63,7 +63,7 @@ class TrialReadyCheckHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(applicationEventPublisher).publishEvent(new TrialReadyEvent(caseId));
+        verify(applicationEventPublisher).publishEvent(new TrialReadyNotificationEvent(caseId));
         verify(externalTaskService).complete(mockTask);
     }
 
@@ -137,8 +137,8 @@ class TrialReadyCheckHandlerTest {
             anyLong()
         );
 
-        verify(applicationEventPublisher, times(2)).publishEvent(any(TrialReadyEvent.class));
-        verify(applicationEventPublisher).publishEvent(new TrialReadyEvent(caseId));
-        verify(applicationEventPublisher).publishEvent(new TrialReadyEvent(otherId));
+        verify(applicationEventPublisher, times(2)).publishEvent(any(TrialReadyNotificationEvent.class));
+        verify(applicationEventPublisher).publishEvent(new TrialReadyNotificationEvent(caseId));
+        verify(applicationEventPublisher).publishEvent(new TrialReadyNotificationEvent(otherId));
     }
 }

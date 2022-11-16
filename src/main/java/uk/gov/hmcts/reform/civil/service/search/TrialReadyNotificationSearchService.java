@@ -17,9 +17,9 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 
 @Service
-public class TrialReadySearchService extends ElasticSearchService {
+public class TrialReadyNotificationSearchService extends ElasticSearchService {
 
-    public TrialReadySearchService(CoreCaseDataService coreCaseDataService) {
+    public TrialReadyNotificationSearchService(CoreCaseDataService coreCaseDataService) {
         super(coreCaseDataService);
     }
 

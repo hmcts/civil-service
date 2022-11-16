@@ -13,11 +13,11 @@ import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
-class TrialReadyCheckSearchServiceTest extends ElasticSearchServiceTest {
+class TrialReadyNotificationSearchServiceTest extends ElasticSearchServiceTest {
 
     @BeforeEach
     void setup() {
-        searchService = new TrialReadySearchService(coreCaseDataService);
+        searchService = new TrialReadyNotificationSearchService(coreCaseDataService);
     }
 
     @Override

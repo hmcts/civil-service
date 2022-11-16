@@ -22,20 +22,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
-    TrialReadyCallbackHandler.class,
+    TrialReadyNotificationCallbackHandler.class,
     JacksonAutoConfiguration.class
 })
-class TrialReadyCheckCallbackHandlerTest extends BaseCallbackHandlerTest {
+class TrialReadyNotificationCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private Time time;
 
     @Autowired
-    private TrialReadyCallbackHandler handler;
+    private TrialReadyNotificationCallbackHandler handler;
 
     @Nested
     class AboutToStartCallback {
@@ -71,7 +71,7 @@ class TrialReadyCheckCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
-                .isEqualTo(TRIAL_READY.name());
+                .isEqualTo(TRIAL_READY_NOTIFICATION.name());
 
             assertThat(response.getData())
                 .extracting("businessProcess")

@@ -3144,7 +3144,7 @@ public class CaseDataBuilder {
         takenOfflineDate = respondent1ResponseDate.plusDays(1);
         return this;
     }
-    
+
     public CaseDataBuilder atStateHearingFeeDuePaid() {
         atStateApplicantRespondToDefenceAndProceed();
         hearingDueDate = now().minusDays(1);
