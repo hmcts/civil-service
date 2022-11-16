@@ -2,11 +2,11 @@
 
 branchName=$1
 
-#Checkout specific branch pf  civil camunda bpmn definition
+#Checkout specific branch pf  civil-ccd-definition
 git clone https://github.com/hmcts/civil-ccd-definition.git
 cd civil-ccd-definition
 
-echo "Switch to ${branchName} branch on civil-camunda-bpmn-definition"
+echo "Switch to ${branchName} branch on civil-ccd-definition"
 git checkout ${branchName}
 cd ..
 
