@@ -306,6 +306,8 @@ public class StateFlowEngine {
                             .and(respondent2NotRepresented)))
             .state(PENDING_CLAIM_ISSUED)
                 .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued)
+            .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COS)
+                .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued)
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
                 .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT)
                     .onlyIf(takenOfflineBySystem
