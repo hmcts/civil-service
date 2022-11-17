@@ -60,12 +60,14 @@ public class ResponseDeadlineExtensionDefendantNotificationHandler
     private CallbackResponse notifySolicitorsForDeadlineExtension(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        notificationService.sendMail(
-            caseData.getRespondent1().getPartyEmail(),
-            notificationsProperties.getRespondentDeadlineExtension(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        if (caseData.getRespondent1() != null && caseData.getRespondent1().getPartyEmail() != null) {
+            notificationService.sendMail(
+                caseData.getRespondent1().getPartyEmail(),
+                notificationsProperties.getRespondentDeadlineExtension(),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
