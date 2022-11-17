@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.hearing.HFPbaDetails;
+import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
@@ -104,7 +104,7 @@ class PaymentsServiceTest {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
         CaseData caseData = CaseData.builder()
-            .hearingFeePBADetails(HFPbaDetails.builder().build())
+            .serviceRequestPBADetails(SRPbaDetails.builder().build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .build();
 
@@ -120,7 +120,7 @@ class PaymentsServiceTest {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
         CaseData caseData = CaseData.builder()
-            .hearingFeePBADetails(HFPbaDetails.builder()
+            .serviceRequestPBADetails(SRPbaDetails.builder()
                                       .fee(Fee.builder()
                                                .calculatedAmountInPence(BigDecimal.valueOf(10800))
                                                .version("1")
@@ -141,7 +141,7 @@ class PaymentsServiceTest {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
         CaseData caseData = CaseData.builder()
-            .hearingFeePBADetails(HFPbaDetails.builder()
+            .serviceRequestPBADetails(SRPbaDetails.builder()
                                       .fee(Fee.builder()
                                                .code("FEE0442")
                                                .version("1")
@@ -161,7 +161,7 @@ class PaymentsServiceTest {
         void shouldCreateCreditAccountPayment_whenValidCaseDetails() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                 .organisationID("OrgId").build();
-        HFPbaDetails hfPbaDetails = HFPbaDetails.builder()
+        SRPbaDetails hfPbaDetails = SRPbaDetails.builder()
                 .serviceReqReference("request-reference")
                 .applicantsPbaAccounts(DynamicList.builder()
                                            .value(DynamicListElement
@@ -174,7 +174,7 @@ class PaymentsServiceTest {
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
                 .build();
 
-        caseData = caseData.toBuilder().hearingFeePBADetails(hfPbaDetails).build();
+        caseData = caseData.toBuilder().serviceRequestPBADetails(hfPbaDetails).build();
         PBAServiceRequestResponse paymentResponse = paymentsService
                 .createCreditAccountPayment(caseData, AUTH_TOKEN);
 

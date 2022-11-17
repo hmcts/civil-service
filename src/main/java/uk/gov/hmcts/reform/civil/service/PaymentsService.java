@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.hearing.HFPbaDetails;
+import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.CasePaymentRequestDto;
@@ -35,13 +35,13 @@ public class PaymentsService {
 
     public void validateRequest(CaseData caseData) {
         String error = null;
-        HFPbaDetails hearingFeePBADetails = caseData.getHearingFeePBADetails();
-        if (hearingFeePBADetails == null) {
+        SRPbaDetails serviceRequestPBADetails = caseData.getServiceRequestPBADetails();
+        if (serviceRequestPBADetails == null) {
             error = "Hearing Fee details not received.";
-        } else if (hearingFeePBADetails.getFee() == null
-            || hearingFeePBADetails.getFee().getCalculatedAmountInPence() == null
-            || isBlank(hearingFeePBADetails.getFee().getVersion())
-            || isBlank(hearingFeePBADetails.getFee().getCode())) {
+        } else if (serviceRequestPBADetails.getFee() == null
+            || serviceRequestPBADetails.getFee().getCalculatedAmountInPence() == null
+            || isBlank(serviceRequestPBADetails.getFee().getVersion())
+            || isBlank(serviceRequestPBADetails.getFee().getCode())) {
             error = "Fees are not set correctly.";
         }
         if (!isBlank(error)) {
@@ -50,7 +50,7 @@ public class PaymentsService {
     }
 
     private PBAServiceRequestDTO buildRequest(CaseData caseData) {
-        HFPbaDetails hearingFeePBADetails = caseData.getHearingFeePBADetails();
+        SRPbaDetails serviceRequestPBADetails = caseData.getServiceRequestPBADetails();
         FeeDto claimFee = caseData.getClaimFee().toFeeDto();
         var organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
         var organisationName = organisationService.findOrganisationById(organisationId)
@@ -58,10 +58,10 @@ public class PaymentsService {
             .orElseThrow(RuntimeException::new);
         PBAServiceRequestDTO pbaServiceRequestDTO = null;
         pbaServiceRequestDTO = PBAServiceRequestDTO.builder()
-                .accountNumber(hearingFeePBADetails.getApplicantsPbaAccounts()
+                .accountNumber(serviceRequestPBADetails.getApplicantsPbaAccounts()
                                    .getValue().getLabel())
                 .amount(claimFee.getCalculatedAmount())
-                .customerReference(hearingFeePBADetails.getPbaReference())
+                .customerReference(serviceRequestPBADetails.getPbaReference())
                 .organisationName(organisationName)
                 .idempotencyKey(String.valueOf(UUID.randomUUID()))
                 .build();
@@ -69,7 +69,7 @@ public class PaymentsService {
     }
 
     public PBAServiceRequestResponse createCreditAccountPayment(CaseData caseData, String authToken) {
-        String serviceReqReference = caseData.getHearingFeePBADetails().getServiceReqReference();
+        String serviceReqReference = caseData.getServiceRequestPBADetails().getServiceReqReference();
         return paymentsClient.createPbaPayment(serviceReqReference, authToken, buildRequest(caseData));
     }
 
@@ -78,8 +78,8 @@ public class PaymentsService {
     }
 
     private CreateServiceRequestDTO buildServiceRequest(CaseData caseData) {
-        HFPbaDetails hearingFeePBADetails = caseData.getHearingFeePBADetails();
-        FeeDto feeResponse = hearingFeePBADetails.getFee().toFeeDto();
+        SRPbaDetails serviceRequestPBADetails = caseData.getServiceRequestPBADetails();
+        FeeDto feeResponse = serviceRequestPBADetails.getFee().toFeeDto();
         String siteId = caseData.getSuperClaimType().equals(SPEC_CLAIM)
             ? paymentsConfiguration.getSpecSiteId() : paymentsConfiguration.getSiteId();
         return CreateServiceRequestDTO.builder()

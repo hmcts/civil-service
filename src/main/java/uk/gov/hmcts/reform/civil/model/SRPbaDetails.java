@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.hearing;
+package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 @Data
 @Builder(toBuilder = true)
-public class HFPbaDetails {
+public class SRPbaDetails {
 
     private final DynamicList applicantsPbaAccounts;
     private final String pbaReference;
@@ -24,7 +24,7 @@ public class HFPbaDetails {
     private final String serviceReqReference;
 
     @JsonCreator
-    HFPbaDetails(@JsonProperty("applicantsPbaAccounts") DynamicList applicantsPbaAccounts,
+    SRPbaDetails(@JsonProperty("applicantsPbaAccounts") DynamicList applicantsPbaAccounts,
                  @JsonProperty("pbaReference") String pbaReference,
                  @JsonProperty("fee") Fee fee,
                  @JsonProperty("paymentDetails") PaymentDetails paymentDetails,

@@ -83,7 +83,7 @@ import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
-import uk.gov.hmcts.reform.civil.model.hearing.HFPbaDetails;
+import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
@@ -279,7 +279,7 @@ public class CaseDataBuilder {
     protected LocalDateTime respondent1LitigationFriendCreatedDate;
     protected LocalDateTime respondent2LitigationFriendCreatedDate;
 
-    public HFPbaDetails hfPbaDetails;
+    public SRPbaDetails srPbaDetails;
 
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
     protected SolicitorOrganisationDetails respondentSolicitor2OrganisationDetails;
@@ -3491,8 +3491,8 @@ public class CaseDataBuilder {
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
-            .hearingFeePBADetails(
-                HFPbaDetails.builder()
+            .serviceRequestPBADetails(
+                SRPbaDetails.builder()
                         .fee(
                         Fee.builder()
                             .code("FE203")
@@ -3513,8 +3513,8 @@ public class CaseDataBuilder {
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-            .hearingFeePBADetails(
-                HFPbaDetails.builder()
+            .serviceRequestPBADetails(
+                SRPbaDetails.builder()
                     .paymentDetails(PaymentDetails.builder()
                                         .status(PaymentStatus.FAILED)
                                         .reference("RC-1658-4258-2679-9795")
@@ -3540,8 +3540,8 @@ public class CaseDataBuilder {
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-            .hearingFeePBADetails(
-                HFPbaDetails.builder()
+            .serviceRequestPBADetails(
+                SRPbaDetails.builder()
                     .paymentSuccessfulDate(LocalDateTime.of(
                         LocalDate.of(2020, 01, 01),
                         LocalTime.of(12, 00, 00)
@@ -3772,7 +3772,7 @@ public class CaseDataBuilder {
             .trialHearingTrialDJ(trialHearingTrialDJ)
             .disposalHearingJudgesRecitalDJ(disposalHearingJudgesRecitalDJ)
             .trialHearingJudgesRecitalDJ(trialHearingJudgesRecitalDJ)
-            .hearingFeePBADetails(hfPbaDetails)
+            .serviceRequestPBADetails(srPbaDetails)
             .changeOfRepresentation(changeOfRepresentation)
             .changeOrganisationRequestField(changeOrganisationRequest)
             .unassignedCaseListDisplayOrganisationReferences(unassignedCaseListDisplayOrganisationReferences)

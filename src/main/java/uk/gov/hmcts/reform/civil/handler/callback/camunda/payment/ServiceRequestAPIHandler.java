@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.model.hearing.HFPbaDetails;
+import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 
 import java.util.ArrayList;
@@ -60,12 +60,12 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
             log.info("calling payment service request " + caseData.getCcdCaseReference());
             var serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
                 .getServiceRequestReference();
-            HFPbaDetails pbaDetails = caseData.getHearingFeePBADetails();
+            SRPbaDetails pbaDetails = caseData.getServiceRequestPBADetails();
             caseData = caseData.toBuilder()
-                .hearingFeePBADetails(pbaDetails.toBuilder()
-                                          .applicantsPbaAccounts(caseData.getHearingFeePBADetails()
+                .serviceRequestPBADetails(pbaDetails.toBuilder()
+                                          .applicantsPbaAccounts(caseData.getServiceRequestPBADetails()
                                                                      .getApplicantsPbaAccounts())
-                                          .fee(caseData.getHearingFeePBADetails().getFee())
+                                          .fee(caseData.getServiceRequestPBADetails().getFee())
                                           .serviceReqReference(serviceRequestReference).build())
                 .build();
 
