@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -307,6 +308,13 @@ public class CaseDataParent implements MappableObject {
     private final ScheduledHearing nextHearingDetails;
 
     private final String respondent1EmailAddress;
+
+    /**
+     * Adding for LR ITP Update
+     */
+    private final ResponseOneVOneShowTag showResponseOneVOneFlag;
+    private final CaseDocument respondent1ClaimResponseDocumentSpec;
+    private final CaseDocument respondent2ClaimResponseDocumentSpec;
 
     private final String migrationId;
 

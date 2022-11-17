@@ -71,8 +71,10 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 sealedForm.getDocumentName(),
                 caseData
             );
+            builder.respondent1ClaimResponseDocumentSpec(stitchedDocument);
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
         } else {
+            builder.respondent1ClaimResponseDocumentSpec(sealedForm);
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(sealedForm));
         }
 

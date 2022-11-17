@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -248,6 +249,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             && featureToggleService.isAccessProfilesEnabled()) {
             updatedCaseData.respondent1Copy(caseData.getRespondent1())
                 .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
+                .showResponseOneVOneFlag(setUpOneVOneFlow(caseData))
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         } else {
@@ -337,5 +339,23 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 claimNumber
             );
         }
+    }
+
+    private ResponseOneVOneShowTag setUpOneVOneFlow(CaseData caseData) {
+        if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+            switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
+                case FULL_DEFENCE:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE;
+                case FULL_ADMISSION:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT;
+                case PART_ADMISSION:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT;
+                case COUNTER_CLAIM:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_COUNTER_CLAIM;
+                default:
+                    return null;
+            }
+        }
+        return null;
     }
 }
