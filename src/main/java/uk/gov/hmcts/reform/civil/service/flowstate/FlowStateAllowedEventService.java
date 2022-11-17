@@ -48,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
@@ -227,7 +228,8 @@ public class FlowStateAllowedEventService {
                 HEARING_FEE_UNPAID,
                 HEARING_SCHEDULED,
                 EVIDENCE_UPLOAD,
-                migrateCase
+                migrateCase,
+                TRIAL_READINESS
             )
         ),
 
@@ -451,7 +453,8 @@ public class FlowStateAllowedEventService {
                 HEARING_SCHEDULED,
                 HEARING_FEE_UNPAID,
                 REFER_TO_JUDGE,
-                migrateCase
+                migrateCase,
+                TRIAL_READINESS
             )
         ),
 
@@ -855,7 +858,8 @@ public class FlowStateAllowedEventService {
                 HEARING_SCHEDULED,
                 HEARING_FEE_UNPAID,
                 REFER_TO_JUDGE,
-                migrateCase
+                migrateCase,
+                TRIAL_READINESS
             )
         ),
 
