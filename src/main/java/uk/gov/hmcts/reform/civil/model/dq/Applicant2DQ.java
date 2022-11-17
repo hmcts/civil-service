@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
@@ -10,24 +12,26 @@ import uk.gov.hmcts.reform.civil.model.documents.Document;
 @Setter
 @Data
 @Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class Applicant2DQ implements DQ {
 
-    private final FileDirectionsQuestionnaire applicant2DQFileDirectionsQuestionnaire;
-    private final DisclosureOfElectronicDocuments applicant2DQDisclosureOfElectronicDocuments;
-    private final DisclosureOfNonElectronicDocuments applicant2DQDisclosureOfNonElectronicDocuments;
-    private final DisclosureReport applicant2DQDisclosureReport;
-    private final Experts applicant2DQExperts;
-    private final ExpertDetails applicant2RespondToClaimExperts;
-    private final Witnesses applicant2DQWitnesses;
-    private final Hearing applicant2DQHearing;
-    private final SmallClaimHearing applicant2DQSmallClaimHearing;
-    private final Document applicant2DQDraftDirections;
-    private final RequestedCourt applicant2DQRequestedCourt;
-    private final HearingSupport applicant2DQHearingSupport;
-    private final FurtherInformation applicant2DQFurtherInformation;
-    private final WelshLanguageRequirements applicant2DQLanguage;
-    private final StatementOfTruth applicant2DQStatementOfTruth;
-    private final VulnerabilityQuestions applicant2DQVulnerabilityQuestions;
+    private FileDirectionsQuestionnaire applicant2DQFileDirectionsQuestionnaire;
+    private DisclosureOfElectronicDocuments applicant2DQDisclosureOfElectronicDocuments;
+    private DisclosureOfNonElectronicDocuments applicant2DQDisclosureOfNonElectronicDocuments;
+    private DisclosureReport applicant2DQDisclosureReport;
+    private Experts applicant2DQExperts;
+    private ExpertDetails applicant2RespondToClaimExperts;
+    private Witnesses applicant2DQWitnesses;
+    private Hearing applicant2DQHearing;
+    private SmallClaimHearing applicant2DQSmallClaimHearing;
+    private Document applicant2DQDraftDirections;
+    private RequestedCourt applicant2DQRequestedCourt;
+    private HearingSupport applicant2DQHearingSupport;
+    private FurtherInformation applicant2DQFurtherInformation;
+    private WelshLanguageRequirements applicant2DQLanguage;
+    private StatementOfTruth applicant2DQStatementOfTruth;
+    private VulnerabilityQuestions applicant2DQVulnerabilityQuestions;
 
     @Override
     @JsonProperty("applicant2DQFileDirectionsQuestionnaire")

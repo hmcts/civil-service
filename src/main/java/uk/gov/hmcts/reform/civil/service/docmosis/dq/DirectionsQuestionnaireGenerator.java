@@ -437,11 +437,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         RequestedCourt rc = dq.getRequestedCourt();
         if (rc == null) {
             return RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(NO)
                 .build();
         } else {
             return RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(ofNullable(rc.getRequestHearingAtSpecificCourt()).orElse(NO))
                 .responseCourtCode(rc.getResponseCourtCode())
                 .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt())
                 .build();

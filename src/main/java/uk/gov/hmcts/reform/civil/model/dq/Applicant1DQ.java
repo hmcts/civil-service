@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
@@ -10,27 +12,29 @@ import uk.gov.hmcts.reform.civil.model.documents.Document;
 @Setter
 @Data
 @Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class Applicant1DQ implements DQ {
 
-    private final FileDirectionsQuestionnaire applicant1DQFileDirectionsQuestionnaire;
-    private final DisclosureOfElectronicDocuments applicant1DQDisclosureOfElectronicDocuments;
-    private final DisclosureOfNonElectronicDocuments applicant1DQDisclosureOfNonElectronicDocuments;
-    private final DisclosureReport applicant1DQDisclosureReport;
-    private final Experts applicant1DQExperts;
-    private final ExpertDetails applicant1RespondToClaimExperts;
-    private final Witnesses applicant1DQWitnesses;
-    private final Hearing applicant1DQHearing;
-    private final HearingLRspec applicant1DQHearingLRspec;
-    private final SmallClaimHearing applicant1DQSmallClaimHearing;
-    private final Document applicant1DQDraftDirections;
-    private final RequestedCourt applicant1DQRequestedCourt;
-    private final HearingSupport applicant1DQHearingSupport;
-    private final FurtherInformation applicant1DQFurtherInformation;
-    private final WelshLanguageRequirements applicant1DQLanguage;
-    private final StatementOfTruth applicant1DQStatementOfTruth;
-    private final VulnerabilityQuestions applicant1DQVulnerabilityQuestions;
-    private final FutureApplications applicant1DQFutureApplications;
-    private final WelshLanguageRequirements applicant1DQLanguageLRspec;
+    private FileDirectionsQuestionnaire applicant1DQFileDirectionsQuestionnaire;
+    private DisclosureOfElectronicDocuments applicant1DQDisclosureOfElectronicDocuments;
+    private DisclosureOfNonElectronicDocuments applicant1DQDisclosureOfNonElectronicDocuments;
+    private DisclosureReport applicant1DQDisclosureReport;
+    private Experts applicant1DQExperts;
+    private ExpertDetails applicant1RespondToClaimExperts;
+    private Witnesses applicant1DQWitnesses;
+    private Hearing applicant1DQHearing;
+    private HearingLRspec applicant1DQHearingLRspec;
+    private SmallClaimHearing applicant1DQSmallClaimHearing;
+    private Document applicant1DQDraftDirections;
+    private RequestedCourt applicant1DQRequestedCourt;
+    private HearingSupport applicant1DQHearingSupport;
+    private FurtherInformation applicant1DQFurtherInformation;
+    private WelshLanguageRequirements applicant1DQLanguage;
+    private StatementOfTruth applicant1DQStatementOfTruth;
+    private VulnerabilityQuestions applicant1DQVulnerabilityQuestions;
+    private FutureApplications applicant1DQFutureApplications;
+    private WelshLanguageRequirements applicant1DQLanguageLRspec;
 
     @Override
     @JsonProperty("applicant1DQFileDirectionsQuestionnaire")
@@ -110,9 +114,10 @@ public class Applicant1DQ implements DQ {
 
         if (applicant1DQRequestedCourt != null) {
             return RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(applicant1DQRequestedCourt.getRequestHearingAtSpecificCourt())
                 .responseCourtCode(applicant1DQRequestedCourt.getResponseCourtCode())
                 .reasonForHearingAtSpecificCourt(applicant1DQRequestedCourt.getReasonForHearingAtSpecificCourt())
+                .caseLocation(applicant1DQRequestedCourt.getCaseLocation())
+                .responseCourtLocations(applicant1DQRequestedCourt.getResponseCourtLocations())
                 .build();
         }
         return null;

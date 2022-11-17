@@ -4,6 +4,7 @@ import feign.FeignException;
 import feign.Request;
 import feign.Response;
 import org.camunda.bpm.client.exception.NotFoundException;
+import org.camunda.bpm.client.exception.RestException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -211,7 +212,8 @@ class CaseEventTaskHandlerTest {
         void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
             String errorMessage = "there was an error";
 
-            doThrow(new NotFoundException(errorMessage)).when(externalTaskService).complete(mockTask);
+            doThrow(new NotFoundException(errorMessage, new RestException(errorMessage, new Exception())))
+                .when(externalTaskService).complete(mockTask);
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -700,7 +702,8 @@ class CaseEventTaskHandlerTest {
                               "ONE_RESPONDENT_REPRESENTATIVE", false,
                               "RPA_CONTINUOUS_FEED", false,
                               FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
-                              FlowFlag.NOTICE_OF_CHANGE.name(), true
+                              FlowFlag.NOTICE_OF_CHANGE.name(), true,
+                              FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false
                 );
             } else if (state.equals(TAKEN_OFFLINE_BY_STAFF)
                 || state.equals(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)
@@ -711,11 +714,14 @@ class CaseEventTaskHandlerTest {
                 || state.equals(FULL_DEFENCE_NOT_PROCEED)) {
                 return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false,
                               FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
-                              FlowFlag.NOTICE_OF_CHANGE.name(), true);
+                              FlowFlag.NOTICE_OF_CHANGE.name(), true,
+                              FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false);
             }
             return Map.of("RPA_CONTINUOUS_FEED", false,
                           FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
-                          FlowFlag.NOTICE_OF_CHANGE.name(), true);
+                          FlowFlag.NOTICE_OF_CHANGE.name(), true,
+                          FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false
+                    );
         }
 
         private CaseData getCaseData(FlowState.Main state) {

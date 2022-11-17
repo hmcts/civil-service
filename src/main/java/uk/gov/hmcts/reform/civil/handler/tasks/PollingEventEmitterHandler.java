@@ -12,10 +12,12 @@ import uk.gov.hmcts.reform.civil.service.search.CaseReadyBusinessProcessSearchSe
 
 import java.util.List;
 
+import static java.lang.String.format;
+
 @Slf4j
 @RequiredArgsConstructor
 @Component
-@ConditionalOnExpression("${POLLING_EVENT_EMITTER_ENABLED:true}")
+@ConditionalOnExpression("${polling.event.emitter.enabled:true}")
 public class PollingEventEmitterHandler implements BaseExternalTaskHandler {
 
     private final CaseReadyBusinessProcessSearchService caseSearchService;
@@ -28,7 +30,12 @@ public class PollingEventEmitterHandler implements BaseExternalTaskHandler {
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
         cases.stream()
             .map(caseDetailsConverter::toCaseData)
-            .forEach(mappedCase -> eventEmitterService.emitBusinessProcessCamundaEvent(mappedCase, true));
+            .forEach(mappedCase -> {
+                log.info(format("Emitting %s camunda event for case through poller: %d",
+                                mappedCase.getBusinessProcess().getCamundaEvent(),
+                                mappedCase.getCcdCaseReference()));
+                eventEmitterService.emitBusinessProcessCamundaEvent(mappedCase, true);
+            });
     }
 
     @Override

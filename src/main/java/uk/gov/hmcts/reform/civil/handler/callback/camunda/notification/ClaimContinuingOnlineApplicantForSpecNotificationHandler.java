@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
@@ -97,10 +98,12 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
         if (caseData.getRespondent2() != null) {
             properties.put(RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
             properties.put(RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()));
-        } else {
+        } else if (caseData.getRespondent1() != null && YesOrNo.YES.equals(caseData.getRespondent1Represented())) {
             properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
             properties.put(RESPONSE_DEADLINE, formatLocalDateTime(
                 caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
+        } else {
+            properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
         }
 
         return properties;

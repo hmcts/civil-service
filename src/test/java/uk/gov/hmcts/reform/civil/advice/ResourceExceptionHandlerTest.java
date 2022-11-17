@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
+import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 
 import java.util.function.Function;
 
@@ -26,6 +27,16 @@ class ResourceExceptionHandlerTest {
             CallbackException::new,
             handler::notFound,
             HttpStatus.NOT_FOUND
+        );
+    }
+
+    @Test
+    void shouldReturnPreconditionFailed_whenStateFlowExceptionThrown() {
+        testTemplate(
+            "expected exception for missing callback handler",
+            StateFlowException::new,
+            handler::incorrectStateFlow,
+            HttpStatus.PRECONDITION_FAILED
         );
     }
 

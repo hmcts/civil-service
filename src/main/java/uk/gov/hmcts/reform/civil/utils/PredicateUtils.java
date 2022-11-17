@@ -42,5 +42,6 @@ public class PredicateUtils {
 
     public static final Predicate<CaseData> defendant1v2SameSolicitorSameResponse =  caseData ->
         caseData.getRespondent1ResponseDate() != null && caseData.getRespondent2() != null
+            && caseData.getRespondent2SameLegalRepresentative() == YES
             && caseData.getRespondentResponseIsSame()  == YES;
 }

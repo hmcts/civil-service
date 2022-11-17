@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.referencedata;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -12,12 +13,14 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.referencedata.LRDConfiguration;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.apache.logging.log4j.util.Strings.concat;
@@ -34,10 +37,12 @@ public class LocationRefDataService {
     public List<String> getCourtLocations(String authToken) {
         try {
             ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
-                    buildURI(),
-                    HttpMethod.GET,
-                    getHeaders(authToken),
-                    new ParameterizedTypeReference<List<LocationRefData>>() {});
+                buildURI(),
+                HttpMethod.GET,
+                getHeaders(authToken),
+                new ParameterizedTypeReference<List<LocationRefData>>() {
+                }
+            );
             return onlyEnglandAndWalesLocations(responseEntity.getBody());
         } catch (Exception e) {
             log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
@@ -51,7 +56,9 @@ public class LocationRefDataService {
                 buildURIforCcmcc(),
                 HttpMethod.GET,
                 getHeaders(authToken),
-                new ParameterizedTypeReference<List<LocationRefData>>() {});
+                new ParameterizedTypeReference<List<LocationRefData>>() {
+                }
+            );
             List<LocationRefData> ccmccLocations = responseEntity.getBody();
             if (ccmccLocations == null || ccmccLocations.isEmpty()) {
                 log.warn("Location Reference Data Lookup did not return any CCMCC location");
@@ -74,7 +81,9 @@ public class LocationRefDataService {
                 buildURIForDefaultJudgments(),
                 HttpMethod.GET,
                 getHeaders(authToken),
-                new ParameterizedTypeReference<>() {});
+                new ParameterizedTypeReference<>() {
+                }
+            );
             return responseEntity.getBody();
         } catch (Exception e) {
             log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
@@ -85,8 +94,8 @@ public class LocationRefDataService {
     private URI buildURI() {
         String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
-                .queryParam("is_hearing_location", "Y")
-                .queryParam("location_type", "Court");
+            .queryParam("is_hearing_location", "Y")
+            .queryParam("location_type", "Court");
         return builder.buildAndExpand(new HashMap<>()).toUri();
     }
 
@@ -116,13 +125,45 @@ public class LocationRefDataService {
 
     private List<String> onlyEnglandAndWalesLocations(List<LocationRefData> locationRefData) {
         return locationRefData == null
-                ? new ArrayList<>()
-                : locationRefData.stream().filter(location -> !"Scotland".equals(location.getRegion()))
-                .map(this::getDisplayEntry).collect(Collectors.toList());
+            ? new ArrayList<>()
+            : locationRefData.stream().filter(location -> !"Scotland".equals(location.getRegion()))
+            .map(LocationRefDataService::getDisplayEntry).collect(Collectors.toList());
     }
 
-    private String getDisplayEntry(LocationRefData location) {
-        return concat(concat(concat(location.getSiteName(), " - "), concat(location.getCourtAddress(), " - ")),
-                      location.getPostcode());
+    public Optional<LocationRefData> getLocationMatchingLabel(String label, String bearerToken) {
+        if (StringUtils.isBlank(label)) {
+            return Optional.empty();
+        }
+
+        List<LocationRefData> locations = getCourtLocationsForDefaultJudgments(bearerToken);
+        return locations.stream().filter(loc -> LocationRefDataService.getDisplayEntry(loc)
+                .equals(label))
+            .findFirst();
+    }
+
+    /**
+     * Label is siteName - courtAddress - postCode.
+     *
+     * @param location a location
+     * @return string to serve as label
+     */
+    public static String getDisplayEntry(LocationRefData location) {
+        return concat(
+            concat(concat(location.getSiteName(), " - "), concat(location.getCourtAddress(), " - ")),
+            location.getPostcode()
+        );
+    }
+
+    /**
+     * Centralized creation of CaseLocation from LocationRefData to reduce the places it can be done.
+     *
+     * @param location mandatory
+     * @return case location built from location
+     */
+    public static CaseLocation buildCaseLocation(LocationRefData location) {
+        return CaseLocation.builder()
+            .region(location.getRegionId())
+            .baseLocation(location.getEpimmsId())
+            .build();
     }
 }

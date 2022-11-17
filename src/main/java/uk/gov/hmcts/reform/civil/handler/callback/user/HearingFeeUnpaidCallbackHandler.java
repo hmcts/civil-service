@@ -20,6 +20,10 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
+<<<<<<< HEAD
+=======
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
+>>>>>>> d7092041ac95c317bc72d5490daab487e1ac366c
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +32,10 @@ public class HearingFeeUnpaidCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(HEARING_FEE_UNPAID);
 
     private final ObjectMapper mapper;
+<<<<<<< HEAD
+=======
+
+>>>>>>> d7092041ac95c317bc72d5490daab487e1ac366c
     private final Time time;
 
     @Override
@@ -52,6 +60,10 @@ public class HearingFeeUnpaidCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))
+<<<<<<< HEAD
+=======
+            .state(CASE_DISMISSED.name())
+>>>>>>> d7092041ac95c317bc72d5490daab487e1ac366c
             .build();
     }
 }
