@@ -278,14 +278,13 @@ payments:
 
 idam:
   web:
-    url: http://sidam-simulator:5000
+    url: http://idam-api:9002
   api:
-    url: http://sidam-simulator:5000
+    url: http://idam-api:5000
   s2s-auth:
     url: http://localhost:4502
     totp_secret: AABBCCDDEEFFGGHH
   client:
-
     id: civil
     redirect_uri: https://localhost:9000/oauth2/callback
     secret: OOOOOOOOOOOOOOOO
