@@ -37,7 +37,7 @@ public class PaymentsService {
         String error = null;
         SRPbaDetails serviceRequestPBADetails = caseData.getServiceRequestPBADetails();
         if (serviceRequestPBADetails == null) {
-            error = "Hearing Fee details not received.";
+            error = "Fee details not received.";
         } else if (serviceRequestPBADetails.getFee() == null
             || serviceRequestPBADetails.getFee().getCalculatedAmountInPence() == null
             || isBlank(serviceRequestPBADetails.getFee().getVersion())
