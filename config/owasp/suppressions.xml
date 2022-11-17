@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
-  <suppress until="2022-12-01">
-    <notes>This vulnerability still exists but NVD informs that this vulnerability has been modified and is currently undergoing reanalysis.</notes>
+  <suppress until="2023-12-31">
+    <notes>This vulnerability still exists but NVD informs that this vulnerability has been modified and is currently undergoing reanalysis.
+    Also, it is not applicable to us as it applies only to serialization/deserialization in the Java "native" way, which we don't use.</notes>
     <cve>CVE-2016-1000027</cve>
   </suppress>
 </suppressions>
