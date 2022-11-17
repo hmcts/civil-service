@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {
-    HearingFeeDueCallbackHandler.class,
+    HearingFeeUnpaidCallbackHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
 })
@@ -35,7 +35,7 @@ class HearingFeeDueCallbackHandlerTest extends BaseCallbackHandlerTest {
     private Time time;
 
     @Autowired
-    private HearingFeeDueCallbackHandler handler;
+    private HearingFeeUnpaidCallbackHandler handler;
 
     @Nested
     class AboutToSubmit {

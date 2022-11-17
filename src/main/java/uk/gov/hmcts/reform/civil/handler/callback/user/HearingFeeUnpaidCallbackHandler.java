@@ -23,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 
 @Service
 @RequiredArgsConstructor
-public class HearingFeeDueCallbackHandler extends CallbackHandler {
+public class HearingFeeUnpaidCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(HEARING_FEE_UNPAID);
 
