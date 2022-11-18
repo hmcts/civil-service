@@ -21,8 +21,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -43,6 +45,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -574,4 +577,96 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+    @Nested
+    class SetUpOveVOneFlag {
+
+        @Test
+        void shouldGetOneVOneFullDefenceFlagV1() {
+            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+
+            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE);
+        }
+
+        @Test
+        void shouldGetOneVOnePartAdmitFlagV1() {
+            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+
+            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT);
+        }
+
+        @Test
+        void shouldGetOneVOneFullAdmitFlagV1() {
+            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+
+            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT);
+        }
+
+        @Test
+        void shouldGetOneVOneCounterClaimFlagV1() {
+            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+
+            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_COUNTER_CLAIM);
+        }
+
+        @Test
+        void shouldGetNullFlagV1() {
+            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent2(PartyBuilder.builder().company().build())
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+
+            assertThat(result).isEqualTo(null);
+        }
+
+        private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
+            return objectMapper.convertValue(response.getData(), CaseData.class);
+        }
+    }
 }
