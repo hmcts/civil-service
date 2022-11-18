@@ -313,6 +313,7 @@ public class CaseDataParent implements MappableObject {
      * Adding for LR ITP Update
      */
     private final ResponseOneVOneShowTag showResponseOneVOneFlag;
+    private final YesOrNo applicant1AcceptPaymentPlanSpec;
     private final CaseDocument respondent1ClaimResponseDocumentSpec;
     private final CaseDocument respondent2ClaimResponseDocumentSpec;
 
