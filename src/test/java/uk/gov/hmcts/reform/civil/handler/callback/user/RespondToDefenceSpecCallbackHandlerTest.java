@@ -582,8 +582,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGetOneVOneFullDefenceFlagV1() {
-            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
-
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .build();
@@ -599,8 +597,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGetOneVOnePartAdmitFlagV1() {
-            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
-
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .build();
@@ -616,8 +612,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGetOneVOneFullAdmitFlagV1() {
-            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
-
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .build();
@@ -633,8 +627,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGetOneVOneCounterClaimFlagV1() {
-            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
-
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
                 .build();
@@ -650,8 +642,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGetNullFlagV1() {
-            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
-
             CaseData caseData = CaseData.builder()
                 .respondent2(PartyBuilder.builder().company().build())
                 .build();

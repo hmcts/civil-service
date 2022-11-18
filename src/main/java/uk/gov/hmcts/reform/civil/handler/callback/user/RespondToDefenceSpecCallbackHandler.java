@@ -249,7 +249,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             && featureToggleService.isAccessProfilesEnabled()) {
             updatedCaseData.respondent1Copy(caseData.getRespondent1())
                 .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
-                .showResponseOneVOneFlag(setUpOneVOneFlow(caseData))
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
         } else {
@@ -268,6 +267,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                                                      .build()
                                              )
                                              .build());
+        }
+
+        if (V_1.equals(callbackParams.getVersion())) {
+            updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
