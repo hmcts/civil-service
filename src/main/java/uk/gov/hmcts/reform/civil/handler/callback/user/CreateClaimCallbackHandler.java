@@ -99,8 +99,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         + "%n%nOnce you have served the claim, send the Certificate of Service and supporting documents to the County"
         + " Court Claims Centre.";
 
-    public static final String LIP_CONFIRMATION_BODY_COF = "<br />[Download the sealed claim form](%s)"
-        + "%n%n Your claim will not be issued until payment is confirmed."
+    public static final String LIP_CONFIRMATION_BODY_COS = "<br />[Download the sealed claim form](%s)"
+        + "%n%n Your claim will not be issued until payment of the issue fee is confirmed."
         + " Once payment is confirmed you will receive an email. The email will also include the date when you need"
         + " to notify the Defendant of the Claim.%n%nYou must notify the Defendant of the claim"
         + " within 4 months of the claim being issued.%n%nIf the defendant(s) include a litigant in person you must"
@@ -110,7 +110,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         + " portal.%n%nIf service of the claim and claim details are processed outside the of the digital portal you "
         + " must complete the next steps option 'confirm service' for both the service of the claim form and the claim"
         + "  details. %n%nIf notification of the claim is processed in the digital portal, the exact date"
-        + " when you must notify the claim details will be provided when you first notify the defendant legal"
+        + " when you must notify the claim details will be provided when you first notify the Defendant legal"
         + " representative of the claim.";
 
     private final ClaimIssueConfiguration claimIssueConfiguration;
@@ -545,7 +545,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             return format(
                 areRespondentsRepresentedAndRegistered(caseData)
                     ? CONFIRMATION_SUMMARY
-                    : LIP_CONFIRMATION_BODY_COF,
+                    : LIP_CONFIRMATION_BODY_COS,
                 format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
                 claimIssueConfiguration.getResponsePackLink()
             ) + exitSurveyContentService.applicantSurvey();

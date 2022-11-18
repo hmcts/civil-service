@@ -77,7 +77,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY_COF;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY_COS;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
@@ -1501,7 +1501,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
 
                 String body = format(
-                    LIP_CONFIRMATION_BODY_COF,
+                        LIP_CONFIRMATION_BODY_COS,
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                     responsePackLink,
                     formatLocalDateTime(serviceDeadline, DATE_TIME_AT)
@@ -1585,7 +1585,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
 
                 String body = format(
-                    LIP_CONFIRMATION_BODY_COF,
+                        LIP_CONFIRMATION_BODY_COS,
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                     responsePackLink,
                     formatLocalDateTime(serviceDeadline, DATE_TIME_AT)
@@ -1642,7 +1642,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .confirmationHeader(format("# Your claim has been received%n## Claim number: %s",
                                                    REFERENCE_NUMBER))
                         .confirmationBody(format(
-                            LIP_CONFIRMATION_BODY_COF,
+                                LIP_CONFIRMATION_BODY_COS,
                             format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                             responsePackLink
                         ) + exitSurveyContentService.applicantSurvey())
@@ -1689,7 +1689,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
 
                 String body = format(
-                    LIP_CONFIRMATION_BODY_COF,
+                        LIP_CONFIRMATION_BODY_COS,
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                     responsePackLink,
                     formatLocalDateTime(serviceDeadline, DATE_TIME_AT)
@@ -1746,7 +1746,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .confirmationHeader(format("# Your claim has been received%n## Claim number: %s",
                                                    REFERENCE_NUMBER))
                         .confirmationBody(format(
-                            LIP_CONFIRMATION_BODY_COF,
+                                LIP_CONFIRMATION_BODY_COS,
                             format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                             responsePackLink
                         ) + exitSurveyContentService.applicantSurvey())

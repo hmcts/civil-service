@@ -26,8 +26,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDism
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledgedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotifiedExtension;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.certificateOfServiceEnabled;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedPastHearingFeeDue;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.certificateOfServiceEnabled;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
@@ -122,7 +122,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CL
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COF;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COS;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
@@ -260,7 +260,7 @@ public class StateFlowEngine {
                         .and(not(specClaim))
                         .and(not(certificateOfServiceEnabled)))
             //Added this condition temporarly until release of certif of Service.
-            .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COF)
+            .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COS)
             .onlyIf((respondent1NotRepresented.and(respondent2NotRepresented))
                         .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
                         .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented))
@@ -306,9 +306,20 @@ public class StateFlowEngine {
                             .and(respondent2NotRepresented)))
             .state(PENDING_CLAIM_ISSUED)
                 .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued)
+            .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COS)
+                .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued
+                                                       .and(not(specClaim))
+                                                       .and(certificateOfServiceEnabled))
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
                 .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT)
-                    .onlyIf(takenOfflineBySystem.and(pastAddLegalRepDeadline))
+                    .onlyIf(takenOfflineBySystem
+                                .and(pastAddLegalRepDeadline)
+                                .and(not(certificateOfServiceEnabled)))
+            .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COS)
+                .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT)
+                    .onlyIf(takenOfflineBySystem
+                                .and(pastAddLegalRepDeadline)
+                                .and(certificateOfServiceEnabled))
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC)
                 .transitionTo(CLAIM_ISSUED)
                     .onlyIf(claimIssued.and(pinInPostEnabledAndLiP))
@@ -500,7 +511,7 @@ public class StateFlowEngine {
             .state(FULL_DEFENCE_NOT_PROCEED)
             .state(TAKEN_OFFLINE_BY_STAFF)
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
-            .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COF)
+            .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COS)
             .state(PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT)
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)
             .state(TAKEN_OFFLINE_UNREGISTERED_DEFENDANT)
