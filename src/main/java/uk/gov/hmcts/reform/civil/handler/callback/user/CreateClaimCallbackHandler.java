@@ -110,7 +110,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         + " portal.%n%nIf service of the claim and claim details are processed outside the of the digital portal you "
         + " must complete the next steps option 'confirm service' for both the service of the claim form and the claim"
         + "  details. %n%nIf notification of the claim is processed in the digital portal, the exact date"
-        + " when you must notify the claim details will be provided when you first notify the defendant legal"
+        + " when you must notify the claim details will be provided when you first notify the Defendant legal"
         + " representative of the claim.";
 
     private final ClaimIssueConfiguration claimIssueConfiguration;
