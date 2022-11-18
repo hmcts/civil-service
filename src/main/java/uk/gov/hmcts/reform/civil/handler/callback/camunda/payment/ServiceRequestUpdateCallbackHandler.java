@@ -16,7 +16,7 @@ import java.util.Map;
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 
 @Slf4j
 @Service
@@ -46,9 +46,9 @@ public class ServiceRequestUpdateCallbackHandler extends CallbackHandler {
 
     private CallbackResponse changeApplicationState(CallbackParams callbackParams) {
         Long caseId = callbackParams.getCaseData().getCcdCaseReference();
-        log.info("Changing state to HEARING_READINESS for caseId: {}", caseId);
+        log.info("Changing state to PREPARE_FOR_HEARING_CONDUCT_HEARING for caseId: {}", caseId);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .state(HEARING_READINESS.toString())
+            .state(PREPARE_FOR_HEARING_CONDUCT_HEARING.name())
             .build();
     }
 

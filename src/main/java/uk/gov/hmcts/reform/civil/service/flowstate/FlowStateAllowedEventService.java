@@ -43,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_PAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
@@ -225,6 +226,7 @@ public class FlowStateAllowedEventService {
                 TAKE_CASE_OFFLINE,
                 EVIDENCE_UPLOAD_JUDGE,
                 HEARING_FEE_UNPAID,
+                HEARING_FEE_PAID,
                 HEARING_SCHEDULED,
                 EVIDENCE_UPLOAD,
                 migrateCase
@@ -496,12 +498,6 @@ public class FlowStateAllowedEventService {
                 REFER_TO_JUDGE,
                 APPLICATION_CLOSED_UPDATE_CLAIM,
                 migrateCase
-            )
-        ),
-        entry(
-            CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName(),
-            List.of(
-                CASE_PROCEEDS_IN_CASEMAN
             )
         ),
         entry(
@@ -860,6 +856,7 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 HEARING_SCHEDULED,
                 HEARING_FEE_UNPAID,
+                HEARING_FEE_PAID,
                 REFER_TO_JUDGE,
                 migrateCase
             )

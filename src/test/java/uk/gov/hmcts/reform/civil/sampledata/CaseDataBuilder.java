@@ -110,10 +110,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKN
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
-<<<<<<< HEAD
-=======
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
->>>>>>> d7092041ac95c317bc72d5490daab487e1ac366c
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
@@ -267,10 +264,7 @@ public class CaseDataBuilder {
     protected LocalDateTime unsuitableSDODate;
     protected LocalDateTime claimDismissedDate;
     protected LocalDateTime caseDismissedHearingFeeDueDate;
-<<<<<<< HEAD
-=======
     protected LocalDate hearingDate;
->>>>>>> d7092041ac95c317bc72d5490daab487e1ac366c
     private InterestClaimOptions interestClaimOptions;
     private YesOrNo claimInterest;
     private SameRateInterestSelection sameRateInterestSelection;
@@ -332,8 +326,6 @@ public class CaseDataBuilder {
     private LocalDate hearingDueDate;
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
-    private LocalDate hearingDueDate;
-
     private CaseLocation caseManagementLocation;
 
     private YesOrNo generalAppVaryJudgementType;
@@ -1045,12 +1037,9 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimDismissedPastHearingFeeDueDeadline() {
         atStateHearingFeeDueUnpaid();
         ccdState = CASE_DISMISSED;
-<<<<<<< HEAD
-        caseDismissedHearingFeeDueDate = hearingDueDate.plusDays(1).atTime(LocalTime.now());
-=======
         caseDismissedHearingFeeDueDate = LocalDateTime.now();
         hearingDate = hearingDueDate.plusWeeks(2);
->>>>>>> d7092041ac95c317bc72d5490daab487e1ac366c
+
         return this;
     }
 
@@ -3184,18 +3173,12 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateHearingFeeDuePaid() {
         atStateApplicantRespondToDefenceAndProceed();
-<<<<<<< HEAD
-        hearingDueDate = now().minusDays(1);
-=======
         hearingDueDate = LocalDate.now().minusDays(1);
->>>>>>> d7092041ac95c317bc72d5490daab487e1ac366c
         hearingFeePaymentDetails = PaymentDetails.builder().status(SUCCESS).build();
         ccdState = HEARING_READINESS;
         return this;
     }
 
-<<<<<<< HEAD
-=======
     public CaseDataBuilder atStateBeforeTakenOfflineSDONotDrawn() {
 
         atStateApplicantRespondToDefenceAndProceed();
@@ -3268,7 +3251,6 @@ public class CaseDataBuilder {
         return this;
     }
 
->>>>>>> d7092041ac95c317bc72d5490daab487e1ac366c
     public CaseDataBuilder businessProcess(BusinessProcess businessProcess) {
         this.businessProcess = businessProcess;
         return this;
@@ -3722,10 +3704,7 @@ public class CaseDataBuilder {
             .selectLitigationFriend(selectLitigationFriend)
             .caseNotes(caseNotes)
             .hearingDueDate(hearingDueDate)
-<<<<<<< HEAD
-=======
             .hearingDate(hearingDate)
->>>>>>> d7092041ac95c317bc72d5490daab487e1ac366c
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)
             .superClaimType(superClaimType == null ? UNSPEC_CLAIM : superClaimType)

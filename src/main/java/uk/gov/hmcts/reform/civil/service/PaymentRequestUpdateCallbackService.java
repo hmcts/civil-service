@@ -64,8 +64,7 @@ public class PaymentRequestUpdateCallbackService {
             eventName
         );
         CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
-        BusinessProcess businessProcess = startEventData.getBusinessProcess()
-            .updateActivityId(serviceRequestReceived);
+        BusinessProcess businessProcess = null;
 
         CaseDataContent caseDataContent = buildCaseDataContent(
             startEventResponse,
@@ -73,7 +72,6 @@ public class PaymentRequestUpdateCallbackService {
             businessProcess
         );
         data = coreCaseDataService.submitUpdate(generalApplicationCaseId, caseDataContent);
-        coreCaseDataService.triggerEvent(caseData.getCcdCaseReference(), SERVICE_REQUEST_RECEIVED);
 
     }
 
