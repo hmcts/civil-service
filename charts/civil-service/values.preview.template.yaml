@@ -1,5 +1,5 @@
 java:
-  image: ${IMAGE_NAME}
+  image: 'hmctspublic.azurecr.io/civil/service:pr-1800'
   ingressHost: ${SERVICE_FQDN}
   keyVaults:
     civil:
