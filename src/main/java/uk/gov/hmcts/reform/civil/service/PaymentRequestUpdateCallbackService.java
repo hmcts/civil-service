@@ -24,6 +24,7 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
+import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Slf4j
 @Service
@@ -51,8 +52,10 @@ public class PaymentRequestUpdateCallbackService {
                                                                                    .getCcdCaseNumber()));
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
             caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
-
-            createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType);
+            if(feeType.equals(FeeType.HEARING.name()) || (feeType.equals(FeeType.CLAIMISSUED.name())
+                && isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled() ? true : false))){
+                createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType);
+            }
 
         } else {
             log.error("Service request status is not PAID for Case id {}",
