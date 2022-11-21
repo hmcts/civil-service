@@ -454,9 +454,10 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 HEARING_SCHEDULED,
                 HEARING_FEE_UNPAID,
+                HEARING_FEE_PAID,
+                SERVICE_REQUEST_RECEIVED,
                 REFER_TO_JUDGE,
-                migrateCase,
-                SERVICE_REQUEST_RECEIVED
+                migrateCase
             )
         ),
 
