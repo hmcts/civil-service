@@ -52,8 +52,8 @@ public class PaymentRequestUpdateCallbackService {
                                                                                    .getCcdCaseNumber()));
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
             caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
-            if(feeType.equals(FeeType.HEARING.name()) || (feeType.equals(FeeType.CLAIMISSUED.name())
-                && isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled() ? true : false))){
+            if (feeType.equals(FeeType.HEARING.name()) || (feeType.equals(FeeType.CLAIMISSUED.name())
+                && isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled() ? true : false))) {
                 createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType);
             }
 
