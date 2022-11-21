@@ -59,6 +59,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @Service
 @RequiredArgsConstructor
@@ -350,9 +351,33 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 case FULL_DEFENCE:
                     return ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE;
                 case FULL_ADMISSION:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT;
+                    if (caseData.getSpecDefenceFullAdmittedRequired() == NO) {
+                        switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
+                            case IMMEDIATELY:
+                                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_IMMEDIATELY;
+                            case BY_SET_DATE:
+                                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_BY_SET_DATE;
+                            case SUGGESTION_OF_REPAYMENT_PLAN:
+                                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_INSTALMENT;
+                            default:
+                                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT;
+                        }
+                    }
+                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID;
                 case PART_ADMISSION:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT;
+                    if (caseData.getSpecDefenceAdmittedRequired() == NO) {
+                        switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
+                            case IMMEDIATELY:
+                                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY;
+                            case BY_SET_DATE:
+                                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE;
+                            case SUGGESTION_OF_REPAYMENT_PLAN:
+                                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT;
+                            default:
+                                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT;
+                        }
+                    }
+                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID;
                 case COUNTER_CLAIM:
                     return ResponseOneVOneShowTag.ONE_V_ONE_COUNTER_CLAIM;
                 default:
