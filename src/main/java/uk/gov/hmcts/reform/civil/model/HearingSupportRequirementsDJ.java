@@ -30,4 +30,6 @@ public class HearingSupportRequirementsDJ {
     private final String[] hearingSupportRequirementOther;
     private final String hearingSupportRequirementOtherDropdown;
     private final List<Element<HearingDates>> hearingDates;
+    private final YesOrNo hearingSupportQuestion;
+    private final String hearingSupportAdditional;
 }
