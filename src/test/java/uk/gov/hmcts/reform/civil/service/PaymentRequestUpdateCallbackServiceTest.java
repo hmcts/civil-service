@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -37,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.FeeType.CLAIMISSUED;
 import static uk.gov.hmcts.reform.civil.enums.FeeType.HEARING;
+
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 
 @SpringBootTest(classes = {
@@ -93,7 +95,7 @@ class PaymentRequestUpdateCallbackServiceTest {
                                                                                           SERVICE_REQUEST_RECEIVED));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), HEARING.name());
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.HEARING.name());
 
         verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
         verify(coreCaseDataService, times(1)).startUpdate(any(), any());
@@ -101,7 +103,31 @@ class PaymentRequestUpdateCallbackServiceTest {
     }
 
     @Test
-    public void shouldProceed_WhenAdditionalPaymentExist_WithPaymentFail_Hearing() {
+    public void shouldStartAndSubmitEventWithCaseDetailsForClaimIssued() {
+        //Given: Case data with PENDING_CASE_ISSUED State and Payment service status is PAID
+        CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
+        caseData = caseData.toBuilder()
+            .ccdState(PENDING_CASE_ISSUED)
+            .build();
+        CaseDetails caseDetails = buildCaseDetails(caseData);
+
+        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(coreCaseDataService.startUpdate(any(), any()))
+                                        .thenReturn(startEventResponse(caseDetails, CREATE_CLAIM_SPEC_AFTER_PAYMENT));
+        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
+
+        //When: callback is called
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.CLAIMISSUED.name());
+
+        //Then: startUpdate and submitUpdate should be called
+        verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
+        verify(coreCaseDataService, times(1)).startUpdate(any(), any());
+        verify(coreCaseDataService, times(1)).submitUpdate(any(), any());
+    }
+
+    @Test
+    public void shouldProceed_WhenAdditionalPaymentExist_WithPaymentFail() {
 
         CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
         caseData = caseData.toBuilder()
@@ -125,7 +151,7 @@ class PaymentRequestUpdateCallbackServiceTest {
                                                                                           SERVICE_REQUEST_RECEIVED));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), HEARING.name());
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.HEARING.name());
 
         verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
         verify(coreCaseDataService, times(1)).startUpdate(any(), any());
@@ -134,7 +160,39 @@ class PaymentRequestUpdateCallbackServiceTest {
     }
 
     @Test
-    public void shouldNotProceed_WhenPaymentFailed_Hearing() {
+
+    public void shouldProceed_WhenAdditionalPaymentExist_WithPaymentFailForClaimIssued() {
+
+        //Given: Case data with PENDING_CASE_ISSUED State and claim issued payment exists with FAILED status
+        CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
+        caseData = caseData.toBuilder()
+            .ccdState(PENDING_CASE_ISSUED)
+            .claimIssuedPaymentDetails(PaymentDetails.builder()
+                                          .status(FAILED)
+                                          .reference("REFERENCE")
+                                          .build())
+            .build();
+
+        CaseDetails caseDetails = buildCaseDetails(caseData);
+
+        when(coreCaseDataService.getCase(Long.valueOf(CASE_ID))).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails))
+            .thenReturn(caseData);
+        when(coreCaseDataService.startUpdate(any(), any()))
+                                        .thenReturn(startEventResponse(caseDetails, CREATE_CLAIM_SPEC_AFTER_PAYMENT));
+        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
+
+        //When: callback is called with service status as PAID
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.CLAIMISSUED.name());
+
+        //Then: startUpdate and submitUpdate should be called
+        verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
+        verify(coreCaseDataService, times(1)).startUpdate(any(), any());
+        verify(coreCaseDataService, times(1)).submitUpdate(any(), any());
+    }
+
+    @Test
+    public void shouldNotProceed_WhenPaymentFailed() {
         CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
         caseData = caseData.toBuilder().ccdState(CASE_PROGRESSION).build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
@@ -146,7 +204,7 @@ class PaymentRequestUpdateCallbackServiceTest {
                                                                                           SERVICE_REQUEST_RECEIVED));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(NOT_PAID), HEARING.name());
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(NOT_PAID), FeeType.HEARING.name());
 
         verify(coreCaseDataService, never()).getCase(Long.valueOf(CASE_ID));
         verify(coreCaseDataService, never()).startUpdate(any(), any());
@@ -154,69 +212,9 @@ class PaymentRequestUpdateCallbackServiceTest {
     }
 
     @Test
-    public void shouldStartAndSubmitEventWithCaseDetails_ClaimIssued() {
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSpec().build();
-        caseData = caseData.toBuilder()
-            .ccdState(PENDING_CASE_ISSUED)
-            .businessProcess(BusinessProcess.builder()
-                                 .status(BusinessProcessStatus.READY)
-                                 .camundaEvent(BUSINESS_PROCESS)
-                                 .build())
-            .build();
-        CaseDetails caseDetails = buildCaseDetails(caseData);
-
-        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-        when(coreCaseDataService.startUpdate(any(), any()))
-                                                    .thenReturn(startEventResponse(caseDetails,
-                                                                                   CREATE_CLAIM_SPEC_AFTER_PAYMENT));
-        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
-
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), CLAIMISSUED.name());
-
-        verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
-        verify(coreCaseDataService, times(1)).startUpdate(any(), any());
-        verify(coreCaseDataService, times(1)).submitUpdate(any(), any());
-    }
-
-    @Test
-    public void shouldProceed_WhenAdditionalPaymentExist_WithPaymentFail_ClaimIssued() {
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSpec().build();
-        caseData = caseData.toBuilder()
-            .ccdState(PENDING_CASE_ISSUED)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(FAILED)
-                                          .reference("REFERENCE")
-                                          .build())
-            .businessProcess(BusinessProcess.builder()
-                                 .status(BusinessProcessStatus.READY)
-                                 .camundaEvent(BUSINESS_PROCESS)
-                                 .build())
-            .build();
-
-        CaseDetails caseDetails = buildCaseDetails(caseData);
-
-        when(coreCaseDataService.getCase(Long.valueOf(CASE_ID))).thenReturn(caseDetails);
-        when(caseDetailsConverter.toCaseData(caseDetails))
-            .thenReturn(caseData);
-        when(coreCaseDataService.startUpdate(any(), any()))
-                                                    .thenReturn(startEventResponse(caseDetails,
-                                                                                   CREATE_CLAIM_SPEC_AFTER_PAYMENT));
-        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
-
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), CLAIMISSUED.name());
-
-        verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
-        verify(coreCaseDataService, times(1)).startUpdate(any(), any());
-        verify(coreCaseDataService, times(1)).submitUpdate(any(), any());
-
-    }
-
-    @Test
-    public void shouldNotProceed_WhenPaymentFailed_ClaimIssued() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSpec().build();
+    public void shouldNotProceed_WhenPaymentFailedForClaimIssued() {
+        //Given: Case data with PENDING_CASE_ISSUED State
+        CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
         caseData = caseData.toBuilder().ccdState(PENDING_CASE_ISSUED).build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
@@ -224,12 +222,13 @@ class PaymentRequestUpdateCallbackServiceTest {
         when(caseDetailsConverter.toCaseData(caseDetails))
             .thenReturn(caseData);
         when(coreCaseDataService.startUpdate(any(), any()))
-                                                    .thenReturn(startEventResponse(caseDetails,
-                                                                                   CREATE_CLAIM_SPEC_AFTER_PAYMENT));
+                                    .thenReturn(startEventResponse(caseDetails, CREATE_CLAIM_SPEC_AFTER_PAYMENT));
         when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
 
-        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(NOT_PAID), CLAIMISSUED.name());
+        //When: callback is called with NOT_PAID status
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(NOT_PAID), FeeType.CLAIMISSUED.name());
 
+        //Then: startUpdate and submitUpdate should not be called
         verify(coreCaseDataService, never()).getCase(Long.valueOf(CASE_ID));
         verify(coreCaseDataService, never()).startUpdate(any(), any());
         verify(coreCaseDataService, never()).submitUpdate(any(), any());
@@ -262,5 +261,4 @@ class PaymentRequestUpdateCallbackServiceTest {
             .caseDetails(caseDetails)
             .build();
     }
-
 }

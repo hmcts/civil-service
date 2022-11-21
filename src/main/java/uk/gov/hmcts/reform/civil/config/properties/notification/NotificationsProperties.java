@@ -45,6 +45,8 @@ public class NotificationsProperties {
     @NotEmpty
     private String solicitorClaimDismissed;
 
+    @NotEmpty String solicitorHearingFeeUnpaid;
+
     @NotEmpty
     private String claimantSolicitorCaseWillProgressOffline;
 
@@ -172,5 +174,14 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String respondentLipResponseSubmissionTemplate;
+
+    @NotEmpty
+    private String hearingListedFeeClaimantLrTemplate;
+
+    @NotEmpty
+    private String hearingListedNoFeeClaimantLrTemplate;
+
+    @NotEmpty
+    private String hearingListedNoFeeDefendantLrTemplate;
 
 }
