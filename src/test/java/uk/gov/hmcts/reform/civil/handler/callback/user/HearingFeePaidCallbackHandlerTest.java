@@ -26,11 +26,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {
-    HearingFeeUnpaidCallbackHandler.class,
+    HearingFeePaidCallbackHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
 })
-class HearingFeeDueCallbackHandlerTest extends BaseCallbackHandlerTest {
+class HearingFeePaidCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private Time time;
@@ -38,7 +38,7 @@ class HearingFeeDueCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CoreCaseDataService coreCaseDataService;
 
     @Autowired
-    private HearingFeeUnpaidCallbackHandler handler;
+    private HearingFeePaidCallbackHandler handler;
 
     @Nested
     class AboutToSubmit {
@@ -50,20 +50,17 @@ class HearingFeeDueCallbackHandlerTest extends BaseCallbackHandlerTest {
         void setup() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastHearingFeeDueDeadline().build();
             params = CallbackParamsBuilder.builder().of(CallbackType.ABOUT_TO_SUBMIT, caseData).build();
-            localDateTime = LocalDateTime.now();
-            when(time.now()).thenReturn(localDateTime);
+
         }
 
         @Test
         void shouldUpdateBusinessProcessToReadyWithEvent_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDuePaid().build();
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData())
-                .containsEntry("businessProcess", Map.of(
-                    "status", "READY",
-                    "camundaEvent", "HEARING_FEE_UNPAID"
-                ))
-                .containsEntry("caseDismissedHearingFeeDueDate", localDateTime.format(ISO_DATE_TIME));
+            assertThat(response.getState()).isEqualTo("PREPARE_FOR_HEARING_CONDUCT_HEARING");
         }
     }
 }

@@ -33,9 +33,7 @@ public class HearingFeePaidCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(ABOUT_TO_SUBMIT), this::setState,
-            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+            callbackKey(ABOUT_TO_SUBMIT), this::setState
         );
     }
 
