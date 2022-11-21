@@ -20,19 +20,19 @@ class EvidenceUploadNotificationSearchServiceTest extends ElasticSearchServiceTe
     @Override
     protected Query buildQuery(int fromValue) {
         BoolQueryBuilder query = boolQuery()
-            .minimumShouldMatch(1)
-            .should(boolQuery()
-                        .must(rangeQuery("data.caseDocumentUploadDate").lt("now").gt(
-                    "now-1d"))
-                        .must(boolQuery().must(matchQuery("state", "CASE_PROGRESSION"))))
-            .should(boolQuery()
-                        .must(rangeQuery("data.caseDocumentUploadDate").lt("now").gt(
-                            "now-1d"))
-                        .must(boolQuery().must(matchQuery("state", "HEARING_READINESS"))))
-            .should(boolQuery()
-                        .must(rangeQuery("data.caseDocumentUploadDate").lt("now").gt(
-                            "now-1d"))
-                        .must(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING"))));
+            .must(boolQuery()
+                      .minimumShouldMatch(1)
+                      .should(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING")))
+                      .should(boolQuery().must(matchQuery("state", "HEARING_READINESS")))
+                      .should(boolQuery().must(matchQuery("state", "CASE_PROGRESSION"))))
+            .must(boolQuery()
+                      .minimumShouldMatch(1)
+                      .should(rangeQuery("data.caseDocumentUploadDate").lt("now").gt(
+                          "now-1d"))
+                      .should(rangeQuery("data.caseDocumentUploadDateRes").lt("now").gt(
+                          "now-1d"))
+                      .should(rangeQuery("data.caseDocumentUploadDateOther").lt("now").gt(
+                          "now-1d")));
         return new Query(query, List.of("reference"), fromValue);
     }
 }
