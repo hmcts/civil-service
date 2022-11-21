@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.List;
 import java.util.Map;
@@ -23,14 +25,8 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_COND
 @RequiredArgsConstructor
 public class ServiceRequestUpdateCallbackHandler extends CallbackHandler {
 
-    private static final String TASK_ID = "ServiceRequestReceived";
-
-    @Override
-    public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
-    }
-
     private static final List<CaseEvent> EVENTS = singletonList(SERVICE_REQUEST_RECEIVED);
+    private final ObjectMapper objectMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -45,10 +41,11 @@ public class ServiceRequestUpdateCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse changeApplicationState(CallbackParams callbackParams) {
-        Long caseId = callbackParams.getCaseData().getCcdCaseReference();
-        log.info("Changing state to PREPARE_FOR_HEARING_CONDUCT_HEARING for caseId: {}", caseId);
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .state(PREPARE_FOR_HEARING_CONDUCT_HEARING.name())
+            .data(dataBuilder.build().toMap(objectMapper))
             .build();
     }
 

@@ -4,7 +4,7 @@ import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.handler.tasks.HearingFeePaidHandler;
+import uk.gov.hmcts.reform.civil.handler.tasks.HearingFeeDueHandler;
 
 @Component
 public class HearingFeePaidExternalTaskListener {
@@ -12,7 +12,7 @@ public class HearingFeePaidExternalTaskListener {
     private static final String TOPIC = "HEARING_READINESS_CHECK";
 
     @Autowired
-    private HearingFeePaidExternalTaskListener(HearingFeePaidHandler handler, ExternalTaskClient client) {
+    private HearingFeePaidExternalTaskListener(HearingFeeDueHandler handler, ExternalTaskClient client) {
         TopicSubscriptionBuilder subscriptionBuilder = client.subscribe(TOPIC);
         subscriptionBuilder.handler(handler).open();
     }

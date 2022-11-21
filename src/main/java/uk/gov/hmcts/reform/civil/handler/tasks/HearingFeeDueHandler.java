@@ -43,11 +43,12 @@ public class HearingFeeDueHandler implements BaseExternalTaskHandler {
                         && hearingFeePaymentDetails.getStatus() == PaymentStatus.SUCCESS)) {
                     log.info("Current case status '{}'", caseDetails.getState());
                     applicationEventPublisher.publishEvent(new HearingFeePaidEvent(caseDetails.getId()));
-                } else if (hearingFeePaymentDetails == null
-                            || hearingFeePaymentDetails.getStatus() == PaymentStatus.FAILED) {
-                    log.info("Current case status '{}'", caseDetails.getState());
-                    applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
                 }
+//                else if (hearingFeePaymentDetails == null
+//                            || hearingFeePaymentDetails.getStatus() == PaymentStatus.FAILED) {
+//                    log.info("Current case status '{}'", caseDetails.getState());
+//                    applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
+//                }
             } catch (Exception e) {
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }

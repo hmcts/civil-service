@@ -56,6 +56,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_C
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
@@ -229,7 +230,8 @@ public class FlowStateAllowedEventService {
                 HEARING_FEE_PAID,
                 HEARING_SCHEDULED,
                 EVIDENCE_UPLOAD,
-                migrateCase
+                migrateCase,
+                SERVICE_REQUEST_RECEIVED
             )
         ),
 
@@ -453,7 +455,8 @@ public class FlowStateAllowedEventService {
                 HEARING_SCHEDULED,
                 HEARING_FEE_UNPAID,
                 REFER_TO_JUDGE,
-                migrateCase
+                migrateCase,
+                SERVICE_REQUEST_RECEIVED
             )
         ),
 
