@@ -856,7 +856,8 @@ public class FlowStateAllowedEventService {
                 HEARING_SCHEDULED,
                 HEARING_FEE_UNPAID,
                 REFER_TO_JUDGE,
-                migrateCase
+                migrateCase,
+                TAKE_CASE_OFFLINE
             )
         ),
 
