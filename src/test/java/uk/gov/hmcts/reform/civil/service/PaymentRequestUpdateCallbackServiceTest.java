@@ -36,8 +36,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFT
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
-import static uk.gov.hmcts.reform.civil.enums.FeeType.CLAIMISSUED;
-import static uk.gov.hmcts.reform.civil.enums.FeeType.HEARING;
 
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 

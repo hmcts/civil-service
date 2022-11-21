@@ -60,7 +60,6 @@ public class PaymentRequestUpdateCallbackService {
         }
     }
 
-
     private void createEvent(CaseData caseData, String caseId, String feeType) {
 
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
