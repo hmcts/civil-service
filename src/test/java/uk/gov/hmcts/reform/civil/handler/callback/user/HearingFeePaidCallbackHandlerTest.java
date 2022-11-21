@@ -19,11 +19,8 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
-import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {
     HearingFeePaidCallbackHandler.class,
