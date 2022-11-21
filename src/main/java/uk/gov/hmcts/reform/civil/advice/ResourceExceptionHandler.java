@@ -19,14 +19,11 @@ public class ResourceExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(value = StateFlowException.class)
-    public ResponseEntity<Object> incorrectStateFlow(Exception exception) {
-        log.debug(exception.getMessage(), exception);
-        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.PRECONDITION_FAILED);
-    }
-
-    @ExceptionHandler(value = IllegalArgumentException.class)
-    public ResponseEntity<Object> illegalArgument(Exception exception) {
+    @ExceptionHandler({
+        StateFlowException.class,
+        IllegalArgumentException.class
+    })
+    public ResponseEntity<Object> incorrectStateFlowOrIllegalArgument(Exception exception) {
         log.debug(exception.getMessage(), exception);
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.PRECONDITION_FAILED);
     }

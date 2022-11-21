@@ -35,7 +35,7 @@ class ResourceExceptionHandlerTest {
         testTemplate(
             "expected exception for missing callback handler",
             StateFlowException::new,
-            handler::incorrectStateFlow,
+            handler::incorrectStateFlowOrIllegalArgument,
             HttpStatus.PRECONDITION_FAILED
         );
     }
@@ -45,7 +45,7 @@ class ResourceExceptionHandlerTest {
         testTemplate(
             "expected exception for missing callback handler",
             IllegalArgumentException::new,
-            handler::illegalArgument,
+            handler::incorrectStateFlowOrIllegalArgument,
             HttpStatus.PRECONDITION_FAILED
         );
     }
