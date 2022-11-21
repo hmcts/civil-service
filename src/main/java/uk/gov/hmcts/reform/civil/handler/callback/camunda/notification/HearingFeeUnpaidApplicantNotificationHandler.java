@@ -58,7 +58,7 @@ public class HearingFeeUnpaidApplicantNotificationHandler extends CallbackHandle
 
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getSolicitorHearingFeeUnpaid(),
+            notificationsProperties.getApplicantHearingFeeUnpaid(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
