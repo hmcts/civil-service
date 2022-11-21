@@ -599,6 +599,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldGetOneVOnePartAdmitFlagV1() {
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .specDefenceAdmittedRequired(YES)
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
 
@@ -607,13 +608,14 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
 
-            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT);
+            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_HAS_PAID);
         }
 
         @Test
         void shouldGetOneVOneFullAdmitFlagV1() {
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .specDefenceFullAdmittedRequired(YES)
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
 
@@ -621,8 +623,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
-
-            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT);
+            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID);
         }
 
         @Test

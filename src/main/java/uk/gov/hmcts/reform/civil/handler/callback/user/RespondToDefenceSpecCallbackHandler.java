@@ -377,7 +377,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                                 return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT;
                         }
                     }
-                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID;
+                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_HAS_PAID;
                 case COUNTER_CLAIM:
                     return ResponseOneVOneShowTag.ONE_V_ONE_COUNTER_CLAIM;
                 default:
