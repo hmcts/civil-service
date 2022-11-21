@@ -65,7 +65,7 @@ public class GenAppStateHelperService {
                                                      String updatedState,
                                                      RequiredState gaFlow) {
 
-        List<Element<GeneralApplicationsDetails>> gaDetails = caseData.getGeneralApplicationsDetails();
+        List<Element<GeneralApplicationsDetails>> gaDetails = caseData.getClaimantGaAppDetails();
         List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection = caseData.getGaDetailsMasterCollection();
 
         Map<Long, GeneralApplication> generalApplicationMap = getLatestStatusOfGeneralApplication(caseData);
@@ -93,7 +93,7 @@ public class GenAppStateHelperService {
         /*
         * Respondent one GA collection
         * */
-        List<Element<GADetailsRespondentSol>> respondentSpecficGADetails = caseData.getGaDetailsRespondentSol();
+        List<Element<GADetailsRespondentSol>> respondentSpecficGADetails = caseData.getRespondentSolGaAppDetails();
 
         if (!isEmpty(respondentSpecficGADetails)) {
             respondentSpecficGADetails.forEach(respondentSolElement -> {
@@ -106,10 +106,10 @@ public class GenAppStateHelperService {
         /*
         * Respondent two GA collection
         * */
-        List<Element<GADetailsRespondentSol>> respondentTwoSpecficGADetails = caseData.getGaDetailsRespondentSolTwo();
+        List<Element<GADetailsRespondentSol>> respondentTwoGADetails = caseData.getRespondentSolTwoGaAppDetails();
 
-        if (!isEmpty(respondentTwoSpecficGADetails)) {
-            respondentTwoSpecficGADetails.forEach(respondentTwoSolElement -> {
+        if (!isEmpty(respondentTwoGADetails)) {
+            respondentTwoGADetails.forEach(respondentTwoSolElement -> {
                 if (applicationFilterCriteria(respondentTwoSolElement.getValue(), generalApplicationMap, gaFlow)) {
                     respondentTwoSolElement.getValue().setCaseState(updatedState);
                 }

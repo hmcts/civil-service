@@ -310,7 +310,7 @@ public class GeneralApplicationDetailsBuilder {
         if (withGADetails) {
             List<GeneralApplicationsDetails> allGaDetails = new ArrayList<>();
             applicationIdStatus.forEach((key, value) -> allGaDetails.add(getGADetails(key, value)));
-            caseDataBuilder.generalApplicationsDetails(
+            caseDataBuilder.claimantGaAppDetails(
                     wrapElements(allGaDetails.toArray(new GeneralApplicationsDetails[0])
             ));
         }
@@ -326,11 +326,12 @@ public class GeneralApplicationDetailsBuilder {
         List<GADetailsRespondentSol> gaDetailsRespo = new ArrayList<>();
         applicationIdStatus.forEach((key, value) -> gaDetailsRespo.add(getGADetailsRespondent(key, value)));
         if (withGADetailsResp) {
-            caseDataBuilder.gaDetailsRespondentSol(wrapElements(gaDetailsRespo.toArray(new GADetailsRespondentSol[0])));
+            caseDataBuilder.respondentSolGaAppDetails(wrapElements(gaDetailsRespo
+                                                                       .toArray(new GADetailsRespondentSol[0])));
         }
 
         if (withGADetailsResp2) {
-            caseDataBuilder.gaDetailsRespondentSolTwo(wrapElements(gaDetailsRespo
+            caseDataBuilder.respondentSolTwoGaAppDetails(wrapElements(gaDetailsRespo
                                                                        .toArray(new GADetailsRespondentSol[0])));
         }
         return caseDataBuilder.build();

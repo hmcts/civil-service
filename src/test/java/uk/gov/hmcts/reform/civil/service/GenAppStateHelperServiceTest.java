@@ -163,9 +163,9 @@ class GenAppStateHelperServiceTest {
             CaseData updatedData = mapper.convertValue(response, CaseData.class);
 
             assertThat(updatedData.getGeneralApplications()).isEmpty();
-            assertThat(updatedData.getGeneralApplicationsDetails()).isNull();
-            assertThat(updatedData.getGaDetailsRespondentSol()).isNull();
-            assertThat(updatedData.getGaDetailsRespondentSolTwo()).isNull();
+            assertThat(updatedData.getClaimantGaAppDetails()).isNull();
+            assertThat(updatedData.getRespondentSolGaAppDetails()).isNull();
+            assertThat(updatedData.getRespondentSolTwoGaAppDetails()).isNull();
             verifyNoMoreInteractions(coreCaseDataService);
         }
 
@@ -234,9 +234,9 @@ class GenAppStateHelperServiceTest {
             CaseData updatedData = mapper.convertValue(response, CaseData.class);
 
             assertThat(updatedData.getGeneralApplications()).isEmpty();
-            assertThat(updatedData.getGeneralApplicationsDetails()).isNull();
-            assertThat(updatedData.getGaDetailsRespondentSol()).isNull();
-            assertThat(updatedData.getGaDetailsRespondentSolTwo()).isNull();
+            assertThat(updatedData.getClaimantGaAppDetails()).isNull();
+            assertThat(updatedData.getRespondentSolGaAppDetails()).isNull();
+            assertThat(updatedData.getRespondentSolTwoGaAppDetails()).isNull();
             verifyNoMoreInteractions(coreCaseDataService);
         }
 
@@ -308,21 +308,21 @@ class GenAppStateHelperServiceTest {
 
         private GeneralApplicationsDetails getGADetailsFromUpdatedCaseData(CaseData caseData,
                                                                            String gaCaseRef) {
-            Optional<Element<GeneralApplicationsDetails>> first = caseData.getGeneralApplicationsDetails().stream()
+            Optional<Element<GeneralApplicationsDetails>> first = caseData.getClaimantGaAppDetails().stream()
                     .filter(ga -> gaCaseRef.equals(ga.getValue().getCaseLink().getCaseReference())).findFirst();
             return first.map(Element::getValue).orElse(null);
         }
 
         private GADetailsRespondentSol getGARespDetailsFromUpdatedCaseData(CaseData caseData,
                                                                            String gaCaseRef) {
-            Optional<Element<GADetailsRespondentSol>> first = caseData.getGaDetailsRespondentSol().stream()
+            Optional<Element<GADetailsRespondentSol>> first = caseData.getRespondentSolGaAppDetails().stream()
                     .filter(ga -> gaCaseRef.equals(ga.getValue().getCaseLink().getCaseReference())).findFirst();
             return first.map(Element::getValue).orElse(null);
         }
 
         private GADetailsRespondentSol getGARespTwoDetailsFromUpdatedCaseData(CaseData caseData,
                                                                            String gaCaseRef) {
-            Optional<Element<GADetailsRespondentSol>> first = caseData.getGaDetailsRespondentSolTwo().stream()
+            Optional<Element<GADetailsRespondentSol>> first = caseData.getRespondentSolTwoGaAppDetails().stream()
                 .filter(ga -> gaCaseRef.equals(ga.getValue().getCaseLink().getCaseReference())).findFirst();
             return first.map(Element::getValue).orElse(null);
         }
