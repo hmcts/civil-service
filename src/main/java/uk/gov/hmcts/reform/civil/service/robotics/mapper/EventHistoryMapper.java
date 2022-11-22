@@ -131,14 +131,6 @@ public class EventHistoryMapper {
                         }
                         break;
                     }
-                    case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COS: {
-                        // this would change in CIV-1620
-                        if (featureToggleService.isNoticeOfChangeEnabled()
-                            && featureToggleService.isCertificateOfServiceEnabled()) {
-                            buildClaimIssued(builder, caseData);
-                        }
-                        break;
-                    }
                     case CLAIM_ISSUED:
                         buildClaimIssued(builder, caseData);
                         break;
