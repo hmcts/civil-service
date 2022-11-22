@@ -95,12 +95,7 @@ public class CaseMigratonUtility {
                                                                                .build()).build());
 
         } else  if (ofNullable(respondent1DQ).isPresent()) {
-            caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
-                                              .respondent1DQRequestedCourt(respondent1DQ
-                                                                               .getRespondent1DQRequestedCourt()
-                                                                               .toBuilder()
-                                                                               .caseLocation(caseLocation)
-                                                                               .build()).build());
+
             caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
                                               .respondent1DQRequestedCourt(RequestedCourt.builder()
                                                                                .caseLocation(caseLocation)
