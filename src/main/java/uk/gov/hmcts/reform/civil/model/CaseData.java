@@ -613,7 +613,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<DocumentUploadTrial>> documentAuthoritiesRes;
     private final List<Element<DocumentUploadTrial>> documentEvidenceForTrialRes;
     private final LocalDateTime caseDocumentUploadDateRes;
-    //respondent
+    //Other party
     private final List<Element<UploadEvidenceDisclosure>> documentDisclosureListOther;
     private final List<Element<UploadEvidenceDisclosure>> documentForDisclosureResOther;
     private final List<Element<UploadEvidenceWitness>> documentWitnessStatementOther;
