@@ -95,7 +95,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COS;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Service
@@ -511,19 +510,9 @@ public class FlowStateAllowedEventService {
                 NOC_REQUEST,
                     APPLY_NOC_DECISION,
                     TAKE_CASE_OFFLINE,
+                    NOTIFY_DEFENDANT_OF_CLAIM,
                     APPLICATION_OFFLINE_UPDATE_CLAIM,
                     migrateCase
-            )
-        ),
-        entry(
-            PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_COS.fullName(),
-            List.of(
-                NOC_REQUEST,
-                NOTIFY_DEFENDANT_OF_CLAIM,
-                APPLY_NOC_DECISION,
-                TAKE_CASE_OFFLINE,
-                APPLICATION_OFFLINE_UPDATE_CLAIM,
-                migrateCase
             )
         ),
         entry(
