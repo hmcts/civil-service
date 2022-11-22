@@ -85,8 +85,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -185,16 +185,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.disposalHearingJudgesRecital(tempDisposalHearingJudgesRecital).build();
 
-        JudgementSum judgementSum = caseData.getDrawDirectionsOrder();
-
-        if (judgementSum != null) {
-            DisposalHearingJudgementDeductionValue tempDisposalHearingJudgementDeductionValue =
-                DisposalHearingJudgementDeductionValue.builder()
-                    .value(judgementSum.getJudgementSum().toString() + "%")
-                    .build();
-
-            updatedData.disposalHearingJudgementDeductionValue(tempDisposalHearingJudgementDeductionValue).build();
-        }
+        updateDeductionValue(caseData, updatedData);
 
         DisposalHearingDisclosureOfDocuments tempDisposalHearingDisclosureOfDocuments =
             DisposalHearingDisclosureOfDocuments.builder()
@@ -313,15 +304,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
 
         updatedData.fastTrackJudgesRecital(tempFastTrackJudgesRecital).build();
-
-        if (judgementSum != null) {
-            FastTrackJudgementDeductionValue tempFastTrackJudgementDeductionValue =
-                FastTrackJudgementDeductionValue.builder()
-                    .value(judgementSum.getJudgementSum().toString() + "%")
-                    .build();
-
-            updatedData.fastTrackJudgementDeductionValue(tempFastTrackJudgementDeductionValue).build();
-        }
 
         FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
             .input1("Documents will be disclosed by uploading to the Digital Portal a list with a disclosure "
@@ -543,15 +525,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.smallClaimsJudgesRecital(tempSmallClaimsJudgesRecital).build();
 
-        if (judgementSum != null) {
-            SmallClaimsJudgementDeductionValue tempSmallClaimsJudgementDeductionValue =
-                SmallClaimsJudgementDeductionValue.builder()
-                    .value(judgementSum.getJudgementSum().toString() + "%")
-                    .build();
-
-            updatedData.smallClaimsJudgementDeductionValue(tempSmallClaimsJudgementDeductionValue).build();
-        }
-
         SmallClaimsDocuments tempSmallClaimsDocuments = SmallClaimsDocuments.builder()
             .input1("Each party must upload to the Digital Portal copies of all documents which they wish the court to"
                         + " consider when reaching its decision not less than 14 days before the hearing.")
@@ -602,10 +575,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         SmallClaimsNotes.SmallClaimsNotesBuilder tempSmallClaimsNotes = SmallClaimsNotes.builder();
         if (featureToggleService.isHearingAndListingSDOEnabled()) {
             tempSmallClaimsNotes.input("Each party has the right to apply to have this Order set aside or varied. "
-                    + "Any such application must be received by the Court "
-                    + "(together with the appropriate fee) by 4pm on "
-                    + DateFormatHelper.formatLocalDate(
-                    deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5), DATE)
+                                           + "Any such application must be received by the Court "
+                                           + "(together with the appropriate fee) by 4pm on "
+                                           + DateFormatHelper.formatLocalDate(
+                deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5), DATE)
             );
         } else {
             tempSmallClaimsNotes.input(
@@ -674,6 +647,34 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    private void updateDeductionValue(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
+        Optional.ofNullable(caseData.getDrawDirectionsOrder())
+            .map(JudgementSum::getJudgementSum)
+            .map(d -> d + "%")
+            .ifPresent(deductionPercentage -> {
+                DisposalHearingJudgementDeductionValue tempDisposalHearingJudgementDeductionValue =
+                    DisposalHearingJudgementDeductionValue.builder()
+                        .value(deductionPercentage)
+                        .build();
+
+                updatedData.disposalHearingJudgementDeductionValue(tempDisposalHearingJudgementDeductionValue);
+
+                FastTrackJudgementDeductionValue tempFastTrackJudgementDeductionValue =
+                    FastTrackJudgementDeductionValue.builder()
+                        .value(deductionPercentage)
+                        .build();
+
+                updatedData.fastTrackJudgementDeductionValue(tempFastTrackJudgementDeductionValue).build();
+
+                SmallClaimsJudgementDeductionValue tempSmallClaimsJudgementDeductionValue =
+                    SmallClaimsJudgementDeductionValue.builder()
+                        .value(deductionPercentage)
+                        .build();
+
+                updatedData.smallClaimsJudgementDeductionValue(tempSmallClaimsJudgementDeductionValue).build();
+            });
+    }
+
     /**
      * Creates the dynamic list for the hearing location, pre-selecting the preferred court if possible.
      *
@@ -710,6 +711,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private CallbackResponse setOrderDetailsFlags(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
+
+        updateDeductionValue(caseData, updatedData);
 
         updatedData.setSmallClaimsFlag(YesOrNo.NO).build();
         updatedData.setFastTrackFlag(YesOrNo.NO).build();
@@ -773,7 +776,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         } else if (caseData.getClaimsTrack() == ClaimsTrack.smallClaimsTrack) {
             return getHearingInPersonSmall(caseData);
         } else if (Optional.ofNullable(caseData.getDisposalHearingMethodToggle())
-                .map(c -> c.contains(OrderDetailsPagesSectionsToggle.SHOW)).orElse(Boolean.FALSE)
+            .map(c -> c.contains(OrderDetailsPagesSectionsToggle.SHOW)).orElse(Boolean.FALSE)
             && caseData.getDisposalHearingMethod() == DisposalHearingMethod.disposalHearingMethodInPerson
             && Optional.ofNullable(caseData.getDisposalHearingMethodInPerson())
             .map(DynamicList::getValue).isPresent()) {
