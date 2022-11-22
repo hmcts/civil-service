@@ -94,8 +94,15 @@ public class CaseMigratonUtility {
                                                                                                  .build())
                                                                                .build()).build());
 
-        } else  if (ofNullable(respondent1DQ).isPresent()) {
-
+        } else  if (ofNullable(respondent1DQ).isPresent() &&
+            ofNullable(respondent1DQ.getRespondent1DQRequestedCourt()).isPresent()) {
+            caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
+                                              .respondent1DQRequestedCourt(respondent1DQ
+                                                                               .getRespondent1DQRequestedCourt()
+                                                                               .toBuilder()
+                                                                               .caseLocation(caseLocation)
+                                                                               .build()).build());
+        } else if (ofNullable(respondent1DQ).isPresent()) {
             caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
                                               .respondent1DQRequestedCourt(RequestedCourt.builder()
                                                                                .caseLocation(caseLocation)
@@ -148,11 +155,19 @@ public class CaseMigratonUtility {
                                                                                                  .build())
                                                                                .build()).build());
 
-        } else  if (ofNullable(respondent2DQ).isPresent()) {
+        } else  if (ofNullable(respondent2DQ).isPresent()
+            && ofNullable(respondent2DQ.getRespondent2DQRequestedCourt()).isPresent()) {
             caseDataBuilder.respondent2DQ(respondent2DQ.toBuilder()
-                                             .respondent2DQRequestedCourt(RequestedCourt.builder()
-                                                                              .caseLocation(caseLocation)
-                                                                              .build()).build());
+                                             .respondent2DQRequestedCourt(respondent2DQ
+                                                                             .getRespondent2DQRequestedCourt()
+                                                                             .toBuilder()
+                                                                             .caseLocation(caseLocation)
+                                                                             .build()).build());
+        } else if (ofNullable(respondent2DQ).isPresent()) {
+            caseDataBuilder.respondent2DQ(respondent2DQ.toBuilder()
+                                              .respondent2DQRequestedCourt(RequestedCourt.builder()
+                                                                               .caseLocation(caseLocation)
+                                                                               .build()).build());
         }
     }
 
@@ -185,11 +200,19 @@ public class CaseMigratonUtility {
                                                                                                            .getRegion())
                                                                                                .build())
                                                                              .build()).build());
-        } else if (ofNullable(applicant1DQ).isPresent()) {
+        } else if (ofNullable(applicant1DQ).isPresent()
+            && ofNullable(applicant1DQ.getApplicant1DQRequestedCourt()).isPresent()) {
             caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
-                                             .applicant1DQRequestedCourt(RequestedCourt.builder()
+                                             .applicant1DQRequestedCourt(applicant1DQ
+                                                                             .getApplicant1DQRequestedCourt()
+                                                                             .toBuilder()
                                                                              .caseLocation(caseLocation)
                                                                              .build()).build());
+        } else if (ofNullable(applicant1DQ).isPresent()) {
+            caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
+                                              .applicant1DQRequestedCourt(RequestedCourt.builder()
+                                                                               .caseLocation(caseLocation)
+                                                                               .build()).build());
         }
 
     }
@@ -223,7 +246,15 @@ public class CaseMigratonUtility {
                                                                                                .build())
                                                                              .build()).build());
 
-        } else if (ofNullable(applicant2DQ).isPresent())  {
+        } else if (ofNullable(applicant2DQ).isPresent()
+            && ofNullable(applicant2DQ.getApplicant2DQRequestedCourt()).isPresent())  {
+            caseDataBuilder.applicant2DQ(applicant2DQ.toBuilder()
+                                             .applicant2DQRequestedCourt(applicant2DQ
+                                                                             .getApplicant2DQRequestedCourt()
+                                                                             .toBuilder()
+                                                                             .caseLocation(caseLocation)
+                                                                             .build()).build());
+        }  else if (ofNullable(applicant2DQ).isPresent()) {
             caseDataBuilder.applicant2DQ(applicant2DQ.toBuilder()
                                              .applicant2DQRequestedCourt(RequestedCourt.builder()
                                                                              .caseLocation(caseLocation)
