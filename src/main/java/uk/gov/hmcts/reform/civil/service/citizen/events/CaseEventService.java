@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.citizen.events;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -15,10 +16,12 @@ import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataC
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class CaseEventService {
 
     private final CoreCaseDataApi coreCaseDataApi;
     private final AuthTokenGenerator authTokenGenerator;
+
 
     private StartEventResponse startEvent(String authorisation, String userId, String caseId, CaseEvent event) {
         return coreCaseDataApi.startEventForCitizen(
@@ -32,7 +35,18 @@ public class CaseEventService {
         );
     }
 
-    public CaseDetails submitEvent(EventSubmissionParams params) {
+    private StartEventResponse startEvent(String authorisation, String userId, CaseEvent event) {
+        return coreCaseDataApi.startForCitizen(
+            authorisation,
+            authTokenGenerator.generate(),
+            userId,
+            JURISDICTION,
+            CASE_TYPE,
+            event.name()
+        );
+    }
+
+    public CaseDetails submitEventForClaim(EventSubmissionParams params) {
         StartEventResponse eventResponse = startEvent(
             params.getAuthorisation(),
             params.getUserId(),
@@ -50,5 +64,23 @@ public class CaseEventService {
             true,
             caseDataContent
         );
+    }
+
+    public CaseDetails submitEventForNewClaim(EventSubmissionParams params){
+        StartEventResponse eventResponse = startEvent(params.getAuthorisation(), params.getUserId(), params.getEvent());
+        CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(eventResponse, params.getUpdates());
+        return coreCaseDataApi.submitForCitizen( params.getAuthorisation(),
+                                                 authTokenGenerator.generate(),
+                                                 params.getUserId(),
+                                                 JURISDICTION,
+                                                 CASE_TYPE,
+                                                 true, caseDataContent);
+    }
+
+    public CaseDetails submitEvent(EventSubmissionParams params) {
+        if(params.isDraftClaim()){
+            return submitEventForNewClaim(params);
+        }
+        return submitEventForClaim(params);
     }
 }

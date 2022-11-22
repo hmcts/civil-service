@@ -157,7 +157,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final Party respondent2Copy;
     private final Party respondent1DetailsForClaimDetailsTab;
     private final Party respondent2DetailsForClaimDetailsTab;
-    private final YesOrNo applicant1Represented;
     private final YesOrNo respondent1Represented;
     private final YesOrNo respondent2Represented;
     private final YesOrNo respondent1OrgRegistered;
@@ -607,13 +606,5 @@ public class CaseData extends CaseDataParent implements MappableObject {
             )
             .filter(Objects::nonNull)
             .findFirst().orElse(null);
-    }
-
-    /**
-     * Defines whether the claim has been raised by unrepresented claimant (lip)
-     * @return true if field is not set or set to No
-     */
-    public boolean isApplicantNotRepresented() {
-        return this.applicant1Represented == null || this.applicant1Represented == YesOrNo.NO;
     }
 }
