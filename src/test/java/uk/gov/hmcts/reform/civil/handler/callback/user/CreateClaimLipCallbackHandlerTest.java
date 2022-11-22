@@ -3,13 +3,11 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -34,9 +32,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
     CreateClaimLipCallBackHandler.class,
     JacksonAutoConfiguration.class,
@@ -67,7 +64,6 @@ public class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CreateClaimLipCallBackHandler handler;
 
     public static final String REFERENCE_NUMBER = "000MC001";
-
 
     @Nested
     class AboutToStatCallback {
@@ -104,7 +100,7 @@ public class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAddCaseReferenceSubmittedDateAndAllocatedTrack_whenInvoked() {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                    CallbackRequest.builder().eventId(CREATE_CLAIM_SPEC.name()).build())
+                    CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -113,7 +109,5 @@ public class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("submittedDate", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME));
 
         }
-
     }
-
 }
