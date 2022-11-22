@@ -510,6 +510,7 @@ public class FlowStateAllowedEventService {
                 NOC_REQUEST,
                     APPLY_NOC_DECISION,
                     TAKE_CASE_OFFLINE,
+                    NOTIFY_DEFENDANT_OF_CLAIM,
                     APPLICATION_OFFLINE_UPDATE_CLAIM,
                     migrateCase
             )

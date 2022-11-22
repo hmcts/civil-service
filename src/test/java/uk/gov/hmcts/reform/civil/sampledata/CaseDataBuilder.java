@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
+import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
@@ -155,6 +156,8 @@ public class CaseDataBuilder {
     protected Party respondent2;
     protected YesOrNo respondent1Represented;
     protected YesOrNo respondent2Represented;
+    protected YesOrNo defendant1LIPAtClaimIssued;
+    protected YesOrNo defendant2LIPAtClaimIssued;
     protected String respondentSolicitor1EmailAddress;
     protected String respondentSolicitor2EmailAddress;
     protected ClaimValue claimValue;
@@ -338,6 +341,8 @@ public class CaseDataBuilder {
 
     private String unassignedCaseListDisplayOrganisationReferences;
     private String caseListDisplayDefendantSolicitorReferences;
+    private  CertificateOfService cosNotifyClaimDefendant1;
+    private  CertificateOfService cosNotifyClaimDefendant2;
 
     private TrialHearingTimeDJ trialHearingTimeDJ;
     private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
@@ -493,6 +498,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondent2OrganisationIDCopy(String id) {
         this.respondent2OrganisationIDCopy = id;
+        return this;
+    }
+
+    public CaseDataBuilder cosNotifyClaimDefendant1(CertificateOfService cosNotifyClaimDefendant) {
+        this.cosNotifyClaimDefendant1 = cosNotifyClaimDefendant;
+        return this;
+    }
+
+    public CaseDataBuilder cosNotifyClaimDefendant2(CertificateOfService cosNotifyClaimDefendant) {
+        this.cosNotifyClaimDefendant2 = cosNotifyClaimDefendant;
         return this;
     }
 
@@ -791,6 +806,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder defendant1LIPAtClaimIssued(YesOrNo defendant1LIPAtClaimIssued) {
+        this.defendant1LIPAtClaimIssued = defendant1LIPAtClaimIssued;
+        return this;
+    }
+
+    public CaseDataBuilder defendant2LIPAtClaimIssued(YesOrNo defendant2LIPAtClaimIssued) {
+        this.defendant2LIPAtClaimIssued = defendant2LIPAtClaimIssued;
+        return this;
+    }
+
     public CaseDataBuilder respondent1OrgRegistered(YesOrNo respondent1OrgRegistered) {
         this.respondent1OrgRegistered = respondent1OrgRegistered;
         return this;
@@ -1055,6 +1080,8 @@ public class CaseDataBuilder {
         respondent2OrganisationPolicy = OrganisationPolicy.builder()
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
             .build();
+        defendant1LIPAtClaimIssued = YES;
+        defendant2LIPAtClaimIssued = YES;
         respondent1OrgRegistered = null;
         respondent2OrgRegistered = null;
         return this;
@@ -1099,7 +1126,7 @@ public class CaseDataBuilder {
         respondent2Represented = YES;
         respondent2OrgRegistered = YES;
         respondentSolicitor1OrganisationDetails = null;
-
+        defendant1LIPAtClaimIssued = YES;
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
             .build();
@@ -1120,7 +1147,7 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondentSolicitor1OrganisationDetails = null;
-
+        defendant2LIPAtClaimIssued = YES;
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY R").build())
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
@@ -1460,6 +1487,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimSubmittedOneRespondentRepresentative() {
         atStateClaimSubmitted();
         addRespondent2 = NO;
+        defendant1LIPAtClaimIssued = NO;
         return this;
     }
 
@@ -1906,6 +1934,34 @@ public class CaseDataBuilder {
         atStateClaimNotified();
         multiPartyClaimTwoDefendantSolicitors();
         defendantSolicitorNotifyClaimOptions("Defendant One: Solicitor A");
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimNotified1v1LiP(CertificateOfService  certificateOfService) {
+        atStatePendingClaimIssued();
+        ccdState = CASE_ISSUED;
+        respondent1Represented = NO;
+        respondent1OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+            .build();
+        defendant1LIPAtClaimIssued = YES;
+        legacyCaseReference = LEGACY_CASE_REFERENCE;
+        cosNotifyClaimDefendant1 = certificateOfService;
+        claimDetailsNotificationDeadline = DEADLINE;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimNotified1v2Respondent2LiP(CertificateOfService  certificateOfService) {
+        atStatePendingClaimIssued();
+        ccdState = CASE_ISSUED;
+        respondent2Represented = NO;
+        respondent2OrganisationPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+            .build();
+        legacyCaseReference = LEGACY_CASE_REFERENCE;
+        cosNotifyClaimDefendant2 = certificateOfService;
+        claimDetailsNotificationDeadline = DEADLINE;
+        defendant2LIPAtClaimIssued = YES;
         return this;
     }
 
@@ -3783,6 +3839,10 @@ public class CaseDataBuilder {
             .unassignedCaseListDisplayOrganisationReferences(unassignedCaseListDisplayOrganisationReferences)
             .caseListDisplayDefendantSolicitorReferences(caseListDisplayDefendantSolicitorReferences)
             .caseManagementLocation(caseManagementLocation)
+            .cosNotifyClaimDefendant1(cosNotifyClaimDefendant1)
+            .cosNotifyClaimDefendant2(cosNotifyClaimDefendant2)
+            .defendant1LIPAtClaimIssued(defendant1LIPAtClaimIssued)
+            .defendant2LIPAtClaimIssued(defendant2LIPAtClaimIssued)
             //Unsuitable for SDO
             .reasonNotSuitableSDO(reasonNotSuitableSDO)
             .trialHearingTimeDJ(trialHearingTimeDJ)

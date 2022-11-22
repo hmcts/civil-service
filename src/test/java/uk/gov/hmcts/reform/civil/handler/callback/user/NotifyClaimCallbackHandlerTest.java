@@ -20,12 +20,14 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static java.lang.String.format;
@@ -39,7 +41,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.DEADLINE;
 import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSINESS_DAY;
@@ -74,6 +78,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private final LocalDateTime notificationDate = LocalDateTime.now();
     private final LocalDateTime deadline = notificationDate.toLocalDate().atTime(END_OF_BUSINESS_DAY);
+    public static final String DOC_SERVED_DATE_IN_FUTURE = "Date you served the documents must be today or in the past";
 
     @Nested
     class AboutToStartCallback {
@@ -123,6 +128,136 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getWarnings()).isEmpty();
         }
+    }
+
+    @Nested
+    class MidEventValidateCosDefendant1Callback {
+
+        private static final String PAGE_ID = "validateCosNotifyClaimDef1";
+
+        @Test
+        void shouldThrowError_whenNotifyingDate_futureDate() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified1v1LiP(CertificateOfService.builder()
+                                                .cosDateOfServiceForDefendant(LocalDate.now().plusDays(2))
+                                                .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).contains(DOC_SERVED_DATE_IN_FUTURE);
+        }
+
+        @Test
+        void shouldThrowError_when_cosDefendant1isNull() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified1v1LiP(null)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNot_ThrowError_whenNotifyingDate_isCurrentDate() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified1v1LiP(CertificateOfService.builder()
+                                                .cosDateOfServiceForDefendant(LocalDate.now())
+                                                .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNot_ThrowError_whenNotifyingDate_isPastDate() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified1v1LiP(CertificateOfService.builder()
+                                                .cosDateOfServiceForDefendant(LocalDate.now().minusDays(3))
+                                                .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+    }
+
+    @Nested
+    class MidEventValidateCosDefendant2Callback {
+
+        private static final String PAGE_ID = "validateCosNotifyClaimDef2";
+
+        @Test
+        void shouldThrowError_whenNotifyingDate_futureDate() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified1v2Respondent2LiP(CertificateOfService.builder()
+                                                .cosDateOfServiceForDefendant(LocalDate.now().plusDays(2))
+                                                .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).contains(DOC_SERVED_DATE_IN_FUTURE);
+        }
+
+        @Test
+        void shouldThrowError_when_cosDefendant1isNull() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified1v2Respondent2LiP(null)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNot_ThrowError_whenNotifyingDate_isCurrentDate() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified1v2Respondent2LiP(CertificateOfService.builder()
+                                                .cosDateOfServiceForDefendant(LocalDate.now())
+                                                .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNot_ThrowError_whenNotifyingDate_isPastDate() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified1v2Respondent2LiP(CertificateOfService.builder()
+                                                .cosDateOfServiceForDefendant(LocalDate.now().minusDays(3))
+                                                .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
     }
 
     @Nested
@@ -348,6 +483,11 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         private static final String CONFIRMATION_BODY = "<br />The defendant legal representative's organisation has "
             + "been notified and granted access to this claim.%n%n"
             + "You must notify the defendant with the claim details by %s";
+
+        private static final String CONFIRMATION_SUMMARY_COS = "<br /><h2 class=\"govuk-heading-m\">What happens"
+            + " next</h2> %n%n You must serve the claim details and complete the certificate of service notify claim"
+            + " details next step by 4:00pm on %s.%n%nThis is a new online process - you don't need to file any"
+            + " further documents to the court";
         public static final String CONFIRMATION_NOTIFICATION_ONE_PARTY_SUMMARY = "<br />Notification of claim sent to "
             + "1 Defendant legal representative only.%n%n"
             + "Your claim will proceed offline.";
@@ -409,6 +549,50 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader(format("# Notification of claim sent%n## Claim number: 000DC001"))
+                    .confirmationBody(confirmationBody)
+                    .build());
+        }
+
+        @Test
+        void shouldReturnExpectedSubmittedCallbackResponse_Defendant1Lip_whenInvoked() {
+            CaseData caseData = CaseDataBuilder
+                .builder().atStateClaimNotified1v1LiP(CertificateOfService
+                                                          .builder().cosDateOfServiceForDefendant(LocalDate.now())
+                                                          .build())
+                .build();
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String formattedDeadline = formatLocalDate(DEADLINE.toLocalDate(), DATE);
+            String confirmationBody = String.format(CONFIRMATION_SUMMARY_COS, formattedDeadline)
+                + exitSurveyContentService.applicantSurvey();
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# Certificate of Service - notify claim successful %n## 000DC001"))
+                    .confirmationBody(confirmationBody)
+                    .build());
+        }
+
+        @Test
+        void shouldReturnExpectedSubmittedCallbackResponse_Defendant2Lip_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified1v2Respondent2LiP(CertificateOfService.builder()
+                                                           .cosDateOfServiceForDefendant(LocalDate.now())
+                                                           .build())
+                .build();
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String formattedDeadline = formatLocalDate(DEADLINE.toLocalDate(), DATE);
+            String confirmationBody = String.format(CONFIRMATION_SUMMARY_COS, formattedDeadline)
+                + exitSurveyContentService.applicantSurvey();
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# Certificate of Service - notify claim successful %n## 000DC001"))
                     .confirmationBody(confirmationBody)
                     .build());
         }
