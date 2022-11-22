@@ -20,12 +20,12 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
 
     @Override
     CallbackResponse validateValues(CaseData caseData) {
-        return validateValuesParty(caseData.getDocumentUploadWitness1(),
-                                   caseData.getDocumentUploadWitness3(),
-                                   caseData.getDocumentUploadExpert1(),
-                                   caseData.getDocumentUploadExpert2(),
-                                   caseData.getDocumentUploadExpert3(),
-                                   caseData.getDocumentUploadExpert4());
+        return validateValuesParty(caseData.getDocumentWitnessStatement(),
+                                   caseData.getDocumentHearsayNotice(),
+                                   caseData.getDocumentExpertReport(),
+                                   caseData.getDocumentJointStatement(),
+                                   caseData.getDocumentQuestions(),
+                                   caseData.getDocumentAnswers());
 
     }
 
