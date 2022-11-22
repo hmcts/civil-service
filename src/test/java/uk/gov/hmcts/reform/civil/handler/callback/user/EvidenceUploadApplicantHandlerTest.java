@@ -43,13 +43,13 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
-    EvidenceUploadHandler.class,
+    EvidenceUploadApplicantHandler.class,
     JacksonAutoConfiguration.class
 })
-class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
+class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
-    private EvidenceUploadHandler handler;
+    private EvidenceUploadApplicantHandler handler;
 
     @MockBean
     private Time time;
