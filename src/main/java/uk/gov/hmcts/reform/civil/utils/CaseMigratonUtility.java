@@ -99,8 +99,8 @@ public class CaseMigratonUtility {
                                                                                                  .build())
                                                                                .build()).build());
 
-        } else  if (ofNullable(respondent1DQ).isPresent() &&
-            ofNullable(respondent1DQ.getRespondent1DQRequestedCourt()).isPresent()) {
+        } else  if (ofNullable(respondent1DQ).isPresent()
+            && ofNullable(respondent1DQ.getRespondent1DQRequestedCourt()).isPresent()) {
             caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
                                               .respondent1DQRequestedCourt(respondent1DQ
                                                                                .getRespondent1DQRequestedCourt()
