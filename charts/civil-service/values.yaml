@@ -57,6 +57,7 @@ java:
     SOME_ENV_VARIABLE: true
     DOCUMENT_MANAGEMENT_SECURED: true
     REST_TEMPLATE_TIMEOUT: 30000
+    POLLING_EVENT_EMITTER_ENABLED: false
 
   keyVaults:
     civil:
@@ -81,4 +82,5 @@ java:
         - robotics-notification-multipartyrecipient
         - robotics-notification-recipient-spec
         - ordnance-survey-api-key
+        - notification-caseworker-spec-receiver
 

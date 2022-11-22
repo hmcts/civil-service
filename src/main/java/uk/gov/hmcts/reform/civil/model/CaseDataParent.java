@@ -157,6 +157,7 @@ public class CaseDataParent implements MappableObject {
     private final DynamicList disposalHearingMethodInPerson;
     private final DynamicList fastTrackMethodInPerson;
     private final DynamicList smallClaimsMethodInPerson;
+    private final DynamicList hearingMethod;
     private final YesOrNo drawDirectionsOrderRequired;
     private final YesOrNo drawDirectionsOrderSmallClaims;
     private final ClaimsTrack claimsTrack;
@@ -190,6 +191,7 @@ public class CaseDataParent implements MappableObject {
     private SmallClaimsJudgesRecital smallClaimsJudgesRecital;
     private SmallClaimsNotes smallClaimsNotes;
     private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
+    private SDOHearingNotes sdoHearingNotes;
     private ReasonNotSuitableSDO reasonNotSuitableSDO;
     private final List<SmallTrack> smallClaims;
     private final SmallClaimsMethod smallClaimsMethod;

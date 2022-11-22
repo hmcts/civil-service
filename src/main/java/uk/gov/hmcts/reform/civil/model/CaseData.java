@@ -499,15 +499,18 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private HearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceHearingDJ;
 
     //Hearing Scheduled
+    private String hearingReference;
     private DynamicList hearingLocation;
     private LocalDate dateOfApplication;
     private LocalDate hearingDate;
+    private LocalDate hearingDueDate;
     private String hearingTimeHourMinute;
     private String hearingReferenceNumber;
     private ListingOrRelisting listingOrRelisting;
     private HearingNoticeList hearingNoticeList;
-    private LocalDate hearingDueDate;
     private Fee hearingFee;
+
+    private LocalDateTime caseDismissedHearingFeeDueDate;
 
     //default judgement SDO fields for trial/fast track
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
@@ -532,6 +535,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> orderSDODocumentDJCollection = new ArrayList<>();
     /**
      * RTJ = Refer To Judge.
      */
