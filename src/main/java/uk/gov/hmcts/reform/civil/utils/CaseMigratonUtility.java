@@ -107,12 +107,12 @@ public class CaseMigratonUtility {
                                                                                .toBuilder()
                                                                                .caseLocation(caseLocation)
                                                                                .build()).build());
-        } else if (ofNullable(respondent1DQ).isPresent()) {
+        } /*else if (ofNullable(respondent1DQ).isPresent()) {
             caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
                                               .respondent1DQRequestedCourt(RequestedCourt.builder()
                                                                                .caseLocation(caseLocation)
                                                                                .build()).build());
-        }
+        }*/
     }
 
     private static void migrateRespondent2DQ(String authToken, CaseData oldCaseData,
@@ -168,12 +168,12 @@ public class CaseMigratonUtility {
                                                                              .toBuilder()
                                                                              .caseLocation(caseLocation)
                                                                              .build()).build());
-        } else if (ofNullable(respondent2DQ).isPresent()) {
+        } /*else if (ofNullable(respondent2DQ).isPresent()) {
             caseDataBuilder.respondent2DQ(respondent2DQ.toBuilder()
                                               .respondent2DQRequestedCourt(RequestedCourt.builder()
                                                                                .caseLocation(caseLocation)
                                                                                .build()).build());
-        }
+        }*/
     }
 
     // Applicable for Respondent1 and Respondent2
@@ -213,12 +213,12 @@ public class CaseMigratonUtility {
                                                                              .toBuilder()
                                                                              .caseLocation(caseLocation)
                                                                              .build()).build());
-        } else if (ofNullable(applicant1DQ).isPresent()) {
+        } /*else if (ofNullable(applicant1DQ).isPresent()) {
             caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
                                               .applicant1DQRequestedCourt(RequestedCourt.builder()
                                                                                .caseLocation(caseLocation)
                                                                                .build()).build());
-        }
+        }*/
 
     }
 
@@ -259,12 +259,12 @@ public class CaseMigratonUtility {
                                                                              .toBuilder()
                                                                              .caseLocation(caseLocation)
                                                                              .build()).build());
-        }  else if (ofNullable(applicant2DQ).isPresent()) {
+        }  /*else if (ofNullable(applicant2DQ).isPresent()) {
             caseDataBuilder.applicant2DQ(applicant2DQ.toBuilder()
                                              .applicant2DQRequestedCourt(RequestedCourt.builder()
                                                                              .caseLocation(caseLocation)
                                                                              .build()).build());
-        }
+        }*/
     }
 
     // Case management category,caseNameHmctsInternal, and supplementaryData
