@@ -39,8 +39,10 @@ import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -272,6 +274,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         if (V_1.equals(callbackParams.getVersion())) {
             updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
+            updatedCaseData.respondent1PaymentDateToStringSpec(setUpPayDateToString(caseData));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -383,6 +386,15 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 default:
                     return null;
             }
+        }
+        return null;
+    }
+
+    private String setUpPayDateToString(CaseData caseData) {
+        if (caseData.getRespondToClaimAdmitPartLRspec() != null
+            && caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null) {
+            return caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()
+                .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         }
         return null;
     }

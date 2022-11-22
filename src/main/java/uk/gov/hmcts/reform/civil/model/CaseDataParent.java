@@ -316,6 +316,7 @@ public class CaseDataParent implements MappableObject {
     private final YesOrNo applicant1AcceptPaymentPlanSpec;
     private final CaseDocument respondent1ClaimResponseDocumentSpec;
     private final CaseDocument respondent2ClaimResponseDocumentSpec;
+    private final String respondent1PaymentDateToStringSpec;
 
     private final String migrationId;
 
