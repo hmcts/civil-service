@@ -239,6 +239,7 @@ class CaseEventTaskHandlerTest {
 
             when(mockTask.getAllVariables()).thenReturn(variables);
             when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
         }
 
         @ParameterizedTest
@@ -703,7 +704,8 @@ class CaseEventTaskHandlerTest {
                               "RPA_CONTINUOUS_FEED", false,
                               FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
                               FlowFlag.NOTICE_OF_CHANGE.name(), true,
-                              FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false
+                              FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
+                              FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
                 );
             } else if (state.equals(TAKEN_OFFLINE_BY_STAFF)
                 || state.equals(PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT)
@@ -715,12 +717,15 @@ class CaseEventTaskHandlerTest {
                 return Map.of("ONE_RESPONDENT_REPRESENTATIVE", true, "RPA_CONTINUOUS_FEED", false,
                               FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
                               FlowFlag.NOTICE_OF_CHANGE.name(), true,
-                              FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false);
+                              FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
+                              FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
+                );
             }
             return Map.of("RPA_CONTINUOUS_FEED", false,
                           FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
                           FlowFlag.NOTICE_OF_CHANGE.name(), true,
-                          FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false
+                          FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
+                          FlowFlag.CERTIFICATE_OF_SERVICE.name(), true
                     );
         }
 

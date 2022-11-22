@@ -84,7 +84,8 @@ class PaymentTaskHandlerTest {
                                                   "RPA_CONTINUOUS_FEED", false,
                                                   FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false,
                                                   FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false,
-                                                  FlowFlag.NOTICE_OF_CHANGE.name(), false));
+                                                  FlowFlag.NOTICE_OF_CHANGE.name(), false,
+                                                  FlowFlag.CERTIFICATE_OF_SERVICE.name(), false));
 
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
