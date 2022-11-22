@@ -74,28 +74,28 @@ public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         List<String> errors = new ArrayList<>();
 
         checkDateCorrectness(time, errors, uploadEvidenceWitness1, date -> date.getValue()
-                                 .getWitnessOption1UploadDate(),
+                                 .getWitnessOptionUploadDate(),
                              "Invalid date: \"witness statement\" "
                                  + "date entered must not be in the future (1).");
         checkDateCorrectness(time, errors, uploadEvidenceWitness3, date -> date.getValue()
-                                 .getWitnessOption3UploadDate(),
+                                 .getWitnessOptionUploadDate(),
                              "Invalid date: \"Notice of the intention to rely on hearsay evidence\" "
                                  + "date entered must not be in the future (2).");
 
         checkDateCorrectness(time, errors, uploadEvidenceExpert1, date -> date.getValue()
-                                 .getExpertOption1UploadDate(),
+                                 .getExpertOptionUploadDate(),
                              "Invalid date: \"Expert's report\""
                                  + " date entered must not be in the future (3).");
         checkDateCorrectness(time, errors, uploadEvidenceExpert2, date -> date.getValue()
-                                 .getExpertOption2UploadDate(),
+                                 .getExpertOptionUploadDate(),
                              "Invalid date: \"Joint statement of experts\" "
                                  + "date entered must not be in the future (4).");
         checkDateCorrectness(time, errors, uploadEvidenceExpert3, date -> date.getValue()
-                                 .getExpertOption3UploadDate(),
+                                 .getExpertOptionUploadDate(),
                              "Invalid date: \"Questions for other party's expert or joint experts\" "
                                  + "expert statement date entered must not be in the future (5).");
         checkDateCorrectness(time, errors, uploadEvidenceExpert4, date -> date.getValue()
-                                 .getExpertOption4UploadDate(),
+                                 .getExpertOptionUploadDate(),
                              "Invalid date: \"Answers to questions asked by the other party\" "
                                  + "date entered must not be in the future (6).");
 
@@ -103,6 +103,7 @@ public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             .errors(errors)
             .build();
     }
+
     <T> void checkDateCorrectness(Time time, List<String> errors, List<Element<T>> documentUpload,
                                   Function<Element<T>, LocalDate> dateExtractor, String errorMessage) {
         if (documentUpload == null) {
