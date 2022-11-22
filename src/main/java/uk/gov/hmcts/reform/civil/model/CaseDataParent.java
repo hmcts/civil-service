@@ -310,7 +310,7 @@ public class CaseDataParent implements MappableObject {
     private final String respondent1EmailAddress;
 
     /**
-     * Adding for LR ITP Update
+     * Adding for LR ITP Update.
      */
     private final ResponseOneVOneShowTag showResponseOneVOneFlag;
     private final YesOrNo applicant1AcceptPaymentPlanSpec;
