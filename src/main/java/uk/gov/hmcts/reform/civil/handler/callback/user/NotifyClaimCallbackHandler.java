@@ -38,6 +38,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
@@ -97,12 +99,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     private CallbackResponse prepareDefendantSolicitorOptions(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if(!featureToggleService.isCertificateOfServiceEnabled()
-            && (
-                caseData.getDefendant1LIPAtClaimIssued().equals(YesOrNo.YES)
-                    || caseData.getDefendant2LIPAtClaimIssued() != null
-            )
-        ) {
+        if(!featureToggleService.isCertificateOfServiceEnabled() && areAnyRespondentsLitigantInPerson(caseData)  ) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT))
                 .build();
@@ -283,11 +280,17 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         return LocalDate.now().isBefore(cosNotifyClaimDefendant.getCosDateOfServiceForDefendant());
     }
 
+
     private boolean isConfirmationForLip(CaseData caseData) {
         return (caseData.getDefendant1LIPAtClaimIssued() != null
             && caseData.getDefendant1LIPAtClaimIssued() == YesOrNo.YES)
             || (caseData.getDefendant2LIPAtClaimIssued() != null
             && caseData.getDefendant2LIPAtClaimIssued() == YesOrNo.YES);
 
+    }
+
+    private boolean areAnyRespondentsLitigantInPerson(CaseData caseData) {
+        return caseData.getRespondent1Represented() == NO
+            || (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
     }
 }
