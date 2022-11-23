@@ -96,6 +96,8 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("reference", "status", "customerReference")
                 .containsExactly(SUCCESSFUL_PAYMENT_REFERENCE, SUCCESS.toString(), "12345");
             assertThat(response.getData()).containsEntry("paymentSuccessfulDate", "2020-01-01T12:00:00");
+
+            assertThat(response.getState()).isEqualTo("CASE_ISSUED");
         }
 
         @ParameterizedTest
