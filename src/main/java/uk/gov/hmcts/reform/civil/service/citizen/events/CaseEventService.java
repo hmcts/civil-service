@@ -66,19 +66,20 @@ public class CaseEventService {
         );
     }
 
-    public CaseDetails submitEventForNewClaim(EventSubmissionParams params){
+    public CaseDetails submitEventForNewClaim(EventSubmissionParams params) {
         StartEventResponse eventResponse = startEvent(params.getAuthorisation(), params.getUserId(), params.getEvent());
         CaseDataContent caseDataContent = caseDataContentFromStartEventResponse(eventResponse, params.getUpdates());
-        return coreCaseDataApi.submitForCitizen( params.getAuthorisation(),
-                                                 authTokenGenerator.generate(),
-                                                 params.getUserId(),
-                                                 JURISDICTION,
-                                                 CASE_TYPE,
-                                                 true, caseDataContent);
+        return coreCaseDataApi.submitForCitizen(params.getAuthorisation(),
+                                                authTokenGenerator.generate(),
+                                                params.getUserId(),
+                                                JURISDICTION,
+                                                CASE_TYPE,
+                                                true, caseDataContent
+        );
     }
 
     public CaseDetails submitEvent(EventSubmissionParams params) {
-        if(params.isDraftClaim()){
+        if (params.isDraftClaim()) {
             return submitEventForNewClaim(params);
         }
         return submitEventForClaim(params);
