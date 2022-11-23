@@ -69,9 +69,10 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
     public static final String DOC_SERVED_DATE_IN_FUTURE =
         "Date you served the documents must be today or in the past";
-    private static final String ERROR_PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT = "There is a problem"
+    public static final String ERROR_PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT = "There is a problem"
         + "\n"
-        + "You cannot perfom this event";
+        + "This action cannot currently be performed because it has either already"
+        + " been completed or another action must be completed first.";
     private final ExitSurveyContentService exitSurveyContentService;
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
@@ -99,7 +100,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     private CallbackResponse prepareDefendantSolicitorOptions(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if(!featureToggleService.isCertificateOfServiceEnabled() && areAnyRespondentsLitigantInPerson(caseData)  ) {
+        if (!featureToggleService.isCertificateOfServiceEnabled() && areAnyRespondentsLitigantInPerson(caseData)) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT))
                 .build();
@@ -279,7 +280,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     private boolean isCosDefendantNotifyDateFutureDate(CertificateOfService cosNotifyClaimDefendant) {
         return LocalDate.now().isBefore(cosNotifyClaimDefendant.getCosDateOfServiceForDefendant());
     }
-
 
     private boolean isConfirmationForLip(CaseData caseData) {
         return (caseData.getDefendant1LIPAtClaimIssued() != null
