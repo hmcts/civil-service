@@ -28,6 +28,7 @@ public class ClaimDismissedHandler implements BaseExternalTaskHandler {
             try {
                 applicationEventPublisher.publishEvent(new DismissClaimEvent(caseDetails.getId()));
             } catch (Exception e) {
+                //log exception and continue with other cases
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }
         });

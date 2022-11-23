@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -33,14 +34,20 @@ public class PaymentTaskHandler implements BaseExternalTaskHandler {
 
     @Override
     public void handleTask(ExternalTask externalTask) {
-        Map<String, Object> allVariables = externalTask.getAllVariables();
-        ExternalTaskInput externalTaskInput = objectMapper.convertValue(allVariables, ExternalTaskInput.class);
-        String caseId = externalTaskInput.getCaseId();
-        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId,
-                                                                                externalTaskInput.getCaseEvent());
-        BusinessProcess businessProcess = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())
-            .getBusinessProcess().updateActivityId(externalTask.getActivityId());
-        data = coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
+        try {
+            Map<String, Object> allVariables = externalTask.getAllVariables();
+            ExternalTaskInput externalTaskInput = objectMapper.convertValue(allVariables, ExternalTaskInput.class);
+            String caseId = externalTaskInput.getCaseId();
+            StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
+                caseId,
+                externalTaskInput.getCaseEvent()
+            );
+            BusinessProcess businessProcess = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())
+                .getBusinessProcess().updateActivityId(externalTask.getActivityId());
+            data = coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
+        } catch (ValueMapperException | IllegalArgumentException e) {
+            throw new InvalidCaseDataException("mapper conversion failed due to incompatible types", e);
+        }
     }
 
     @Override

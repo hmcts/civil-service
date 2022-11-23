@@ -49,6 +49,7 @@ public class HearingFeeDueHandler implements BaseExternalTaskHandler {
                     applicationEventPublisher.publishEvent(new HearingFeeUnpaidEvent(caseDetails.getId()));
                 }
             } catch (Exception e) {
+                //log exception and continue with other cases
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }
         });

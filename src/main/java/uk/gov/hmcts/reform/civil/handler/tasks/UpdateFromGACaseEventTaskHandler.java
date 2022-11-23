@@ -11,15 +11,16 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
+import uk.gov.hmcts.reform.civil.service.search.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Long.parseLong;
+import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
 @Component
@@ -35,28 +36,46 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
 
     @Override
     public void handleTask(ExternalTask externalTask) {
-        ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
-        String generalAppCaseId = variables.getCaseId();
-        String civilCaseId = variables.getGeneralAppParentCaseLink();
+        String generalAppCaseId = null;
+        try {
+            ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
 
-        generalAppCaseData = caseDetailsConverter.toGACaseData(coreCaseDataService
-                                                                   .getCase(parseLong(generalAppCaseId)));
+            generalAppCaseId =
+                ofNullable(variables.getCaseId()).orElseThrow(() -> new CaseNotFoundException());
+            String finalGeneralAppCaseId = generalAppCaseId;
+            String civilCaseId =
+                ofNullable(variables.getGeneralAppParentCaseLink())
+                    .orElseThrow(() -> new InvalidCaseDataException(
+                        "General application parent case link not found for civil case " + finalGeneralAppCaseId));
 
-        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(civilCaseId, variables.getCaseEvent());
-        civilCaseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+            generalAppCaseData = caseDetailsConverter.toGACaseData(coreCaseDataService
+                                                                       .getCase(parseLong(generalAppCaseId)));
 
-        data = coreCaseDataService.submitUpdate(
-            civilCaseId,
-            CaseDataContentConverter.caseDataContentFromStartEventResponse(
-                startEventResponse,
-                getUpdatedCaseData(civilCaseData, generalAppCaseData)
-            )
-        );
+            StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
+                civilCaseId,
+                variables.getCaseEvent()
+            );
+            civilCaseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+
+            data = coreCaseDataService.submitUpdate(
+                civilCaseId,
+                CaseDataContentConverter.caseDataContentFromStartEventResponse(
+                    startEventResponse,
+                    getUpdatedCaseData(civilCaseData, generalAppCaseData)
+                )
+            );
+        } catch (NumberFormatException ne) {
+            throw new InvalidCaseDataException(
+                "Conversion to long datatype failed for general application for case " + generalAppCaseId,
+                ne
+            );
+        } catch (IllegalArgumentException e) {
+            throw new InvalidCaseDataException("mapper conversion failed due to incompatible types", e);
+        }
     }
 
     private Map<String, Object> getUpdatedCaseData(CaseData civilCaseData, CaseData generalAppCaseData) {
-        List<Element<CaseDocument>> generalOrderDocument = Optional
-            .ofNullable(civilCaseData.getGeneralOrderDocument())
+        List<Element<CaseDocument>> generalOrderDocument = ofNullable(civilCaseData.getGeneralOrderDocument())
             .orElse(newArrayList());
 
         if (generalAppCaseData.getGeneralOrderDocument() != null
@@ -64,8 +83,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             generalOrderDocument.addAll(generalAppCaseData.getGeneralOrderDocument());
         }
 
-        List<Element<CaseDocument>> dismissalOrderDocument = Optional
-            .ofNullable(civilCaseData.getDismissalOrderDocument())
+        List<Element<CaseDocument>> dismissalOrderDocument = ofNullable(civilCaseData.getDismissalOrderDocument())
             .orElse(newArrayList());
 
         if (generalAppCaseData.getDismissalOrderDocument() != null
@@ -73,8 +91,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             dismissalOrderDocument.addAll(generalAppCaseData.getDismissalOrderDocument());
         }
 
-        List<Element<CaseDocument>> directionOrderDocument = Optional
-            .ofNullable(civilCaseData.getDirectionOrderDocument())
+        List<Element<CaseDocument>> directionOrderDocument = ofNullable(civilCaseData.getDirectionOrderDocument())
             .orElse(newArrayList());
 
         if (generalAppCaseData.getDirectionOrderDocument() != null

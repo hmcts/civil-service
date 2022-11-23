@@ -8,6 +8,7 @@ import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.hmcts.reform.civil.service.search.exceptions.CaseNotFoundException;
 
 import java.util.Arrays;
 
@@ -43,6 +44,10 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
         } catch (BpmnError e) {
             externalTaskService.handleBpmnError(externalTask, e.getErrorCode());
             log.error("Bpmn error for external task '{}' with processInstanceId '{}'",
+                      topicName, processInstanceId, e
+            );
+        } catch (CaseNotFoundException  | InvalidCaseDataException e) {
+            log.error("External task '{}' errored  with processInstanceId '{}'",
                       topicName, processInstanceId, e);
         } catch (Exception e) {
             handleFailure(externalTask, externalTaskService, e);

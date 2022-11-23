@@ -51,21 +51,25 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
 
     @Override
     public void handleTask(ExternalTask externalTask) {
-        ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
-        String caseId = variables.getCaseId();
-        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, variables.getCaseEvent());
-        CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
-        BusinessProcess businessProcess = startEventData.getBusinessProcess()
-            .updateActivityId(externalTask.getActivityId());
+        try {
+            ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
+            String caseId = variables.getCaseId();
+            StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, variables.getCaseEvent());
+            CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+            BusinessProcess businessProcess = startEventData.getBusinessProcess()
+                .updateActivityId(externalTask.getActivityId());
 
-        String flowState = externalTask.getVariable(FLOW_STATE);
-        CaseDataContent caseDataContent = caseDataContent(
-            startEventResponse,
-            businessProcess,
-            flowState,
-            startEventData
-        );
-        data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
+            String flowState = externalTask.getVariable(FLOW_STATE);
+            CaseDataContent caseDataContent = caseDataContent(
+                startEventResponse,
+                businessProcess,
+                flowState,
+                startEventData
+            );
+            data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidCaseDataException("mapper conversion failed due to incompatible types", e);
+        }
     }
 
     @Override

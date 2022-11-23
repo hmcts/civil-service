@@ -29,6 +29,7 @@ public class TakeCaseOfflineHandler implements BaseExternalTaskHandler {
                 log.info("Current case status '{}'", caseDetails.getState());
                 applicationEventPublisher.publishEvent(new TakeCaseOfflineEvent(caseDetails.getId()));
             } catch (Exception e) {
+                //log exception and continue with other cases
                 log.error("Updating case with id: '{}' failed", caseDetails.getId(), e);
             }
         });
