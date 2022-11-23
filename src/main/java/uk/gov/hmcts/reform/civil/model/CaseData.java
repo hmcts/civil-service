@@ -611,22 +611,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<Document>> documentAuthoritiesRes;
     private final List<Element<Document>> documentEvidenceForTrialRes;
     private final LocalDateTime caseDocumentUploadDateRes;
-    //Other party
-    private final List<Element<Document>> documentDisclosureListOther;
-    private final List<Element<Document>> documentForDisclosureResOther;
-    private final List<Element<UploadEvidenceWitness>> documentWitnessStatementOther;
-    private final List<Element<UploadEvidenceWitness>> documentWitnessSummaryOther;
-    private final List<Element<UploadEvidenceWitness>> documentHearsayNoticeOther;
-    private final List<Element<UploadEvidenceWitness>> documentReferredInStatementOther;
-    private final List<Element<UploadEvidenceExpert>> documentExpertReportOther;
-    private final List<Element<UploadEvidenceExpert>> documentJointStatementOther;
-    private final List<Element<UploadEvidenceExpert>> documentQuestionsOther;
-    private final List<Element<UploadEvidenceExpert>> documentAnswersOther;
-    private final List<Element<Document>> documentCaseSummaryOther;
-    private final List<Element<Document>> documentSkeletonArgumentOther;
-    private final List<Element<Document>> documentAuthoritiesOther;
-    private final List<Element<Document>> documentEvidenceForTrialOther;
-    private final LocalDateTime caseDocumentUploadDateOther;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
