@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSp
 import java.util.Set;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
@@ -50,7 +51,8 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
                     throw new UnsupportedOperationException("Specified claims are not enabled");
                 }
             } else {
-                roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
+                roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData,
+                                                             callbackParams.getParams().get(BEARER_TOKEN).toString());
                 errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());
             }
 
