@@ -44,9 +44,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
     StateFlowEngine.class,
     InterestCalculator.class,
     StateFlowEngine.class,
-},
+    },
     properties = {"reference.database.enabled=false"})
-public class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
+class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private FeatureToggleService toggleService;
