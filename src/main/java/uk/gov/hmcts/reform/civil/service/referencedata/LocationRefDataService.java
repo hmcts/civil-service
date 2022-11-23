@@ -136,7 +136,7 @@ public class LocationRefDataService {
         String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
             .queryParam("epimms_id", epimmsId);
-        return builder.buildAndExpand(new HashMap<>()).toUri();//http://localhost:8765/refdata/location/court-venues?epimms_id=214320
+        return builder.buildAndExpand(new HashMap<>()).toUri();
     }
 
     private HttpEntity<String> getHeaders(String authToken) {
