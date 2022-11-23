@@ -357,33 +357,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 case FULL_DEFENCE:
                     return ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE;
                 case FULL_ADMISSION:
-                    if (caseData.getSpecDefenceFullAdmittedRequired() == NO) {
-                        switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
-                            case IMMEDIATELY:
-                                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_IMMEDIATELY;
-                            case BY_SET_DATE:
-                                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_BY_SET_DATE;
-                            case SUGGESTION_OF_REPAYMENT_PLAN:
-                                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_INSTALMENT;
-                            default:
-                                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT;
-                        }
-                    }
-                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID;
+                    return setUpOneVOneFlowForFullAdmit(caseData);
                 case PART_ADMISSION:
-                    if (caseData.getSpecDefenceAdmittedRequired() == NO) {
-                        switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
-                            case IMMEDIATELY:
-                                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY;
-                            case BY_SET_DATE:
-                                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE;
-                            case SUGGESTION_OF_REPAYMENT_PLAN:
-                                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT;
-                            default:
-                                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT;
-                        }
-                    }
-                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_HAS_PAID;
+                    return setUpOneVOneFlowForPartAdmit(caseData);
                 case COUNTER_CLAIM:
                     return ResponseOneVOneShowTag.ONE_V_ONE_COUNTER_CLAIM;
                 default:
@@ -400,5 +376,37 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         }
         return null;
+    }
+
+    private ResponseOneVOneShowTag setUpOneVOneFlowForPartAdmit(CaseData caseData) {
+        if (caseData.getSpecDefenceAdmittedRequired() == NO) {
+            switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
+                case IMMEDIATELY:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY;
+                case BY_SET_DATE:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE;
+                case SUGGESTION_OF_REPAYMENT_PLAN:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT;
+                default:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT;
+            }
+        }
+        return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_HAS_PAID;
+    }
+
+    private ResponseOneVOneShowTag setUpOneVOneFlowForFullAdmit(CaseData caseData) {
+        if (caseData.getSpecDefenceFullAdmittedRequired() == NO) {
+            switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
+                case IMMEDIATELY:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_IMMEDIATELY;
+                case BY_SET_DATE:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_BY_SET_DATE;
+                case SUGGESTION_OF_REPAYMENT_PLAN:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_INSTALMENT;
+                default:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT;
+            }
+        }
+        return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID;
     }
 }

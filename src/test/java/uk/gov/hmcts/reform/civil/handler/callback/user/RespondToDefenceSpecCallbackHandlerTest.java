@@ -691,7 +691,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
 
-            assertThat(result).isEqualTo(null);
+            assertThat(result).isNull();
         }
 
         private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
