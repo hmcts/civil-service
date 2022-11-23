@@ -103,8 +103,7 @@ public class CaseMigratonUtility {
 
         } else  if (ofNullable(respondent1DQ).isPresent()
             && ofNullable(respondent1DQ.getRespondent1DQRequestedCourt()).isPresent()) {
-            log.info("Migrating Respondent1DQRequestedCourt: {}", respondent1DQ
-                .getRespondent1DQRequestedCourt());
+
             caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
                                               .respondent1DQRequestedCourt(respondent1DQ
                                                                                .getRespondent1DQRequestedCourt()
@@ -289,6 +288,7 @@ public class CaseMigratonUtility {
 
     //get  specSiteId from   PaymentsConfiguration paymentsConfiguration;
     private static void setSupplementaryData(Long caseId, CoreCaseDataService coreCaseDataService, String specSiteId) {
+        log.info("GS Site ID is : {}", specSiteId);
         Map<String, Map<String, Map<String, Object>>> supplementaryDataCivil = new HashMap<>();
         supplementaryDataCivil.put(
             "supplementary_data_updates",
@@ -298,7 +298,7 @@ public class CaseMigratonUtility {
             ))
         );
         coreCaseDataService.setSupplementaryData(caseId, supplementaryDataCivil);
-
+        log.info("GS Site After submission  : {}", specSiteId);
     }
 
     private static StringBuilder getCaseParticipants(CaseData caseData) {

@@ -73,7 +73,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
             );
 
         }
-
+        caseLocation = CaseLocation.builder().baseLocation("420219").region("2").build();
         CaseMigratonUtility.migrateRespondentAndApplicantDQ(authToken, oldCaseData, caseDataBuilder,
                                                             locationRefDataService, caseLocation
         );
