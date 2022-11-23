@@ -14,7 +14,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class EventSubmissionParams {
 
-    private final static String DRAFT_CLAIM_ID = "draft";
+    private static final String DRAFT_CLAIM_ID = "draft";
 
     private String authorisation;
     private String userId;
@@ -22,7 +22,7 @@ public class EventSubmissionParams {
     private CaseEvent event;
     private Map<String, Object> updates;
 
-    public boolean isDraftClaim(){
+    public boolean isDraftClaim() {
         return caseId.equals(DRAFT_CLAIM_ID);
     }
 }

@@ -22,7 +22,6 @@ public class CaseEventService {
     private final CoreCaseDataApi coreCaseDataApi;
     private final AuthTokenGenerator authTokenGenerator;
 
-
     private StartEventResponse startEvent(String authorisation, String userId, String caseId, CaseEvent event) {
         return coreCaseDataApi.startEventForCitizen(
             authorisation,
