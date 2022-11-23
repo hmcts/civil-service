@@ -87,18 +87,14 @@ public class CaseMigratonUtility {
                 respondent1DQ.getRespondent1DQRequestedCourt()
                     .getResponseCourtCode());
 
+            CaseLocation location =      respondent1DQ.getRespondent1DQRequestedCourt()
+                .getCaseLocation().toBuilder()
+                .baseLocation(refdata.getEpimmsId()).region(refdata.getRegion()).build();
             caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
                                               .respondent1DQRequestedCourt(respondent1DQ
                                                                                .getRespondent1DQRequestedCourt()
                                                                                .toBuilder()
-                                                                               .caseLocation(CaseLocation.builder()
-                                                                                                 .baseLocation(
-                                                                                                     refdata
-                                                                                                         .getEpimmsId())
-                                                                                                 .region(
-                                                                                                     refdata
-                                                                                                         .getRegion())
-                                                                                                 .build())
+                                                                               .caseLocation(location)
                                                                                .build()).build());
 
         } else  if (ofNullable(respondent1DQ).isPresent()
@@ -132,38 +128,21 @@ public class CaseMigratonUtility {
                 authToken,
                 respondent2DQ.getRespondent2DQRequestedCourt()
                     .getResponseCourtCode());
+//
+//            CaseLocation location = CaseLocation.builder().baseLocation(refdata.getEpimmsId())
+//                .region(refdata.getRegion()).build();
 
-            CaseLocation location = CaseLocation.builder().baseLocation(refdata.getEpimmsId())
-                .region(refdata.getRegion()).build();
+            CaseLocation location =      respondent2DQ.getRespondent2DQRequestedCourt()
+                .getCaseLocation().toBuilder()
+                .baseLocation(refdata.getEpimmsId()).region(refdata.getRegion()).build();
 
             caseDataBuilder.respondent2DQ(respondent2DQ.builder()
                                               .respondent2DQRequestedCourt(respondent2DQ
                                                                                .getRespondent2DQRequestedCourt()
-                                                                               .builder()
-                                                                               .caseLocation(CaseLocation.builder()
-                                                                                                 .baseLocation(
-                                                                                                     refdata
-                                                                                                         .getEpimmsId())
-                                                                                                 .region(
-                                                                                                     refdata
-                                                                                                         .getRegion())
-                                                                                                 .build())
-                                                                               .build()).build());
-            caseDataBuilder.respondent2DQ(respondent2DQ.toBuilder()
-                                              .respondent2DQRequestedCourt(respondent2DQ
-                                                                               .getRespondent2DQRequestedCourt()
                                                                                .toBuilder()
-                                                                               .caseLocation(CaseLocation.builder()
-                                                                                                 .baseLocation(
-                                                                                                     refdata
-                                                                                                         .getEpimmsId())
-                                                                                                 .region(
-                                                                                                     refdata
-                                                                                                         .getRegion())
-                                                                                                 .build())
+                                                                               .caseLocation(location)
                                                                                .build()).build());
-
-        } else  if (ofNullable(respondent2DQ).isPresent()
+             } else  if (ofNullable(respondent2DQ).isPresent()
             && ofNullable(respondent2DQ.getRespondent2DQRequestedCourt()).isPresent()) {
             caseDataBuilder.respondent2DQ(respondent2DQ.toBuilder()
                                              .respondent2DQRequestedCourt(respondent2DQ
@@ -196,17 +175,15 @@ public class CaseMigratonUtility {
                 applicant1DQ.getApplicant1DQRequestedCourt()
                     .getResponseCourtCode());
 
+            CaseLocation location =      applicant1DQ.getApplicant1DQRequestedCourt()
+                .getCaseLocation().toBuilder()
+                .baseLocation(refdata.getEpimmsId()).region(refdata.getRegion()).build();
+
             caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
                                              .applicant1DQRequestedCourt(applicant1DQ
                                                                              .getApplicant1DQRequestedCourt()
                                                                              .toBuilder()
-                                                                             .caseLocation(CaseLocation.builder()
-                                                                                               .baseLocation(
-                                                                                                   refdata
-                                                                                                       .getEpimmsId())
-                                                                                               .region(refdata
-                                                                                                           .getRegion())
-                                                                                               .build())
+                                                                             .caseLocation(location)
                                                                              .build()).build());
         } else if (ofNullable(applicant1DQ).isPresent()
             && ofNullable(applicant1DQ.getApplicant1DQRequestedCourt()).isPresent()) {
@@ -241,17 +218,15 @@ public class CaseMigratonUtility {
                 applicant2DQ.getApplicant2DQRequestedCourt()
                     .getResponseCourtCode());
 
+            CaseLocation location =      applicant2DQ.getApplicant2DQRequestedCourt()
+                .getCaseLocation().toBuilder()
+                .baseLocation(refdata.getEpimmsId()).region(refdata.getRegion()).build();
+
             caseDataBuilder.applicant2DQ(applicant2DQ.toBuilder()
                                              .applicant2DQRequestedCourt(applicant2DQ
                                                                              .getApplicant2DQRequestedCourt()
                                                                              .toBuilder()
-                                                                             .caseLocation(CaseLocation.builder()
-                                                                                               .baseLocation(
-                                                                                                   refdata
-                                                                                                       .getEpimmsId())
-                                                                                               .region(
-                                                                                                   refdata.getRegion())
-                                                                                               .build())
+                                                                             .caseLocation(location)
                                                                              .build()).build());
 
         } else if (ofNullable(applicant2DQ).isPresent()
