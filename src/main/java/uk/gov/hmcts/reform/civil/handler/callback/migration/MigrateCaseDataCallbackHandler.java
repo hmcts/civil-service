@@ -56,7 +56,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
 
         CaseLocation caseLocation = CaseLocation.builder().baseLocation("420219").region("2").build();
         if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
-            CaseMigratonUtility.migrateGS(oldCaseData, "AAA7",
+            CaseMigratonUtility.migrateGS(oldCaseData, "AAA6",
                                           caseDataBuilder, coreCaseDataService
             );
 
@@ -64,7 +64,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
         } else {
             caseLocation = CaseLocation.builder().baseLocation("192280").region("4").build();
             CaseMigratonUtility.migrateCaseManagementLocation(caseDataBuilder, caseLocation);
-            CaseMigratonUtility.migrateGS(oldCaseData, "AAA6",
+            CaseMigratonUtility.migrateGS(oldCaseData, "AAA7",
                                           caseDataBuilder, coreCaseDataService
             );
 
