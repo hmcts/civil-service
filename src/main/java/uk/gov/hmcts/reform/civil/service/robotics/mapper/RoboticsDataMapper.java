@@ -90,12 +90,12 @@ public class RoboticsDataMapper {
             .owningCourtCode("390")
             .owningCourtName("CCMCC")
             .caseType("PERSONAL INJURY")
-            .preferredCourtCode(getPreferredCode(caseData, authToken))
+            .preferredCourtCode(getPreferredCourtCode(caseData, authToken))
             .caseAllocatedTo(buildAllocatedTrack(caseData.getAllocatedTrack()))
             .build();
     }
 
-    private String getPreferredCode(CaseData caseData, String authToken) {
+    private String getPreferredCourtCode(CaseData caseData, String authToken) {
         List<LocationRefData> courtLocationsByEpimmsId = locationRefDataService.getCourtLocationsByEpimmsId(
                 authToken, caseData.getCaseManagementLocation().getBaseLocation())
             .stream()
