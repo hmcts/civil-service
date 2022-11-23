@@ -43,13 +43,13 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
-    EvidenceUploadHandler.class,
+    EvidenceUploadApplicantHandler.class,
     JacksonAutoConfiguration.class
 })
-class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
+class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
-    private EvidenceUploadHandler handler;
+    private EvidenceUploadApplicantHandler handler;
 
     @MockBean
     private Time time;
@@ -82,10 +82,10 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOption1UploadDate,documentUploadExpert1",
-        "expertOption2UploadDate,documentUploadExpert2",
-        "expertOption3UploadDate,documentUploadExpert3",
-        "expertOption4UploadDate,documentUploadExpert4"
+        "expertOptionUploadDate,documentExpertReport",
+        "expertOptionUploadDate,documentJointStatement",
+        "expertOptionUploadDate,documentQuestions",
+        "expertOptionUploadDate,documentAnswers"
     })
     void shouldNotReturnError_whenExpertOptionUploadDatePast(String dateField, String collectionField) {
         // Given
@@ -107,10 +107,10 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOption1UploadDate,documentUploadExpert1",
-        "expertOption2UploadDate,documentUploadExpert2",
-        "expertOption3UploadDate,documentUploadExpert3",
-        "expertOption4UploadDate,documentUploadExpert4"
+        "expertOptionUploadDate,documentExpertReport",
+        "expertOptionUploadDate,documentJointStatement",
+        "expertOptionUploadDate,documentQuestions",
+        "expertOptionUploadDate,documentAnswers"
     })
     void shouldNotReturnError_whenExpertOptionUploadDatePresent(String dateField, String collectionField) {
         // Given
@@ -132,13 +132,13 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOption1UploadDate,documentUploadExpert1,Invalid date: \"Expert's report\""
+        "expertOptionUploadDate,documentExpertReport,Invalid date: \"Expert's report\""
         + " date entered must not be in the future (3).",
-        "expertOption2UploadDate,documentUploadExpert2,Invalid date: \"Joint statement of experts\" "
+        "expertOptionUploadDate,documentJointStatement,Invalid date: \"Joint statement of experts\" "
             + "date entered must not be in the future (4).",
-        "expertOption3UploadDate,documentUploadExpert3,Invalid date: \"Questions for other party's expert "
+        "expertOptionUploadDate,documentQuestions,Invalid date: \"Questions for other party's expert "
             + "or joint experts\" expert statement date entered must not be in the future (5).",
-        "expertOption4UploadDate,documentUploadExpert4,Invalid date: \"Answers to questions asked by the other party\" "
+        "expertOptionUploadDate,documentAnswers,Invalid date: \"Answers to questions asked by the other party\" "
             + "date entered must not be in the future (6)."
     })
     void shouldReturnError_whenExpertOptionUploadDateFuture(String dateField, String collectionField,
@@ -162,9 +162,9 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "witnessOption1UploadDate,documentUploadWitness1,Invalid date: \"witness statement\" "
+        "witnessOptionUploadDate,documentWitnessStatement,Invalid date: \"witness statement\" "
             + "date entered must not be in the future (1).",
-        "witnessOption3UploadDate,documentUploadWitness3,Invalid date: \"Notice of the intention to rely on"
+        "witnessOptionUploadDate,documentHearsayNotice,Invalid date: \"Notice of the intention to rely on"
             + " hearsay evidence\" date entered must not be in the future (2)."
     })
     void shouldReturnError_whenWitnessOptionUploadDateInFuture(String dateField, String collectionField,
@@ -188,8 +188,8 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "witnessOption1UploadDate,documentUploadWitness1",
-        "witnessOption3UploadDate,documentUploadWitness3"
+        "witnessOptionUploadDate,documentWitnessStatement",
+        "witnessOptionUploadDate,documentHearsayNotice"
     })
     void shouldNotReturnError_whenWitnessOptionUploadDatePresent(String dateField, String collectionField) {
         // Given
@@ -211,8 +211,8 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "witnessOption1UploadDate,documentUploadWitness1",
-        "witnessOption3UploadDate,documentUploadWitness3"
+        "witnessOptionUploadDate,documentWitnessStatement",
+        "witnessOptionUploadDate,documentHearsayNotice"
     })
     void shouldNotReturnError_whenWitnessOptionUploadDatePast(String dateField, String collectionField) {
         // Given
@@ -234,8 +234,8 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "witnessOption1UploadDate,documentUploadWitness1,Invalid date: \"witness statement\" date entered must not be in the future (1).",
-        "witnessOption3UploadDate,documentUploadWitness3,Invalid date: \"Notice of the intention to rely on hearsay evidence\" " +
+        "witnessOptionUploadDate,documentWitnessStatement,Invalid date: \"witness statement\" date entered must not be in the future (1).",
+        "witnessOptionUploadDate,documentHearsayNotice,Invalid date: \"Notice of the intention to rely on hearsay evidence\" " +
             "date entered must not be in the future (2)."
     })
     void shouldReturnError_whenOneDateIsInFutureForWitnessStatements(String dateField, String collectionField, String errorMessage) {
@@ -261,13 +261,13 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOption1UploadDate,documentUploadExpert1,Invalid date: \"Expert's report\""
+        "expertOptionUploadDate,documentExpertReport,Invalid date: \"Expert's report\""
             + " date entered must not be in the future (3).",
-        "expertOption2UploadDate,documentUploadExpert2,Invalid date: \"Joint statement of experts\" "
+        "expertOptionUploadDate,documentJointStatement,Invalid date: \"Joint statement of experts\" "
             + "date entered must not be in the future (4).",
-        "expertOption3UploadDate,documentUploadExpert3,Invalid date: \"Questions for other party's expert "
+        "expertOptionUploadDate,documentQuestions,Invalid date: \"Questions for other party's expert "
             + "or joint experts\" expert statement date entered must not be in the future (5).",
-        "expertOption4UploadDate,documentUploadExpert4,Invalid date: \"Answers to questions asked by the other party\" "
+        "expertOptionUploadDate,documentAnswers,Invalid date: \"Answers to questions asked by the other party\" "
             + "date entered must not be in the future (6)."
     })
     void shouldReturnError_whenOneDateIsInFutureForExpertStatements(String dateField, String collectionField, String errorMessage) {

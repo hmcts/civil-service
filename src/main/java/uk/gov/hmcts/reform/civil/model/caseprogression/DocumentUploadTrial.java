@@ -12,9 +12,5 @@ import uk.gov.hmcts.reform.civil.model.documents.Document;
 @AllArgsConstructor
 public class DocumentUploadTrial {
 
-    private Document trialOption1;
-    private Document trialOption2;
-    private Document trialOption3;
-    private Document trialOption4;
-
+    private Document trialOptionDocument;
 }
