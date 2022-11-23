@@ -12,6 +12,5 @@ import uk.gov.hmcts.reform.civil.model.documents.Document;
 @AllArgsConstructor
 public class UploadEvidenceDisclosure {
 
-    private Document disclosureOption1;
-    private Document disclosureOption2;
+    private Document disclosureOptionDocument;
 }
