@@ -349,7 +349,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private ResponseOneVOneShowTag setUpOneVOneFlow(CaseData caseData) {
-        if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+        if (ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
+            if (caseData.getRespondent1ClaimResponseTypeForSpec() == null) {
+                return null;
+            }
             switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
                 case FULL_DEFENCE:
                     return ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE;
