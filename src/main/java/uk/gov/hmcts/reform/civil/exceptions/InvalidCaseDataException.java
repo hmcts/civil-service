@@ -1,6 +1,6 @@
-package uk.gov.hmcts.reform.civil.handler.tasks;
+package uk.gov.hmcts.reform.civil.exceptions;
 
-public class InvalidCaseDataException extends RuntimeException {
+public class InvalidCaseDataException extends NotRetryableException {
 
     private static final String ERROR_MESSAGE = "Invalid case data";
 

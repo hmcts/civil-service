@@ -1,22 +1,23 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.exceptions.CaseIdNotProvidedException;
+import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
-import uk.gov.hmcts.reform.civil.service.search.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Long.parseLong;
@@ -41,7 +42,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
 
             generalAppCaseId =
-                ofNullable(variables.getCaseId()).orElseThrow(() -> new CaseNotFoundException());
+                ofNullable(variables.getCaseId()).orElseThrow(CaseIdNotProvidedException::new);
             String finalGeneralAppCaseId = generalAppCaseId;
             String civilCaseId =
                 ofNullable(variables.getGeneralAppParentCaseLink())
@@ -65,11 +66,12 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
                 )
             );
         } catch (NumberFormatException ne) {
+            log.error("Conversion to long datatype failed for general application for case {}", generalAppCaseId);
             throw new InvalidCaseDataException(
-                "Conversion to long datatype failed for general application for case " + generalAppCaseId,
-                ne
+                "Conversion to long datatype failed for general application for a case ", ne
             );
         } catch (IllegalArgumentException e) {
+            log.error("mapper conversion failed due to incompatible types");
             throw new InvalidCaseDataException("mapper conversion failed due to incompatible types", e);
         }
     }

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import java.util.Arrays;
+
 import feign.FeignException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
@@ -8,9 +10,7 @@ import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.hmcts.reform.civil.service.search.exceptions.CaseNotFoundException;
-
-import java.util.Arrays;
+import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.helpers.ExponentialRetryTimeoutHelper.calculateExponentialRetryTimeout;
@@ -46,7 +46,7 @@ public interface BaseExternalTaskHandler extends ExternalTaskHandler {
             log.error("Bpmn error for external task '{}' with processInstanceId '{}'",
                       topicName, processInstanceId, e
             );
-        } catch (CaseNotFoundException  | InvalidCaseDataException e) {
+        } catch (NotRetryableException e) {
             log.error("External task '{}' errored  with processInstanceId '{}'",
                       topicName, processInstanceId, e);
         } catch (Exception e) {
