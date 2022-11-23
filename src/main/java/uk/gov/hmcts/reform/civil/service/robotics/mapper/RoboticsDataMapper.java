@@ -96,12 +96,12 @@ public class RoboticsDataMapper {
     }
 
     private String getPreferredCourtCode(CaseData caseData, String authToken) {
-        List<LocationRefData> courtLocationsByEpimmsId = locationRefDataService.getCourtLocationsByEpimmsId(
+        List<LocationRefData> courtLocations= locationRefDataService.getCourtLocationsByEpimmsId(
                 authToken, caseData.getCaseManagementLocation().getBaseLocation())
             .stream()
             .filter(id -> id.getCourtTypeId().equals("10"))
             .collect(Collectors.toList());
-        return courtLocationsByEpimmsId.get(0).getCourtLocationCode();
+        return courtLocations.get(0).getCourtLocationCode();
     }
 
     private String buildAllocatedTrack(AllocatedTrack allocatedTrack) {
