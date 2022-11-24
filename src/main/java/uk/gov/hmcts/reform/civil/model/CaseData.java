@@ -1,5 +1,14 @@
 package uk.gov.hmcts.reform.civil.model;
 
+import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -34,8 +43,6 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
-import uk.gov.hmcts.reform.civil.model.caseprogression.DocumentUploadTrial;
-import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDisclosure;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -97,15 +104,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearin
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
-import javax.validation.Valid;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 
@@ -539,6 +537,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> orderSDODocumentDJCollection = new ArrayList<>();
     /**
      * RTJ = Refer To Judge.
      */
@@ -579,53 +580,37 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<DocumentAndNote>> documentAndNote;
     private final CaseNoteType caseNoteType;
     //applicant
-    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure1;
-    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure2;
-    private final List<Element<UploadEvidenceWitness>> documentUploadWitness1;
-    private final List<Element<UploadEvidenceWitness>> documentUploadWitness2;
-    private final List<Element<UploadEvidenceWitness>> documentUploadWitness3;
-    private final List<Element<UploadEvidenceWitness>> documentUploadWitness4;
-    private final List<Element<UploadEvidenceExpert>> documentUploadExpert1;
-    private final List<Element<UploadEvidenceExpert>> documentUploadExpert2;
-    private final List<Element<UploadEvidenceExpert>> documentUploadExpert3;
-    private final List<Element<UploadEvidenceExpert>> documentUploadExpert4;
-    private final List<Element<DocumentUploadTrial>> documentUploadTrial1;
-    private final List<Element<DocumentUploadTrial>> documentUploadTrial2;
-    private final List<Element<DocumentUploadTrial>> documentUploadTrial3;
-    private final List<Element<DocumentUploadTrial>> documentUploadTrial4;
+    private final List<Element<Document>> documentDisclosureList;
+    private final List<Element<Document>> documentForDisclosure;
+    private final List<Element<UploadEvidenceWitness>> documentWitnessStatement;
+    private final List<Element<UploadEvidenceWitness>> documentWitnessSummary;
+    private final List<Element<UploadEvidenceWitness>> documentHearsayNotice;
+    private final List<Element<UploadEvidenceWitness>> documentReferredInStatement;
+    private final List<Element<UploadEvidenceExpert>> documentExpertReport;
+    private final List<Element<UploadEvidenceExpert>> documentJointStatement;
+    private final List<Element<UploadEvidenceExpert>> documentQuestions;
+    private final List<Element<UploadEvidenceExpert>> documentAnswers;
+    private final List<Element<Document>> documentCaseSummary;
+    private final List<Element<Document>> documentSkeletonArgument;
+    private final List<Element<Document>> documentAuthorities;
+    private final List<Element<Document>> documentEvidenceForTrial;
     private final LocalDateTime caseDocumentUploadDate;
     //respondent
-    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure1Res;
-    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure2Res;
-    private final List<Element<UploadEvidenceWitness>> documentUploadWitness1Res;
-    private final List<Element<UploadEvidenceWitness>> documentUploadWitness2Res;
-    private final List<Element<UploadEvidenceWitness>> documentUploadWitness3Res;
-    private final List<Element<UploadEvidenceWitness>> documentUploadWitness4Res;
-    private final List<Element<UploadEvidenceExpert>> documentUploadExpert1Res;
-    private final List<Element<UploadEvidenceExpert>> documentUploadExpert2Res;
-    private final List<Element<UploadEvidenceExpert>> documentUploadExpert3Res;
-    private final List<Element<UploadEvidenceExpert>> documentUploadExpert4Res;
-    private final List<Element<DocumentUploadTrial>> documentUploadTrial1Res;
-    private final List<Element<DocumentUploadTrial>> documentUploadTrial2Res;
-    private final List<Element<DocumentUploadTrial>> documentUploadTrial3Res;
-    private final List<Element<DocumentUploadTrial>> documentUploadTrial4Res;
+    private final List<Element<Document>> documentDisclosureListRes;
+    private final List<Element<Document>> documentForDisclosureRes;
+    private final List<Element<UploadEvidenceWitness>> documentWitnessStatementRes;
+    private final List<Element<UploadEvidenceWitness>> documentWitnessSummaryRes;
+    private final List<Element<UploadEvidenceWitness>> documentHearsayNoticeRes;
+    private final List<Element<UploadEvidenceWitness>> documentReferredInStatementRes;
+    private final List<Element<UploadEvidenceExpert>> documentExpertReportRes;
+    private final List<Element<UploadEvidenceExpert>> documentJointStatementRes;
+    private final List<Element<UploadEvidenceExpert>> documentQuestionsRes;
+    private final List<Element<UploadEvidenceExpert>> documentAnswersRes;
+    private final List<Element<Document>> documentCaseSummaryRes;
+    private final List<Element<Document>> documentSkeletonArgumentRes;
+    private final List<Element<Document>> documentAuthoritiesRes;
+    private final List<Element<Document>> documentEvidenceForTrialRes;
     private final LocalDateTime caseDocumentUploadDateRes;
-    //respondent
-    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure1Other;
-    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure2Other;
-    private final List<Element<UploadEvidenceWitness>> documentUploadWitness1Other;
-    private final List<Element<UploadEvidenceWitness>> documentUploadWitness2Other;
-    private final List<Element<UploadEvidenceWitness>> documentUploadWitness3Other;
-    private final List<Element<UploadEvidenceWitness>> documentUploadWitness4Other;
-    private final List<Element<UploadEvidenceExpert>> documentUploadExpert1Other;
-    private final List<Element<UploadEvidenceExpert>> documentUploadExpert2Other;
-    private final List<Element<UploadEvidenceExpert>> documentUploadExpert3Other;
-    private final List<Element<UploadEvidenceExpert>> documentUploadExpert4Other;
-    private final List<Element<DocumentUploadTrial>> documentUploadTrial1Other;
-    private final List<Element<DocumentUploadTrial>> documentUploadTrial2Other;
-    private final List<Element<DocumentUploadTrial>> documentUploadTrial3Other;
-    private final List<Element<DocumentUploadTrial>> documentUploadTrial4Other;
-    private final LocalDateTime caseDocumentUploadDateOther;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending

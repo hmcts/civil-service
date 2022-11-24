@@ -1,5 +1,11 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,12 +31,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -38,18 +38,18 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_OTHER_PARTY;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
-    EvidenceUploadOtherPartyHandler.class,
+    EvidenceUploadApplicantHandler.class,
     JacksonAutoConfiguration.class
 })
-class EvidenceUploadOtherPartyHandlerTest extends BaseCallbackHandlerTest {
+class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
-    private EvidenceUploadOtherPartyHandler handler;
+    private EvidenceUploadApplicantHandler handler;
 
     @MockBean
     private Time time;
@@ -60,7 +60,7 @@ class EvidenceUploadOtherPartyHandlerTest extends BaseCallbackHandlerTest {
     private final UploadEvidenceExpert uploadEvidenceDate = new UploadEvidenceExpert();
     private final UploadEvidenceWitness uploadEvidenceDate2 = new UploadEvidenceWitness();
 
-    private static final String PAGE_ID = "validateValuesOtherParty";
+    private static final String PAGE_ID = "validateValuesApplicant";
 
     @BeforeEach
     void setup() {
@@ -82,10 +82,10 @@ class EvidenceUploadOtherPartyHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOption1UploadDate,documentUploadExpert1Other",
-        "expertOption2UploadDate,documentUploadExpert2Other",
-        "expertOption3UploadDate,documentUploadExpert3Other",
-        "expertOption4UploadDate,documentUploadExpert4Other"
+        "expertOptionUploadDate,documentExpertReport",
+        "expertOptionUploadDate,documentJointStatement",
+        "expertOptionUploadDate,documentQuestions",
+        "expertOptionUploadDate,documentAnswers"
     })
     void shouldNotReturnError_whenExpertOptionUploadDatePast(String dateField, String collectionField) {
         // Given
@@ -107,10 +107,10 @@ class EvidenceUploadOtherPartyHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOption1UploadDate,documentUploadExpert1Other",
-        "expertOption2UploadDate,documentUploadExpert2Other",
-        "expertOption3UploadDate,documentUploadExpert3Other",
-        "expertOption4UploadDate,documentUploadExpert4Other"
+        "expertOptionUploadDate,documentExpertReport",
+        "expertOptionUploadDate,documentJointStatement",
+        "expertOptionUploadDate,documentQuestions",
+        "expertOptionUploadDate,documentAnswers"
     })
     void shouldNotReturnError_whenExpertOptionUploadDatePresent(String dateField, String collectionField) {
         // Given
@@ -132,13 +132,13 @@ class EvidenceUploadOtherPartyHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOption1UploadDate,documentUploadExpert1Other,Invalid date: \"Expert's report\""
+        "expertOptionUploadDate,documentExpertReport,Invalid date: \"Expert's report\""
         + " date entered must not be in the future (3).",
-        "expertOption2UploadDate,documentUploadExpert2Other,Invalid date: \"Joint statement of experts\" "
+        "expertOptionUploadDate,documentJointStatement,Invalid date: \"Joint statement of experts\" "
             + "date entered must not be in the future (4).",
-        "expertOption3UploadDate,documentUploadExpert3Other,Invalid date: \"Questions for other party's expert "
+        "expertOptionUploadDate,documentQuestions,Invalid date: \"Questions for other party's expert "
             + "or joint experts\" expert statement date entered must not be in the future (5).",
-        "expertOption4UploadDate,documentUploadExpert4Other,Invalid date: \"Answers to questions asked by the other party\" "
+        "expertOptionUploadDate,documentAnswers,Invalid date: \"Answers to questions asked by the other party\" "
             + "date entered must not be in the future (6)."
     })
     void shouldReturnError_whenExpertOptionUploadDateFuture(String dateField, String collectionField,
@@ -162,9 +162,9 @@ class EvidenceUploadOtherPartyHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "witnessOption1UploadDate,documentUploadWitness1Other,Invalid date: \"witness statement\" "
+        "witnessOptionUploadDate,documentWitnessStatement,Invalid date: \"witness statement\" "
             + "date entered must not be in the future (1).",
-        "witnessOption3UploadDate,documentUploadWitness3Other,Invalid date: \"Notice of the intention to rely on"
+        "witnessOptionUploadDate,documentHearsayNotice,Invalid date: \"Notice of the intention to rely on"
             + " hearsay evidence\" date entered must not be in the future (2)."
     })
     void shouldReturnError_whenWitnessOptionUploadDateInFuture(String dateField, String collectionField,
@@ -188,8 +188,8 @@ class EvidenceUploadOtherPartyHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "witnessOption1UploadDate,documentUploadWitness1Other",
-        "witnessOption3UploadDate,documentUploadWitness3Other"
+        "witnessOptionUploadDate,documentWitnessStatement",
+        "witnessOptionUploadDate,documentHearsayNotice"
     })
     void shouldNotReturnError_whenWitnessOptionUploadDatePresent(String dateField, String collectionField) {
         // Given
@@ -211,8 +211,8 @@ class EvidenceUploadOtherPartyHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "witnessOption1UploadDate,documentUploadWitness1Other",
-        "witnessOption3UploadDate,documentUploadWitness3Other"
+        "witnessOptionUploadDate,documentWitnessStatement",
+        "witnessOptionUploadDate,documentHearsayNotice"
     })
     void shouldNotReturnError_whenWitnessOptionUploadDatePast(String dateField, String collectionField) {
         // Given
@@ -234,8 +234,8 @@ class EvidenceUploadOtherPartyHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "witnessOption1UploadDate,documentUploadWitness1Other,Invalid date: \"witness statement\" date entered must not be in the future (1).",
-        "witnessOption3UploadDate,documentUploadWitness3Other,Invalid date: \"Notice of the intention to rely on hearsay evidence\" " +
+        "witnessOptionUploadDate,documentWitnessStatement,Invalid date: \"witness statement\" date entered must not be in the future (1).",
+        "witnessOptionUploadDate,documentHearsayNotice,Invalid date: \"Notice of the intention to rely on hearsay evidence\" " +
             "date entered must not be in the future (2)."
     })
     void shouldReturnError_whenOneDateIsInFutureForWitnessStatements(String dateField, String collectionField, String errorMessage) {
@@ -261,13 +261,13 @@ class EvidenceUploadOtherPartyHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOption1UploadDate,documentUploadExpert1Other,Invalid date: \"Expert's report\""
+        "expertOptionUploadDate,documentExpertReport,Invalid date: \"Expert's report\""
             + " date entered must not be in the future (3).",
-        "expertOption2UploadDate,documentUploadExpert2Other,Invalid date: \"Joint statement of experts\" "
+        "expertOptionUploadDate,documentJointStatement,Invalid date: \"Joint statement of experts\" "
             + "date entered must not be in the future (4).",
-        "expertOption3UploadDate,documentUploadExpert3Other,Invalid date: \"Questions for other party's expert "
+        "expertOptionUploadDate,documentQuestions,Invalid date: \"Questions for other party's expert "
             + "or joint experts\" expert statement date entered must not be in the future (5).",
-        "expertOption4UploadDate,documentUploadExpert4Other,Invalid date: \"Answers to questions asked by the other party\" "
+        "expertOptionUploadDate,documentAnswers,Invalid date: \"Answers to questions asked by the other party\" "
             + "date entered must not be in the future (6)."
     })
     void shouldReturnError_whenOneDateIsInFutureForExpertStatements(String dateField, String collectionField, String errorMessage) {
@@ -304,7 +304,7 @@ class EvidenceUploadOtherPartyHandlerTest extends BaseCallbackHandlerTest {
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
         // Then
-        assertThat(updatedData.getCaseDocumentUploadDateOther()).isEqualTo(time.now());
+        assertThat(updatedData.getCaseDocumentUploadDate()).isEqualTo(time.now());
     }
 
     @Test
@@ -336,7 +336,7 @@ class EvidenceUploadOtherPartyHandlerTest extends BaseCallbackHandlerTest {
         handler.register(registerTarget);
 
         // Then
-        assertThat(registerTarget).containsExactly(entry(EVIDENCE_UPLOAD_OTHER_PARTY.name(), handler));
+        assertThat(registerTarget).containsExactly(entry(EVIDENCE_UPLOAD_APPLICANT.name(), handler));
     }
 
     private <T, A> T invoke(T target, String method, A argument) {
