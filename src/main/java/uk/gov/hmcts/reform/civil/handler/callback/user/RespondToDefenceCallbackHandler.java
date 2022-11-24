@@ -269,40 +269,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         //Set to null because there are no more deadlines
         builder.nextDeadline(null);
         AboutToStartOrSubmitCallbackResponse response = null;
-
-        if (v1 && featureToggleService.isSdoEnabled()
-            && !AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
-            if (caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
-                if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE))
-                    || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
-                    response = AboutToStartOrSubmitCallbackResponse.builder()
-                    .data(builder.build().toMap(objectMapper))
-                    .state(CaseState.JUDICIAL_REFERRAL.name())
-                    .build();
-                } else if (multiPartyScenario.equals(ONE_V_TWO_TWO_LEGAL_REP)) {
-                    if (caseData.getRespondent2ClaimResponseType()
-                        .equals(RespondentResponseType.FULL_DEFENCE)) {
-                        response = AboutToStartOrSubmitCallbackResponse.builder()
-                            .data(builder.build().toMap(objectMapper))
-                            .state(CaseState.JUDICIAL_REFERRAL.name())
-                            .build();
-                    }
-                } else {
-                    response = AboutToStartOrSubmitCallbackResponse.builder()
-                        .data(builder.build().toMap(objectMapper))
-                        .build();
-                }
-            } else {
-                response = AboutToStartOrSubmitCallbackResponse.builder()
-                    .data(builder.build().toMap(objectMapper))
-                    .build();
-            }
-        } else {
-            response = AboutToStartOrSubmitCallbackResponse.builder()
+        response = AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder.build().toMap(objectMapper))
                 .build();
-        }
-
         return response;
     }
 
