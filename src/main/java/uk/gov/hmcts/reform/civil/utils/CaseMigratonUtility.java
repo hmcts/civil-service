@@ -45,18 +45,19 @@ public class CaseMigratonUtility {
                                                  CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                                  LocationRefDataService locationRefDataService) {
 
-        CourtLocation location = oldCaseData.getCourtLocation();
-        // To fetch Location ref data based om preferred court
-        LocationRefData refdata = locationRefDataService.getCourtLocation(
-            authToken,
-            location.getApplicantPreferredCourt()
-        );
-        CaseLocation caseLocation = CaseLocation.builder().baseLocation(refdata.getEpimmsId())
-            .region(refdata.getRegionId()).build();
-        caseDataBuilder.courtLocation(CourtLocation.builder().caseLocation(caseLocation)
-                                          .applicantPreferredCourtLocationList(
-                                              location.getApplicantPreferredCourtLocationList())
-                                          .applicantPreferredCourt(location.getApplicantPreferredCourt()).build());
+        CourtLocation location = oldCaseData.getCourtLocation();        // To fetch Location ref data based om preferred court
+        if (ofNullable(location).isPresent()) {
+            LocationRefData refData = locationRefDataService.getCourtLocation(
+                authToken,
+                location.getApplicantPreferredCourt()
+            );
+            CaseLocation caseLocation = CaseLocation.builder().baseLocation(refData.getEpimmsId())
+                .region(refData.getRegionId()).build();
+            caseDataBuilder.courtLocation(CourtLocation.builder().caseLocation(caseLocation)
+                                              .applicantPreferredCourtLocationList(
+                                                  location.getApplicantPreferredCourtLocationList())
+                                              .applicantPreferredCourt(location.getApplicantPreferredCourt()).build());
+        }
 
     }
 
