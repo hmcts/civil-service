@@ -31,8 +31,7 @@ class EvidenceUploadNotificationSearchServiceTest extends ElasticSearchServiceTe
                           "now-1d"))
                       .should(rangeQuery("data.caseDocumentUploadDateRes").lt("now").gt(
                           "now-1d"))
-                      .should(rangeQuery("data.caseDocumentUploadDateOther").lt("now").gt(
-                          "now-1d")));
+                      );
         return new Query(query, List.of("reference"), fromValue);
     }
 }
