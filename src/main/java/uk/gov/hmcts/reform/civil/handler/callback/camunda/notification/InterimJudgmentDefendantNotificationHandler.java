@@ -51,7 +51,7 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
 
     private CallbackResponse notifyAllPartiesInterimJudgmentApprovedDefendant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YesOrNo.YES)) {
             if (checkDefendantRequested(caseData, caseData.getRespondent1().getPartyName())
                 || checkIfBothDefendants(caseData)) {
@@ -91,7 +91,7 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
         var state = "JUDICIAL_REFERRAL";
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(state)
-            .data(caseData.toMap(objectMapper))
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 

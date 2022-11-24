@@ -9,10 +9,7 @@ import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.dq.*;
 //import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
@@ -27,6 +24,7 @@ import java.util.Map;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Slf4j
@@ -62,10 +60,11 @@ public class CaseMigratonUtility {
 
     }
 
-    public static void migrateRespondentAndApplicantDQ(String authToken, CaseData oldCaseData,
+    public static void migrateRespondentAndApplicantDQUnSpec(String authToken, CaseData oldCaseData,
                                                        CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                                        LocationRefDataService locationRefDataService,
                                                        CaseLocation caseLocation) {
+
         migrateRespondent1DQ(authToken, oldCaseData, caseDataBuilder, locationRefDataService, caseLocation);
         migrateRespondent2DQ(authToken, oldCaseData, caseDataBuilder, locationRefDataService, caseLocation);
         migrateApplicant1DQ(authToken, oldCaseData, caseDataBuilder, locationRefDataService, caseLocation);
@@ -97,7 +96,13 @@ public class CaseMigratonUtility {
                                                                                .getRespondent1DQRequestedCourt()
                                                                                .toBuilder()
                                                                                .caseLocation(location)
-                                                                               .build()).build());
+                                                                               .build()).respondToCourtLocation(
+                RequestedCourt.builder()
+                    .responseCourtLocations(null)
+                    .responseCourtCode(refdata.getCourtLocationCode())
+
+                    .build()).responseClaimCourtLocationRequired(YES).build());
+            ;
 
         } else  if (ofNullable(respondent1DQ).isPresent()
             && ofNullable(respondent1DQ.getRespondent1DQRequestedCourt()).isPresent()) {
@@ -130,9 +135,6 @@ public class CaseMigratonUtility {
                 authToken,
                 respondent2DQ.getRespondent2DQRequestedCourt()
                     .getResponseCourtCode());
-//
-//            CaseLocation location = CaseLocation.builder().baseLocation(refdata.getEpimmsId())
-//                .region(refdata.getRegion()).build();
 
             CaseLocation location =      respondent2DQ.getRespondent2DQRequestedCourt()
                 .getCaseLocation().toBuilder()
@@ -143,7 +145,15 @@ public class CaseMigratonUtility {
                                                                                .getRespondent2DQRequestedCourt()
                                                                                .toBuilder()
                                                                                .caseLocation(location)
-                                                                               .build()).build());
+                                                                               .build()).
+            respondToCourtLocation2(RequestedCourt.builder()
+                                         .responseCourtLocations(null)
+                                         .responseCourtCode(refdata.getCourtLocationCode())
+                                         .reasonForHearingAtSpecificCourt(
+                                             oldCaseData.getRespondent2DQ().getRespondToCourtLocation2()
+                                                 .getReasonForHearingAtSpecificCourt()
+                                         ).build())
+                                         .build());
              } else  if (ofNullable(respondent2DQ).isPresent()
             && ofNullable(respondent2DQ.getRespondent2DQRequestedCourt()).isPresent()) {
             caseDataBuilder.respondent2DQ(respondent2DQ.toBuilder()
@@ -248,9 +258,8 @@ public class CaseMigratonUtility {
     }
 
     // Case management category,caseNameHmctsInternal, and supplementaryData
-    public static void migrateGS(CaseData oldCaseData, String specSiteId,
-                                 CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                                 CoreCaseDataService coreCaseDataService) {
+    public static void migrateGS(CaseData oldCaseData,
+                                 CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
 
         caseDataBuilder.caseNameHmctsInternal(getCaseParticipants(oldCaseData).toString());
         CaseManagementCategoryElement civil =
@@ -259,12 +268,12 @@ public class CaseMigratonUtility {
         itemList.add(element(civil));
         caseDataBuilder.caseManagementCategory(
             CaseManagementCategory.builder().value(civil).list_items(itemList).build());
-        setSupplementaryData(oldCaseData.getCcdCaseReference(), coreCaseDataService, specSiteId);
+      //  setSupplementaryData(oldCaseData.getCcdCaseReference(), coreCaseDataService, specSiteId);
 
     }
 
     //get  specSiteId from   PaymentsConfiguration paymentsConfiguration;
-    private static void setSupplementaryData(Long caseId, CoreCaseDataService coreCaseDataService, String specSiteId) {
+    public  static void setSupplementaryData(Long caseId, CoreCaseDataService coreCaseDataService, String specSiteId) {
         log.info("GS Site ID is : {}", specSiteId);
         Map<String, Map<String, Map<String, Object>>> supplementaryDataCivil = new HashMap<>();
 

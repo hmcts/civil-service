@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -24,6 +25,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 
 @Slf4j
@@ -44,6 +46,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_SUBMIT), this::migrateCaseData)
+            .put(callbackKey(SUBMITTED), this::migrateCaseData)
             .build();
     }
 
@@ -56,17 +59,14 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
 
         CaseLocation caseLocation = CaseLocation.builder().baseLocation("420219").region("2").build();
         if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
-            CaseMigratonUtility.migrateGS(oldCaseData, "AAA6",
-                                          caseDataBuilder, coreCaseDataService
+            CaseMigratonUtility.migrateGS(oldCaseData, caseDataBuilder
             );
 
             CaseMigratonUtility.migrateCaseManagementLocation(caseDataBuilder, caseLocation);
         } else {
             caseLocation = CaseLocation.builder().baseLocation("192280").region("4").build();
             CaseMigratonUtility.migrateCaseManagementLocation(caseDataBuilder, caseLocation);
-            CaseMigratonUtility.migrateGS(oldCaseData, "AAA7",
-                                          caseDataBuilder, coreCaseDataService
-            );
+            CaseMigratonUtility.migrateGS(oldCaseData, caseDataBuilder);
 
             CaseMigratonUtility.migrateUnspecCoutLocation(authToken, oldCaseData, caseDataBuilder,
                                                           locationRefDataService
@@ -74,13 +74,28 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
 
         }
         caseLocation = CaseLocation.builder().baseLocation("420219").region("2").build();
-        CaseMigratonUtility.migrateRespondentAndApplicantDQ(authToken, oldCaseData, caseDataBuilder,
-                                                            locationRefDataService, caseLocation
+        CaseMigratonUtility.migrateRespondentAndApplicantDQUnSpec(authToken, oldCaseData, caseDataBuilder,
+                                                                  locationRefDataService, caseLocation
         );
+
         caseDataBuilder.migrationId(MIGRATION_ID_VALUE);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private CallbackResponse migrateSuppmentryData(CallbackParams callbackParams) {
+        CaseData oldCaseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
+        if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
+            CaseMigratonUtility.setSupplementaryData(oldCaseData.getCcdCaseReference(), coreCaseDataService
+                , "AAA6");
+        } else {
+            CaseMigratonUtility.setSupplementaryData(oldCaseData.getCcdCaseReference(), coreCaseDataService
+                , "AAA7");
+
+        }
+        return SubmittedCallbackResponse.builder().build();
     }
     /*private CallbackResponse migrateCaseData(CallbackParams callbackParams) {
         CaseData oldCaseData = callbackParams.getCaseData();
