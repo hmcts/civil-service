@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
@@ -32,6 +33,8 @@ public class PaymentsService {
 
     @Value("${serviceRequest.api.callback-url}")
     String callBackUrl;
+    @Value("${serviceRequestUpdateClaimIssued.api.callback-url}")
+    String callBackUrlClaimIssued;
 
     public void validateRequest(CaseData caseData) {
         String error = null;
@@ -79,22 +82,36 @@ public class PaymentsService {
 
     private CreateServiceRequestDTO buildServiceRequest(CaseData caseData) {
         SRPbaDetails serviceRequestPBADetails = caseData.getServiceRequestPBADetails();
-        FeeDto feeResponse = serviceRequestPBADetails.getFee().toFeeDto();
-        String siteId = caseData.getSuperClaimType().equals(SPEC_CLAIM)
-            ? paymentsConfiguration.getSpecSiteId() : paymentsConfiguration.getSiteId();
-        return CreateServiceRequestDTO.builder()
-            .caseReference(caseData.getLegacyCaseReference())
-            .ccdCaseNumber(caseData.getCcdCaseReference().toString())
-            .hmctsOrgId(siteId)
-            .callBackUrl(callBackUrl)
-            .fees(new FeeDto[] { (FeeDto.builder()
-                .calculatedAmount(feeResponse.getCalculatedAmount())
-                .code(feeResponse.getCode())
-                .version(feeResponse.getVersion())
-                .volume(1).build())})
-            .casePaymentRequest(CasePaymentRequestDto.builder()
-                                    .action(PAYMENT_ACTION)
-                                    .responsibleParty(caseData.getApplicantPartyName()).build())
-            .build();
+        String callBackUrlToggle = null;
+
+        if (caseData.getCcdState().name().equals(CaseState.PENDING_CASE_ISSUED.name())) {
+            callBackUrlToggle = callBackUrlClaimIssued;
+        } else if (caseData.getCcdState().name().equals(CaseState.HEARING_READINESS.name())) {
+            callBackUrlToggle = callBackUrl;
+        }
+        if (callBackUrlToggle != null) {
+            FeeDto feeResponse = serviceRequestPBADetails.getFee().toFeeDto();
+            String siteId = caseData.getSuperClaimType().equals(SPEC_CLAIM)
+                ? paymentsConfiguration.getSpecSiteId() : paymentsConfiguration.getSiteId();
+            return CreateServiceRequestDTO.builder()
+                .caseReference(caseData.getLegacyCaseReference())
+                .ccdCaseNumber(caseData.getCcdCaseReference().toString())
+                .hmctsOrgId(siteId)
+                .callBackUrl(callBackUrlToggle)
+                .fees(new FeeDto[]{(FeeDto.builder()
+                    .calculatedAmount(feeResponse.getCalculatedAmount())
+                    .code(feeResponse.getCode())
+                    .version(feeResponse.getVersion())
+                    .volume(1).build())})
+                .casePaymentRequest(CasePaymentRequestDto.builder()
+                                        .action(PAYMENT_ACTION)
+                                        .responsibleParty(caseData.getApplicantPartyName()).build())
+                .build();
+        }
+        else
+        {
+            throw new RuntimeException("Invalid Case State"+ caseData.getCcdCaseReference());
+        }
     }
+
 }
