@@ -88,11 +88,11 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
         CaseData oldCaseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
         if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
-            CaseMigratonUtility.setSupplementaryData(oldCaseData.getCcdCaseReference(), coreCaseDataService
-                , "AAA6");
+            CaseMigratonUtility.setSupplementaryData(oldCaseData.getCcdCaseReference(), coreCaseDataService,
+                                                     "AAA6");
         } else {
-            CaseMigratonUtility.setSupplementaryData(oldCaseData.getCcdCaseReference(), coreCaseDataService
-                , "AAA7");
+            CaseMigratonUtility.setSupplementaryData(oldCaseData.getCcdCaseReference(), coreCaseDataService,
+                                                     "AAA7");
 
         }
         return SubmittedCallbackResponse.builder().build();
