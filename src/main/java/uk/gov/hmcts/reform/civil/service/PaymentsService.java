@@ -90,7 +90,7 @@ public class PaymentsService {
             callBackUrlToggle = callBackUrl;
         }
         if (callBackUrlToggle != null) {
-            FeeDto feeResponse = serviceRequestPBADetails.getFee().toFeeDto();
+            FeeDto feeResponse = caseData.getClaimFee().toFeeDto();   //serviceRequestPBADetails.getFee().toFeeDto();
             String siteId = caseData.getSuperClaimType().equals(SPEC_CLAIM)
                 ? paymentsConfiguration.getSpecSiteId() : paymentsConfiguration.getSiteId();
             return CreateServiceRequestDTO.builder()

@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
@@ -34,7 +35,7 @@ import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PaymentsCallbackHandler extends CallbackHandler {
+public class PaymentsCallbackPBAHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(MAKE_PBA_PAYMENT);
     private static final String ERROR_MESSAGE = "Technical error occurred";
@@ -81,7 +82,9 @@ public class PaymentsCallbackHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         try {
             log.info("processing payment for case " + caseData.getCcdCaseReference());
-            var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken).getPaymentReference();
+            var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken)
+                .getPaymentReference();
+            SRPbaDetails pbaDetails = caseData.getServiceRequestPBADetails();
             PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
                 .map(PaymentDetails::toBuilder)
                 .orElse(PaymentDetails.builder())
