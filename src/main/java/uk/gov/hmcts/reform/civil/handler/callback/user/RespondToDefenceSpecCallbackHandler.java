@@ -88,7 +88,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
             .put(callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag)
-            .put(callbackKey(V_1, MID, "validate-payment-date"), this::validateRespondentPaymentDate)
+            .put(callbackKey(V_1, MID, "validate-respondent-payment-date"), this::validatePaymentDate)
             .put(callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false))
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true))
             .put(callbackKey(ABOUT_TO_START), this::populateCaseData)
@@ -339,11 +339,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
     }
 
-    private CallbackResponse validateRespondentPaymentDate(CallbackParams callbackParams) {
+    private CallbackResponse validatePaymentDate(CallbackParams callbackParams) {
 
         var caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
-        /*Create Case field based on CIV-776 */
+
         if (checkPastDateValidation(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())) {
             errors.add("Enter a date that is today or in the future");
         }
