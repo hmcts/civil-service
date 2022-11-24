@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.client.models.StatusHistoryDto;
-import uk.gov.hmcts.reform.payments.response.PBAServiceRequestResponse;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -42,11 +41,11 @@ import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
 @SpringBootTest(classes = {
-    PaymentsCallbackPBAHandler.class,
+    PaymentsCallbackHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class
 })
-class PaymentsCallbackPBAHandlerTest extends BaseCallbackHandlerTest {
+class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private static final String SUCCESSFUL_PAYMENT_REFERENCE = "RC-1234-1234-1234-1234";
     private static final String PAYMENT_ERROR_MESSAGE = "Your account is deleted";
@@ -61,7 +60,7 @@ class PaymentsCallbackPBAHandlerTest extends BaseCallbackHandlerTest {
     private Time time;
 
     @Autowired
-    private PaymentsCallbackPBAHandler handler;
+    private PaymentsCallbackHandler handler;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -86,12 +85,12 @@ class PaymentsCallbackPBAHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldMakePbaPayment_whenInvoked() {
-            when(paymentsService.createCreditAccountPayment1(any(), any()))
-                .thenReturn(PBAServiceRequestResponse.builder().paymentReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
+            when(paymentsService.createCreditAccountPayment(any(), any()))
+                .thenReturn(PaymentDto.builder().reference(SUCCESSFUL_PAYMENT_REFERENCE).build());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(paymentsService).createCreditAccountPayment1(caseData, "BEARER_TOKEN");
+            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
             assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
                 .extracting("reference", "status", "customerReference")
                 .containsExactly(SUCCESSFUL_PAYMENT_REFERENCE, SUCCESS.toString(), "12345");
@@ -101,11 +100,11 @@ class PaymentsCallbackPBAHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @ValueSource(ints = {403, 422, 504})
         void shouldUpdateFailureReason_whenSpecificFeignExceptionsThrown(int status) {
-            doThrow(buildFeignException(status)).when(paymentsService).createCreditAccountPayment1(any(), any());
+            doThrow(buildFeignException(status)).when(paymentsService).createCreditAccountPayment(any(), any());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(paymentsService).createCreditAccountPayment1(caseData, "BEARER_TOKEN");
+            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
             assertThat(response.getData()).extracting("claimIssuedPaymentDetails").doesNotHaveToString("reference");
             assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
                 .extracting("errorMessage", "errorCode", "status", "customerReference")
@@ -116,11 +115,11 @@ class PaymentsCallbackPBAHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotThrowError_whenPaymentIsResubmittedWithInTwoMinutes() {
             doThrow(new InvalidPaymentRequestException("Duplicate Payment."))
-                .when(paymentsService).createCreditAccountPayment1(any(), any());
+                .when(paymentsService).createCreditAccountPayment(any(), any());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(paymentsService).createCreditAccountPayment1(caseData, "BEARER_TOKEN");
+            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
             assertThat(response.getErrors()).isEmpty();
             assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
                 .extracting("errorMessage", "status", "customerReference")
@@ -130,11 +129,11 @@ class PaymentsCallbackPBAHandlerTest extends BaseCallbackHandlerTest {
         @ParameterizedTest
         @ValueSource(ints = {401, 404, 409})
         void shouldAddError_whenOtherExceptionThrown(int status) {
-            doThrow(buildFeignException(status)).when(paymentsService).createCreditAccountPayment1(any(), any());
+            doThrow(buildFeignException(status)).when(paymentsService).createCreditAccountPayment(any(), any());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            verify(paymentsService).createCreditAccountPayment1(caseData, "BEARER_TOKEN");
+            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
             assertThat(response.getData()).doesNotHaveToString("paymentReference");
             assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
                 .doesNotHaveToString("paymentErrorMessage");
@@ -146,10 +145,10 @@ class PaymentsCallbackPBAHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldThrowException_whenForbiddenExceptionThrownContainsInvalidResponse() {
             doThrow(buildForbiddenFeignExceptionWithInvalidResponse())
-                .when(paymentsService).createCreditAccountPayment1(any(), any());
+                .when(paymentsService).createCreditAccountPayment(any(), any());
 
             assertThrows(FeignException.class, () -> handler.handle(params));
-            verify(paymentsService).createCreditAccountPayment1(caseData, "BEARER_TOKEN");
+            verify(paymentsService).createCreditAccountPayment(caseData, "BEARER_TOKEN");
         }
 
         @Test

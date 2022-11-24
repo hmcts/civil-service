@@ -44,25 +44,24 @@ public class PaymentsService {
     @Value("${serviceRequestUpdateClaimIssued.api.callback-url}")
     String callBackUrlClaimIssued;
 
-    class OldCode {
-        public PaymentDto createCreditAccountPayment(CaseData caseData, String authToken) throws FeignException {
-            return paymentsClient.createCreditAccountPayment(authToken, buildRequest(caseData));
-        }
+    public PaymentDto createCreditAccountPayment(CaseData caseData, String authToken) throws FeignException {
+        return paymentsClient.createCreditAccountPayment(authToken, buildRequest(caseData));
+    }
 
-        private CreditAccountPaymentRequest buildRequest(CaseData caseData) {
-            FeeDto claimFee = caseData.getClaimFee().toFeeDto();
-            var organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
-            var organisationName = organisationService.findOrganisationById(organisationId)
+    private CreditAccountPaymentRequest buildRequest(CaseData caseData) {
+        FeeDto claimFee = caseData.getClaimFee().toFeeDto();
+        var organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+        var organisationName = organisationService.findOrganisationById(organisationId)
                 .map(Organisation::getName)
                 .orElseThrow(RuntimeException::new);
 
-            String customerReference = ofNullable(caseData.getClaimIssuedPaymentDetails())
+        String customerReference = ofNullable(caseData.getClaimIssuedPaymentDetails())
                 .map(PaymentDetails::getCustomerReference)
                 .orElse(caseData.getPaymentReference());
-            CreditAccountPaymentRequest creditAccountPaymentRequest = null;
+        CreditAccountPaymentRequest creditAccountPaymentRequest = null;
 
-            if (!isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
-                creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
+        if (!isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+            creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
                     .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
                     .amount(claimFee.getCalculatedAmount())
                     .caseReference(caseData.getLegacyCaseReference())
@@ -74,8 +73,8 @@ public class PaymentsService {
                     .siteId(paymentsConfiguration.getSiteId())
                     .fees(new FeeDto[]{claimFee})
                     .build();
-            } else if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
-                creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
+        } else if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+            creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
                     .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
                     .amount(claimFee.getCalculatedAmount())
                     .caseReference(caseData.getLegacyCaseReference())
@@ -87,38 +86,35 @@ public class PaymentsService {
                     .siteId(paymentsConfiguration.getSpecSiteId())
                     .fees(new FeeDto[]{claimFee})
                     .build();
-            }
-            return creditAccountPaymentRequest;
         }
+        return creditAccountPaymentRequest;
     }
 
-    class NewCode
-    {
-        public void validateRequest(CaseData caseData) {
-            String error = null;
-            SRPbaDetails serviceRequestPBADetails = caseData.getServiceRequestPBADetails();
-            if (serviceRequestPBADetails == null) {
-                error = "Fee details not received.";
-            } else if (serviceRequestPBADetails.getFee() == null
+    public void validateRequest(CaseData caseData) {
+        String error = null;
+        SRPbaDetails serviceRequestPBADetails = caseData.getServiceRequestPBADetails();
+        if (serviceRequestPBADetails == null) {
+            error = "Fee details not received.";
+        } else if (serviceRequestPBADetails.getFee() == null
                 || serviceRequestPBADetails.getFee().getCalculatedAmountInPence() == null
                 || isBlank(serviceRequestPBADetails.getFee().getVersion())
                 || isBlank(serviceRequestPBADetails.getFee().getCode())) {
-                error = "Fees are not set correctly.";
-            }
-            if (!isBlank(error)) {
-                throw new InvalidPaymentRequestException(error);
-            }
+            error = "Fees are not set correctly.";
         }
+        if (!isBlank(error)) {
+            throw new InvalidPaymentRequestException(error);
+        }
+    }
 
-        private PBAServiceRequestDTO buildRequest(CaseData caseData) {
-            SRPbaDetails serviceRequestPBADetails = caseData.getServiceRequestPBADetails();
-            FeeDto claimFee = caseData.getClaimFee().toFeeDto();
-            var organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
-            var organisationName = organisationService.findOrganisationById(organisationId)
+    private PBAServiceRequestDTO buildRequest1(CaseData caseData) {
+        SRPbaDetails serviceRequestPBADetails = caseData.getServiceRequestPBADetails();
+        FeeDto claimFee = caseData.getClaimFee().toFeeDto();
+        var organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+        var organisationName = organisationService.findOrganisationById(organisationId)
                 .map(Organisation::getName)
                 .orElseThrow(RuntimeException::new);
-            PBAServiceRequestDTO pbaServiceRequestDTO = null;
-            pbaServiceRequestDTO = PBAServiceRequestDTO.builder()
+        PBAServiceRequestDTO pbaServiceRequestDTO = null;
+        pbaServiceRequestDTO = PBAServiceRequestDTO.builder()
                 .accountNumber(serviceRequestPBADetails.getApplicantsPbaAccounts()
                                    .getValue().getLabel())
                 .amount(claimFee.getCalculatedAmount())
@@ -126,32 +122,32 @@ public class PaymentsService {
                 .organisationName(organisationName)
                 .idempotencyKey(String.valueOf(UUID.randomUUID()))
                 .build();
-            return pbaServiceRequestDTO;
+        return pbaServiceRequestDTO;
+    }
+
+    public PBAServiceRequestResponse createCreditAccountPayment1(CaseData caseData, String authToken) {
+        String serviceReqReference = caseData.getServiceRequestPBADetails().getServiceReqReference();
+        return paymentsClient.createPbaPayment(serviceReqReference, authToken, buildRequest1(caseData));
+    }
+
+    public PaymentServiceResponse createServiceRequest(CaseData caseData, String authToken) {
+        return paymentsClient.createServiceRequest(authToken, buildServiceRequest(caseData));
+    }
+
+    private CreateServiceRequestDTO buildServiceRequest(CaseData caseData) {
+        SRPbaDetails serviceRequestPBADetails = caseData.getServiceRequestPBADetails();
+        String callBackUrlToggle = null;
+
+        if (caseData.getCcdState().name().equals(CaseState.PENDING_CASE_ISSUED.name())) {
+            callBackUrlToggle = callBackUrlClaimIssued;
+        } else if (caseData.getCcdState().name().equals(CaseState.HEARING_READINESS.name())) {
+            callBackUrlToggle = callBackUrl;
         }
-
-        public PBAServiceRequestResponse createCreditAccountPayment(CaseData caseData, String authToken) {
-            String serviceReqReference = caseData.getServiceRequestPBADetails().getServiceReqReference();
-            return paymentsClient.createPbaPayment(serviceReqReference, authToken, buildRequest(caseData));
-        }
-
-        public PaymentServiceResponse createServiceRequest(CaseData caseData, String authToken) {
-            return paymentsClient.createServiceRequest(authToken, buildServiceRequest(caseData));
-        }
-
-        private CreateServiceRequestDTO buildServiceRequest(CaseData caseData) {
-            SRPbaDetails serviceRequestPBADetails = caseData.getServiceRequestPBADetails();
-            String callBackUrlToggle = null;
-
-            if (caseData.getCcdState().name().equals(CaseState.PENDING_CASE_ISSUED.name())) {
-                callBackUrlToggle = callBackUrlClaimIssued;
-            } else if (caseData.getCcdState().name().equals(CaseState.HEARING_READINESS.name())) {
-                callBackUrlToggle = callBackUrl;
-            }
-            if (callBackUrlToggle != null) {
-                FeeDto feeResponse = serviceRequestPBADetails.getFee().toFeeDto();
-                String siteId = caseData.getSuperClaimType().equals(SPEC_CLAIM)
+        if (callBackUrlToggle != null) {
+            FeeDto feeResponse = serviceRequestPBADetails.getFee().toFeeDto();
+            String siteId = caseData.getSuperClaimType().equals(SPEC_CLAIM)
                     ? paymentsConfiguration.getSpecSiteId() : paymentsConfiguration.getSiteId();
-                return CreateServiceRequestDTO.builder()
+            return CreateServiceRequestDTO.builder()
                     .caseReference(caseData.getLegacyCaseReference())
                     .ccdCaseNumber(caseData.getCcdCaseReference().toString())
                     .hmctsOrgId(siteId)
@@ -165,11 +161,9 @@ public class PaymentsService {
                                             .action(PAYMENT_ACTION)
                                             .responsibleParty(caseData.getApplicantPartyName()).build())
                     .build();
-            }
-            else
-            {
-                throw new RuntimeException("Invalid Case State"+ caseData.getCcdCaseReference());
-            }
+        } else {
+            throw new RuntimeException("Invalid Case State" + caseData.getCcdCaseReference());
         }
     }
 }
+

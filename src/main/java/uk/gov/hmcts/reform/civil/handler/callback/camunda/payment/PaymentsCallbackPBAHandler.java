@@ -82,7 +82,7 @@ public class PaymentsCallbackPBAHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         try {
             log.info("processing payment for case " + caseData.getCcdCaseReference());
-            var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken)
+            var paymentReference = paymentsService.createCreditAccountPayment1(caseData, authToken)
                 .getPaymentReference();
             SRPbaDetails pbaDetails = caseData.getServiceRequestPBADetails();
             PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
