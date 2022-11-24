@@ -46,7 +46,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_SUBMIT), this::migrateCaseData)
-            .put(callbackKey(SUBMITTED), this::migrateCaseData)
+            .put(callbackKey(SUBMITTED), this::migrateSuppmentryData)
             .build();
     }
 
