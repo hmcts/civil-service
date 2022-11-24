@@ -18,8 +18,10 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.Optional;
 
@@ -32,6 +34,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AGREED_EXTENSION_DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
 @SpringBootTest(classes = {
     ResponseDeadlineExtensionDefendantNotificationHandler.class,
@@ -45,6 +49,8 @@ class ResponseDeadlineExtensionDefendantNotificationHandlerTest extends BaseCall
     private NotificationsProperties notificationsProperties;
     @MockBean
     private OrganisationService organisationService;
+    @MockBean
+    private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
 
     @Autowired
     private ResponseDeadlineExtensionDefendantNotificationHandler handler;
@@ -55,6 +61,7 @@ class ResponseDeadlineExtensionDefendantNotificationHandlerTest extends BaseCall
         private final String emailTemplate = "emailTemplate";
         private final String defendantEmail = "sherlock@scotlandyard.co.uk";
         private final String legacyReference = "000MC001";
+
 
         @BeforeEach
         void setUp() {
@@ -81,6 +88,7 @@ class ResponseDeadlineExtensionDefendantNotificationHandlerTest extends BaseCall
                                 .type(Party.Type.COMPANY)
                                 .companyName("Bad guys ltd")
                                 .build())
+                .respondentSolicitor1AgreedDeadlineExtension(LocalDate.now())
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -99,7 +107,8 @@ class ResponseDeadlineExtensionDefendantNotificationHandlerTest extends BaseCall
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
-                CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
+                CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+                AGREED_EXTENSION_DATE, formatLocalDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE)
             );
         }
 
