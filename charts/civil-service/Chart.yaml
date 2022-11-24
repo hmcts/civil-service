@@ -2,7 +2,7 @@ apiVersion: v2
 description: A Helm chart for civil-service App
 name: civil-service
 home: https://github.com/hmcts/civil-service
-version: 0.0.26
+version: 0.0.27
 maintainers:
   - name: HMCTS Civil team
 
@@ -13,8 +13,7 @@ dependencies:
   - name: ccd
     version: 8.0.17
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
-    tags:
-      - civil-ccd-stack
+    condition: ccd.enabled
   - name: xui-webapp
     version: ~0.2.16
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
