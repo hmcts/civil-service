@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 
+import java.net.UnknownHostException;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,6 +38,16 @@ class ResourceExceptionHandlerTest {
             StateFlowException::new,
             handler::incorrectStateFlow,
             HttpStatus.PRECONDITION_FAILED
+        );
+    }
+
+    @Test
+    void shouldReturnMethodNotAllowed_whenUnknownHostException() {
+        testTemplate(
+            "expected exception for missing callback handler",
+            UnknownHostException::new,
+            handler::unknownHost,
+            HttpStatus.NOT_ACCEPTABLE
         );
     }
 
