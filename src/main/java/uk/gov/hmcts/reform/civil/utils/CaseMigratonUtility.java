@@ -48,7 +48,7 @@ public class CaseMigratonUtility {
                                                  CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                                  LocationRefDataService locationRefDataService) {
 
-        CourtLocation location = oldCaseData.getCourtLocation();        // To fetch Location ref data based om preferred court
+        CourtLocation location = oldCaseData.getCourtLocation();
         if (ofNullable(location).isPresent()) {
             LocationRefData refData = locationRefDataService.getCourtLocation(
                 authToken,
@@ -151,12 +151,14 @@ public class CaseMigratonUtility {
                                                                                .getRespondent2DQRequestedCourt()
                                                                                .toBuilder()
                                                                                .caseLocation(location)
-                                                                               .build()).
-                                              respondToCourtLocation2(RequestedCourt.builder()
+                                                                               .build())
+                                              .respondToCourtLocation2(RequestedCourt.builder()
                                                                           .responseCourtLocations(null)
-                                                                          .responseCourtCode(refdata.getCourtLocationCode())
+                                                                          .responseCourtCode(
+                                                                              refdata.getCourtLocationCode())
                                                                           .reasonForHearingAtSpecificCourt(
-                                                                              oldCaseData.getRespondent2DQ().getRespondToCourtLocation2()
+                                                                              oldCaseData.getRespondent2DQ()
+                                                                                  .getRespondToCourtLocation2()
                                                                                   .getReasonForHearingAtSpecificCourt()
                                                                           ).build())
                                               .build());
