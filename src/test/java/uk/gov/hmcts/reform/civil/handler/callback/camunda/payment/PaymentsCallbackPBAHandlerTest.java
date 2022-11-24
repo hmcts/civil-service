@@ -42,11 +42,11 @@ import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
 @SpringBootTest(classes = {
-    PaymentsCallbackHandler.class,
+    PaymentsCallbackPBAHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class
 })
-class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
+class PaymentsCallbackPBAHandlerTest extends BaseCallbackHandlerTest {
 
     private static final String SUCCESSFUL_PAYMENT_REFERENCE = "RC-1234-1234-1234-1234";
     private static final String PAYMENT_ERROR_MESSAGE = "Your account is deleted";
@@ -61,7 +61,7 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
     private Time time;
 
     @Autowired
-    private PaymentsCallbackHandler handler;
+    private PaymentsCallbackPBAHandler handler;
 
     @Autowired
     private ObjectMapper objectMapper;

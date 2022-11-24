@@ -81,7 +81,7 @@ public class PaymentsCallbackHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         try {
             log.info("processing payment for case " + caseData.getCcdCaseReference());
-            var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken).getPaymentReference();
+            var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken).getReference();
             PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
                 .map(PaymentDetails::toBuilder)
                 .orElse(PaymentDetails.builder())
