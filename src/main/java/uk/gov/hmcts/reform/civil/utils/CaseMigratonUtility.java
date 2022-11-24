@@ -9,7 +9,11 @@ import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
-import uk.gov.hmcts.reform.civil.model.dq.*;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 //import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
@@ -61,9 +65,9 @@ public class CaseMigratonUtility {
     }
 
     public static void migrateRespondentAndApplicantDQUnSpec(String authToken, CaseData oldCaseData,
-                                                       CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                                                       LocationRefDataService locationRefDataService,
-                                                       CaseLocation caseLocation) {
+                                                             CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
+                                                             LocationRefDataService locationRefDataService,
+                                                             CaseLocation caseLocation) {
 
         migrateRespondent1DQ(authToken, oldCaseData, caseDataBuilder, locationRefDataService, caseLocation);
         migrateRespondent2DQ(authToken, oldCaseData, caseDataBuilder, locationRefDataService, caseLocation);
@@ -97,13 +101,13 @@ public class CaseMigratonUtility {
                                                                                .getRespondent1DQRequestedCourt()
                                                                                .toBuilder()
                                                                                .caseLocation(location)
-                                                                               .build()).respondToCourtLocation(
-                    RequestedCourt.builder()
-                        .responseCourtLocations(null)
-                        .responseCourtCode(refdata.getCourtLocationCode())
+                                                                               .build())
+                                              .respondToCourtLocation(
+                                                  RequestedCourt.builder()
+                                                      .responseCourtLocations(null)
+                                                      .responseCourtCode(refdata.getCourtLocationCode())
 
-                        .build()).responseClaimCourtLocationRequired(YES).build());
-            ;
+                                                      .build()).responseClaimCourtLocationRequired(YES).build());
 
         } else if (ofNullable(respondent1DQ).isPresent()
             && ofNullable(respondent1DQ.getRespondent1DQRequestedCourt()).isPresent()) {
