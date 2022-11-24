@@ -152,7 +152,7 @@ public class CaseMigratonUtility {
                                                                                .toBuilder()
                                                                                .caseLocation(location)
                                                                                .build())
-                                              .respondToCourtLocation2(RequestedCourt.builder()
+                                              ./*respondToCourtLocation2(RequestedCourt.builder()
                                                                           .responseCourtLocations(null)
                                                                           .responseCourtCode(
                                                                               refdata.getCourtLocationCode())
@@ -160,8 +160,8 @@ public class CaseMigratonUtility {
                                                                               oldCaseData.getRespondent2DQ()
                                                                                   .getRespondToCourtLocation2()
                                                                                   .getReasonForHearingAtSpecificCourt()
-                                                                          ).build())
-                                              .build());
+                                                                          ).build()) */
+                                              build());
         } else if (ofNullable(respondent2DQ).isPresent()
             && ofNullable(respondent2DQ.getRespondent2DQRequestedCourt()).isPresent()) {
             caseDataBuilder.respondent2DQ(respondent2DQ.toBuilder()
