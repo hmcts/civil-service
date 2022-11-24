@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
@@ -266,6 +267,7 @@ public class CaseMigratonUtility {
     private static void setSupplementaryData(Long caseId, CoreCaseDataService coreCaseDataService, String specSiteId) {
         log.info("GS Site ID is : {}", specSiteId);
         Map<String, Map<String, Map<String, Object>>> supplementaryDataCivil = new HashMap<>();
+
         supplementaryDataCivil.put(
             "supplementary_data_updates",
             singletonMap("$set", singletonMap(
@@ -273,8 +275,8 @@ public class CaseMigratonUtility {
                 specSiteId
             ))
         );
-        coreCaseDataService.setSupplementaryData(caseId, supplementaryDataCivil);
-        log.info("GS Site After submission  : {}", specSiteId);
+        CaseDetails details =  coreCaseDataService.setSupplementaryData(caseId, supplementaryDataCivil);
+        log.info("GS Site After submission  : {}", details.getData());
     }
 
     private static StringBuilder getCaseParticipants(CaseData caseData) {
