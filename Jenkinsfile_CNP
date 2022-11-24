@@ -7,6 +7,7 @@ import uk.gov.hmcts.contino.AppPipelineDsl
 def type = "java"
 def product = "civil"
 def component = "service"
+def ccddefbranch = "publishAfterJudicialReferalState"
 AppPipelineConfig pipelineConf
 
 static Map<String, Object> secret(String secretName, String envVariable) {
@@ -100,7 +101,7 @@ withPipeline(type, product, component) {
       ./bin/add-roles.sh
       ./bin/pull-latest-release-asset.sh civil-ccd-definition civil-ccd-definition.zip
       ./bin/pull-latest-release-asset.sh civil-camunda-bpmn-definition civil-camunda-bpmn-definition.zip
-      ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json"
+      ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json" ${ccddefbranch}
 
       ./bin/import-bpmn-diagram.sh .
     """
