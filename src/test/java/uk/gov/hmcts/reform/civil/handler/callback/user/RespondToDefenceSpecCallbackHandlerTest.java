@@ -50,6 +50,7 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -571,6 +572,34 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     "not to proceed",
                     caseData.getLegacyCaseReference()
                 );
+        }
+    }
+
+    @Nested
+    class PaymentDateValidationCallback {
+
+        private static final String PAGE_ID = "validate-respondent-payment-date";
+
+        @Test
+        void shouldReturnError_whenPastPaymentDate() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .applicant1RequestedPaymentDateForDefendantSpec(LocalDate.now().minusDays(15))
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0)).isEqualTo("Enter a date that is today or in the future");
+        }
+
+        @Test
+        void shouldNotReturnError_whenPastPaymentDate() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .applicant1RequestedPaymentDateForDefendantSpec(LocalDate.now().minusDays(15))
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
         }
     }
 
