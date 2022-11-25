@@ -397,7 +397,7 @@ public class CaseMigratonUtility {
             ))
         );
         CaseDetails details = coreCaseDataService.setSupplementaryData(caseId, supplementaryDataCivil);
-        log.info("GS Site After submission  : {}", details.getData());
+        log.info("GS Site After submission  : {}", details);
     }
 
     private static StringBuilder getCaseParticipants(CaseData caseData) {
