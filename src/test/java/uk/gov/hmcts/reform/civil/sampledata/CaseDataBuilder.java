@@ -3605,6 +3605,11 @@ public class CaseDataBuilder {
                             .version("1")
                             .build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1(Party.builder()
+                            .individualFirstName("First name")
+                            .individualLastName("Second name")
+                            .type(Party.Type.INDIVIDUAL)
+                            .partyName("test").build())
             .build();
     }
 
