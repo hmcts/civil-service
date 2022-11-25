@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 
 @SpringBootTest(classes = {
     MigrateCaseDataCallbackHandler.class,
@@ -39,6 +40,7 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
     private  LocationRefDataService locationRefDataService;
 
     private static final String USER_AUTH_TOKEN = "Bearer user-xyz";
+
 
     @Test
     void shouldReturnNoError_whenAboutToSubmitIsInvoked_UNSpec() {
@@ -60,11 +62,8 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
-        SubmittedCallbackResponse response1 = (SubmittedCallbackResponse)handler
-            .handle(params);
         assertThat(response.getErrors()).isNull();
-
-    }
+           }
 
     @Test
     void shouldReturnNoError_whenAboutToSubmitIsInvoked_SpecNoCourtCode() {
@@ -119,8 +118,6 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
             LocationRefData.builder().epimmsId("1234").region("1").build());
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-            .handle(params);
-        SubmittedCallbackResponse response1 = (SubmittedCallbackResponse)handler
             .handle(params);
         assertThat(response.getErrors()).isNull();
     }
@@ -234,5 +231,19 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
 
         assertThat(response.getErrors()).isNull();
     }
+
+    @Test
+    void shouldReturnNoError_whenSubmittedIsInvoked_UNSpec() {
+        //CourtLocation location = CourtLocation.builder().applicantPreferredCourt("123").build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued()
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+        SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
+            .handle(params);
+    }
+
 
 }
