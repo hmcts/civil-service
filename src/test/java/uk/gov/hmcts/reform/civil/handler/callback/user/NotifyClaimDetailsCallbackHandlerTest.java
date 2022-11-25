@@ -313,7 +313,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
                 .setCoSClaimDetailsWithDate(true, false, past, null)
                 .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, "cos1");
+        CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
         AboutToStartOrSubmitCallbackResponse successResponse =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(successResponse.getErrors()).isEmpty();
@@ -328,7 +328,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
                 .setCoSClaimDetailsWithDate(true, true, past, future)
                 .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, "cos2");
+        CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails2");
         AboutToStartOrSubmitCallbackResponse successResponse =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(successResponse.getErrors().size()).isEqualTo(1);

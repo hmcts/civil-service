@@ -59,9 +59,9 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             "<br /><h2 class=\"govuk-heading-m\">What happens next</h2> "
             + "%n%n The defendant(s) must respond to the claim by %s. "
             + "If the defendant(s) appoint a legal representative who respond online "
-            + "your account will be updated%n%n"
-            + "If the defendant(s) do not wish for the claim remain on line and respond offline, "
-            + "the claim will be moved and will continue off line.%n%n "
+            + "your account will be updated.%n%n"
+            + "If the defendant(s) do not wish for the claim to remain online and respond offline, "
+            + "the claim will be moved and will continue offline.%n%n "
             + "This is a new online process - " + "you don't need to file any further documents to the court.";
 
     public static final String NOTIFICATION_ONE_PARTY_SUMMARY = "<br />Notification of claim details sent to "
@@ -86,8 +86,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             callbackKey(ABOUT_TO_START), this::prepareDefendantSolicitorOptions,
             callbackKey(MID, "validateNotificationOption"), this::validateNotificationOption,
             callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim,
-            callbackKey(MID, "cos1"), this::validateCertificateOfService,
-            callbackKey(MID, "cos2"), this::validateCertificateOfService,
+            callbackKey(MID, "validateCosNotifyClaimDetails1"), this::validateCertificateOfService,
+            callbackKey(MID, "validateCosNotifyClaimDetails2"), this::validateCertificateOfService,
             callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
             callbackKey(SUBMITTED), this::buildConfirmationWithSolicitorOptions
         );
@@ -146,7 +146,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
         String confirmationText = getConfirmationBody(caseData);
 
-        String body = format(confirmationText, formattedDeadline) + exitSurveyContentService.applicantSurvey();
+        String body = format(confirmationText, formattedDeadline)
+                + (areRespondentsRepresentedAndRegistered(caseData)?exitSurveyContentService.applicantSurvey():"");
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(String.format(
@@ -193,7 +194,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
 
         String body = format(getConfirmationBody(caseData), formattedDeadline)
-                + exitSurveyContentService.applicantSurvey();
+                + (areRespondentsRepresentedAndRegistered(caseData)?exitSurveyContentService.applicantSurvey():"");
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(String.format(
