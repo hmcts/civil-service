@@ -103,7 +103,7 @@ public class PaymentsService {
                 .volume(1).build())})
             .casePaymentRequest(CasePaymentRequestDto.builder()
                                     .action(PAYMENT_ACTION)
-                                    .responsibleParty(caseData.getApplicantPartyName()).build())
+                                    .responsibleParty(caseData.getApplicant1().getPartyName()).build())
             .build();
     }
 }
