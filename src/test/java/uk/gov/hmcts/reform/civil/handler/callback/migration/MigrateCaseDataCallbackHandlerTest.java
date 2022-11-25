@@ -72,6 +72,7 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
             .respondent1DQWithLocation()
             .respondent2DQWithLocation()
             .applicant1DQWithLocation()
+            .applicant2DQWithLocation()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .applicant2DQWithLocation()
             .build();
@@ -129,6 +130,7 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
             .respondent1DQWithLocation()
             .respondent2DQWithLocation()
             .applicant1DQWithLocation()
+            .applicant2DQWithLocation()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .applicant2DQWithLocation()
             .build();
@@ -155,6 +157,7 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
             .respondent1DQWithLocation()
             .respondent2DQWithLocation()
             .applicant1DQWithLocation()
+            .applicant2DQWithLocation()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .applicant2DQWithLocation()
             .build();
@@ -213,6 +216,7 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
             .respondent1DQWithLocation()
             .respondent2DQWithLocation()
             .applicant1DQWithLocation()
+            .applicant2DQWithLocation()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .applicant2DQWithLocation()
             .build();
