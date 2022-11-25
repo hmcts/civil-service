@@ -36,6 +36,7 @@ class EvidenceUploadNotificationEventHandlerTest {
 
     @Test
     void shouldNotifyAllSolicitors() {
+        //given: case details
         Long caseId = 1633357679902210L;
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .build();
@@ -43,8 +44,9 @@ class EvidenceUploadNotificationEventHandlerTest {
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         EvidenceUploadNotificationEvent event = new EvidenceUploadNotificationEvent(caseId);
+        //when: Evidence upload Notification handler is called
         handler.sendEvidenceUploadNotification(event);
-
+        //then: Should call notification handler for all solicitors
         verify(applicantNotificationHandler).notifyApplicantEvidenceUpload(caseData);
         verify(respondentNotificationHandler).notifyRespondentEvidenceUpload(caseData, false);
         verify(respondentNotificationHandler).notifyRespondentEvidenceUpload(caseData, true);
@@ -52,33 +54,37 @@ class EvidenceUploadNotificationEventHandlerTest {
 
     @Test
     void shouldContinueRespondentNotificationIfApplicantFailed() {
+        //given: case details
         Long caseId = 1633357679902210L;
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .build();
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        //when: Exception is thrown from applicant notification handler
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         doThrow(new RuntimeException()).when(applicantNotificationHandler).notifyApplicantEvidenceUpload(caseData);
         EvidenceUploadNotificationEvent event = new EvidenceUploadNotificationEvent(caseId);
         handler.sendEvidenceUploadNotification(event);
-
+        //then: Respondent handler should be called for both solicitors
         verify(respondentNotificationHandler).notifyRespondentEvidenceUpload(caseData, true);
         verify(respondentNotificationHandler).notifyRespondentEvidenceUpload(caseData, false);
     }
 
     @Test
     void shouldContinueRespondent2IfRespondent1Failed() {
+        //given: case details
         Long caseId = 1633357679902210L;
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .build();
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        //when: Exception is thrown for repondent1 notification handler
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
         doThrow(new RuntimeException()).when(respondentNotificationHandler).notifyRespondentEvidenceUpload(caseData,
                                                                                                            true);
         EvidenceUploadNotificationEvent event = new EvidenceUploadNotificationEvent(caseId);
         handler.sendEvidenceUploadNotification(event);
-
+        //then: Applicant handler and Respondent handler (for respondent2) should be called
         verify(applicantNotificationHandler).notifyApplicantEvidenceUpload(caseData);
         verify(respondentNotificationHandler).notifyRespondentEvidenceUpload(caseData, false);
     }

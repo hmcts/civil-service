@@ -46,6 +46,7 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
         void shouldNotifyRespondent1Solicitor_whenInvoked() {
             //given: case data has one respondent solicitor
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            //when: RepondentNotificationhandler for solictior1 is called
             handler.notifyRespondentEvidenceUpload(caseData, true);
             //then: email should be sent to respondent solicitor1
             verify(notificationService).sendMail(
@@ -63,6 +64,7 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
                 .atStateClaimDetailsNotified().addRespondent2(YesOrNo.YES)
                 .respondentSolicitor2EmailAddress("respondentsolicitor@example.com")
                 .build();
+            //when: RepondentNotificationhandler for solictior2 is called
             handler.notifyRespondentEvidenceUpload(caseData, false);
             //then: email should be sent to respondent solicitor2
             verify(notificationService).sendMail(

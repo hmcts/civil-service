@@ -23,6 +23,14 @@ public class EvidenceUploadNotificationEventHandler {
     private final EvidenceUploadApplicantNotificationHandler evidenceUploadApplicantNotificationHandler;
     private final EvidenceUploadRespondentNotificationHandler evidenceUploadRespondentNotificationHandler;
 
+    /**
+     * This method will send notification to applicant and respondent solicitors.
+     * This method will not throw any exception but log warning if there is any error while
+     * sending notification because these email notifications are not business critical
+     * and provided as a courtesy, as the user can log in and see the new uploads.
+     *
+     * @param event EvidenceUploadNotificationEvent
+     */
     @EventListener
     public void sendEvidenceUploadNotification(EvidenceUploadNotificationEvent event) {
         CaseDetails caseDetails = coreCaseDataService.getCase(event.getCaseId());
@@ -30,17 +38,17 @@ public class EvidenceUploadNotificationEventHandler {
         try {
             evidenceUploadApplicantNotificationHandler.notifyApplicantEvidenceUpload(caseData);
         } catch (Exception e) {
-            log.error("Failed to send email notification to applicant for case '{}'", event.getCaseId());
+            log.warn("Failed to send email notification to applicant for case '{}'", event.getCaseId());
         }
         try {
             evidenceUploadRespondentNotificationHandler.notifyRespondentEvidenceUpload(caseData, true);
         } catch (Exception e) {
-            log.error("Failed to send email notification to respondent solicitor1 for case '{}'", event.getCaseId());
+            log.warn("Failed to send email notification to respondent solicitor1 for case '{}'", event.getCaseId());
         }
         try {
             evidenceUploadRespondentNotificationHandler.notifyRespondentEvidenceUpload(caseData, false);
         } catch (Exception e) {
-            log.error("Failed to send email notification to respondent solicitor2 for case '{}'", event.getCaseId());
+            log.warn("Failed to send email notification to respondent solicitor2 for case '{}'", event.getCaseId());
         }
     }
 }
