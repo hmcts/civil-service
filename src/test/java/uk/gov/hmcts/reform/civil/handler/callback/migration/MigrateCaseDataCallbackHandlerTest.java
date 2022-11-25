@@ -47,9 +47,11 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssued()
             .courtLocation()
+            .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .respondent1DQWithLocation()
             .applicant1DQWithLocation()
             .build();
+        caseData = caseData.toBuilder().caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "444")).thenReturn(
@@ -76,6 +78,7 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .applicant2DQWithLocation()
             .build();
+        caseData = caseData.toBuilder().caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
         caseData = caseData.toBuilder().respondent1DQ(caseData.getRespondent1DQ().toBuilder()
                                                           .respondent1DQRequestedCourt(
                                                               caseData.getRespondent1DQ()
@@ -134,6 +137,7 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .applicant2DQWithLocation()
             .build();
+        caseData = caseData.toBuilder().caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // params.getParams().put(BEARER_TOKEN,USER_AUTH_TOKEN);
         when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "444")).thenReturn(
@@ -161,6 +165,7 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .applicant2DQWithLocation()
             .build();
+        caseData = caseData.toBuilder().caseAccessCategory(CaseCategory.UNSPEC_CLAIM).build();
         caseData = caseData.toBuilder().respondent1DQ(caseData.getRespondent1DQ().toBuilder()
                                                           .respondent1DQRequestedCourt(
                                                               caseData.getRespondent1DQ()
@@ -220,6 +225,7 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .applicant2DQWithLocation()
             .build();
+        caseData = caseData.toBuilder().caseAccessCategory(CaseCategory.UNSPEC_CLAIM).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // params.getParams().put(BEARER_TOKEN,USER_AUTH_TOKEN);
         when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "444")).thenReturn(

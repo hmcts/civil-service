@@ -69,6 +69,8 @@ public class CaseMigratonUtility {
                                                              CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                                              LocationRefDataService locationRefDataService,
                                                              CaseLocation caseLocation) {
+        log.info("CaseCategory is : {}", oldCaseData.getCaseAccessCategory());
+
         if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
 
             migrateRespondent1DQ(authToken, oldCaseData, caseDataBuilder, locationRefDataService, caseLocation);
