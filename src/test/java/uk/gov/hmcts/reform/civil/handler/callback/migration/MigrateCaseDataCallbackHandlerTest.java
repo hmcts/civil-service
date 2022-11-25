@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -59,8 +60,10 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
-
+        SubmittedCallbackResponse response1 = (SubmittedCallbackResponse)handler
+            .handle(params);
         assertThat(response.getErrors()).isNull();
+
     }
 
     @Test
@@ -117,7 +120,8 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
-
+        SubmittedCallbackResponse response1 = (SubmittedCallbackResponse)handler
+            .handle(params);
         assertThat(response.getErrors()).isNull();
     }
 
