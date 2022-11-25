@@ -126,15 +126,16 @@ public class RoboticsNotificationService {
     }
 
     private String getRoboticsEmailRecipient(boolean isMultiParty, boolean isSpecClaim) {
-        String recipient = null;
         if (isSpecClaim) {
-            recipient = roboticsEmailConfiguration.getSpecRecipient();
+            log.info("EMAIl:---------" + roboticsEmailConfiguration.getSpecRecipient());
+            return roboticsEmailConfiguration.getSpecRecipient();
         }
-        recipient = isMultiParty ? roboticsEmailConfiguration
+        String recipient = isMultiParty ? roboticsEmailConfiguration
             .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
         log.info("EMAIl:---------" + recipient);
-        return recipient;
-    }
+        return isMultiParty ? roboticsEmailConfiguration
+            .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
+}
 
     public static String findLatestEventTriggerReason(EventHistory eventHistory) {
         List<Event> events = flatEvents(eventHistory);

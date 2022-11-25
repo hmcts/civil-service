@@ -46,15 +46,13 @@ public class StartBusinessProcessCallbackHandler extends CallbackHandler {
         switch (businessProcess.getStatusOrDefault()) {
             case READY:
             case DISPATCHED:
+                log.info("HANDLERSTART LegacyCaseReference ({}) businessProcessInstanceId({})",
+                         data.getLegacyCaseReference(), businessProcess.getProcessInstanceId());
                 return evaluateReady(callbackParams, businessProcess);
             default:
                 log.error("----------------HANDLER START BUSINESS PROCESS ERROR -START------------------");
-                log.error("CAMUNDAHANDLERERROR LegacyCaseReference ({}) AllocatedTrack ({})  "
-                              + "businessProcessInstanceId({})",
-                          data.getLegacyCaseReference(),
-                          data.getAllocatedTrack(),
-                          businessProcess.getProcessInstanceId()
-                );
+                log.error("CAMUNDAHANDLERERROR LegacyCaseReference ({}) businessProcessInstanceId({})",
+                          data.getLegacyCaseReference(), businessProcess.getProcessInstanceId());
                 log.error("----------------HANDLER START BUSINESS PROCESS ERROR -END------------------");
                 return AboutToStartOrSubmitCallbackResponse.builder()
                     .errors(List.of("Concurrency Error"))
