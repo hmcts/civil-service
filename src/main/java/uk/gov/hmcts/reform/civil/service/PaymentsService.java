@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
@@ -19,7 +20,7 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 import java.util.UUID;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,8 @@ public class PaymentsService {
     private final PaymentsClient paymentsClient;
     private final PaymentsConfiguration paymentsConfiguration;
     private final OrganisationService organisationService;
+
+    private final FeatureToggleService featureToggleService;
 
     @Value("${serviceRequest.api.callback-url}")
     String callBackUrl;
@@ -80,8 +83,14 @@ public class PaymentsService {
     private CreateServiceRequestDTO buildServiceRequest(CaseData caseData) {
         SRPbaDetails serviceRequestPBADetails = caseData.getServiceRequestPBADetails();
         FeeDto feeResponse = caseData.getClaimFee().toFeeDto();
-        String siteId = caseData.getSuperClaimType().equals(SPEC_CLAIM)
-            ? paymentsConfiguration.getSpecSiteId() : paymentsConfiguration.getSiteId();
+        String siteId = null;
+
+        if (!isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+            siteId = paymentsConfiguration.getSiteId();
+        } else if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+            siteId = paymentsConfiguration.getSpecSiteId();
+        }
+
         return CreateServiceRequestDTO.builder()
             .caseReference(caseData.getLegacyCaseReference())
             .ccdCaseNumber(caseData.getCcdCaseReference().toString())

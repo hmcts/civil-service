@@ -62,10 +62,9 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
                 .getServiceRequestReference();
             SRPbaDetails pbaDetails = caseData.getServiceRequestPBADetails();
             caseData = caseData.toBuilder()
-                .serviceRequestPBADetails(pbaDetails.toBuilder()
-                                          .applicantsPbaAccounts(caseData.getServiceRequestPBADetails()
-                                                                     .getApplicantsPbaAccounts())
-                                          .fee(caseData.getServiceRequestPBADetails().getFee())
+                .serviceRequestPBADetails(SRPbaDetails.builder()
+                                          .applicantsPbaAccounts(caseData.getApplicantSolicitor1PbaAccounts())
+                                          .fee(caseData.getClaimFee())
                                           .serviceReqReference(serviceRequestReference).build())
                 .build();
 
