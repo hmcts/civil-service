@@ -147,4 +147,88 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
         assertThat(response.getErrors()).isNull();
     }
 
+    @Test
+    void shouldReturnNoError_whenAboutToSubmitIsInvoked_UnSpecNoCourtCode() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued()
+            .courtLocation()
+            .respondent1DQWithLocation()
+            .respondent2DQWithLocation()
+            .applicant1DQWithLocation()
+            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+            .applicant2DQWithLocation()
+            .build();
+        caseData = caseData.toBuilder().respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                                          .respondent1DQRequestedCourt(
+                                                              caseData.getRespondent1DQ()
+                                                                  .getRespondent1DQRequestedCourt()
+                                                                  .toBuilder()
+                                                                  .responseCourtCode(null).build())
+                                                          .build()).build();
+        caseData = caseData.toBuilder()
+            .respondent2DQ(caseData.getRespondent2DQ().toBuilder()
+                               .respondent2DQRequestedCourt(
+                                   caseData.getRespondent2DQ()
+                                       .getRespondent2DQRequestedCourt()
+                                       .toBuilder()
+                                       .responseCourtCode(null).build())
+                               .build()).build();
+
+        caseData = caseData.toBuilder().applicant1DQ(caseData.getApplicant1DQ().toBuilder()
+                                                         .applicant1DQRequestedCourt(
+                                                             caseData.getApplicant1DQ()
+                                                                 .getApplicant1DQRequestedCourt()
+                                                                 .toBuilder()
+                                                                 .responseCourtCode(null).build())
+                                                         .build()).build();
+
+        caseData = caseData.toBuilder().applicant2DQ(caseData.getApplicant2DQ().toBuilder()
+                                                         .applicant2DQRequestedCourt(
+                                                             caseData.getApplicant2DQ()
+                                                                 .getApplicant2DQRequestedCourt()
+                                                                 .toBuilder()
+                                                                 .responseCourtCode(null).build())
+                                                         .build()).build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // params.getParams().put(BEARER_TOKEN,USER_AUTH_TOKEN);
+        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "444")).thenReturn(
+            LocationRefData.builder().epimmsId("1234").region("1").build());
+        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "court4")).thenReturn(
+            LocationRefData.builder().epimmsId("1234").region("1").build());
+        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "127")).thenReturn(
+            LocationRefData.builder().epimmsId("1234").region("1").build());
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        assertThat(response.getErrors()).isNull();
+    }
+
+    @Test
+    void shouldReturnNoError_whenAboutToSubmitIsInvoked_UnSpec() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePendingClaimIssued()
+            .courtLocation()
+            .respondent1DQWithLocation()
+            .respondent2DQWithLocation()
+            .applicant1DQWithLocation()
+            .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+            .applicant2DQWithLocation()
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // params.getParams().put(BEARER_TOKEN,USER_AUTH_TOKEN);
+        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "444")).thenReturn(
+            LocationRefData.builder().epimmsId("1234").region("1").build());
+        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "court4")).thenReturn(
+            LocationRefData.builder().epimmsId("1234").region("1").build());
+        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "127")).thenReturn(
+            LocationRefData.builder().epimmsId("1234").region("1").build());
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        assertThat(response.getErrors()).isNull();
+    }
+
 }
