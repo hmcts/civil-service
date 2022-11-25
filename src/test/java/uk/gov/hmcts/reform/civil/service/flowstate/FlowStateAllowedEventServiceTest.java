@@ -53,7 +53,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
@@ -226,8 +225,7 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_JUDGE,
                         EVIDENCE_UPLOAD_APPLICANT,
                         migrateCase,
-                        EVIDENCE_UPLOAD_RESPONDENT,
-                        EVIDENCE_UPLOAD_NOTIFICATION
+                        EVIDENCE_UPLOAD_RESPONDENT
                     }
                 ),
                 of(
@@ -252,8 +250,7 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_JUDGE,
                         EVIDENCE_UPLOAD_APPLICANT,
                         migrateCase,
-                        EVIDENCE_UPLOAD_RESPONDENT,
-                        EVIDENCE_UPLOAD_NOTIFICATION
+                        EVIDENCE_UPLOAD_RESPONDENT
                     }
                 ),
                 of(
@@ -283,8 +280,7 @@ class FlowStateAllowedEventServiceTest {
                         HEARING_SCHEDULED,
                         EVIDENCE_UPLOAD_APPLICANT,
                         migrateCase,
-                        EVIDENCE_UPLOAD_RESPONDENT,
-                        EVIDENCE_UPLOAD_NOTIFICATION
+                        EVIDENCE_UPLOAD_RESPONDENT
                     }
                 ),
                 of(
