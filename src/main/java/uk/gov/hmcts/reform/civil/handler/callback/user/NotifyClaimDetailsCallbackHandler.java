@@ -147,7 +147,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         String confirmationText = getConfirmationBody(caseData);
 
         String body = format(confirmationText, formattedDeadline)
-                + (areRespondentsRepresentedAndRegistered(caseData)?exitSurveyContentService.applicantSurvey():"");
+                + (areRespondentsRepresentedAndRegistered(caseData)
+                ? exitSurveyContentService.applicantSurvey() : "");
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(String.format(
@@ -194,7 +195,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
 
         String body = format(getConfirmationBody(caseData), formattedDeadline)
-                + (areRespondentsRepresentedAndRegistered(caseData)?exitSurveyContentService.applicantSurvey():"");
+                + (areRespondentsRepresentedAndRegistered(caseData)
+                ? exitSurveyContentService.applicantSurvey() : "");
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(String.format(
