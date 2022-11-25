@@ -512,6 +512,10 @@ class DirectionsQuestionnaireGeneratorTest {
                 uk.gov.hmcts.reform.civil.model.dq.Expert expert1 =
                     uk.gov.hmcts.reform.civil.model.dq.Expert.builder()
                         .name("Expert 1")
+                        .firstName("first")
+                        .lastName("last")
+                        .phoneNumber("07123456789")
+                        .emailAddress("test@email.com")
                         .fieldOfExpertise("expertise 1")
                         .whyRequired("Explanation")
                         .estimatedCost(BigDecimal.valueOf(10000))
@@ -533,6 +537,10 @@ class DirectionsQuestionnaireGeneratorTest {
                 assertThat(extracted.getFieldOfExpertise()).isEqualTo(expert1.getFieldOfExpertise());
                 assertThat(extracted.getWhyRequired()).isEqualTo(expert1.getWhyRequired());
                 assertThat(extracted.getFormattedCost()).isEqualTo("£100.00");
+                assertThat(extracted.getFirstName()).isEqualTo("first");
+                assertThat(extracted.getLastName()).isEqualTo("last");
+                assertThat(extracted.getPhoneNumber()).isEqualTo("07123456789");
+                assertThat(extracted.getEmailAddress()).isEqualTo("test@email.com");
             }
 
             @Test
@@ -675,6 +683,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
                                        .respondToClaimExperts(ExpertDetails.builder()
                                                                   .expertName("Mr Expert Defendant")
+                                                                  .firstName("Expert")
+                                                                  .lastName("Defendant")
+                                                                  .phoneNumber("07123456789")
+                                                                  .emailAddress("test@email.com")
                                                                   .fieldofExpertise("Roofing")
                                                                   .estimatedCost(new BigDecimal(434))
                                                                   .build())
@@ -726,6 +738,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
                                        .respondToClaimExperts(ExpertDetails.builder()
                                                                   .expertName("Mr Expert Defendant")
+                                                                  .firstName("Expert")
+                                                                  .lastName("Defendant")
+                                                                  .phoneNumber("07123456789")
+                                                                  .emailAddress("test@email.com")
                                                                   .fieldofExpertise("Roofing")
                                                                   .estimatedCost(new BigDecimal(434))
                                                                   .build())
@@ -821,6 +837,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .stream()
                     .map(expert -> Expert.builder()
                         .name(expert.getName())
+                        .firstName(expert.getFirstName())
+                        .lastName(expert.getLastName())
+                        .phoneNumber(expert.getPhoneNumber())
+                        .emailAddress(expert.getEmailAddress())
                         .fieldOfExpertise(expert.getFieldOfExpertise())
                         .whyRequired(expert.getWhyRequired())
                         .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
@@ -1392,6 +1412,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .stream()
                     .map(expert -> Expert.builder()
                         .name(expert.getName())
+                        .firstName(expert.getFirstName())
+                        .lastName(expert.getLastName())
+                        .phoneNumber(expert.getPhoneNumber())
+                        .emailAddress(expert.getEmailAddress())
                         .fieldOfExpertise(expert.getFieldOfExpertise())
                         .whyRequired(expert.getWhyRequired())
                         .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
