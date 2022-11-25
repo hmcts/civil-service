@@ -41,7 +41,6 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
 
     private static final String USER_AUTH_TOKEN = "Bearer user-xyz";
 
-
     @Test
     void shouldReturnNoError_whenAboutToSubmitIsInvoked_UNSpec() {
         //CourtLocation location = CourtLocation.builder().applicantPreferredCourt("123").build();
@@ -63,7 +62,7 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
         assertThat(response.getErrors()).isNull();
-           }
+    }
 
     @Test
     void shouldReturnNoError_whenAboutToSubmitIsInvoked_SpecNoCourtCode() {
@@ -244,6 +243,4 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
         SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
             .handle(params);
     }
-
-
 }
