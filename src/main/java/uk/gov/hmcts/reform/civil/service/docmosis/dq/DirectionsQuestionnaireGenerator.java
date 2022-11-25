@@ -270,7 +270,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         boolean specAndSmallClaim = false;
         if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
             && "SMALL_CLAIM".equals(caseData.getResponseClaimTrack())) {
-            witnesses = getWitnessesSmallClaim(witnessesIncludingDefendants);
+            if (!featureToggleService.isHearingAndListingSDOEnabled()) {
+                witnesses = getWitnessesSmallClaim(witnessesIncludingDefendants);
+            }
             specAndSmallClaim = true;
         }
 
@@ -775,7 +777,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         Expert expertDetails;
         if (experts != null) {
             expertDetails = Expert.builder()
-                .name(String.format("%s %s", experts.getFirstName(), experts.getLastName()))
+                .name(experts.getExpertName())
                 .formattedCost(MonetaryConversions.penniesToPounds(experts.getEstimatedCost()).toString())
                 .fieldOfExpertise(experts.getFieldofExpertise())
                 .whyRequired(experts.getWhyRequired())
