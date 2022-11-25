@@ -82,12 +82,14 @@ public class RoboticsNotificationService {
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
             }
             return Optional.of(EmailData.builder()
-                .message(getMessage(caseData, isMultiParty))
-                .subject(getSubject(caseData, triggerEvent, isMultiParty))
-                .to(getRoboticsEmailRecipient(isMultiParty,
-                                              isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())))
-                .attachments(of(json(roboticsJsonData, fileName)))
-                .build());
+                                   .message(getMessage(caseData, isMultiParty))
+                                   .subject(getSubject(caseData, triggerEvent, isMultiParty))
+                                   .to(getRoboticsEmailRecipient(
+                                       isMultiParty,
+                                       isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())
+                                   ))
+                                   .attachments(of(json(roboticsJsonData, fileName)))
+                                   .build());
         } catch (JsonProcessingException e) {
             throw new RoboticsDataException(e.getMessage(), e);
         }
@@ -106,16 +108,16 @@ public class RoboticsNotificationService {
         String subject = null;
         if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
             subject = isMultiParty ? String.format("Multiparty LR v LR Case Data for %s - %s - %s",
-                                                caseData.getLegacyCaseReference(),
-                                                caseData.getCcdState(), triggerEvent
+                                                   caseData.getLegacyCaseReference(),
+                                                   caseData.getCcdState(), triggerEvent
             ) : String.format(
                 "LR v LR Case Data for %s",
                 caseData.getLegacyCaseReference()
             );
         } else {
             subject = isMultiParty ? String.format("Multiparty claim data for %s - %s - %s",
-                                                caseData.getLegacyCaseReference(),
-                                                caseData.getCcdState(), triggerEvent
+                                                   caseData.getLegacyCaseReference(),
+                                                   caseData.getCcdState(), triggerEvent
             ) : String.format(
                 "Robotics case data for %s",
                 caseData.getLegacyCaseReference()
@@ -135,7 +137,7 @@ public class RoboticsNotificationService {
         log.info("EMAIl:---------" + recipient);
         return isMultiParty ? roboticsEmailConfiguration
             .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
-}
+    }
 
     public static String findLatestEventTriggerReason(EventHistory eventHistory) {
         List<Event> events = flatEvents(eventHistory);
