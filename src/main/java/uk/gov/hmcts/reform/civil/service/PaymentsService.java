@@ -79,7 +79,7 @@ public class PaymentsService {
 
     private CreateServiceRequestDTO buildServiceRequest(CaseData caseData) {
         SRPbaDetails serviceRequestPBADetails = caseData.getServiceRequestPBADetails();
-        FeeDto feeResponse = serviceRequestPBADetails.getFee().toFeeDto();
+        FeeDto feeResponse = caseData.getClaimFee().toFeeDto();
         String siteId = caseData.getSuperClaimType().equals(SPEC_CLAIM)
             ? paymentsConfiguration.getSpecSiteId() : paymentsConfiguration.getSiteId();
         return CreateServiceRequestDTO.builder()
