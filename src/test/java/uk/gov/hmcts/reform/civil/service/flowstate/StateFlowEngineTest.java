@@ -623,7 +623,6 @@ class StateFlowEngineTest {
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
                 assertThat(stateFlow.getFlags()).hasSize(6).contains(
-                    entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
                     entry(FlowFlag.RPA_CONTINUOUS_FEED.name(), true),
                     entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
@@ -658,7 +657,6 @@ class StateFlowEngineTest {
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
                 assertThat(stateFlow.getFlags()).hasSize(6).contains(
-                    entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
                     entry(FlowFlag.RPA_CONTINUOUS_FEED.name(), true),
                     entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
