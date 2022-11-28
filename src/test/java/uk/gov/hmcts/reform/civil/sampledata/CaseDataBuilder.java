@@ -3671,7 +3671,7 @@ public class CaseDataBuilder {
         if (setCos1) {
             CertificateOfService.CertificateOfServiceBuilder cos1Builder = CertificateOfService.builder()
                     .cosDateOfServiceForDefendant(cos1Date);
-            if(file1) {
+            if (file1) {
                 cos1Builder.cosEvidenceDocument(files);
             }
             this.cosNotifyClaimDetails1 = cos1Builder.build();
@@ -3679,7 +3679,7 @@ public class CaseDataBuilder {
         if (setCos2) {
             CertificateOfService.CertificateOfServiceBuilder cos2Builder = CertificateOfService.builder()
                     .cosDateOfServiceForDefendant(cos2Date);
-            if(file2) {
+            if (file2) {
                 cos2Builder.cosEvidenceDocument(files);
             }
             this.cosNotifyClaimDetails2 = cos2Builder.build();
