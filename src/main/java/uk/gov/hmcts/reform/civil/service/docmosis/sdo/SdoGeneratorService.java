@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
@@ -31,7 +29,6 @@ public class SdoGeneratorService {
     private final DocumentManagementService documentManagementService;
     private final IdamClient idamClient;
     private final FeatureToggleService toggleService;
-    private final ObjectMapper objectMapper;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         MappableObject templateData;
@@ -55,11 +52,6 @@ public class SdoGeneratorService {
             templateData = getTemplateDataDisposal(caseData, judgeName);
         }
 
-        try {
-            System.out.println(objectMapper.writeValueAsString(templateData));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData,
             docmosisTemplate
