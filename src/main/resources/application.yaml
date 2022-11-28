@@ -56,6 +56,12 @@ serviceRequest:
     site_id : AAA7
     service : CIVIL
 
+serviceRequestClaimIssued:
+  api:
+    callback-url: http://civil-service-{{ .Values.global.environment }}.service.core-compute-{{- .Values.global.environment }}.internal/service-request-update-claim-issued
+    site_id: AAA7
+    service: CIVIL
+
 send-letter:
   url: ${SEND_LETTER_URL:http://localhost:8765}
 
