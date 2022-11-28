@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
