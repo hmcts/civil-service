@@ -11,6 +11,7 @@ import java.util.List;
 @Builder
 public class HearingSupport {
 
+    // CIV-5557 to be removed
     private final List<SupportRequirements> requirements;
     private final String signLanguageRequired;
     private final String languageToBeInterpreted;

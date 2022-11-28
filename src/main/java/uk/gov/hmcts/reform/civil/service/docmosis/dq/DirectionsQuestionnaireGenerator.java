@@ -235,7 +235,45 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
-
+//====Remove Mocks============
+        caseData = caseData.toBuilder()
+            .applicant1(
+                caseData.getApplicant1().toBuilder()
+                    .individualFirstName("John")
+                    .individualLastName("Doe")
+                    .partyPhone("01482567891")
+                    .partyEmail("john.doe@example.com")
+                    .build())
+            .applicant2(
+                caseData.getApplicant2() != null ? caseData.getApplicant2().toBuilder()
+                    .individualFirstName("Emma")
+                    .individualLastName("Wilson")
+                    .partyPhone("01482567891")
+                    .partyEmail("emma.wilson@example.com")
+                    .build() : null)
+            .applicant1LitigationFriend(
+                caseData.getApplicant1LitigationFriend() != null ? caseData.getApplicant1LitigationFriend().toBuilder()
+                    .firstName("Litigation")
+                    .lastName("Friend")
+                    .phoneNumber("03245345221")
+                    .emailAddress("lit.friend@example.com")
+                    .build() : null)
+            .respondent1(
+                caseData.getRespondent1().toBuilder()
+                    .individualFirstName("Jane")
+                    .individualLastName("Doe")
+                    .partyPhone("01482567891")
+                    .partyEmail("jane.doe@example.com")
+                    .build())
+            .respondent2(
+                caseData.getRespondent2() != null ? caseData.getRespondent2().toBuilder()
+                    .individualFirstName("Jack")
+                    .individualLastName("Bower")
+                    .partyPhone("01482567891")
+                    .partyEmail("jack.bower@example.com")
+                    .build() : null)
+            .build();
+        //==============================
         boolean claimantResponseLRspec = isClaimantResponse(caseData)
             && isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled());
 
@@ -332,27 +370,57 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     private Party getApplicant2DQParty(CaseData caseData) {
 
         var applicant = caseData.getApplicant2();
-        return Party.builder()
+        var litigationFriend = caseData.getApplicant2LitigationFriend();
+        var applicant2PartyBuilder = Party.builder()
             .name(applicant.getPartyName())
-            .primaryAddress(applicant.getPrimaryAddress())
+            .primaryAddress(caseData.getApplicant1().getPrimaryAddress())
+            .representative(representativeService
+                                .getApplicantRepresentative(caseData))
             .litigationFriendName(
-                ofNullable(caseData.getApplicant2LitigationFriend())
+                ofNullable(litigationFriend)
                     .map(LitigationFriend::getFullName)
-                    .orElse(""))
-            .build();
+                    .orElse(""));
+        if(featureToggleService.isHearingAndListingSDOEnabled()) {
+            //Keep when hnl toggle is removed
+            applicant2PartyBuilder
+                .emailAddress(applicant.getPartyEmail())
+                .phoneNumber(applicant.getPartyPhone())
+                .litigationFriendPhoneNumber(ofNullable(litigationFriend)
+                                                             .map(LitigationFriend::getPhoneNumber)
+                                                             .orElse(""))
+                .litigationFriendEmailAddress(ofNullable(litigationFriend)
+                                                  .map(LitigationFriend::getEmailAddress)
+                                                  .orElse(""));
+        }
+        return applicant2PartyBuilder.build();
     }
 
     private Party getApplicant1DQParty(CaseData caseData) {
-        var applicant = caseData.getApplicant1();
 
-        return Party.builder()
+        var applicant = caseData.getApplicant1();
+        var litigationFriend = caseData.getApplicant1LitigationFriend();
+        var applicant1PartyBuilder = Party.builder()
             .name(applicant.getPartyName())
-            .primaryAddress(applicant.getPrimaryAddress())
+            .primaryAddress(caseData.getApplicant1().getPrimaryAddress())
+            .representative(representativeService
+                                .getApplicantRepresentative(caseData))
             .litigationFriendName(
-                ofNullable(caseData.getApplicant1LitigationFriend())
+                ofNullable(litigationFriend)
                     .map(LitigationFriend::getFullName)
-                    .orElse(""))
-            .build();
+                    .orElse(""));
+        if(featureToggleService.isHearingAndListingSDOEnabled()) {
+            //Keep when hnl toggle is removed
+            applicant1PartyBuilder
+                .emailAddress(applicant.getPartyEmail())
+                .phoneNumber(applicant.getPartyPhone())
+                .litigationFriendPhoneNumber(ofNullable(litigationFriend)
+                                          .map(LitigationFriend::getPhoneNumber)
+                                          .orElse(""))
+                .litigationFriendEmailAddress(ofNullable(litigationFriend)
+                                                  .map(LitigationFriend::getEmailAddress)
+                                                  .orElse(""));
+        }
+        return applicant1PartyBuilder.build();
     }
 
     private void setApplicants(DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder,
@@ -620,30 +688,58 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             }
 
             if (isProceedingAgainstRespondent1(caseData)) {
-                respondents.add(Party.builder()
-                                    .name(caseData.getRespondent1().getPartyName())
-                                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-                                    .representative(representativeService
-                                                        .getRespondent1Representative(caseData))
-                                    .litigationFriendName(
-                                        ofNullable(caseData.getRespondent1LitigationFriend())
-                                            .map(LitigationFriend::getFullName)
-                                            .orElse(""))
-                                    .build());
+                var respondent = caseData.getRespondent1();
+                var litigationFriend = caseData.getRespondent1LitigationFriend();
+                var respondent1PartyBuilder = Party.builder()
+                    .name(respondent.getPartyName())
+                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                    .representative(representativeService
+                                        .getRespondent1Representative(caseData))
+                    .litigationFriendName(
+                        ofNullable(litigationFriend)
+                            .map(LitigationFriend::getFullName)
+                            .orElse(""));
+                if(featureToggleService.isHearingAndListingSDOEnabled()) {
+                    //Keep when hnl toggle is removed
+                    respondent1PartyBuilder
+                        .emailAddress(respondent.getPartyEmail())
+                        .phoneNumber(respondent.getPartyPhone())
+                        .litigationFriendPhoneNumber(ofNullable(litigationFriend)
+                                                         .map(LitigationFriend::getPhoneNumber)
+                                                         .orElse(""))
+                        .litigationFriendEmailAddress(ofNullable(litigationFriend)
+                                                          .map(LitigationFriend::getEmailAddress)
+                                                          .orElse(""));
+                }
+                respondents.add(respondent1PartyBuilder.build());
             }
+
             if (isProceedingAgainstRespondent2(caseData)) {
-                respondents.add(Party.builder()
-                                    .name(caseData.getRespondent2().getPartyName())
-                                    .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
-                                    .representative(representativeService
-                                                        .getRespondent2Representative(caseData))
-                                    .litigationFriendName(
-                                        ofNullable(caseData.getRespondent2LitigationFriend())
-                                            .map(LitigationFriend::getFullName)
-                                            .orElse(""))
-                                    .build());
+                var respondent = caseData.getRespondent2();
+                var litigationFriend = caseData.getRespondent2LitigationFriend();
+                var respondent2PartyBuilder = Party.builder()
+                    .name(respondent.getPartyName())
+                    .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
+                    .representative(representativeService
+                                        .getRespondent2Representative(caseData))
+                    .litigationFriendName(
+                        ofNullable(litigationFriend)
+                            .map(LitigationFriend::getFullName)
+                            .orElse(""));
+                if(featureToggleService.isHearingAndListingSDOEnabled()) {
+                    //Keep when hnl toggle is removed
+                    respondent2PartyBuilder
+                        .emailAddress(respondent.getPartyEmail())
+                        .phoneNumber(respondent.getPartyPhone())
+                        .litigationFriendPhoneNumber(ofNullable(litigationFriend)
+                                                         .map(LitigationFriend::getPhoneNumber)
+                                                         .orElse(""))
+                        .litigationFriendEmailAddress(ofNullable(litigationFriend)
+                                                          .map(LitigationFriend::getEmailAddress)
+                                                          .orElse(""));
+                }
+                respondents.add(respondent2PartyBuilder.build());
             }
-            return respondents;
         }
 
         if (respondent2HasSameLegalRep(caseData)) {
@@ -767,7 +863,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         return unwrapElements(dq.getExperts().getDetails())
             .stream()
             .map(expert -> Expert.builder()
-                .name(expert.getName())
+                .name(featureToggleService.isHearingAndListingSDOEnabled()
+                          ? String.format("%s %s", expert.getFirstName() + " " + expert.getLastName())
+                          : expert.getName())
                 .fieldOfExpertise(expert.getFieldOfExpertise())
                 .whyRequired(expert.getWhyRequired())
                 .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
