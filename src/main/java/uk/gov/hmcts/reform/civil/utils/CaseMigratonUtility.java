@@ -118,20 +118,17 @@ public class CaseMigratonUtility {
 
                                                       .build()).responseClaimCourtLocationRequired(YES).build());
 
-        } else if (ofNullable(respondent1DQ).isPresent()
-            && ofNullable(respondent1DQ.getRespondent1DQRequestedCourt()).isPresent()) {
+        } else if (ofNullable(respondent1DQ).isPresent()) {
 
             caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
-                                              .respondent1DQRequestedCourt(respondent1DQ
-                                                                               .getRespondent1DQRequestedCourt()
-                                                                               .toBuilder()
+                                              .respondent1DQRequestedCourt(RequestedCourt
+                                                                               .builder()
                                                                                .caseLocation(caseLocation)
                                                                                .build())
                                               .respondToCourtLocation(
                                                   RequestedCourt.builder()
                                                       .responseCourtLocations(null)
                                                       .responseCourtCode("335")
-
                                                       .build()).responseClaimCourtLocationRequired(YES).build());
 
         } /*else if (ofNullable(respondent1DQ).isPresent()) {
@@ -174,18 +171,18 @@ public class CaseMigratonUtility {
                                                                                refdata.getCourtLocationCode())
                                                                            .build())
                                               .build());
-        } else if (ofNullable(respondent2DQ).isPresent()
-            && ofNullable(respondent2DQ.getRespondent2DQRequestedCourt()).isPresent()) {
+            caseDataBuilder.responseClaimCourtLocation2Required(YES);
+        } else if (ofNullable(respondent2DQ).isPresent()) {
             caseDataBuilder.respondent2DQ(respondent2DQ.toBuilder()
-                                              .respondent2DQRequestedCourt(respondent2DQ
-                                                                               .getRespondent2DQRequestedCourt()
-                                                                               .toBuilder()
+                                              .respondent2DQRequestedCourt(RequestedCourt.builder()
                                                                                .caseLocation(caseLocation)
                                                                                .build())
                                               .respondToCourtLocation2(RequestedCourt.builder()
                                                                            .responseCourtLocations(null)
-                                                                           .responseCourtCode("335").build())
+                                                                           .responseCourtCode("335")
+                                                                           .build())
                                               .build());
+            caseDataBuilder.responseClaimCourtLocation2Required(YES);
         } /*else if (ofNullable(respondent2DQ).isPresent()) {
             caseDataBuilder.respondent2DQ(respondent2DQ.toBuilder()
                                               .respondent2DQRequestedCourt(RequestedCourt.builder()
@@ -222,13 +219,10 @@ public class CaseMigratonUtility {
                                                                                .build())
                                              .build());
 
-        } else if (ofNullable(respondent1DQ).isPresent()
-            && ofNullable(respondent1DQ.getRespondent1DQRequestedCourt()).isPresent()) {
+        } else if (ofNullable(respondent1DQ).isPresent()) {
 
             caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
-                                              .respondent1DQRequestedCourt(respondent1DQ
-                                                                               .getRespondent1DQRequestedCourt()
-                                                                               .toBuilder()
+                                              .respondent1DQRequestedCourt(RequestedCourt.builder()
                                                                                .caseLocation(caseLocation)
                                                                                .build()).build());
 
@@ -266,12 +260,9 @@ public class CaseMigratonUtility {
                                                                                .toBuilder()
                                                                                .caseLocation(location)
                                                                                .build()).build());
-        } else if (ofNullable(respondent2DQ).isPresent()
-            && ofNullable(respondent2DQ.getRespondent2DQRequestedCourt()).isPresent()) {
+        } else if (ofNullable(respondent2DQ).isPresent()) {
             caseDataBuilder.respondent2DQ(respondent2DQ.toBuilder()
-                                              .respondent2DQRequestedCourt(respondent2DQ
-                                                                               .getRespondent2DQRequestedCourt()
-                                                                               .toBuilder()
+                                              .respondent2DQRequestedCourt(RequestedCourt.builder()
                                                                                .caseLocation(caseLocation)
                                                                                .build()).build());
         } /*else if (ofNullable(respondent2DQ).isPresent()) {
@@ -310,12 +301,9 @@ public class CaseMigratonUtility {
                                                                              .toBuilder()
                                                                              .caseLocation(location)
                                                                              .build()).build());
-        } else if (ofNullable(applicant1DQ).isPresent()
-            && ofNullable(applicant1DQ.getApplicant1DQRequestedCourt()).isPresent()) {
+        } else if (ofNullable(applicant1DQ).isPresent()) {
             caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
-                                             .applicant1DQRequestedCourt(applicant1DQ
-                                                                             .getApplicant1DQRequestedCourt()
-                                                                             .toBuilder()
+                                             .applicant1DQRequestedCourt(RequestedCourt.builder()
                                                                              .caseLocation(caseLocation)
                                                                              .build()).build());
         } /*else if (ofNullable(applicant1DQ).isPresent()) {
@@ -355,12 +343,9 @@ public class CaseMigratonUtility {
                                                                              .caseLocation(location)
                                                                              .build()).build());
 
-        } else if (ofNullable(applicant2DQ).isPresent()
-            && ofNullable(applicant2DQ.getApplicant2DQRequestedCourt()).isPresent()) {
+        } else if (ofNullable(applicant2DQ).isPresent()) {
             caseDataBuilder.applicant2DQ(applicant2DQ.toBuilder()
-                                             .applicant2DQRequestedCourt(applicant2DQ
-                                                                             .getApplicant2DQRequestedCourt()
-                                                                             .toBuilder()
+                                             .applicant2DQRequestedCourt(RequestedCourt.builder()
                                                                              .caseLocation(caseLocation)
                                                                              .build()).build());
         }  /*else if (ofNullable(applicant2DQ).isPresent()) {
