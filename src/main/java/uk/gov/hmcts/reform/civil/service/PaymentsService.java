@@ -98,7 +98,7 @@ public class PaymentsService {
 
         String callbackURLUsed = null;
 
-        if(caseData.getCcdState().equals(PENDING_CLAIM_ISSUED)) {
+        if (caseData.getCcdState().equals(PENDING_CLAIM_ISSUED)) {
             callbackURLUsed = callBackUrlClaimIssued;
         } else if (caseData.getCcdState().equals(HEARING_READINESS)) {
             callbackURLUsed = callBackUrl;
@@ -110,7 +110,7 @@ public class PaymentsService {
                 .ccdCaseNumber(caseData.getCcdCaseReference().toString())
                 .hmctsOrgId(siteId)
                 .callBackUrl(callbackURLUsed)
-                .fees(new FeeDto[] { (FeeDto.builder()
+                .fees(new FeeDto[]{(FeeDto.builder()
                     .calculatedAmount(feeResponse.getCalculatedAmount())
                     .code(feeResponse.getCode())
                     .version(feeResponse.getVersion())
@@ -120,6 +120,7 @@ public class PaymentsService {
                                         .responsibleParty(caseData.getApplicant1().getPartyName()).build())
                 .build();
         } else {
-            throw new RuntimeException("Invalid Case State"+ caseData.getCcdCaseReference());
+            throw new RuntimeException("Invalid Case State" + caseData.getCcdCaseReference());
         }
+    }
 }
