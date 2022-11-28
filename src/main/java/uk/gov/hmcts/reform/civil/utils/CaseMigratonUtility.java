@@ -101,8 +101,7 @@ public class CaseMigratonUtility {
                     .getResponseCourtCode()
             );
 
-            CaseLocation location = respondent1DQ.getRespondent1DQRequestedCourt()
-                .getCaseLocation().toBuilder()
+            CaseLocation location =  CaseLocation.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegion()).build();
 
             caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
@@ -155,8 +154,7 @@ public class CaseMigratonUtility {
                     .getResponseCourtCode()
             );
 
-            CaseLocation location = respondent2DQ.getRespondent2DQRequestedCourt()
-                .getCaseLocation().toBuilder()
+            CaseLocation location =  CaseLocation.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegion()).build();
 
             caseDataBuilder.respondent2DQ(respondent2DQ.builder()
@@ -207,8 +205,7 @@ public class CaseMigratonUtility {
                     .getResponseCourtCode()
             );
 
-            CaseLocation location = respondent1DQ.getRespondent1DQRequestedCourt()
-                .getCaseLocation().toBuilder()
+            CaseLocation location =  CaseLocation.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegion()).build();
 
             caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
@@ -226,12 +223,7 @@ public class CaseMigratonUtility {
                                                                                .caseLocation(caseLocation)
                                                                                .build()).build());
 
-        } /*else if (ofNullable(respondent1DQ).isPresent()) {
-            caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
-                                              .respondent1DQRequestedCourt(RequestedCourt.builder()
-                                                                               .caseLocation(caseLocation)
-                                                                               .build()).build());
-        }*/
+        }
     }
 
     private static void migrateRespondent2DQUnSpec(String authToken, CaseData oldCaseData,
@@ -250,8 +242,7 @@ public class CaseMigratonUtility {
                     .getResponseCourtCode()
             );
 
-            CaseLocation location = respondent2DQ.getRespondent2DQRequestedCourt()
-                .getCaseLocation().toBuilder()
+            CaseLocation location =  CaseLocation.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegion()).build();
 
             caseDataBuilder.respondent2DQ(respondent2DQ.builder()
@@ -265,12 +256,7 @@ public class CaseMigratonUtility {
                                               .respondent2DQRequestedCourt(RequestedCourt.builder()
                                                                                .caseLocation(caseLocation)
                                                                                .build()).build());
-        } /*else if (ofNullable(respondent2DQ).isPresent()) {
-            caseDataBuilder.respondent2DQ(respondent2DQ.toBuilder()
-                                              .respondent2DQRequestedCourt(RequestedCourt.builder()
-                                                                               .caseLocation(caseLocation)
-                                                                               .build()).build());
-        }*/
+        }
     }
 
     // Applicable for Respondent1 and Respondent2
@@ -291,8 +277,7 @@ public class CaseMigratonUtility {
                     .getResponseCourtCode()
             );
 
-            CaseLocation location = applicant1DQ.getApplicant1DQRequestedCourt()
-                .getCaseLocation().toBuilder()
+            CaseLocation location =  CaseLocation.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegion()).build();
 
             caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
@@ -301,18 +286,22 @@ public class CaseMigratonUtility {
                                                                              .toBuilder()
                                                                              .caseLocation(location)
                                                                              .build()).build());
-        } else if (ofNullable(applicant1DQ).isPresent()) {
+        } else if (ofNullable(applicant1DQ).isPresent()
+            && CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
             caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
                                              .applicant1DQRequestedCourt(RequestedCourt.builder()
                                                                              .caseLocation(caseLocation)
                                                                              .build()).build());
-        } /*else if (ofNullable(applicant1DQ).isPresent()) {
-            caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
-                                              .applicant1DQRequestedCourt(RequestedCourt.builder()
-                                                                               .caseLocation(caseLocation)
-                                                                               .build()).build());
-        }*/
 
+        } else if (ofNullable(applicant1DQ).isPresent() && ofNullable(oldCaseData.getCourtLocation()).isPresent()) {
+            caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
+                                             .applicant1DQRequestedCourt(RequestedCourt.builder()
+                                                                             .caseLocation(oldCaseData
+                                                                                               .getCourtLocation()
+                                                                                               .getCaseLocation())
+                                                                             .build()).build());
+
+        }
     }
 
     // Applicable for Respondent1 and Respondent2
@@ -332,8 +321,7 @@ public class CaseMigratonUtility {
                     .getResponseCourtCode()
             );
 
-            CaseLocation location = applicant2DQ.getApplicant2DQRequestedCourt()
-                .getCaseLocation().toBuilder()
+            CaseLocation location =  CaseLocation.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegion()).build();
 
             caseDataBuilder.applicant2DQ(applicant2DQ.toBuilder()
@@ -343,17 +331,21 @@ public class CaseMigratonUtility {
                                                                              .caseLocation(location)
                                                                              .build()).build());
 
-        } else if (ofNullable(applicant2DQ).isPresent()) {
+        } else if (ofNullable(applicant2DQ).isPresent()
+            && CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
             caseDataBuilder.applicant2DQ(applicant2DQ.toBuilder()
                                              .applicant2DQRequestedCourt(RequestedCourt.builder()
                                                                              .caseLocation(caseLocation)
                                                                              .build()).build());
-        }  /*else if (ofNullable(applicant2DQ).isPresent()) {
+        } else if (ofNullable(applicant2DQ).isPresent() && ofNullable(oldCaseData.getCourtLocation()).isPresent()) {
             caseDataBuilder.applicant2DQ(applicant2DQ.toBuilder()
                                              .applicant2DQRequestedCourt(RequestedCourt.builder()
-                                                                             .caseLocation(caseLocation)
+                                                                             .caseLocation(oldCaseData
+                                                                                               .getCourtLocation()
+                                                                                               .getCaseLocation())
                                                                              .build()).build());
-        }*/
+        }
+
     }
 
     // Case management category,caseNameHmctsInternal, and supplementaryData
