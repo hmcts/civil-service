@@ -74,9 +74,6 @@ public class SdoGeneratorServiceTest {
     @MockBean
     protected IdamClient idamClient;
 
-    @MockBean
-    private FeatureToggleService featureToggleService;
-
     @Autowired
     private SdoGeneratorService generator;
 
@@ -138,6 +135,7 @@ public class SdoGeneratorServiceTest {
 
     @Test
     public void sdoFast() {
+        when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_FAST)))
             .thenReturn(new DocmosisDocument(SDO_FAST.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
@@ -190,6 +188,7 @@ public class SdoGeneratorServiceTest {
 
     @Test
     public void sdoDisposal() {
+        when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_DISPOSAL)))
             .thenReturn(new DocmosisDocument(SDO_DISPOSAL.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposal, bytes, SDO_ORDER)))
