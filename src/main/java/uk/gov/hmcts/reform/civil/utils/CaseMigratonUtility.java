@@ -80,7 +80,7 @@ public class CaseMigratonUtility {
             migrateRespondent2DQUnSpec(authToken, oldCaseData, caseDataBuilder, locationRefDataService, caseLocation);
         }
         migrateApplicant1DQ(authToken, oldCaseData, caseDataBuilder, locationRefDataService, caseLocation);
-        migrateApplicant2DQ(authToken, oldCaseData, caseDataBuilder, locationRefDataService, caseLocation);
+        //migrateApplicant2DQ(authToken, oldCaseData, caseDataBuilder, locationRefDataService, caseLocation);
 
     }
 
@@ -294,18 +294,22 @@ public class CaseMigratonUtility {
                                                                              .build()).build());
 
         } else if (ofNullable(applicant1DQ).isPresent() && ofNullable(oldCaseData.getCourtLocation()).isPresent()) {
+            LocationRefData refData = locationRefDataService.getCourtLocation(
+                authToken,
+                oldCaseData.getCourtLocation().getApplicantPreferredCourt()
+            );
+            caseLocation = CaseLocation.builder().baseLocation(refData.getEpimmsId())
+                .region(refData.getRegionId()).build();
             caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
                                              .applicant1DQRequestedCourt(RequestedCourt.builder()
-                                                                             .caseLocation(oldCaseData
-                                                                                               .getCourtLocation()
-                                                                                               .getCaseLocation())
+                                                                             .caseLocation(caseLocation)
                                                                              .build()).build());
 
         }
     }
 
     // Applicable for Respondent1 and Respondent2
-    private static void migrateApplicant2DQ(String authToken, CaseData oldCaseData,
+    /*private static void migrateApplicant2DQ(String authToken, CaseData oldCaseData,
                                             CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                             LocationRefDataService locationRefDataService,
                                             CaseLocation caseLocation) {
@@ -338,15 +342,21 @@ public class CaseMigratonUtility {
                                                                              .caseLocation(caseLocation)
                                                                              .build()).build());
         } else if (ofNullable(applicant2DQ).isPresent() && ofNullable(oldCaseData.getCourtLocation()).isPresent()) {
-            caseDataBuilder.applicant2DQ(applicant2DQ.toBuilder()
+
+                LocationRefData refData = locationRefDataService.getCourtLocation(
+                    authToken,
+                    oldCaseData.getCourtLocation().getApplicantPreferredCourt()
+                );
+                 caseLocation = CaseLocation.builder().baseLocation(refData.getEpimmsId())
+                    .region(refData.getRegionId()).build();
+
+                caseDataBuilder.applicant2DQ(applicant2DQ.toBuilder()
                                              .applicant2DQRequestedCourt(RequestedCourt.builder()
-                                                                             .caseLocation(oldCaseData
-                                                                                               .getCourtLocation()
-                                                                                               .getCaseLocation())
+                                                                             .caseLocation(caseLocation)
                                                                              .build()).build());
         }
 
-    }
+    }*/
 
     // Case management category,caseNameHmctsInternal, and supplementaryData
     public static void migrateGS(CaseData oldCaseData,
