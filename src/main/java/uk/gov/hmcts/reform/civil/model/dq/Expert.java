@@ -7,7 +7,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-@Builder(toBuilder = true)
+@Builder
 public class Expert {
 
     private final String name;
