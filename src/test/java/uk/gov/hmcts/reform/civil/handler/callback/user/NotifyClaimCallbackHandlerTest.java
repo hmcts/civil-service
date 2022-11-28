@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -34,6 +35,7 @@ import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -79,6 +81,10 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     private final LocalDateTime notificationDate = LocalDateTime.now();
     private final LocalDateTime deadline = notificationDate.toLocalDate().atTime(END_OF_BUSINESS_DAY);
     public static final String DOC_SERVED_DATE_IN_FUTURE = "Date you served the documents must be today or in the past";
+    private static final String ERROR_PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT = "There is a problem"
+        + "\n"
+        + "This action cannot currently be performed because it has either already"
+        + " been completed or another action must be completed first.";
 
     @Nested
     class AboutToStartCallback {
@@ -88,12 +94,74 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified_1v2_andNotifyBothSolicitors()
                 .build();
-
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertTrue(response.getData().containsKey("defendantSolicitorNotifyClaimOptions"));
+        }
+
+        @Test
+        void aboutToStart_ShouldReturnErrorMessageCallbackResponse_1v1_WhenDefendant1LiP_CosDisabled() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v1LiP()
+                .build();
+
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains(ERROR_PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT);
+        }
+
+        @Test
+        void aboutToStart_ShouldReturnErrorMessageCallbackResponse_1v2WhenDefendant2LiP_CosDisabled() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v2Respondent2LiP()
+                .addRespondent2(YesOrNo.YES)
+                .build();
+
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains(ERROR_PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT);
+        }
+
+        @Test
+        void aboutToStart_Should_Not_ReturnErrorMessageCallbackResponse_1v1_WhenDefendant1Represented_CosDisabled() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .addRespondent2(YesOrNo.NO)
+                .build();
+
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertNull(response.getErrors());
+        }
+
+        @Test
+        void aboutToStart_ShouldNotReturnErrorMessageCallbackResponse_1v2_BothDefendant1Represented_CosDisabled() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmittedTwoRespondentRepresentatives()
+                .build();
+
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertNull(response.getErrors());
         }
     }
 
@@ -597,4 +665,5 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build());
         }
     }
+
 }
