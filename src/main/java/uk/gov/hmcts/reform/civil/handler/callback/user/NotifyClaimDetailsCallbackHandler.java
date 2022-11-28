@@ -74,6 +74,9 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     public static final String DOC_SERVED_DATE_IN_FUTURE =
             "Date you served the documents must be today or in the past";
 
+    public static final String DOC_SERVED_MANDATORY =
+            "Supporting evidence is required";
+
     private final ExitSurveyContentService exitSurveyContentService;
     private final ObjectMapper objectMapper;
     private final Time time;
@@ -261,6 +264,12 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                     && LocalDate.now().isBefore(
                     caseData.getCosNotifyClaimDetails2().getCosDateOfServiceForDefendant()))) {
                 errors.add(DOC_SERVED_DATE_IN_FUTURE);
+            }
+            if ((Objects.nonNull(caseData.getCosNotifyClaimDetails1())
+                    && Objects.isNull(caseData.getCosNotifyClaimDetails1().getCosEvidenceDocument()))
+                || (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
+                    && Objects.isNull(caseData.getCosNotifyClaimDetails2().getCosEvidenceDocument()))) {
+                errors.add(DOC_SERVED_MANDATORY);
             }
         }
 
