@@ -435,13 +435,13 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             } else {
                 dataBuilder.defendant1LIPAtClaimIssued(NO);
             }
-            if (YES.equals(caseData.getAddRespondent2())) {
-                if (caseData.getRespondent2Represented() == NO) {
-                    dataBuilder.defendant2LIPAtClaimIssued(YES);
-                } else {
-                    dataBuilder.defendant2LIPAtClaimIssued(NO);
-                }
+
+            if (isSecondRespondentLitigantInPerson(caseData)) {
+                dataBuilder.defendant2LIPAtClaimIssued(YES);
+            } else {
+                dataBuilder.defendant2LIPAtClaimIssued(NO);
             }
+
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -535,7 +535,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private boolean areAnyRespondentsLitigantInPerson(CaseData caseData) {
         return caseData.getRespondent1Represented() == NO
-            || (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
+            ||  isSecondRespondentLitigantInPerson(caseData);
+    }
+
+    private boolean isSecondRespondentLitigantInPerson(CaseData caseData) {
+        return (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
     }
 
     private String getBody(CaseData caseData) {
