@@ -62,7 +62,6 @@ class ResponseDeadlineExtDefNotifHandlerTest extends BaseCallbackHandlerTest {
         private final String defendantEmail = "sherlock@scotlandyard.co.uk";
         private final String legacyReference = "000MC001";
 
-
         @BeforeEach
         void setUp() {
             when(organisationService.findOrganisationById(anyString()))
