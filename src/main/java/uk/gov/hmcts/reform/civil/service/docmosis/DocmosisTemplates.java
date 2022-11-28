@@ -38,10 +38,13 @@ public enum DocmosisTemplates {
     SDO_SMALL("CV-DAM-STD-ENG-00001.docx", "small_claims_sdo_%s.pdf"),
     SDO_SMALL_HNL("CV-DAM-STD-ENG-00004.docx", "small_claims_sdo_%s.pdf"),
     SDO_FAST("CV-DAM-STD-ENG-00002.docx", "fast_track_sdo_%s.pdf"),
+    SDO_HNL_FAST("CV-DAM-STD-ENG-00002-HNL.docx", "fast_track_sdo_%s.pdf"),
     SDO_DISPOSAL("CV-DAM-STD-ENG-00003.docx", "disposal_hearing_sdo_%s.pdf"),
     PIN_IN_THE_POST_LETTER("CV-CMC-LET-ENG-PIP0001.docx", "PIP_letter.pdf"),
 
-    //HNL uplifting templates
+    //HNL uplifted docs to be replaced with original once ready
+    SDO_HNL_DISPOSAL("CV-DAM-STD-ENG-00003-HNL.docx", "disposal_hearing_sdo_%s.pdf"),
+    DJ_SDO_HNL_DISPOSAL("CV-UNS-DEC-ENG-01200.docx", "Order_disposal_%s.pdf"),
     DEFENDANT_RESPONSE_SPEC_HNL("CV-SPC-HRN-ENG-01209.docx", "%s_response_sealed_form.pdf");
 
     private final String template;
