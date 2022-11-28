@@ -20,8 +20,6 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 import java.util.UUID;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Service
@@ -98,9 +96,9 @@ public class PaymentsService {
 
         String callbackURLUsed = null;
 
-        if (caseData.getCcdState().equals(PENDING_CASE_ISSUED)) {
+        if (caseData.getHearingDate() == null) {
             callbackURLUsed = callBackUrlClaimIssued;
-        } else if (caseData.getCcdState().equals(HEARING_READINESS)) {
+        } else if (caseData.getHearingDate() != null) {
             callbackURLUsed = callBackUrl;
         }
 
