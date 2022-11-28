@@ -3620,6 +3620,7 @@ public class CaseDataBuilder {
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
+            .ccdState(PENDING_CASE_ISSUED)
             .claimFee(
                 Fee.builder()
                             .code("FE203")

@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
@@ -98,7 +99,7 @@ public class PaymentsService {
 
         String callbackURLUsed = null;
 
-        if (caseData.getCcdState().equals(PENDING_CLAIM_ISSUED)) {
+        if (caseData.getCcdState().equals(PENDING_CASE_ISSUED)) {
             callbackURLUsed = callBackUrlClaimIssued;
         } else if (caseData.getCcdState().equals(HEARING_READINESS)) {
             callbackURLUsed = callBackUrl;
