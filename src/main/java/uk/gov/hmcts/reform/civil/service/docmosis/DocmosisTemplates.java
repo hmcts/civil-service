@@ -43,6 +43,11 @@ public enum DocmosisTemplates {
     SDO_HNL_DISPOSAL("CV-DAM-STD-ENG-00003-HNL.docx", "disposal_hearing_sdo_%s.pdf"),
     PIN_IN_THE_POST_LETTER("CV-CMC-LET-ENG-PIP0001.docx", "PIP_letter.pdf");
 
+    //HNL uplifted docs to be replaced with original once ready
+    DJ_SDO_HNL_DISPOSAL("CV-UNS-DEC-ENG-01200.docx", "Order_disposal_%s.pdf");
+
+
+
     private final String template;
     private final String documentTitle;
 
