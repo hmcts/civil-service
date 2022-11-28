@@ -310,4 +310,6 @@ public class CaseDataParent implements MappableObject {
 
     private final String migrationId;
 
+    private final LocalDate applicant1RequestedPaymentDateForDefendantSpec;
+
 }
