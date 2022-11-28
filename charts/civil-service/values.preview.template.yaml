@@ -43,7 +43,7 @@ java:
     DOCUMENT_MANAGEMENT_SECURED: true
     STITCHING_API_ENABLED: true
   postgresql:
-    enabled: true
+    enabled: false
     image:
       tag: '11.6.0'
     primary:
@@ -66,13 +66,13 @@ java:
       password: ${POSTGRES_PASSWORD}
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
-  enabled: true
+  enabled: false
   redirect_uris:
     XUI:
       - https://xui-${SERVICE_FQDN}/oauth2/callback
 
 xui-webapp:
-  enabled: true
+  enabled: false
   nodejs:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
@@ -93,7 +93,7 @@ xui-webapp:
       LAUNCH_DARKLY_CLIENT_ID: ~
 
 ccd:
-  enabled: true
+  enabled: false
   ccd:
     adminWeb:
       enabled: false
@@ -111,10 +111,6 @@ ccd:
       enabled: true
 
   global:
-    ccdApiGatewayIngress: http://${SERVICE_NAME}-ccd-api-gw
-    ccdDataStoreUrl: http://${SERVICE_NAME}-ccd-data-store-api
-    ccdDefinitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
-    ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
     dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
     idamApiUrl: https://idam-api.aat.platform.hmcts.net
     idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
@@ -185,7 +181,7 @@ ccd:
       enabled: false
 
 camunda-bpm:
-  enabled: true
+  enabled: false
   java:
     disableKeyVaults: true
     releaseNameOverride: ${SERVICE_NAME}-camunda
