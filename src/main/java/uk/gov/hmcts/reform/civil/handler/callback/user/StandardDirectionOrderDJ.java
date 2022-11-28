@@ -325,10 +325,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         if (featureToggleService.isHearingAndListingSDOEnabled()) {
             caseDataBuilder.disposalHearingOrderMadeWithoutHearingDJ(DisposalHearingOrderMadeWithoutHearingDJ
                                                    .builder()
-                                                   .input(String.format("This order has been made without a hearing. "
-                                                              + "Each party has the right to apply to have this order "
-                                                              + "set aside or varied. Any such application must be "
-                                                              + "received by the Court "
+                                                   .input(String.format("Each party has the right to apply to have this"
+                                                              + " order set aside or varied. Any such application must "
+                                                              + "be received by the Court "
                                                               + "(together with the appropriate fee) by 4pm on %s.",
                                                           deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
                                                               .format(DateTimeFormatter
@@ -442,8 +441,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         if (featureToggleService.isHearingAndListingSDOEnabled()) {
             caseDataBuilder.trialOrderMadeWithoutHearingDJ(TrialOrderMadeWithoutHearingDJ.builder()
                                                .input(String.format(
-                                                   "This order has been made without a hearing. "
-                                                       + "Each party has the right to apply to have this Order "
+                                                       "Each party has the right to apply to have this Order "
                                                        + "set aside or varied. Any such application must be "
                                                        + "received by the Court "
                                                        + "(together with the appropriate fee) by 4pm on %s.",

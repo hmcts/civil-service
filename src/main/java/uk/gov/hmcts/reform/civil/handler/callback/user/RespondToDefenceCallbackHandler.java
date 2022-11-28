@@ -267,6 +267,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         AboutToStartOrSubmitCallbackResponse response = null;
         response = AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder.build().toMap(objectMapper))
+                .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
                 .build();
         return response;
     }
