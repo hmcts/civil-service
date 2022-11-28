@@ -20,6 +20,8 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 import java.util.UUID;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Service
@@ -35,6 +37,9 @@ public class PaymentsService {
 
     @Value("${serviceRequest.api.callback-url}")
     String callBackUrl;
+
+    @Value("${serviceRequestClaimIssued.api.callback-url}")
+    String callBackUrlClaimIssued;
 
     public void validateRequest(CaseData caseData) {
         String error = null;
@@ -91,19 +96,30 @@ public class PaymentsService {
             siteId = paymentsConfiguration.getSpecSiteId();
         }
 
-        return CreateServiceRequestDTO.builder()
-            .caseReference(caseData.getLegacyCaseReference())
-            .ccdCaseNumber(caseData.getCcdCaseReference().toString())
-            .hmctsOrgId(siteId)
-            .callBackUrl(callBackUrl)
-            .fees(new FeeDto[] { (FeeDto.builder()
-                .calculatedAmount(feeResponse.getCalculatedAmount())
-                .code(feeResponse.getCode())
-                .version(feeResponse.getVersion())
-                .volume(1).build())})
-            .casePaymentRequest(CasePaymentRequestDto.builder()
-                                    .action(PAYMENT_ACTION)
-                                    .responsibleParty(caseData.getApplicant1().getPartyName()).build())
-            .build();
-    }
+        String callbackURLUsed = null;
+
+        if(caseData.getCcdState().equals(PENDING_CLAIM_ISSUED)) {
+            callbackURLUsed = callBackUrlClaimIssued;
+        } else if (caseData.getCcdState().equals(HEARING_READINESS)) {
+            callbackURLUsed = callBackUrl;
+        }
+
+        if (callbackURLUsed != null) {
+            return CreateServiceRequestDTO.builder()
+                .caseReference(caseData.getLegacyCaseReference())
+                .ccdCaseNumber(caseData.getCcdCaseReference().toString())
+                .hmctsOrgId(siteId)
+                .callBackUrl(callbackURLUsed)
+                .fees(new FeeDto[] { (FeeDto.builder()
+                    .calculatedAmount(feeResponse.getCalculatedAmount())
+                    .code(feeResponse.getCode())
+                    .version(feeResponse.getVersion())
+                    .volume(1).build())})
+                .casePaymentRequest(CasePaymentRequestDto.builder()
+                                        .action(PAYMENT_ACTION)
+                                        .responsibleParty(caseData.getApplicant1().getPartyName()).build())
+                .build();
+        } else {
+            throw new RuntimeException("Invalid Case State"+ caseData.getCcdCaseReference());
+        }
 }
