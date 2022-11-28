@@ -521,7 +521,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocuments").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(10).toString());
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocuments").extracting("input2")
-                .isEqualTo("The parties must upload to the Digital Portal copies of those documents which they wish the"
+                .isEqualTo("The parties must upload to the Digital Portal copies of those documents which they wish the "
                                + "court to consider when deciding the amount of damages, by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocuments").extracting("date2")
                 .isEqualTo(LocalDate.now().plusWeeks(10).toString());
@@ -542,7 +542,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("input4")
                 .isEqualTo("The provisions of CPR 32.6 apply to such evidence.");
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("input5")
-                .isEqualTo("Any application by the defendant pursuant to CPR 32.7 must be made by 4pm on");
+                .isEqualTo("Any application by the defendant in relation to CPR 32.7 must be made by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("date3")
                 .isEqualTo(LocalDate.now().plusWeeks(6).toString());
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("input6")
