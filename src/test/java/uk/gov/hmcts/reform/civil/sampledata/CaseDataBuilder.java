@@ -3661,16 +3661,28 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder setCoSClaimDetailsWithDate(boolean setCos1, boolean setCos2,
-                                                      LocalDate cos1Date, LocalDate cos2Date) {
+                                                      LocalDate cos1Date, LocalDate cos2Date,
+                                                      boolean file1, boolean file2) {
+        List<Element<Document>> files = wrapElements(Document.builder()
+                .documentUrl("fake-url")
+                .documentFileName("file-name")
+                .documentBinaryUrl("binary-url")
+                .build());
         if (setCos1) {
-            CertificateOfService cos1 = CertificateOfService.builder()
-                    .cosDateOfServiceForDefendant(cos1Date).build();
-            this.cosNotifyClaimDetails1 = cos1;
+            CertificateOfService.CertificateOfServiceBuilder cos1Builder = CertificateOfService.builder()
+                    .cosDateOfServiceForDefendant(cos1Date);
+            if(file1) {
+                cos1Builder.cosEvidenceDocument(files);
+            }
+            this.cosNotifyClaimDetails1 = cos1Builder.build();
         }
         if (setCos2) {
-            CertificateOfService cos2 = CertificateOfService.builder()
-                    .cosDateOfServiceForDefendant(cos2Date).build();
-            this.cosNotifyClaimDetails2 = cos2;
+            CertificateOfService.CertificateOfServiceBuilder cos2Builder = CertificateOfService.builder()
+                    .cosDateOfServiceForDefendant(cos2Date);
+            if(file2) {
+                cos2Builder.cosEvidenceDocument(files);
+            }
+            this.cosNotifyClaimDetails2 = cos2Builder.build();
         }
         return this;
     }
