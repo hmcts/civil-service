@@ -18,9 +18,9 @@ import java.util.Map;
 
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 
 @Slf4j
 @Service
@@ -30,12 +30,12 @@ public class CreateClaimSpecAfterPaymentCallbackHandler extends CallbackHandler 
     // This should be created by the handler/service that receives payment info via our endpoint.
     private static final List<CaseEvent> EVENTS = singletonList(CREATE_CLAIM_SPEC_AFTER_PAYMENT);
     private final ObjectMapper objectMapper;
-    private String state = PENDING_CASE_ISSUED.toString();
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(V_1, ABOUT_TO_SUBMIT), this::changeStateToCaseIssued
+            callbackKey(V_1, ABOUT_TO_SUBMIT), this::changeStateToCaseIssued,
+            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
     }
 
@@ -52,7 +52,6 @@ public class CreateClaimSpecAfterPaymentCallbackHandler extends CallbackHandler 
 
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(dataBuilder.build().toMap(objectMapper))
-                .state(state)
                 .build();
     }
 
