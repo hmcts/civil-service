@@ -86,10 +86,12 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
                 "claimant-deadline-extension-notification-" + legacyReference
             );
         }
+
         @Test
         void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-            assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-                "NOTIFY_CLAIMANT_CUI_FOR_DEADLINE_EXTENSION").build()).build())).isEqualTo(TASK_ID);
+            assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
+                CallbackRequest.builder().eventId(
+                    "NOTIFY_CLAIMANT_CUI_FOR_DEADLINE_EXTENSION").build()).build())).isEqualTo(TASK_ID);
         }
 
         @NotNull

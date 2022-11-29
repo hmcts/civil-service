@@ -103,8 +103,9 @@ class ResponseDeadlineExtensionDefendantNotificationHandlerTest extends BaseCall
 
         @Test
         void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-            assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-                "NOTIFY_DEFENDANT_CUI_FOR_DEADLINE_EXTENSION").build()).build())).isEqualTo(TASK_ID);
+            assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
+                CallbackRequest.builder().eventId(
+                    "NOTIFY_DEFENDANT_CUI_FOR_DEADLINE_EXTENSION").build()).build())).isEqualTo(TASK_ID);
         }
 
         @NotNull
