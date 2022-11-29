@@ -183,8 +183,12 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         // set organisation policy after removing it in claim issue
         // workaround for hiding cases in CAA list before case notify
         setOrganisationPolicy(caseData, caseDataBuilder);
-
-        LocalDateTime claimDetailsNotificationDeadline = getDeadline(claimNotificationDate);
+        LocalDateTime claimDetailsNotificationDeadline;
+        if (featureToggleService.isCertificateOfServiceEnabled() && areAnyRespondentsLitigantInPerson(caseData)) {
+            claimDetailsNotificationDeadline = getDeadline(getServiceDate(caseData));
+        } else {
+            claimDetailsNotificationDeadline = getDeadline(claimNotificationDate);
+        }
 
         caseDataBuilder
             .claimDetailsNotificationDeadline(claimDetailsNotificationDeadline)
@@ -292,5 +296,38 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     private boolean areAnyRespondentsLitigantInPerson(CaseData caseData) {
         return caseData.getRespondent1Represented() == NO
             || (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
+    }
+
+    private LocalDateTime getServiceDate(CaseData caseData) {
+        if (Objects.nonNull(caseData.getCosNotifyClaimDefendant1())
+            && Objects.nonNull(caseData.getCosNotifyClaimDefendant2())) {
+
+            if (caseData.getCosNotifyClaimDefendant1().getCosDateOfServiceForDefendant()
+                .isEqual(caseData.getCosNotifyClaimDefendant2().getCosDateOfServiceForDefendant())) {
+
+                return  caseData.getCosNotifyClaimDefendant1().getCosDateOfServiceForDefendant().atStartOfDay();
+
+            } else if (caseData.getCosNotifyClaimDefendant1().getCosDateOfServiceForDefendant()
+                .isBefore(caseData.getCosNotifyClaimDefendant2().getCosDateOfServiceForDefendant())) {
+
+                return  caseData.getCosNotifyClaimDefendant1().getCosDateOfServiceForDefendant().atStartOfDay();
+
+            } else if (caseData.getCosNotifyClaimDefendant1().getCosDateOfServiceForDefendant()
+                .isAfter(caseData.getCosNotifyClaimDefendant2().getCosDateOfServiceForDefendant())) {
+
+                return caseData.getCosNotifyClaimDefendant2().getCosDateOfServiceForDefendant().atStartOfDay();
+            }
+
+        } else if (Objects.isNull(caseData.getCosNotifyClaimDefendant1())
+            && Objects.nonNull(caseData.getCosNotifyClaimDefendant2())) {
+
+            return  caseData.getCosNotifyClaimDefendant2().getCosDateOfServiceForDefendant().atStartOfDay();
+
+        } else if (Objects.nonNull(caseData.getCosNotifyClaimDefendant1())
+            && Objects.isNull(caseData.getCosNotifyClaimDefendant2())) {
+
+            return caseData.getCosNotifyClaimDefendant1().getCosDateOfServiceForDefendant().atStartOfDay();
+        }
+        return time.now();
     }
 }

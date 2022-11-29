@@ -1951,7 +1951,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimNotified1v2Respondent2LiP(CertificateOfService  certificateOfService) {
+    public CaseDataBuilder atStateClaimNotified1v2RespondentLiP() {
         atStatePendingClaimIssued();
         ccdState = CASE_ISSUED;
         respondent2Represented = NO;
@@ -1959,7 +1959,6 @@ public class CaseDataBuilder {
             .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
             .build();
         legacyCaseReference = LEGACY_CASE_REFERENCE;
-        cosNotifyClaimDefendant2 = certificateOfService;
         claimDetailsNotificationDeadline = DEADLINE;
         defendant2LIPAtClaimIssued = YES;
         return this;
