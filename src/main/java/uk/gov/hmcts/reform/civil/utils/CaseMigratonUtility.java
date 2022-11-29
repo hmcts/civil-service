@@ -116,7 +116,8 @@ public class CaseMigratonUtility {
 
                                                       .build()).responseClaimCourtLocationRequired(YES).build());
 
-        } else if (ofNullable(respondent1DQ).isPresent()) {
+        } else if (ofNullable(respondent1DQ).isPresent()
+            && ofNullable(respondent1DQ.getRespondent1DQExperts()).isPresent()) {
 
             caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
                                               .respondent1DQRequestedCourt(RequestedCourt
@@ -169,7 +170,8 @@ public class CaseMigratonUtility {
                                                                            .build())
                                               .build());
             caseDataBuilder.responseClaimCourtLocation2Required(YES);
-        } else if (ofNullable(respondent2DQ).isPresent()) {
+        } else if (ofNullable(respondent2DQ).isPresent()
+            && ofNullable(respondent2DQ.getRespondent2DQExperts()).isPresent()) {
             caseDataBuilder.respondent2DQ(respondent2DQ.toBuilder()
                                               .respondent2DQRequestedCourt(RequestedCourt.builder()
                                                                                .caseLocation(caseLocation)
@@ -215,7 +217,8 @@ public class CaseMigratonUtility {
                                                                                .build())
                                              .build());
 
-        } else if (ofNullable(respondent1DQ).isPresent()) {
+        } else if (ofNullable(respondent1DQ).isPresent()
+            && ofNullable(respondent1DQ.getRespondent1DQExperts()).isPresent()) {
 
             caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
                                               .respondent1DQRequestedCourt(RequestedCourt.builder()
@@ -250,7 +253,8 @@ public class CaseMigratonUtility {
                                                                                .toBuilder()
                                                                                .caseLocation(location)
                                                                                .build()).build());
-        } else if (ofNullable(respondent2DQ).isPresent()) {
+        } else if (ofNullable(respondent2DQ).isPresent()
+            && ofNullable(respondent2DQ.getRespondent2DQExperts()).isPresent()) {
             caseDataBuilder.respondent2DQ(respondent2DQ.toBuilder()
                                               .respondent2DQRequestedCourt(RequestedCourt.builder()
                                                                                .caseLocation(caseLocation)
@@ -286,13 +290,16 @@ public class CaseMigratonUtility {
                                                                              .caseLocation(location)
                                                                              .build()).build());
         } else if (ofNullable(applicant1DQ).isPresent()
-            && CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
+            && CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())
+            && ofNullable(applicant1DQ.getExperts()).isPresent()) {
+
             caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
                                              .applicant1DQRequestedCourt(RequestedCourt.builder()
                                                                              .caseLocation(caseLocation)
                                                                              .build()).build());
 
-        } else if (ofNullable(applicant1DQ).isPresent() && ofNullable(oldCaseData.getCourtLocation()).isPresent()) {
+        } else if (ofNullable(applicant1DQ).isPresent() && ofNullable(oldCaseData.getCourtLocation()).isPresent()
+            && ofNullable(applicant1DQ.getExperts()).isPresent()) {
             LocationRefData refData = locationRefDataService.getCourtLocation(
                 authToken,
                 oldCaseData.getCourtLocation().getApplicantPreferredCourt()
