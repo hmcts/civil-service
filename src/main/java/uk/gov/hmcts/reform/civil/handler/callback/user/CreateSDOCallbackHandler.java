@@ -201,7 +201,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 .input1("The parties shall serve on each other copies of the documents upon which reliance is to be"
                             + " placed at the disposal hearing by 4pm on")
                 .date1(LocalDate.now().plusWeeks(10))
-                .input2("The parties must upload to the Digital Portal copies of those documents which they wish the"
+                .input2("The parties must upload to the Digital Portal copies of those documents which they wish the "
                             + "court to consider when deciding the amount of damages, by 4pm on")
                 .date2(LocalDate.now().plusWeeks(10))
                 .build();
@@ -218,7 +218,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "when deciding the amount of damages by 4pm on")
             .date2(LocalDate.now().plusWeeks(4))
             .input4("The provisions of CPR 32.6 apply to such evidence.")
-            .input5("Any application by the defendant pursuant to CPR 32.7 must be made by 4pm on")
+            .input5("Any application by the defendant in relation to CPR 32.7 must be made by 4pm on")
             .date3(LocalDate.now().plusWeeks(6))
             .input6("and must be accompanied by proposed directions for allocation and listing for trial on quantum. "
                         + "This is because cross-examination will cause the hearing to exceed the 30-minute "
