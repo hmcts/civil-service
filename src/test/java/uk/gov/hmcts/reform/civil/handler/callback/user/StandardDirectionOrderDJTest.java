@@ -466,7 +466,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo(LocalDate.now().plusWeeks(4).toString());
 
             assertThat(response.getData()).extracting("disposalHearingOrderMadeWithoutHearingDJ").extracting("input")
-                .isEqualTo(String.format("This order has been made without a hearing. Each party "
+                .isEqualTo(String.format("Each party "
                                              + "has the right to apply to have this order "
                                              + "set aside or varied. Any such application must be "
                                              + "received by the Court "
@@ -493,7 +493,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "summary and a chronology.");
 
             assertThat(response.getData()).extracting("trialOrderMadeWithoutHearingDJ").extracting("input")
-                .isEqualTo(String.format("This order has been made without a hearing. Each party has the right to "
+                .isEqualTo(String.format("Each party has the right to "
                                              + "apply to have this Order set aside or varied. Any such application "
                                              + "must be received by the Court (together with the appropriate fee) "
                                              + "by 4pm on %s.",
