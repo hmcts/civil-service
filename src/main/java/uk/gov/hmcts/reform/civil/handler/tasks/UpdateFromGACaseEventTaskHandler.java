@@ -69,7 +69,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
                 "Conversion to long datatype failed for general application for a case ", ne
             );
         } catch (IllegalArgumentException | ValueMapperException e) {
-            throw new InvalidCaseDataException("mapper conversion failed due to incompatible types", e);
+            throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
         }
     }
 

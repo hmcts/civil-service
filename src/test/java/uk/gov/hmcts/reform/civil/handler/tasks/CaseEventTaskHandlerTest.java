@@ -807,7 +807,7 @@ class CaseEventTaskHandlerTest {
         void shouldNotCallHandleFailureMethod_whenMapperConversionFailed() {
             //given: ExternalTask.getAllVariables throws ValueMapperException
             when(mockTask.getAllVariables())
-                .thenThrow(new ValueMapperException("mapper conversion failed due to incompatible types"));
+                .thenThrow(new ValueMapperException("Mapper conversion failed due to incompatible types"));
 
             //when: Task handler is called and ValueMapperException is thrown
             caseEventTaskHandler.execute(mockTask, externalTaskService);

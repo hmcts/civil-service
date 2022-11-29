@@ -234,9 +234,9 @@ class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallback
         void shouldNotCallHandleFailureMethod_whenValueMapperExceptionThrown() {
             //given: ExternalTask.getAllVariables throws ValueMapperException
             when(mockTask.getAllVariables())
-                .thenThrow(new ValueMapperException("mapper conversion failed due to incompatible types"));
+                .thenThrow(new ValueMapperException("Mapper conversion failed due to incompatible types"));
 
-            //Task handler is called and ValueMapperException is thrown
+            //when: Task handler is called and ValueMapperException is thrown
             handler.execute(mockTask, externalTaskService);
 
             //then: Retry should not happen in this case

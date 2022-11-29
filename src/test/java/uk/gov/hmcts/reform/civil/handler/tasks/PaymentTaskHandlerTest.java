@@ -113,7 +113,7 @@ class PaymentTaskHandlerTest {
         void shouldNotCallHandleFailureMethod_whenValueMapperExceptionThrown() {
             //given: ExternalTask.getAllVariables throws ValueMapperException
             when(mockExternalTask.getAllVariables())
-                .thenThrow(new ValueMapperException("mapper conversion failed due to incompatible types"));
+                .thenThrow(new ValueMapperException("Mapper conversion failed due to incompatible types"));
 
             //Task handler is called and ValueMapperException is thrown
             paymentTaskHandler.execute(mockExternalTask, externalTaskService);

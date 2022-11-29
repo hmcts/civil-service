@@ -61,7 +61,7 @@ public class StartGeneralApplicationBusinessProcessTaskHandler implements BaseEx
             externalTaskInput = mapper.convertValue(externalTask.getAllVariables(),
                                                                   ExternalTaskInput.class);
         } catch (ValueMapperException | IllegalArgumentException e) {
-            throw new InvalidCaseDataException("mapper conversion failed due to incompatible types", e);
+            throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
         }
         if (null != externalTaskInput) {
             String caseId = ofNullable(externalTaskInput.getCaseId()).orElseThrow(CaseIdNotProvidedException::new);
@@ -88,7 +88,7 @@ public class StartGeneralApplicationBusinessProcessTaskHandler implements BaseEx
             }
             return data;
         } else {
-            throw new InvalidCaseDataException("mapper conversion failed due to incompatible types");
+            throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types");
         }
     }
 

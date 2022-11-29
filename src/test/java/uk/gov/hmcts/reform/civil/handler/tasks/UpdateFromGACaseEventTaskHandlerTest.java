@@ -233,12 +233,12 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         void shouldNotCallHandleFailureMethod_whenMapperConversionFailed() {
             //given: ExternalTask.getAllVariables throws ValueMapperException
             when(mockExternalTask.getAllVariables())
-                .thenThrow(new ValueMapperException("mapper conversion failed due to incompatible types"));
+                .thenThrow(new ValueMapperException("Mapper conversion failed due to incompatible types"));
 
-            //Task handler is called and ValueMapperException is thrown
+            //when: Task handler is called and ValueMapperException is thrown
             handler.execute(mockExternalTask, externalTaskService);
 
-            //Retry should not happen in this case
+            //then: Retry should not happen in this case
             verify(externalTaskService, never()).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
