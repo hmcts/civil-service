@@ -220,7 +220,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "updated counter schedule of loss by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossDJ").extracting("date3")
                 .isEqualTo(LocalDate.now().plusWeeks(12).toString());
-            assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossDJ").extracting("input4")
+            assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossDJ").extracting("inputText4")
                 .isEqualTo("If there is a claim for future pecuniary loss and the parties have not already set out "
                                + "their case on periodical payments, they must do so in the respective schedule"
                                + " and counter-schedule.");

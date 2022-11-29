@@ -272,7 +272,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                          + " must upload to the Digital Portal an "
                                                                          + "updated counter schedule of loss by 4pm on")
                                                              .date3(LocalDate.now().plusWeeks(12))
-                                                             .input4("If there is a claim for future pecuniary loss"
+                                                             .inputText4("If there is a claim for future pecuniary loss"
                                                                          + " and the parties have not already set out"
                                                                          + " their case on periodical payments, they"
                                                                          + " must do so in the respective schedule"
