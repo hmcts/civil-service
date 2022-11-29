@@ -7,7 +7,7 @@ import uk.gov.hmcts.contino.AppPipelineDsl
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccddefbranch = "master"
+def ccddefbranch = "publishAfterJudicialReferalState"
 AppPipelineConfig pipelineConf
 
 static Map<String, Object> secret(String secretName, String envVariable) {
