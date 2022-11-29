@@ -829,7 +829,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "notification. The hearing will have a time estimate of");
             assertThat(response.getData()).extracting("smallClaimsHearing").extracting("input2")
                 .isEqualTo("The claimant must by no later than 4 weeks before the hearing date, pay the court the "
-                               + "required hearing fee or submit a fully completed application for Help with Fees. "
+                               + "required hearing fee or submit a fully completed application for Help with Fees. \n"
                                + "If the claimant fails to pay the fee or obtain a fee exemption by that time the "
                                + "claim will be struck without further order.");
 
@@ -900,7 +900,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "hearing, save with permission of the Trial Judge.");
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input4")
                 .isEqualTo("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
-                               + "later than 4pm on.");
+                               + "later than 4pm on");
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date2")
                 .isEqualTo(LocalDate.now().plusWeeks(6).toString());
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input5")
@@ -983,7 +983,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("smallClaimsHearing").extracting("input2")
                 .isEqualTo("The claimant must by no later than 14 days before the hearing date, pay the court the "
-                               + "required hearing fee or submit a fully completed application for Help with Fees. "
+                               + "required hearing fee or submit a fully completed application for Help with Fees. \n"
                                + "If the claimant fails to pay the fee or obtain a fee exemption by that time the "
                                + "claim will be struck without further order.");
 

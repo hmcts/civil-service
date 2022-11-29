@@ -118,12 +118,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         "Upon considering the claim form, particulars of claim, statements of case and Directions questionnaires";
     public static final String HEARING_TIME_TEXT_AFTER =
         "The claimant must by no later than 14 days before the hearing date, pay the court the "
-            + "required hearing fee or submit a fully completed application for Help with Fees. If the "
+            + "required hearing fee or submit a fully completed application for Help with Fees. \nIf the "
             + "claimant fails to pay the fee or obtain a fee exemption by that time the claim will be "
             + "struck without further order.";
     public static final String HEARING_TIME_TEXT_AFTER_HNL =
         "The claimant must by no later than 4 weeks before the hearing date, pay the court the "
-            + "required hearing fee or submit a fully completed application for Help with Fees. If the "
+            + "required hearing fee or submit a fully completed application for Help with Fees. \nIf the "
             + "claimant fails to pay the fee or obtain a fee exemption by that time the claim will be "
             + "struck without further order.";
 
@@ -637,7 +637,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
                         + "save with permission of the Trial Judge.")
             .input4("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
-                        + "later than 4pm on.")
+                        + "later than 4pm on")
             .date2(LocalDate.now().plusWeeks(6))
             .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
                         + "paragraph above, each party may rely upon written evidence by way of witness statement of "
