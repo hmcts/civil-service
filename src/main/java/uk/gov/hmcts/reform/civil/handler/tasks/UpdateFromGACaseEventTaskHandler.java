@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -37,17 +38,15 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
 
     @Override
     public void handleTask(ExternalTask externalTask) {
-        String generalAppCaseId = null;
         try {
             ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
 
-            generalAppCaseId =
+            String generalAppCaseId =
                 ofNullable(variables.getCaseId()).orElseThrow(CaseIdNotProvidedException::new);
-            String finalGeneralAppCaseId = generalAppCaseId;
             String civilCaseId =
                 ofNullable(variables.getGeneralAppParentCaseLink())
                     .orElseThrow(() -> new InvalidCaseDataException(
-                        "General application parent case link not found for civil case " + finalGeneralAppCaseId));
+                        "General application parent case link not found"));
 
             generalAppCaseData = caseDetailsConverter.toGACaseData(coreCaseDataService
                                                                        .getCase(parseLong(generalAppCaseId)));
@@ -66,12 +65,10 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
                 )
             );
         } catch (NumberFormatException ne) {
-            log.error("Conversion to long datatype failed for general application for case {}", generalAppCaseId);
             throw new InvalidCaseDataException(
                 "Conversion to long datatype failed for general application for a case ", ne
             );
-        } catch (IllegalArgumentException e) {
-            log.error("mapper conversion failed due to incompatible types");
+        } catch (IllegalArgumentException | ValueMapperException e) {
             throw new InvalidCaseDataException("mapper conversion failed due to incompatible types", e);
         }
     }

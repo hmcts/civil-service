@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -224,5 +226,68 @@ class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallback
             anyLong()
         );
         verify(externalTaskService).handleBpmnError(mockTask, ERROR_CODE);
+    }
+
+    @Nested
+    class NotRetryableFailureTest {
+        @Test
+        void shouldNotCallHandleFailureMethod_whenValueMapperExceptionThrown() {
+            //given: ExternalTask.getAllVariables throws ValueMapperException
+            when(mockTask.getAllVariables())
+                .thenThrow(new ValueMapperException("mapper conversion failed due to incompatible types"));
+
+            //Task handler is called and ValueMapperException is thrown
+            handler.execute(mockTask, externalTaskService);
+
+            //then: Retry should not happen in this case
+            verify(externalTaskService, never()).handleFailure(
+                any(ExternalTask.class),
+                anyString(),
+                anyString(),
+                anyInt(),
+                anyLong()
+            );
+        }
+
+        @Test
+        void shouldNotCallHandleFailureMethod_whenIllegalArgumentExceptionThrown() {
+            //given: ExternalTask variables with incompatible event type
+            String incompatibleEventType = "test";
+            Map<String, Object> allVariables = Map.of("caseId", CASE_ID, "caseEvent", incompatibleEventType);
+            when(mockTask.getAllVariables())
+                .thenReturn(allVariables);
+
+            //when: Task handler is called and IllegalArgumentException is thrown
+            handler.execute(mockTask, externalTaskService);
+
+            //then: Retry should not happen in this case
+            verify(externalTaskService, never()).handleFailure(
+                any(ExternalTask.class),
+                anyString(),
+                anyString(),
+                anyInt(),
+                anyLong()
+            );
+        }
+
+        @Test
+        void shouldNotCallHandleFailureMethod_whenCaseIdNotFound() {
+            //given: ExternalTask variables without caseId
+            Map<String, Object> allVariables = Map.of("caseEvent", START_BUSINESS_PROCESS_GASPEC);
+            when(mockTask.getAllVariables())
+                .thenReturn(allVariables);
+
+            //when: Task handler is called and CaseIdNotProvidedException is thrown
+            handler.execute(mockTask, externalTaskService);
+
+            //then: Retry should not happen in this case
+            verify(externalTaskService, never()).handleFailure(
+                any(ExternalTask.class),
+                anyString(),
+                anyString(),
+                anyInt(),
+                anyLong()
+            );
+        }
     }
 }

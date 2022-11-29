@@ -6,6 +6,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.exceptions.CaseIdNotProvidedException;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -25,6 +27,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.APPLICATION;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.CASE_SETTLED;
@@ -54,7 +57,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
     public void handleTask(ExternalTask externalTask) {
         try {
             ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
-            String caseId = variables.getCaseId();
+            String caseId = ofNullable(variables.getCaseId()).orElseThrow(CaseIdNotProvidedException::new);
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, variables.getCaseEvent());
             CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
             BusinessProcess businessProcess = startEventData.getBusinessProcess()
@@ -68,7 +71,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 startEventData
             );
             data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
-        } catch (IllegalArgumentException e) {
+        } catch (ValueMapperException | IllegalArgumentException e) {
             throw new InvalidCaseDataException("mapper conversion failed due to incompatible types", e);
         }
     }

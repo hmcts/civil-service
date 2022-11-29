@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -35,7 +37,11 @@ import static java.time.LocalDateTime.now;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_PDF_TO_MAIN_CASE;
@@ -219,6 +225,69 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
         verify(externalTaskService).complete(mockExternalTask);
+    }
+
+    @Nested
+    class NotRetryableFailureTest {
+        @Test
+        void shouldNotCallHandleFailureMethod_whenMapperConversionFailed() {
+            //given: ExternalTask.getAllVariables throws ValueMapperException
+            when(mockExternalTask.getAllVariables())
+                .thenThrow(new ValueMapperException("mapper conversion failed due to incompatible types"));
+
+            //Task handler is called and ValueMapperException is thrown
+            handler.execute(mockExternalTask, externalTaskService);
+
+            //Retry should not happen in this case
+            verify(externalTaskService, never()).handleFailure(
+                any(ExternalTask.class),
+                anyString(),
+                anyString(),
+                anyInt(),
+                anyLong()
+            );
+        }
+
+        @Test
+        void shouldNotCallHandleFailureMethod_whenIllegalArgumentExceptionThrown() {
+            //given: ExternalTask variables with incompatible event type
+            String incompatibleEventType = "test";
+            Map<String, Object> allVariables = Map.of("caseId", CIVIL_CASE_ID, "caseEvent", incompatibleEventType);
+            when(mockExternalTask.getAllVariables())
+                .thenReturn(allVariables);
+
+            //when: Task handler is called and IllegalArgumentException is thrown
+            handler.execute(mockExternalTask, externalTaskService);
+
+            //then: Retry should not happen in this case
+            verify(externalTaskService, never()).handleFailure(
+                any(ExternalTask.class),
+                anyString(),
+                anyString(),
+                anyInt(),
+                anyLong()
+            );
+        }
+
+        @Test
+        void shouldNotCallHandleFailureMethod_whenCaseIdNotFound() {
+            //given: ExternalTask variables without caseId
+            Map<String, Object> allVariables = Map.of("caseEvent", ADD_PDF_TO_MAIN_CASE);
+            when(mockExternalTask.getAllVariables())
+                .thenReturn(allVariables);
+
+            //when: Task handler is called and CaseIdNotProvidedException is thrown
+            handler.execute(mockExternalTask, externalTaskService);
+
+            //then: Retry should not happen in this case
+            verify(externalTaskService, never()).handleFailure(
+                any(ExternalTask.class),
+                anyString(),
+                anyString(),
+                anyInt(),
+                anyLong()
+            );
+        }
     }
 
     public final CaseDocument pdfDocument = CaseDocument.builder()

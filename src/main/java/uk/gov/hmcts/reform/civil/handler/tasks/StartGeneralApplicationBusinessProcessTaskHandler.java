@@ -7,6 +7,7 @@ import java.util.Optional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.exceptions.CaseIdNotProvidedException;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -24,6 +26,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+
+import static java.util.Optional.ofNullable;
 
 @Component
 @RequiredArgsConstructor
@@ -56,11 +60,11 @@ public class StartGeneralApplicationBusinessProcessTaskHandler implements BaseEx
         try {
             externalTaskInput = mapper.convertValue(externalTask.getAllVariables(),
                                                                   ExternalTaskInput.class);
-        } catch (IllegalArgumentException e) {
+        } catch (ValueMapperException | IllegalArgumentException e) {
             throw new InvalidCaseDataException("mapper conversion failed due to incompatible types", e);
         }
         if (null != externalTaskInput) {
-            String caseId = externalTaskInput.getCaseId();
+            String caseId = ofNullable(externalTaskInput.getCaseId()).orElseThrow(CaseIdNotProvidedException::new);
             CaseEvent caseEvent = externalTaskInput.getCaseEvent();
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);
             CaseData data = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());

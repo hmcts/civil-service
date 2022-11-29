@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.exceptions.CaseIdNotProvidedException;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -20,6 +21,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+
+import static java.util.Optional.ofNullable;
 
 @Component
 @Slf4j
@@ -38,7 +41,7 @@ public class PaymentTaskHandler implements BaseExternalTaskHandler {
         try {
             Map<String, Object> allVariables = externalTask.getAllVariables();
             ExternalTaskInput externalTaskInput = objectMapper.convertValue(allVariables, ExternalTaskInput.class);
-            String caseId = externalTaskInput.getCaseId();
+            String caseId = ofNullable(externalTaskInput.getCaseId()).orElseThrow(CaseIdNotProvidedException::new);
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
                 caseId,
                 externalTaskInput.getCaseEvent()
