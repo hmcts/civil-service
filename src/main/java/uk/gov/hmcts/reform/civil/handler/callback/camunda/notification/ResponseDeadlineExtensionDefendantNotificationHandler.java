@@ -80,7 +80,7 @@ public class ResponseDeadlineExtensionDefendantNotificationHandler
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             AGREED_EXTENSION_DATE, formatLocalDate(
                 caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE
-            )// TODO a date should be sent and update here
+            )
         );
     }
 

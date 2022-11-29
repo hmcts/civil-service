@@ -78,7 +78,7 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData),
             AGREED_EXTENSION_DATE, formatLocalDate(
                 caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE
-            ) // TODO a date should be sent and update here
+            )
         );
     }
 
