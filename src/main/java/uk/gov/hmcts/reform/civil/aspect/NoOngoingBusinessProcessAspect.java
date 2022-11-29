@@ -43,7 +43,7 @@ public class NoOngoingBusinessProcessAspect {
 
         log.info("callbackParams.getType(): " + callbackParams.getType());
         log.info("caseEvent.isCamundaEvent(): " + caseEvent.isCamundaEvent());
-        log.info("caseData.hasNoOngoingBusinessProcess() " + caseData.hasNoOngoingBusinessProcess());
+        log.info("caseData.hasNoOngoingBusinessProcess() " + caseData.getBusinessProcess());
         log.info("generalAppsOrSDOOrReferToJudge(callbackParams) " + generalAppsOrSDOOrReferToJudge(callbackParams));
         log.info("caseEvent.equals(CaseEvent.migrateCase) " + caseEvent.equals(CaseEvent.migrateCase));
 
