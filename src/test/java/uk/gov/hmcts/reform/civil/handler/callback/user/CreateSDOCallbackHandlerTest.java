@@ -521,8 +521,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocuments").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(10).toString());
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocuments").extracting("input2")
-                .isEqualTo("The parties must upload to the Digital Portal copies of those documents which they wish the "
-                               + "court to consider when deciding the amount of damages, by 4pm on");
+                .isEqualTo(
+                    "The parties must upload to the Digital Portal copies of those documents which they wish the "
+                        + "court to consider when deciding the amount of damages, by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocuments").extracting("date2")
                 .isEqualTo(LocalDate.now().plusWeeks(10).toString());
 
