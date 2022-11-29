@@ -1165,7 +1165,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .accessCode(
                                     AccessCodeGenerator.generateAccessCode())
                                 .respondentCaseRole(
-                                    CaseRole.RESPONDENTSOLICITORONESPEC.getFormattedName())
+                                    CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
                                 .expiryDate(LocalDate.now().plusDays(
                                     180))
                                 .build());
