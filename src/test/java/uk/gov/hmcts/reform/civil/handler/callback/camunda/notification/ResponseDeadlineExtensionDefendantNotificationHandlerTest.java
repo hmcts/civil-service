@@ -38,10 +38,10 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
 @SpringBootTest(classes = {
-    ResponseDeadlineExtDefNotifHandler.class,
+    ResponseDeadlineExtensionDefendantNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
-class ResponseDeadlineExtDefNotifHandlerTest extends BaseCallbackHandlerTest {
+class ResponseDeadlineExtensionDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
@@ -53,7 +53,7 @@ class ResponseDeadlineExtDefNotifHandlerTest extends BaseCallbackHandlerTest {
     private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
 
     @Autowired
-    private ResponseDeadlineExtDefNotifHandler handler;
+    private ResponseDeadlineExtensionDefendantNotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {

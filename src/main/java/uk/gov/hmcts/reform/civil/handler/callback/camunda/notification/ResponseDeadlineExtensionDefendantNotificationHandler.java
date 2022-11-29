@@ -19,22 +19,22 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_CUI_FOR_DEADLINE_EXTENSION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_CUI_FOR_DEADLINE_EXTENSION;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
-public class ResponseDeadlineExtClaNotifHandler
+public class ResponseDeadlineExtensionDefendantNotificationHandler
     extends CallbackHandler implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(
-        NOTIFY_CLAIMANT_CUI_FOR_DEADLINE_EXTENSION
+        NOTIFY_DEFENDANT_CUI_FOR_DEADLINE_EXTENSION
     );
 
-    public static final String TASK_ID = "DefendantResponseDeadlineExtensionNotifyClaimant";
-    private static final String REFERENCE_TEMPLATE = "claimant-deadline-extension-notification-%s";
+    public static final String TASK_ID = "DefendantResponseDeadlineExtensionNotifyDefendant";
+    private static final String REFERENCE_TEMPLATE = "defendant-deadline-extension-notification-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -43,7 +43,7 @@ public class ResponseDeadlineExtClaNotifHandler
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifySolicitorsForDeadlineExtension
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendantForDeadlineExtension
         );
     }
 
@@ -57,15 +57,17 @@ public class ResponseDeadlineExtClaNotifHandler
         return EVENTS;
     }
 
-    private CallbackResponse notifySolicitorsForDeadlineExtension(CallbackParams callbackParams) {
+    private CallbackResponse notifyDefendantForDeadlineExtension(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getClaimantDeadlineExtension(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        if (caseData.getRespondent1() != null && caseData.getRespondent1().getPartyEmail() != null) {
+            notificationService.sendMail(
+                caseData.getRespondent1().getPartyEmail(),
+                notificationsProperties.getRespondentDeadlineExtension(),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
@@ -75,10 +77,10 @@ public class ResponseDeadlineExtClaNotifHandler
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData),
+            CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             AGREED_EXTENSION_DATE, formatLocalDate(
                 caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE
-            ) // TODO a date should be sent and update here
+            )// TODO a date should be sent and update here
         );
     }
 
