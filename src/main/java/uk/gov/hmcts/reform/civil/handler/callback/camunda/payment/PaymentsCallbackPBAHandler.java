@@ -64,7 +64,7 @@ public class PaymentsCallbackPBAHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CaseData updateWithDuplicatePaymentError(CaseData caseData, InvalidPaymentRequestException e) {
+    private CaseData updateWithDuplicatePaymentError(CaseData caseData) {
         var paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
             .map(PaymentDetails::toBuilder)
             .orElse(PaymentDetails.builder())
@@ -84,7 +84,7 @@ public class PaymentsCallbackPBAHandler extends CallbackHandler {
             log.info("processing payment for case " + caseData.getCcdCaseReference());
             var paymentReference = paymentsService.createCreditAccountPayment1(caseData, authToken)
                 .getPaymentReference();
-            SRPbaDetails pbaDetails = caseData.getClaimIssuedPBADetails();
+
             PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
                 .map(PaymentDetails::toBuilder)
                 .orElse(PaymentDetails.builder())
@@ -110,7 +110,7 @@ public class PaymentsCallbackPBAHandler extends CallbackHandler {
             log.error(String.format("Duplicate Payment error status code 400 for case: %s, response body: %s",
                                     caseData.getCcdCaseReference(), e.getMessage()
             ));
-            caseData = updateWithDuplicatePaymentError(caseData, e);
+            caseData = updateWithDuplicatePaymentError(caseData);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
