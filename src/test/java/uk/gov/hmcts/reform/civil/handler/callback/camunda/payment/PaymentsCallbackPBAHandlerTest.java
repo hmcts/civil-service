@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
@@ -44,7 +45,8 @@ import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 @SpringBootTest(classes = {
     PaymentsCallbackPBAHandler.class,
     JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    FeatureToggleService.class
 })
 class PaymentsCallbackPBAHandlerTest extends BaseCallbackHandlerTest {
 
@@ -66,13 +68,16 @@ class PaymentsCallbackPBAHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
     private CaseData caseData;
     private CallbackParams params;
 
     @BeforeEach
     public void setup() {
         caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
-
+        when(featureToggleService.isPbaV3Enabled()).thenReturn(false);
         when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
     }
 
