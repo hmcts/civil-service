@@ -92,6 +92,6 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
     private SRPbaDetails
         extractPaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-        return responseCaseData.getServiceRequestPBADetails();
+        return responseCaseData.getClaimIssuedPBADetails();
     }
 }

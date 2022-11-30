@@ -104,7 +104,7 @@ class PaymentsServiceTest {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
         CaseData caseData = CaseData.builder()
-            .serviceRequestPBADetails(SRPbaDetails.builder().build())
+            .claimIssuedPBADetails(SRPbaDetails.builder().build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .build();
 
@@ -120,7 +120,7 @@ class PaymentsServiceTest {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
         CaseData caseData = CaseData.builder()
-            .serviceRequestPBADetails(SRPbaDetails.builder()
+            .claimIssuedPBADetails(SRPbaDetails.builder()
                                       .fee(Fee.builder()
                                                .calculatedAmountInPence(BigDecimal.valueOf(10800))
                                                .version("1")
@@ -141,7 +141,7 @@ class PaymentsServiceTest {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
         CaseData caseData = CaseData.builder()
-            .serviceRequestPBADetails(SRPbaDetails.builder()
+            .claimIssuedPBADetails(SRPbaDetails.builder()
                                       .fee(Fee.builder()
                                                .code("FEE0442")
                                                .version("1")
@@ -174,9 +174,9 @@ class PaymentsServiceTest {
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
                 .build();
 
-        caseData = caseData.toBuilder().serviceRequestPBADetails(hfPbaDetails).build();
+        caseData = caseData.toBuilder().claimIssuedPBADetails(hfPbaDetails).build();
         PBAServiceRequestResponse paymentResponse = paymentsService
-                .createCreditAccountPayment(caseData, AUTH_TOKEN);
+                .createCreditAccountPayment1(caseData, AUTH_TOKEN);
 
         verify(organisationService).findOrganisationById("OrgId");
         verify(paymentsClient).createPbaPayment(eq("request-reference"), eq(AUTH_TOKEN), any());

@@ -62,9 +62,9 @@ serviceRequestClaimIssued:
     site_id: AAA7
     service: CIVIL
 
+
 send-letter:
   url: ${SEND_LETTER_URL:http://localhost:8765}
-
 
 fees:
   api:

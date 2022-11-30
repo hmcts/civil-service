@@ -60,13 +60,22 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
             log.info("calling payment service request " + caseData.getCcdCaseReference());
             var serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
                 .getServiceRequestReference();
-            SRPbaDetails pbaDetails = caseData.getServiceRequestPBADetails();
-            caseData = caseData.toBuilder()
-                .serviceRequestPBADetails(SRPbaDetails.builder()
-                                          .applicantsPbaAccounts(caseData.getApplicantSolicitor1PbaAccounts())
-                                          .fee(caseData.getClaimFee())
-                                          .serviceReqReference(serviceRequestReference).build())
-                .build();
+
+            if (caseData.getHearingDate() != null) {
+                caseData = caseData.toBuilder()
+                    .hearingFeePBADetails(SRPbaDetails.builder()
+                                                  .applicantsPbaAccounts(caseData.getApplicantSolicitor1PbaAccounts())
+                                                  .fee(caseData.getHearingFee())
+                                                  .serviceReqReference(serviceRequestReference).build())
+                    .build();
+            } else {
+                caseData = caseData.toBuilder()
+                    .claimIssuedPBADetails(SRPbaDetails.builder()
+                                                  .applicantsPbaAccounts(caseData.getApplicantSolicitor1PbaAccounts())
+                                                  .fee(caseData.getClaimFee())
+                                                  .serviceReqReference(serviceRequestReference).build())
+                    .build();
+            }
 
         } catch (FeignException e) {
             log.info(String.format("Http Status %s ", e.status()), e);

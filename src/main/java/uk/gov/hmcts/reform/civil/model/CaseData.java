@@ -125,7 +125,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final GAStatementOfTruth generalAppStatementOfTruth;
     private final GAHearingDetails generalAppHearingDetails;
     private final GASolicitorDetailsGAspec generalAppApplnSolicitor;
-    private final SRPbaDetails serviceRequestPBADetails;
+    private final SRPbaDetails hearingFeePBADetails;
+    private final SRPbaDetails claimIssuedPBADetails;
     private final String applicantPartyName;
 
     private final YesOrNo generalAppVaryJudgementType;

@@ -3656,7 +3656,7 @@ public class CaseDataBuilder {
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
-            .serviceRequestPBADetails(
+            .claimIssuedPBADetails(
                 SRPbaDetails.builder()
                         .fee(
                         Fee.builder()
@@ -3700,7 +3700,7 @@ public class CaseDataBuilder {
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-            .serviceRequestPBADetails(
+            .claimIssuedPBADetails(
                 SRPbaDetails.builder()
                     .paymentDetails(PaymentDetails.builder()
                                         .status(PaymentStatus.FAILED)
@@ -3727,7 +3727,7 @@ public class CaseDataBuilder {
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
             .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
-            .serviceRequestPBADetails(
+            .claimIssuedPBADetails(
                 SRPbaDetails.builder()
                     .paymentSuccessfulDate(LocalDateTime.of(
                         LocalDate.of(2020, 01, 01),
@@ -3964,7 +3964,7 @@ public class CaseDataBuilder {
             .trialHearingTrialDJ(trialHearingTrialDJ)
             .disposalHearingJudgesRecitalDJ(disposalHearingJudgesRecitalDJ)
             .trialHearingJudgesRecitalDJ(trialHearingJudgesRecitalDJ)
-            .serviceRequestPBADetails(srPbaDetails)
+            .claimIssuedPBADetails(srPbaDetails)
             .changeOfRepresentation(changeOfRepresentation)
             .changeOrganisationRequestField(changeOrganisationRequest)
             .unassignedCaseListDisplayOrganisationReferences(unassignedCaseListDisplayOrganisationReferences)
