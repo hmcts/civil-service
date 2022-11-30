@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.referencedata.LRDConfiguration;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 
@@ -167,6 +168,7 @@ public class LocationRefDataService {
             .build();
     }
 
+
     public LocationRefData getCourtLocation(String authToken, String threeDigitCode) {
         try {
             ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
@@ -200,6 +202,19 @@ public class LocationRefDataService {
             .queryParam("court_status", "Open");
 
         return builder.buildAndExpand(new HashMap<>()).toUri();
+    }
+
+    /**
+     * Updates both caseManagementLocation and locationName with the same LocationRefData to ease not forgetting
+     * about one of those.
+     *
+     * @param builder  (mandatory) to build a case data
+     * @param location (mandatory) what to update with
+     */
+    public static void updateWithLocation(CaseData.CaseDataBuilder<?, ?> builder, LocationRefData location) {
+        builder
+            .caseManagementLocation(buildCaseLocation(location))
+            .locationName(location.getSiteName());
     }
 
 }
