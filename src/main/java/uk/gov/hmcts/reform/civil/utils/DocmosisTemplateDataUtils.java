@@ -55,14 +55,14 @@ public class DocmosisTemplateDataUtils {
     public static String fetchApplicantName(CaseData caseData) {
         StringBuilder applicantNameBuilder = new StringBuilder();
 
-        if (caseData.getApplicant2() != null) {
+        if (caseData.getApplicant1() != null && caseData.getApplicant2() != null) {
             applicantNameBuilder.append("1 ");
             applicantNameBuilder.append(caseData.getApplicant1().getPartyName());
             soleTraderCompany(caseData.getApplicant1(), applicantNameBuilder);
             applicantNameBuilder.append(" & 2 ");
             applicantNameBuilder.append(caseData.getApplicant2().getPartyName());
             soleTraderCompany(caseData.getApplicant2(), applicantNameBuilder);
-        } else {
+        } else if (caseData.getApplicant1() != null) {
             applicantNameBuilder.append(caseData.getApplicant1().getPartyName());
             soleTraderCompany(caseData.getApplicant1(), applicantNameBuilder);
             litigationFriend(caseData.getApplicant1LitigationFriend(), applicantNameBuilder);
