@@ -374,6 +374,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             && caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null) {
             return caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()
                 .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
+        } else if (caseData.getRespondent1ResponseDate() != null) {
+            return caseData.getRespondent1ResponseDate().plusDays(5)
+                .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         }
         return null;
     }

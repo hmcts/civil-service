@@ -724,6 +724,24 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                              .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)));
         }
 
+        @Test
+        void shouldSetUpPaymentDateForResponseDateToString() {
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ResponseDate(LocalDateTime.now())
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            String result = getCaseData(response).getRespondent1PaymentDateToStringSpec();
+
+            assertThat(result).isEqualTo(whenWillPay
+                                             .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)));
+        }
+
         private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
             return objectMapper.convertValue(response.getData(), CaseData.class);
         }
