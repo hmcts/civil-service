@@ -63,33 +63,30 @@ public class StartGeneralApplicationBusinessProcessTaskHandler implements BaseEx
         } catch (ValueMapperException | IllegalArgumentException e) {
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
         }
-        if (null != externalTaskInput) {
-            String caseId = ofNullable(externalTaskInput.getCaseId()).orElseThrow(CaseIdNotProvidedException::new);
-            CaseEvent caseEvent = externalTaskInput.getCaseEvent();
-            StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);
-            CaseData data = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
-            List<Element<GeneralApplication>> generalApplications = data.getGeneralApplications();
 
-            Optional<Element<GeneralApplication>> firstGA = generalApplications
-                .stream().filter(ga -> ga.getValue() != null
-                    && ga.getValue().getBusinessProcess() != null
-                    && StringUtils.isBlank(ga.getValue().getBusinessProcess().getProcessInstanceId())).findFirst();
+        String caseId = ofNullable(externalTaskInput.getCaseId()).orElseThrow(CaseIdNotProvidedException::new);
+        CaseEvent caseEvent = externalTaskInput.getCaseEvent();
+        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);
+        CaseData data = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+        List<Element<GeneralApplication>> generalApplications = data.getGeneralApplications();
 
-            if (firstGA.isPresent()) {
-                GeneralApplication ga = firstGA.get().getValue();
-                switch (ga.getBusinessProcess().getStatusOrDefault()) {
-                    case READY:
-                    case DISPATCHED:
-                        ga.getBusinessProcess().updateProcessInstanceId(externalTask.getProcessInstanceId());
-                        return updateBusinessProcess(caseId, startEventResponse, generalApplications);
-                    default:
-                        throw new BpmnError("ABORT");
-                }
+        Optional<Element<GeneralApplication>> firstGA = generalApplications
+            .stream().filter(ga -> ga.getValue() != null
+                && ga.getValue().getBusinessProcess() != null
+                && StringUtils.isBlank(ga.getValue().getBusinessProcess().getProcessInstanceId())).findFirst();
+
+        if (firstGA.isPresent()) {
+            GeneralApplication ga = firstGA.get().getValue();
+            switch (ga.getBusinessProcess().getStatusOrDefault()) {
+                case READY:
+                case DISPATCHED:
+                    ga.getBusinessProcess().updateProcessInstanceId(externalTask.getProcessInstanceId());
+                    return updateBusinessProcess(caseId, startEventResponse, generalApplications);
+                default:
+                    throw new BpmnError("ABORT");
             }
-            return data;
-        } else {
-            throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types");
         }
+        return data;
     }
 
     private CaseData updateBusinessProcess(
