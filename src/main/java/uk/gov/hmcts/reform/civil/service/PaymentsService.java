@@ -128,7 +128,8 @@ public class PaymentsService {
                 .map(Organisation::getName)
                 .orElseThrow(RuntimeException::new);
         PBAServiceRequestDTO pbaServiceRequestDTO = null;
-        pbaServiceRequestDTO = PBAServiceRequestDTO.builder()
+        if (serviceRequestPBADetails != null) {
+            pbaServiceRequestDTO = PBAServiceRequestDTO.builder()
                 .accountNumber(serviceRequestPBADetails.getApplicantsPbaAccounts()
                                    .getValue().getLabel())
                 .amount(srFee.getCalculatedAmount())
@@ -136,7 +137,12 @@ public class PaymentsService {
                 .organisationName(organisationName)
                 .idempotencyKey(String.valueOf(UUID.randomUUID()))
                 .build();
-        return pbaServiceRequestDTO;
+            return pbaServiceRequestDTO;
+
+        } else {
+            throw new RuntimeException("Invalid Case State" + caseData.getCcdCaseReference());
+        }
+
     }
 
     public PBAServiceRequestResponse createCreditAccountPayment1(CaseData caseData, String authToken) {
