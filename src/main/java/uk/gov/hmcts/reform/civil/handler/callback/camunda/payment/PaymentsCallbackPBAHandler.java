@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
@@ -44,6 +45,7 @@ public class PaymentsCallbackPBAHandler extends CallbackHandler {
 
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
+    private final FeatureToggleService featureToggleService;
     private final Time time;
 
     @Override
@@ -60,7 +62,11 @@ public class PaymentsCallbackPBAHandler extends CallbackHandler {
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return EVENTS;
+        if(featureToggleService.isPbaV3Enabled()){
+            return EVENTS;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     private CaseData updateWithDuplicatePaymentError(CaseData caseData) {
@@ -122,7 +128,7 @@ public class PaymentsCallbackPBAHandler extends CallbackHandler {
         try {
             var paymentDto = objectMapper.readValue(e.contentUTF8(), PaymentDto.class);
             var statusHistory = paymentDto.getStatusHistories()[0];
-            PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
+            PaymentDetails paymentDetailsErrored = ofNullable(caseData.getClaimIssuedPaymentDetails())
                 .map(PaymentDetails::toBuilder).orElse(PaymentDetails.builder())
                 .status(FAILED)
                 .errorCode(statusHistory.getErrorCode())
@@ -130,7 +136,7 @@ public class PaymentsCallbackPBAHandler extends CallbackHandler {
                 .build();
 
             return caseData.toBuilder()
-                .claimIssuedPaymentDetails(paymentDetails)
+                .claimIssuedPaymentDetails(paymentDetailsErrored)
                 .build();
         } catch (JsonProcessingException jsonException) {
             log.error(jsonException.getMessage());
