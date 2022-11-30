@@ -773,7 +773,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         } else if (caseData.getClaimsTrack() == ClaimsTrack.smallClaimsTrack) {
             return getHearingInPersonSmall(caseData);
         } else if (Optional.ofNullable(caseData.getDisposalHearingMethodToggle())
-                .map(c -> c.contains(OrderDetailsPagesSectionsToggle.SHOW)).orElse(Boolean.FALSE)
+            .map(c -> c.contains(OrderDetailsPagesSectionsToggle.SHOW)).orElse(Boolean.FALSE)
             && caseData.getDisposalHearingMethod() == DisposalHearingMethod.disposalHearingMethodInPerson
             && Optional.ofNullable(caseData.getDisposalHearingMethodInPerson())
             .map(DynamicList::getValue).isPresent()) {
@@ -792,8 +792,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 hearingInPersonLocation,
                 callbackParams.getParams().get(BEARER_TOKEN).toString()
             )
-            .map(LocationRefDataService::buildCaseLocation)
-            .ifPresent(dataBuilder::caseManagementLocation);
+            .ifPresent(locationRefData -> LocationRefDataService.updateWithLocation(dataBuilder, locationRefData));
 
         CaseDocument document = caseData.getSdoOrderDocument();
         if (document != null) {

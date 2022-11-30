@@ -184,6 +184,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocationRefData matching = LocationRefData.builder()
                 .regionId("region id")
                 .epimmsId("epimms id")
+                .siteName("site name")
                 .build();
             Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
                 CallbackParams.Params.BEARER_TOKEN).toString()))
@@ -195,6 +196,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
                 .containsOnly(matching.getRegionId(), matching.getEpimmsId());
+            assertThat(response.getData())
+                .extracting("locationName")
+                .isEqualTo(matching.getSiteName());
         }
 
         @Test
@@ -210,6 +214,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocationRefData matching = LocationRefData.builder()
                 .regionId("region id")
                 .epimmsId("epimms id")
+                .siteName("location name")
                 .build();
             Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
                     CallbackParams.Params.BEARER_TOKEN).toString()))
@@ -221,6 +226,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
                 .containsOnly(matching.getRegionId(), matching.getEpimmsId());
+            assertThat(response.getData())
+                .extracting("locationName")
+                .isEqualTo(matching.getSiteName());
         }
 
         @Test
@@ -236,6 +244,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocationRefData matching = LocationRefData.builder()
                 .regionId("region id")
                 .epimmsId("epimms id")
+                .siteName("location name")
                 .build();
             Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
                     CallbackParams.Params.BEARER_TOKEN).toString()))
@@ -247,6 +256,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("caseManagementLocation")
                 .extracting("region", "baseLocation")
                 .containsOnly(matching.getRegionId(), matching.getEpimmsId());
+            assertThat(response.getData())
+                .extracting("locationName")
+                .isEqualTo(matching.getSiteName());
         }
 
         @Test
