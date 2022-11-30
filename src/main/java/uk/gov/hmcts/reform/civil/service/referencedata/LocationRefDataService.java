@@ -168,7 +168,6 @@ public class LocationRefDataService {
             .build();
     }
 
-
     public LocationRefData getCourtLocation(String authToken, String threeDigitCode) {
         try {
             ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
