@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static java.lang.String.format;
@@ -304,4 +305,73 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+    @Test
+    void shouldPassValidateCertificateOfService_whenDateIsPast() {
+        when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+        LocalDate past = LocalDate.now().minusDays(1);
+        CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
+                .setCoSClaimDetailsWithDate(true, false, past, null, true, true)
+                .build();
+        CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
+        AboutToStartOrSubmitCallbackResponse successResponse =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(successResponse.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldFailValidateCertificateOfService_whenDateIsFuture() {
+        when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+        LocalDate past = LocalDate.now().minusDays(1);
+        LocalDate future = LocalDate.now().plusDays(1);
+        CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
+                .setCoSClaimDetailsWithDate(true, true, past, future, true, true)
+                .build();
+        CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails2");
+        AboutToStartOrSubmitCallbackResponse successResponse =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(successResponse.getErrors().size()).isEqualTo(1);
+    }
+
+    @Test
+    void shouldPassValidateCertificateOfService_whenHasFile() {
+        when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+        LocalDate past = LocalDate.now().minusDays(1);
+        CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
+                .setCoSClaimDetailsWithDate(true, false, past, null, true, false)
+                .build();
+        CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
+        AboutToStartOrSubmitCallbackResponse successResponse =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(successResponse.getErrors()).isEmpty();
+    }
+
+    @Test
+    void shouldPassValidateCertificateOfService_whenHasNoFile() {
+        when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+        LocalDate past = LocalDate.now().minusDays(1);
+        CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
+                .setCoSClaimDetailsWithDate(true, false, past, null, false, false)
+                .build();
+        CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
+        AboutToStartOrSubmitCallbackResponse successResponse =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(successResponse.getErrors().size()).isEqualTo(1);
+    }
+
+    @Test
+    void shouldReturnCoSConfirmation_whenCosNotifyDetailsSuccess() {
+        when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+        LocalDate past = LocalDate.now().minusDays(1);
+        CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
+                .setCoSClaimDetailsWithDate(true, true, past, past, true, true)
+                .build();
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+        SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+        assertThat(response.getConfirmationHeader()).contains("Certificate of Service");
+    }
 }

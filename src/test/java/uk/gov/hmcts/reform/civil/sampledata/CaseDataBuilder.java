@@ -355,6 +355,8 @@ public class CaseDataBuilder {
     private String caseListDisplayDefendantSolicitorReferences;
     private  CertificateOfService cosNotifyClaimDefendant1;
     private  CertificateOfService cosNotifyClaimDefendant2;
+    private CertificateOfService cosNotifyClaimDetails1;
+    private CertificateOfService cosNotifyClaimDetails2;
 
     private FastTrackHearingTime fastTrackHearingTime;
     private FastTrackOrderWithoutJudgement fastTrackOrderWithoutJudgement;
@@ -1486,6 +1488,21 @@ public class CaseDataBuilder {
         addRespondent2 = YES;
         respondent2OrganisationPolicy = null;
         respondent2Represented = YES;
+        respondent2OrgRegistered = NO;
+        respondent2SameLegalRepresentative = NO;
+        return this;
+    }
+
+    public CaseDataBuilder multiPartyClaimTwoDefendantLips() {
+        //TODO replace with LIPS data
+        atStateClaimDraft();
+        respondent1OrganisationPolicy = null;
+        respondent1Represented = NO;
+        respondent1OrgRegistered = NO;
+
+        addRespondent2 = YES;
+        respondent2OrganisationPolicy = null;
+        respondent2Represented = NO;
         respondent2OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
         return this;
@@ -3682,6 +3699,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimDetailsNotified_1v2_andNotifyBothCoS() {
+        atStateClaimDetailsNotified();
+        multiPartyClaimTwoDefendantLips();
+        return this;
+    }
+
     public CaseDataBuilder respondent1DQWitnessesRequiredSpec(YesOrNo respondent1DQWitnessesRequiredSpec) {
         this.respondent1DQWitnessesRequiredSpec = respondent1DQWitnessesRequiredSpec;
         return this;
@@ -3710,6 +3733,33 @@ public class CaseDataBuilder {
         } else {
             this.caseListDisplayDefendantSolicitorReferences =
                 this.solicitorReferences.getRespondentSolicitor1Reference();
+        }
+        return this;
+    }
+
+    public CaseDataBuilder setCoSClaimDetailsWithDate(boolean setCos1, boolean setCos2,
+                                                      LocalDate cos1Date, LocalDate cos2Date,
+                                                      boolean file1, boolean file2) {
+        List<Element<Document>> files = wrapElements(Document.builder()
+                .documentUrl("fake-url")
+                .documentFileName("file-name")
+                .documentBinaryUrl("binary-url")
+                .build());
+        if (setCos1) {
+            CertificateOfService.CertificateOfServiceBuilder cos1Builder = CertificateOfService.builder()
+                    .cosDateOfServiceForDefendant(cos1Date);
+            if (file1) {
+                cos1Builder.cosEvidenceDocument(files);
+            }
+            this.cosNotifyClaimDetails1 = cos1Builder.build();
+        }
+        if (setCos2) {
+            CertificateOfService.CertificateOfServiceBuilder cos2Builder = CertificateOfService.builder()
+                    .cosDateOfServiceForDefendant(cos2Date);
+            if (file2) {
+                cos2Builder.cosEvidenceDocument(files);
+            }
+            this.cosNotifyClaimDetails2 = cos2Builder.build();
         }
         return this;
     }
@@ -3931,6 +3981,9 @@ public class CaseDataBuilder {
             .disposalHearingFinalDisposalHearingTimeDJ(disposalHearingFinalDisposalHearingTimeDJ)
             .trialHearingTimeDJ(trialHearingTimeDJ)
             .trialOrderMadeWithoutHearingDJ(trialOrderMadeWithoutHearingDJ)
+                //Certificate of Service
+                .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
+                .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
             .build();
     }
 
