@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
@@ -37,6 +38,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
     private final SealedClaimResponseFormGeneratorForSpec formGenerator;
 
     private final CivilDocumentStitchingService civilDocumentStitchingService;
+    private final FeatureToggleService toggleService;
 
     @Value("${stitching.enabled:true}")
     private boolean stitchEnabled;
@@ -71,10 +73,14 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 sealedForm.getDocumentName(),
                 caseData
             );
-            builder.respondent1ClaimResponseDocumentSpec(stitchedDocument);
+            if (toggleService.isPinInPostEnabled()) {
+                builder.respondent1ClaimResponseDocumentSpec(stitchedDocument);
+            }
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
         } else {
-            builder.respondent1ClaimResponseDocumentSpec(sealedForm);
+            if (toggleService.isPinInPostEnabled()) {
+                builder.respondent1ClaimResponseDocumentSpec(sealedForm);
+            }
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(sealedForm));
         }
 
