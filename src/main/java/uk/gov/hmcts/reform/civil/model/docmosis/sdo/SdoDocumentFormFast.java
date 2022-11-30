@@ -18,9 +18,11 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
@@ -50,7 +52,6 @@ public class SdoDocumentFormFast implements MappableObject {
     private final Party applicant2;
     private final boolean hasRespondent2;
     private final Party respondent2;
-
     private final YesOrNo drawDirectionsOrderRequired;
     private final JudgementSum drawDirectionsOrder;
     private final ClaimsTrack claimsTrack;
@@ -70,6 +71,8 @@ public class SdoDocumentFormFast implements MappableObject {
     private final FastTrackWitnessOfFact fastTrackWitnessOfFact;
     private final FastTrackSchedulesOfLoss fastTrackSchedulesOfLoss;
     private final FastTrackTrial fastTrackTrial;
+    private final FastTrackHearingTime fastTrackHearingTime;
+    private final String fastTrackHearingTimeEstimate;
     private final String fastTrackTrialBundleTypeText;
 
     private final FastTrackMethod fastTrackMethod;
@@ -88,6 +91,7 @@ public class SdoDocumentFormFast implements MappableObject {
     private final List<Element<FastTrackAddNewDirections>> fastTrackAddNewDirections;
 
     private FastTrackNotes fastTrackNotes;
+    private FastTrackOrderWithoutJudgement fastTrackOrderWithoutJudgement;
 
     private final boolean fastTrackAltDisputeResolutionToggle;
     private final boolean fastTrackVariationOfDirectionsToggle;
