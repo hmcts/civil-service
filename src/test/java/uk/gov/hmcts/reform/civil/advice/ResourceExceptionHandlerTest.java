@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 
@@ -37,6 +38,19 @@ class ResourceExceptionHandlerTest {
             StateFlowException::new,
             handler::incorrectStateFlow,
             HttpStatus.PRECONDITION_FAILED
+        );
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenHttpClientErrorExceptionThrown() {
+        testTemplate(
+            "expected exception for missing callback handler",
+            exp -> new HttpClientErrorException(
+                HttpStatus.BAD_REQUEST,
+                "expected exception for missing callback handler"
+            ),
+            handler::badRequest,
+            HttpStatus.BAD_REQUEST
         );
     }
 
