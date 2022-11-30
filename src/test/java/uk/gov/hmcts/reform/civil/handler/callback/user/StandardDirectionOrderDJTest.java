@@ -347,9 +347,11 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo("The claimant must prepare a Scott Schedule of the defects, items of damage "
                                + "or any other relevant matters");
             assertThat(response.getData()).extracting("trialBuildingDispute").extracting("input2")
-                .isEqualTo("The columns should be headed: \n - Item; \n - Alleged Defect; "
-                               + "\n - Claimant's costing;\n - Defendant's response;\n - Defendant's"
-                               + "\n - costing; \n - Reserved for Judge's use");
+                .isEqualTo("The columns should be headed: \n - Item; \n - "
+                               + "Alleged Defect; "
+                               + "\n - Claimant's costing;\n - Defendant's"
+                               + " response;\n - Defendant's costing;"
+                               + " \n - Reserved for Judge's use");
             assertThat(response.getData()).extracting("trialBuildingDispute").extracting("input3")
                 .isEqualTo("The claimant must upload to the Digital Portal the "
                                + "Scott Schedule with the relevant "
@@ -373,10 +375,12 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + " The defendant must give facilities for inspection by the claimant, the claimant's"
                                + " legal advisers and experts of these original notes on 7 days written notice.");
             assertThat(response.getData()).extracting("trialClinicalNegligence").extracting("input4")
-                .isEqualTo("Legible copies of the medical and educational records of the claimant / Deceased / "
-                               + "claimant's Mother are to be placed in a separate paginated bundle by the "
-                               + "claimant's Solicitors and kept up to date. All references to medical notes are to be "
-                               + "made by reference to the pages in that bundle.");
+                .isEqualTo("Legible copies of the medical and educational "
+                               + "records of the claimant are to be placed in a"
+                               + " separate paginated bundle by the claimant’s "
+                               + "solicitors and kept up to date. All references "
+                               + "to medical notes are to be made by reference to"
+                               + " the pages in that bundle");
 
             assertThat(response.getData()).extracting("trialCreditHire").extracting("input1")
                 .isEqualTo("If impecuniosity is alleged by the claimant and not admitted "
@@ -397,8 +401,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "facilities available to the claimant");
             assertThat(response.getData()).extracting("trialCreditHire").extracting("input2")
                 .isEqualTo("The claimant must upload to the Digital Portal a witness "
-                               + "statement addressing \na)the need to hire a replacement "
-                               + "vehicle; and \nb)impecuniosity");
+                               + "statement addressing \na) the need to hire a replacement "
+                               + "vehicle; and \nb) impecuniosity");
             assertThat(response.getData()).extracting("trialCreditHire").extracting("input3")
                 .isEqualTo("This statement must be uploaded to the Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("trialCreditHire").extracting("date1")
@@ -438,8 +442,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo("The claimant must prepare a Scott Schedule of the items "
                                + "in disrepair");
             assertThat(response.getData()).extracting("trialHousingDisrepair").extracting("input2")
-                .isEqualTo("The columns should be headed: \n - Item; \n - Alleged "
-                               + "\n - disrepair; \n - Defendant's Response; \n - Reserved for Judge's Use");
+                .isEqualTo("The columns should be headed: \n - Item; \n - Alleged disrepair; "
+                               + "\n - Defendant's Response; \n - Reserved for Judge's Use");
             assertThat(response.getData()).extracting("trialHousingDisrepair").extracting("input3")
                 .isEqualTo("The claimant must upload to the Digital Portal the "
                                + "Scott Schedule with the relevant columns "

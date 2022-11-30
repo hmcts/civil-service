@@ -472,8 +472,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                  .input2("The columns should be headed: \n - Item; \n - "
                                                              + "Alleged Defect; "
                                                              + "\n - Claimant's costing;\n - Defendant's"
-                                                             + " response;\n - Defendant's"
-                                                             + "\n - costing; \n - Reserved for Judge's use")
+                                                             + " response;\n - Defendant's costing;"
+                                                             + " \n - Reserved for Judge's use")
                                                  .input3("The claimant must upload to the Digital Portal the "
                                                              + "Scott Schedule with the relevant "
                                                              + "columns completed by 4pm on")
@@ -488,21 +488,19 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                     .builder()
                                                     .input1("Documents should be retained as follows:")
                                                     .input2("the parties must retain all electronically stored "
-                                                                +
-                                                                "documents relating to the issues in this Claim.")
+                                                                + "documents relating to the issues in this Claim.")
                                                     .input3("the defendant must retain the original clinical notes"
                                                                 + " relating to the issues in this Claim. "
                                                                 + "The defendant must give facilities for inspection "
                                                                 + "by the claimant, "
                                                                 + "the claimant's legal advisers and experts of these"
                                                                 + " original notes on 7 days written notice.")
-                                                    .input4("Legible copies of the medical and educational records of"
-                                                                + " the claimant / Deceased / "
-                                                                + "claimant's Mother are to be placed in a separate"
-                                                                + " paginated bundle by the "
-                                                                + "claimant's Solicitors and kept up to date. All "
-                                                                + "references to medical notes are to be made "
-                                                                + "by reference to the pages in that bundle.")
+                                                    .input4("Legible copies of the medical and educational "
+                                                                + "records of the claimant are to be placed in a"
+                                                                + " separate paginated bundle by the claimant’s "
+                                                                + "solicitors and kept up to date. All references "
+                                                                + "to medical notes are to be made by reference to"
+                                                                + " the pages in that bundle")
                                                     .build());
 
         caseDataBuilder.trialCreditHire(TrialCreditHire
@@ -526,8 +524,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                         + "c. Evidence of any loan, overdraft or other credit "
                                                         + "facilities available to the claimant")
                                             .input2("The claimant must upload to the Digital Portal a witness "
-                                                        + "statement addressing \na)the need to hire a replacement "
-                                                        + "vehicle; and \nb)impecuniosity")
+                                                        + "statement addressing \na) the need to hire a replacement "
+                                                        + "vehicle; and \nb) impecuniosity")
                                             .input3("This statement must be uploaded to the Digital Portal by 4pm on")
                                             .date1(LocalDate.now().plusWeeks(8))
                                             .input4("A failure to comply will result in the claimant being "
@@ -588,8 +586,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.trialHousingDisrepair(TrialHousingDisrepair.builder()
                                                   .input1("The claimant must prepare a Scott Schedule of the items "
                                                               + "in disrepair")
-                                                  .input2("The columns should be headed: \n - Item; \n - Alleged "
-                                                    + "\n - disrepair; \n - Defendant's Response; \n - "
+                                                  .input2("The columns should be headed: \n - Item; \n - "
+                                                              + "Alleged disrepair; "
+                                                              + "\n - Defendant's Response; \n - "
                                                               + "Reserved for Judge's Use")
                                                   .input3("The claimant must upload to the Digital Portal the "
                                                               + "Scott Schedule with the relevant columns "
