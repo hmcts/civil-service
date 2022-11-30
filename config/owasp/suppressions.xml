@@ -4,5 +4,6 @@
     <notes>This vulnerability still exists but NVD informs that this vulnerability has been modified and is currently undergoing reanalysis.
     Also, it is not applicable to us as it applies only to serialization/deserialization in the Java "native" way, which we don't use.</notes>
     <cve>CVE-2016-1000027</cve>
+    <cve>CVE-2022-41946</cve>
   </suppress>
 </suppressions>
