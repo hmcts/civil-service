@@ -56,7 +56,7 @@ public class CaseMigratonUtility {
             );
             CaseLocation caseLocation = CaseLocation.builder().baseLocation(refData.getEpimmsId())
                 .region(refData.getRegionId()).build();
-            caseDataBuilder.courtLocation(CourtLocation.builder().caseLocation(caseLocation)
+            caseDataBuilder.courtLocation(oldCaseData.getCourtLocation().toBuilder().caseLocation(caseLocation)
                                               .applicantPreferredCourtLocationList(
                                                   location.getApplicantPreferredCourtLocationList())
                                               .applicantPreferredCourt(location.getApplicantPreferredCourt()).build());
