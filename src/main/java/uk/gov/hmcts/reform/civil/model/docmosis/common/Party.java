@@ -17,8 +17,6 @@ public class Party {
     private final String soleTraderTradingAs;
     private final String partyEmail;
     private final String partyPhone;
-    private final String phoneNumber;
-    private final String emailAddress;
     private final String litigationFriendPhoneNumber;
     private final String litigationFriendEmailAddress;
 }

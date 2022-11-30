@@ -64,6 +64,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_2V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
@@ -241,6 +242,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 caseData.getApplicant1().toBuilder()
                     .individualFirstName("John")
                     .individualLastName("Doe")
+                    .type(INDIVIDUAL)
                     .partyPhone("01482567891")
                     .partyEmail("john.doe@example.com")
                     .build())
@@ -248,6 +250,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 caseData.getApplicant2() != null ? caseData.getApplicant2().toBuilder()
                     .individualFirstName("Emma")
                     .individualLastName("Wilson")
+                    .type(INDIVIDUAL)
                     .partyPhone("01482567891")
                     .partyEmail("emma.wilson@example.com")
                     .build() : null)
@@ -262,6 +265,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 caseData.getRespondent1().toBuilder()
                     .individualFirstName("Jane")
                     .individualLastName("Doe")
+                    .type(INDIVIDUAL)
                     .partyPhone("01482567891")
                     .partyEmail("jane.doe@example.com")
                     .build())
@@ -269,6 +273,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 caseData.getRespondent2() != null ? caseData.getRespondent2().toBuilder()
                     .individualFirstName("Jack")
                     .individualLastName("Bower")
+                    .type(INDIVIDUAL)
                     .partyPhone("01482567891")
                     .partyEmail("jack.bower@example.com")
                     .build() : null)
@@ -383,8 +388,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         if(featureToggleService.isHearingAndListingSDOEnabled()) {
             //Keep when hnl toggle is removed
             applicant2PartyBuilder
-                .emailAddress(applicant.getPartyEmail())
-                .phoneNumber(applicant.getPartyPhone())
+                .partyEmail(applicant.getPartyEmail())
+                .partyPhone(applicant.getPartyPhone())
+                .litigationFriendName(ofNullable(litigationFriend)
+                                          .map(lf -> String.format("%s %s", lf.getFirstName(), lf.getLastName()))
+                                          .orElse(""))
                 .litigationFriendPhoneNumber(ofNullable(litigationFriend)
                                                              .map(LitigationFriend::getPhoneNumber)
                                                              .orElse(""))
@@ -411,8 +419,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         if(featureToggleService.isHearingAndListingSDOEnabled()) {
             //Keep when hnl toggle is removed
             applicant1PartyBuilder
-                .emailAddress(applicant.getPartyEmail())
-                .phoneNumber(applicant.getPartyPhone())
+                .partyEmail(applicant.getPartyEmail())
+                .partyPhone(applicant.getPartyPhone())
+                .litigationFriendName(ofNullable(litigationFriend)
+                                          .map(lf -> String.format("%s %s", lf.getFirstName(), lf.getLastName()))
+                                          .orElse(""))
                 .litigationFriendPhoneNumber(ofNullable(litigationFriend)
                                           .map(LitigationFriend::getPhoneNumber)
                                           .orElse(""))
@@ -702,8 +713,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 if(featureToggleService.isHearingAndListingSDOEnabled()) {
                     //Keep when hnl toggle is removed
                     respondent1PartyBuilder
-                        .emailAddress(respondent.getPartyEmail())
-                        .phoneNumber(respondent.getPartyPhone())
+                        .partyEmail(respondent.getPartyEmail())
+                        .partyPhone(respondent.getPartyPhone())
+                        .litigationFriendName(ofNullable(litigationFriend)
+                                                  .map(lf -> String.format("%s %s", lf.getFirstName(), lf.getLastName()))
+                                                  .orElse(""))
                         .litigationFriendPhoneNumber(ofNullable(litigationFriend)
                                                          .map(LitigationFriend::getPhoneNumber)
                                                          .orElse(""))
@@ -729,8 +743,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 if(featureToggleService.isHearingAndListingSDOEnabled()) {
                     //Keep when hnl toggle is removed
                     respondent2PartyBuilder
-                        .emailAddress(respondent.getPartyEmail())
-                        .phoneNumber(respondent.getPartyPhone())
+                        .partyEmail(respondent.getPartyEmail())
+                        .partyPhone(respondent.getPartyPhone())
+                        .litigationFriendName(ofNullable(litigationFriend)
+                                                  .map(lf -> String.format("%s %s", lf.getFirstName(), lf.getLastName()))
+                                                  .orElse(""))
                         .litigationFriendPhoneNumber(ofNullable(litigationFriend)
                                                          .map(LitigationFriend::getPhoneNumber)
                                                          .orElse(""))
@@ -744,48 +761,105 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
         if (respondent2HasSameLegalRep(caseData)) {
             if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
-                return List.of(
-                    Party.builder()
+                var respondent1Party = Party.builder()
                         .name(caseData.getRespondent1().getPartyName())
                         .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
                         .representative(representativeService.getRespondent1Representative(caseData))
                         .litigationFriendName(
                             ofNullable(caseData.getRespondent1LitigationFriend())
                                 .map(LitigationFriend::getFullName)
-                                .orElse(""))
-                        .build(),
-                    Party.builder()
+                                .orElse(""));
+
+                var respondent2Party = Party.builder()
                         .name(caseData.getRespondent2().getPartyName())
                         .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
                         .representative(representativeService.getRespondent2Representative(caseData))
                         .litigationFriendName(
                             ofNullable(caseData.getRespondent2LitigationFriend())
                                 .map(LitigationFriend::getFullName)
-                                .orElse(""))
-                        .build()
-                );
+                                .orElse(""));
+
+                if(featureToggleService.isHearingAndListingSDOEnabled()) {
+                    //Keep when hnl toggle is removed
+                    respondent1Party
+                        .partyEmail(caseData.getRespondent1().getPartyEmail())
+                        .partyPhone(caseData.getRespondent1().getPartyPhone())
+                        .litigationFriendName(ofNullable(caseData.getRespondent1LitigationFriend())
+                                                  .map(lf -> String.format("%s %s", lf.getFirstName(), lf.getLastName()))
+                                                  .orElse(""))
+                        .litigationFriendPhoneNumber(ofNullable(caseData.getRespondent1LitigationFriend())
+                                                         .map(LitigationFriend::getPhoneNumber)
+                                                         .orElse(""))
+                        .litigationFriendEmailAddress(ofNullable(caseData.getRespondent1LitigationFriend())
+                                                          .map(LitigationFriend::getEmailAddress)
+                                                          .orElse(""));
+                    respondent2Party
+                        .partyEmail(caseData.getRespondent2().getPartyEmail())
+                        .partyPhone(caseData.getRespondent2().getPartyPhone())
+                        .litigationFriendName(ofNullable(caseData.getRespondent2LitigationFriend())
+                                                  .map(lf -> String.format("%s %s", lf.getFirstName(), lf.getLastName()))
+                                                  .orElse(""))
+                        .litigationFriendPhoneNumber(ofNullable(caseData.getRespondent2LitigationFriend())
+                                                         .map(LitigationFriend::getPhoneNumber)
+                                                         .orElse(""))
+                        .litigationFriendEmailAddress(ofNullable(caseData.getRespondent2LitigationFriend())
+                                                          .map(LitigationFriend::getEmailAddress)
+                                                          .orElse(""));
+                }
+
+                return List.of(respondent1Party.build(), respondent2Party.build());
             } else if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
                 if ("ONE".equals(defendantIdentifier)) {
                     // TODO add specific test to check below party
-                    return List.of(Party.builder()
+                    var respondent1Party = Party.builder()
                                        .name(caseData.getRespondent1().getPartyName())
                                        .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
                                        .representative(representativeService.getRespondent1Representative(caseData))
                                        .litigationFriendName(
                                            ofNullable(caseData.getRespondent1LitigationFriend())
                                                .map(LitigationFriend::getFullName)
-                                               .orElse(""))
-                                       .build());
+                                               .orElse(""));
+                    if(featureToggleService.isHearingAndListingSDOEnabled()) {
+                        //Keep when hnl toggle is removed
+                        respondent1Party
+                            .partyEmail(caseData.getRespondent1().getPartyEmail())
+                            .partyPhone(caseData.getRespondent1().getPartyPhone())
+                            .litigationFriendName(ofNullable(caseData.getRespondent1LitigationFriend())
+                                                      .map(lf -> String.format("%s %s", lf.getFirstName(), lf.getLastName()))
+                                                      .orElse(""))
+                            .litigationFriendPhoneNumber(ofNullable(caseData.getRespondent1LitigationFriend())
+                                                             .map(LitigationFriend::getPhoneNumber)
+                                                             .orElse(""))
+                            .litigationFriendEmailAddress(ofNullable(caseData.getRespondent1LitigationFriend())
+                                                              .map(LitigationFriend::getEmailAddress)
+                                                              .orElse(""));
+                    }
+                    return List.of(respondent1Party.build());
                 } else if ("TWO".equals(defendantIdentifier)) {
-                    return List.of(Party.builder()
+                    var respondent2Party = Party.builder()
                                        .name(caseData.getRespondent2().getPartyName())
                                        .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
                                        .representative(representativeService.getRespondent1Representative(caseData))
                                        .litigationFriendName(
                                            ofNullable(caseData.getRespondent2LitigationFriend())
                                                .map(LitigationFriend::getFullName)
-                                               .orElse(""))
-                                       .build());
+                                               .orElse(""));
+                    if(featureToggleService.isHearingAndListingSDOEnabled()) {
+                        //Keep when hnl toggle is removed
+                        respondent2Party
+                            .partyEmail(caseData.getRespondent2().getPartyEmail())
+                            .partyPhone(caseData.getRespondent2().getPartyPhone())
+                            .litigationFriendName(ofNullable(caseData.getRespondent2LitigationFriend())
+                                                      .map(lf -> String.format("%s %s", lf.getFirstName(), lf.getLastName()))
+                                                      .orElse(""))
+                            .litigationFriendPhoneNumber(ofNullable(caseData.getRespondent2LitigationFriend())
+                                                             .map(LitigationFriend::getPhoneNumber)
+                                                             .orElse(""))
+                            .litigationFriendEmailAddress(ofNullable(caseData.getRespondent2LitigationFriend())
+                                                              .map(LitigationFriend::getEmailAddress)
+                                                              .orElse(""));
+                    }
+                    return List.of(respondent2Party.build());
                 }
             }
         }
@@ -797,15 +871,32 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             respondentRepresentative = representativeService.getRespondent2Representative(caseData);
             litigationFriend = caseData.getRespondent2LitigationFriend();
         }
-        return List.of(Party.builder()
-                           .name(respondent.getPartyName())
-                           .primaryAddress(respondent.getPrimaryAddress())
-                           .representative(respondentRepresentative)
-                           .litigationFriendName(
-                               ofNullable(litigationFriend)
-                                   .map(LitigationFriend::getFullName)
-                                   .orElse(""))
-                           .build());
+        var respondent1Party = Party.builder()
+            .name(respondent.getPartyName())
+            .primaryAddress(respondent.getPrimaryAddress())
+            .representative(respondentRepresentative)
+            .litigationFriendName(
+                ofNullable(litigationFriend)
+                    .map(LitigationFriend::getFullName)
+                    .orElse(""));
+
+        if(featureToggleService.isHearingAndListingSDOEnabled()) {
+            //Keep when hnl toggle is removed
+            respondent1Party
+                .partyEmail(caseData.getRespondent1().getPartyEmail())
+                .partyPhone(caseData.getRespondent1().getPartyPhone())
+                .litigationFriendName(ofNullable(caseData.getRespondent1LitigationFriend())
+                                          .map(lf -> String.format("%s %s", lf.getFirstName(), lf.getLastName()))
+                                          .orElse(""))
+                .litigationFriendPhoneNumber(ofNullable(caseData.getRespondent1LitigationFriend())
+                                                 .map(LitigationFriend::getPhoneNumber)
+                                                 .orElse(""))
+                .litigationFriendEmailAddress(ofNullable(caseData.getRespondent1LitigationFriend())
+                                                  .map(LitigationFriend::getEmailAddress)
+                                                  .orElse(""));
+        }
+
+        return List.of(respondent1Party.build());
     }
 
     private boolean respondent2HasSameLegalRep(CaseData caseData) {
@@ -864,7 +955,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .stream()
             .map(expert -> Expert.builder()
                 .name(featureToggleService.isHearingAndListingSDOEnabled()
-                          ? String.format("%s %s", expert.getFirstName() + " " + expert.getLastName())
+                          ? String.format("%s %s", expert.getFirstName(), expert.getLastName())
                           : expert.getName())
                 .fieldOfExpertise(expert.getFieldOfExpertise())
                 .whyRequired(expert.getWhyRequired())
