@@ -281,9 +281,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
         caseDataBuilder.disposalHearingFinalDisposalHearingDJ(DisposalHearingFinalDisposalHearingDJ
                                                                   .builder()
-                                                                  .input("This claim be listed for final "
+                                                                  .input("This claim will be listed for final "
                                                                              + "disposal before a Judge on the first "
-                                                                             + "available date after.")
+                                                                             + "available date after")
                                                                   .date(LocalDate.now().plusWeeks(16))
                                                                   .build());
 
