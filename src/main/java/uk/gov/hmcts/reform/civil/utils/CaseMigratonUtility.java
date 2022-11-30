@@ -41,12 +41,15 @@ public class CaseMigratonUtility {
     // Applicable for both spec and unspec
     public static void migrateCaseManagementLocation(CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                                      CaseLocation caseLocation) {
+        log.info("Migrate Case Management location for spec and unspec");
+
         caseDataBuilder.caseManagementLocation(caseLocation);
     }
 
     public static void migrateUnspecCoutLocation(String authToken, CaseData oldCaseData,
                                                  CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                                  LocationRefDataService locationRefDataService) {
+        log.info("Migrate Case  location for  unspec");
 
         CourtLocation location = oldCaseData.getCourtLocation();
         if (ofNullable(location).isPresent()) {
@@ -71,10 +74,12 @@ public class CaseMigratonUtility {
         log.info("CaseCategory is : {}", oldCaseData.getCaseAccessCategory());
 
         if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
+            log.info("Spec DQ Migration");
 
             migrateRespondent1DQ(authToken, oldCaseData, caseDataBuilder, locationRefDataService, caseLocation);
             migrateRespondent2DQ(authToken, oldCaseData, caseDataBuilder, locationRefDataService, caseLocation);
         } else {
+            log.info("UNSpec DQ Migration");
             migrateRespondent1DQUnspec(authToken, oldCaseData, caseDataBuilder, locationRefDataService, caseLocation);
             migrateRespondent2DQUnSpec(authToken, oldCaseData, caseDataBuilder, locationRefDataService, caseLocation);
         }
@@ -367,8 +372,9 @@ public class CaseMigratonUtility {
     // Case management category,caseNameHmctsInternal, and supplementaryData
     public static void migrateGS(CaseData oldCaseData,
                                  CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-
+        log.info("Migrate GS related data");
         caseDataBuilder.caseNameHmctsInternal(getCaseParticipants(oldCaseData).toString());
+
         CaseManagementCategoryElement civil =
             CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
         List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
