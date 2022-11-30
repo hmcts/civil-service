@@ -62,7 +62,7 @@ public class PaymentsCallbackPBAHandler extends CallbackHandler {
 
     @Override
     public List<CaseEvent> handledEvents() {
-        if(featureToggleService.isPbaV3Enabled()){
+        if (featureToggleService.isPbaV3Enabled()) {
             return EVENTS;
         } else {
             return Collections.emptyList();
