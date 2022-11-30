@@ -436,12 +436,13 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 dataBuilder.defendant1LIPAtClaimIssued(NO);
             }
 
-            if (isSecondRespondentLitigantInPerson(caseData)) {
-                dataBuilder.defendant2LIPAtClaimIssued(YES);
-            } else {
-                dataBuilder.defendant2LIPAtClaimIssued(NO);
+            if(YES.equals(caseData.getAddRespondent2())){
+                if (caseData.getRespondent2Represented() == NO) {
+                    dataBuilder.defendant2LIPAtClaimIssued(YES);
+                } else {
+                    dataBuilder.defendant2LIPAtClaimIssued(NO);
+                }
             }
-
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
