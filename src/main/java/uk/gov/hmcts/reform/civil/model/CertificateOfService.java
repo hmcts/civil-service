@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.CoSRecipientServeLocationOwnerType;
 import uk.gov.hmcts.reform.civil.enums.CoSRecipientServeType;
 import uk.gov.hmcts.reform.civil.enums.CosRecipientServeLocationType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 
@@ -48,4 +49,6 @@ public class CertificateOfService {
     private String cosSenderFirm;
     @JsonProperty("cosSenderStatementOfTruthLabel")
     private List<String> cosSenderStatementOfTruthLabel;
+    @JsonProperty("cosDetailSaved")
+    private YesOrNo cosDetailSaved;
 }

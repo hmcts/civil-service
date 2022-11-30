@@ -11,11 +11,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -105,6 +108,25 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime notificationDateTime = time.now();
 
+        if (toggleService.isCertificateOfServiceEnabled()) {
+            if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
+                caseData.getCosNotifyClaimDetails1().setCosDetailSaved(YesOrNo.YES);
+                if (Objects.isNull(caseData.getServedDocumentFiles().getParticularsOfClaimDocument())) {
+                    caseData.getServedDocumentFiles().setParticularsOfClaimDocument(new ArrayList<>());
+                }
+                caseData.getServedDocumentFiles().getParticularsOfClaimDocument()
+                        .addAll(caseData.getCosNotifyClaimDetails1().getCosEvidenceDocument());
+            }
+            if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
+                caseData.getCosNotifyClaimDetails2().setCosDetailSaved(YesOrNo.YES);
+                if (Objects.isNull(caseData.getServedDocumentFiles().getParticularsOfClaimDocument())) {
+                    caseData.getServedDocumentFiles().setParticularsOfClaimDocument(new ArrayList<>());
+                }
+                caseData.getServedDocumentFiles().getParticularsOfClaimDocument()
+                        .addAll(caseData.getCosNotifyClaimDetails2().getCosEvidenceDocument());
+            }
+        }
+
         LocalDate notificationDate = notificationDateTime.toLocalDate();
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         CaseData updatedCaseData;
@@ -132,7 +154,6 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 ))
                 .build();
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
             .build();
@@ -257,6 +278,12 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
         ArrayList<String> errors = new ArrayList<>();
         if (toggleService.isCertificateOfServiceEnabled()) {
+            if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
+                caseData.getCosNotifyClaimDetails1().setCosDetailSaved(NO);
+            }
+            if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
+                caseData.getCosNotifyClaimDetails2().setCosDetailSaved(NO);
+            }
             if ((Objects.nonNull(caseData.getCosNotifyClaimDetails1())
                     && LocalDate.now().isBefore(
                     caseData.getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant()))
