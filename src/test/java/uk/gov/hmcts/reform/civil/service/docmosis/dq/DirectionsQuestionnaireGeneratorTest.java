@@ -310,6 +310,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .atStateApplicantRespondToDefenceAndProceed()
                     .applicant1DQWithExperts()
                     .applicant1DQWithWitnesses()
+                    .applicant1DQWithHearingSupport()
                     .build()
                     .toBuilder()
                     .businessProcess(BusinessProcess.builder()
@@ -326,6 +327,10 @@ class DirectionsQuestionnaireGeneratorTest {
                 assertEquals(applicant1ExpertsMock(), templateData.getExperts());
                 assertEquals(applicant1WitnessesMock(), templateData.getWitnesses());
                 assertEquals(
+                    templateData.getSupport(),
+                    caseData.getApplicant1DQ().getHearingSupport()
+                );
+                assertEquals(
                     caseData.getApplicant1DQ().getFileDirectionQuestionnaire(),
                     templateData.getFileDirectionsQuestionnaire()
                 );
@@ -338,6 +343,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .multiPartyClaimTwoApplicants()
                     .applicant1DQWithExperts()
                     .applicant1DQWithWitnesses()
+                    .applicant1DQWithHearingSupport()
                     .build()
                     .toBuilder()
                     .businessProcess(BusinessProcess.builder()
@@ -356,6 +362,10 @@ class DirectionsQuestionnaireGeneratorTest {
                 assertEquals(applicant1ExpertsMock(), templateData.getExperts());
                 assertEquals(applicant1WitnessesMock(), templateData.getWitnesses());
                 assertEquals(
+                    templateData.getSupport(),
+                    caseData.getApplicant1DQ().getHearingSupport()
+                );
+                assertEquals(
                     templateData.getFileDirectionsQuestionnaire(),
                     caseData.getApplicant1DQ().getFileDirectionQuestionnaire()
                 );
@@ -369,6 +379,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .applicant1DQ()
                     .applicant1DQWithExperts()
                     .applicant1DQWithWitnesses()
+                    .applicant1DQWithHearingSupport()
                     .build()
                     .toBuilder()
                     .businessProcess(BusinessProcess.builder()
@@ -385,6 +396,10 @@ class DirectionsQuestionnaireGeneratorTest {
 
                 assertEquals(applicant1ExpertsMock(), templateData.getExperts());
                 assertEquals(applicant1WitnessesMock(), templateData.getWitnesses());
+                assertEquals(
+                    templateData.getSupport(),
+                    caseData.getApplicant1DQ().getHearingSupport()
+                );
                 assertEquals(
                     templateData.getFileDirectionsQuestionnaire(),
                     caseData.getApplicant1DQ().getFileDirectionQuestionnaire()
