@@ -15,13 +15,15 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
+import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
 
 import java.time.LocalDate;
@@ -32,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -111,19 +114,37 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         if (toggleService.isCertificateOfServiceEnabled()) {
             if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
                 caseData.getCosNotifyClaimDetails1().setCosDetailSaved(YesOrNo.YES);
-                if (Objects.isNull(caseData.getServedDocumentFiles().getParticularsOfClaimDocument())) {
-                    caseData.getServedDocumentFiles().setParticularsOfClaimDocument(new ArrayList<>());
+                if (Objects.isNull(caseData.getServedDocumentFiles())) {
+                    caseData = caseData.toBuilder()
+                            .servedDocumentFiles(ServedDocumentFiles.builder().build()).build();
                 }
-                caseData.getServedDocumentFiles().getParticularsOfClaimDocument()
-                        .addAll(caseData.getCosNotifyClaimDetails1().getCosEvidenceDocument());
+                if (Objects.isNull(caseData.getServedDocumentFiles().getOther())) {
+                    caseData.getServedDocumentFiles().setOther(new ArrayList<>());
+                }
+                List<Document> cosDoc1 = ElementUtils
+                        .unwrapElements(caseData.getCosNotifyClaimDetails1()
+                                .getCosEvidenceDocument());
+                caseData.getServedDocumentFiles().getOther()
+                        .addAll(cosDoc1.stream()
+                                .map(x->ElementUtils.element(new DocumentWithRegex(x)))
+                                .collect(Collectors.toList()));
             }
             if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
                 caseData.getCosNotifyClaimDetails2().setCosDetailSaved(YesOrNo.YES);
-                if (Objects.isNull(caseData.getServedDocumentFiles().getParticularsOfClaimDocument())) {
-                    caseData.getServedDocumentFiles().setParticularsOfClaimDocument(new ArrayList<>());
+                if (Objects.isNull(caseData.getServedDocumentFiles())) {
+                    caseData = caseData.toBuilder()
+                            .servedDocumentFiles(ServedDocumentFiles.builder().build()).build();
                 }
-                caseData.getServedDocumentFiles().getParticularsOfClaimDocument()
-                        .addAll(caseData.getCosNotifyClaimDetails2().getCosEvidenceDocument());
+                if (Objects.isNull(caseData.getServedDocumentFiles().getOther())) {
+                    caseData.getServedDocumentFiles().setOther(new ArrayList<>());
+                }
+                List<Document> cosDoc2 = ElementUtils
+                        .unwrapElements(caseData.getCosNotifyClaimDetails2()
+                                .getCosEvidenceDocument());
+                caseData.getServedDocumentFiles().getOther()
+                        .addAll(cosDoc2.stream()
+                                .map(x->ElementUtils.element(new DocumentWithRegex(x)))
+                                .collect(Collectors.toList()));
             }
         }
 
@@ -171,7 +192,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         String confirmationText = getConfirmationBody(caseData);
 
         String body = format(confirmationText, formattedDeadline)
-                + (areRespondentsRepresentedAndRegistered(caseData)
+                + (isConfirmationForLip(caseData)
                 ? exitSurveyContentService.applicantSurvey() : "");
 
         return SubmittedCallbackResponse.builder()
@@ -189,7 +210,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 ? CONFIRMATION_SUMMARY
                 : NOTIFICATION_ONE_PARTY_SUMMARY;
         if (toggleService.isCertificateOfServiceEnabled()) {
-            return areRespondentsRepresentedAndRegistered(caseData)
+            return isConfirmationForLip(caseData)
                             ? confirmationTextLR
                             : CONFIRMATION_COS_SUMMARY;
         } else {
@@ -199,7 +220,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
     private String getConfirmationHeader(CaseData caseData) {
         if (toggleService.isCertificateOfServiceEnabled()) {
-            return areRespondentsRepresentedAndRegistered(caseData)
+            return isConfirmationForLip(caseData)
                     ? CONFIRMATION_HEADER
                     : CONFIRMATION_COS_HEADER;
         } else {
@@ -207,11 +228,11 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         }
     }
 
-    private boolean areRespondentsRepresentedAndRegistered(CaseData caseData) {
-        return !(caseData.getRespondent1Represented() == NO
-                || caseData.getRespondent1OrgRegistered() == NO
-                || caseData.getRespondent2Represented() == NO
-                || caseData.getRespondent2OrgRegistered() == NO);
+    private boolean isConfirmationForLip(CaseData caseData) {
+        return (caseData.getDefendant1LIPAtClaimIssued() != null
+                && caseData.getDefendant1LIPAtClaimIssued() == YesOrNo.YES)
+                || (caseData.getDefendant2LIPAtClaimIssued() != null
+                && caseData.getDefendant2LIPAtClaimIssued() == YesOrNo.YES);
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
@@ -219,7 +240,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
 
         String body = format(getConfirmationBody(caseData), formattedDeadline)
-                + (areRespondentsRepresentedAndRegistered(caseData)
+                + (isConfirmationForLip(caseData)
                 ? exitSurveyContentService.applicantSurvey() : "");
 
         return SubmittedCallbackResponse.builder()
