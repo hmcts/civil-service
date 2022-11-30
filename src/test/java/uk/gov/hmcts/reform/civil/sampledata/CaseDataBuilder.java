@@ -345,7 +345,7 @@ public class CaseDataBuilder {
     private GAApplicationType generalAppType;
     private GAHearingDateGAspec generalAppHearingDate;
 
-    private List<Element<ChangeOfRepresentation>> changeOfRepresentation;
+    private ChangeOfRepresentation changeOfRepresentation;
     private ChangeOrganisationRequest changeOrganisationRequest;
 
     private String unassignedCaseListDisplayOrganisationReferences;
@@ -1917,7 +1917,7 @@ public class CaseDataBuilder {
             .organisationToRemoveID(oldOrgId)
             .timestamp(LocalDateTime.now())
             .build();
-        changeOfRepresentation = wrapElements(newChange);
+        changeOfRepresentation = newChange;
         return this;
     }
 
