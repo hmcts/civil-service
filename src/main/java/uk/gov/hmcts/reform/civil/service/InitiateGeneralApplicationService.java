@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -226,11 +225,6 @@ public class InitiateGeneralApplicationService {
         newApplication.add(element(application));
 
         return newApplication;
-    }
-
-    public Boolean validateFileName(String fileName, String expectedFileName) {
-
-        return FilenameUtils.removeExtension(fileName).equalsIgnoreCase(expectedFileName);
     }
 
     public List<String> validateUrgencyDates(GAUrgencyRequirement generalAppUrgencyRequirement) {
