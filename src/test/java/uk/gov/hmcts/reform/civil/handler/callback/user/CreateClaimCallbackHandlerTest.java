@@ -1125,8 +1125,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData()).extracting("defendant1LIPAtClaimIssued")
                     .isEqualTo("Yes");
-                assertThat(response.getData()).extracting("defendant2LIPAtClaimIssued")
-                    .isNull();
+                assertThat(response.getData()).extracting("defendant2LIPAtClaimIssued").isNull();
             }
 
             @Test
