@@ -12,11 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
@@ -51,9 +47,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
@@ -201,22 +194,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder.build().toMap(objectMapper));
 
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-
-        if (v1 && featureToggleService.isSdoEnabled()) {
-            if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
-                if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE))
-                    || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
-                    response.state(CaseState.JUDICIAL_REFERRAL.name());
-                } else if (multiPartyScenario.equals(ONE_V_TWO_TWO_LEGAL_REP)) {
-                    if (caseData.getRespondent2ClaimResponseTypeForSpec()
-                        .equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
-                        response.state(CaseState.JUDICIAL_REFERRAL.name());
-                    }
-                }
-            }
-        }
-
         return response.build();
     }
 
@@ -280,10 +257,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
-        if (featureToggleService.isSdoEnabled() && !AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
-            caseData.toBuilder().ccdState(CaseState.JUDICIAL_REFERRAL).build();
-        }
 
         SubmittedCallbackResponse.SubmittedCallbackResponseBuilder responseBuilder =
             SubmittedCallbackResponse.builder();
