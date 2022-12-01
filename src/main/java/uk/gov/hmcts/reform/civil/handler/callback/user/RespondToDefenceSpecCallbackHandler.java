@@ -35,11 +35,14 @@ import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +64,8 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.*;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -93,6 +98,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
             .put(callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag)
             .put(callbackKey(V_1, MID, "validate-respondent-payment-date"), this::validatePaymentDate)
+            .put(callbackKey(V_1, MID, "get-payment-date"), this::getPaymentDate)
+            .put(callbackKey(V_1, MID, "validate-suggest-instalments"), this::suggestInstalmentsValidation)
             .put(callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false))
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true))
             .put(callbackKey(ABOUT_TO_START), this::populateCaseData)
@@ -350,6 +357,45 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         if (checkPastDateValidation(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())) {
             errors.add("Enter a date that is today or in the future");
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse getPaymentDate(CallbackParams callbackParams) {
+
+        var caseData = callbackParams.getCaseData();
+
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        //Set the hint date for repayment to be 30 days in the future
+        String formattedDeadline = formatLocalDateTime(LocalDateTime.now().plusDays(30), DATE);
+        caseDataBuilder.currentDateboxDefendantSpec(formattedDeadline);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse suggestInstalmentsValidation(CallbackParams callbackParams) {
+
+        var caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+
+        //Check repayment amount requested is less than the overall claim amount
+        var totalClaimAmount = caseData.getTotalClaimAmount();
+        var regularRepaymentAmountPennies = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
+        var regularRepaymentAmountPounds = MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies);
+
+        if (regularRepaymentAmountPounds.compareTo(totalClaimAmount) > 0) {
+            errors.add("Regular payment cannot exceed the full claim amount");
+        }
+
+        LocalDate eligibleDate;
+        formatLocalDate(eligibleDate = LocalDate.now().plusDays(30), DATE);
+        if (caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec().isBefore(eligibleDate.plusDays(1))) {
+            errors.add("Selected date must be after " + formatLocalDate(eligibleDate, DATE));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
