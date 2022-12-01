@@ -95,4 +95,8 @@
   <suppress>
     <cve>CVE-2022-41946</cve>
   </suppress>
+  <suppress>
+    <notes>Temporary Suppression - as under reanalysis</notes>
+    <cve>CVE-2016-1000027</cve>
+  </suppress>
 </suppressions>
