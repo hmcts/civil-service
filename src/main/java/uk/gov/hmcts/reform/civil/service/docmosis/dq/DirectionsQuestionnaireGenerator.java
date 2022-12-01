@@ -284,6 +284,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .witnessesIncludingDefendants(witnessesIncludingDefendants)
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
+            .support(dq.getHearingSupport())
             .furtherInformation(getFurtherInformation(dq, caseData))
             .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())

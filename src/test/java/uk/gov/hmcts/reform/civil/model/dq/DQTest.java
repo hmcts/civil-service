@@ -54,6 +54,8 @@ abstract class DQTest {
             .languageToBeInterpreted("English")
             .signLanguageRequired("Spanish")
             .otherSupport("other support")
+            .supportRequirements(YES)
+            .supportRequirementsAdditional("additional support")
             .build();
     }
 

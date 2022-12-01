@@ -674,6 +674,21 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder applicant1DQWithHearingSupport() {
+        var applicant1DQBuilder = applicant1DQ != null
+            ? applicant1DQ.toBuilder() : applicant1DQ().build().getApplicant1DQ().toBuilder();
+
+        applicant1DQBuilder.applicant1DQHearingSupport(
+            HearingSupport.builder()
+                .supportRequirements(YES)
+                .supportRequirementsAdditional("Support requirements")
+                .build()
+        ).build();
+
+        applicant1DQ = applicant1DQBuilder.build();
+        return this;
+    }
+
     public CaseDataBuilder applicant2DQ() {
         applicant2DQ = Applicant2DQ.builder()
             .applicant2DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()

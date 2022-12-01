@@ -307,6 +307,7 @@ class DirectionsQuestionnaireGeneratorTest {
             void whenCaseStateIsFullDefence1v1ApplicantProceedsLRSpec_shouldGetRespondentDQData() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
+                    .applicant1DQWithHearingSupport()
                     .build()
                     .toBuilder()
                     .businessProcess(BusinessProcess.builder()
@@ -324,6 +325,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     templateData.getFileDirectionsQuestionnaire(),
                     caseData.getApplicant1DQ().getFileDirectionQuestionnaire()
                 );
+                assertEquals(
+                    templateData.getSupport(),
+                    caseData.getApplicant1DQ().getHearingSupport()
+                );
             }
 
             @Test
@@ -331,6 +336,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
                     .multiPartyClaimTwoApplicants()
+                    .applicant1DQWithHearingSupport()
                     .build()
                     .toBuilder()
                     .businessProcess(BusinessProcess.builder()
@@ -350,6 +356,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     templateData.getFileDirectionsQuestionnaire(),
                     caseData.getApplicant1DQ().getFileDirectionQuestionnaire()
                 );
+                assertEquals(
+                    templateData.getSupport(),
+                    caseData.getApplicant1DQ().getHearingSupport()
+                );
             }
 
             @Test
@@ -358,6 +368,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .multiPartyClaimOneDefendantSolicitor()
                     .atStateApplicantRespondToDefenceAndNotProceed_1v2()
                     .applicant1DQ()
+                    .applicant1DQWithHearingSupport()
                     .build()
                     .toBuilder()
                     .businessProcess(BusinessProcess.builder()
@@ -375,6 +386,10 @@ class DirectionsQuestionnaireGeneratorTest {
                 assertEquals(
                     templateData.getFileDirectionsQuestionnaire(),
                     caseData.getApplicant1DQ().getFileDirectionQuestionnaire()
+                );
+                assertEquals(
+                    templateData.getSupport(),
+                    caseData.getApplicant1DQ().getHearingSupport()
                 );
             }
 
