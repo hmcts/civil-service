@@ -44,7 +44,7 @@ class ResourceExceptionHandlerTest {
     }
 
     @Test
-    void shouldReturnUnauthorized_whenFeignExceptionUnauthorizedExceptionThrown() {
+    void shouldReturnUnauthorized_whenFeignExceptionUnauthorizedExceptionThrownlol() {
         testTemplate(
             "expected exception for missing callback handler",
             str -> new FeignException.Unauthorized(
