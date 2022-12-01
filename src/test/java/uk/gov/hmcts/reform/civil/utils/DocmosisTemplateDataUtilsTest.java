@@ -16,6 +16,23 @@ import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.toCaseNa
 class DocmosisTemplateDataUtilsTest {
 
     @Test
+    void shouldReturnNull_whenBothApplicant1NotFount() {
+        CaseData caseData = CaseData.builder()
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .individualTitle("Mr.")
+                             .individualFirstName("Alex")
+                             .individualLastName("Richards")
+                             .partyName("Mr. Alex Richards")
+                             .build())
+            .build();
+        String caseName = toCaseName.apply(caseData);
+        assertThat(caseData.getApplicant1()).isNull();
+        assertThat(caseName).isNotEqualTo("Mr. Sam Clark vs Mr. Alex Richards");
+    }
+
+
+    @Test
     void shouldReturnCaseName_whenBothPartiesAreIndividuals() {
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder()
