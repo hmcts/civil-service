@@ -10,7 +10,7 @@ echo "Switch to ${branchName} branch on civil-camunda-bpmn-definition"
 git checkout ${branchName}
 cd ..
 
-#Copy ccd to civil-ccd-defm
+#Copy ccd to civil-ccd-def
 cp -r ./civil-ccd-definition/ccd-definition .
 cp -r ./civil-ccd-definition/e2e .
 rm -rf ./civil-ccd-definition
