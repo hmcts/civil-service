@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
@@ -12,16 +13,19 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimForm;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
@@ -38,6 +42,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final RepresentativeService representativeService;
+    private final LocationRefDataService locationRefDataService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         SealedClaimForm templateData = getTemplateData(caseData);
@@ -63,14 +68,19 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
     public SealedClaimForm getTemplateData(CaseData caseData) {
         Optional<SolicitorReferences> solicitorReferences = ofNullable(caseData.getSolicitorReferences());
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-
+        List<LocationRefData> courtLocations = (locationRefDataService
+            .getCourtLocationsByEpimmsId(
+                CallbackParams.Params.BEARER_TOKEN.toString(),
+                caseData.getCourtLocation().getCaseLocation().getBaseLocation()));
         SealedClaimForm.SealedClaimFormBuilder sealedClaimFormBuilder = SealedClaimForm.builder()
             .applicants(getApplicants(caseData, multiPartyScenario))
             .respondents(getRespondents(caseData, multiPartyScenario))
             .claimValue(caseData.getClaimValue().formData())
             .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
             .claimDetails(caseData.getDetailsOfClaim())
-            .hearingCourtLocation(caseData.getCourtLocation().getApplicantPreferredCourt())
+            .hearingCourtLocation(courtLocations.stream()
+                                      .filter(id -> id.getCourtTypeId().equals("10"))
+                                      .collect(Collectors.toList()).get(0).getCourtLocationCode())
             .referenceNumber(caseData.getLegacyCaseReference())
             .issueDate(caseData.getIssueDate())
             .submittedOn(caseData.getSubmittedDate().toLocalDate())

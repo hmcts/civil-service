@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -29,14 +30,17 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -44,6 +48,7 @@ import static java.time.LocalDate.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
@@ -77,6 +82,9 @@ class EventHistoryMapperTest {
     @MockBean
     private FeatureToggleService featureToggleService;
 
+    @MockBean
+    private LocationRefDataService locationRefDataService;
+
     @Autowired
     EventHistoryMapper mapper;
 
@@ -85,10 +93,18 @@ class EventHistoryMapperTest {
 
     LocalDateTime localDateTime;
 
+    List<LocationRefData> courtLocations;
+
     @BeforeEach
     void setup() {
         localDateTime = LocalDateTime.of(2020, 8, 1, 12, 0, 0);
         when(time.now()).thenReturn(localDateTime);
+        courtLocations = new ArrayList<>();
+        courtLocations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
+                          .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
+                          .courtTypeId("10").courtLocationCode("131")
+                          .epimmsId("214320").build());
+        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(courtLocations);
     }
 
     @Nested
@@ -4064,12 +4080,20 @@ class EventHistoryMapperTest {
                         .litigiousPartyID("001")
                         .eventDetails(EventDetails.builder()
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
-                                          .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                          .preferredCourtCode(courtLocations.stream()
+                                                                  .filter(id -> id.getCourtTypeId().equals(
+                                                                      "10"))
+                                                                  .collect(Collectors.toList()).get(0)
+                                                                  .getCourtLocationCode())
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant1DQ(),
-                            caseData.getCourtLocation().getApplicantPreferredCourt()
+                            courtLocations.stream()
+                                .filter(id -> id.getCourtTypeId().equals(
+                                    "10"))
+                                .collect(Collectors.toList()).get(0)
+                                .getCourtLocationCode()
                         ))
                         .build();
                     Event expectedReplyToDefence = Event.builder()
@@ -4156,12 +4180,20 @@ class EventHistoryMapperTest {
                         .litigiousPartyID("001")
                         .eventDetails(EventDetails.builder()
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
-                                          .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                          .preferredCourtCode(courtLocations.stream()
+                                                                  .filter(id -> id.getCourtTypeId().equals(
+                                                                      "10"))
+                                                                  .collect(Collectors.toList()).get(0)
+                                                                  .getCourtLocationCode())
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant1DQ(),
-                            caseData.getCourtLocation().getApplicantPreferredCourt()
+                            courtLocations.stream()
+                                .filter(id -> id.getCourtTypeId().equals(
+                                    "10"))
+                                .collect(Collectors.toList()).get(0)
+                                .getCourtLocationCode()
                         ))
                         .build();
                     Event expectedReplyToDefence = Event.builder()
@@ -4376,12 +4408,20 @@ class EventHistoryMapperTest {
                         .litigiousPartyID("001")
                         .eventDetails(EventDetails.builder()
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
-                                          .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                          .preferredCourtCode(courtLocations.stream()
+                                                                  .filter(id -> id.getCourtTypeId().equals(
+                                                                      "10"))
+                                                                  .collect(Collectors.toList()).get(0)
+                                                                  .getCourtLocationCode())
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant1DQ(),
-                            caseData.getCourtLocation().getApplicantPreferredCourt()
+                            courtLocations.stream()
+                                .filter(id -> id.getCourtTypeId().equals(
+                                    "10"))
+                                .collect(Collectors.toList()).get(0)
+                                .getCourtLocationCode()
                         ))
                         .build();
                     List<Event> expectedMiscEvents = List.of(
@@ -4510,12 +4550,20 @@ class EventHistoryMapperTest {
                         .litigiousPartyID("001")
                         .eventDetails(EventDetails.builder()
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
-                                          .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                          .preferredCourtCode(courtLocations.stream()
+                                                                  .filter(id -> id.getCourtTypeId().equals(
+                                                                      "10"))
+                                                                  .collect(Collectors.toList()).get(0)
+                                                                  .getCourtLocationCode())
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant1DQ(),
-                            caseData.getCourtLocation().getApplicantPreferredCourt()
+                            courtLocations.stream()
+                                .filter(id -> id.getCourtTypeId().equals(
+                                    "10"))
+                                .collect(Collectors.toList()).get(0)
+                                .getCourtLocationCode()
                         ))
                         .build();
                     List<Event> expectedMiscEvents = List.of(
@@ -5107,12 +5155,20 @@ class EventHistoryMapperTest {
                         .litigiousPartyID("001")
                         .eventDetails(EventDetails.builder()
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
-                                          .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                          .preferredCourtCode(courtLocations.stream()
+                                                                  .filter(id -> id.getCourtTypeId().equals(
+                                                                      "10"))
+                                                                  .collect(Collectors.toList()).get(0)
+                                                                  .getCourtLocationCode())
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant1DQ(),
-                            caseData.getCourtLocation().getApplicantPreferredCourt()
+                            courtLocations.stream()
+                                .filter(id -> id.getCourtTypeId().equals(
+                                    "10"))
+                                .collect(Collectors.toList()).get(0)
+                                .getCourtLocationCode()
                         ))
                         .build();
                     Event expectedApplicant2DQ = Event.builder()
@@ -5122,12 +5178,20 @@ class EventHistoryMapperTest {
                         .litigiousPartyID("004")
                         .eventDetails(EventDetails.builder()
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant2DQ()))
-                                          .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                          .preferredCourtCode(courtLocations.stream()
+                                                                  .filter(id -> id.getCourtTypeId().equals(
+                                                                      "10"))
+                                                                  .collect(Collectors.toList()).get(0)
+                                                                  .getCourtLocationCode())
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant2DQ(),
-                            caseData.getCourtLocation().getApplicantPreferredCourt()
+                            courtLocations.stream()
+                                .filter(id -> id.getCourtTypeId().equals(
+                                    "10"))
+                                .collect(Collectors.toList()).get(0)
+                                .getCourtLocationCode()
                         ))
                         .build();
                     List<Event> expectedMiscEvents = List.of(
@@ -5231,12 +5295,20 @@ class EventHistoryMapperTest {
                         .litigiousPartyID("001")
                         .eventDetails(EventDetails.builder()
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
-                                          .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                          .preferredCourtCode(courtLocations.stream()
+                                                                  .filter(id -> id.getCourtTypeId().equals(
+                                                                      "10"))
+                                                                  .collect(Collectors.toList()).get(0)
+                                                                  .getCourtLocationCode())
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant1DQ(),
-                            caseData.getCourtLocation().getApplicantPreferredCourt()
+                            courtLocations.stream()
+                                .filter(id -> id.getCourtTypeId().equals(
+                                    "10"))
+                                .collect(Collectors.toList()).get(0)
+                                .getCourtLocationCode()
                         ))
                         .build();
                     Event expectedApplicant2DQ = Event.builder()
@@ -5246,12 +5318,20 @@ class EventHistoryMapperTest {
                         .litigiousPartyID("004")
                         .eventDetails(EventDetails.builder()
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant2DQ()))
-                                          .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                          .preferredCourtCode(courtLocations.stream()
+                                                                  .filter(id -> id.getCourtTypeId().equals(
+                                                                      "10"))
+                                                                  .collect(Collectors.toList()).get(0)
+                                                                  .getCourtLocationCode())
                                           .preferredCourtName("")
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant2DQ(),
-                            caseData.getCourtLocation().getApplicantPreferredCourt()
+                            courtLocations.stream()
+                                .filter(id -> id.getCourtTypeId().equals(
+                                    "10"))
+                                .collect(Collectors.toList()).get(0)
+                                .getCourtLocationCode()
                         ))
                         .build();
                     List<Event> expectedMiscEvents = List.of(
@@ -5472,12 +5552,20 @@ class EventHistoryMapperTest {
                     .litigiousPartyID("001")
                     .eventDetails(EventDetails.builder()
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
-                                      .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                      .preferredCourtCode(courtLocations.stream()
+                                                              .filter(id -> id.getCourtTypeId().equals(
+                                                                  "10"))
+                                                              .collect(Collectors.toList()).get(0)
+                                                              .getCourtLocationCode())
                                       .preferredCourtName("")
                                       .build())
                     .eventDetailsText(mapper.prepareEventDetailsText(
                         caseData.getApplicant1DQ(),
-                        caseData.getCourtLocation().getApplicantPreferredCourt()
+                        courtLocations.stream()
+                            .filter(id -> id.getCourtTypeId().equals(
+                                "10"))
+                            .collect(Collectors.toList()).get(0)
+                            .getCourtLocationCode()
                     ))
                     .build();
 
@@ -5587,12 +5675,20 @@ class EventHistoryMapperTest {
                     .litigiousPartyID("001")
                     .eventDetails(EventDetails.builder()
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
-                                      .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                      .preferredCourtCode(courtLocations.stream()
+                                                              .filter(id -> id.getCourtTypeId().equals(
+                                                                  "10"))
+                                                              .collect(Collectors.toList()).get(0)
+                                                              .getCourtLocationCode())
                                       .preferredCourtName("")
                                       .build())
                     .eventDetailsText(mapper.prepareEventDetailsText(
                         caseData.getApplicant1DQ(),
-                        caseData.getCourtLocation().getApplicantPreferredCourt()
+                        courtLocations.stream()
+                            .filter(id -> id.getCourtTypeId().equals(
+                                "10"))
+                            .collect(Collectors.toList()).get(0)
+                            .getCourtLocationCode()
                     ))
                     .build();
 
@@ -5703,12 +5799,20 @@ class EventHistoryMapperTest {
                     .litigiousPartyID("004")
                     .eventDetails(EventDetails.builder()
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant2DQ()))
-                                      .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                      .preferredCourtCode(courtLocations.stream()
+                                                              .filter(id -> id.getCourtTypeId().equals(
+                                                                  "10"))
+                                                              .collect(Collectors.toList()).get(0)
+                                                              .getCourtLocationCode())
                                       .preferredCourtName("")
                                       .build())
                     .eventDetailsText(mapper.prepareEventDetailsText(
                         caseData.getApplicant2DQ(),
-                        caseData.getCourtLocation().getApplicantPreferredCourt()
+                        courtLocations.stream()
+                            .filter(id -> id.getCourtTypeId().equals(
+                                "10"))
+                            .collect(Collectors.toList()).get(0)
+                            .getCourtLocationCode()
                     ))
                     .build();
                 List<Event> expectedMiscEvents = List.of(
@@ -5791,12 +5895,20 @@ class EventHistoryMapperTest {
                     .litigiousPartyID("004")
                     .eventDetails(EventDetails.builder()
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant2DQ()))
-                                      .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                                      .preferredCourtCode(courtLocations.stream()
+                                                              .filter(id -> id.getCourtTypeId().equals(
+                                                                  "10"))
+                                                              .collect(Collectors.toList()).get(0)
+                                                              .getCourtLocationCode())
                                       .preferredCourtName("")
                                       .build())
                     .eventDetailsText(mapper.prepareEventDetailsText(
                         caseData.getApplicant2DQ(),
-                        caseData.getCourtLocation().getApplicantPreferredCourt()
+                        courtLocations.stream()
+                            .filter(id -> id.getCourtTypeId().equals(
+                                "10"))
+                            .collect(Collectors.toList()).get(0)
+                            .getCourtLocationCode()
                     ))
                     .build();
                 List<Event> expectedMiscEvents = List.of(

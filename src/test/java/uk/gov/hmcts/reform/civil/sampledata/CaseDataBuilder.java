@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
@@ -90,12 +89,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
@@ -132,9 +126,6 @@ import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
-import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.FIFTEEN_MINUTES;
-import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.FIFTEEN_MINUTES;
-import static uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator.DISPOSAL_HEARING;
 import static uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator.DISPOSAL_HEARING;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -158,6 +149,7 @@ public class CaseDataBuilder {
     protected SolicitorReferences solicitorReferences;
     protected String respondentSolicitor2Reference;
     protected CourtLocation courtLocation;
+    protected LocationRefData locationRefData;
     protected Party applicant1;
     protected Party applicant2;
     protected YesOrNo applicant1LitigationFriendRequired;
@@ -337,8 +329,6 @@ public class CaseDataBuilder {
     private LocalDate hearingDueDate;
 
     private CaseLocation caseManagementLocation;
-    private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
-    private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
 
     private YesOrNo generalAppVaryJudgementType;
     private Document generalAppN245FormUpload;
@@ -350,12 +340,6 @@ public class CaseDataBuilder {
 
     private String unassignedCaseListDisplayOrganisationReferences;
     private String caseListDisplayDefendantSolicitorReferences;
-
-    private FastTrackHearingTime fastTrackHearingTime;
-    private FastTrackOrderWithoutJudgement fastTrackOrderWithoutJudgement;
-
-    private DisposalOrderWithoutHearing disposalOrderWithoutHearing;
-    private DisposalHearingHearingTime disposalHearingHearingTime;
 
     private TrialHearingTimeDJ trialHearingTimeDJ;
     private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
@@ -1387,16 +1371,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder courtLocation_old() {
         this.courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("127").build();
+            .applicantPreferredCourt("131").build();
         return this;
     }
 
     public CaseDataBuilder courtLocation() {
         this.courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("127")
+            .applicantPreferredCourt("131")
             .caseLocation(CaseLocation.builder()
-                              .region("regionId1")
-                              .baseLocation("epimmsId1")
+                              .region("4")
+                              .baseLocation("214320")
                               .build())
             .build();
         return this;
@@ -1410,6 +1394,10 @@ public class CaseDataBuilder {
         courtLocation = CourtLocation.builder()
             .applicantPreferredCourtLocationList(
                 DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
+            .caseLocation(CaseLocation.builder()
+                              .region("10")
+                              .baseLocation("214320")
+                              .build())
             .build();
         claimValue = ClaimValue.builder()
             .statementOfValueInPennies(BigDecimal.valueOf(10000000))
@@ -1598,47 +1586,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateSdoFastTrackTrial() {
-        fastTrackHearingTime = FastTrackHearingTime.builder()
-            .helpText1("If either party considers that the time estimate is insufficient, "
-                           + "they must inform the court within 7 days of the date of this order.")
-            .helpText2("Not more than seven nor less than three clear days before the trial, "
-                           + "the claimant must file at court and serve an indexed and paginated bundle of "
-                           + "documents which complies with the requirements of Rule 39.5 Civil Procedure Rules "
-                           + "and which complies with requirements of PD32. The parties must endeavour to agree "
-                           + "the contents of the bundle before it is filed. The bundle will include a case "
-                           + "summary and a chronology.")
-            .hearingDuration(FastTrackHearingTimeEstimate.ONE_HOUR)
-            .dateFrom(LocalDate.parse("2022-01-01"))
-            .dateTo(LocalDate.parse("2022-01-02"))
-            .build();
-        fastTrackOrderWithoutJudgement = FastTrackOrderWithoutJudgement.builder()
-            .input(String.format("Each party has the right to apply "
-                                     + "to have this Order set aside or varied. Any such application must be "
-                                     + "received by the Court (together with the appropriate fee) by 4pm "
-                                     + "on %s.",
-                                 LocalDate.parse("2022-01-30")))
-            .build();
-        return this;
-    }
-
-    public CaseDataBuilder atStateSdoDisposal() {
-        disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
-             .input(String.format(
-            "Each party has the right to apply to have this Order set "
-                + "aside or varied. Any such application must be received "
-                + "by the Court (together with the appropriate fee) "
-                + "by 4pm on %s.", LocalDate.parse("2022-01-30")))
-            .build();
-        disposalHearingHearingTime = DisposalHearingHearingTime.builder()
-            .input("This claim will be listed for final disposal before a judge on the first available date after")
-            .time(FIFTEEN_MINUTES)
-            .dateFrom(LocalDate.parse("2022-01-01"))
-            .dateFrom(LocalDate.parse("2022-01-02"))
-            .build();
-        return this;
-    }
-
     public CaseDataBuilder atStateClaimIssuedDisposalHearing() {
         caseManagementOrderSelection = DISPOSAL_HEARING;
 
@@ -1736,18 +1683,6 @@ public class CaseDataBuilder {
                        + "available date after.")
             .date(LocalDate.now().plusWeeks(16))
             .time(DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES)
-            .build();
-        return this;
-    }
-
-    public CaseDataBuilder atStateClaimIssuedDisposalHearingInPersonDJ() {
-        disposalHearingFinalDisposalHearingTimeDJ = DisposalHearingFinalDisposalHearingTimeDJ
-            .builder()
-            .input("This claim be listed for final "
-                       + "disposal before a Judge on the first "
-                       + "available date after.")
-            .date(LocalDate.now().plusWeeks(16))
-            .time(uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES)
             .build();
         return this;
     }
@@ -3131,12 +3066,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateDisposalHearingOrderMadeWithoutHearing() {
-        disposalHearingOrderMadeWithoutHearingDJ =
-            DisposalHearingOrderMadeWithoutHearingDJ.builder().input("test").build();
-        return this;
-    }
-
     public CaseDataBuilder atStateNotificationAcknowledged_1v2_BothDefendants() {
         atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors();
         respondent1ClaimResponseIntentionType = FULL_DEFENCE;
@@ -3848,15 +3777,8 @@ public class CaseDataBuilder {
             .unassignedCaseListDisplayOrganisationReferences(unassignedCaseListDisplayOrganisationReferences)
             .caseListDisplayDefendantSolicitorReferences(caseListDisplayDefendantSolicitorReferences)
             .caseManagementLocation(caseManagementLocation)
-            .disposalHearingOrderMadeWithoutHearingDJ(disposalHearingOrderMadeWithoutHearingDJ)
             //Unsuitable for SDO
             .reasonNotSuitableSDO(reasonNotSuitableSDO)
-            .fastTrackHearingTime(fastTrackHearingTime)
-            .fastTrackOrderWithoutJudgement(fastTrackOrderWithoutJudgement)
-            .disposalHearingHearingTime(disposalHearingHearingTime)
-            .disposalOrderWithoutHearing(disposalOrderWithoutHearing)
-            .disposalHearingOrderMadeWithoutHearingDJ(disposalHearingOrderMadeWithoutHearingDJ)
-            .disposalHearingFinalDisposalHearingTimeDJ(disposalHearingFinalDisposalHearingTimeDJ)
             .trialHearingTimeDJ(trialHearingTimeDJ)
             .trialOrderMadeWithoutHearingDJ(trialOrderMadeWithoutHearingDJ)
             .build();

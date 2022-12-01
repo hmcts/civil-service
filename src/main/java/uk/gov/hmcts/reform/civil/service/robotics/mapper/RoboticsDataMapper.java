@@ -95,13 +95,15 @@ public class RoboticsDataMapper {
             .build();
     }
 
-    private String getPreferredCourtCode(CaseData caseData, String authToken) {
-        List<LocationRefData> courtLocations= locationRefDataService.getCourtLocationsByEpimmsId(
-                authToken, caseData.getCaseManagementLocation().getBaseLocation())
-            .stream()
-            .filter(id -> id.getCourtTypeId().equals("10"))
-            .collect(Collectors.toList());
-        return courtLocations.get(0).getCourtLocationCode();
+    public String getPreferredCourtCode(CaseData caseData, String authToken) {
+        List<LocationRefData> courtLocations = locationRefDataService.getCourtLocationsByEpimmsId(
+                authToken, caseData.getCourtLocation().getCaseLocation().getBaseLocation());
+        if (!courtLocations.isEmpty()) {
+            return courtLocations.stream()
+                .filter(id -> id.getCourtTypeId().equals("10"))
+                .collect(Collectors.toList()).get(0).getCourtLocationCode();
+        }
+        return null;
     }
 
     private String buildAllocatedTrack(AllocatedTrack allocatedTrack) {

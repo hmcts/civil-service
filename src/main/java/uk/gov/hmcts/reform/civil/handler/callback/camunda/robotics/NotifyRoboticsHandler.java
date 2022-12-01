@@ -57,7 +57,8 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
             }
 
             if (errors == null || errors.isEmpty()) {
-                roboticsNotificationService.notifyRobotics(caseData, multiPartyScenario);
+                roboticsNotificationService.notifyRobotics(caseData, multiPartyScenario,
+                                                           callbackParams.getParams().get(BEARER_TOKEN).toString());
             } else {
                 throw new JsonSchemaValidationException(
                     format("Invalid RPA Json payload for %s", caseData.getLegacyCaseReference()),

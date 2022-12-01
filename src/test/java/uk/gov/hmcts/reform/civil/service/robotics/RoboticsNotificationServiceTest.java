@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
@@ -50,6 +51,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -91,7 +93,7 @@ class RoboticsNotificationServiceTest {
 
     @Captor
     private ArgumentCaptor<EmailData> emailDataArgumentCaptor;
-
+    private static final String BEARER_TOKEN = "Bearer Token";
     @MockBean
     SendGridClient sendGridClient;
     @MockBean
@@ -106,6 +108,8 @@ class RoboticsNotificationServiceTest {
     RoboticsDataMapperForSpec roboticsDataMapperForSpec;
     @MockBean
     private Time time;
+    @MockBean
+    LocationRefDataService locationRefDataService;
 
     LocalDateTime localDateTime;
 
@@ -125,7 +129,7 @@ class RoboticsNotificationServiceTest {
                 .respondent2Represented(YES)
                 .build();
         }
-        service.notifyRobotics(caseData, false);
+        service.notifyRobotics(caseData, false, BEARER_TOKEN);
 
         verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
 
@@ -167,7 +171,7 @@ class RoboticsNotificationServiceTest {
                 .build())
             .build();
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(build);
-        service.notifyRobotics(caseData, false);
+        service.notifyRobotics(caseData, false, BEARER_TOKEN);
 
         verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
 
@@ -190,7 +194,7 @@ class RoboticsNotificationServiceTest {
     void shouldThrowNullPointerException_whenCaseDataIsNull() {
 
         assertThrows(NullPointerException.class, () ->
-            service.notifyRobotics(null, true));
+            service.notifyRobotics(null, true, BEARER_TOKEN));
     }
 
     @Test
@@ -208,7 +212,7 @@ class RoboticsNotificationServiceTest {
                 .build();
         }
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
-        service.notifyRobotics(caseData, multiPartyScenario);
+        service.notifyRobotics(caseData, multiPartyScenario, BEARER_TOKEN);
 
         verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
 
@@ -243,7 +247,7 @@ class RoboticsNotificationServiceTest {
                 .respondent2Represented(YES)
                 .build();
         }
-        service.notifyRobotics(caseData, isMultiPartyScenario(caseData));
+        service.notifyRobotics(caseData, isMultiPartyScenario(caseData), BEARER_TOKEN);
 
         verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
 
@@ -288,7 +292,7 @@ class RoboticsNotificationServiceTest {
         when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
 
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
-        service.notifyRobotics(caseData, multiPartyScenario);
+        service.notifyRobotics(caseData, multiPartyScenario, BEARER_TOKEN);
 
         verify(roboticsDataMapperForSpec).toRoboticsCaseData(caseData);
         verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
@@ -331,7 +335,7 @@ class RoboticsNotificationServiceTest {
         when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
 
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
-        service.notifyRobotics(caseData, multiPartyScenario);
+        service.notifyRobotics(caseData, multiPartyScenario, BEARER_TOKEN);
 
         verifyNoInteractions(sendGridClient);
     }
@@ -354,7 +358,7 @@ class RoboticsNotificationServiceTest {
                 .respondent2Represented(YES)
                 .build();
         }
-        service.notifyRobotics(caseData, isMultiPartyScenario(caseData));
+        service.notifyRobotics(caseData, isMultiPartyScenario(caseData), BEARER_TOKEN);
 
         verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
 

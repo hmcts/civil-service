@@ -45,9 +45,9 @@ public class RoboticsNotificationService {
     private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
     private final FeatureToggleService toggleService;
 
-    public void notifyRobotics(@NotNull CaseData caseData, boolean isMultiParty) {
+    public void notifyRobotics(@NotNull CaseData caseData, boolean isMultiParty, String authToken) {
         requireNonNull(caseData);
-        Optional<EmailData> emailData = prepareEmailData(caseData, isMultiParty);
+        Optional<EmailData> emailData = prepareEmailData(caseData, isMultiParty, authToken);
         emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
     }
 
@@ -61,7 +61,7 @@ public class RoboticsNotificationService {
         }
     }
 
-    private Optional<EmailData> prepareEmailData(CaseData caseData, boolean isMultiParty) {
+    private Optional<EmailData> prepareEmailData(CaseData caseData, boolean isMultiParty, String authToken) {
 
         byte[] roboticsJsonData;
         try {
@@ -77,7 +77,7 @@ public class RoboticsNotificationService {
                     return Optional.empty();
                 }
             } else {
-                RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
+                RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData, authToken);
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
             }
