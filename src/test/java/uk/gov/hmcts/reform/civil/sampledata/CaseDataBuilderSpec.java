@@ -1,59 +1,35 @@
 package uk.gov.hmcts.reform.civil.sampledata;
 
-import uk.gov.hmcts.reform.ccd.model.ChangeOrganisationApprovalStatus;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-import uk.gov.hmcts.reform.civil.enums.*;
-import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
-import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
-import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
-import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
-import uk.gov.hmcts.reform.civil.model.*;
-import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
-import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
-import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
-import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ClaimValue;
+import uk.gov.hmcts.reform.civil.model.CorrectEmail;
+import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PaymentDetails;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.*;
-import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
-import uk.gov.hmcts.reform.civil.model.dq.*;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
-import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
-import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
-import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
-import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
-import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
-import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
-import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
-import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import static java.time.LocalDate.now;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.*;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.*;
-import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
-import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
-import static uk.gov.hmcts.reform.civil.enums.PersonalInjuryType.ROAD_ACCIDENT;
-import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
-import static uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator.DISPOSAL_HEARING;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class CaseDataBuilderSpec {
 
@@ -62,13 +38,6 @@ public class CaseDataBuilderSpec {
     public static final LocalDateTime SUBMITTED_DATE_TIME = LocalDateTime.now();
     public static final LocalDateTime RESPONSE_DEADLINE = SUBMITTED_DATE_TIME.toLocalDate().plusDays(14)
         .atTime(23, 59, 59);
-    public static final LocalDateTime APPLICANT_RESPONSE_DEADLINE = SUBMITTED_DATE_TIME.plusDays(120);
-    public static final LocalDate CLAIM_ISSUED_DATE = now();
-    public static final LocalDateTime DEADLINE = LocalDate.now().atStartOfDay().plusDays(14);
-    public static final LocalDate PAST_DATE = now().minusDays(1);
-    public static final LocalDateTime NOTIFICATION_DEADLINE = LocalDate.now().atStartOfDay().plusDays(14);
-    public static final BigDecimal FAST_TRACK_CLAIM_AMOUNT = BigDecimal.valueOf(10000);
-    public static final LocalDate FUTURE_DATE = LocalDate.now().plusYears(1);
 
     // Create Claim
     protected Long ccdCaseReference;
@@ -295,7 +264,6 @@ public class CaseDataBuilderSpec {
     public CaseDataBuilderSpec atStateSpec1v1DefendantUnrepresentedClaimSubmitted() {
         atStateSpec1v1ClaimSubmitted();
         respondent1Represented = NO;
-
         return this;
     }
 
@@ -304,7 +272,6 @@ public class CaseDataBuilderSpec {
         addApplicant2 = YES;
         applicant2 = PartyBuilder.builder().individual().build();
         respondent1Represented = NO;
-
         return this;
     }
 
@@ -316,7 +283,6 @@ public class CaseDataBuilderSpec {
         respondent1OrgRegistered = YES;
         respondent2Represented = NO;
         respondent2OrgRegistered = NO;
-
         return this;
     }
 
@@ -328,7 +294,6 @@ public class CaseDataBuilderSpec {
         respondent2Represented = NO;
         respondent1OrgRegistered = NO;
         respondent2OrgRegistered = NO;
-
         return this;
     }
 
@@ -336,7 +301,6 @@ public class CaseDataBuilderSpec {
         atStateSpec1v1ClaimSubmitted();
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
-
         return this;
     }
 
@@ -346,7 +310,6 @@ public class CaseDataBuilderSpec {
         applicant2 = PartyBuilder.builder().individual().build();
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
-
         return this;
     }
 
@@ -359,7 +322,6 @@ public class CaseDataBuilderSpec {
         respondent2Represented = YES;
         respondent2OrgRegistered = YES;
         respondent2SameLegalRepresentative = NO;
-
         return this;
     }
 
@@ -371,7 +333,6 @@ public class CaseDataBuilderSpec {
         respondent1OrgRegistered = NO;
         respondent2Represented = YES;
         respondent2OrgRegistered = YES;
-
         return this;
     }
 
@@ -384,10 +345,8 @@ public class CaseDataBuilderSpec {
         respondent2Represented = YES;
         respondent1OrgRegistered = NO;
         respondent2OrgRegistered = NO;
-
         return this;
     }
-
 
     public static CaseDataBuilderSpec builder() {
         return new CaseDataBuilderSpec();
@@ -416,7 +375,6 @@ public class CaseDataBuilderSpec {
             .claimFee(claimFee)
             .applicantSolicitor1CheckEmail(applicantSolicitor1CheckEmail)
             .applicantSolicitor1UserDetails(applicantSolicitor1UserDetails)
-
             .ccdState(ccdState)
             .ccdCaseReference(ccdCaseReference)
             .applicant1OrganisationPolicy(applicant1OrganisationPolicy)
