@@ -43,7 +43,7 @@ class StateFlowEngineSpecTest {
     @Nested
     class EvaluateStateFlowEngine {
 
-        @Test //AC 1 (1V1  represented and registered) //works
+        @Test //AC 1 (1V1  represented and registered)
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmittedWithOneRespondentRepresentativeSpecified() {
             CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v1ClaimSubmitted()
                 .build();
@@ -70,7 +70,7 @@ class StateFlowEngineSpecTest {
             );
         }
 
-        @Test //AC 2 (1V2 same defendant solicitor) //works
+        @Test //AC 2 (1V2 same defendant solicitor)
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1v2SameSolicitorSpecified() {
             CaseData caseData = CaseDataBuilderSpec.builder().atStateClaimSubmittedTwoRespondentSameSolicitorSpec()
                 .build();
@@ -97,7 +97,7 @@ class StateFlowEngineSpecTest {
             );
         }
 
-        @Test //AC 3 (1V2 different defendant solicitor) ///working
+        @Test //AC 3 (1V2 different defendant solicitor)
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1v2DifferentSolicitorSpecified() {
             CaseData caseData = CaseDataBuilderSpec.builder().atStateClaimSubmittedTwoRespondentDifferentSolicitorSpec()
                 .build();
@@ -125,7 +125,7 @@ class StateFlowEngineSpecTest {
             );
         }
 
-        @Test //AC 4 (2v1) ///working
+        @Test //AC 4 (2v1)
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted2v1Specified() {
             CaseData caseData = CaseDataBuilderSpec.builder().atStateClaimSubmitted2v1()
                 .build();
@@ -152,7 +152,7 @@ class StateFlowEngineSpecTest {
             );
         }
 
-        @Test //AC 5 (1V1 unrepresented defendant) ///working
+        @Test //AC 5 (1V1 unrepresented defendant)
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1v1UnrepresentedDefendantSpecified() {
             CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v1DefendantUnrepresentedClaimSubmitted()
                 .build();
@@ -178,7 +178,7 @@ class StateFlowEngineSpecTest {
             );
         }
 
-        @Test //AC 6 (2V1 unrepresented defendant) ///working
+        @Test //AC 6 (2V1 unrepresented defendant)
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted2v1UnrepresentedDefendantSpecified() {
             CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec2v1DefendantUnrepresentedClaimSubmitted()
                 .build();
@@ -204,7 +204,7 @@ class StateFlowEngineSpecTest {
             );
         }
 
-        @Test //AC 7 (1V2 one unrepresented defendant) ///working
+        @Test //AC 7 (1V2 one unrepresented defendant)
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1v2OneUnrepresentedDefendantSpecified() {
             CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v2OneDefendantUnrepresentedClaimSubmitted()
                 .build();
@@ -230,7 +230,7 @@ class StateFlowEngineSpecTest {
             );
         }
 
-        @Test //AC 8 (1V2 both defendants unrepresented ) ///working
+        @Test //AC 8 (1V2 both defendants unrepresented )
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1v2BothUnrepresentedDefendantSpecified() {
             CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v2BothDefendantUnrepresentedClaimSubmitted()
                 .build();
@@ -256,7 +256,7 @@ class StateFlowEngineSpecTest {
             );
         }
 
-        @Test //AC 9 (1V1  defendant represented, solicitor unregistered) ///working
+        @Test //AC 9 (1V1  defendant represented, solicitor unregistered)
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1v1UnregisteredDefendantSpecified() {
             CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v1DefendantUnregisteredClaimSubmitted()
                 .build();
@@ -283,7 +283,7 @@ class StateFlowEngineSpecTest {
             );
         }
 
-        @Test //AC 10 (2V1  defendant represented, solicitor unregistered ) ///working
+        @Test //AC 10 (2V1  defendant represented, solicitor unregistered )
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted2v1UnregisteredDefendantSpecified() {
             CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec2v1DefendantUnregisteredClaimSubmitted()
                 .build();
@@ -310,7 +310,7 @@ class StateFlowEngineSpecTest {
             );
         }
 
-        @Test //AC 11 1v2 defendant 1 represented solicitor unregistered, and defendant 2 solicitor registered defendant  ///not working
+        @Test //AC 11 1v2 defendant 1 represented solicitor unregistered, and defendant 2 solicitor registered defendant
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1v2OneRepresentedUnregisteredDefendantSpecified() {
             CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v2Solicitor1UnregisteredSolicitor2Registered()
                 .build();
@@ -328,15 +328,17 @@ class StateFlowEngineSpecTest {
                     SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
             verify(featureToggleService).isRpaContinuousFeedEnabled();
 
-            assertThat(stateFlow.getFlags()).hasSize(4).contains(
+            assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                entry("ONE_RESPONDENT_REPRESENTATIVE", false),
+                entry("TWO_RESPONDENT_REPRESENTATIVES", true),
+                entry("RPA_CONTINUOUS_FEED", true),
                 entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry("RPA_CONTINUOUS_FEED", true)
+                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false)
             );
         }
 
-        @Test //AC 13 1v2 defendant 1 represented solicitor unregistered,and defendant 2 unrepresented  ///working
+        @Test //AC 13 1v2 defendant 1 represented solicitor unregistered,and defendant 2 unrepresented
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1v2OneRepresentedUnregisteredOtherUnrepresentedDefendantSpecified() {
             CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v2OneDefendantRepresentedUnregisteredOtherUnrepresentedClaimSubmitted()
                 .build();
@@ -362,7 +364,7 @@ class StateFlowEngineSpecTest {
             );
         }
 
-        @Test //AC 14 1v2 Both defendants represented and both defendant solicitors unregistered ///working
+        @Test //AC 14 1v2 Both defendants represented and both defendant solicitors unregistered
         void shouldReturnClaimSubmitted_1v2BothDefendantRepresentedAndUnregistered() {
             CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v2BothDefendantRepresentedAndUnregistered()
                 .build();
