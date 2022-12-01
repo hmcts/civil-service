@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
@@ -18,6 +20,8 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 
 public class DocmosisTemplateDataUtils {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DocmosisTemplateDataUtils.class);
 
     public static final int CASE_NAME_LENGTH_TO_FIT_IN_DOCS = 37;
     public static final String REFERENCE_NOT_PROVIDED = "Not Provided";
@@ -66,6 +70,8 @@ public class DocmosisTemplateDataUtils {
             applicantNameBuilder.append(caseData.getApplicant1().getPartyName());
             soleTraderCompany(caseData.getApplicant1(), applicantNameBuilder);
             litigationFriend(caseData.getApplicant1LitigationFriend(), applicantNameBuilder);
+        } else {
+            LOG.info("Applicant1 not found");
         }
 
         return applicantNameBuilder.toString();
