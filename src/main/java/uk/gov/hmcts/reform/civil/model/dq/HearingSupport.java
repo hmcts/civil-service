@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 import java.util.List;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class HearingSupport {
 
     // CIV-5557 to be removed
