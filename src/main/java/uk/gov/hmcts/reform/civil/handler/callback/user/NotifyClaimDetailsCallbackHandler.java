@@ -144,6 +144,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 ))
                 .build();
         }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
             .build();
