@@ -3294,8 +3294,7 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
 
         reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input("This is more than 150 111111111111111111111111111111111111111111111111111111111111111111111111111"
-                       + "111111111111111111111111111111111111111111111111111111")
+                                                   .input("unforeseen complexities")
             .build();
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
 
