@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -112,40 +113,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         LocalDateTime notificationDateTime = time.now();
 
         if (toggleService.isCertificateOfServiceEnabled()) {
-            if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
-                caseData.getCosNotifyClaimDetails1().setCosDetailSaved(YesOrNo.YES);
-                if (Objects.isNull(caseData.getServedDocumentFiles())) {
-                    caseData = caseData.toBuilder()
-                            .servedDocumentFiles(ServedDocumentFiles.builder().build()).build();
-                }
-                if (Objects.isNull(caseData.getServedDocumentFiles().getOther())) {
-                    caseData.getServedDocumentFiles().setOther(new ArrayList<>());
-                }
-                List<Document> cosDoc1 = ElementUtils
-                        .unwrapElements(caseData.getCosNotifyClaimDetails1()
-                                .getCosEvidenceDocument());
-                caseData.getServedDocumentFiles().getOther()
-                        .addAll(cosDoc1.stream()
-                                .map(x->ElementUtils.element(new DocumentWithRegex(x)))
-                                .collect(Collectors.toList()));
-            }
-            if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
-                caseData.getCosNotifyClaimDetails2().setCosDetailSaved(YesOrNo.YES);
-                if (Objects.isNull(caseData.getServedDocumentFiles())) {
-                    caseData = caseData.toBuilder()
-                            .servedDocumentFiles(ServedDocumentFiles.builder().build()).build();
-                }
-                if (Objects.isNull(caseData.getServedDocumentFiles().getOther())) {
-                    caseData.getServedDocumentFiles().setOther(new ArrayList<>());
-                }
-                List<Document> cosDoc2 = ElementUtils
-                        .unwrapElements(caseData.getCosNotifyClaimDetails2()
-                                .getCosEvidenceDocument());
-                caseData.getServedDocumentFiles().getOther()
-                        .addAll(cosDoc2.stream()
-                                .map(x->ElementUtils.element(new DocumentWithRegex(x)))
-                                .collect(Collectors.toList()));
-            }
+            caseData = prepareCoSDetails(caseData, 1);
+            caseData = prepareCoSDetails(caseData, 2);
         }
 
         LocalDate notificationDate = notificationDateTime.toLocalDate();
@@ -180,6 +149,33 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             .build();
     }
 
+    private CaseData prepareCoSDetails(CaseData caseData, int idx) {
+        CertificateOfService cosNotifyClaimDetails;
+        if (idx == 1) {
+            cosNotifyClaimDetails = caseData.getCosNotifyClaimDetails1();
+        } else {
+            cosNotifyClaimDetails = caseData.getCosNotifyClaimDetails2();
+        }
+        if (Objects.nonNull(cosNotifyClaimDetails)) {
+            cosNotifyClaimDetails.setCosDetailSaved(YesOrNo.YES);
+            if (Objects.isNull(caseData.getServedDocumentFiles())) {
+                caseData = caseData.toBuilder()
+                        .servedDocumentFiles(ServedDocumentFiles.builder().build()).build();
+            }
+            if (Objects.isNull(caseData.getServedDocumentFiles().getOther())) {
+                caseData.getServedDocumentFiles().setOther(new ArrayList<>());
+            }
+            List<Document> cosDoc = ElementUtils
+                    .unwrapElements(cosNotifyClaimDetails
+                            .getCosEvidenceDocument());
+            caseData.getServedDocumentFiles().getOther()
+                    .addAll(cosDoc.stream()
+                            .map(x -> ElementUtils.element(new DocumentWithRegex(x)))
+                            .collect(Collectors.toList()));
+        }
+        return caseData;
+    }
+
     private SubmittedCallbackResponse buildConfirmationWithSolicitorOptions(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
@@ -193,7 +189,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
         String body = format(confirmationText, formattedDeadline)
                 + (isConfirmationForLip(caseData)
-                ? exitSurveyContentService.applicantSurvey() : "");
+                ? "" : exitSurveyContentService.applicantSurvey());
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(String.format(
@@ -211,8 +207,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 : NOTIFICATION_ONE_PARTY_SUMMARY;
         if (toggleService.isCertificateOfServiceEnabled()) {
             return isConfirmationForLip(caseData)
-                            ? confirmationTextLR
-                            : CONFIRMATION_COS_SUMMARY;
+                            ? CONFIRMATION_COS_SUMMARY
+                            : confirmationTextLR;
         } else {
             return confirmationTextLR;
         }
@@ -221,8 +217,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private String getConfirmationHeader(CaseData caseData) {
         if (toggleService.isCertificateOfServiceEnabled()) {
             return isConfirmationForLip(caseData)
-                    ? CONFIRMATION_HEADER
-                    : CONFIRMATION_COS_HEADER;
+                    ? CONFIRMATION_COS_HEADER
+                    : CONFIRMATION_HEADER;
         } else {
             return CONFIRMATION_HEADER;
         }
@@ -241,7 +237,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
         String body = format(getConfirmationBody(caseData), formattedDeadline)
                 + (isConfirmationForLip(caseData)
-                ? exitSurveyContentService.applicantSurvey() : "");
+                ? "" : exitSurveyContentService.applicantSurvey());
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(String.format(

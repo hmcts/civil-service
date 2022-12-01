@@ -1476,17 +1476,14 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder multiPartyClaimTwoDefendantLips() {
-        //TODO replace with LIPS data
         atStateClaimDraft();
         respondent1OrganisationPolicy = null;
-        respondent1Represented = NO;
-        respondent1OrgRegistered = NO;
+        defendant1LIPAtClaimIssued = YES;
 
         addRespondent2 = YES;
         respondent2OrganisationPolicy = null;
-        respondent2Represented = NO;
-        respondent2OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
+        defendant2LIPAtClaimIssued = YES;
         return this;
     }
 
