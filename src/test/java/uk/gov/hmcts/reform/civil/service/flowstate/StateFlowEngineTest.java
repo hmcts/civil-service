@@ -2064,7 +2064,7 @@ class StateFlowEngineTest {
                 .extracting(State::getName)
                 .isNotNull()
                 .isEqualTo(flowState.fullName());
-            if(flowState.fullName().equals(TAKEN_OFFLINE_AFTER_SDO.fullName())) {
+            if (flowState.fullName().equals(TAKEN_OFFLINE_AFTER_SDO.fullName())) {
                 assertThat(stateFlow.getStateHistory())
                     .hasSize(12)
                     .extracting(State::getName)
