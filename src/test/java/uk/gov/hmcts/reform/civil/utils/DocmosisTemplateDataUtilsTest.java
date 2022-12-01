@@ -30,8 +30,7 @@ class DocmosisTemplateDataUtilsTest {
         assertThat(caseData.getApplicant1()).isNull();
         assertThat(caseName).isNotEqualTo("Mr. Sam Clark vs Mr. Alex Richards");
     }
-
-
+    
     @Test
     void shouldReturnCaseName_whenBothPartiesAreIndividuals() {
         CaseData caseData = CaseData.builder()
