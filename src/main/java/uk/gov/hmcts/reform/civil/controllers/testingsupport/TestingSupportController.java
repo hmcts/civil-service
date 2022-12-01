@@ -44,6 +44,8 @@ public class TestingSupportController {
     private final EventHistoryMapper eventHistoryMapper;
     private final RoboticsDataMapper roboticsDataMapper;
 
+    private static final String BEARER_TOKEN = "Bearer Token";
+
     @GetMapping("/testing-support/case/{caseId}/business-process")
     public ResponseEntity<BusinessProcessInfo> getBusinessProcess(@PathVariable("caseId") Long caseId) {
         CaseData caseData = caseDetailsConverter.toCaseData(coreCaseDataService.getCase(caseId));
@@ -141,6 +143,6 @@ public class TestingSupportController {
         produces = "application/json")
     public String getRPAJsonInformationForCaseData(
         @RequestBody CaseData caseData) throws JsonProcessingException {
-        return roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+        return roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
     }
 }
