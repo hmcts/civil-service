@@ -1019,16 +1019,17 @@ public class EventHistoryMapper {
                                   .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
                                   .eventDetails(EventDetails.builder()
                                                     .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
-                                                    .preferredCourtCode(courtLocations.stream()
-                                                                            .filter(id -> id.getCourtTypeId().equals(
-                                                                                "10"))
-                                                                            .collect(Collectors.toList()).get(0)
-                                                                            .getCourtLocationCode())
+                                                    .preferredCourtCode(courtLocations.isEmpty()
+                                                                            ? null : courtLocations.stream()
+                                                        .filter(id -> id.getCourtTypeId().equals(
+                                                            "10"))
+                                                        .collect(Collectors.toList()).get(0)
+                                                        .getCourtLocationCode())
                                                     .preferredCourtName("")
                                                     .build())
                                   .eventDetailsText(prepareEventDetailsText(
                                       applicantDetails.get(index).getDq(),
-                                      courtLocations.stream()
+                                      courtLocations.isEmpty() ? null : courtLocations.stream()
                                           .filter(id -> id.getCourtTypeId().equals(
                                               "10"))
                                           .collect(Collectors.toList()).get(0)

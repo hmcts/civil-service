@@ -246,7 +246,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                     applicant1DQBuilder.applicant1DQRequestedCourt(
                         RequestedCourt.builder()
                             .caseLocation(caseData.getCourtLocation().getCaseLocation())
-                            .responseCourtCode(courtLocations.stream()
+                            .responseCourtCode(courtLocations.isEmpty() ? null : courtLocations.stream()
                                                    .filter(id -> id.getCourtTypeId().equals("10"))
                                                    .collect(Collectors.toList()).get(0).getCourtLocationCode())
                             .build());
