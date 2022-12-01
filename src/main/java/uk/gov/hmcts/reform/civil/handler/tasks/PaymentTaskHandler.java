@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.civil.exceptions.CaseIdNotProvidedException;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -41,7 +40,8 @@ public class PaymentTaskHandler implements BaseExternalTaskHandler {
         try {
             Map<String, Object> allVariables = externalTask.getAllVariables();
             ExternalTaskInput externalTaskInput = objectMapper.convertValue(allVariables, ExternalTaskInput.class);
-            String caseId = ofNullable(externalTaskInput.getCaseId()).orElseThrow(CaseIdNotProvidedException::new);
+            String caseId = ofNullable(externalTaskInput.getCaseId())
+                .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
                 caseId,
                 externalTaskInput.getCaseEvent()

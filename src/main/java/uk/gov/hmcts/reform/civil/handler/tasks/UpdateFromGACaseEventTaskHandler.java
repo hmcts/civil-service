@@ -10,7 +10,6 @@ import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.civil.exceptions.CaseIdNotProvidedException;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -42,7 +41,8 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
 
             String generalAppCaseId =
-                ofNullable(variables.getCaseId()).orElseThrow(CaseIdNotProvidedException::new);
+                ofNullable(variables.getCaseId())
+                    .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
             String civilCaseId =
                 ofNullable(variables.getGeneralAppParentCaseLink())
                     .orElseThrow(() -> new InvalidCaseDataException(

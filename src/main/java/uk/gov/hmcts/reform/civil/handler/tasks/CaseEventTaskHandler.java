@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.exceptions.CaseIdNotProvidedException;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -57,7 +56,8 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
     public void handleTask(ExternalTask externalTask) {
         try {
             ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
-            String caseId = ofNullable(variables.getCaseId()).orElseThrow(CaseIdNotProvidedException::new);
+            String caseId = ofNullable(variables.getCaseId())
+                .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, variables.getCaseEvent());
             CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
             BusinessProcess businessProcess = startEventData.getBusinessProcess()

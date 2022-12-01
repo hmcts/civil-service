@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.exceptions.CaseIdNotProvidedException;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -64,7 +63,8 @@ public class StartGeneralApplicationBusinessProcessTaskHandler implements BaseEx
             throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
         }
 
-        String caseId = ofNullable(externalTaskInput.getCaseId()).orElseThrow(CaseIdNotProvidedException::new);
+        String caseId = ofNullable(externalTaskInput.getCaseId())
+            .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
         CaseEvent caseEvent = externalTaskInput.getCaseEvent();
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);
         CaseData data = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
