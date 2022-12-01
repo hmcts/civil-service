@@ -30,6 +30,8 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 
@@ -113,10 +115,15 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private final DisposalHearingMethodDJ trialHearingMethodDJ;
     private final String trialHearingLocation;
 
-    //hnl fields for trial
+    //hnl fields
+    private final DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
+    private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
+    private String disposalHearingTimeEstimateDJ;
 
+    //hnl fields for trial
     private TrialHearingTimeDJ trialHearingTimeDJ;
     private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
     private String trialHearingTimeEstimateDJ;
+
 
 }

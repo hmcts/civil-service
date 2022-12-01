@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
@@ -54,6 +55,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -73,6 +75,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -322,10 +325,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         if (featureToggleService.isHearingAndListingSDOEnabled()) {
             caseDataBuilder.disposalHearingOrderMadeWithoutHearingDJ(DisposalHearingOrderMadeWithoutHearingDJ
                                                    .builder()
-                                                   .input(String.format("This order has been made without a hearing. "
-                                                              + "Each party has the right to apply to have this order "
-                                                              + "set aside or varied. Any such application must be "
-                                                              + "received by the Court "
+                                                   .input(String.format("Each party has the right to apply to have this"
+                                                              + " order set aside or varied. Any such application must "
+                                                              + "be received by the Court "
                                                               + "(together with the appropriate fee) by 4pm on %s.",
                                                           deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
                                                               .format(DateTimeFormatter
@@ -439,8 +441,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         if (featureToggleService.isHearingAndListingSDOEnabled()) {
             caseDataBuilder.trialOrderMadeWithoutHearingDJ(TrialOrderMadeWithoutHearingDJ.builder()
                                                .input(String.format(
-                                                   "This order has been made without a hearing. "
-                                                       + "Each party has the right to apply to have this Order "
+                                                       "Each party has the right to apply to have this Order "
                                                        + "set aside or varied. Any such application must be "
                                                        + "received by the Court "
                                                        + "(together with the appropriate fee) by 4pm on %s.",
@@ -636,6 +637,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         CaseDocument document = defaultJudgmentOrderFormGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.orderSDODocumentDJ(document.getDocumentLink());
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
+        systemGeneratedCaseDocuments.add(element(document));
+        caseDataBuilder.orderSDODocumentDJCollection(systemGeneratedCaseDocuments);
         caseDataBuilder.disposalHearingMethodInPersonDJ(deleteLocationList(
             caseData.getDisposalHearingMethodInPersonDJ()));
         caseDataBuilder.trialHearingMethodInPersonDJ(deleteLocationList(
