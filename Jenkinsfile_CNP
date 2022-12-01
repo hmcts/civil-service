@@ -7,7 +7,7 @@ import uk.gov.hmcts.contino.AppPipelineDsl
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdBranch = "bug/CIV-4519"
+def ccddefbranch = "bug/CIV-4519"
 def camundaBranch = "bug/CIV-4519"
 AppPipelineConfig pipelineConf
 
@@ -102,7 +102,7 @@ withPipeline(type, product, component) {
       ./bin/add-roles.sh
       ./bin/pull-latest-release-asset.sh civil-ccd-definition civil-ccd-definition.zip
       ./bin/pull-latest-release-asset.sh civil-camunda-bpmn-definition civil-camunda-bpmn-definition.zip
-      ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json" ${ccdBranch}
+      ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json" ${ccddefbranch}
 
       ./bin/import-bpmn-diagram.sh ${camundaBranch}
     """
@@ -134,7 +134,7 @@ withPipeline(type, product, component) {
       ./bin/add-roles.sh
       ./bin/pull-latest-release-asset.sh civil-ccd-definition civil-ccd-definition.zip
       ./bin/pull-latest-release-asset.sh civil-camunda-bpmn-definition civil-camunda-bpmn-definition.zip
-      ./bin/import-ccd-definition.sh ${ccdBranch} "-e *GAspec.json,*DJspec.json,*-nonprod.json,*DJ.json,*DJ-SDO-nonprod.json,*DJ-nonprod.json"
+      ./bin/import-ccd-definition.sh "-e *GAspec.json,*DJspec.json,*-nonprod.json,*DJ.json,*DJ-SDO-nonprod.json,*DJ-nonprod.json" ${ccddefbranch}
       ./bin/import-bpmn-diagram.sh ${camundaBranch}
     """
     env.URL="https://civil-service-xui-staging.aat.platform.hmcts.net"
