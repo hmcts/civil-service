@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static java.util.Collections.emptyList;
@@ -50,12 +49,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private static final String VALIDATE_URGENCY_DATE_PAGE = "ga-validate-urgency-date";
     private static final String VALIDATE_GA_TYPE = "ga-validate-type";
-    private static final String VALIDATE_N245_FORM_NAME = "ga-validate-n245form-name";
     private static final String VALIDATE_HEARING_DATE = "ga-validate-hearing-date";
     private static final String VALIDATE_HEARING_PAGE = "ga-hearing-screen-validation";
-    private static final String N245_FILE_NAME = "Statement of incomings and outgoings";
-    private static final String N245_FILE_NAME_ERROR = "File should be named "
-        + "as \"Statement of incomings and outgoings\"";
     private static final String INVALID_HEARING_DATE = "The hearing date must be in the future";
     private static final String SET_FEES_AND_PBA = "ga-fees-and-pba";
     private static final String POUND_SYMBOL = "£";
@@ -75,7 +70,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             callbackKey(ABOUT_TO_START), this::aboutToStartValidattionAndSetup,
             callbackKey(MID, VALIDATE_GA_TYPE), this::gaValidateType,
             callbackKey(MID, VALIDATE_HEARING_DATE), this::gaValidateHearingDate,
-            callbackKey(MID, VALIDATE_N245_FORM_NAME), this::gaValidateN245FormName,
             callbackKey(MID, VALIDATE_URGENCY_DATE_PAGE), this::gaValidateUrgencyDate,
             callbackKey(MID, VALIDATE_HEARING_PAGE), this::gaValidateHearingScreen,
             callbackKey(MID, SET_FEES_AND_PBA), this::setFeesAndPBA,
@@ -133,24 +127,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             && caseData.getGeneralAppHearingDate().getHearingScheduledPreferenceYesNo().equals(YesOrNo.YES)
             && caseData.getGeneralAppHearingDate().getHearingScheduledDate().isBefore(LocalDate.now())) {
             errors.add(INVALID_HEARING_DATE);
-        }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
-    }
-
-    private CallbackResponse gaValidateN245FormName(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = new ArrayList<>();
-        if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)
-            && ! Objects.isNull(caseData.getGeneralAppN245FormUpload())) {
-
-            if (!initiateGeneralApplicationService.validateFileName(caseData
-                                                                        .getGeneralAppN245FormUpload()
-                                                                        .getDocumentFileName(), N245_FILE_NAME)) {
-                errors.add(N245_FILE_NAME_ERROR);
-            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
