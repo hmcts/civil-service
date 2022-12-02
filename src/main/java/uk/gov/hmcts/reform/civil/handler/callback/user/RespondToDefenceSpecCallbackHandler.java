@@ -423,7 +423,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         List<String> errors = new ArrayList<>();
         if (caseData.getCcjPaymentPaidSomeAmount() != null) {
             if (caseData.getCcjPaymentPaidSomeAmount()
-                .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0){
+                .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0) {
                 errors.add("The amount paid must be less than the full claim amount.");
             }
         }
