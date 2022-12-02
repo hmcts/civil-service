@@ -69,7 +69,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
                 .getTestCaseDataWithDetails(CaseData.builder().build(),
                         true,
                         true,
-                        true,
+                        true, true,
                         getOriginalStatusOfGeneralApplication_test1());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -95,7 +95,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
                 .getTestCaseDataWithDetails(CaseData.builder().build(),
                         false,
                         false,
-                        false,
+                        false, false,
                         Map.of());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -112,7 +112,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
                 .getTestCaseDataWithDetails(CaseData.builder().build(),
                         true,
                         true,
-                        true,
+                        true, true,
                         getOriginalStatusOfGeneralApplication_test1());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
