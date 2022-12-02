@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
@@ -33,6 +34,7 @@ public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     private final String pageId;
     private final ObjectMapper objectMapper;
     private final Time time;
+    private MultiPartyScenario multiPartyScenario;
 
     protected EvidenceUploadHandlerBase(ObjectMapper objectMapper, Time time, List<CaseEvent> events, String pageId) {
         this.objectMapper = objectMapper;
@@ -42,6 +44,7 @@ public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     }
 
     abstract CallbackResponse validateValues(CaseData caseData);
+    abstract CallbackResponse caseType(CaseData caseData);
 
     abstract void applyDocumentUploadDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, LocalDateTime now);
 
@@ -53,14 +56,35 @@ public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_START), this::caseType)
             .put(callbackKey(MID, pageId), this::validate)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::documentUploadTime)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
 
+    CallbackResponse caseType(CallbackParams callbackParams) {
+        return caseTypeDetermine(callbackParams.getCaseData());
+
+    }
+
+    CallbackResponse caseTypeDetermine(CaseData caseData) {
+        //CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        if (multiPartyScenario.getMultiPartyScenario(caseData).equals(MultiPartyScenario.ONE_V_ONE)) {
+              caseDataBuilder.caseTypeFlag("ONEvONE");
+              System.out.println("do dah");
+              System.out.println(caseData.getCaseTypeFlag());
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
     CallbackResponse validate(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        System.out.println(caseData.getCaseTypeFlag());
         return validateValues(callbackParams.getCaseData());
 
     }
