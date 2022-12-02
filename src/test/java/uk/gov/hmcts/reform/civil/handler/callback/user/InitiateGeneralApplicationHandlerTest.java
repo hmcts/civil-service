@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -259,59 +258,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isEqualTo(null);
         }
 
-    }
-
-    @Nested
-    class MidEventForN245FormNameValidation extends LocationRefSampleDataBuilder {
-
-        private static final String VALIDATE_N245_FORM_NAME = "ga-validate-n245form-name";
-        private static final String N245_FILE_NAME = "Statement of incomings and outgoings";
-        private static final String N245_FILE_NAME_ERROR = "File should be named "
-            + "as \"Statement of incomings and outgoings\"";
-
-        @Test
-        void shouldThrowErrorsWhenFormNameDoesNot_Matches() {
-            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
-            CaseData caseData = CaseDataBuilder
-                .builder()
-                .generalAppN245FormUpload(Document.builder().documentFileName("capture.pdf").build())
-                .generalAppType(GAApplicationType.builder().types(types).build()).build();
-
-            when(initiateGeneralAppService.validateFileName(caseData
-                                                                .getGeneralAppN245FormUpload()
-                                                                .getDocumentFileName(), N245_FILE_NAME))
-                .thenCallRealMethod();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_N245_FORM_NAME);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors().size()).isEqualTo(1);
-
-            assertThat(response.getErrors().get(0)).isEqualTo(N245_FILE_NAME_ERROR);
-        }
-
-        @Test
-        void shouldNotCauseAnyErrorsWhenFormNameMatchesForMultipleTypes() {
-            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_JUDGEMENT);
-
-            CaseData caseData = CaseDataBuilder
-                .builder()
-                .generalAppN245FormUpload(Document.builder()
-                                              .documentFileName("Statement of incomings and outgoings.pdf").build())
-                .generalAppType(GAApplicationType.builder().types(types).build()).build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_N245_FORM_NAME);
-
-            when(initiateGeneralAppService.validateFileName(caseData
-                                                                .getGeneralAppN245FormUpload()
-                                                                .getDocumentFileName(), N245_FILE_NAME))
-                .thenCallRealMethod();
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors()).isEmpty();
-        }
     }
 
     @Nested
