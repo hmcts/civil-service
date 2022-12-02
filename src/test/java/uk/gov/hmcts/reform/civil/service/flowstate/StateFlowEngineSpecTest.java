@@ -100,7 +100,8 @@ class StateFlowEngineSpecTest {
 
         @Test //AC 3 (1V2 different defendant solicitor)
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1v2DifferentSolicitorSpecified() {
-            CaseData caseData = CaseDataBuilderSpec.builder().atStateClaimSubmittedTwoRespondentDifferentSolicitorSpec()
+            CaseData caseData = CaseDataBuilderSpec.builder()
+                .atStateClaimSubmittedTwoRespondentDifferentSolicitorSpec()
                 .build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -311,9 +312,11 @@ class StateFlowEngineSpecTest {
             );
         }
 
-        @Test //AC 11 1v2 defendant 1 represented solicitor unregistered, and defendant 2 solicitor registered defendant
-        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1v2OneRepresentedUnregisteredDefendantSpecified() {
-            CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v2Solicitor1UnregisteredSolicitor2Registered()
+        @Test //AC 11 1v2 defendant 1 represented solicitor unregistered,
+            // and defendant 2 solicitor registered defendant
+        void shouldReturnClaimSubmitted_atStateClaimSubmitted1v2OneRepresentedUnregisteredDefendantSpecified() {
+            CaseData caseData = CaseDataBuilderSpec.builder()
+                .atStateSpec1v2Solicitor1UnregisteredSolicitor2Registered()
                 .build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -340,8 +343,9 @@ class StateFlowEngineSpecTest {
         }
 
         @Test //AC 13 1v2 defendant 1 represented solicitor unregistered,and defendant 2 unrepresented
-        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1v2OneRepresentedUnregisteredOtherUnrepresentedDefendantSpecified() {
-            CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v2OneDefendantRepresentedUnregisteredOtherUnrepresentedClaimSubmitted()
+        void shouldReturnClaimSubmitted_1v2OneRepresentedUnregisteredOtherUnrepresentedDefendantSpecified() {
+            CaseData caseData = CaseDataBuilderSpec.builder()
+                .atStateSpec1v2OneDefendantRepresentedUnregisteredOtherUnrepresentedClaimSubmitted()
                 .build();
 
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
