@@ -223,17 +223,17 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                 .input3("The claimant must upload to the Digital Portal copies of the "
                                                             + "witness statements of all witnesses whose evidence they "
                                                             + "wish the court to consider when deciding the amount of "
-                                                            + "damages by by 4pm on ")
+                                                            + "damages by 4pm on ")
                                                 .date2(LocalDate.now().plusWeeks(4))
                                                 .input4("The provisions of CPR 32.6 apply to such evidence.")
-                                                .input5("Any application by the defendant/s pursuant to CPR 32.7 "
+                                                .input5("Any application by the defendant in relation to CPR 32.7 "
                                                             + "must be made by 4pm on")
                                                 .date3(LocalDate.now().plusWeeks(2))
-                                                .input6("and must be accompanied by proposed directions for "
-                                                            + "allocation and listing for trial on quantum as"
-                                                            + " cross-examination will result in the hearing "
-                                                            + "exceeding the 30 minute maximum time estimate"
-                                                            + " for a disposal hearing")
+                                                .input6("and must be accompanied by proposed directions for allocation"
+                                                            + " and listing for trial on quantum. This is because"
+                                                            + " cross-examination will cause the hearing to exceed"
+                                                            + " the 30-minute maximum time estimate for a disposal"
+                                                            + " hearing")
                                                 .build());
 
         caseDataBuilder.disposalHearingMedicalEvidenceDJ(DisposalHearingMedicalEvidenceDJ
@@ -256,7 +256,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
         caseDataBuilder.disposalHearingSchedulesOfLossDJ(DisposalHearingSchedulesOfLossDJ
                                                              .builder()
-                                                             .input1("If there is a claim for ongoing/future loss "
+                                                             .input1("If there is a claim for ongoing or future loss "
                                                                          + "in the original schedule of losses then"
                                                                          + " the claimant"
                                                                          + " must send an up to date schedule of "
@@ -272,13 +272,18 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                          + " must upload to the Digital Portal an "
                                                                          + "updated counter schedule of loss by 4pm on")
                                                              .date3(LocalDate.now().plusWeeks(12))
+                                                             .inputText4("If there is a claim for future pecuniary loss"
+                                                                         + " and the parties have not already set out"
+                                                                         + " their case on periodical payments, they"
+                                                                         + " must do so in the respective schedule"
+                                                                         + " and counter-schedule.")
                                                              .build());
 
         caseDataBuilder.disposalHearingFinalDisposalHearingDJ(DisposalHearingFinalDisposalHearingDJ
                                                                   .builder()
-                                                                  .input("This claim be listed for final "
+                                                                  .input("This claim will be listed for final "
                                                                              + "disposal before a Judge on the first "
-                                                                             + "available date after.")
+                                                                             + "available date after")
                                                                   .date(LocalDate.now().plusWeeks(16))
                                                                   .build());
 
@@ -306,8 +311,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
         caseDataBuilder.disposalHearingBundleDJ(DisposalHearingBundleDJ
                                                     .builder()
-                                                    .input("The claimant must lodge at court at least 7 "
-                                                               + "days before the disposal")
+                                                    .input("At least 7 days before the disposal hearing, the claimant"
+                                                               + " must upload to the Digital Portal")
                                                     .build());
 
         caseDataBuilder.disposalHearingNotesDJ(DisposalHearingNotesDJ
