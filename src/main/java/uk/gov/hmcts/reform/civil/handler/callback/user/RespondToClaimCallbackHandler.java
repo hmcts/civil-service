@@ -583,7 +583,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             ));
     }
 
-    private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+     private void assembleResponseDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         List<Element<CaseDocument>> defendantUploads = new ArrayList<>();
         Optional.ofNullable(caseData.getRespondent1ClaimResponseDocument())
             .map(ResponseDocument::getFile).ifPresent(respondent1ClaimDocument -> defendantUploads.add(
