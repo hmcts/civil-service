@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -38,7 +37,6 @@ import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
-import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -46,7 +44,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Optional.ofNullable;
@@ -163,18 +160,6 @@ public class InitiateGeneralApplicationService {
                 .generalAppStatementOfTruth(GAStatementOfTruth.builder().build());
         }
 
-        Optional<Organisation> org = findOrganisation(authToken);
-        if (org.isPresent()) {
-            applicationBuilder
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec
-                                             .builder()
-                                             .id(userDetails.getId())
-                                             .email(userDetails.getEmail())
-                                             .forename(userDetails.getForename())
-                                             .surname(userDetails.getSurname())
-                                             .organisationIdentifier(org.get().getOrganisationIdentifier()).build());
-        }
-
         GACaseManagementCategoryElement civil =
             GACaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
         List<Element<GACaseManagementCategoryElement>> itemList = new ArrayList<>();
@@ -289,16 +274,6 @@ public class InitiateGeneralApplicationService {
                     }
                 });
             }
-        }
-    }
-
-    public Optional<Organisation> findOrganisation(String authToken) {
-        try {
-            return ofNullable(organisationApi.findUserOrganisation(authToken, authTokenGenerator.generate()));
-
-        } catch (FeignException.NotFound | FeignException.Forbidden ex) {
-            log.error("User not registered in MO", ex);
-            return Optional.empty();
         }
     }
 
