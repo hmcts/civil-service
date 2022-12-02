@@ -38,6 +38,7 @@ class StateFlowEngineSpecTest {
     void setup() {
         when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
         when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
+        when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
     }
 
     @Nested

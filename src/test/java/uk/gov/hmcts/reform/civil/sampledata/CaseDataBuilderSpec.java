@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.civil.sampledata;
 
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
@@ -24,8 +24,6 @@ import java.time.LocalDateTime;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
@@ -38,6 +36,7 @@ public class CaseDataBuilderSpec {
         .atTime(23, 59, 59);
 
     // Create Claim
+    protected CaseCategory caseAccessCategory;
     protected Long ccdCaseReference;
     protected SolicitorReferences solicitorReferences;
     protected Party applicant1;
@@ -64,7 +63,6 @@ public class CaseDataBuilderSpec {
     protected OrganisationPolicy respondent1OrganisationPolicy;
     protected OrganisationPolicy respondent2OrganisationPolicy;
     protected YesOrNo addApplicant2;
-    protected SuperClaimType superClaimType;
     protected YesOrNo addRespondent2;
     protected YesOrNo respondent2SameLegalRepresentative;
 
@@ -180,7 +178,7 @@ public class CaseDataBuilderSpec {
     }
 
     public CaseDataBuilderSpec atStateClaimDraft() {
-        superClaimType = SPEC_CLAIM;
+        caseAccessCategory = CaseCategory.SPEC_CLAIM;
         solicitorReferences = SolicitorReferences.builder()
             .applicantSolicitor1Reference("12345")
             .respondentSolicitor1Reference("6789")
@@ -353,6 +351,7 @@ public class CaseDataBuilderSpec {
     public CaseData build() {
         return CaseData.builder()
             // Create Claim
+            .caseAccessCategory(caseAccessCategory)
             .legacyCaseReference(legacyCaseReference)
             .solicitorReferences(solicitorReferences)
             .claimValue(claimValue)
@@ -383,8 +382,6 @@ public class CaseDataBuilderSpec {
             .respondent2SameLegalRepresentative(respondent2SameLegalRepresentative)
             //dates
             .submittedDate(submittedDate)
-            //ui field
-            .superClaimType(superClaimType == null ? UNSPEC_CLAIM : superClaimType)
             //workaround fields
             .respondent1Copy(respondent1Copy)
             .respondent2Copy(respondent2Copy)
