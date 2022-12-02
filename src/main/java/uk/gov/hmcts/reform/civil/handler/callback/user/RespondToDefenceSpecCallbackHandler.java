@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,11 +36,14 @@ import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -87,18 +91,19 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(MID, "experts"), this::validateApplicantExperts,
-            callbackKey(MID, "witnesses"), this::validateApplicantWitnesses,
-            callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
-            callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
-            callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag,
-            callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false),
-            callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true),
-            callbackKey(ABOUT_TO_START), this::populateCaseData,
-            callbackKey(V_1, ABOUT_TO_START), this::populateCaseData,
-            callbackKey(SUBMITTED), this::buildConfirmation
-        );
+        return new ImmutableMap.Builder<String, Callback>()
+            .put(callbackKey(MID, "experts"), this::validateApplicantExperts)
+            .put(callbackKey(MID, "witnesses"), this::validateApplicantWitnesses)
+            .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
+            .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
+            .put(callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag)
+            .put(callbackKey(V_1, MID, "validate-amount-paid"), this::validateAmountPaid)
+            .put(callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false))
+            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true))
+            .put(callbackKey(ABOUT_TO_START), this::populateCaseData)
+            .put(callbackKey(V_1, ABOUT_TO_START), this::populateCaseData)
+            .put(callbackKey(SUBMITTED), this::buildConfirmation)
+            .build();
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
@@ -411,5 +416,19 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             }
         }
         return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID;
+    }
+
+    private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+        if (caseData.getCcjPaymentPaidSomeAmount() != null) {
+            if (caseData.getCcjPaymentPaidSomeAmount()
+                .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0){
+                errors.add("The amount paid must be less than the full claim amount.");
+            }
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
     }
 }
