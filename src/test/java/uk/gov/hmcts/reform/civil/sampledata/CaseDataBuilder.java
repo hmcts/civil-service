@@ -1452,16 +1452,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder courtLocation_old() {
         this.courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("131").build();
+            .applicantPreferredCourt("127").build();
         return this;
     }
 
     public CaseDataBuilder courtLocation() {
         this.courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("131")
+            .applicantPreferredCourt("127")
             .caseLocation(CaseLocation.builder()
-                              .region("4")
-                              .baseLocation("214320")
+                              .region("regionId1")
+                              .baseLocation("epimmsId1")
                               .build())
             .build();
         return this;

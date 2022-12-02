@@ -117,7 +117,7 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
             LocationRefData.builder().epimmsId("1234").region("1").build());
         when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "court4")).thenReturn(
             LocationRefData.builder().epimmsId("1234").region("1").build());
-        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "131")).thenReturn(
+        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "127")).thenReturn(
             LocationRefData.builder().epimmsId("1234").region("1").build());
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -144,7 +144,7 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
             LocationRefData.builder().epimmsId("1234").region("1").build());
         when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "court4")).thenReturn(
             LocationRefData.builder().epimmsId("1234").region("1").build());
-        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "131")).thenReturn(
+        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "127")).thenReturn(
             LocationRefData.builder().epimmsId("1234").region("1").build());
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -204,7 +204,7 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
             LocationRefData.builder().epimmsId("1234").region("1").build());
         when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "court4")).thenReturn(
             LocationRefData.builder().epimmsId("1234").region("1").build());
-        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "131")).thenReturn(
+        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "127")).thenReturn(
             LocationRefData.builder().epimmsId("1234").region("1").build());
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -232,7 +232,7 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
             LocationRefData.builder().epimmsId("1234").region("1").build());
         when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "court4")).thenReturn(
             LocationRefData.builder().epimmsId("1234").region("1").build());
-        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "131")).thenReturn(
+        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "127")).thenReturn(
             LocationRefData.builder().epimmsId("1234").region("1").build());
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
