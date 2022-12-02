@@ -56,7 +56,7 @@ public class CaseDataBuilderSpec {
     protected PaymentDetails claimIssuedPaymentDetails;
     protected CorrectEmail applicantSolicitor1CheckEmail;
     protected IdamUserDetails applicantSolicitor1UserDetails;
-//    //Acknowledge Claim
+    //Acknowledge Claim
     protected YesOrNo respondent1OrgRegistered;
     protected YesOrNo respondent2OrgRegistered;
     protected OrganisationPolicy applicant1OrganisationPolicy;
@@ -66,7 +66,7 @@ public class CaseDataBuilderSpec {
     protected YesOrNo addRespondent2;
     protected YesOrNo respondent2SameLegalRepresentative;
 
-//    //dates
+    //dates
     protected LocalDateTime submittedDate;
 
     private String respondent1OrganisationIDCopy;
