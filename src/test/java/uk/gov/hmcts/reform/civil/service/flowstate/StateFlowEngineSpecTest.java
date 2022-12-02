@@ -312,8 +312,7 @@ class StateFlowEngineSpecTest {
             );
         }
 
-        @Test //AC 11 1v2 defendant 1 represented solicitor unregistered,
-            // and defendant 2 solicitor registered defendant
+        @Test //AC 11 1v2 def 1 represented solicitor unregistered, and def 2 solicitor registered
         void shouldReturnClaimSubmitted_atStateClaimSubmitted1v2OneRepresentedUnregisteredDefendantSpecified() {
             CaseData caseData = CaseDataBuilderSpec.builder()
                 .atStateSpec1v2Solicitor1UnregisteredSolicitor2Registered()
