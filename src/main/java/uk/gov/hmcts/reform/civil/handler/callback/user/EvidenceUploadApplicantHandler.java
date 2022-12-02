@@ -6,6 +6,7 @@ import java.util.Collections;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.Time;
 
@@ -16,6 +17,11 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
 
     public EvidenceUploadApplicantHandler(ObjectMapper objectMapper, Time time) {
         super(objectMapper, time, Collections.singletonList(EVIDENCE_UPLOAD_APPLICANT), "validateValuesApplicant");
+    }
+
+    @Override
+    CallbackResponse caseType(CaseData caseData) {
+        return caseTypeDetermine(caseData);
     }
 
     @Override

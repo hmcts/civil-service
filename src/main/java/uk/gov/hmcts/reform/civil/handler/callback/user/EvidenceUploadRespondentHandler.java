@@ -29,6 +29,11 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
 
     }
 
+    @Override
+    CallbackResponse caseType(CaseData caseData) {
+        return null;
+    }
+
     void applyDocumentUploadDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, LocalDateTime now) {
         caseDataBuilder.caseDocumentUploadDateRes(now);
     }
