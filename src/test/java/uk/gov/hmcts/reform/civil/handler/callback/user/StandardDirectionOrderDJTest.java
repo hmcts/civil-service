@@ -225,7 +225,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "their case on periodical payments, they must do so in the respective schedule"
                                + " and counter-schedule.");
 
-            assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingDJ").extracting("input")
+            assertThat(response.getData())
+                .extracting("disposalHearingFinalDisposalHearingDJ").extracting("input")
                 .isEqualTo("This claim will be listed for final disposal before a Judge on the first available date after");
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingDJ").extracting("date")
                 .isEqualTo(LocalDate.now().plusWeeks(16).toString());
