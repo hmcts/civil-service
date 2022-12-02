@@ -21,12 +21,19 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 
 public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
@@ -35,16 +42,21 @@ public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final Time time;
     private MultiPartyScenario multiPartyScenario;
+    private final CoreCaseUserService coreCaseUserService;
+    private final UserService userService;
 
-    protected EvidenceUploadHandlerBase(ObjectMapper objectMapper, Time time, List<CaseEvent> events, String pageId) {
+    protected EvidenceUploadHandlerBase(UserService userService, CoreCaseUserService coreCaseUserService,ObjectMapper objectMapper, Time time, List<CaseEvent> events, String pageId) {
         this.objectMapper = objectMapper;
         this.time = time;
         this.events = events;
         this.pageId = pageId;
+        this.coreCaseUserService = coreCaseUserService;
+        this.userService = userService;
+
     }
 
     abstract CallbackResponse validateValues(CaseData caseData);
-    abstract CallbackResponse caseType(CaseData caseData);
+    abstract CallbackResponse caseType(CaseData caseData, CallbackParams callbackParams);
 
     abstract void applyDocumentUploadDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, LocalDateTime now);
 
@@ -64,19 +76,30 @@ public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     }
 
     CallbackResponse caseType(CallbackParams callbackParams) {
-        return caseTypeDetermine(callbackParams.getCaseData());
+        return caseTypeDetermine(callbackParams.getCaseData(), callbackParams);
 
     }
 
-    CallbackResponse caseTypeDetermine(CaseData caseData) {
-        //CaseData caseData = callbackParams.getCaseData();
+    CallbackResponse caseTypeDetermine(CaseData caseData, CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        if (multiPartyScenario.getMultiPartyScenario(caseData).equals(MultiPartyScenario.ONE_V_ONE)) {
-              caseDataBuilder.caseTypeFlag("ONEvONE");
-              System.out.println("do dah");
-              System.out.println(caseData.getCaseTypeFlag());
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+
+        if (!multiPartyScenario.getMultiPartyScenario(caseData).equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)) {
+              caseDataBuilder.caseTypeFlag("NotMultiParty");
+        } else {
+
+
+            if(coreCaseUserService.userHasCaseRole(caseData
+                                                       .getCcdCaseReference()
+                                                       .toString(),userInfo.getUid(),RESPONDENTSOLICITORTWO)){
+                caseDataBuilder.caseTypeFlag("MultiParty");
+            }
+
         }
+        System.out.println(coreCaseUserService.getUserCaseRoles(caseData
+                                                                    .getCcdCaseReference().toString(),userInfo.getUid()));
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
