@@ -173,19 +173,19 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo("The claimant must upload to the Digital Portal copies of the "
                                + "witness statements of all witnesses whose evidence they "
                                + "wish the court to consider when deciding the amount of "
-                               + "damages by by 4pm on ");
+                               + "damages by 4pm on ");
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("date2")
                 .isEqualTo(LocalDate.now().plusWeeks(4).toString());
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input4")
                 .isEqualTo("The provisions of CPR 32.6 apply to such evidence.");
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input5")
-                .isEqualTo("Any application by the defendant/s pursuant to CPR 32.7 must be made by 4pm on");
+                .isEqualTo("Any application by the defendant in relation to CPR 32.7 must be made by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("date3")
                 .isEqualTo(LocalDate.now().plusWeeks(2).toString());
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input6")
-                .isEqualTo("and must be accompanied by proposed directions for allocation and listing for trial on "
-                               + "quantum as cross-examination will result in the hearing exceeding the 30 minute "
-                               + "maximum time estimate for a disposal hearing");
+                .isEqualTo("and must be accompanied by proposed directions for allocation and listing for trial"
+                               + " on quantum. This is because cross-examination will cause the hearing to exceed"
+                               + " the 30-minute maximum time estimate for a disposal hearing");
 
             assertThat(response.getData()).extracting("disposalHearingMedicalEvidenceDJ").extracting("input1")
                 .isEqualTo("The claimant has permission to rely upon the"
@@ -202,7 +202,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo(LocalDate.now().plusWeeks(6).toString());
 
             assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossDJ").extracting("input1")
-                .isEqualTo("If there is a claim for ongoing/future loss in the original schedule of losses then the "
+                .isEqualTo("If there is a claim for ongoing or future loss in the original schedule of losses then the "
                                + "claimant must send an up to date schedule of loss to the defendant by 4pm on the");
             assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossDJ").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(10).toString());
@@ -220,14 +220,21 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                                + "updated counter schedule of loss by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossDJ").extracting("date3")
                 .isEqualTo(LocalDate.now().plusWeeks(12).toString());
+            assertThat(response.getData()).extracting("disposalHearingSchedulesOfLossDJ").extracting("inputText4")
+                .isEqualTo("If there is a claim for future pecuniary loss and the parties have not already set out "
+                               + "their case on periodical payments, they must do so in the respective schedule"
+                               + " and counter-schedule.");
 
-            assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingDJ").extracting("input")
-                .isEqualTo("This claim be listed for final disposal before a Judge on the first available date after.");
+            assertThat(response.getData())
+                .extracting("disposalHearingFinalDisposalHearingDJ").extracting("input")
+                .isEqualTo("This claim will be listed for final disposal "
+                                + "before a Judge on the first available date after");
             assertThat(response.getData()).extracting("disposalHearingFinalDisposalHearingDJ").extracting("date")
                 .isEqualTo(LocalDate.now().plusWeeks(16).toString());
 
             assertThat(response.getData()).extracting("disposalHearingBundleDJ").extracting("input")
-                .isEqualTo("The claimant must lodge at court at least 7 days before the disposal");
+                .isEqualTo("At least 7 days before the disposal hearing, the claimant must upload to the"
+                               + " Digital Portal");
 
             assertThat(response.getData()).extracting("disposalHearingNotesDJ").extracting("input")
                 .isEqualTo("This order has been made without a hearing. Each "
