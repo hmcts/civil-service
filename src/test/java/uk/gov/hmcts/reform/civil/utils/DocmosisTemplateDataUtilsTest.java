@@ -25,12 +25,13 @@ class DocmosisTemplateDataUtilsTest {
                              .individualLastName("Richards")
                              .partyName("Mr. Alex Richards")
                              .build())
+            .ccdCaseReference(1L)
             .build();
         String caseName = toCaseName.apply(caseData);
         assertThat(caseData.getApplicant1()).isNull();
         assertThat(caseName).isNotEqualTo("Mr. Sam Clark vs Mr. Alex Richards");
     }
-    
+
     @Test
     void shouldReturnCaseName_whenBothPartiesAreIndividuals() {
         CaseData caseData = CaseData.builder()
