@@ -87,8 +87,8 @@ class SealedClaimFormGeneratorTest {
         List<LocationRefData> locations = new ArrayList<>();
         locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
                           .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
-                          .courtTypeId("10").courtLocationCode("131")
-                          .epimmsId("214320").build());
+                          .courtTypeId("10").courtLocationCode("121")
+                          .epimmsId("000000").build());
         when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
     }
 

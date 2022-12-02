@@ -636,7 +636,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 List<LocationRefData> locations = new ArrayList<>();
                 locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
                                   .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
-                                  .courtTypeId("10").courtLocationCode("131")
+                                  .courtTypeId("10").courtLocationCode("121")
                                   .epimmsId("214320").build());
                 when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
@@ -646,7 +646,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData()).extracting("applicant1DQRequestedCourt")
                     .extracting("responseCourtCode")
-                    .isEqualTo("131");
+                    .isEqualTo("121");
 
                 assertThat(response.getData()).extracting("applicant1DQRequestedCourt")
                     .extracting("caseLocation")
