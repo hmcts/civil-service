@@ -238,16 +238,19 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUpdateCertificateOfService_and_documents_whenSubmitted() {
             when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
-            LocalDate past = LocalDate.now().minusDays(1);
+            LocalDate cosDate = localDateTime.minusDays(2).toLocalDate();
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDate.atStartOfDay()))
+                    .thenReturn(newDate.minusDays(2));
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
-                    .setCoSClaimDetailsWithDate(true, false, past, null, true, false)
+                    .setCoSClaimDetailsWithDate(true, false, cosDate, null, true, false)
                     .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(1);
             assertThat(updatedData.getCosNotifyClaimDetails1().getCosDetailSaved()).isEqualTo(YES);
+            assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(newDate.minusDays(2));
         }
     }
 

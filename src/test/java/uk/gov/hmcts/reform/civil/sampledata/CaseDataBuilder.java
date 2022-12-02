@@ -1497,11 +1497,13 @@ public class CaseDataBuilder {
         atStateClaimDraft();
         respondent1OrganisationPolicy = null;
         defendant1LIPAtClaimIssued = YES;
+        respondent1Represented = NO;
 
         addRespondent2 = YES;
         respondent2OrganisationPolicy = null;
         respondent2SameLegalRepresentative = NO;
         defendant2LIPAtClaimIssued = YES;
+        respondent2Represented = NO;
         return this;
     }
 
@@ -3742,6 +3744,11 @@ public class CaseDataBuilder {
                 .documentFileName("file-name")
                 .documentBinaryUrl("binary-url")
                 .build());
+        List<Element<Document>> files2 = wrapElements(Document.builder()
+                .documentUrl("fake-url2")
+                .documentFileName("file-name2")
+                .documentBinaryUrl("binary-url2")
+                .build());
         if (setCos1) {
             CertificateOfService.CertificateOfServiceBuilder cos1Builder = CertificateOfService.builder()
                     .cosDateOfServiceForDefendant(cos1Date);
@@ -3754,7 +3761,7 @@ public class CaseDataBuilder {
             CertificateOfService.CertificateOfServiceBuilder cos2Builder = CertificateOfService.builder()
                     .cosDateOfServiceForDefendant(cos2Date);
             if (file2) {
-                cos2Builder.cosEvidenceDocument(files);
+                cos2Builder.cosEvidenceDocument(files2);
             }
             this.cosNotifyClaimDetails2 = cos2Builder.build();
         }
@@ -3978,9 +3985,9 @@ public class CaseDataBuilder {
             .disposalHearingFinalDisposalHearingTimeDJ(disposalHearingFinalDisposalHearingTimeDJ)
             .trialHearingTimeDJ(trialHearingTimeDJ)
             .trialOrderMadeWithoutHearingDJ(trialOrderMadeWithoutHearingDJ)
-                //Certificate of Service
-                .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
-                .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
+            //Certificate of Service
+            .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
+            .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
             .build();
     }
 
