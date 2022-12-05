@@ -247,7 +247,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(1);
-            assertThat(updatedData.getCosNotifyClaimDetails1().getCosDetailSaved()).isEqualTo(YES);
+            assertThat(updatedData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
         }
     }
 
@@ -336,7 +336,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         AboutToStartOrSubmitCallbackResponse successResponse =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(successResponse.getErrors()).isEmpty();
-        assertThat(params.getCaseData().getCosNotifyClaimDetails1().getCosDetailSaved()).isEqualTo(NO);
+        assertThat(params.getCaseData().getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(NO);
     }
 
     @Test
