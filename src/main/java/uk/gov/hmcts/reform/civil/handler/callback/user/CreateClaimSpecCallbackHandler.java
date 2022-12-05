@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -32,6 +33,7 @@ import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -44,6 +46,7 @@ import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
@@ -136,6 +139,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final StateFlowEngine stateFlowEngine;
     private final FeatureToggleService featureToggleService;
 
+    @Value("${court-location.specified-claim.epimms-id}")
+    private String epimmsId;
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
@@ -391,6 +396,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         }
 
+        if (V_1.equals(callbackParams.getVersion())
+            && toggleService.isCourtLocationDynamicListEnabled()) {
+            dataBuilder.caseManagementLocation(CaseLocation.builder().region(regionId).baseLocation(epimmsId).build());
+        }
+
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
         ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
 
@@ -412,6 +422,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             log.info("Case management equals: " + caseData.getCaseManagementCategory());
             log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
 
+        }
+
+        if (featureToggleService.isNoticeOfChangeEnabled()) {
+            OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

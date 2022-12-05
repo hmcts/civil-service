@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -42,6 +43,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
@@ -68,7 +70,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -115,6 +116,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService featureToggleService;
+
+    @Value("${court-location.unspecified-claim.region-id}")
+    private String regionId;
+    @Value("${court-location.unspecified-claim.epimms-id}")
+    private String epimmsId;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -313,12 +319,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         if (caseData.getRespondent2SameLegalRepresentative() == YES) {
             OrganisationPolicy.OrganisationPolicyBuilder organisationPolicy2Builder = OrganisationPolicy.builder();
 
-            if (caseData.getRespondent1OrgRegistered() == YES) {
-                OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
-                organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
-                    .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
-                    .build();
-            }
+            OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
+            organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
+                .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
+                .build();
 
             organisationPolicy2Builder.orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
             caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2Builder.build());
@@ -386,7 +390,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             if (areAnyRespondentsLitigantInPerson(caseData) == true) {
                 dataBuilder.addLegalRepDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(time.now()));
             }
-            populateBlankOrgPolicies(dataBuilder, caseData);
+            OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
         }
 
         // temporarily default to yes for CIV-2659
@@ -429,21 +433,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                       YES.equals(caseData.getAddRespondent2())
                           && NO.equals(caseData.getRespondent2SameLegalRepresentative())
                             ? ", " + caseData.getRespondent2().getPartyName() : "");
-    }
-
-    private void populateBlankOrgPolicies(CaseData.CaseDataBuilder dataBuilder, CaseData caseData) {
-        if (caseData.getRespondent1OrganisationPolicy() == null) {
-            dataBuilder
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
-                                                   .build());
-        }
-        if (caseData.getRespondent2OrganisationPolicy() == null) {
-            dataBuilder
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
-                                                   .build());
-        }
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
@@ -583,11 +572,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         if (Objects.nonNull(courtLocation)) {
             CourtLocation.CourtLocationBuilder courtLocationBuilder = caseData.getCourtLocation().toBuilder();
             dataBuilder
+                .caseManagementLocation(CaseLocation.builder().region(regionId).baseLocation(epimmsId).build())
                 .courtLocation(courtLocationBuilder
                                    .applicantPreferredCourt(courtLocation.getCourtLocationCode())
-                                   .caseLocation(CaseLocation.builder()
-                                                     .region(courtLocation.getRegionId())
-                                                     .baseLocation(courtLocation.getEpimmsId()).build())
+                                   .caseLocation(LocationRefDataService.buildCaseLocation(courtLocation))
                                    //to clear list of court locations from caseData
                                    .applicantPreferredCourtLocationList(null)
                                    .build());

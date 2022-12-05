@@ -64,6 +64,10 @@ public class FeatureToggleService {
         return isFeatureEnabled("enableSDO");
     }
 
+    public boolean isGeneralApplicationsEnabled() {
+        return internalClient.boolVariation("general_applications_enabled", createLDUser().build(), false);
+    }
+
     public LDUser.Builder createLDUser() {
         return new LDUser.Builder("civil-service")
             .custom("timestamp", String.valueOf(System.currentTimeMillis()))
@@ -88,6 +92,14 @@ public class FeatureToggleService {
 
     public boolean isAccessProfilesEnabled() {
         return internalClient.boolVariation("access-profiles", createLDUser().build(), false);
+    }
+
+    public boolean isPbaV3Enabled() {
+        return internalClient.boolVariation("pba-version-3-ways-to-pay", createLDUser().build(), false);
+    }
+
+    public boolean isSDOEnabled() {
+        return internalClient.boolVariation("enableSDO", createLDUser().build(), false);
     }
 
     private void close() {

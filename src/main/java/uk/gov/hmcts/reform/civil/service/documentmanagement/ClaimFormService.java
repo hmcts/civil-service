@@ -28,4 +28,8 @@ public class ClaimFormService {
     public byte[] downloadSealedDocument(String authorisation, CaseDocument caseDocument) {
         return sealedClaimFormGeneratorForSpec.downloadDocument(caseDocument, authorisation);
     }
+
+    public byte[] downloadSealedDocument(CaseDocument caseDocument) {
+        return sealedClaimFormGeneratorForSpec.downloadDocument(caseDocument);
+    }
 }

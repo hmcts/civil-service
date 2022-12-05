@@ -105,6 +105,15 @@ class FeatureToggleServiceTest {
     }
 
     @Test
+    void shouldCallBoolVariation_whenIsGeneralApplicationsEnabledInvoked() {
+        var generalApplicationsKey = "general_applications_enabled";
+        givenToggle(generalApplicationsKey, true);
+
+        assertThat(featureToggleService.isGeneralApplicationsEnabled()).isTrue();
+        verifyBoolVariationCalled(generalApplicationsKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
     void shouldCallBoolVariation_whenIsPinInPostEnabledInvoked() {
         var pinInPostKey = "pin-in-post";
         givenToggle(pinInPostKey, true);
@@ -120,6 +129,15 @@ class FeatureToggleServiceTest {
 
         assertThat(featureToggleService.isAccessProfilesEnabled()).isTrue();
         verifyBoolVariationCalled(accessProfilesKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
+    void shouldCallBoolVariation_whenIsSDOEnabledInvoked() {
+        var enableSDOKey = "enableSDO";
+        givenToggle(enableSDOKey, true);
+
+        assertThat(featureToggleService.isSDOEnabled()).isTrue();
+        verifyBoolVariationCalled(enableSDOKey, List.of("timestamp", "environment"));
     }
 
     @Test
@@ -169,5 +187,14 @@ class FeatureToggleServiceTest {
             any(LDUser.class),
             eq(false)
         );
+    }
+
+    @Test
+    void shouldCallBoolVariation_whenIsPbaV3EnabledInvoked() {
+        var pbaV3Key = "pba-version-3-ways-to-pay";
+        givenToggle(pbaV3Key, true);
+
+        assertThat(featureToggleService.isPbaV3Enabled()).isTrue();
+        verifyBoolVariationCalled(pbaV3Key, List.of("timestamp", "environment"));
     }
 }

@@ -20,7 +20,9 @@ public enum SmallClaimsTimeEstimate {
     @JsonProperty("FOUR_HOURS")
     FOUR_HOURS("Four hours"),
     @JsonProperty("ONE_DAY")
-    ONE_DAY("One day");
+    ONE_DAY("One day"),
+    @JsonProperty("OTHER")
+    OTHER("Other");
 
     private final String label;
 

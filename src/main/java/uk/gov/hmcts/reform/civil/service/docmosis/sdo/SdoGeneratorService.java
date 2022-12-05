@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -27,6 +28,9 @@ public class SdoGeneratorService {
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
     private final IdamClient idamClient;
+    private final FeatureToggleService toggleService;
+
+    private final FeatureToggleService featuretoggleService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         MappableObject templateData;
@@ -37,12 +41,18 @@ public class SdoGeneratorService {
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
+
+            if (toggleService.isHearingAndListingSDOEnabled()) {
+                docmosisTemplate = DocmosisTemplates.SDO_SMALL_HNL;
+            }
             templateData = getTemplateDataSmall(caseData, judgeName);
         } else if (SdoHelper.isFastTrack(caseData)) {
-            docmosisTemplate = DocmosisTemplates.SDO_FAST;
+            docmosisTemplate = featuretoggleService.isHearingAndListingSDOEnabled()
+                ? DocmosisTemplates.SDO_HNL_FAST : DocmosisTemplates.SDO_FAST;
             templateData = getTemplateDataFast(caseData, judgeName);
         } else {
-            docmosisTemplate = DocmosisTemplates.SDO_DISPOSAL;
+            docmosisTemplate = featuretoggleService.isHearingAndListingSDOEnabled()
+                ? DocmosisTemplates.SDO_HNL_DISPOSAL : DocmosisTemplates.SDO_DISPOSAL;
             templateData = getTemplateDataDisposal(caseData, judgeName);
         }
 
@@ -65,7 +75,7 @@ public class SdoGeneratorService {
     }
 
     private SdoDocumentFormDisposal getTemplateDataDisposal(CaseData caseData, String judgeName) {
-        return SdoDocumentFormDisposal.builder()
+        var sdoDocumentBuilder = SdoDocumentFormDisposal.builder()
             .currentDate(LocalDate.now())
             .judgeName(judgeName)
             .caseNumber(caseData.getLegacyCaseReference())
@@ -137,12 +147,20 @@ public class SdoGeneratorService {
             )
             .disposalHearingCostsToggle(
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingCostsToggle")
-            )
-            .build();
+            );
+
+        if (featuretoggleService.isHearingAndListingSDOEnabled()) {
+            sdoDocumentBuilder
+                .disposalOrderWithoutHearing(caseData.getDisposalOrderWithoutHearing())
+                .disposalHearingTime(caseData.getDisposalHearingHearingTime())
+                .disposalHearingTimeEstimate(caseData.getDisposalHearingHearingTime().getTime().getLabel());
+        }
+
+        return sdoDocumentBuilder.build();
     }
 
     private SdoDocumentFormFast getTemplateDataFast(CaseData caseData, String judgeName) {
-        return SdoDocumentFormFast.builder()
+        var sdoDocumentFormBuilder = SdoDocumentFormFast.builder()
             .currentDate(LocalDate.now())
             .judgeName(judgeName)
             .caseNumber(caseData.getLegacyCaseReference())
@@ -234,8 +252,17 @@ public class SdoGeneratorService {
             )
             .fastTrackMethodToggle(
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")
-            )
-            .build();
+            );
+
+        if (featuretoggleService.isHearingAndListingSDOEnabled()) {
+            sdoDocumentFormBuilder
+                .fastTrackOrderWithoutJudgement(caseData.getFastTrackOrderWithoutJudgement())
+                .fastTrackHearingTime(caseData.getFastTrackHearingTime())
+                .fastTrackHearingTimeEstimate(
+                    caseData.getFastTrackHearingTime().getHearingDuration().getLabel());
+        }
+
+        return sdoDocumentFormBuilder.build();
     }
 
     private SdoDocumentFormSmall getTemplateDataSmall(CaseData caseData, String judgeName) {
@@ -269,6 +296,8 @@ public class SdoGeneratorService {
                 SdoHelper.getSmallClaimsHearingTimeLabel(caseData)
             )
             .smallClaimsMethod(caseData.getSmallClaimsMethod())
+            // CIV-5514: smallClaimsMethodInPerson, smallClaimsMethodTelephoneHearing and
+            // smallClaimsMethodVideoConferenceHearing can be removed after HNL is live
             .smallClaimsMethodInPerson(caseData.getSmallClaimsMethodInPerson())
             .smallClaimsMethodTelephoneHearing(
                 SdoHelper.getSmallClaimsMethodTelephoneHearingLabel(caseData)
