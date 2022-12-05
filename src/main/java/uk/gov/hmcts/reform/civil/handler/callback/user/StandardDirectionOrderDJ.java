@@ -232,7 +232,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                 .input6("and must be accompanied by proposed directions for allocation"
                                                             + " and listing for trial on quantum. This is because"
                                                             + " cross-examination will cause the hearing to exceed"
-                                                            + " the 30-minute maximum time estimate for a disposal"
+                                                            + " the 30 minute maximum time estimate for a disposal"
                                                             + " hearing")
                                                 .build());
 
@@ -474,10 +474,10 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                  .input1("The claimant must prepare a Scott Schedule of the defects,"
                                                              + " items of damage "
                                                              + "or any other relevant matters")
-                                                 .input2("The columns should be headed: \n - Item; \n - "
-                                                             + "Alleged Defect; "
-                                                             + "\n - Claimant's costing;\n - Defendant's"
-                                                             + " response;\n - Defendant's costing;"
+                                                 .input2("The columns should be headed: \n - Item \n - "
+                                                             + "Alleged Defect "
+                                                             + "\n - Claimant's costing\n - Defendant's"
+                                                             + " response\n - Defendant's costing"
                                                              + " \n - Reserved for Judge's use")
                                                  .input3("The claimant must upload to the Digital Portal the "
                                                              + "Scott Schedule with the relevant "
@@ -591,9 +591,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.trialHousingDisrepair(TrialHousingDisrepair.builder()
                                                   .input1("The claimant must prepare a Scott Schedule of the items "
                                                               + "in disrepair")
-                                                  .input2("The columns should be headed: \n - Item; \n - "
-                                                              + "Alleged disrepair; "
-                                                              + "\n - Defendant's Response; \n - "
+                                                  .input2("The columns should be headed: \n - Item \n - "
+                                                              + "Alleged disrepair "
+                                                              + "\n - Defendant's Response \n - "
                                                               + "Reserved for Judge's Use")
                                                   .input3("The claimant must upload to the Digital Portal the "
                                                               + "Scott Schedule with the relevant columns "

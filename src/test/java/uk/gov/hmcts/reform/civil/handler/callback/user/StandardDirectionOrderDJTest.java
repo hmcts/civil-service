@@ -185,7 +185,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input6")
                 .isEqualTo("and must be accompanied by proposed directions for allocation and listing for trial"
                                + " on quantum. This is because cross-examination will cause the hearing to exceed"
-                               + " the 30-minute maximum time estimate for a disposal hearing");
+                               + " the 30 minute maximum time estimate for a disposal hearing");
 
             assertThat(response.getData()).extracting("disposalHearingMedicalEvidenceDJ").extracting("input1")
                 .isEqualTo("The claimant has permission to rely upon the"
@@ -354,10 +354,10 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo("The claimant must prepare a Scott Schedule of the defects, items of damage "
                                + "or any other relevant matters");
             assertThat(response.getData()).extracting("trialBuildingDispute").extracting("input2")
-                .isEqualTo("The columns should be headed: \n - Item; \n - "
-                               + "Alleged Defect; "
-                               + "\n - Claimant's costing;\n - Defendant's"
-                               + " response;\n - Defendant's costing;"
+                .isEqualTo("The columns should be headed: \n - Item \n - "
+                               + "Alleged Defect "
+                               + "\n - Claimant's costing\n - Defendant's"
+                               + " response\n - Defendant's costing"
                                + " \n - Reserved for Judge's use");
             assertThat(response.getData()).extracting("trialBuildingDispute").extracting("input3")
                 .isEqualTo("The claimant must upload to the Digital Portal the "
@@ -449,8 +449,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo("The claimant must prepare a Scott Schedule of the items "
                                + "in disrepair");
             assertThat(response.getData()).extracting("trialHousingDisrepair").extracting("input2")
-                .isEqualTo("The columns should be headed: \n - Item; \n - Alleged disrepair; "
-                               + "\n - Defendant's Response; \n - Reserved for Judge's Use");
+                .isEqualTo("The columns should be headed: \n - Item \n - Alleged disrepair "
+                               + "\n - Defendant's Response \n - Reserved for Judge's Use");
             assertThat(response.getData()).extracting("trialHousingDisrepair").extracting("input3")
                 .isEqualTo("The claimant must upload to the Digital Portal the "
                                + "Scott Schedule with the relevant columns "
