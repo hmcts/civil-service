@@ -9,11 +9,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
-import uk.gov.service.notify.NotificationClientException;
 
 import java.net.SocketTimeoutException;
-
-import static org.springframework.http.HttpStatus.FAILED_DEPENDENCY;
 
 @Slf4j
 @ControllerAdvice
@@ -38,11 +35,4 @@ public class ResourceExceptionHandler {
                                     new HttpHeaders(), HttpStatus.GATEWAY_TIMEOUT);
     }
 
-    @ExceptionHandler(NotificationClientException.class)
-    public ResponseEntity<Object> handleNotificationClientException(NotificationClientException exception) {
-        log.debug(exception.getMessage(), exception);
-        return ResponseEntity
-            .status(FAILED_DEPENDENCY)
-            .body(exception.getMessage());
-    }
 }

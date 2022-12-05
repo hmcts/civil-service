@@ -47,14 +47,12 @@ public class SendGridClient {
 
             Response response = sendGrid.api(request);
             if (!is2xxSuccessful(response)) {
-                log.error("EMAIl SEND FAILED:---------" + subject);
                 throw new EmailSendFailedException(new HttpException(String.format(
                     "SendGrid returned a non-success response (%d); body: %s",
                     response.getStatusCode(),
                     response.getBody()
                 )));
             }
-            log.info("EMAIl SENT:---------" + subject);
         } catch (IOException exception) {
             throw new EmailSendFailedException(exception);
         }
