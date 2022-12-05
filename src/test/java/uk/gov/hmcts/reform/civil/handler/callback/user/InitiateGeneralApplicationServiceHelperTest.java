@@ -238,6 +238,136 @@ public class InitiateGeneralApplicationServiceHelperTest {
     }
 
     @Test
+    void shouldSetApplicantSolicitorOrgIDTo200() {
+
+        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
+            .thenReturn(CaseAssignedUserRolesResource.builder()
+                            .caseAssignedUserRoles(getCaseUsersForApplicantCheck()).build());
+
+        GeneralApplication result = helper.setRespondentDetailsIfPresent(
+            GeneralApplication.builder().build(),
+            CaseData.builder().ccdCaseReference(1234L)
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .organisation(Organisation.builder().organisationID("100").build())
+                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
+                                                   .build())
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .organisation(Organisation.builder().organisationID("101").build())
+                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
+                                                   .build())
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(APPLICANT_EMAIL_ID_CONSTANT).build())
+                .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
+                .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
+                .respondent2(Party.builder().type(COMPANY).companyName("Respondent1").build())
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                                  .organisation(Organisation.builder().organisationID("200").build())
+                                                  .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
+                                                  .build())
+                .applicant2OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .organisation(Organisation.builder().organisationID("201").build())
+                                                   .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
+                                                   .build()).build(),
+            getUserDetails(STRING_NUM_CONSTANT, APPLICANT_EMAIL_ID_CONSTANT)
+        );
+
+        assertDoesNotThrow(() -> helper);
+        assertThat(result).isNotNull();
+        assertThat(result.getGeneralAppApplnSolicitor().getOrganisationIdentifier()).isEqualTo("200");
+    }
+
+    @Test
+    void shouldSetApplicantSolicitorOrgIDTo100() {
+
+        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
+            .thenReturn(CaseAssignedUserRolesResource.builder()
+                            .caseAssignedUserRoles(getCaseUsersForApplicantCheck()).build());
+
+        GeneralApplication result = helper.setRespondentDetailsIfPresent(
+            GeneralApplication.builder().build(),
+            CaseData.builder().ccdCaseReference(1234L)
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .organisation(Organisation.builder().organisationID("100").build())
+                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
+                                                   .build())
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .organisation(Organisation.builder().organisationID("101").build())
+                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
+                                                   .build())
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(APPLICANT_EMAIL_ID_CONSTANT).build())
+                .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
+                .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
+                .applicant2(Party.builder().type(COMPANY).companyName("Applicant2").build())
+                .respondent1(Party.builder().type(COMPANY).companyName("Respondent1").build())
+                .respondent2(Party.builder().type(COMPANY).companyName("Respondent2").build())
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                                  .organisation(Organisation.builder().organisationID("200").build())
+                                                  .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
+                                                  .build())
+                .applicant2OrganisationPolicy(OrganisationPolicy.builder()
+                                                  .organisation(Organisation.builder().organisationID("201").build())
+                                                  .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
+                                                  .build()).build(),
+            getUserDetails("2", APPLICANT_EMAIL_ID_CONSTANT)
+        );
+
+        assertDoesNotThrow(() -> helper);
+        assertThat(result).isNotNull();
+        assertThat(result.getGeneralAppApplnSolicitor().getOrganisationIdentifier()).isEqualTo("100");
+    }
+
+    @Test
+    void shouldSetApplicantSolicitorOrgIDTo101() {
+
+        when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
+            .thenReturn(CaseAssignedUserRolesResource.builder()
+                            .caseAssignedUserRoles(getCaseUsersForApplicantCheck()).build());
+
+        GeneralApplication result = helper.setRespondentDetailsIfPresent(
+            GeneralApplication.builder().build(),
+            CaseData.builder().ccdCaseReference(1234L)
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .organisation(Organisation.builder().organisationID("100").build())
+                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
+                                                   .build())
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .organisation(Organisation.builder().organisationID("101").build())
+                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
+                                                   .build())
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(APPLICANT_EMAIL_ID_CONSTANT).build())
+                .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
+                .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
+                .applicant2(Party.builder().type(COMPANY).companyName("Applicant2").build())
+                .respondent1(Party.builder().type(COMPANY).companyName("Respondent1").build())
+                .respondent2(Party.builder().type(COMPANY).companyName("Respondent2").build())
+                .addRespondent2(YesOrNo.YES)
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                                  .organisation(Organisation.builder().organisationID("200").build())
+                                                  .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
+                                                  .build())
+                .applicant2OrganisationPolicy(OrganisationPolicy.builder()
+                                                  .organisation(Organisation.builder().organisationID("201").build())
+                                                  .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
+                                                  .build()).build(),
+            getUserDetails("3", APPLICANT_EMAIL_ID_CONSTANT)
+        );
+
+        assertDoesNotThrow(() -> helper);
+        assertThat(result).isNotNull();
+        assertThat(result.getGeneralAppApplnSolicitor().getOrganisationIdentifier()).isEqualTo("101");
+    }
+
+    public List<CaseAssignedUserRole> getCaseUsersForApplicantCheck() {
+        return List.of(
+            CaseAssignedUserRole.builder().caseDataId("1").userId(STRING_NUM_CONSTANT)
+                .caseRole(APPLICANTSOLICITORONE.getFormattedName()).build(),
+            CaseAssignedUserRole.builder().caseDataId("1").userId("2")
+                .caseRole(RESPONDENTSOLICITORONE.getFormattedName()).build(),
+            CaseAssignedUserRole.builder().caseDataId("1").userId("3")
+                .caseRole(RESPONDENTSOLICITORTWO.getFormattedName()).build()
+        );
+    }
+
+    @Test
     void shouldNotExceptionClaimantDetialsSetToAppln() {
 
         when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
@@ -343,6 +473,8 @@ public class InitiateGeneralApplicationServiceHelperTest {
         GeneralApplication result = helper.setRespondentDetailsIfPresent(
             GeneralApplication.builder().build(),
             CaseData.builder().ccdCaseReference(1234L)
+                .addRespondent2(YesOrNo.NO)
+                .addApplicant2(YesOrNo.NO)
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                                    .organisation(Organisation.builder().organisationID("123").build())
                                                    .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE
@@ -356,6 +488,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
                 .respondentSolicitor2EmailAddress(TEST_USER_EMAILID)
                 .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
+                .applicant1(Party.builder().type(COMPANY).companyName("Applicant2").build())
                 .respondent1(Party.builder().type(COMPANY).companyName("Respondent1").build())
                 .respondent2(Party.builder().type(COMPANY).companyName("Respondent2").build())
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder().id(STRING_NUM_CONSTANT)

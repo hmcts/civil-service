@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.advice;
 
 import feign.FeignException;
+import feign.Request;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -10,8 +11,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 
 import java.net.UnknownHostException;
+import java.util.Map;
 import java.util.function.Function;
 
+import static feign.Request.HttpMethod.GET;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ResourceExceptionHandlerTest {
@@ -98,6 +102,20 @@ class ResourceExceptionHandlerTest {
             IllegalArgumentException::new,
             handler::incorrectStateFlowOrIllegalArgument,
             HttpStatus.PRECONDITION_FAILED
+        );
+    }
+
+    public void testFeignExceptionGatewayTimeoutException() {
+        FeignException notFoundFeignException = new FeignException.GatewayTimeout(
+            "gateway time out message",
+            Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
+            "gateway time out response body".getBytes(UTF_8)
+        );
+        testTemplate(
+            "gateway time out message",
+            notFoundFeignException,
+            handler::handleFeignExceptionGatewayTimeout,
+            HttpStatus.GATEWAY_TIMEOUT
         );
     }
 
