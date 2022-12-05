@@ -268,6 +268,13 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                     .phoneNumber("03245345221")
                     .emailAddress("lit.friend@example.com")
                     .build() : null)
+            .applicant2LitigationFriend(
+                LitigationFriend.builder()
+                    .firstName("Litigation A2")
+                    .lastName("Friend A2")
+                    .phoneNumber("03245342222")
+                    .emailAddress("lit.friend.A2@example.com")
+                    .build())
             .respondent1(
                 caseData.getRespondent1().toBuilder()
                     .individualFirstName("Jane")
@@ -862,85 +869,6 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                         .build());
                 }
                 return respondents;
-
-//                var respondent1PartyBuilder = Party.builder()
-//                    .name(caseData.getRespondent1().getPartyName())
-//                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-//                    .representative(representativeService
-//                                        .getRespondent1Representative(caseData))
-//                    .litigationFriendName(
-//                        ofNullable(caseData.getRespondent1LitigationFriend())
-//                            .map(LitigationFriend::getFullName)
-//                            .orElse(""));
-//                var respondent2PartyBuilder = Party.builder()
-//                    .name(caseData.getRespondent2().getPartyName())
-//                    .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
-//                    .representative(representativeService
-//                                        .getRespondent2Representative(caseData))
-//                    .litigationFriendName(
-//                        ofNullable(caseData.getRespondent2LitigationFriend())
-//                            .map(LitigationFriend::getFullName)
-//                            .orElse(""));
-//
-//                if(featureToggleService.isHearingAndListingSDOEnabled()) {
-//                    //Keep when hnl toggle is removed
-//                    respondent1PartyBuilder
-//                        .partyEmail(caseData.getRespondent1().getPartyEmail())
-//                        .partyPhone(caseData.getRespondent1().getPartyPhone())
-//                        .litigationFriendName(ofNullable(caseData.getRespondent1LitigationFriend())
-//                                                  .map(lf -> String.format("%s %s", lf.getFirstName(), lf.getLastName()))
-//                                                  .orElse(""))
-//                        .litigationFriendPhoneNumber(ofNullable(caseData.getRespondent1LitigationFriend())
-//                                                         .map(LitigationFriend::getPhoneNumber)
-//                                                         .orElse(""))
-//                        .litigationFriendEmailAddress(ofNullable(caseData.getRespondent1LitigationFriend())
-//                                                          .map(LitigationFriend::getEmailAddress)
-//                                                          .orElse(""));
-//                    respondent2PartyBuilder
-//                        .partyEmail(caseData.getRespondent2().getPartyEmail())
-//                        .partyPhone(caseData.getRespondent2().getPartyPhone())
-//                        .litigationFriendName(ofNullable(caseData.getRespondent2LitigationFriend())
-//                                                  .map(lf -> String.format("%s %s", lf.getFirstName(), lf.getLastName()))
-//                                                  .orElse(""))
-//                        .litigationFriendPhoneNumber(ofNullable(caseData.getRespondent2LitigationFriend())
-//                                                         .map(LitigationFriend::getPhoneNumber)
-//                                                         .orElse(""))
-//                        .litigationFriendEmailAddress(ofNullable(caseData.getRespondent2LitigationFriend())
-//                                                          .map(LitigationFriend::getEmailAddress)
-//                                                          .orElse(""));
-//                }
-//                respondents.add(respondent1PartyBuilder.build());
-//                respondents.add(respondent2PartyBuilder.build());
-//
-//            } else if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
-//                var respondent1PartyBuilder = Party.builder()
-//                    .name(caseData.getRespondent1().getPartyName())
-//                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-//                    .representative(representativeService
-//                                        .getRespondent1Representative(caseData))
-//                    .litigationFriendName(
-//                        ofNullable(caseData.getRespondent1LitigationFriend())
-//                            .map(LitigationFriend::getFullName)
-//                            .orElse(""));
-//
-//                if(featureToggleService.isHearingAndListingSDOEnabled()) {
-//                    //Keep when hnl toggle is removed
-//                    respondent1PartyBuilder
-//                        .partyEmail(caseData.getRespondent1().getPartyEmail())
-//                        .partyPhone(caseData.getRespondent1().getPartyPhone())
-//                        .litigationFriendName(ofNullable(caseData.getRespondent1LitigationFriend())
-//                                                  .map(lf -> String.format("%s %s", lf.getFirstName(), lf.getLastName()))
-//                                                  .orElse(""))
-//                        .litigationFriendPhoneNumber(ofNullable(caseData.getRespondent1LitigationFriend())
-//                                                         .map(LitigationFriend::getPhoneNumber)
-//                                                         .orElse(""))
-//                        .litigationFriendEmailAddress(ofNullable(caseData.getRespondent1LitigationFriend())
-//                                                          .map(LitigationFriend::getEmailAddress)
-//                                                          .orElse(""));
-//                }
-//                respondents.add(respondent1PartyBuilder.build());
-//            }
-//            return respondents;
             }
 
             if (isProceedingAgainstRespondent1(caseData)) {
@@ -1002,6 +930,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 }
                 respondents.add(respondent2PartyBuilder.build());
             }
+            return respondents;
         }
 
         if (respondent2HasSameLegalRep(caseData)) {
