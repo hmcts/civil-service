@@ -162,19 +162,13 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 .build();
     }
 
-    private boolean areAnyRespondentsLitigantInPerson(CaseData caseData) {
-        return caseData.getRespondent1Represented() == NO
-                || (YES.equals(caseData.getAddRespondent2())
-                && (caseData.getRespondent2Represented() == NO));
-    }
-
     private LocalDateTime getEarliestDateOfService(CaseData caseData) {
         List<LocalDateTime> dates = new ArrayList<LocalDateTime>();
         dates.add(time.now());
         LocalDateTime cosDate1 = time.now();
         LocalDateTime cosDate2 = time.now();
 
-        if (toggleService.isCertificateOfServiceEnabled() && areAnyRespondentsLitigantInPerson(caseData)) {
+        if (toggleService.isCertificateOfServiceEnabled()) {
             if(Objects.nonNull(caseData.getCosNotifyClaimDetails1())
                     && Objects.nonNull(caseData
                     .getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant())) {
