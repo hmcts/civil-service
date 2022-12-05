@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
+import uk.gov.service.notify.NotificationClientException;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -57,6 +58,16 @@ class ResourceExceptionHandlerTest {
             notFoundFeignException,
             handler::handleFeignExceptionGatewayTimeout,
             HttpStatus.GATEWAY_TIMEOUT
+        );
+    }
+
+    @Test
+    public void testHandleNotificationClientException() {
+        testTemplate(
+            "expected exception from notification api",
+            NotificationClientException::new,
+            handler::handleNotificationClientException,
+            HttpStatus.FAILED_DEPENDENCY
         );
     }
 
