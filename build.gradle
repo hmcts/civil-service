@@ -59,10 +59,17 @@ allprojects {
     // range of 0-10 fails the build, anything greater and it doesn't fail the build
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
     suppressionFile = 'config/owasp/suppressions.xml'
+    cveValidForHours = 24
 
     analyzers {
       // Disable scanning of .NET related binaries
       assemblyEnabled = false
+      retirejs {
+        enabled = false
+      }
+      ossIndex {
+        enabled = false
+      }
     }
   }
 
@@ -103,6 +110,22 @@ allprojects {
         version: '7.18.0'
       ) {
         entry 'camunda-engine'
+      }
+      // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
+      dependencySet(
+        group: 'com.amazonaws',
+        version: '1.12.261'
+      ) {
+        entry 'aws-java-sdk-core'
+        entry 'aws-java-sdk-kms'
+        entry 'aws-java-sdk-s3'
+      }
+      // Solves CVE-2020-17521
+      dependencySet(
+        group: 'org.codehaus.groovy',
+        version: '2.4.21'
+      ) {
+        entry 'groovy-all'
       }
     }
     imports {
@@ -257,7 +280,7 @@ task smoke(description: 'Runs the smoke tests.') {
 }
 
 task functional(description: 'Runs the functional tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity, runSpecApiTests, runApiTests, runDJTests))
+  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity, runSpecApiTests, runApiTests))
 }
 
 task crossbrowser(description: 'Runs the crossbrowser tests.') {
