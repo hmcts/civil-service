@@ -4,8 +4,13 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
+import uk.gov.hmcts.reform.ccd.model.PreviousOrganisationCollectionItem;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -103,6 +108,43 @@ class OrgPolicyUtilsTest {
                         .build()).respondent2OrganisationIDCopy(expected).build();
 
             assertEquals(expected, OrgPolicyUtils.getRespondent2SolicitorOrgId(caseData));
+        }
+    }
+
+    @Nested
+    class BuildPreviousOrganisationTest {
+        @Test
+        void shouldGetLatestOrganisationChange_whenChangesExist() {
+            var latestDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
+            var oldestDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
+
+            var orgPolicy = OrganisationPolicy.builder()
+                .previousOrganisations(List.of(
+                    buildPreviousOrganisation("latest-previous-org", latestDate),
+                    buildPreviousOrganisation("oldest-previous-org", oldestDate)))
+                .build();
+
+            var actual = OrgPolicyUtils.getLatestOrganisationChanges(orgPolicy);
+            assertEquals(
+                PreviousOrganisation.builder()
+                    .organisationName("latest-previous-org")
+                    .toTimestamp(latestDate).build(), actual);
+        }
+
+        @Test
+        void shouldReturnNull_whenOrgPolicyIsNull() {
+            var orgPolicy = OrganisationPolicy.builder().build();
+            assertNull(OrgPolicyUtils.getLatestOrganisationChanges(orgPolicy));
+        }
+
+        @Test
+        void shouldReturnNull_whenPreviousOrganisationsIsNull() {
+            assertNull(OrgPolicyUtils.getLatestOrganisationChanges(null));
+        }
+
+        private PreviousOrganisationCollectionItem buildPreviousOrganisation(String name, LocalDateTime toDate) {
+            return PreviousOrganisationCollectionItem.builder().value(
+                PreviousOrganisation.builder().organisationName(name).toTimestamp(toDate).build()).build();
         }
     }
 }
