@@ -32,7 +32,6 @@ public class ResourceExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.PRECONDITION_FAILED);
     }
 
-
     @ExceptionHandler(value = UnknownHostException.class)
     public ResponseEntity<Object> unknownHost(Exception exception) {
         log.debug(exception.getMessage(), exception);
