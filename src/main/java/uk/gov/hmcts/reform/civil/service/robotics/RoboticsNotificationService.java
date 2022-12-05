@@ -114,8 +114,10 @@ public class RoboticsNotificationService {
                 "LR v LR Case Data for %s",
                 caseData.getLegacyCaseReference()
             );
+            log.info("Subject--------" + subject);
+            return subject;
         } else {
-            subject = isMultiParty ? String.format("Multiparty claim data for %s - %s - %s",
+            return isMultiParty ? String.format("Multiparty claim data for %s - %s - %s",
                                                    caseData.getLegacyCaseReference(),
                                                    caseData.getCcdState(), triggerEvent
             ) : String.format(
@@ -123,8 +125,6 @@ public class RoboticsNotificationService {
                 caseData.getLegacyCaseReference()
             );
         }
-        log.info("Subject--------" + subject);
-        return subject;
     }
 
     private String getRoboticsEmailRecipient(boolean isMultiParty, boolean isSpecClaim) {
@@ -132,9 +132,7 @@ public class RoboticsNotificationService {
             log.info("EMAIl:---------" + roboticsEmailConfiguration.getSpecRecipient());
             return roboticsEmailConfiguration.getSpecRecipient();
         }
-        String recipient = isMultiParty ? roboticsEmailConfiguration
-            .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
-        log.info("EMAIl:---------" + recipient);
+
         return isMultiParty ? roboticsEmailConfiguration
             .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
     }
