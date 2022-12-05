@@ -397,7 +397,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         if (toggleService.isNoticeOfChangeEnabled()) {
             // LiP are not represented or registered
-            populateBlankOrgPolicies(dataBuilder, caseData);
+            OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
         }
 
         // temporarily default to yes for CIV-2659
