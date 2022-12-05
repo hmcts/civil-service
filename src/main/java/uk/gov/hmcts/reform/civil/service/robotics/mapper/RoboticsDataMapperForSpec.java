@@ -43,7 +43,7 @@ import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPound
  */
 @Service
 @RequiredArgsConstructor
-public class RoboticsDataMapperForSpec {
+public class RoboticsDataMapperForSpec extends RoboticsCaseDataMapper{
 
     public static final String APPLICANT_SOLICITOR_ID = "001";
     public static final String RESPONDENT_SOLICITOR_ID = "002";
@@ -54,8 +54,9 @@ public class RoboticsDataMapperForSpec {
 
     public static final String RESPONDENT2_SOLICITOR_ID = "003";
     private final RoboticsAddressMapper addressMapper;
-    private final EventHistoryMapper eventHistoryMapper;
     private final OrganisationService organisationService;
+
+    private final EventHistoryMapper eventHistoryMapper;
     private final FeatureToggleService featureToggleService;
 
     public RoboticsCaseDataSpec toRoboticsCaseData(CaseData caseData) {
@@ -69,32 +70,6 @@ public class RoboticsDataMapperForSpec {
         return builder.build();
     }
 
-    private ClaimDetails buildClaimDetails(CaseData caseData) {
-        BigDecimal claimInterest = caseData.getTotalInterest() != null
-            ? caseData.getTotalInterest() : BigDecimal.ZERO;
-        BigDecimal amountClaimedWithInterest = caseData.getTotalClaimAmount().add(claimInterest);
-        return ClaimDetails.builder()
-            .amountClaimed(amountClaimedWithInterest)
-            .courtFee(ofNullable(caseData.getClaimFee())
-                          .map(fee -> penniesToPounds(fee.getCalculatedAmountInPence()))
-                          .orElse(null))
-            .caseIssuedDate(ofNullable(caseData.getIssueDate())
-                                .map(issueDate -> issueDate.format(ISO_DATE))
-                                .orElse(null))
-            .caseRequestReceivedDate(caseData.getSubmittedDate().toLocalDate().format(ISO_DATE))
-            .build();
-    }
-
-    private CaseHeader buildCaseHeader(CaseData caseData) {
-        return CaseHeader.builder()
-            .caseNumber(caseData.getLegacyCaseReference())
-            .owningCourtCode("700")
-            .owningCourtName("Online Civil Money Claim")
-            .caseType("CLAIM - SPEC ONLY")
-            .preferredCourtCode("")
-            .caseAllocatedTo("")
-            .build();
-    }
 
     private List<Solicitor> buildSolicitors(CaseData caseData) {
         List<Solicitor> solicitorsList = new ArrayList<>();

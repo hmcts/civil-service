@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataException;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperFactory;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 
 import java.util.Collection;
@@ -44,6 +45,7 @@ public class RoboticsNotificationService {
     private final RoboticsDataMapper roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
     private final FeatureToggleService toggleService;
+    private final RoboticsDataMapperFactory roboticsDataMapperFactory;
 
     public void notifyRobotics(@NotNull CaseData caseData, boolean isMultiParty) {
         requireNonNull(caseData);
@@ -70,7 +72,7 @@ public class RoboticsNotificationService {
 
             if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
                 if (canSendEmailSpec()) {
-                    RoboticsCaseDataSpec roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+                    RoboticsCaseDataSpec roboticsCaseData = getRoboticsCaseDataSpec(caseData);
                     triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseData.getEvents());
                     roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
                 } else {
@@ -91,6 +93,16 @@ public class RoboticsNotificationService {
         } catch (JsonProcessingException e) {
             throw new RoboticsDataException(e.getMessage(), e);
         }
+    }
+
+    private RoboticsCaseDataSpec getRoboticsCaseDataSpec(CaseData caseData) {
+        RoboticsCaseDataSpec roboticsCaseData;
+        if(toggleService.isPinInPostEnabled()){
+            roboticsCaseData = roboticsDataMapperFactory.getRoboticsDataMapper(caseData).toRoboticsCaseData(caseData);
+        }else{
+            roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+        }
+        return roboticsCaseData;
     }
 
     private String getMessage(CaseData caseData, boolean isMultiParty) {
