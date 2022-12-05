@@ -105,15 +105,15 @@ class ResourceExceptionHandlerTest {
         );
     }
 
+    @Test
     public void testFeignExceptionGatewayTimeoutException() {
-        FeignException notFoundFeignException = new FeignException.GatewayTimeout(
-            "gateway time out message",
-            Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
-            "gateway time out response body".getBytes(UTF_8)
-        );
         testTemplate(
             "gateway time out message",
-            notFoundFeignException,
+            str -> new FeignException.GatewayTimeout(
+                "gateway time out message",
+                Mockito.mock(feign.Request.class),
+                new byte[]{}
+            ),
             handler::handleFeignExceptionGatewayTimeout,
             HttpStatus.GATEWAY_TIMEOUT
         );
@@ -131,4 +131,5 @@ class ResourceExceptionHandlerTest {
         assertThat(result.getBody()).isNotNull()
             .extracting(Object::toString).asString().contains(message);
     }
+
 }

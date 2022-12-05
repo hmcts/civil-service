@@ -55,6 +55,7 @@ public class ResourceExceptionHandler {
     public ResponseEntity<Object> noSuchMethodError(Throwable error) {
         log.debug(error.getMessage(), error);
         return new ResponseEntity<>(error.getMessage(), new HttpHeaders(), HttpStatus.METHOD_NOT_ALLOWED);
+    }
 
     @ExceptionHandler({FeignException.GatewayTimeout.class, SocketTimeoutException.class})
     public ResponseEntity<String> handleFeignExceptionGatewayTimeout(Exception exception) {
