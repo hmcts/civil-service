@@ -138,7 +138,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final InterestCalculator interestCalculator;
     private final FeatureToggleService toggleService;
     private final StateFlowEngine stateFlowEngine;
-    private final FeatureToggleService featureToggleService;
 
     @Value("${court-location.specified-claim.region-id}")
     private String regionId;
