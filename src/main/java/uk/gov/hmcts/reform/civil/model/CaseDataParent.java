@@ -121,7 +121,7 @@ public class CaseDataParent implements MappableObject {
     // for witness
     private final YesOrNo respondent1DQWitnessesRequiredSpec;
     private final List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
-
+    @Deprecated
     private final LocalDateTime addLegalRepDeadline;
 
     @Builder.Default

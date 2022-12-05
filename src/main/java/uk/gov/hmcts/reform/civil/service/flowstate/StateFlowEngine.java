@@ -60,7 +60,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notifica
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.oneVsOneCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastAddLegalRepDeadline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimDetailsNotificationDeadline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimNotificationDeadline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentFailed;
@@ -308,6 +307,8 @@ public class StateFlowEngine {
                 .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued
                                                        .and(not(specClaim))
                                                        .and(certificateOfServiceEnabled))
+                .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT).onlyIf(takenOfflineBySystem
+                                                                                .and(noticeOfChangeEnabled.negate()))
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC)
                 .transitionTo(CLAIM_ISSUED)
                     .onlyIf(claimIssued.and(pinInPostEnabledAndLiP))
