@@ -337,7 +337,8 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                     .addRespondent2(NO)
                     .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                    .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build())
+                    .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().hearingTemporaryLocation(
+                        DynamicList.builder().build()).build())
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

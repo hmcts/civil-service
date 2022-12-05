@@ -5,6 +5,7 @@ import feign.Request;
 import feign.Response;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.RestException;
+import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -802,6 +803,68 @@ class CaseEventTaskHandlerTest {
                     throw new IllegalStateException("Unexpected flow state " + state.fullName());
             }
             return caseDataBuilder.build();
+        }
+    }
+
+    @Nested
+    class NotRetryableFailureTest {
+        @Test
+        void shouldNotCallHandleFailureMethod_whenMapperConversionFailed() {
+            //given: ExternalTask.getAllVariables throws ValueMapperException
+            when(mockTask.getAllVariables())
+                .thenThrow(new ValueMapperException("Mapper conversion failed due to incompatible types"));
+
+            //when: Task handler is called and ValueMapperException is thrown
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            //then: Retry should not happen in this case
+            verify(externalTaskService, never()).handleFailure(
+                any(ExternalTask.class),
+                anyString(),
+                anyString(),
+                anyInt(),
+                anyLong()
+            );
+        }
+
+        @Test
+        void shouldNotCallHandleFailureMethod_whenIllegalArgumentExceptionThrown() {
+            //given: ExternalTask variables with incompatible event type
+            String incompatibleEventType = "test";
+            Map<String, Object> allVariables = Map.of("caseId", CASE_ID, "caseEvent", incompatibleEventType);
+            when(mockTask.getAllVariables()).thenReturn(allVariables);
+
+            //when: Task handler is called and IllegalArgumentException is thrown
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            //then: Retry should not happen in this case
+            verify(externalTaskService, never()).handleFailure(
+                any(ExternalTask.class),
+                anyString(),
+                anyString(),
+                anyInt(),
+                anyLong()
+            );
+        }
+
+        @Test
+        void shouldNotCallHandleFailureMethod_whenCaseIdNotFound() {
+            //given: ExternalTask variables without caseId
+            Map<String, Object> allVariables = Map.of("caseEvent", NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
+            when(mockTask.getAllVariables())
+                .thenReturn(allVariables);
+
+            //when: Task handler is called and CaseIdNotProvidedException is thrown
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            //then: Retry should not happen in this case
+            verify(externalTaskService, never()).handleFailure(
+                any(ExternalTask.class),
+                anyString(),
+                anyString(),
+                anyInt(),
+                anyLong()
+            );
         }
     }
 }
