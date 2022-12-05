@@ -637,7 +637,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
                                   .courtName("Court Name").region("Region").regionId("regionId1").courtVenueId("000")
                                   .courtTypeId("10").courtLocationCode("121")
-                                  .epimmsId("epimmsId1").build());
+                                  .epimmsId("000000").build());
                 when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
@@ -651,7 +651,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(response.getData()).extracting("applicant1DQRequestedCourt")
                     .extracting("caseLocation")
                     .extracting("region", "baseLocation")
-                    .containsExactly("regionId1", "epimmsId1");
+                    .containsExactly("2", "000000");
             }
         }
 

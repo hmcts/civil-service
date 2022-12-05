@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataMaxEdgeCasesBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataMinEdgeCasesBuilder;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
@@ -33,6 +35,8 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -75,6 +79,9 @@ class RpaConsumerTest extends BaseRpaTest {
     PrdAdminUserConfiguration userConfig;
     @MockBean
     FeatureToggleService featureToggleService;
+
+    @MockBean
+    LocationRefDataService locationRefDataService;
     @MockBean
     private Time time;
 
@@ -86,6 +93,12 @@ class RpaConsumerTest extends BaseRpaTest {
         localDateTime = LocalDateTime.of(2020, 8, 1, 12, 0, 0);
         when(time.now()).thenReturn(localDateTime);
         given(organisationApi.findOrganisationById(any(), any(), any())).willReturn(ORGANISATION);
+        List<LocationRefData> locations = new ArrayList<>();
+        locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
+                          .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
+                          .courtTypeId("10").courtLocationCode("121")
+                          .epimmsId("000000").build());
+        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
     }
 
     @Nested
@@ -533,8 +546,9 @@ class RpaConsumerTest extends BaseRpaTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atState(FlowState.Main.FULL_DEFENCE_PROCEED)
                     .legacyCaseReference("000DC019")
-                    .courtLocation_old()
+                    .courtLocation()
                     .build();
+
                 String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
                 assertThat(payload, validateJson());
@@ -654,7 +668,7 @@ class RpaConsumerTest extends BaseRpaTest {
                     .multiPartyClaimTwoApplicants()
                     .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
                     .legacyCaseReference("000DC042")
-                    .courtLocation_old()
+                    .courtLocation()
                     .build();
                 String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
@@ -674,8 +688,9 @@ class RpaConsumerTest extends BaseRpaTest {
                     .multiPartyClaimTwoApplicants()
                     .atStateApplicant1RespondToDefenceAndProceed_2v1()
                     .legacyCaseReference("000DC043")
-                    .courtLocation_old()
+                    .courtLocation()
                     .build();
+
                 String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
                 assertThat(payload, validateJson());
@@ -694,8 +709,9 @@ class RpaConsumerTest extends BaseRpaTest {
                     .multiPartyClaimTwoApplicants()
                     .atStateApplicant2RespondToDefenceAndProceed_2v1()
                     .legacyCaseReference("000DC044")
-                    .courtLocation_old()
+                    .courtLocation()
                     .build();
+
                 String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
                 assertThat(payload, validateJson());

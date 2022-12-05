@@ -1460,8 +1460,8 @@ public class CaseDataBuilder {
         this.courtLocation = CourtLocation.builder()
             .applicantPreferredCourt("127")
             .caseLocation(CaseLocation.builder()
-                              .region("regionId1")
-                              .baseLocation("epimmsId1")
+                              .region("2")
+                              .baseLocation("000000")
                               .build())
             .build();
         return this;
