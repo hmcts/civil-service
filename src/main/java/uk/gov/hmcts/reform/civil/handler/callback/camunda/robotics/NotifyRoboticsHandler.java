@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataException;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperFactory;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 
 import java.util.Set;
@@ -31,6 +32,7 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
     private final JsonSchemaValidationService jsonSchemaValidationService;
     private final RoboticsDataMapper roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
+    private final RoboticsDataMapperFactory roboticsDataMapperFactory;
     private final FeatureToggleService toggleService;
 
     protected CallbackResponse notifyRobotics(CallbackParams callbackParams) {
@@ -44,9 +46,10 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
 
             if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
                 if (toggleService.isLrSpecEnabled()) {
-                    roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+                    roboticsCaseDataSpec = getRoboticsCaseDataSpec(caseData);
                     errors = jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString());
-                } else {
+                }
+                else {
                     throw new UnsupportedOperationException("Specified claims are not enabled");
                 }
             } else {
@@ -66,5 +69,15 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
             throw new RoboticsDataException(e.getMessage(), e);
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private RoboticsCaseDataSpec getRoboticsCaseDataSpec(CaseData caseData) {
+        RoboticsCaseDataSpec roboticsCaseDataSpec;
+        if (toggleService.isPinInPostEnabled()){
+           roboticsCaseDataSpec = roboticsDataMapperFactory.getRoboticsDataMapper(caseData).toRoboticsCaseData(caseData);
+        } else {
+            roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+        }
+        return roboticsCaseDataSpec;
     }
 }

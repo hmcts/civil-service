@@ -98,8 +98,10 @@ public class RoboticsNotificationService {
     private RoboticsCaseDataSpec getRoboticsCaseDataSpec(CaseData caseData) {
         RoboticsCaseDataSpec roboticsCaseData;
         if(toggleService.isPinInPostEnabled()){
+            log.info("pin in post enabled");
             roboticsCaseData = roboticsDataMapperFactory.getRoboticsDataMapper(caseData).toRoboticsCaseData(caseData);
         }else{
+            log.info("pin in post disabled");
             roboticsCaseData = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
         }
         return roboticsCaseData;

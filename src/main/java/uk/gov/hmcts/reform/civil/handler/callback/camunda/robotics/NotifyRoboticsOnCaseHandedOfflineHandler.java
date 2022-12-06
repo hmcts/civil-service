@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperFactory;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class NotifyRoboticsOnCaseHandedOfflineHandler extends NotifyRoboticsHand
         JsonSchemaValidationService jsonSchemaValidationService,
         RoboticsDataMapper roboticsDataMapper,
         RoboticsDataMapperForSpec roboticsDataMapperForSpec,
+        RoboticsDataMapperFactory roboticsDataMapperFactory,
         FeatureToggleService toggleService
     ) {
         super(
@@ -32,6 +34,7 @@ public class NotifyRoboticsOnCaseHandedOfflineHandler extends NotifyRoboticsHand
             jsonSchemaValidationService,
             roboticsDataMapper,
             roboticsDataMapperForSpec,
+            roboticsDataMapperFactory,
             toggleService
         );
     }
