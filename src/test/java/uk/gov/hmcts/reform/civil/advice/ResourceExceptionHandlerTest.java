@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
+import uk.gov.service.notify.NotificationClientException;
 
 import java.net.UnknownHostException;
 import java.util.function.Function;
@@ -44,7 +45,7 @@ class ResourceExceptionHandlerTest {
     }
 
     @Test
-    void shouldReturnUnauthorized_whenFeignExceptionUnauthorizedExceptionThrownlol() {
+    void shouldReturnUnauthorized_whenFeignExceptionUnauthorizedExceptionThrown() {
         testTemplate(
             "expected exception for missing callback handler",
             str -> new FeignException.Unauthorized(
@@ -101,6 +102,30 @@ class ResourceExceptionHandlerTest {
         );
     }
 
+    @Test
+    public void testFeignExceptionGatewayTimeoutException() {
+        testTemplate(
+            "gateway time out message",
+            str -> new FeignException.GatewayTimeout(
+                "gateway time out message",
+                Mockito.mock(feign.Request.class),
+                new byte[]{}
+            ),
+            handler::handleFeignExceptionGatewayTimeout,
+            HttpStatus.GATEWAY_TIMEOUT
+        );
+    }
+
+    @Test
+    public void testHandleNotificationClientException() {
+        testTemplate(
+            "expected exception from notification api",
+            NotificationClientException::new,
+            handler::handleNotificationClientException,
+            HttpStatus.FAILED_DEPENDENCY
+        );
+    }
+
     private <E extends Throwable> void testTemplate(
         String message,
         Function<String, E> exceptionBuilder,
@@ -113,4 +138,5 @@ class ResourceExceptionHandlerTest {
         assertThat(result.getBody()).isNotNull()
             .extracting(Object::toString).asString().contains(message);
     }
+
 }

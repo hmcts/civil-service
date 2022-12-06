@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
+import uk.gov.service.notify.NotificationClientException;
+
+import java.net.SocketTimeoutException;
+
+import static org.springframework.http.HttpStatus.FAILED_DEPENDENCY;
 
 import java.net.UnknownHostException;
 
@@ -31,7 +36,7 @@ public class ResourceExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.PRECONDITION_FAILED);
     }
 
-    @ExceptionHandler(value = UnknownHostException.class)
+  @ExceptionHandler(value = UnknownHostException.class)
     public ResponseEntity<Object> unknownHost(Exception exception) {
         log.debug(exception.getMessage(), exception);
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_ACCEPTABLE);
@@ -55,4 +60,18 @@ public class ResourceExceptionHandler {
         return new ResponseEntity<>(error.getMessage(), new HttpHeaders(), HttpStatus.METHOD_NOT_ALLOWED);
     }
 
+    @ExceptionHandler({FeignException.GatewayTimeout.class, SocketTimeoutException.class})
+    public ResponseEntity<String> handleFeignExceptionGatewayTimeout(Exception exception) {
+        log.debug(exception.getMessage(), exception);
+        return new ResponseEntity<>(exception.getMessage(),
+                                    new HttpHeaders(), HttpStatus.GATEWAY_TIMEOUT);
+    }
+
+    @ExceptionHandler(NotificationClientException.class)
+    public ResponseEntity<Object> handleNotificationClientException(NotificationClientException exception) {
+        log.debug(exception.getMessage(), exception);
+        return ResponseEntity
+            .status(FAILED_DEPENDENCY)
+            .body(exception.getMessage());
+    }
 }

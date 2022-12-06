@@ -121,9 +121,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         LocationRefData location = fillPreferredLocationData(locations, caseData.getHearingSupportRequirementsDJ());
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (Objects.nonNull(location)) {
-            caseDataBuilder.hearingSupportRequirementsDJ(caseData.getHearingSupportRequirementsDJ().toBuilder()
-                        .hearingPreferredLocation(caseData.getHearingSupportRequirementsDJ()
-                                .getHearingTemporaryLocation().getValue().getLabel()).build())
+            caseDataBuilder
                 .caseManagementLocation(LocationRefDataService.buildCaseLocation(location));
             caseDataBuilder.locationName(location.getSiteName());
         }
@@ -234,9 +232,12 @@ public class DefaultJudgementHandler extends CallbackHandler {
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        if (Objects.nonNull(caseData.getHearingSupportRequirementsDJ())) {
+        if (Objects.nonNull(caseData.getHearingSupportRequirementsDJ())
+            && Objects.nonNull(caseData.getHearingSupportRequirementsDJ().getHearingTemporaryLocation())) {
+            DynamicList locationList = caseData.getHearingSupportRequirementsDJ().getHearingTemporaryLocation();
+            locationList.setListItems(null);
             HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ()
-                .toBuilder().hearingTemporaryLocation(null).build();
+                .toBuilder().hearingTemporaryLocation(locationList).build();
             caseDataBuilder
                 .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
         }
