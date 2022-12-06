@@ -51,7 +51,7 @@ public class OrgPolicyUtils {
         if (organisationPolicy != null && organisationPolicy.getPreviousOrganisations() != null) {
             return organisationPolicy.getPreviousOrganisations().stream()
                 .map(orgCollectionObject -> orgCollectionObject.getValue())
-                .max(Comparator.comparing(PreviousOrganisation::getToTimestamp)).get();
+                .max(Comparator.comparing(PreviousOrganisation::getToTimestamp)).orElse(null);
         } else {
             return null;
         }
