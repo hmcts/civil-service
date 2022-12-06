@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
@@ -32,6 +33,7 @@ public class ClaimContinuingOnlineApplicantNotificationHandler extends CallbackH
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -52,10 +54,14 @@ public class ClaimContinuingOnlineApplicantNotificationHandler extends CallbackH
 
     private CallbackResponse notifyApplicantSolicitorForClaimContinuingOnline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        boolean isCosEnabled = featureToggleService.isCertificateOfServiceEnabled();
+        String emailTemplateID = isCosEnabled != true
+            ? notificationsProperties.getClaimantSolicitorClaimContinuingOnline()
+            : notificationsProperties.getClaimantSolicitorClaimContinuingOnlineCos();
 
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getClaimantSolicitorClaimContinuingOnline(),
+            emailTemplateID,
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
