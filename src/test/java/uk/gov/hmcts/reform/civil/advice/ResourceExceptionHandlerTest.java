@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
+import uk.gov.service.notify.NotificationClientException;
 
 import java.net.UnknownHostException;
 import java.util.function.Function;
@@ -115,8 +116,20 @@ class ResourceExceptionHandlerTest {
         );
     }
 
-    private <E extends Throwable> void testTemplate(
-        String message,
+
+
+    @Test
+    public void testHandleNotificationClientException() {
+        testTemplate(
+            "expected exception from notification api",
+            NotificationClientException::new,
+            handler::handleNotificationClientException,
+            HttpStatus.FAILED_DEPENDENCY
+        );
+    }
+
+ private <E extends Throwable> void testTemplate(
+       String message,
         Function<String, E> exceptionBuilder,
         Function<E, ResponseEntity<?>> method,
         HttpStatus expectedStatus
