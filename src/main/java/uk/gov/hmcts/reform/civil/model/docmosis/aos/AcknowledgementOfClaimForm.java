@@ -35,4 +35,5 @@ public class AcknowledgementOfClaimForm implements MappableObject {
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate responseDeadline;
     private final List<Party> respondent;
+    private final List<String> responseIntentions;
 }

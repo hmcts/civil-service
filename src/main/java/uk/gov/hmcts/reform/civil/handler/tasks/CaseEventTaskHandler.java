@@ -30,12 +30,12 @@ import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.CASE_SE
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.DEFENDANT_DOES_NOT_CONSENT;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.JUDGEMENT_REQUEST;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.OTHER;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED_NOTICE_OF_CHANGE;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @RequiredArgsConstructor
 @Component
@@ -107,6 +107,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                     return "RPA Reason: Defendant partial admission.";
                 case COUNTER_CLAIM:
                     return "RPA Reason: Defendant rejects and counter claims.";
+                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC:
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
                     return "RPA Reason: Unrepresented defendant(s).";
                 case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
@@ -161,6 +162,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             }
 
             switch (flowState) {
+                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC:
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
                     return format("Unrepresented defendant: %s",
                                       StringUtils.join(
@@ -184,7 +186,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                                                               caseData), " and "
                                         ));
                 case FULL_DEFENCE_PROCEED:
-                    return !SPEC_CLAIM.equals(caseData.getSuperClaimType())
+                    return !isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
                         ? getDescriptionFullDefenceProceed(caseData) : null;
                 default:
                     break;

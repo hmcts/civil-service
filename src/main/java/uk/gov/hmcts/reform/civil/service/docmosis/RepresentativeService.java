@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.docmosis;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
@@ -13,6 +12,7 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative.fromOrganisation;
+import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +40,7 @@ public class RepresentativeService {
 
             Optional.ofNullable(caseData.getRespondentSolicitor1ServiceAddress())
                 .ifPresent(representativeBuilder::serviceAddress);
-            if (SuperClaimType.SPEC_CLAIM == caseData.getSuperClaimType()
+            if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
                 && caseData.getSpecRespondentCorrespondenceAddressdetails() != null) {
                 representativeBuilder.serviceAddress(caseData.getSpecRespondentCorrespondenceAddressdetails());
             }
@@ -83,7 +83,7 @@ public class RepresentativeService {
         var representativeBuilder = representative.toBuilder();
         Optional.ofNullable(caseData.getApplicantSolicitor1ServiceAddress())
             .ifPresent(representativeBuilder::serviceAddress);
-        if (SuperClaimType.SPEC_CLAIM == caseData.getSuperClaimType()
+        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
             && caseData.getSpecApplicantCorrespondenceAddressdetails() != null) {
             representativeBuilder.serviceAddress(caseData.getSpecApplicantCorrespondenceAddressdetails());
         }

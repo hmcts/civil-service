@@ -1,30 +1,3 @@
-tags:
-  civil-ccd-stack: true
-
-postgresql:
-  enabled: true
-  image:
-    registry: hmctspublic.azurecr.io
-    repository: imported/bitnami/postgresql
-    tag: '11.3.0'
-    pullPolicy: Always
-    debug: true
-  resources:
-    requests:
-      cpu: 25m
-  initdbScripts:
-    init.sql: |-
-      CREATE DATABASE cmc WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-      CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-      CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-      CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-      CREATE DATABASE "camunda" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-      CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-  postgresqlUsername: ${POSTGRES_USER}
-  postgresqlPassword: ${POSTGRES_PASSWORD}
-  persistence:
-    enabled: false
-
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
@@ -40,16 +13,16 @@ java:
         - cross-access-user-password
         - prd-admin-user-username
         - prd-admin-user-password
-        - AppInsightsInstrumentationKey
         - docmosis-api-key
         - gov-notify-api-key
         - sendgrid-api-key
         - robotics-notification-sender
         - robotics-notification-recipient
         - robotics-notification-recipient-spec
-        - launch-darkly-sdk-key
         - robotics-notification-multipartyrecipient
         - ordnance-survey-api-key
+        - notification-caseworker-spec-receiver
+        - launch-darkly-sdk-key
   environment:
     CORE_CASE_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
     OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
@@ -58,15 +31,40 @@ java:
     CMC_DB_PASSWORD: ${POSTGRES_PASSWORD}
     CMC_DB_CONNECTION_OPTIONS: '?sslmode=allow'
     REFERENCE_DATABASE_MIGRATION: true
-    FEIGN_CLIENT_CONFIG_REMOTERUNTIMESERVICE_URL: http://civil-service-camunda-staging-aat.service.core-compute-aat.internal/engine-rest/
-    FEIGN_CLIENT_CONFIG_REMOTEEXTERNALTASKSERVICE_URL: http://civil-service-camunda-staging-aat.service.core-compute-aat.internal/engine-rest/
-    FEIGN_CLIENT_CONFIG_REMOTEREPOSITORYSERVICE_URL: http://civil-service-camunda-staging-aat.service.core-compute-aat.internal/engine-rest/
+    FEIGN_CLIENT_CONFIG_REMOTERUNTIMESERVICE_URL: http://${SERVICE_NAME}-camunda/engine-rest/
+    FEIGN_CLIENT_CONFIG_REMOTEEXTERNALTASKSERVICE_URL: http://${SERVICE_NAME}-camunda/engine-rest/
+    FEIGN_CLIENT_CONFIG_REMOTEREPOSITORYSERVICE_URL: http://${SERVICE_NAME}-camunda/engine-rest/
+    SERVICE_REQUEST_UPDATE: http://${SERVICE_FQDN}/service-request-update
     TESTING_SUPPORT_ENABLED: true
     POLLING_EVENT_EMITTER_ENABLED: false
     LAUNCH_DARKLY_ENV: service-staging
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
     DOCUMENT_MANAGEMENT_SECURED: true
-
+    RELEASE_REVISION: "{{ .Release.Revision }}"
+  postgresql:
+    enabled: true
+    image:
+      registry: hmctspublic.azurecr.io
+      repository: imported/bitnami/postgresql
+      tag: '11.6.0'
+    primary:
+      persistence:
+        enabled: false
+      resources:
+        requests:
+          cpu: 25m
+      initdb:
+        scripts:
+          init.sql: |
+            CREATE DATABASE cmc WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "camunda" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+    auth:
+      username: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-xui-idam-pr
   enabled: true
@@ -81,6 +79,10 @@ xui-webapp:
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctspublic.azurecr.io/xui/webapp:latest
     ingressHost: civil-service-xui-staging.aat.platform.hmcts.net
+    devcpuRequests: 500m
+    devmemoryRequests: 512Mi
+    devcpuLimits: 1
+    devmemoryLimits: 1Gi
     environment:
       HEALTH_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw/health
       HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health
@@ -92,6 +94,7 @@ xui-webapp:
       SERVICES_IDAM_ISS_URL: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts
 
 ccd:
+  enabled: true
   ccd:
     adminWeb:
       enabled: false
@@ -110,8 +113,8 @@ ccd:
 
   global:
     ccdApiGatewayIngress: http://${SERVICE_NAME}-ccd-api-gw
-    ccdDataStoreUrl: http://civil-service-data-store-staging-aat.service.core-compute-aat.internal
-    ccdDefinitionStoreUrl: http://civil-service-definition-store-staging-aat.service.core-compute-aat.internal
+    ccdDataStoreUrl: http://${SERVICE_NAME}-ccd-data-store-api
+    ccdDefinitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
     ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
     dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
     idamApiUrl: https://idam-api.aat.platform.hmcts.net
@@ -149,10 +152,13 @@ ccd:
         CCD_MULTIPARTY_LOG_LEVEL: DEBUG
         CCD_MULTIPARTY_CASE_TYPES: CIVIL
         CCD_MULTIPARTY_EVENTS: DEFENDANT_RESPONSE,ACKNOWLEDGE_CLAIM,CLAIMANT_RESPONSE
+        RELEASE_REVISION: "{{ .Release.Revision }}"
       keyVaults: []
       ingressHost: civil-service-data-store-staging-aat.service.core-compute-aat.internal
   am-role-assignment-service:
     java:
+      environment:
+        RELEASE_REVISION: "{{ .Release.Revision }}"
       keyVaults:
         am:
           secrets:
@@ -160,17 +166,23 @@ ccd:
   ccd-definition-store-api:
     java:
       imagePullPolicy: Always
+      devcpuRequests: 500m
+      devmemoryRequests: 512Mi
+      devcpuLimits: 2
+      devmemoryLimits: 1Gi
       environment:
         DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
+        RELEASE_REVISION: "{{ .Release.Revision }}"
       keyVaults: []
       ingressHost: civil-service-definition-store-staging-aat.service.core-compute-aat.internal
   ccd-user-profile-api:
     java:
       imagePullPolicy: Always
       enviroment:
-        USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
+        USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresqlx
+        RELEASE_REVISION: "{{ .Release.Revision }}"
       keyVaults: []
       ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
 
@@ -184,6 +196,10 @@ camunda-bpm:
     disableKeyVaults: true
     releaseNameOverride: ${SERVICE_NAME}-camunda
     ingressHost: civil-service-camunda-staging-aat.service.core-compute-aat.internal
+    devcpuRequests: 500m
+    devmemoryRequests: 512Mi
+    devcpuLimits: 1
+    devmemoryLimits: 1Gi
     environment:
       CAMUNDA_API_AUTH_ENABLED: false
       CAMUNDA_DB_HOST: ${SERVICE_NAME}-postgresql
@@ -193,3 +209,4 @@ camunda-bpm:
       CAMUNDA_BPM_DATABASE_SCHEMA_UPDATE: true
       S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       CAMUNDA_DB_CONN_OPTIONS: ""
+      RELEASE_REVISION: "{{ .Release.Revision }}"

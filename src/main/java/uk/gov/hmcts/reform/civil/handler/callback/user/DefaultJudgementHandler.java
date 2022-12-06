@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 
@@ -125,8 +124,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
             caseDataBuilder.hearingSupportRequirementsDJ(caseData.getHearingSupportRequirementsDJ().toBuilder()
                         .hearingPreferredLocation(caseData.getHearingSupportRequirementsDJ()
                                 .getHearingTemporaryLocation().getValue().getLabel()).build())
-                .caseManagementLocation(CaseLocation.builder().region(location.getRegionId()).baseLocation(
-                    location.getEpimmsId()).build());
+                .caseManagementLocation(LocationRefDataService.buildCaseLocation(location));
             caseDataBuilder.locationName(location.getSiteName());
         }
 
@@ -173,6 +171,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         if (caseData.getDefendantDetails().getValue().getLabel().startsWith("Both")) {
             caseDataBuilder.bothDefendants(caseData.getDefendantDetails().getValue().getLabel());
         }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -243,15 +242,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         }
         caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT));
 
-        var state = "PROCEEDS_IN_HERITAGE_SYSTEM";
-        if (caseData.getRespondent2() == null || caseData.getRespondent2() != null
-            && caseData.getDefendantDetails().getValue()
-            .getLabel().startsWith("Both")) {
-            state = "JUDICIAL_REFERRAL";
-        }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .state(state)
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
@@ -261,6 +252,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
                             .map(location -> location.getSiteName()
                                 + " - " + location.getCourtAddress()
                                 + " - " + location.getPostcode())
+                            .sorted()
                             .collect(Collectors.toList()));
     }
 

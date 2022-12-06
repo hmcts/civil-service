@@ -87,12 +87,57 @@ class FeatureToggleServiceTest {
     }
 
     @Test
+    void shouldCallBoolVariation_whenIsHearingAndListingSDOEnabledInvoked() {
+        var hearingAndListingKey = "hearing-and-listing-sdo";
+        givenToggle(hearingAndListingKey, true);
+
+        assertThat(featureToggleService.isHearingAndListingSDOEnabled()).isTrue();
+        verifyBoolVariationCalled(hearingAndListingKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
+    void shouldCallBoolVariation_whenisCourtLocationDynamicListEnabledInvoked() {
+        var courtLocationDynamicListKey = "court-location-dynamic-list";
+        givenToggle(courtLocationDynamicListKey, true);
+
+        assertThat(featureToggleService.isCourtLocationDynamicListEnabled()).isTrue();
+        verifyBoolVariationCalled(courtLocationDynamicListKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
+    void shouldCallBoolVariation_whenIsGeneralApplicationsEnabledInvoked() {
+        var generalApplicationsKey = "general_applications_enabled";
+        givenToggle(generalApplicationsKey, true);
+
+        assertThat(featureToggleService.isGeneralApplicationsEnabled()).isTrue();
+        verifyBoolVariationCalled(generalApplicationsKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
     void shouldCallBoolVariation_whenIsPinInPostEnabledInvoked() {
         var pinInPostKey = "pin-in-post";
         givenToggle(pinInPostKey, true);
 
         assertThat(featureToggleService.isPinInPostEnabled()).isTrue();
         verifyBoolVariationCalled(pinInPostKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
+    void shouldCallBoolVariation_whenIsAccessProfilesEnabledInvoked() {
+        var accessProfilesKey = "access-profiles";
+        givenToggle(accessProfilesKey, true);
+
+        assertThat(featureToggleService.isAccessProfilesEnabled()).isTrue();
+        verifyBoolVariationCalled(accessProfilesKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
+    void shouldCallBoolVariation_whenIsSDOEnabledInvoked() {
+        var enableSDOKey = "enableSDO";
+        givenToggle(enableSDOKey, true);
+
+        assertThat(featureToggleService.isSDOEnabled()).isTrue();
+        verifyBoolVariationCalled(enableSDOKey, List.of("timestamp", "environment"));
     }
 
     @Test
@@ -131,5 +176,25 @@ class FeatureToggleServiceTest {
             any(LDUser.class),
             eq(false)
         );
+    }
+
+    @Test
+    public void globalSearch_LDTagName() {
+        featureToggleService.isGlobalSearchEnabled();
+
+        Mockito.verify(ldClient).boolVariation(
+            eq("global-search-specified"),
+            any(LDUser.class),
+            eq(false)
+        );
+    }
+
+    @Test
+    void shouldCallBoolVariation_whenIsPbaV3EnabledInvoked() {
+        var pbaV3Key = "pba-version-3-ways-to-pay";
+        givenToggle(pbaV3Key, true);
+
+        assertThat(featureToggleService.isPbaV3Enabled()).isTrue();
+        verifyBoolVariationCalled(pbaV3Key, List.of("timestamp", "environment"));
     }
 }

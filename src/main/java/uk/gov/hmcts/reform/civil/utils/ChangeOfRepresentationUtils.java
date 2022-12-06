@@ -18,9 +18,10 @@ public class ChangeOfRepresentationUtils {
     public static ChangeOfRepresentation getLatestChangeOfRepresentation(
         List<Element<ChangeOfRepresentation>> changeOfRepresentationHistory) {
         if (changeOfRepresentationHistory.size() > 1) {
-            List<ChangeOfRepresentation> changeOfRepresentations = unwrapElements(changeOfRepresentationHistory);
-            ArrayList<ChangeOfRepresentation> changeOfRepresentations1 = new ArrayList<>(changeOfRepresentations);
-            changeOfRepresentations1.sort(sortNoCEvents());
+            ArrayList<ChangeOfRepresentation> changeOfRepresentations =
+                new ArrayList<>(unwrapElements(changeOfRepresentationHistory));
+            changeOfRepresentations.sort(sortNoCEvents());
+            return changeOfRepresentations.get(0);
         }
         return changeOfRepresentationHistory.get(0).getValue();
     }

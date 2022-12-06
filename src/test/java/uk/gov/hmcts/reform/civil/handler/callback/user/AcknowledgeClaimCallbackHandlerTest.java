@@ -230,7 +230,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void setup() {
             newDeadline = LocalDateTime.now().plusDays(14);
             nextDeadline = LocalDateTime.now().plusDays(7);
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(newDeadline);
+            when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(newDeadline);
             when(deadlinesCalculator.nextDeadline(any())).thenReturn(nextDeadline);
             acknowledgementDate = LocalDateTime.now();
             when(time.now()).thenReturn(acknowledgementDate);

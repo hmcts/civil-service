@@ -25,7 +25,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_DETAILS;
@@ -69,7 +68,7 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
             responseDeadline = LocalDateTime.now().plusDays(14);
             when(notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate())
                 .thenReturn(templateId);
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(responseDeadline);
+            when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
         }
 
         @Test
@@ -111,7 +110,7 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONSE_DEADLINE, formatLocalDate(caseData.getClaimDetailsNotificationDeadline().toLocalDate(), DATE),
                 RESPONSE_DEADLINE_PLUS_28, formatLocalDate(
-                    deadlinesCalculator.plus14DaysAt4pmDeadline(caseData.getRespondent1ResponseDeadline())
+                    deadlinesCalculator.plus14DaysDeadline(caseData.getRespondent1ResponseDeadline())
                          .toLocalDate(), DATE),
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
@@ -124,7 +123,6 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
-                .version(V_1)
                 .request(CallbackRequest.builder()
                              .eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS.name())
                              .build())
@@ -147,7 +145,6 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
-                .version(V_1)
                 .request(CallbackRequest.builder()
                              .eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_DETAILS.name())
                              .build())
@@ -170,7 +167,6 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
-                .version(V_1)
                 .request(CallbackRequest.builder()
                              .eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS.name())
                              .build()

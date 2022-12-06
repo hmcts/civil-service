@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -34,6 +35,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DETAILS_A
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Address.fromContactInformation;
+import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
+import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
 import static uk.gov.hmcts.reform.civil.utils.ChangeOfRepresentationUtils.getLatestChangeOfRepresentation;
 
 @Slf4j
@@ -104,16 +107,12 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         boolean isApplicantSolicitorRole = isApplicantOrRespondent(replacedSolicitorCaseRole);
 
         if (isApplicantSolicitorRole) {
-            if (addedOrganisation != null) {
-                updateApplicantSolicitorDetails(caseDataBuilder, addedSolicitorDetails, addedOrganisation);
-            }
+            updateApplicantSolicitorDetails(caseDataBuilder, addedSolicitorDetails, addedOrganisation);
         } else {
-            if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
-                && addedOrganisation != null) {
+            if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
                 updateRespondentSolicitor1Details(caseDataBuilder, addedOrganisation, addedSolicitorDetails);
             } else {
-                if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
-                    && addedOrganisation != null) {
+                if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
                     updateRespondentSolicitor2Details(caseDataBuilder, addedOrganisation, addedSolicitorDetails);
                 }
             }
@@ -121,9 +120,36 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
 
         updateSolicitorReferences(caseData, caseDataBuilder, replacedSolicitorCaseRole);
 
+        updateOrgPolicyReferences(caseData, caseDataBuilder, replacedSolicitorCaseRole);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void updateOrgPolicyReferences(CaseData caseData,
+                                           CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
+                                           String replacedSolicitorCaseRole) {
+        if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(replacedSolicitorCaseRole)) {
+            OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
+            OrganisationPolicy updatedOrgPolicy =
+                respondent1OrganisationPolicy.toBuilder().orgPolicyReference(null).build();
+            caseDataBuilder.respondent1OrganisationPolicy(updatedOrgPolicy);
+        } else if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(replacedSolicitorCaseRole)) {
+            OrganisationPolicy respondent2OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
+            OrganisationPolicy updatedOrgPolicy =
+                respondent2OrganisationPolicy.toBuilder().orgPolicyReference(null).build();
+            caseDataBuilder.respondent2OrganisationPolicy(updatedOrgPolicy);
+        } else {
+            OrganisationPolicy applicant1OrganisationPolicy = caseData.getApplicant1OrganisationPolicy();
+            OrganisationPolicy updatedOrgPolicy =
+                applicant1OrganisationPolicy.toBuilder().orgPolicyReference(null).build();
+            caseDataBuilder.applicant1OrganisationPolicy(updatedOrgPolicy);
+        }
+        if (caseData.getUnassignedCaseListDisplayOrganisationReferences() != null) {
+            caseDataBuilder.unassignedCaseListDisplayOrganisationReferences(
+                getAllOrganisationPolicyReferences(caseDataBuilder.build()));
+        }
     }
 
     private void updateRespondentSolicitor2Details(
@@ -251,6 +277,16 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             // only update if it's been created during acknowledge claim
             if (caseData.getSolicitorReferencesCopy() != null) {
                 caseDataBuilder.solicitorReferencesCopy(updatedSolicitorReferences);
+            }
+
+            // also update this field because it exists
+            if (replacedCaseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
+                caseDataBuilder.respondentSolicitor2Reference(null);
+            }
+
+            if (caseData.getCaseListDisplayDefendantSolicitorReferences() != null) {
+                caseDataBuilder.caseListDisplayDefendantSolicitorReferences(
+                    getAllDefendantSolicitorReferences(caseDataBuilder.build()));
             }
         }
     }

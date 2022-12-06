@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,7 +44,6 @@ public class ChangeOfRepresentationUtilsTest {
             .caseRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
             .timestamp(LocalDateTime.now().minusDays(1)).build();
 
-        ArrayList<ChangeOfRepresentation> changeOfRepresentationHistoryOld = new ArrayList<>();
         changeOfRepListOld.add(element(changeOfRepresentation2));
 
         ChangeOfRepresentation changeOfRepresentation3 = ChangeOfRepresentation.builder()
