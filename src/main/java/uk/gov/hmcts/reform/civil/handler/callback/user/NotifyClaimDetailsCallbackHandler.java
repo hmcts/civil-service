@@ -171,7 +171,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         LocalDateTime date = time.now();
 
         if (toggleService.isCertificateOfServiceEnabled()) {
-            if(Objects.nonNull(caseData.getCosNotifyClaimDetails1())
+            if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
                     && Objects.nonNull(caseData
                     .getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant())) {
                 LocalDateTime cosDate1 = caseData.getCosNotifyClaimDetails1()
@@ -180,7 +180,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                     date = cosDate1;
                 }
             }
-            if(Objects.nonNull(caseData.getCosNotifyClaimDetails2())
+            if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
                     && Objects.nonNull(caseData
                     .getCosNotifyClaimDetails2().getCosDateOfServiceForDefendant())) {
                 LocalDateTime cosDate2 = caseData.getCosNotifyClaimDetails2()
