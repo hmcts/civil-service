@@ -413,6 +413,9 @@ public class FlowPredicate {
     public static final Predicate<CaseData> takenOfflineBySystem = caseData ->
         caseData.getTakenOfflineDate() != null;
 
+    public static final Predicate<CaseData> takenOfflineAfterSDO = caseData ->
+        caseData.getTakenOfflineDate() != null;
+
     public static final Predicate<CaseData> takenOfflineByStaff = caseData ->
         caseData.getTakenOfflineByStaffDate() != null;
 
