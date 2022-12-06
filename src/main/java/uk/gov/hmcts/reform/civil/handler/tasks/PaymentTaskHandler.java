@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -17,7 +21,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
-import java.util.Map;
+import static java.util.Optional.ofNullable;
 
 @Component
 @Slf4j
@@ -33,14 +37,21 @@ public class PaymentTaskHandler implements BaseExternalTaskHandler {
 
     @Override
     public void handleTask(ExternalTask externalTask) {
-        Map<String, Object> allVariables = externalTask.getAllVariables();
-        ExternalTaskInput externalTaskInput = objectMapper.convertValue(allVariables, ExternalTaskInput.class);
-        String caseId = externalTaskInput.getCaseId();
-        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId,
-                                                                                externalTaskInput.getCaseEvent());
-        BusinessProcess businessProcess = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())
-            .getBusinessProcess().updateActivityId(externalTask.getActivityId());
-        data = coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
+        try {
+            Map<String, Object> allVariables = externalTask.getAllVariables();
+            ExternalTaskInput externalTaskInput = objectMapper.convertValue(allVariables, ExternalTaskInput.class);
+            String caseId = ofNullable(externalTaskInput.getCaseId())
+                .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
+            StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
+                caseId,
+                externalTaskInput.getCaseEvent()
+            );
+            BusinessProcess businessProcess = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())
+                .getBusinessProcess().updateActivityId(externalTask.getActivityId());
+            data = coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
+        } catch (ValueMapperException | IllegalArgumentException e) {
+            throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
+        }
     }
 
     @Override
