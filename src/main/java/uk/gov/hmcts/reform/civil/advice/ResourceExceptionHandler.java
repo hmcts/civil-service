@@ -36,19 +36,19 @@ public class ResourceExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.PRECONDITION_FAILED);
     }
 
-  @ExceptionHandler(value = UnknownHostException.class)
+    @ExceptionHandler(value = UnknownHostException.class)
     public ResponseEntity<Object> unknownHost(Exception exception) {
         log.debug(exception.getMessage(), exception);
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_ACCEPTABLE);
     }
 
-    @ExceptionHandler(value =  FeignException.Unauthorized.class)
+    @ExceptionHandler(value = FeignException.Unauthorized.class)
     public ResponseEntity<Object> unauthorizedFeign(Exception exception) {
         log.debug(exception.getMessage(), exception);
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(value =  FeignException.Forbidden.class)
+    @ExceptionHandler(value = FeignException.Forbidden.class)
     public ResponseEntity<Object> forbiddenFeign(Exception exception) {
         log.debug(exception.getMessage(), exception);
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN);
@@ -64,7 +64,8 @@ public class ResourceExceptionHandler {
     public ResponseEntity<String> handleFeignExceptionGatewayTimeout(Exception exception) {
         log.debug(exception.getMessage(), exception);
         return new ResponseEntity<>(exception.getMessage(),
-                                    new HttpHeaders(), HttpStatus.GATEWAY_TIMEOUT);
+                                    new HttpHeaders(), HttpStatus.GATEWAY_TIMEOUT
+        );
     }
 
     @ExceptionHandler(NotificationClientException.class)
