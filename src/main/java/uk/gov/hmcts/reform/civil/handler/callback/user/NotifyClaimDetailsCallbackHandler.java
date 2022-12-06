@@ -119,6 +119,11 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
         LocalDate notificationDate = notificationDateTime.toLocalDate();
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        if (toggleService.isCertificateOfServiceEnabled()
+            && multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP
+            && isConfirmationForLip(caseData)) {
+            multiPartyScenario = null;
+        }
         CaseData updatedCaseData;
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             updatedCaseData = caseData.toBuilder()
