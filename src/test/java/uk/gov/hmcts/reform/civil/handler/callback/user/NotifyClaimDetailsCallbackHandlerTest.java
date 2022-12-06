@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -65,6 +66,9 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private ExitSurveyContentService exitSurveyContentService;
+
+    @Autowired
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Nested
     class AboutToStartCallback {
@@ -230,6 +234,21 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("respondent2ResponseDeadline", newDate.format(ISO_DATE_TIME))
                 .containsEntry("claimDismissedDeadline", sixMonthDate.format(ISO_DATE_TIME));
         }
+
+        @Test
+        void shouldUpdateCertificateOfService_and_documents_whenSubmitted() {
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+            LocalDate past = LocalDate.now().minusDays(1);
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
+                    .setCoSClaimDetailsWithDate(true, false, past, null, true, false)
+                    .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(1);
+            assertThat(updatedData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
+        }
     }
 
     @Nested
@@ -317,6 +336,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         AboutToStartOrSubmitCallbackResponse successResponse =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(successResponse.getErrors()).isEmpty();
+        assertThat(params.getCaseData().getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(NO);
     }
 
     @Test
