@@ -198,7 +198,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             cosNotifyClaimDetails = caseData.getCosNotifyClaimDetails2();
         }
         if (Objects.nonNull(cosNotifyClaimDetails)) {
-            cosNotifyClaimDetails.setCosDocSaved(YesOrNo.YES);
+            cosNotifyClaimDetails.setCosDocSaved(YES);
             if (Objects.isNull(caseData.getServedDocumentFiles())) {
                 caseData = caseData.toBuilder()
                         .servedDocumentFiles(ServedDocumentFiles.builder().build()).build();
