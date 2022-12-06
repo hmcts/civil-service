@@ -296,7 +296,7 @@ public class GeneralApplicationDetailsBuilder {
     public CaseData getTestCaseDataWithDetails(CaseData caseData,
                                                boolean withGADetails,
                                                boolean withGADetailsResp,
-                                               boolean withGADetailsResp2,
+                                               boolean withGADetailsResp2, boolean withGADetailsMaster,
                                                Map<String, String> applicationIdStatus) {
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
@@ -306,19 +306,34 @@ public class GeneralApplicationDetailsBuilder {
             applicationIdStatus.forEach((key, value) -> genApps.add(getGeneralApplication(key)));
             caseDataBuilder.generalApplications(wrapElements(genApps.toArray(new GeneralApplication[0])));
         }
+
         if (withGADetails) {
             List<GeneralApplicationsDetails> allGaDetails = new ArrayList<>();
             applicationIdStatus.forEach((key, value) -> allGaDetails.add(getGADetails(key, value)));
-            caseDataBuilder.generalApplicationsDetails(
+            caseDataBuilder.claimantGaAppDetails(
                     wrapElements(allGaDetails.toArray(new GeneralApplicationsDetails[0])
             ));
         }
+
+        if (withGADetailsMaster) {
+            List<GeneralApplicationsDetails> allGaDetails = new ArrayList<>();
+            applicationIdStatus.forEach((key, value) -> allGaDetails.add(getGADetails(key, value)));
+            caseDataBuilder.gaDetailsMasterCollection(
+                wrapElements(allGaDetails.toArray(new GeneralApplicationsDetails[0])
+                ));
+        }
+
         List<GADetailsRespondentSol> gaDetailsRespo = new ArrayList<>();
         applicationIdStatus.forEach((key, value) -> gaDetailsRespo.add(getGADetailsRespondent(key, value)));
         if (withGADetailsResp) {
-            caseDataBuilder.gaDetailsRespondentSol(wrapElements(gaDetailsRespo.toArray(new GADetailsRespondentSol[0])));
+            caseDataBuilder.respondentSolGaAppDetails(wrapElements(gaDetailsRespo
+                                                                       .toArray(new GADetailsRespondentSol[0])));
         }
 
+        if (withGADetailsResp2) {
+            caseDataBuilder.respondentSolTwoGaAppDetails(wrapElements(gaDetailsRespo
+                                                                       .toArray(new GADetailsRespondentSol[0])));
+        }
         return caseDataBuilder.build();
     }
 
