@@ -190,15 +190,15 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
     }
 
-    private CaseData prepareCoSDetails(CaseData caseData, int idx) {
+    private CaseData prepareCoSDetails(CaseData caseData, int lipNumber) {
         CertificateOfService cosNotifyClaimDetails;
-        if (idx == 1) {
+        if (lipNumber == 1) {
             cosNotifyClaimDetails = caseData.getCosNotifyClaimDetails1();
         } else {
             cosNotifyClaimDetails = caseData.getCosNotifyClaimDetails2();
         }
         if (Objects.nonNull(cosNotifyClaimDetails)) {
-            cosNotifyClaimDetails.setCosDetailSaved(YES);
+            cosNotifyClaimDetails.setCosDocSaved(YesOrNo.YES);
             if (Objects.isNull(caseData.getServedDocumentFiles())) {
                 caseData = caseData.toBuilder()
                         .servedDocumentFiles(ServedDocumentFiles.builder().build()).build();
@@ -211,7 +211,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                             .getCosEvidenceDocument());
             caseData.getServedDocumentFiles().getOther()
                     .addAll(cosDoc.stream()
-                            .map(x -> ElementUtils.element(new DocumentWithRegex(x)))
+                            .map(document -> ElementUtils.element(new DocumentWithRegex(document)))
                             .collect(Collectors.toList()));
         }
         return caseData;
@@ -337,10 +337,10 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         ArrayList<String> errors = new ArrayList<>();
         if (toggleService.isCertificateOfServiceEnabled()) {
             if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
-                caseData.getCosNotifyClaimDetails1().setCosDetailSaved(NO);
+                caseData.getCosNotifyClaimDetails1().setCosDocSaved(NO);
             }
             if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
-                caseData.getCosNotifyClaimDetails2().setCosDetailSaved(NO);
+                caseData.getCosNotifyClaimDetails2().setCosDocSaved(NO);
             }
             if ((Objects.nonNull(caseData.getCosNotifyClaimDetails1())
                     && LocalDate.now().isBefore(
