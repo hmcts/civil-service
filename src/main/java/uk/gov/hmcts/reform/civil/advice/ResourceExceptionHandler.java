@@ -16,6 +16,8 @@ import java.net.SocketTimeoutException;
 
 import static org.springframework.http.HttpStatus.FAILED_DEPENDENCY;
 
+import java.net.UnknownHostException;
+
 @Slf4j
 @ControllerAdvice
 public class ResourceExceptionHandler {
@@ -63,7 +65,8 @@ public class ResourceExceptionHandler {
     public ResponseEntity<String> handleFeignExceptionGatewayTimeout(Exception exception) {
         log.debug(exception.getMessage(), exception);
         return new ResponseEntity<>(exception.getMessage(),
-                                    new HttpHeaders(), HttpStatus.GATEWAY_TIMEOUT);
+                                    new HttpHeaders(), HttpStatus.GATEWAY_TIMEOUT
+        );
     }
 
     @ExceptionHandler(NotificationClientException.class)
