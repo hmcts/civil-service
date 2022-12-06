@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -13,15 +12,18 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategoryElement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
@@ -35,14 +37,13 @@ import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
-import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Optional.ofNullable;
@@ -111,6 +112,8 @@ public class InitiateGeneralApplicationService {
             .generalAppPBADetails(GAPbaDetails.builder().build())
             .generalAppDetailsOfOrder(EMPTY)
             .generalAppReasonsOfOrder(EMPTY)
+            .generalAppN245FormUpload(Document.builder().build())
+            .generalAppHearingDate(GAHearingDateGAspec.builder().build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().build())
             .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().build())
             .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
@@ -157,18 +160,6 @@ public class InitiateGeneralApplicationService {
                 .generalAppStatementOfTruth(GAStatementOfTruth.builder().build());
         }
 
-        Optional<Organisation> org = findOrganisation(authToken);
-        if (org.isPresent()) {
-            applicationBuilder
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec
-                                             .builder()
-                                             .id(userDetails.getId())
-                                             .email(userDetails.getEmail())
-                                             .forename(userDetails.getForename())
-                                             .surname(userDetails.getSurname())
-                                             .organisationIdentifier(org.get().getOrganisationIdentifier()).build());
-        }
-
         GACaseManagementCategoryElement civil =
             GACaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
         List<Element<GACaseManagementCategoryElement>> itemList = new ArrayList<>();
@@ -186,9 +177,15 @@ public class InitiateGeneralApplicationService {
             .calculateApplicantResponseDeadline(
                 LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS);
 
+        if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)
+            && ! Objects.isNull(caseData.getGeneralAppN245FormUpload())) {
+            applicationBuilder.generalAppN245FormUpload(caseData.getGeneralAppN245FormUpload());
+        }
+
         GeneralApplication generalApplication = applicationBuilder
             .businessProcess(BusinessProcess.ready(INITIATE_GENERAL_APPLICATION))
             .generalAppType(caseData.getGeneralAppType())
+            .generalAppHearingDate(caseData.getGeneralAppHearingDate())
             .generalAppRespondentAgreement(caseData.getGeneralAppRespondentAgreement())
             .generalAppUrgencyRequirement(caseData.getGeneralAppUrgencyRequirement())
             .generalAppDetailsOfOrder(caseData.getGeneralAppDetailsOfOrder())
@@ -277,16 +274,6 @@ public class InitiateGeneralApplicationService {
                     }
                 });
             }
-        }
-    }
-
-    public Optional<Organisation> findOrganisation(String authToken) {
-        try {
-            return ofNullable(organisationApi.findUserOrganisation(authToken, authTokenGenerator.generate()));
-
-        } catch (FeignException.NotFound | FeignException.Forbidden ex) {
-            log.error("User not registered in MO", ex);
-            return Optional.empty();
         }
     }
 

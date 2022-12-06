@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.referencedata;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -12,12 +13,15 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.referencedata.LRDConfiguration;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.apache.logging.log4j.util.Strings.concat;
@@ -53,7 +57,9 @@ public class LocationRefDataService {
                 buildURIforCcmcc(),
                 HttpMethod.GET,
                 getHeaders(authToken),
-                new ParameterizedTypeReference<List<LocationRefData>>() {});
+                new ParameterizedTypeReference<List<LocationRefData>>() {
+                }
+            );
             List<LocationRefData> ccmccLocations = responseEntity.getBody();
             if (ccmccLocations == null || ccmccLocations.isEmpty()) {
                 log.warn("Location Reference Data Lookup did not return any CCMCC location");
@@ -125,6 +131,17 @@ public class LocationRefDataService {
             .map(LocationRefDataService::getDisplayEntry).collect(Collectors.toList());
     }
 
+    public Optional<LocationRefData> getLocationMatchingLabel(String label, String bearerToken) {
+        if (StringUtils.isBlank(label)) {
+            return Optional.empty();
+        }
+
+        List<LocationRefData> locations = getCourtLocationsForDefaultJudgments(bearerToken);
+        return locations.stream().filter(loc -> LocationRefDataService.getDisplayEntry(loc)
+                .equals(label))
+            .findFirst();
+    }
+
     /**
      * Label is siteName - courtAddress - postCode.
      *
@@ -137,4 +154,66 @@ public class LocationRefDataService {
             location.getPostcode()
         );
     }
+
+    /**
+     * Centralized creation of CaseLocation from LocationRefData to reduce the places it can be done.
+     *
+     * @param location mandatory
+     * @return case location built from location
+     */
+    public static CaseLocation buildCaseLocation(LocationRefData location) {
+        return CaseLocation.builder()
+            .region(location.getRegionId())
+            .baseLocation(location.getEpimmsId())
+            .build();
+    }
+
+    public LocationRefData getCourtLocation(String authToken, String threeDigitCode) {
+        try {
+            ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
+                buildURIforCourtCode(threeDigitCode),
+                HttpMethod.GET,
+                getHeaders(authToken),
+                new ParameterizedTypeReference<List<LocationRefData>>() {
+                }
+            );
+            List<LocationRefData> locations = responseEntity.getBody();
+            if (locations == null || locations.isEmpty()) {
+                return LocationRefData.builder().build();
+            } else {
+                if (locations.size() > 1) {
+                    log.warn("Location Reference Data Lookup returned more than one CCMCC location");
+                }
+                return locations.get(0);
+            }
+        } catch (Exception e) {
+            log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
+        }
+        return LocationRefData.builder().build();
+    }
+
+    private URI buildURIforCourtCode(String courtCode) {
+        String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
+            .queryParam("court_type_id", "10")
+            .queryParam("is_case_management_location", "Y")
+            .queryParam("court_location_code", courtCode)
+            .queryParam("court_status", "Open");
+
+        return builder.buildAndExpand(new HashMap<>()).toUri();
+    }
+
+    /**
+     * Updates both caseManagementLocation and locationName with the same LocationRefData to ease not forgetting
+     * about one of those.
+     *
+     * @param builder  (mandatory) to build a case data
+     * @param location (mandatory) what to update with
+     */
+    public static void updateWithLocation(CaseData.CaseDataBuilder<?, ?> builder, LocationRefData location) {
+        builder
+            .caseManagementLocation(buildCaseLocation(location))
+            .locationName(location.getSiteName());
+    }
+
 }

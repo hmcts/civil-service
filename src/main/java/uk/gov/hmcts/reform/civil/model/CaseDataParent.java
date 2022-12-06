@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantRespon
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
@@ -39,6 +40,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
@@ -47,6 +49,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
@@ -140,8 +143,11 @@ public class CaseDataParent implements MappableObject {
     private DisposalHearingSchedulesOfLoss disposalHearingSchedulesOfLoss;
     private DisposalHearingStandardDisposalOrder disposalHearingStandardDisposalOrder;
     private DisposalHearingFinalDisposalHearing disposalHearingFinalDisposalHearing;
+    private DisposalHearingHearingTime disposalHearingHearingTime;
     private DisposalHearingBundle disposalHearingBundle;
     private DisposalHearingNotes disposalHearingNotes;
+    private String disposalHearingHearingNotes;
+    private DisposalOrderWithoutHearing disposalOrderWithoutHearing;
     private final DisposalHearingMethod disposalHearingMethod;
     private final DisposalHearingMethodTelephoneHearing disposalHearingMethodTelephoneHearing;
     private final DisposalHearingMethodVideoConferenceHearing disposalHearingMethodVideoConferenceHearing;
@@ -150,6 +156,7 @@ public class CaseDataParent implements MappableObject {
     private final DynamicList disposalHearingMethodInPerson;
     private final DynamicList fastTrackMethodInPerson;
     private final DynamicList smallClaimsMethodInPerson;
+    private final DynamicList hearingMethod;
     private final YesOrNo drawDirectionsOrderRequired;
     private final YesOrNo drawDirectionsOrderSmallClaims;
     private final ClaimsTrack claimsTrack;
@@ -183,6 +190,7 @@ public class CaseDataParent implements MappableObject {
     private SmallClaimsJudgesRecital smallClaimsJudgesRecital;
     private SmallClaimsNotes smallClaimsNotes;
     private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
+    private SDOHearingNotes sdoHearingNotes;
     private ReasonNotSuitableSDO reasonNotSuitableSDO;
     private final List<SmallTrack> smallClaims;
     private final SmallClaimsMethod smallClaimsMethod;
@@ -213,11 +221,13 @@ public class CaseDataParent implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> smallClaimsDocumentsToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsWitnessStatementToggle;
 
-    private Document sdoOrderDocument;
+    private CaseDocument sdoOrderDocument;
 
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
     private final YesOrNo setFastTrackFlag;
+    private final String eventDescriptionRTJ;
+    private final String additionalInformationRTJ;
 
     private final LocalDate nextDeadline;
     private final String allPartyNames;
@@ -297,5 +307,7 @@ public class CaseDataParent implements MappableObject {
     private final ScheduledHearing nextHearingDetails;
 
     private final String respondent1EmailAddress;
+
+    private final String migrationId;
 
 }
