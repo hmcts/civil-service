@@ -7,9 +7,6 @@ import uk.gov.hmcts.contino.AppPipelineDsl
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdDefBranch = "cosintegration"
-def camundaBranch = "cosintegration"
-
 AppPipelineConfig pipelineConf
 
 static Map<String, Object> secret(String secretName, String envVariable) {
@@ -103,9 +100,9 @@ withPipeline(type, product, component) {
       ./bin/add-roles.sh
       ./bin/pull-latest-release-asset.sh civil-ccd-definition civil-ccd-definition.zip
       ./bin/pull-latest-release-asset.sh civil-camunda-bpmn-definition civil-camunda-bpmn-definition.zip
-      ./bin/pull-latest-ccd-files.sh ${ccdDefBranch}
-      ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json" ${ccdDefBranch}
-      ./bin/pull-latest-camunda-files.sh ${camundaBranch}
+      ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json"
+
+      ./bin/import-bpmn-diagram.sh .
     """
 
     env.URL="https://xui-civil-service-pr-${CHANGE_ID}.service.core-compute-preview.internal"
