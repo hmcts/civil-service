@@ -65,11 +65,23 @@ public class GenAppStateHelperService {
                                                      String updatedState,
                                                      RequiredState gaFlow) {
 
-        List<Element<GeneralApplicationsDetails>> gaDetails = caseData.getGeneralApplicationsDetails();
-        List<Element<GADetailsRespondentSol>> respondentSpecficGADetails = caseData.getGaDetailsRespondentSol();
+        List<Element<GeneralApplicationsDetails>> gaDetails = caseData.getClaimantGaAppDetails();
+        List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection = caseData.getGaDetailsMasterCollection();
 
         Map<Long, GeneralApplication> generalApplicationMap = getLatestStatusOfGeneralApplication(caseData);
-
+        /*
+        * Master GA collection for Judge, case worker, legal adviser etc..
+        * */
+        if (!isEmpty(gaDetailsMasterCollection)) {
+            gaDetailsMasterCollection.forEach(gaMasterColl -> {
+                if (applicationFilterCriteria(gaMasterColl.getValue(), generalApplicationMap, gaFlow)) {
+                    gaMasterColl.getValue().setCaseState(updatedState);
+                }
+            });
+        }
+        /*
+        * Claimant GA Collection
+        * */
         if (!isEmpty(gaDetails)) {
             gaDetails.forEach(gaDetails1 -> {
                 if (applicationFilterCriteria(gaDetails1.getValue(), generalApplicationMap, gaFlow)) {
@@ -77,10 +89,29 @@ public class GenAppStateHelperService {
                 }
             });
         }
+
+        /*
+        * Respondent one GA collection
+        * */
+        List<Element<GADetailsRespondentSol>> respondentSpecficGADetails = caseData.getRespondentSolGaAppDetails();
+
         if (!isEmpty(respondentSpecficGADetails)) {
             respondentSpecficGADetails.forEach(respondentSolElement -> {
                 if (applicationFilterCriteria(respondentSolElement.getValue(), generalApplicationMap, gaFlow)) {
                     respondentSolElement.getValue().setCaseState(updatedState);
+                }
+            });
+        }
+
+        /*
+        * Respondent two GA collection
+        * */
+        List<Element<GADetailsRespondentSol>> respondentTwoGADetails = caseData.getRespondentSolTwoGaAppDetails();
+
+        if (!isEmpty(respondentTwoGADetails)) {
+            respondentTwoGADetails.forEach(respondentTwoSolElement -> {
+                if (applicationFilterCriteria(respondentTwoSolElement.getValue(), generalApplicationMap, gaFlow)) {
+                    respondentTwoSolElement.getValue().setCaseState(updatedState);
                 }
             });
         }
