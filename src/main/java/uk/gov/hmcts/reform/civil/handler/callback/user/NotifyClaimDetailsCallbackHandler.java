@@ -113,8 +113,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         LocalDateTime notificationDateTime = time.now();
 
         if (toggleService.isCertificateOfServiceEnabled()) {
-            caseData = prepareCoSDetails(caseData, 1);
-            caseData = prepareCoSDetails(caseData, 2);
+            caseData = saveCoSDetailsDoc(caseData, 1);
+            caseData = saveCoSDetailsDoc(caseData, 2);
         }
 
         LocalDate notificationDate = notificationDateTime.toLocalDate();
@@ -150,7 +150,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             .build();
     }
 
-    private CaseData prepareCoSDetails(CaseData caseData, int lipNumber) {
+    private CaseData saveCoSDetailsDoc(CaseData caseData, int lipNumber) {
         CertificateOfService cosNotifyClaimDetails;
         if (lipNumber == 1) {
             cosNotifyClaimDetails = caseData.getCosNotifyClaimDetails1();
