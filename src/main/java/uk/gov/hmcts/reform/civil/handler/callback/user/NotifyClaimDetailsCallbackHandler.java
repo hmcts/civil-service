@@ -168,30 +168,30 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     }
 
     private LocalDateTime getEarliestDateOfService(CaseData caseData) {
-        List<LocalDateTime> dates = new ArrayList<LocalDateTime>();
-        dates.add(time.now());
-        LocalDateTime cosDate1 = time.now();
-        LocalDateTime cosDate2 = time.now();
+        LocalDateTime date = time.now();
 
         if (toggleService.isCertificateOfServiceEnabled()) {
             if(Objects.nonNull(caseData.getCosNotifyClaimDetails1())
                     && Objects.nonNull(caseData
                     .getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant())) {
-                cosDate1 = caseData.getCosNotifyClaimDetails1()
+                LocalDateTime cosDate1 = caseData.getCosNotifyClaimDetails1()
                         .getCosDateOfServiceForDefendant().atStartOfDay();
+                if (cosDate1.isBefore(date)) {
+                    date = cosDate1;
+                }
             }
             if(Objects.nonNull(caseData.getCosNotifyClaimDetails2())
                     && Objects.nonNull(caseData
                     .getCosNotifyClaimDetails2().getCosDateOfServiceForDefendant())) {
-                cosDate2 = caseData.getCosNotifyClaimDetails2()
+                LocalDateTime cosDate2 = caseData.getCosNotifyClaimDetails2()
                         .getCosDateOfServiceForDefendant().atStartOfDay();
+                if (cosDate2.isBefore(date)) {
+                    date = cosDate2;
+                }
             }
-            dates.add(cosDate1);
-            dates.add(cosDate2);
-            Collections.sort(dates);
         }
 
-        return dates.get(0);
+        return date;
 
     }
 
