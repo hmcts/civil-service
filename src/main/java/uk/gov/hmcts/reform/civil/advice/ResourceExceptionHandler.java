@@ -40,7 +40,8 @@ public class ResourceExceptionHandler {
     public ResponseEntity<Object> badRequest(Exception exception) {
         log.debug(exception.getMessage(), exception);
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
-
+    }
+    
     @ExceptionHandler(value = UnknownHostException.class)
     public ResponseEntity<Object> unknownHost(Exception exception) {
         log.debug(exception.getMessage(), exception);
