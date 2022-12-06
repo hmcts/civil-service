@@ -43,7 +43,6 @@ public class ResourceExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_ACCEPTABLE);
     }
 
-
     @ExceptionHandler(value =  FeignException.Unauthorized.class)
     public ResponseEntity<Object> unauthorizedFeign(Exception exception) {
         log.debug(exception.getMessage(), exception);
