@@ -116,8 +116,6 @@ class ResourceExceptionHandlerTest {
         );
     }
 
-
-
     @Test
     public void testHandleNotificationClientException() {
         testTemplate(
@@ -128,8 +126,8 @@ class ResourceExceptionHandlerTest {
         );
     }
 
- private <E extends Throwable> void testTemplate(
-       String message,
+    private <E extends Throwable> void testTemplate(
+        String message,
         Function<String, E> exceptionBuilder,
         Function<E, ResponseEntity<?>> method,
         HttpStatus expectedStatus
