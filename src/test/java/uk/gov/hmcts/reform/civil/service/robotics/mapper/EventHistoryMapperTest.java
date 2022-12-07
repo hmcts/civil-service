@@ -7000,6 +7000,8 @@ class EventHistoryMapperTest {
     public void specCaseEvents() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v2UnrepresentedDefendant()
+            .defendant1LIPAtClaimIssued(NO)
+            .defendant2LIPAtClaimIssued(null)
             .build().toBuilder()
             .superClaimType(SuperClaimType.SPEC_CLAIM)
             .build();
