@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
+import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -52,6 +53,7 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private final Integer witnessesIncludingDefendants;
     private final Hearing hearing;
     private final String hearingSupport;
+    private final HearingSupport support;
     private final FurtherInformation furtherInformation;
     private final WelshLanguageRequirements welshLanguageRequirements;
     private final StatementOfTruth statementOfTruth;

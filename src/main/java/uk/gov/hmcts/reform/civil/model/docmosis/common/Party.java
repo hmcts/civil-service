@@ -14,6 +14,8 @@ public class Party {
     private final Address primaryAddress;
     private final Representative representative;
     private final String litigationFriendName;
+    private final String litigationFriendFirstName;
+    private final String litigationFriendLastName;
     private final String soleTraderTradingAs;
     private final String partyEmail;
     private final String partyPhone;
