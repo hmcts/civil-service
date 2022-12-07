@@ -312,6 +312,7 @@ public class CaseDataParent implements MappableObject {
     private final String migrationId;
 
     private final LocalDate applicant1RequestedPaymentDateForDefendantSpec;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal applicant1SuggestInstalmentsPaymentAmountForDefendantSpec;
     private final PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
     private final LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;

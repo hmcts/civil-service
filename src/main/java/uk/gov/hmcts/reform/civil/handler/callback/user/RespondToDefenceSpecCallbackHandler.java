@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -352,7 +353,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse validatePaymentDate(CallbackParams callbackParams) {
 
-        var caseData = callbackParams.getCaseData();
+        CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
         if (checkPastDateValidation(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())) {
@@ -366,7 +367,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse getPaymentDate(CallbackParams callbackParams) {
 
-        var caseData = callbackParams.getCaseData();
+        CaseData caseData = callbackParams.getCaseData();
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         //Set the hint date for repayment to be 30 days in the future
@@ -380,13 +381,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse suggestInstalmentsValidation(CallbackParams callbackParams) {
 
-        var caseData = callbackParams.getCaseData();
+        CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
         //Check repayment amount requested is less than the overall claim amount
-        var totalClaimAmount = caseData.getTotalClaimAmount();
-        var regularRepaymentAmountPennies = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
-        var regularRepaymentAmountPounds = MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies);
+        BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
+        BigDecimal regularRepaymentAmountPennies = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
+        BigDecimal regularRepaymentAmountPounds = MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies);
 
         if (regularRepaymentAmountPounds.compareTo(totalClaimAmount) > 0) {
             errors.add("Regular payment cannot exceed the full claim amount");
