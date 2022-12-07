@@ -103,8 +103,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCertificateOfServiceEnabled() {
-        return internalClient.boolVariation("isCertificateOfServiceEnabled",
-                                            createLDUser().build(), false);
+        return true;
     }
 
     private void close() {
