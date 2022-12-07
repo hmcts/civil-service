@@ -38,12 +38,12 @@ public class ResourceExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.PRECONDITION_FAILED);
     }
 
-    @ExceptionHandler(value = HttpClientErrorException.class)
+    @ExceptionHandler(value = HttpClientErrorException.BadRequest.class)
     public ResponseEntity<Object> badRequest(Exception exception) {
         log.debug(exception.getMessage(), exception);
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
-    
+
     @ExceptionHandler(value = UnknownHostException.class)
     public ResponseEntity<Object> unknownHost(Exception exception) {
         log.debug(exception.getMessage(), exception);
