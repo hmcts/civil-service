@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.prd.model.DxAddress;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -97,7 +96,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .atStateClaimIssued()
                 .build();
 
-            caseData.toBuilder().changeOfRepresentation(new ArrayList<>());
+            caseData.toBuilder().changeOfRepresentation(null);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

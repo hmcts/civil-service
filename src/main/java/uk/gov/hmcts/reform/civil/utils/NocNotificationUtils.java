@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.model.RecipientData;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.utils.ChangeOfRepresentationUtils.getLatestChangeOfRepresentation;
 
 public class NocNotificationUtils {
 
@@ -21,8 +20,7 @@ public class NocNotificationUtils {
      * @return string email of the former solicitor.
      */
     public static String getPreviousSolicitorEmail(CaseData caseData) {
-        return getLatestChangeOfRepresentation(caseData.getChangeOfRepresentation())
-            .getFormerRepresentationEmailAddress();
+        return caseData.getChangeOfRepresentation().getFormerRepresentationEmailAddress();
     }
 
     /**
@@ -103,20 +101,17 @@ public class NocNotificationUtils {
     }
 
     private static boolean isRespondent2NewSolicitor(CaseData caseData) {
-        return getLatestChangeOfRepresentation(caseData.getChangeOfRepresentation())
-            .getCaseRole()
+        return caseData.getChangeOfRepresentation().getCaseRole()
             .equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
     }
 
     private static boolean isApplicant1NewSolicitor(CaseData caseData) {
-        return getLatestChangeOfRepresentation(caseData.getChangeOfRepresentation())
-            .getCaseRole()
+        return caseData.getChangeOfRepresentation().getCaseRole()
             .equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
     }
 
     private static boolean isRespondent1NewSolicitor(CaseData caseData) {
-        return getLatestChangeOfRepresentation(caseData.getChangeOfRepresentation())
-            .getCaseRole()
+        return caseData.getChangeOfRepresentation().getCaseRole()
             .equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
     }
 

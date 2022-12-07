@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NocNotificationUtils;
@@ -25,7 +24,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_OTHER_SOLICITO
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_OTHER_SOLICITOR_2;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.utils.ChangeOfRepresentationUtils.getLatestChangeOfRepresentation;
 
 @Service
 @RequiredArgsConstructor
@@ -121,16 +119,14 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        ChangeOfRepresentation latestChangeOfRepresentation =
-            getLatestChangeOfRepresentation(caseData.getChangeOfRepresentation());
         return Map.of(
             CASE_NAME, NocNotificationUtils.getCaseName(caseData),
             ISSUE_DATE, formatLocalDate(caseData.getIssueDate(), DATE),
             CCD_REF, caseData.getCcdCaseReference().toString(),
             FORMER_SOL,
-            latestChangeOfRepresentation.getOrganisationToRemoveID() != null
-                ? getOrganisationName(latestChangeOfRepresentation.getOrganisationToRemoveID()) : "LiP",
-            NEW_SOL, getOrganisationName(latestChangeOfRepresentation.getOrganisationToAddID()),
+            caseData.getChangeOfRepresentation().getOrganisationToRemoveID() != null
+                ? getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToRemoveID()) : "LiP",
+            NEW_SOL, getOrganisationName(caseData.getChangeOfRepresentation().getOrganisationToAddID()),
             OTHER_SOL_NAME, event.equals(NOTIFY_OTHER_SOLICITOR_2)
                 ? getOrganisationName(NocNotificationUtils.getOtherSolicitor2Name(caseData)) :
                 getOrganisationName(NocNotificationUtils.getOtherSolicitor1Name(caseData)));
@@ -145,8 +141,7 @@ public class ChangeOfRepresentationNotificationHandler extends CallbackHandler i
     private boolean shouldSkipEvent(CaseEvent event, CaseData caseData) {
         switch (event) {
             case NOTIFY_FORMER_SOLICITOR:
-                return getLatestChangeOfRepresentation(caseData.getChangeOfRepresentation())
-                    .getOrganisationToRemoveID() == null;
+                return caseData.getChangeOfRepresentation().getOrganisationToRemoveID() == null;
             case NOTIFY_OTHER_SOLICITOR_1:
                 return NocNotificationUtils.isOtherParty1Lip(caseData);
             case NOTIFY_OTHER_SOLICITOR_2:

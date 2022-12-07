@@ -345,7 +345,7 @@ public class CaseDataBuilder {
     private GAApplicationType generalAppType;
     private GAHearingDateGAspec generalAppHearingDate;
 
-    private List<Element<ChangeOfRepresentation>> changeOfRepresentation;
+    private ChangeOfRepresentation changeOfRepresentation;
     private ChangeOrganisationRequest changeOrganisationRequest;
 
     private String unassignedCaseListDisplayOrganisationReferences;
@@ -2011,8 +2011,7 @@ public class CaseDataBuilder {
         if (formerSolicitorEmail != null) {
             newChangeBuilder.formerRepresentationEmailAddress(formerSolicitorEmail);
         }
-        ChangeOfRepresentation newChange = newChangeBuilder.build();
-        changeOfRepresentation = wrapElements(newChange);
+        changeOfRepresentation = newChangeBuilder.build();
         return this;
     }
 

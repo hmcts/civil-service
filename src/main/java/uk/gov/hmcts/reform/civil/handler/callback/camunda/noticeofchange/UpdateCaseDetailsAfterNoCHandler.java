@@ -14,17 +14,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.prd.model.Organisation;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +34,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Address.fromContactInformation;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
-import static uk.gov.hmcts.reform.civil.utils.ChangeOfRepresentationUtils.getLatestChangeOfRepresentation;
 
 @Slf4j
 @Service
@@ -81,16 +77,14 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         // nullify this field since it was persisted to auto approve noc
         caseDataBuilder.changeOrganisationRequestField(null);
 
-        List<Element<ChangeOfRepresentation>> changeOfRepresentationHistory = caseData.getChangeOfRepresentation();
-        if (changeOfRepresentationHistory == null || changeOfRepresentationHistory.isEmpty()) {
+        if (caseData.getChangeOfRepresentation() == null) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of("No Notice of Change events recorded"))
                 .build();
         }
-        ChangeOfRepresentation changeOfRepresentation = getLatestChangeOfRepresentation(changeOfRepresentationHistory);
 
         uk.gov.hmcts.reform.prd.model.Organisation addedOrganisation = organisationService.findOrganisationById(
-            changeOfRepresentation.getOrganisationToAddID()).orElse(null);
+            caseData.getChangeOfRepresentation().getOrganisationToAddID()).orElse(null);
         if (addedOrganisation == null) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of("Organisation to add is null"))
@@ -102,7 +96,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             callbackParams.getRequest().getCaseDetails()
         );
 
-        String replacedSolicitorCaseRole = changeOfRepresentation.getCaseRole();
+        String replacedSolicitorCaseRole = caseData.getChangeOfRepresentation().getCaseRole();
 
         boolean isApplicantSolicitorRole = isApplicantOrRespondent(replacedSolicitorCaseRole);
 
