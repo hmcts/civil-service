@@ -627,6 +627,21 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<Document>> documentSkeletonArgumentRes;
     private final List<Element<Document>> documentAuthoritiesRes;
     private final List<Element<Document>> documentEvidenceForTrialRes;
+    //these fields are shown if the solicitor is for respondent 2 and respondents have different solicitors
+    private final List<Element<Document>> documentDisclosureListRes2;
+    private final List<Element<Document>> documentForDisclosureRes2;
+    private final List<Element<UploadEvidenceWitness>> documentWitnessStatementRes2;
+    private final List<Element<UploadEvidenceWitness>> documentWitnessSummaryRes2;
+    private final List<Element<UploadEvidenceWitness>> documentHearsayNoticeRes2;
+    private final List<Element<UploadEvidenceWitness>> documentReferredInStatementRes2;
+    private final List<Element<UploadEvidenceExpert>> documentExpertReportRes2;
+    private final List<Element<UploadEvidenceExpert>> documentJointStatementRes2;
+    private final List<Element<UploadEvidenceExpert>> documentQuestionsRes2;
+    private final List<Element<UploadEvidenceExpert>> documentAnswersRes2;
+    private final List<Element<Document>> documentCaseSummaryRes2;
+    private final List<Element<Document>> documentSkeletonArgumentRes2;
+    private final List<Element<Document>> documentAuthoritiesRes2;
+    private final List<Element<Document>> documentEvidenceForTrialRes2;
     private final LocalDateTime caseDocumentUploadDateRes;
 
     /**

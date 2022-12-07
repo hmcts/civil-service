@@ -6,7 +6,6 @@ import java.util.Collections;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -29,13 +28,14 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
                                    caseData.getDocumentExpertReportRes(),
                                    caseData.getDocumentJointStatementRes(),
                                    caseData.getDocumentQuestionsRes(),
-                                   caseData.getDocumentAnswersRes());
+                                   caseData.getDocumentAnswersRes(),
+                                   caseData.getDocumentWitnessStatementRes2(),
+                                   caseData.getDocumentHearsayNoticeRes2(),
+                                   caseData.getDocumentExpertReportRes2(),
+                                   caseData.getDocumentJointStatementRes2(),
+                                   caseData.getDocumentQuestionsRes2(),
+                                   caseData.getDocumentAnswersRes2());
 
-    }
-
-    @Override
-    CallbackResponse caseType(CaseData caseData, CallbackParams callbackParams) {
-        return null;
     }
 
     @Override
