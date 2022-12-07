@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.civil.utils;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+
 public class OrgPolicyUtils {
 
     private OrgPolicyUtils() {
@@ -24,5 +27,21 @@ public class OrgPolicyUtils {
             && orgPolicy.getOrganisation() != null
             && orgPolicy.getOrganisation().getOrganisationID() != null
             ? orgPolicy.getOrganisation().getOrganisationID() : null;
+    }
+
+    public static void addMissingOrgPolicies(CaseData.CaseDataBuilder dataBuilder) {
+        CaseData caseData = dataBuilder.build();
+        if (caseData.getRespondent1OrganisationPolicy() == null) {
+            dataBuilder
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
+                                                   .build());
+        }
+        if (caseData.getRespondent2OrganisationPolicy() == null) {
+            dataBuilder
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
+                                                   .build());
+        }
     }
 }
