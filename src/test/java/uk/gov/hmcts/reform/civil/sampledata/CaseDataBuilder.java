@@ -1085,6 +1085,8 @@ public class CaseDataBuilder {
                 return atStateClaimDismissedPastClaimNotificationDeadline();
             case TAKEN_OFFLINE_SDO_NOT_DRAWN:
                 return atStateTakenOfflineSDONotDrawn(mpScenario);
+            case TAKEN_OFFLINE_AFTER_SDO:
+                return atStateTakenOfflineAfterSDO(mpScenario);
             default:
                 throw new IllegalArgumentException("Invalid internal state: " + flowState);
         }
@@ -3355,10 +3357,27 @@ public class CaseDataBuilder {
         }
 
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+
         reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
                                                    .input("unforeseen complexities")
-                                                   .build();
+            .build();
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflineAfterSDO(MultiPartyScenario mpScenario) {
+
+        atStateApplicantRespondToDefenceAndProceed(mpScenario);
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP) {
+            atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2();
+        } else if (mpScenario == TWO_V_ONE) {
+            atStateBothApplicantsRespondToDefenceAndProceed_2v1();
+        }
+
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+
+        takenOfflineDate = applicant1ResponseDate.plusDays(1);
         return this;
     }
 
