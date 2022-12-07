@@ -34,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1_MULTIPARTY_SAME_SOL;
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.CIVIL_COURT_TYPE_ID;
 
 @Service
 @RequiredArgsConstructor
@@ -79,7 +80,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
             .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
             .claimDetails(caseData.getDetailsOfClaim())
             .hearingCourtLocation(courtLocations.isEmpty() ? null : courtLocations.stream()
-                .filter(id -> id.getCourtTypeId().equals("10"))
+                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
                 .collect(Collectors.toList()).get(0).getCourtLocationCode())
             .referenceNumber(caseData.getLegacyCaseReference())
             .issueDate(caseData.getIssueDate())

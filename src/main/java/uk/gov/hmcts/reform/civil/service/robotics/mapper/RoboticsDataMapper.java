@@ -53,7 +53,7 @@ public class RoboticsDataMapper {
     public static final String RESPONDENT2_ID = "003";
     public static final String APPLICANT2_ID = "004";
     public static final String RESPONDENT2_SOLICITOR_ID = "003";
-
+    public static final String CIVIL_COURT_TYPE_ID = "10";
     private final RoboticsAddressMapper addressMapper;
     private final EventHistoryMapper eventHistoryMapper;
     private final OrganisationService organisationService;
@@ -100,7 +100,7 @@ public class RoboticsDataMapper {
                 authToken, caseData.getCourtLocation().getCaseLocation().getBaseLocation());
         if (!courtLocations.isEmpty()) {
             return courtLocations.stream()
-                .filter(id -> id.getCourtTypeId().equals("10"))
+                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
                 .collect(Collectors.toList()).get(0).getCourtLocationCode();
         }
         return null;

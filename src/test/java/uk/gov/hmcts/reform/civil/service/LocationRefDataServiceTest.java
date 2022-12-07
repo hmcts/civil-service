@@ -34,6 +34,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.OK;
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.CIVIL_COURT_TYPE_ID;
 
 @SpringBootTest(classes = {GeneralAppFeesService.class, RestTemplate.class, GeneralAppFeesConfiguration.class})
 class LocationRefDataServiceTest {
@@ -430,7 +431,7 @@ class LocationRefDataServiceTest {
 
             List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsId("user_token", "192280");
             String prefferedCourtCode = result.stream()
-                .filter(id -> id.getCourtTypeId().equals("10"))
+                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
                 .collect(Collectors.toList()).get(0).getCourtLocationCode();
 
             verify(lrdConfiguration, times(1)).getUrl();

@@ -61,6 +61,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.CIVIL_COURT_TYPE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 
 @Service
@@ -247,7 +248,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                         RequestedCourt.builder()
                             .caseLocation(caseData.getCourtLocation().getCaseLocation())
                             .responseCourtCode(courtLocations.isEmpty() ? null : courtLocations.stream()
-                                                   .filter(id -> id.getCourtTypeId().equals("10"))
+                                                   .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
                                                    .collect(Collectors.toList()).get(0).getCourtLocationCode())
                             .build());
                 }
