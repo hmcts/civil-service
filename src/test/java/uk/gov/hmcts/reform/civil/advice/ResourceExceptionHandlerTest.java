@@ -113,8 +113,7 @@ class ResourceExceptionHandlerTest {
             ),
             handler::badRequest,
             HttpStatus.BAD_REQUEST
-          );
-
+        );
     }
 
     public void testFeignExceptionGatewayTimeoutException() {
