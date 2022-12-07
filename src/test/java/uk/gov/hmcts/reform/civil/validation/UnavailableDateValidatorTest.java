@@ -123,7 +123,7 @@ class UnavailableDateValidatorTest {
                 .build();
 
             assertThat(validator.validate(hearing))
-                .containsExactly("The date cannot be in the past and must not be more than a year in the future");
+                .containsExactly("Dates must be within the next 12 months.");
         }
 
         @Test
@@ -137,7 +137,7 @@ class UnavailableDateValidatorTest {
                 .build();
 
             assertThat(validator.validate(hearing))
-                .containsExactly("The date cannot be in the past and must not be more than a year in the future");
+                .containsExactly("Unavailable Date cannot be past date");
         }
 
         @Test
