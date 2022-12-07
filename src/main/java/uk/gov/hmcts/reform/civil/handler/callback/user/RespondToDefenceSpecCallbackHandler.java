@@ -277,7 +277,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                                              .build());
         }
 
-        if (V_1.equals(callbackParams.getVersion())) {
+        if (V_1.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
             updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
             updatedCaseData.respondent1PaymentDateToStringSpec(setUpPayDateToString(caseData));
         }
