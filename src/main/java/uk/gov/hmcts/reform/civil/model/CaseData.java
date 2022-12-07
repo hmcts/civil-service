@@ -34,6 +34,10 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+import uk.gov.hmcts.reform.civil.model.caseprogression.DocumentUploadTrial;
+import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDisclosure;
+import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
+import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -579,6 +583,25 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<DocumentWithName>> documentOnly;
     private final List<Element<DocumentAndNote>> documentAndNote;
     private final CaseNoteType caseNoteType;
+
+    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure1;
+    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure2;
+
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness1;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness2;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness3;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness4;
+
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert1;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert2;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert3;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert4;
+
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial1;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial2;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial3;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial4;
+    private final LocalDateTime caseDocumentUploadDate;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending

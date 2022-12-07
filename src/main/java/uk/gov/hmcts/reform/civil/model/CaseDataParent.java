@@ -317,4 +317,14 @@ public class CaseDataParent implements MappableObject {
     private final LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
     private final String currentDateboxDefendantSpec;
 
+    /**
+     * Adding for Certificate of Service.
+     */
+    private final CertificateOfService cosNotifyClaimDetails1;
+    private final CertificateOfService cosNotifyClaimDetails2;
+    private final YesOrNo defendant1LIPAtClaimIssued;
+    private final YesOrNo defendant2LIPAtClaimIssued;
+    private final CertificateOfService cosNotifyClaimDefendant1;
+    private final CertificateOfService cosNotifyClaimDefendant2;
+
 }
