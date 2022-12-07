@@ -67,6 +67,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFIC
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_SDO;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
 import static uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService.findLatestEventTriggerReason;
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.CIVIL_COURT_TYPE_ID;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -4083,7 +4084,7 @@ class EventHistoryMapperTest {
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
                                           .preferredCourtCode(courtLocations.isEmpty() ? null : courtLocations.stream()
                                                                   .filter(id -> id.getCourtTypeId().equals(
-                                                                      "10"))
+                                                                      CIVIL_COURT_TYPE_ID))
                                                                   .collect(Collectors.toList()).get(0)
                                                                   .getCourtLocationCode())
                                           .preferredCourtName("")
@@ -4092,7 +4093,7 @@ class EventHistoryMapperTest {
                             caseData.getApplicant1DQ(),
                             courtLocations.isEmpty() ? null : courtLocations.stream()
                                 .filter(id -> id.getCourtTypeId().equals(
-                                    "10"))
+                                    CIVIL_COURT_TYPE_ID))
                                 .collect(Collectors.toList()).get(0)
                                 .getCourtLocationCode()
                         ))
@@ -4183,7 +4184,7 @@ class EventHistoryMapperTest {
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
                                           .preferredCourtCode(courtLocations.isEmpty() ? null : courtLocations.stream()
                                                                   .filter(id -> id.getCourtTypeId().equals(
-                                                                      "10"))
+                                                                      CIVIL_COURT_TYPE_ID))
                                                                   .collect(Collectors.toList()).get(0)
                                                                   .getCourtLocationCode())
                                           .preferredCourtName("")
@@ -4192,7 +4193,7 @@ class EventHistoryMapperTest {
                             caseData.getApplicant1DQ(),
                             courtLocations.isEmpty() ? null : courtLocations.stream()
                                 .filter(id -> id.getCourtTypeId().equals(
-                                    "10"))
+                                    CIVIL_COURT_TYPE_ID))
                                 .collect(Collectors.toList()).get(0)
                                 .getCourtLocationCode()
                         ))
@@ -4294,7 +4295,7 @@ class EventHistoryMapperTest {
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
                                           .preferredCourtCode(courtLocations.isEmpty() ? null : courtLocations.stream()
                                                                   .filter(id -> id.getCourtTypeId().equals(
-                                                                      "10"))
+                                                                      CIVIL_COURT_TYPE_ID))
                                                                   .collect(Collectors.toList()).get(0)
                                                                   .getCourtLocationCode())
                                           .preferredCourtName("")
@@ -4303,7 +4304,7 @@ class EventHistoryMapperTest {
                             caseData.getApplicant1DQ(),
                             courtLocations.stream()
                                 .filter(id -> id.getCourtTypeId().equals(
-                                    "10"))
+                                    CIVIL_COURT_TYPE_ID))
                                 .collect(Collectors.toList()).get(0)
                                 .getCourtLocationCode()
                         ))
@@ -4522,7 +4523,7 @@ class EventHistoryMapperTest {
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
                                           .preferredCourtCode(courtLocations.stream()
                                                                   .filter(id -> id.getCourtTypeId().equals(
-                                                                      "10"))
+                                                                      CIVIL_COURT_TYPE_ID))
                                                                   .collect(Collectors.toList()).get(0)
                                                                   .getCourtLocationCode())
                                           .preferredCourtName("")
@@ -4531,7 +4532,7 @@ class EventHistoryMapperTest {
                             caseData.getApplicant1DQ(),
                             courtLocations.isEmpty() ? null : courtLocations.stream()
                                 .filter(id -> id.getCourtTypeId().equals(
-                                    "10"))
+                                    CIVIL_COURT_TYPE_ID))
                                 .collect(Collectors.toList()).get(0)
                                 .getCourtLocationCode()
                         ))
@@ -4664,7 +4665,7 @@ class EventHistoryMapperTest {
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
                                           .preferredCourtCode(courtLocations.isEmpty() ? null : courtLocations.stream()
                                                                   .filter(id -> id.getCourtTypeId().equals(
-                                                                      "10"))
+                                                                      CIVIL_COURT_TYPE_ID))
                                                                   .collect(Collectors.toList()).get(0)
                                                                   .getCourtLocationCode())
                                           .preferredCourtName("")
@@ -4673,7 +4674,7 @@ class EventHistoryMapperTest {
                             caseData.getApplicant1DQ(),
                             courtLocations.isEmpty() ? null : courtLocations.stream()
                                 .filter(id -> id.getCourtTypeId().equals(
-                                    "10"))
+                                    CIVIL_COURT_TYPE_ID))
                                 .collect(Collectors.toList()).get(0)
                                 .getCourtLocationCode()
                         ))
@@ -5269,7 +5270,7 @@ class EventHistoryMapperTest {
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
                                           .preferredCourtCode(courtLocations.isEmpty() ? null : courtLocations.stream()
                                                                   .filter(id -> id.getCourtTypeId().equals(
-                                                                      "10"))
+                                                                      CIVIL_COURT_TYPE_ID))
                                                                   .collect(Collectors.toList()).get(0)
                                                                   .getCourtLocationCode())
                                           .preferredCourtName("")
@@ -5278,7 +5279,7 @@ class EventHistoryMapperTest {
                             caseData.getApplicant1DQ(),
                             courtLocations.isEmpty() ? null : courtLocations.stream()
                                 .filter(id -> id.getCourtTypeId().equals(
-                                    "10"))
+                                    CIVIL_COURT_TYPE_ID))
                                 .collect(Collectors.toList()).get(0)
                                 .getCourtLocationCode()
                         ))
@@ -5292,7 +5293,7 @@ class EventHistoryMapperTest {
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant2DQ()))
                                           .preferredCourtCode(courtLocations.isEmpty() ? null : courtLocations.stream()
                                                                   .filter(id -> id.getCourtTypeId().equals(
-                                                                      "10"))
+                                                                      CIVIL_COURT_TYPE_ID))
                                                                   .collect(Collectors.toList()).get(0)
                                                                   .getCourtLocationCode())
                                           .preferredCourtName("")
@@ -5301,7 +5302,7 @@ class EventHistoryMapperTest {
                             caseData.getApplicant2DQ(),
                             courtLocations.isEmpty() ? null : courtLocations.stream()
                                 .filter(id -> id.getCourtTypeId().equals(
-                                    "10"))
+                                    CIVIL_COURT_TYPE_ID))
                                 .collect(Collectors.toList()).get(0)
                                 .getCourtLocationCode()
                         ))
@@ -5409,7 +5410,7 @@ class EventHistoryMapperTest {
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
                                           .preferredCourtCode(courtLocations.isEmpty() ? null : courtLocations.stream()
                                                                   .filter(id -> id.getCourtTypeId().equals(
-                                                                      "10"))
+                                                                      CIVIL_COURT_TYPE_ID))
                                                                   .collect(Collectors.toList()).get(0)
                                                                   .getCourtLocationCode())
                                           .preferredCourtName("")
@@ -5418,7 +5419,7 @@ class EventHistoryMapperTest {
                             caseData.getApplicant1DQ(),
                             courtLocations.isEmpty() ? null : courtLocations.stream()
                                 .filter(id -> id.getCourtTypeId().equals(
-                                    "10"))
+                                    CIVIL_COURT_TYPE_ID))
                                 .collect(Collectors.toList()).get(0)
                                 .getCourtLocationCode()
                         ))
@@ -5432,7 +5433,7 @@ class EventHistoryMapperTest {
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant2DQ()))
                                           .preferredCourtCode(courtLocations.isEmpty() ? null : courtLocations.stream()
                                                                   .filter(id -> id.getCourtTypeId().equals(
-                                                                      "10"))
+                                                                      CIVIL_COURT_TYPE_ID))
                                                                   .collect(Collectors.toList()).get(0)
                                                                   .getCourtLocationCode())
                                           .preferredCourtName("")
@@ -5441,7 +5442,7 @@ class EventHistoryMapperTest {
                             caseData.getApplicant2DQ(),
                             courtLocations.isEmpty() ? null : courtLocations.stream()
                                 .filter(id -> id.getCourtTypeId().equals(
-                                    "10"))
+                                    CIVIL_COURT_TYPE_ID))
                                 .collect(Collectors.toList()).get(0)
                                 .getCourtLocationCode()
                         ))
@@ -5666,7 +5667,7 @@ class EventHistoryMapperTest {
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
                                       .preferredCourtCode(courtLocations.isEmpty() ? null : courtLocations.stream()
                                                               .filter(id -> id.getCourtTypeId().equals(
-                                                                  "10"))
+                                                                  CIVIL_COURT_TYPE_ID))
                                                               .collect(Collectors.toList()).get(0)
                                                               .getCourtLocationCode())
                                       .preferredCourtName("")
@@ -5675,7 +5676,7 @@ class EventHistoryMapperTest {
                         caseData.getApplicant1DQ(),
                         courtLocations.isEmpty() ? null : courtLocations.stream()
                             .filter(id -> id.getCourtTypeId().equals(
-                                "10"))
+                                CIVIL_COURT_TYPE_ID))
                             .collect(Collectors.toList()).get(0)
                             .getCourtLocationCode()
                     ))
@@ -5789,7 +5790,7 @@ class EventHistoryMapperTest {
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
                                       .preferredCourtCode(courtLocations.isEmpty() ? null : courtLocations.stream()
                                                               .filter(id -> id.getCourtTypeId().equals(
-                                                                  "10"))
+                                                                  CIVIL_COURT_TYPE_ID))
                                                               .collect(Collectors.toList()).get(0)
                                                               .getCourtLocationCode())
                                       .preferredCourtName("")
@@ -5798,7 +5799,7 @@ class EventHistoryMapperTest {
                         caseData.getApplicant1DQ(),
                         courtLocations.isEmpty() ? null : courtLocations.stream()
                             .filter(id -> id.getCourtTypeId().equals(
-                                "10"))
+                                CIVIL_COURT_TYPE_ID))
                             .collect(Collectors.toList()).get(0)
                             .getCourtLocationCode()
                     ))
@@ -5913,7 +5914,7 @@ class EventHistoryMapperTest {
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant2DQ()))
                                       .preferredCourtCode(courtLocations.isEmpty() ? null : courtLocations.stream()
                                                               .filter(id -> id.getCourtTypeId().equals(
-                                                                  "10"))
+                                                                  CIVIL_COURT_TYPE_ID))
                                                               .collect(Collectors.toList()).get(0)
                                                               .getCourtLocationCode())
                                       .preferredCourtName("")
@@ -5922,7 +5923,7 @@ class EventHistoryMapperTest {
                         caseData.getApplicant2DQ(),
                         courtLocations.isEmpty() ? null : courtLocations.stream()
                             .filter(id -> id.getCourtTypeId().equals(
-                                "10"))
+                                CIVIL_COURT_TYPE_ID))
                             .collect(Collectors.toList()).get(0)
                             .getCourtLocationCode()
                     ))
@@ -6009,7 +6010,7 @@ class EventHistoryMapperTest {
                                       .stayClaim(mapper.isStayClaim(caseData.getApplicant2DQ()))
                                       .preferredCourtCode(courtLocations.isEmpty() ? null : courtLocations.stream()
                                                               .filter(id -> id.getCourtTypeId().equals(
-                                                                  "10"))
+                                                                  CIVIL_COURT_TYPE_ID))
                                                               .collect(Collectors.toList()).get(0)
                                                               .getCourtLocationCode())
                                       .preferredCourtName("")
@@ -6018,7 +6019,7 @@ class EventHistoryMapperTest {
                         caseData.getApplicant2DQ(),
                         courtLocations.isEmpty() ? null : courtLocations.stream()
                             .filter(id -> id.getCourtTypeId().equals(
-                                "10"))
+                                CIVIL_COURT_TYPE_ID))
                             .collect(Collectors.toList()).get(0)
                             .getCourtLocationCode()
                     ))

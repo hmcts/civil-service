@@ -81,6 +81,7 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.REPLY_TO_DEFENC
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.CIVIL_COURT_TYPE_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
@@ -1025,7 +1026,7 @@ public class EventHistoryMapper {
                                                     .preferredCourtCode(courtLocations.isEmpty()
                                                                             ? null : courtLocations.stream()
                                                         .filter(id -> id.getCourtTypeId().equals(
-                                                            "10"))
+                                                            CIVIL_COURT_TYPE_ID))
                                                         .collect(Collectors.toList()).get(0)
                                                         .getCourtLocationCode())
                                                     .preferredCourtName("")
@@ -1034,7 +1035,7 @@ public class EventHistoryMapper {
                                       applicantDetails.get(index).getDq(),
                                       courtLocations.isEmpty() ? null : courtLocations.stream()
                                           .filter(id -> id.getCourtTypeId().equals(
-                                              "10"))
+                                              CIVIL_COURT_TYPE_ID))
                                           .collect(Collectors.toList()).get(0)
                                           .getCourtLocationCode()
                                   ))
