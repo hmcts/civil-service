@@ -38,15 +38,13 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWOSPEC;
 
-public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
+abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     private final List<CaseEvent> events;
     private final String pageId;
     private final String createShowCondition;
     private final ObjectMapper objectMapper;
-    private String Flag;
     private final Time time;
-    private MultiPartyScenario multiPartyScenario;
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
 
@@ -60,11 +58,9 @@ public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         this.pageId = pageId;
         this.coreCaseUserService = coreCaseUserService;
         this.userService = userService;
-
     }
 
     abstract CallbackResponse validateValues(CaseData caseData);
-    abstract CallbackResponse caseType(CaseData caseData, CallbackParams callbackParams);
     abstract CallbackResponse createShowCondition(CaseData caseData);
 
     abstract void applyDocumentUploadDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, LocalDateTime now);
@@ -77,7 +73,7 @@ public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::caseType)
+            .put(callbackKey(ABOUT_TO_START), this::getCaseType)
             .put(callbackKey(MID, createShowCondition), this::createShow)
             .put(callbackKey(MID, pageId), this::validate)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::documentUploadTime)
@@ -85,13 +81,13 @@ public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             .build();
     }
 
-    CallbackResponse caseType(CallbackParams callbackParams) {
-        return caseTypeDetermine(callbackParams.getCaseData(), callbackParams);
-    }
-
-    CallbackResponse caseTypeDetermine(CaseData caseData, CallbackParams callbackParams) {
+    CallbackResponse getCaseType(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        System.out.println("solcitor is " +coreCaseUserService.getUserCaseRoles(caseData
+                                                                    .getCcdCaseReference()
+                                                                    .toString(),userInfo.getUid()));
 
         if(coreCaseUserService.userHasCaseRole(caseData
                                                    .getCcdCaseReference()
@@ -102,6 +98,8 @@ public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
             caseDataBuilder.caseTypeFlag("RespondentTwoFields");
         }
+
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -194,7 +192,13 @@ public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                          List<Element<UploadEvidenceExpert>> uploadEvidenceExpert1,
                                          List<Element<UploadEvidenceExpert>> uploadEvidenceExpert2,
                                          List<Element<UploadEvidenceExpert>> uploadEvidenceExpert3,
-                                         List<Element<UploadEvidenceExpert>> uploadEvidenceExpert4) {
+                                         List<Element<UploadEvidenceExpert>> uploadEvidenceExpert4,
+                                         List<Element<UploadEvidenceWitness>> uploadEvidenceWitness1respondent2,
+                                         List<Element<UploadEvidenceWitness>> uploadEvidenceWitness3respondent2,
+                                         List<Element<UploadEvidenceExpert>> uploadEvidenceExpert1respondent2,
+                                         List<Element<UploadEvidenceExpert>> uploadEvidenceExpert2respondent2,
+                                         List<Element<UploadEvidenceExpert>> uploadEvidenceExpert3respondent2,
+                                         List<Element<UploadEvidenceExpert>> uploadEvidenceExpert4respondent2) {
         List<String> errors = new ArrayList<>();
 
         checkDateCorrectness(time, errors, uploadEvidenceWitness1, date -> date.getValue()
@@ -222,6 +226,36 @@ public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Answers to questions asked by the other party\" "
                                  + "date entered must not be in the future (6).");
+
+        // date checks for respondent 2 fields
+
+        checkDateCorrectness(time, errors, uploadEvidenceWitness1respondent2, date -> date.getValue()
+                                 .getWitnessOptionUploadDate(),
+                             "Invalid date: \"witness statement\" "
+                                 + "date entered must not be in the future (1).");
+        checkDateCorrectness(time, errors, uploadEvidenceWitness3respondent2, date -> date.getValue()
+                                 .getWitnessOptionUploadDate(),
+                             "Invalid date: \"Notice of the intention to rely on hearsay evidence\" "
+                                 + "date entered must not be in the future (2).");
+
+        checkDateCorrectness(time, errors, uploadEvidenceExpert1respondent2, date -> date.getValue()
+                                 .getExpertOptionUploadDate(),
+                             "Invalid date: \"Expert's report\""
+                                 + " date entered must not be in the future (3).");
+        checkDateCorrectness(time, errors, uploadEvidenceExpert2respondent2, date -> date.getValue()
+                                 .getExpertOptionUploadDate(),
+                             "Invalid date: \"Joint statement of experts\" "
+                                 + "date entered must not be in the future (4).");
+        checkDateCorrectness(time, errors, uploadEvidenceExpert3respondent2, date -> date.getValue()
+                                 .getExpertOptionUploadDate(),
+                             "Invalid date: \"Questions for other party's expert or joint experts\" "
+                                 + "expert statement date entered must not be in the future (5).");
+        checkDateCorrectness(time, errors, uploadEvidenceExpert4respondent2, date -> date.getValue()
+                                 .getExpertOptionUploadDate(),
+                             "Invalid date: \"Answers to questions asked by the other party\" "
+                                 + "date entered must not be in the future (6).");
+
+        System.out.println(uploadEvidenceWitness1);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
