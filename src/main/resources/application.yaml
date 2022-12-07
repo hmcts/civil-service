@@ -252,6 +252,11 @@ exit-survey:
   applicant-link: https://www.smartsurvey.co.uk/s/CivilDamages_ExitSurvey_Claimant/
   respondent-link: https://www.smartsurvey.co.uk/s/CivilDamages_ExitSurvey_Defendant/
 
+polling:
+  event:
+    emitter:
+      enabled: ${POLLING_EVENT_EMITTER_ENABLED:false}
+
 ---
 
 spring:
@@ -428,7 +433,3 @@ idam:
   api:
     url: http://ccd-test-stubs-service:5555
 
-polling:
-  event:
-    emitter:
-      enabled: ${POLLING_EVENT_EMITTER_ENABLED:false}
