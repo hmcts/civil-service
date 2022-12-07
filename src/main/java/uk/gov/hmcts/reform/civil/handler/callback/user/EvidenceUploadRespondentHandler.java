@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 
@@ -19,7 +18,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPO
 public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
 
     public EvidenceUploadRespondentHandler(UserService userService, CoreCaseUserService coreCaseUserService, ObjectMapper objectMapper, Time time) {
-        super(userService, coreCaseUserService, objectMapper, time, Collections.singletonList(EVIDENCE_UPLOAD_RESPONDENT), "validateValuesRespondent");
+        super(userService, coreCaseUserService, objectMapper, time, Collections.singletonList(EVIDENCE_UPLOAD_RESPONDENT),
+              "validateValuesRespondent", "createShowCondition");
     }
 
     @Override
@@ -36,6 +36,25 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
     @Override
     CallbackResponse caseType(CaseData caseData, CallbackParams callbackParams) {
         return null;
+    }
+
+    @Override
+    CallbackResponse createShowCondition(CaseData caseData) {
+
+        return showCondition(caseData, caseData.getWitnessSelectionEvidenceRes(),
+                             caseData.getWitnessSelectionEvidenceSmallClaimRes(),
+                             caseData.getWitnessSelectionEvidenceRes(),
+                             caseData.getWitnessSelectionEvidenceSmallClaimRes(),
+                             caseData.getWitnessSelectionEvidenceRes(),
+                             caseData.getWitnessSelectionEvidenceSmallClaimRes(),
+                             caseData.getExpertSelectionEvidenceRes(),
+                             caseData.getExpertSelectionEvidenceSmallClaimRes(),
+                             caseData.getExpertSelectionEvidenceRes(),
+                             caseData.getExpertSelectionEvidenceSmallClaimRes(),
+                             caseData.getTrialSelectionEvidenceRes(),
+                             caseData.getTrialSelectionEvidenceSmallClaimRes(),
+                             caseData.getTrialSelectionEvidenceRes(),
+                             caseData.getTrialSelectionEvidenceSmallClaimRes());
     }
 
     void applyDocumentUploadDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, LocalDateTime now) {

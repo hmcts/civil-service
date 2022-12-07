@@ -17,6 +17,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
@@ -24,30 +27,35 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWOSPEC;
 
 public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     private final List<CaseEvent> events;
     private final String pageId;
+    private final String createShowCondition;
     private final ObjectMapper objectMapper;
+    private String Flag;
     private final Time time;
     private MultiPartyScenario multiPartyScenario;
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
 
-    protected EvidenceUploadHandlerBase(UserService userService, CoreCaseUserService coreCaseUserService,ObjectMapper objectMapper, Time time, List<CaseEvent> events, String pageId) {
+    protected EvidenceUploadHandlerBase(UserService userService, CoreCaseUserService coreCaseUserService,
+                                        ObjectMapper objectMapper, Time time, List<CaseEvent> events, String pageId,
+                                        String createShowCondition) {
         this.objectMapper = objectMapper;
         this.time = time;
+        this.createShowCondition = createShowCondition;
         this.events = events;
         this.pageId = pageId;
         this.coreCaseUserService = coreCaseUserService;
@@ -57,6 +65,7 @@ public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     abstract CallbackResponse validateValues(CaseData caseData);
     abstract CallbackResponse caseType(CaseData caseData, CallbackParams callbackParams);
+    abstract CallbackResponse createShowCondition(CaseData caseData);
 
     abstract void applyDocumentUploadDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, LocalDateTime now);
 
@@ -69,6 +78,7 @@ public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::caseType)
+            .put(callbackKey(MID, createShowCondition), this::createShow)
             .put(callbackKey(MID, pageId), this::validate)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::documentUploadTime)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
@@ -77,28 +87,96 @@ public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     CallbackResponse caseType(CallbackParams callbackParams) {
         return caseTypeDetermine(callbackParams.getCaseData(), callbackParams);
-
     }
 
     CallbackResponse caseTypeDetermine(CaseData caseData, CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
-        if (!multiPartyScenario.getMultiPartyScenario(caseData).equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)) {
-              caseDataBuilder.caseTypeFlag("NotMultiParty");
-        } else {
+        if(coreCaseUserService.userHasCaseRole(caseData
+                                                   .getCcdCaseReference()
+                                                   .toString(),userInfo.getUid(),RESPONDENTSOLICITORTWO) ||
+            coreCaseUserService.userHasCaseRole(caseData
+                                                    .getCcdCaseReference()
+                                                    .toString(),userInfo.getUid(),RESPONDENTSOLICITORTWOSPEC)) {
 
-
-            if(coreCaseUserService.userHasCaseRole(caseData
-                                                       .getCcdCaseReference()
-                                                       .toString(),userInfo.getUid(),RESPONDENTSOLICITORTWO)){
-                caseDataBuilder.caseTypeFlag("MultiParty");
-            }
-
+            caseDataBuilder.caseTypeFlag("RespondentTwoFields");
         }
-        System.out.println(coreCaseUserService.getUserCaseRoles(caseData
-                                                                    .getCcdCaseReference().toString(),userInfo.getUid()));
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    CallbackResponse createShow(CallbackParams callbackParams) {
+        return createShowCondition(callbackParams.getCaseData());
+    }
+
+    // CCD has limited show hide functionality, we want to show a field based on a fixed listed containing an element,
+    // or a second list containing an element, AND with the addition of the user being respondent2 solicitor, the below
+    // combines the list condition into one single condition, which can then be used in CCD along with the
+    // caseTypeFlag condition
+    CallbackResponse showCondition(CaseData caseData, List<EvidenceUploadWitness> witnessStatementFastTrack,
+                                   List<EvidenceUploadWitness> witnessStatementSmallTrack,
+                                   List<EvidenceUploadWitness> witnessSummaryFastTrack,
+                                   List<EvidenceUploadWitness> witnessSummarySmallTrack,
+                                   List<EvidenceUploadWitness> witnessReferredFastTrack,
+                                   List<EvidenceUploadWitness> witnessReferredSmallTrack,
+                                   List<EvidenceUploadExpert> expertReportFastTrack,
+                                   List<EvidenceUploadExpert> expertReportSmallTrack,
+                                   List<EvidenceUploadExpert> expertJointFastTrack,
+                                   List<EvidenceUploadExpert> expertJointSmallTrack,
+                                   List<EvidenceUploadTrial> trialAuthorityFastTrack,
+                                   List<EvidenceUploadTrial> trialAuthoritySmallTrack,
+                                   List<EvidenceUploadTrial> trialDocumentaryFastTrack,
+                                   List<EvidenceUploadTrial> trialDocumentarySmallTrack
+                                   ) {
+
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        // clears the flag, as otherwise if the user returns to previous screen and unselects an option,
+        // which was previously selected, the option will still be shown
+        caseDataBuilder.witnessStatementFlag("do_not_show");
+        caseDataBuilder.witnessSummaryFlag("do_not_show");
+        caseDataBuilder.witnessReferredStatementFlag("do_not_show");
+        caseDataBuilder.expertReportFlag("do_not_show");
+        caseDataBuilder.expertJointFlag("do_not_show");
+        caseDataBuilder.trialAuthorityFlag("do_not_show");
+        caseDataBuilder.trialDocumentaryFlag("do_not_show");
+
+        // Based on claim type being fast track or small claims, there will be two different lists to select from
+        // for either list we then want to display a (same) document upload field corresponding,
+        // below combines what would have been two separate show conditions in CCD, into a single flag
+        if (nonNull(witnessStatementFastTrack) && witnessStatementFastTrack.contains(EvidenceUploadWitness.WITNESS_STATEMENT) ||
+            nonNull(witnessStatementSmallTrack) && witnessStatementSmallTrack.contains(EvidenceUploadWitness.WITNESS_STATEMENT)) {
+            caseDataBuilder.witnessStatementFlag("show_witness_statement");
+        }
+        if (nonNull(witnessSummaryFastTrack) && witnessSummaryFastTrack.contains(EvidenceUploadWitness.WITNESS_SUMMARY) ||
+            nonNull(witnessSummarySmallTrack) && witnessSummarySmallTrack.contains(EvidenceUploadWitness.WITNESS_SUMMARY)) {
+            caseDataBuilder.witnessSummaryFlag("show_witness_summary");
+        }
+        if (nonNull(witnessReferredFastTrack) && witnessReferredFastTrack.contains(EvidenceUploadWitness.DOCUMENTS_REFERRED) ||
+            nonNull(witnessReferredSmallTrack) && witnessReferredSmallTrack.contains(EvidenceUploadWitness.DOCUMENTS_REFERRED)) {
+            caseDataBuilder.witnessReferredStatementFlag("show_witness_referred");
+        }
+        if (nonNull(expertReportFastTrack) && expertReportFastTrack.contains(EvidenceUploadExpert.EXPERT_REPORT) ||
+            nonNull(expertReportSmallTrack) && expertReportSmallTrack.contains(EvidenceUploadExpert.EXPERT_REPORT)) {
+            caseDataBuilder.expertReportFlag("show_expert_report");
+        }
+        if (nonNull(expertJointFastTrack) && expertJointFastTrack.contains(EvidenceUploadExpert.JOINT_STATEMENT) ||
+            nonNull(expertJointSmallTrack) && expertJointSmallTrack.contains(EvidenceUploadExpert.JOINT_STATEMENT)) {
+            System.out.println("show_joint_expert");
+            caseDataBuilder.expertJointFlag("show_joint_expert");
+        }
+        if (nonNull(trialAuthorityFastTrack) && trialAuthorityFastTrack.contains(EvidenceUploadTrial.AUTHORITIES) ||
+            nonNull(trialAuthoritySmallTrack) && trialAuthoritySmallTrack.contains(EvidenceUploadTrial.AUTHORITIES)) {
+            System.out.println("show_trial_authority");
+            caseDataBuilder.trialAuthorityFlag("show_trial_authority");
+        }
+        if (nonNull(trialDocumentaryFastTrack) && trialDocumentaryFastTrack.contains(EvidenceUploadTrial.DOCUMENTARY) ||
+            nonNull(trialDocumentarySmallTrack) && trialDocumentarySmallTrack.contains(EvidenceUploadTrial.DOCUMENTARY)) {
+            System.out.println("show_trial_documentary");
+            caseDataBuilder.trialDocumentaryFlag("show_trial_documentary");
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -107,7 +185,6 @@ public abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     CallbackResponse validate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        System.out.println(caseData.getCaseTypeFlag());
         return validateValues(callbackParams.getCaseData());
 
     }
