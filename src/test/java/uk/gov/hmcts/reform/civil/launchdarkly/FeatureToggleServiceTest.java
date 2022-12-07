@@ -149,6 +149,15 @@ class FeatureToggleServiceTest {
         verifyBoolVariationCalled(organisationOnboardedFeatureKey, List.of("timestamp", "environment", "orgId"));
     }
 
+    @Test
+    void shouldCallBoolVariation_whenIsCertificateOfServiceEnabledInvoked() {
+        var certificateOfServiceKey = "isCertificateOfServiceEnabled";
+        givenToggle(certificateOfServiceKey, true);
+
+        assertThat(featureToggleService.isCertificateOfServiceEnabled()).isTrue();
+        verifyBoolVariationCalled(certificateOfServiceKey, List.of("timestamp", "environment"));
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(ldClient.boolVariation(eq(feature), any(LDUser.class), anyBoolean()))
             .thenReturn(state);
