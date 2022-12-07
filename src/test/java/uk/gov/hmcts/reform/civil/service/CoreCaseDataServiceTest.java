@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.HashMap;
@@ -53,6 +54,7 @@ class CoreCaseDataServiceTest {
     private static final String USER_AUTH_TOKEN = "Bearer user-xyz";
     private static final String SERVICE_AUTH_TOKEN = "Bearer service-xyz";
     private static final String CASE_TYPE = "CIVIL";
+    public static final String GENERALAPPLICATION_CASE_TYPE = "GENERALAPPLICATION";
 
     @MockBean
     private SystemUpdateUserConfiguration userConfig;
@@ -134,6 +136,69 @@ class CoreCaseDataServiceTest {
                 eq(USER_ID),
                 eq(JURISDICTION),
                 eq(CASE_TYPE),
+                eq(CASE_ID),
+                anyBoolean(),
+                any(CaseDataContent.class)
+            );
+        }
+
+        private StartEventResponse buildStartEventResponse() {
+            return StartEventResponse.builder()
+                .eventId(EVENT_ID)
+                .token(EVENT_TOKEN)
+                .caseDetails(caseDetails)
+                .build();
+        }
+    }
+
+    @Nested
+    class TriggerGeneralApplicationEvent {
+
+        private static final String EVENT_ID = "APPLICATION_PROCEEDS_IN_HERITAGE";
+        private static final String JURISDICTION = "CIVIL";
+        private static final String EVENT_TOKEN = "eventToken";
+        private static final String CASE_ID = "1";
+        private static final String USER_ID = "User1";
+        private final CaseData caseData = new GeneralApplicationDetailsBuilder()
+                .getTriggerGeneralApplicationTestData();
+        private final CaseDetails caseDetails = CaseDetailsBuilder.builder()
+            .data(caseData)
+            .build();
+
+        @BeforeEach
+        void setUp() {
+            when(userService.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());
+
+            when(coreCaseDataApi.startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID, JURISDICTION,
+                    GENERALAPPLICATION_CASE_TYPE, CASE_ID, EVENT_ID
+            )).thenReturn(buildStartEventResponse());
+
+            when(coreCaseDataApi.submitEventForCaseWorker(
+                eq(USER_AUTH_TOKEN),
+                eq(SERVICE_AUTH_TOKEN),
+                eq(USER_ID),
+                eq(JURISDICTION),
+                eq(GENERALAPPLICATION_CASE_TYPE),
+                eq(CASE_ID),
+                anyBoolean(),
+                any(CaseDataContent.class)
+                 )
+            ).thenReturn(caseDetails);
+        }
+
+        @Test
+        void shouldStartAndSubmitEvent_WhenCalled() {
+            service.triggerGeneralApplicationEvent(Long.valueOf(CASE_ID), CaseEvent.valueOf(EVENT_ID));
+
+            verify(coreCaseDataApi).startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID, JURISDICTION,
+                    GENERALAPPLICATION_CASE_TYPE, CASE_ID, EVENT_ID
+            );
+            verify(coreCaseDataApi).submitEventForCaseWorker(
+                eq(USER_AUTH_TOKEN),
+                eq(SERVICE_AUTH_TOKEN),
+                eq(USER_ID),
+                eq(JURISDICTION),
+                eq(GENERALAPPLICATION_CASE_TYPE),
                 eq(CASE_ID),
                 anyBoolean(),
                 any(CaseDataContent.class)

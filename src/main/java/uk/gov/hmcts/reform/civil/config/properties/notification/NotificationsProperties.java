@@ -43,7 +43,15 @@ public class NotificationsProperties {
     private String failedPaymentForSpec;
 
     @NotEmpty
-    private String solicitorClaimDismissed;
+    private String solicitorClaimDismissedWithin4Months;
+
+    @NotEmpty
+    private String solicitorClaimDismissedWithin14Days;
+
+    @NotEmpty
+    private String solicitorClaimDismissedWithinDeadline;
+
+    @NotEmpty String solicitorHearingFeeUnpaid;
 
     @NotEmpty
     private String claimantSolicitorCaseWillProgressOffline;
@@ -95,6 +103,9 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String sdoOrdered;
+
+    @NotEmpty
+    private String sdoOrderedSpec;
 
     @NotEmpty
     private String claimantSolicitorConfirmsNotToProceedSpec;
@@ -154,6 +165,8 @@ public class NotificationsProperties {
     private String standardDirectionOrderDJTemplate;
 
     @NotEmpty
+    private String caseworkerDefaultJudgmentRequested;
+
     private String respondentChangeOfAddressNotificationTemplate;
 
     @NotEmpty
@@ -164,5 +177,17 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String respondentLipFullDefenceNoMediationTemplate;
+
+    @NotEmpty
+    private String respondentLipResponseSubmissionTemplate;
+
+    @NotEmpty
+    private String hearingListedFeeClaimantLrTemplate;
+
+    @NotEmpty
+    private String hearingListedNoFeeClaimantLrTemplate;
+
+    @NotEmpty
+    private String hearingListedNoFeeDefendantLrTemplate;
 
 }

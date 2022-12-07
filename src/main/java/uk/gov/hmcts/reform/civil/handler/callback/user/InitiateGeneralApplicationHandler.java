@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -25,6 +27,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,7 +48,10 @@ import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private static final String VALIDATE_URGENCY_DATE_PAGE = "ga-validate-urgency-date";
+    private static final String VALIDATE_GA_TYPE = "ga-validate-type";
+    private static final String VALIDATE_HEARING_DATE = "ga-validate-hearing-date";
     private static final String VALIDATE_HEARING_PAGE = "ga-hearing-screen-validation";
+    private static final String INVALID_HEARING_DATE = "The hearing date must be in the future";
     private static final String SET_FEES_AND_PBA = "ga-fees-and-pba";
     private static final String POUND_SYMBOL = "£";
     private static final List<CaseEvent> EVENTS = Collections.singletonList(INITIATE_GENERAL_APPLICATION);
@@ -62,6 +68,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::aboutToStartValidattionAndSetup,
+            callbackKey(MID, VALIDATE_GA_TYPE), this::gaValidateType,
+            callbackKey(MID, VALIDATE_HEARING_DATE), this::gaValidateHearingDate,
             callbackKey(MID, VALIDATE_URGENCY_DATE_PAGE), this::gaValidateUrgencyDate,
             callbackKey(MID, VALIDATE_HEARING_PAGE), this::gaValidateHearingScreen,
             callbackKey(MID, SET_FEES_AND_PBA), this::setFeesAndPBA,
@@ -95,6 +103,35 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .errors(errors)
                 .data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
+    }
+
+    private CallbackResponse gaValidateType(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)) {
+            caseDataBuilder.generalAppVaryJudgementType(YesOrNo.YES);
+        } else {
+            caseDataBuilder.generalAppVaryJudgementType(YesOrNo.NO);
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse gaValidateHearingDate(CallbackParams callbackParams) {
+        List<String> errors = new ArrayList<>();
+
+        CaseData caseData = callbackParams.getCaseData();
+        if (caseData.getGeneralAppHearingDate() != null
+            && caseData.getGeneralAppHearingDate().getHearingScheduledPreferenceYesNo().equals(YesOrNo.YES)
+            && caseData.getGeneralAppHearingDate().getHearingScheduledDate().isBefore(LocalDate.now())) {
+            errors.add(INVALID_HEARING_DATE);
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
     }
 
     private List<String> getPbaAccounts(String authToken) {

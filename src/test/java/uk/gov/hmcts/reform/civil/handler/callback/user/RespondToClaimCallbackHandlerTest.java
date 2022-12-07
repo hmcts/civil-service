@@ -57,8 +57,10 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -305,24 +307,38 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldHandleCourtLocationData() {
                 when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
 
+                when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString()))
+                    .thenReturn(Collections.singletonList(
+                        LocationRefData.builder()
+                            .courtLocationCode("123")
+                            .siteName("Site name")
+                            .build()
+                    ));
                 when(courtLocationUtils.getLocationsFromList(any()))
                     .thenReturn(fromList(List.of("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124")));
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
+                    .build().toBuilder()
+                    .courtLocation(uk.gov.hmcts.reform.civil.model.CourtLocation.builder()
+                                       .applicantPreferredCourt("123")
+                                       .build())
                     .build();
 
-                CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
+                CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_2, caseData, ABOUT_TO_START);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
-                DynamicList dynamicList = getCaseData(response)
-                    .getRespondent1DQ().getRespondent1DQRequestedCourt().getResponseCourtLocations();
+                RequestedCourt respondent1DQRequestedCourt = getCaseData(response)
+                    .getRespondent1DQ().getRespondent1DQRequestedCourt();
+                DynamicList dynamicList = respondent1DQRequestedCourt.getResponseCourtLocations();
 
                 List<String> courtlist = dynamicList.getListItems().stream()
                     .map(DynamicListElement::getLabel)
                     .collect(Collectors.toList());
 
                 assertThat(courtlist).containsOnly("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124");
+                assertThat(respondent1DQRequestedCourt.getOtherPartyPreferredSite())
+                    .isEqualTo("123 Site name");
             }
 
             @Test
@@ -975,7 +991,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains("documentName=defendant1-defence.pdf")
                 .contains("documentSize=0")
                 .contains("createdDatetime=2022-02-18T12:10:55")
-                .contains("documentLink={document_url=http://dm-store:4506/documents/73526424-8434-4b1f-acca-bd33a3f8338f")
+                .contains(
+                    "documentLink={document_url=http://dm-store:4506/documents/73526424-8434-4b1f-acca-bd33a3f8338f")
                 .contains("documentType=DEFENDANT_DEFENCE")
                 .contains("documentName=defendant2-defence.pdf")
                 .contains("documentName=defendant1-directions.pdf")
@@ -1018,8 +1035,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             var beforeCaseData = Map.of("solicitorReferences",
                                         Map.of("applicantSolicitor1Reference", "12345",
-                                               "respondentSolicitor1Reference", "6789"),
-                                        "respondentSolicitor2Reference", "01234");
+                                               "respondentSolicitor1Reference", "6789"
+                                        ),
+                                        "respondentSolicitor2Reference", "01234"
+            );
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT, beforeCaseData);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1210,14 +1229,22 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
 
+                    DynamicListElement selectedCourtLocation = DynamicListElement.builder()
+                        .label("selected location label")
+                        .code(UUID.randomUUID().toString())
+                        .build();
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
                         .respondent1Copy(PartyBuilder.builder().individual().build())
                         .respondent1DQ(
                             Respondent1DQ.builder().respondent1DQRequestedCourt(
                                 RequestedCourt.builder()
-                                    .requestHearingAtSpecificCourt(YES)
-                                    .responseCourtLocations(DynamicList.builder().build())
+                                    .responseCourtLocations(DynamicList.fromList(
+                                        Collections.singletonList(locationA),
+                                        LocationRefDataService::getDisplayEntry,
+                                        locationA,
+                                        false
+                                    ))
                                     .build()).build())
                         .build();
 
@@ -1245,9 +1272,11 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 @Test
                 void shouldHandleCourtLocationData_SameResponse() {
                     when(coreCaseUserService.userHasCaseRole(any(), any(),
-                                                             eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+                                                             eq(RESPONDENTSOLICITORONE)
+                    )).thenReturn(true);
                     when(coreCaseUserService.userHasCaseRole(any(), any(),
-                                                             eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+                                                             eq(RESPONDENTSOLICITORTWO)
+                    )).thenReturn(true);
 
                     LocationRefData locationA = LocationRefData.builder()
                         .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
@@ -1255,6 +1284,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
 
+                    DynamicListElement selectedCourtLocation = DynamicListElement.builder()
+                        .label("selected location label")
+                        .code(UUID.randomUUID().toString())
+                        .build();
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimOneDefendantSolicitor()
                         .atStateRespondentFullDefence()
@@ -1264,8 +1297,12 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .respondent1DQ(
                             Respondent1DQ.builder().respondent1DQRequestedCourt(
                                 RequestedCourt.builder()
-                                    .requestHearingAtSpecificCourt(YES)
-                                    .responseCourtLocations(DynamicList.builder().build())
+                                    .responseCourtLocations(DynamicList.fromList(
+                                        Collections.singletonList(locationA),
+                                        LocationRefDataService::getDisplayEntry,
+                                        locationA,
+                                        false
+                                    ))
                                     .build()).build())
                         .build();
 
@@ -1290,9 +1327,11 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 @Test
                 void shouldHandleCourtLocationData_DifferentResponse() {
                     when(coreCaseUserService.userHasCaseRole(any(), any(),
-                                                             eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+                                                             eq(RESPONDENTSOLICITORONE)
+                    )).thenReturn(true);
                     when(coreCaseUserService.userHasCaseRole(any(), any(),
-                                                             eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+                                                             eq(RESPONDENTSOLICITORTWO)
+                    )).thenReturn(true);
 
                     LocationRefData locationA = LocationRefData.builder()
                         .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
@@ -1300,6 +1339,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
 
+                    DynamicListElement selectedCourtLocation = DynamicListElement.builder()
+                        .label("selected location label")
+                        .code(UUID.randomUUID().toString())
+                        .build();
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimOneDefendantSolicitor()
                         .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
@@ -1309,14 +1352,23 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .respondent1DQ(
                             Respondent1DQ.builder().respondent1DQRequestedCourt(
                                 RequestedCourt.builder()
-                                    .requestHearingAtSpecificCourt(YES)
-                                    .responseCourtLocations(DynamicList.builder().build())
+                                    .responseCourtLocations(
+                                        DynamicList.fromList(
+                                            Collections.singletonList(locationA),
+                                            LocationRefDataService::getDisplayEntry,
+                                            locationA,
+                                            false
+                                        ))
                                     .build()).build())
                         .respondent2DQ(
                             Respondent2DQ.builder().respondent2DQRequestedCourt(
                                 RequestedCourt.builder()
-                                    .requestHearingAtSpecificCourt(YES)
-                                    .responseCourtLocations(DynamicList.builder().build())
+                                    .responseCourtLocations(DynamicList.fromList(
+                                        Collections.singletonList(locationA),
+                                        LocationRefDataService::getDisplayEntry,
+                                        locationA,
+                                        false
+                                    ))
                                     .build()).build())
                         .build();
 
@@ -1366,6 +1418,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
 
+                    DynamicListElement selectedCourtLocation = DynamicListElement.builder()
+                        .label("selected location label")
+                        .code(UUID.randomUUID().toString())
+                        .build();
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
@@ -1373,8 +1429,14 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .respondent2DQ(
                             Respondent2DQ.builder().respondent2DQRequestedCourt(
                                 RequestedCourt.builder()
-                                    .requestHearingAtSpecificCourt(YES)
-                                    .responseCourtLocations(DynamicList.builder().build())
+                                    .responseCourtLocations(
+                                        DynamicList.fromList(
+                                            Collections.singletonList(locationA),
+                                            LocationRefDataService::getDisplayEntry,
+                                            locationA,
+                                            false
+                                        )
+                                    )
                                     .build()).build())
                         .respondent1Copy(PartyBuilder.builder().individual().build())
                         .respondent2Copy(PartyBuilder.builder().individual().build())
@@ -1401,7 +1463,8 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 @Test
                 void shouldHandleCourtLocationData_when1stRespondentAnsweringBefore2nd() {
                     when(coreCaseUserService.userHasCaseRole(any(), any(),
-                                                             eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+                                                             eq(RESPONDENTSOLICITORONE)
+                    )).thenReturn(true);
 
                     LocationRefData locationA = LocationRefData.builder()
                         .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
@@ -1409,6 +1472,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
                         .thenReturn(locationA);
 
+                    DynamicListElement selectedCourtLocation = DynamicListElement.builder()
+                        .label("selected location label")
+                        .code(UUID.randomUUID().toString())
+                        .build();
                     CaseData caseData = CaseDataBuilder.builder()
                         .multiPartyClaimTwoDefendantSolicitors()
                         .atStateRespondentFullDefenceAfterNotifyClaimDetailsAwaiting2ndRespondentResponse()
@@ -1417,8 +1484,13 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .respondent1DQ(
                             Respondent1DQ.builder().respondent1DQRequestedCourt(
                                 RequestedCourt.builder()
-                                    .requestHearingAtSpecificCourt(YES)
-                                    .responseCourtLocations(DynamicList.builder().build())
+                                    .responseCourtLocations(DynamicList.fromList(
+                                        Collections.singletonList(locationA),
+                                        LocationRefDataService::getDisplayEntry,
+                                        locationA,
+                                        false
+                                    ))
+                                    .responseCourtCode("312")
                                     .build()).build())
                         .build();
 
@@ -1451,7 +1523,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .respondent1DQ(
                             Respondent1DQ.builder().respondent1DQRequestedCourt(
                                 RequestedCourt.builder()
-                                    .requestHearingAtSpecificCourt(NO)
                                     .build()).build())
                         .build();
 
@@ -1482,7 +1553,6 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .respondent1DQ(
                             Respondent1DQ.builder().respondent1DQRequestedCourt(
                                 RequestedCourt.builder()
-                                    .requestHearingAtSpecificCourt(NO)
                                     .build()).build())
                         .build();
 
@@ -1524,8 +1594,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         "<br /> The Claimant legal representative will get a notification to confirm you have "
                             + "provided the Defendant defence. You will be CC'ed.%n"
                             + "The Claimant has until %s to discontinue or proceed with this claim",
-                        formatLocalDateTime(APPLICANT_RESPONSE_DEADLINE, DATE))
-                        + exitSurveyContentService.respondentSurvey())
+                        formatLocalDateTime(APPLICANT_RESPONSE_DEADLINE, DATE)
+                    )
+                                          + exitSurveyContentService.respondentSurvey())
                     .build());
         }
 
@@ -1569,7 +1640,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                             + "provided the Defendant defence. You will be CC'ed.%n"
                             + "The Claimant has until %s to discontinue or proceed with this claim",
                         formatLocalDateTime(APPLICANT_RESPONSE_DEADLINE, DATE)
-                                      )
+                    )
                                           + exitSurveyContentService.respondentSurvey())
                     .build());
         }

@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
@@ -17,34 +19,36 @@ import java.util.stream.Stream;
 @Setter
 @Data
 @Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class Respondent1DQ implements DQ {
 
-    private final FileDirectionsQuestionnaire respondent1DQFileDirectionsQuestionnaire;
-    private final DisclosureOfElectronicDocuments respondent1DQDisclosureOfElectronicDocuments;
-    private final DisclosureOfNonElectronicDocuments respondent1DQDisclosureOfNonElectronicDocuments;
-    private final DisclosureReport respondent1DQDisclosureReport;
-    private final Experts respondent1DQExperts;
-    private final ExpertDetails respondToClaimExperts;
-    private final Witnesses respondent1DQWitnesses;
-    private final Hearing respondent1DQHearing;
-    private final SmallClaimHearing respondent1DQHearingSmallClaim;
-    private final HearingLRspec respondent1DQHearingFastClaim;
-    private final Document respondent1DQDraftDirections;
-    private final RequestedCourt respondent1DQRequestedCourt;
-    private final HearingSupport respondent1DQHearingSupport;
-    private final FurtherInformation respondent1DQFurtherInformation;
-    private final WelshLanguageRequirements respondent1DQLanguage;
-    private final WelshLanguageRequirements respondent1DQLanguageLRspec;
-    private final StatementOfTruth respondent1DQStatementOfTruth;
-    private final FutureApplications respondent1DQFutureApplications;
-    private final List<Element<AccountSimple>> respondent1BankAccountList;
-    private final HomeDetails respondent1DQHomeDetails;
-    private final YesOrNo respondent1DQCarerAllowanceCredit;
-    private final List<Element<RecurringIncomeLRspec>> respondent1DQRecurringIncome;
-    private final List<Element<RecurringExpenseLRspec>> respondent1DQRecurringExpenses;
-    private final YesOrNo responseClaimCourtLocationRequired;
-    private final RequestedCourt respondToCourtLocation;
-    private final VulnerabilityQuestions respondent1DQVulnerabilityQuestions;
+    private FileDirectionsQuestionnaire respondent1DQFileDirectionsQuestionnaire;
+    private DisclosureOfElectronicDocuments respondent1DQDisclosureOfElectronicDocuments;
+    private DisclosureOfNonElectronicDocuments respondent1DQDisclosureOfNonElectronicDocuments;
+    private DisclosureReport respondent1DQDisclosureReport;
+    private Experts respondent1DQExperts;
+    private ExpertDetails respondToClaimExperts;
+    private Witnesses respondent1DQWitnesses;
+    private Hearing respondent1DQHearing;
+    private SmallClaimHearing respondent1DQHearingSmallClaim;
+    private HearingLRspec respondent1DQHearingFastClaim;
+    private Document respondent1DQDraftDirections;
+    private RequestedCourt respondent1DQRequestedCourt;
+    private HearingSupport respondent1DQHearingSupport;
+    private FurtherInformation respondent1DQFurtherInformation;
+    private WelshLanguageRequirements respondent1DQLanguage;
+    private WelshLanguageRequirements respondent1DQLanguageLRspec;
+    private StatementOfTruth respondent1DQStatementOfTruth;
+    private FutureApplications respondent1DQFutureApplications;
+    private List<Element<AccountSimple>> respondent1BankAccountList;
+    private HomeDetails respondent1DQHomeDetails;
+    private YesOrNo respondent1DQCarerAllowanceCredit;
+    private List<Element<RecurringIncomeLRspec>> respondent1DQRecurringIncome;
+    private List<Element<RecurringExpenseLRspec>> respondent1DQRecurringExpenses;
+    private YesOrNo responseClaimCourtLocationRequired;
+    private RequestedCourt respondToCourtLocation;
+    private VulnerabilityQuestions respondent1DQVulnerabilityQuestions;
 
     @Override
     @JsonProperty("respondent1DQFileDirectionsQuestionnaire")
@@ -125,12 +129,6 @@ public class Respondent1DQ implements DQ {
             Optional<RequestedCourt> optRespondentDQ = Optional.ofNullable(this.respondent1DQRequestedCourt);
             Optional<RequestedCourt> optRespond = Optional.ofNullable(this.respondToCourtLocation);
 
-            YesOrNo requestHearingAtSpecificCourt = Stream.of(
-                optRespondentDQ.map(RequestedCourt::getRequestHearingAtSpecificCourt),
-                Optional.ofNullable(responseClaimCourtLocationRequired),
-                optRespond.map(RequestedCourt::getRequestHearingAtSpecificCourt)
-            ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(YesOrNo.NO);
-
             String responseCourtCode = Stream.of(
                 optRespondentDQ.map(RequestedCourt::getResponseCourtCode),
                 optRespond.map(RequestedCourt::getResponseCourtCode)
@@ -141,10 +139,16 @@ public class Respondent1DQ implements DQ {
                 optRespond.map(RequestedCourt::getReasonForHearingAtSpecificCourt)
             ).filter(Optional::isPresent).findFirst().map(Optional::get).orElse(null);
 
-            return RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(requestHearingAtSpecificCourt)
+            RequestedCourt.RequestedCourtBuilder copyBuilder = RequestedCourt.builder()
                 .responseCourtCode(responseCourtCode)
-                .reasonForHearingAtSpecificCourt(reasonForHearingAtSpecificCourt)
+                .reasonForHearingAtSpecificCourt(reasonForHearingAtSpecificCourt);
+
+            Stream.of(
+                optRespondentDQ.map(RequestedCourt::getCaseLocation),
+                optRespond.map(RequestedCourt::getCaseLocation)
+            ).filter(Optional::isPresent).findFirst().map(Optional::get).ifPresent(copyBuilder::caseLocation);
+
+            return copyBuilder
                 .build();
         }
         return respondent1DQRequestedCourt;

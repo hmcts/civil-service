@@ -104,6 +104,20 @@ public abstract class BaseCallbackHandlerTest {
     }
 
     public CallbackParams callbackParamsOf(CaseData caseData,
+                                                                CaseDetails caseDetails,
+                                                                CallbackType type
+    ) {
+        return CallbackParams.builder()
+            .type(type)
+            .request(CallbackRequest.builder()
+                         .caseDetails(caseDetails)
+                         .build())
+            .caseData(caseData)
+            .params(Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"))
+            .build();
+    }
+
+    public CallbackParams callbackParamsOf(CaseData caseData,
                                            CallbackType type,
                                            CallbackVersion version,
                                            String pageId,

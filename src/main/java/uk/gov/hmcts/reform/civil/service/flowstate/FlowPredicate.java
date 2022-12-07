@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
+import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -389,10 +391,18 @@ public class FlowPredicate {
     public static final Predicate<CaseData> fullDefenceProceed = caseData ->
         getPredicateForClaimantIntentionProceed(caseData);
 
+    public static final Predicate<CaseData> takenOfflineSDONotDrawn = caseData ->
+
+        caseData.getReasonNotSuitableSDO() != null
+            && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+            && caseData.getCcdState() == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
     public static final Predicate<CaseData> fullDefenceNotProceed = caseData ->
         getPredicateForClaimantIntentionNotProceed(caseData);
 
     public static final Predicate<CaseData> takenOfflineBySystem = caseData ->
+        caseData.getTakenOfflineDate() != null;
+
+    public static final Predicate<CaseData> takenOfflineAfterSDO = caseData ->
         caseData.getTakenOfflineDate() != null;
 
     public static final Predicate<CaseData> takenOfflineByStaff = caseData ->
@@ -468,10 +478,26 @@ public class FlowPredicate {
     }
 
     public static final Predicate<CaseData> takenOfflineByStaffAfterNotificationAcknowledged = caseData ->
-        caseData.getTakenOfflineByStaffDate() != null
-            && caseData.getRespondent1AcknowledgeNotificationDate() != null
-            && caseData.getRespondent1TimeExtensionDate() == null
-            && caseData.getRespondent1ResponseDate() == null;
+        getPredicateTakenOfflineByStaffAfterNotificationAcknowledged(caseData);
+
+    public static final boolean getPredicateTakenOfflineByStaffAfterNotificationAcknowledged(CaseData caseData) {
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP:
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                return (caseData.getTakenOfflineByStaffDate() != null
+                    && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                    && caseData.getRespondent1TimeExtensionDate() == null
+                    && caseData.getRespondent1ResponseDate() == null
+                    && caseData.getRespondent2AcknowledgeNotificationDate() != null
+                    && caseData.getRespondent2TimeExtensionDate() == null
+                    && caseData.getRespondent2ResponseDate() == null);
+            default:
+                return (caseData.getTakenOfflineByStaffDate() != null
+                    && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                    && caseData.getRespondent1TimeExtensionDate() == null
+                    && caseData.getRespondent1ResponseDate() == null);
+        }
+    }
 
     public static final Predicate<CaseData> caseDismissedAfterDetailNotified = caseData ->
         caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
@@ -550,6 +576,9 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> claimDismissedByCamunda = caseData ->
         caseData.getClaimDismissedDate() != null;
+
+    public static final Predicate<CaseData> caseDismissedPastHearingFeeDue = caseData ->
+        caseData.getCaseDismissedHearingFeeDueDate() != null;
 
     public static final Predicate<CaseData> fullAdmissionSpec = caseData ->
         getPredicateForResponseTypeSpec(caseData, RespondentResponseTypeSpec.FULL_ADMISSION);
