@@ -36,6 +36,10 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+import uk.gov.hmcts.reform.civil.model.caseprogression.DocumentUploadTrial;
+import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDisclosure;
+import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
+import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -140,9 +144,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @Builder.Default
     private final List<Element<GeneralApplication>> generalApplications = new ArrayList<>();
 
-    private final List<Element<GeneralApplicationsDetails>> generalApplicationsDetails;
-    private final List<Element<GADetailsRespondentSol>> gaDetailsRespondentSol;
-    private final List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolTwo;
+    private final List<Element<GeneralApplicationsDetails>> claimantGaAppDetails;
+    private final List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection;
+    private final List<Element<GADetailsRespondentSol>> respondentSolGaAppDetails;
+    private final List<Element<GADetailsRespondentSol>> respondentSolTwoGaAppDetails;
     private final SolicitorReferences solicitorReferences;
     private final SolicitorReferences solicitorReferencesCopy;
     private final String respondentSolicitor2Reference;
@@ -501,7 +506,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private HearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceHearingDJ;
 
-    //Hearing Scheduled (& related)
+    //Hearing Scheduled
+    private String hearingReference;
     private DynamicList hearingLocation;
     private LocalDate dateOfApplication;
     private LocalDate hearingDate;
@@ -541,6 +547,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
+
+    @Builder.Default
+    private final List<Element<CaseDocument>> orderSDODocumentDJCollection = new ArrayList<>();
     /**
      * RTJ = Refer To Judge.
      */
@@ -582,6 +591,25 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<DocumentWithName>> documentOnly;
     private final List<Element<DocumentAndNote>> documentAndNote;
     private final CaseNoteType caseNoteType;
+
+    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure1;
+    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure2;
+
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness1;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness2;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness3;
+    private final List<Element<UploadEvidenceWitness>> documentUploadWitness4;
+
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert1;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert2;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert3;
+    private final List<Element<UploadEvidenceExpert>> documentUploadExpert4;
+
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial1;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial2;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial3;
+    private final List<Element<DocumentUploadTrial>> documentUploadTrial4;
+    private final LocalDateTime caseDocumentUploadDate;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending

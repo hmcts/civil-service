@@ -36,13 +36,20 @@ public enum DocmosisTemplates {
     DJ_SDO_HNL_TRIAL("CV-UNS-DEC-ENG-01133-HNL.docx", "Order_trial_%s.pdf"),
     CLAIMANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01062.docx", "%s_directions_questionnaire_form_%s.pdf"),
     SDO_SMALL("CV-DAM-STD-ENG-00001.docx", "small_claims_sdo_%s.pdf"),
+    SDO_SMALL_HNL("CV-DAM-STD-ENG-00004.docx", "small_claims_sdo_%s.pdf"),
     SDO_FAST("CV-DAM-STD-ENG-00002.docx", "fast_track_sdo_%s.pdf"),
+    SDO_HNL_FAST("CV-DAM-STD-ENG-00002-HNL.docx", "fast_track_sdo_%s.pdf"),
     SDO_DISPOSAL("CV-DAM-STD-ENG-00003.docx", "disposal_hearing_sdo_%s.pdf"),
     HEARING_SMALL_CLAIMS("CV-UNS-HNO-ENG-01197.docx", "hearing_small_claim_%s.pdf"),
     HEARING_FAST_TRACK("CV-UNS-HNO-ENG-01198.docx", "hearing_fast_track_%s.pdf"),
     HEARING_APPLICATION("CV-UNS-HNO-ENG-01199.docx", "hearing_application_%s.pdf"),
     HEARING_OTHER("CV-UNS-HNO-ENG-01196.docx", "hearing_other_claim_%s.pdf"),
     PIN_IN_THE_POST_LETTER("CV-CMC-LET-ENG-PIP0001.docx", "PIP_letter.pdf");
+    SDO_HNL_DISPOSAL("CV-DAM-STD-ENG-00003-HNL.docx", "disposal_hearing_sdo_%s.pdf"),
+    PIN_IN_THE_POST_LETTER("CV-CMC-LET-ENG-PIP0001.docx", "PIP_letter.pdf"),
+
+    //HNL uplifted docs to be replaced with original once ready
+    DJ_SDO_HNL_DISPOSAL("CV-UNS-DEC-ENG-01200.docx", "Order_disposal_%s.pdf");
 
     private final String template;
     private final String documentTitle;

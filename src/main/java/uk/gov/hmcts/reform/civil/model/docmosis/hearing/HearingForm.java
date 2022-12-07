@@ -4,7 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+
+import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+
+import java.time.LocalDate;
 
 @Getter
 @Builder
@@ -36,4 +40,10 @@ public class HearingForm implements MappableObject {
     private final boolean claimant2exists;
     private final boolean defendant2exists;
 
+    private final String claimReferenceNumber;
+    private final CorrectEmail emailAddress;
+    private final String hearingFee;
+    private final String deadlineDate;
+    private final String claimantReferenceNumber;
+    private final String defendantReferenceNumber;
 }
