@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
@@ -61,6 +60,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     }
 
     abstract CallbackResponse validateValues(CaseData caseData);
+
     abstract CallbackResponse createShowCondition(CaseData caseData);
 
     abstract void applyDocumentUploadDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, LocalDateTime now);
@@ -85,20 +85,19 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        System.out.println("solcitor is " +coreCaseUserService.getUserCaseRoles(caseData
-                                                                    .getCcdCaseReference()
-                                                                    .toString(),userInfo.getUid()));
 
-        if(coreCaseUserService.userHasCaseRole(caseData
+        //For case which are 1v1, 2v1 and 1v2 (same solicitor) we show respondent fields for documents to be uploaded,
+        //if a case is 1v2 and different solicitors we want to sure separate fields for each respondent solicitor,
+        // below creates a show condition for these fields if user is respondent 2 solicitor
+        if (coreCaseUserService.userHasCaseRole(caseData
                                                    .getCcdCaseReference()
-                                                   .toString(),userInfo.getUid(),RESPONDENTSOLICITORTWO) ||
-            coreCaseUserService.userHasCaseRole(caseData
+                                                   .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)
+            || coreCaseUserService.userHasCaseRole(caseData
                                                     .getCcdCaseReference()
-                                                    .toString(),userInfo.getUid(),RESPONDENTSOLICITORTWOSPEC)) {
+                                                    .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWOSPEC)) {
 
             caseDataBuilder.caseTypeFlag("RespondentTwoFields");
         }
-
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -144,34 +143,34 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         // Based on claim type being fast track or small claims, there will be two different lists to select from
         // for either list we then want to display a (same) document upload field corresponding,
         // below combines what would have been two separate show conditions in CCD, into a single flag
-        if (nonNull(witnessStatementFastTrack) && witnessStatementFastTrack.contains(EvidenceUploadWitness.WITNESS_STATEMENT) ||
-            nonNull(witnessStatementSmallTrack) && witnessStatementSmallTrack.contains(EvidenceUploadWitness.WITNESS_STATEMENT)) {
+        if (nonNull(witnessStatementFastTrack) && witnessStatementFastTrack.contains(EvidenceUploadWitness.WITNESS_STATEMENT)
+            || nonNull(witnessStatementSmallTrack) && witnessStatementSmallTrack.contains(EvidenceUploadWitness.WITNESS_STATEMENT)) {
             caseDataBuilder.witnessStatementFlag("show_witness_statement");
         }
-        if (nonNull(witnessSummaryFastTrack) && witnessSummaryFastTrack.contains(EvidenceUploadWitness.WITNESS_SUMMARY) ||
-            nonNull(witnessSummarySmallTrack) && witnessSummarySmallTrack.contains(EvidenceUploadWitness.WITNESS_SUMMARY)) {
+        if (nonNull(witnessSummaryFastTrack) && witnessSummaryFastTrack.contains(EvidenceUploadWitness.WITNESS_SUMMARY)
+            || nonNull(witnessSummarySmallTrack) && witnessSummarySmallTrack.contains(EvidenceUploadWitness.WITNESS_SUMMARY)) {
             caseDataBuilder.witnessSummaryFlag("show_witness_summary");
         }
-        if (nonNull(witnessReferredFastTrack) && witnessReferredFastTrack.contains(EvidenceUploadWitness.DOCUMENTS_REFERRED) ||
-            nonNull(witnessReferredSmallTrack) && witnessReferredSmallTrack.contains(EvidenceUploadWitness.DOCUMENTS_REFERRED)) {
+        if (nonNull(witnessReferredFastTrack) && witnessReferredFastTrack.contains(EvidenceUploadWitness.DOCUMENTS_REFERRED)
+            || nonNull(witnessReferredSmallTrack) && witnessReferredSmallTrack.contains(EvidenceUploadWitness.DOCUMENTS_REFERRED)) {
             caseDataBuilder.witnessReferredStatementFlag("show_witness_referred");
         }
-        if (nonNull(expertReportFastTrack) && expertReportFastTrack.contains(EvidenceUploadExpert.EXPERT_REPORT) ||
-            nonNull(expertReportSmallTrack) && expertReportSmallTrack.contains(EvidenceUploadExpert.EXPERT_REPORT)) {
+        if (nonNull(expertReportFastTrack) && expertReportFastTrack.contains(EvidenceUploadExpert.EXPERT_REPORT)
+            || nonNull(expertReportSmallTrack) && expertReportSmallTrack.contains(EvidenceUploadExpert.EXPERT_REPORT)) {
             caseDataBuilder.expertReportFlag("show_expert_report");
         }
-        if (nonNull(expertJointFastTrack) && expertJointFastTrack.contains(EvidenceUploadExpert.JOINT_STATEMENT) ||
-            nonNull(expertJointSmallTrack) && expertJointSmallTrack.contains(EvidenceUploadExpert.JOINT_STATEMENT)) {
+        if (nonNull(expertJointFastTrack) && expertJointFastTrack.contains(EvidenceUploadExpert.JOINT_STATEMENT)
+            || nonNull(expertJointSmallTrack) && expertJointSmallTrack.contains(EvidenceUploadExpert.JOINT_STATEMENT)) {
             System.out.println("show_joint_expert");
             caseDataBuilder.expertJointFlag("show_joint_expert");
         }
-        if (nonNull(trialAuthorityFastTrack) && trialAuthorityFastTrack.contains(EvidenceUploadTrial.AUTHORITIES) ||
-            nonNull(trialAuthoritySmallTrack) && trialAuthoritySmallTrack.contains(EvidenceUploadTrial.AUTHORITIES)) {
+        if (nonNull(trialAuthorityFastTrack) && trialAuthorityFastTrack.contains(EvidenceUploadTrial.AUTHORITIES)
+            || nonNull(trialAuthoritySmallTrack) && trialAuthoritySmallTrack.contains(EvidenceUploadTrial.AUTHORITIES)) {
             System.out.println("show_trial_authority");
             caseDataBuilder.trialAuthorityFlag("show_trial_authority");
         }
-        if (nonNull(trialDocumentaryFastTrack) && trialDocumentaryFastTrack.contains(EvidenceUploadTrial.DOCUMENTARY) ||
-            nonNull(trialDocumentarySmallTrack) && trialDocumentarySmallTrack.contains(EvidenceUploadTrial.DOCUMENTARY)) {
+        if (nonNull(trialDocumentaryFastTrack) && trialDocumentaryFastTrack.contains(EvidenceUploadTrial.DOCUMENTARY)
+            || nonNull(trialDocumentarySmallTrack) && trialDocumentarySmallTrack.contains(EvidenceUploadTrial.DOCUMENTARY)) {
             System.out.println("show_trial_documentary");
             caseDataBuilder.trialDocumentaryFlag("show_trial_documentary");
         }
