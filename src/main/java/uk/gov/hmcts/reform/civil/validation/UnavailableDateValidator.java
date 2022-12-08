@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
+import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
@@ -107,11 +108,11 @@ public class UnavailableDateValidator implements
         List<String> errors = new ArrayList<>();
         unavailableDate.forEach(element -> {
             UnavailableDate unavailableDateElement = element.getValue();
-            if (SpecJourneyConstantLRSpec.SINGLE_DATE.equals(unavailableDateElement.getUnavailableDateType())
+            if (UnavailableDateType.SINGLE_DATE.equals(unavailableDateElement.getUnavailableDateType().toString())
                 && unavailableDateElement.getDate() == null) {
                 errors.add("Details of unavailable date required");
             }
-            if (SpecJourneyConstantLRSpec.DATE_RANGE.equals(unavailableDateElement.getUnavailableDateType())) {
+            if (UnavailableDateType.DATE_RANGE.equals(unavailableDateElement.getUnavailableDateType().toString())) {
                 if (unavailableDateElement.getFromDate() == null
                     || unavailableDateElement.getToDate() == null) {
                     errors.add("Details of unavailable date required");
