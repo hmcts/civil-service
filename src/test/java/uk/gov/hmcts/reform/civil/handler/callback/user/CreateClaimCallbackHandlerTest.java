@@ -101,7 +101,8 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     PostcodeValidator.class,
     StateFlowEngine.class,
     ValidationAutoConfiguration.class,
-    ValidateEmailService.class},
+    ValidateEmailService.class,
+    OrganisationService.class},
     properties = {"reference.database.enabled=false"})
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -665,6 +666,49 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isEmpty();
         }
+
+        @Test
+        void shouldReturnError_whenBothSolicitorOrganisationsAreSame1v1() {
+
+            uk.gov.hmcts.reform.ccd.model.Organisation organisation
+                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .organisationID("orgId")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(
+                "The legal representative details for the claimant and defendant are the same.  "
+                     + "Please amend accordingly.");
+        }
+
+        @Test
+        void shouldReturnError_whenApplicantAndRespondent1SolicitorOrganisationsAreSame2v1() {
+
+            uk.gov.hmcts.reform.ccd.model.Organisation organisation
+                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .organisationID("orgId")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .multiPartyClaimTwoApplicants()
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(
+                "The legal representative details for the claimant and defendant are the same.  "
+                    + "Please amend accordingly.");
+        }
     }
 
     @Nested
@@ -734,6 +778,74 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnError_whenApplicantAndRespondent1SolicitorOrganisationsAreSame1v2() {
+
+            uk.gov.hmcts.reform.ccd.model.Organisation organisation
+                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .organisationID("orgId")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .respondent2Represented(YES)
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(
+                "The legal representative details for the claimant and defendant are the same.  "
+                     + "Please amend accordingly.");
+        }
+
+        @Test
+        void shouldReturnError_whenApplicantAndRespondent2SolicitorOrganisationsAreSame1v2() {
+
+            uk.gov.hmcts.reform.ccd.model.Organisation organisation
+                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .organisationID("orgId")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .respondent2Represented(YES)
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(
+                "The legal representative details for the claimant and defendant are the same.  "
+                     + "Please amend accordingly.");
+        }
+
+        @Test
+        void shouldReturnError_whenApplicantAndRespondent1SolicitorOrganisationsAreSame1v2SameSol() {
+
+            uk.gov.hmcts.reform.ccd.model.Organisation organisation
+                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .organisationID("orgId")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .multiPartyClaimOneDefendantSolicitor()
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(
+                "The legal representative details for the claimant and defendant are the same.  "
+                    + "Please amend accordingly.");
         }
     }
 
