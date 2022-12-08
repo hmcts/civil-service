@@ -86,9 +86,9 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2SameLegalRepresentative(YES)
             .build();
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
-        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).thenReturn(false);
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -105,9 +105,9 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2SameLegalRepresentative(NO)
             .build();
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
-        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).thenReturn(false);
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -121,9 +121,9 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .build();
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
-        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).thenReturn(false);
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -137,7 +137,11 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         "expertOptionUploadDate,documentExpertReportRes",
         "expertOptionUploadDate,documentJointStatementRes",
         "expertOptionUploadDate,documentQuestionsRes",
-        "expertOptionUploadDate,documentAnswersRes"
+        "expertOptionUploadDate,documentAnswersRes",
+        "expertOptionUploadDate,documentExpertReportRes2",
+        "expertOptionUploadDate,documentJointStatementRes2",
+        "expertOptionUploadDate,documentQuestionsRes2",
+        "expertOptionUploadDate,documentAnswersRes2"
     })
     void shouldNotReturnError_whenExpertOptionUploadDatePast(String dateField, String collectionField) {
         // Given
@@ -162,7 +166,11 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         "expertOptionUploadDate,documentExpertReportRes",
         "expertOptionUploadDate,documentJointStatementRes",
         "expertOptionUploadDate,documentQuestionsRes",
-        "expertOptionUploadDate,documentAnswersRes"
+        "expertOptionUploadDate,documentAnswersRes",
+        "expertOptionUploadDate,documentExpertReportRes2",
+        "expertOptionUploadDate,documentJointStatementRes2",
+        "expertOptionUploadDate,documentQuestionsRes2",
+        "expertOptionUploadDate,documentAnswersRes2"
     })
     void shouldNotReturnError_whenExpertOptionUploadDatePresent(String dateField, String collectionField) {
         // Given
@@ -191,6 +199,14 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         "expertOptionUploadDate,documentQuestionsRes,Invalid date: \"Questions for other party's expert "
             + "or joint experts\" expert statement date entered must not be in the future (5).",
         "expertOptionUploadDate,documentAnswersRes,Invalid date: \"Answers to questions asked by the other party\" "
+            + "date entered must not be in the future (6).",
+        "expertOptionUploadDate,documentExpertReportRes2,Invalid date: \"Expert's report\""
+            + " date entered must not be in the future (3).",
+        "expertOptionUploadDate,documentJointStatementRes2,Invalid date: \"Joint statement of experts\" "
+            + "date entered must not be in the future (4).",
+        "expertOptionUploadDate,documentQuestionsRes2,Invalid date: \"Questions for other party's expert "
+            + "or joint experts\" expert statement date entered must not be in the future (5).",
+        "expertOptionUploadDate,documentAnswersRes2,Invalid date: \"Answers to questions asked by the other party\" "
             + "date entered must not be in the future (6)."
     })
     void shouldReturnError_whenExpertOptionUploadDateFuture(String dateField, String collectionField,
@@ -217,6 +233,10 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         "witnessOptionUploadDate,documentWitnessStatementRes,Invalid date: \"witness statement\" "
             + "date entered must not be in the future (1).",
         "witnessOptionUploadDate,documentHearsayNoticeRes,Invalid date: \"Notice of the intention to rely on"
+            + " hearsay evidence\" date entered must not be in the future (2).",
+        "witnessOptionUploadDate,documentWitnessStatementRes2,Invalid date: \"witness statement\" "
+            + "date entered must not be in the future (1).",
+        "witnessOptionUploadDate,documentHearsayNoticeRes2,Invalid date: \"Notice of the intention to rely on"
             + " hearsay evidence\" date entered must not be in the future (2)."
     })
     void shouldReturnError_whenWitnessOptionUploadDateInFuture(String dateField, String collectionField,
@@ -241,7 +261,9 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @CsvSource({
         "witnessOptionUploadDate,documentWitnessStatementRes",
-        "witnessOptionUploadDate,documentHearsayNoticeRes"
+        "witnessOptionUploadDate,documentHearsayNoticeRes",
+        "witnessOptionUploadDate,documentWitnessStatementRes2",
+        "witnessOptionUploadDate,documentHearsayNoticeRes2"
     })
     void shouldNotReturnError_whenWitnessOptionUploadDatePresent(String dateField, String collectionField) {
         // Given
@@ -263,6 +285,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
+        "witnessOptionUploadDate,documentWitnessStatementRes",
+        "witnessOptionUploadDate,documentHearsayNoticeRes",
         "witnessOptionUploadDate,documentWitnessStatementRes",
         "witnessOptionUploadDate,documentHearsayNoticeRes"
     })
@@ -288,6 +312,9 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @CsvSource({
         "witnessOptionUploadDate,documentWitnessStatementRes,Invalid date: \"witness statement\" date entered must not be in the future (1).",
         "witnessOptionUploadDate,documentHearsayNoticeRes,Invalid date: \"Notice of the intention to rely on hearsay evidence\" " +
+            "date entered must not be in the future (2).",
+        "witnessOptionUploadDate,documentWitnessStatementRes2,Invalid date: \"witness statement\" date entered must not be in the future (1).",
+        "witnessOptionUploadDate,documentHearsayNoticeRes2,Invalid date: \"Notice of the intention to rely on hearsay evidence\" " +
             "date entered must not be in the future (2)."
     })
     void shouldReturnError_whenOneDateIsInFutureForWitnessStatements(String dateField, String collectionField, String errorMessage) {
@@ -320,6 +347,14 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         "expertOptionUploadDate,documentQuestionsRes,Invalid date: \"Questions for other party's expert "
             + "or joint experts\" expert statement date entered must not be in the future (5).",
         "expertOptionUploadDate,documentAnswersRes,Invalid date: \"Answers to questions asked by the other party\" "
+            + "date entered must not be in the future (6).",
+        "expertOptionUploadDate,documentExpertReportRes,Invalid date: \"Expert's report\""
+            + " date entered must not be in the future (3).",
+        "expertOptionUploadDate,documentJointStatementRes2,Invalid date: \"Joint statement of experts\" "
+            + "date entered must not be in the future (4).",
+        "expertOptionUploadDate,documentQuestionsRes2,Invalid date: \"Questions for other party's expert "
+            + "or joint experts\" expert statement date entered must not be in the future (5).",
+        "expertOptionUploadDate,documentAnswersRes2,Invalid date: \"Answers to questions asked by the other party\" "
             + "date entered must not be in the future (6)."
     })
     void shouldReturnError_whenOneDateIsInFutureForExpertStatements(String dateField, String collectionField, String errorMessage) {
