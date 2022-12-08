@@ -275,7 +275,6 @@ class DirectionsQuestionnaireGeneratorTest {
 
             @Test
             void whenCaseStateIsRespondedToClaim_shouldGetRespondentDQData() {
-//                when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
                 CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
                     .applicant1LitigationFriend(LitigationFriend.builder()
                                                     .fullName("Applicant LF")

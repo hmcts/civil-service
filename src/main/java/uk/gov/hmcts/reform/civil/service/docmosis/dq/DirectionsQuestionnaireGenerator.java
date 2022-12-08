@@ -14,9 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
-import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
@@ -35,7 +33,6 @@ import uk.gov.hmcts.reform.civil.model.dq.FutureApplications;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -46,9 +43,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
-import java.math.BigDecimal;
 import java.text.NumberFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,11 +63,12 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_2V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_MULTIPARTY_SAME_SOL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HNL_DQ_RESPONSE_1V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HNL_DQ_RESPONSE_2V1;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
@@ -81,7 +77,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_AD
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
 @RequiredArgsConstructor
@@ -119,23 +114,27 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
-        DocmosisTemplates templateId = N181;
+        DocmosisTemplates templateId = featureToggleService.isHearingAndListingSDOEnabled()
+            ? HNL_DQ_RESPONSE_1V1 : N181;
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 if (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
-                    templateId = N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
+                    templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                        ? DocmosisTemplates.HNL_DQ_RESPONSE_1V2_DS : N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
                 }
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
-                    templateId = N181_MULTIPARTY_SAME_SOL;
+                    templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                        ? DocmosisTemplates.HNL_DQ_RESPONSE_1V2_SS : N181_MULTIPARTY_SAME_SOL;
                 }
                 break;
             case TWO_V_ONE:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
-                    templateId = N181_2V1;
+                    templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                        ? DocmosisTemplates.HNL_DQ_RESPONSE_2V1 : N181_2V1;
                 }
                 break;
             default:
@@ -147,7 +146,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                                               String authorisation,
                                                               String respondent) {
         DocmosisTemplates templateId = TWO_V_ONE.equals(MultiPartyScenario
-                                                            .getMultiPartyScenario(caseData)) ? N181_2V1 : N181;
+                                                            .getMultiPartyScenario(caseData)) ? N181_2V1 :
+            (featureToggleService.isHearingAndListingSDOEnabled() ? HNL_DQ_RESPONSE_2V1 : N181);
         DirectionsQuestionnaireForm templateData;
 
         if (respondent.equals("ONE")) {
@@ -158,7 +158,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             throw new IllegalArgumentException("Respondent argument is expected to be one of ONE or TWO");
         }
 
-        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N181);
+        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
+            templateData, featureToggleService.isHearingAndListingSDOEnabled() ? HNL_DQ_RESPONSE_1V1 : N181);
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
@@ -173,7 +174,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                                           String respondent) {
         // TODO check if this is the correct template, I just copy-pasted from generateDQFor1v2SingleSolDiffResponse
         DocmosisTemplates templateId = TWO_V_ONE.equals(MultiPartyScenario
-                                                            .getMultiPartyScenario(caseData)) ? N181_2V1 : N181;
+                                                            .getMultiPartyScenario(caseData)) ? N181_2V1 :
+            (featureToggleService.isHearingAndListingSDOEnabled() ? HNL_DQ_RESPONSE_2V1 : N181);
         String fileName = getFileName(caseData, templateId);
         LocalDateTime responseDate;
         if ("ONE".equals(respondent)) {
@@ -202,7 +204,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             templateData = getRespondent2TemplateData(caseData, "TWO");
         }
 
-        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N181);
+        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
+            templateData, featureToggleService.isHearingAndListingSDOEnabled() ? HNL_DQ_RESPONSE_1V1 : N181);
         CaseDocument document = documentManagementService.uploadDocument(
             authorisation,
             new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
@@ -241,225 +244,6 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
-//====Remove Mocks============
-//        caseData = caseData.toBuilder()
-//            .courtLocation(CourtLocation.builder()
-//                               .applicantPreferredCourt("123")
-//                               .build())
-//            .applicant1(
-//                caseData.getApplicant1().toBuilder()
-//                    .individualFirstName("John")
-//                    .individualLastName("Doe")
-//                    .type(INDIVIDUAL)
-//                    .partyPhone("01482567891")
-//                    .partyEmail("john.doe@example.com")
-//                    .build())
-//            .applicant2(
-//                caseData.getApplicant2() != null ? caseData.getApplicant2().toBuilder()
-//                    .individualFirstName("Emma")
-//                    .individualLastName("Wilson")
-//                    .type(INDIVIDUAL)
-//                    .partyPhone("01482567891")
-//                    .partyEmail("emma.wilson@example.com")
-//                    .build() : null)
-//            .applicant1LitigationFriend(
-//                caseData.getApplicant1LitigationFriend() != null ? caseData.getApplicant1LitigationFriend()
-//                .toBuilder()
-//                    .firstName("Litigation")
-//                    .lastName("Friend")
-//                    .phoneNumber("03245345221")
-//                    .emailAddress("lit.friend@example.com")
-//                    .build() : null)
-//            .applicant2LitigationFriend(
-//                LitigationFriend.builder()
-//                    .firstName("Litigation A2")
-//                    .lastName("Friend A2")
-//                    .phoneNumber("03245342222")
-//                    .emailAddress("lit.friend.A2@example.com")
-//                    .build())
-//            .respondent1(
-//                caseData.getRespondent1().toBuilder()
-//                    .individualFirstName("Jane")
-//                    .individualLastName("Doe")
-//                    .type(INDIVIDUAL)
-//                    .partyPhone("01482567891")
-//                    .partyEmail("jane.doe@example.com")
-//                    .build())
-//            .respondent2(
-//                caseData.getRespondent2() != null ? caseData.getRespondent2().toBuilder()
-//                    .individualFirstName("Jack")
-//                    .individualLastName("Bower")
-//                    .type(INDIVIDUAL)
-//                    .partyPhone("01482567891")
-//                    .partyEmail("jack.bower@example.com")
-//                    .build() : null)
-//            .respondent1LitigationFriend(
-//               LitigationFriend.builder()
-//                   .firstName("Rlit")
-//                    .lastName("RFriend")
-//                    .phoneNumber("02245345221")
-//                    .emailAddress("rlit.friend@example.com")
-//                    .build())
-//            .respondent2LitigationFriend(
-//                caseData.getRespondent2LitigationFriend() != null ? caseData.getRespondent2LitigationFriend()
-//                  .toBuilder()
-//                LitigationFriend.builder()
-//                    .firstName("R2Litigation")
-//                    .lastName("R2Friend")
-//                    .phoneNumber("02245345221")
-//                    .emailAddress("r2lit.friend@example.com")
-//                    .build())
-//            .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
-//                               .respondent1DQExperts(caseData.getRespondent1DQ().getExperts().toBuilder()
-//                                                         .expertRequired(YES)
-//                                                         .expertReportsSent(ExpertReportsSent.YES)
-//                                                         .jointExpertSuitable(YES)
-//                                                         .details(wrapElements(uk.gov.hmcts.reform.civil.model.dq
-//                                                         .Expert.builder()
-//                                                                                   .firstName("Liam")
-//                                                                                   .lastName("Hemsworth")
-//                                                                                   .phoneNumber("0801238")
-//                                                                                   .emailAddress("liam.hem@v1.com")
-//                                                                                   .fieldOfExpertise("Science")
-//                                                                                   .estimatedCost(BigDecimal.ONE)
-//                                                                                   .whyRequired("Some Reason")
-//                                                                                   .build()))
-//                                                         .build())
-//                               .respondent1DQWitnesses(caseData.getRespondent1DQ().getWitnesses().toBuilder()
-//                                                           .witnessesToAppear(YES)
-//                                                           .details(wrapElements(Witness.builder()
-//                                                                                     .firstName("RD")
-//                                                                                     .lastName("J")
-//                                                                                     .phoneNumber("1238019238")
-//                                                                                     .emailAddress("rdj@v1.com")
-//                                                                                     .reasonForWitness("some reason")
-//                                                                                     .build()))
-//                                                           .build())
-//                               .respondent1DQHearing(caseData.getRespondent1DQ().getHearing().toBuilder()
-//                                                         .unavailableDatesRequired(YES)
-//                                                         .unavailableDates(wrapElements(UnavailableDate.builder()
-//                                                                                            .date(LocalDate.now())
-//                                                                                            .build(),
-//                                                                                        UnavailableDate.builder()
-//                                                                                            .fromDate(LocalDate.now()
-//                                                                                            .minusDays(5))
-//                                                                                            .toDate(LocalDate.now()
-//                                                                                            .minusDays(3))
-//                                                                                            .build()))
-//                                                         .build())
-//                               .respondent1DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
-//                                                                        .vulnerabilityAdjustments("VULN AHJSDHLA")
-//                                                                        .vulnerabilityAdjustmentsRequired(YES)
-//                                                                        .build())
-//                               .respondent1DQHearingSupport(HearingSupport.builder()
-//                                                                .supportRequirements(YES)
-//                                                                .supportRequirementsAdditional("SUPP KLHJDLSSAJHD")
-//                                                                .build())
-//                               .build()
-//            )
-//            .respondent2DQ(caseData.getRespondent2DQ().toBuilder()
-//                               .respondent2DQExperts(uk.gov.hmcts.reform.civil.model.dq.Experts.builder()
-//                                                         .expertRequired(YES)
-//                                                         .expertReportsSent(ExpertReportsSent.YES)
-//                                                         .jointExpertSuitable(YES)
-//                                                         .details(wrapElements(uk.gov.hmcts.reform.civil.model.dq
-//                                                         .Expert.builder()
-//                                                                                   .firstName("Liam")
-//                                                                                   .lastName("Hemsworth")
-//                                                                                   .phoneNumber("0801238")
-//                                                                                   .emailAddress("liam.hem@v1.com")
-//                                                                                   .fieldOfExpertise("Science")
-//                                                                                   .estimatedCost(BigDecimal.ONE)
-//                                                                                   .whyRequired("Some Reason")
-//                                                                                   .build()))
-//                                                         .build())
-//                               .respondent2DQWitnesses(uk.gov.hmcts.reform.civil.model.dq.Witnesses.builder()
-//                                                           .witnessesToAppear(YES)
-//                                                           .details(wrapElements(Witness.builder()
-//                                                                                     .firstName("RD")
-//                                                                                     .lastName("J")
-//                                                                                     .phoneNumber("1238019238")
-//                                                                                     .emailAddress("rdj@v1.com")
-//                                                                                     .reasonForWitness("some reason")
-//                                                                                     .build()))
-//                                                           .build())
-//                               .respondent2DQHearing(uk.gov.hmcts.reform.civil.model.dq.Hearing.builder()
-//                                                         .unavailableDatesRequired(YES)
-//                                                         .unavailableDates(wrapElements(UnavailableDate.builder()
-//                                                                                            .date(LocalDate.now())
-//                                                                                            .build(),
-//                                                                                        UnavailableDate.builder()
-//                                                                                            .fromDate(LocalDate.now()
-//                                                                                            .minusDays(5))
-//                                                                                            .toDate(LocalDate.now()
-//                                                                                            .minusDays(3))
-//                                                                                            .build()))
-//                                                         .build())
-//                               .respondent2DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
-//                                                                        .vulnerabilityAdjustments("VULN AHJSDHLA")
-//                                                                        .vulnerabilityAdjustmentsRequired(YES)
-//                                                                        .build())
-//                               .respondent2DQHearingSupport(HearingSupport.builder()
-//                                                                .supportRequirements(YES)
-//                                                                .supportRequirementsAdditional("SUPP KLHJDLSSAJHD")
-//                                                                .build())
-//                               .build()
-//            )
-//            .applicant1DQ(caseData.getApplicant1DQ().toBuilder()
-//                               .applicant1DQExperts(uk.gov.hmcts.reform.civil.model.dq.Experts.builder()
-//                                                         .expertRequired(YES)
-//                                                         .expertReportsSent(ExpertReportsSent.YES)
-//                                                         .jointExpertSuitable(YES)
-//                                                         .details(wrapElements(uk.gov.hmcts.reform.civil.model.dq
-//                                                         .Expert.builder()
-//                                                                                   .firstName("Liam")
-//                                                                                   .lastName("Hemsworth")
-//                                                                                   .phoneNumber("0801238")
-//                                                                                   .emailAddress("liam.hem@v1.com")
-//                                                                                   .fieldOfExpertise("Science")
-//                                                                                   .estimatedCost(BigDecimal.ONE)
-//                                                                                   .whyRequired("Some Reason")
-//                                                                                   .build()))
-//                                                         .build())
-//                               .applicant1DQWitnesses(uk.gov.hmcts.reform.civil.model.dq.Witnesses.builder()
-//                                                           .witnessesToAppear(YES)
-//                                                           .details(wrapElements(Witness.builder()
-//                                                                                     .firstName("RD")
-//                                                                                     .lastName("J")
-//                                                                                     .phoneNumber("1238019238")
-//                                                                                     .emailAddress("rdj@v1.com")
-//                                                                                     .reasonForWitness("some reason")
-//                                                                                     .build()))
-//                                                           .build())
-//                               .applicant1DQHearing(uk.gov.hmcts.reform.civil.model.dq.Hearing.builder()
-//                                                         .unavailableDatesRequired(YES)
-//                                                         .unavailableDates(wrapElements(UnavailableDate.builder()
-//                                                                                            .date(LocalDate.now())
-//                                                                                            .build(),
-//                                                                                        UnavailableDate.builder()
-//                                                                                            .fromDate(LocalDate.now()
-//                                                                                            .minusDays(5))
-//                                                                                            .toDate(LocalDate.now()
-//                                                                                            .minusDays(3))
-//                                                                                            .build()))
-//                                                         .build())
-//                               .applicant1DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
-//                                                                        .vulnerabilityAdjustments("VULN AHJSDHLA")
-//                                                                        .vulnerabilityAdjustmentsRequired(YES)
-//                                                                        .build())
-//                               .applicant1DQHearingSupport(HearingSupport.builder()
-//                                                                .supportRequirements(YES)
-//                                                                .supportRequirementsAdditional("SUPP KLHJDLSSAJHD")
-//                                                                .build())
-//                              .applicant1DQRequestedCourt(RequestedCourt.builder()
-//                                                              .requestHearingAtSpecificCourt(YES)
-//                                                              .responseCourtCode("123")
-//                                                              .build())
-//                               .build()
-//      )
-//      .build();
-
-        //==============================
         boolean claimantResponseLRspec = isClaimantResponse(caseData)
             && isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled());
 
