@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 
 import java.util.ArrayList;
@@ -26,7 +25,6 @@ public class ValidateFeeCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(VALIDATE_FEE);
     private static final String ERROR_MESSAGE = "Fee has changed since claim submitted. It needs to be validated again";
     private static final String TASK_ID = "ValidateClaimFee";
-    private final FeatureToggleService featureToggleService;
 
     private final FeesService feesService;
 

@@ -128,7 +128,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final FeatureToggleService toggleService;
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
-    private final FeatureToggleService featureToggleService;
 
     @Value("${court-location.unspecified-claim.region-id}")
     private String regionId;

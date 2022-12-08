@@ -49,7 +49,7 @@ class FeesServiceTest {
                             .feeAmount(TEST_FEE_AMOUNT_POUNDS)
                             .code("test_fee_code")
                             .version(1)
-                            .build());;
+                            .build());
         given(feesClient.findRangeGroup(any(), any())).willReturn(buildFeeRangeResponse());
         given(feesConfiguration.getChannel()).willReturn(CHANNEL);
         given(feesConfiguration.getEvent()).willReturn(EVENT);
