@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -728,6 +729,32 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseData.builder()
                 .respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            String result = getCaseData(response).getRespondent1PaymentDateToStringSpec();
+
+            assertThat(result).isEqualTo(whenWillPay
+                                             .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)));
+        }
+
+        @Test
+        void shouldSetUpPaymentDateToStringForPartAdmitPaid() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+
+            RespondToClaim respondToAdmittedClaim =
+                RespondToClaim.builder()
+                    .howMuchWasPaid(null)
+                    .whenWasThisAmountPaid(whenWillPay)
+                    .build();
+
+            CaseData caseData = CaseData.builder()
+                .respondToAdmittedClaim(respondToAdmittedClaim)
                 .build();
             CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
 
