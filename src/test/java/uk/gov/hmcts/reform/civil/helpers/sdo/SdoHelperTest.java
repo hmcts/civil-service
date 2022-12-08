@@ -195,7 +195,7 @@ public class SdoHelperTest {
                 .smallClaimsHearing(smallClaimsHearing)
                 .build();
 
-            assertThat(SdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo("Four hours");
+            assertThat(SdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo("four hours");
         }
 
         @Test
