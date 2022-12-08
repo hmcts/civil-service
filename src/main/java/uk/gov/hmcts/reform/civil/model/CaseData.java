@@ -15,8 +15,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
-import uk.gov.hmcts.reform.civil.enums.HearingNoticeList;
-import uk.gov.hmcts.reform.civil.enums.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
@@ -33,6 +31,10 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
+import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
+import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
+import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseprogression.DocumentUploadTrial;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDisclosure;
@@ -518,6 +520,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private ListingOrRelisting listingOrRelisting;
     private HearingNoticeList hearingNoticeList;
     private Fee hearingFee;
+    private HearingChannel channel;
+    private HearingDuration hearingDuration;
+    private String information;
+    private String hearingNoticeListOther;
 
     private LocalDateTime caseDismissedHearingFeeDueDate;
 
@@ -582,6 +588,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> dismissalOrderDocument;
     private final List<Element<CaseDocument>> directionOrderDocument;
 
+    @Builder.Default
+    private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
     //case progression
     private final List<Element<DocumentWithName>> documentOnly;
     private final List<Element<DocumentAndNote>> documentAndNote;
