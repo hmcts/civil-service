@@ -154,6 +154,24 @@ class DefendantPinToPostLRspecServiceTest {
         }
     }
 
+    @Test
+    void shouldResetPinExpiryDateSuccessfully() {
+        LocalDate expiryDate = LocalDate.of(
+            2022,
+            1,
+            1);
+        DefendantPinToPostLRspec initialPin = DefendantPinToPostLRspec.builder()
+                                               .accessCode("TEST1234")
+                                               .expiryDate(expiryDate)
+                                               .build();
+
+
+        DefendantPinToPostLRspec resetPin = defendantPinToPostLRspecService.resetPinExpiryDate(initialPin);
+
+        assertThat(resetPin.getExpiryDate()).isEqualTo(LocalDate.now().plusDays(180));
+        assertThat(resetPin.getAccessCode()).isEqualTo(initialPin.getAccessCode());
+    }
+
     private LocalDate getDate180days() {
         return LocalDate.now()
             .plusDays(180);
