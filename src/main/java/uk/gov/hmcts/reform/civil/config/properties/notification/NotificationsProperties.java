@@ -43,7 +43,13 @@ public class NotificationsProperties {
     private String failedPaymentForSpec;
 
     @NotEmpty
-    private String solicitorClaimDismissed;
+    private String solicitorClaimDismissedWithin4Months;
+
+    @NotEmpty
+    private String solicitorClaimDismissedWithin14Days;
+
+    @NotEmpty
+    private String solicitorClaimDismissedWithinDeadline;
 
     @NotEmpty String solicitorHearingFeeUnpaid;
 
@@ -189,5 +195,8 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String noticeOfChangeOtherParties;
+
+    @NotEmpty
+    private String claimantSolicitorClaimContinuingOnlineCos;
 
 }
