@@ -87,7 +87,7 @@ class StateFlowEngineSpecTest {
         );
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{index}: The state is transitioned correctly from SPEC_DRAFT to CLAIM_SUBMITTED")
     @MethodSource("caseDataStream")
     void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted(CaseData caseData) {
         // When
@@ -105,7 +105,7 @@ class StateFlowEngineSpecTest {
                 SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{index}: The common state flow flags are present for a case transitioned to CLAIM_SUBMITTED")
     @MethodSource("caseDataStream")
     void shouldContainCommonFlags_whenCaseDataAtStateClaimSubmitted(CaseData caseData) {
         //When
@@ -121,7 +121,7 @@ class StateFlowEngineSpecTest {
         );
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{index}: The state flow flag ONE_RESPONDENT_REPRESENTATIVE is set to true (for appropriate cases)")
     @MethodSource("caseDataStreamOneRespondentRepresentative")
     void shouldHaveOneRespondentRepresentativeFlagsSet_whenCaseDataAtStateClaimSubmitted(CaseData caseData) {
         // When
@@ -134,7 +134,7 @@ class StateFlowEngineSpecTest {
         assertThat(stateFlow.getFlags()).hasSize(6);    // bonus: if this fails, a flag was added/removed but tests were not updated
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{index}: The state flow flags ONE_RESPONDENT_REPRESENTATIVE and TWO_RESPONDENT_REPRESENTATIVES are present and set to the correct values (for appropriate cases)")
     @MethodSource("caseDataStreamTwoRespondentRepresentatives")
     void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1v2DifferentSolicitorSpecified(CaseData caseData) {
         //When
@@ -161,7 +161,7 @@ class StateFlowEngineSpecTest {
         );
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{index}: The feature flags are carried to the appropriate state flow flags")
     @MethodSource("commonFlagNames")
     void shouldUseTrueFeatureFlag_whenCaseDataAtStateClaimSubmitted(String flagName, StubbingFn stubbingFunction) {
         // Given: some case data (which one shouldn't matter)
