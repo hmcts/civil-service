@@ -187,7 +187,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .siteName("site name")
                 .build();
             Mockito.when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
-                CallbackParams.Params.BEARER_TOKEN).toString()))
+                    CallbackParams.Params.BEARER_TOKEN).toString()))
                 .thenReturn(Optional.of(matching));
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -533,8 +533,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocuments").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(10).toString());
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocuments").extracting("input2")
-                .isEqualTo("The parties must upload to the Digital Portal copies of those documents which they wish the"
-                               + "court to consider when deciding the amount of damages, by 4pm on");
+                .isEqualTo(
+                    "The parties must upload to the Digital Portal copies of those documents which they wish the "
+                        + "court to consider when deciding the amount of damages, by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingDisclosureOfDocuments").extracting("date2")
                 .isEqualTo(LocalDate.now().plusWeeks(10).toString());
 
@@ -554,7 +555,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("input4")
                 .isEqualTo("The provisions of CPR 32.6 apply to such evidence.");
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("input5")
-                .isEqualTo("Any application by the defendant pursuant to CPR 32.7 must be made by 4pm on");
+                .isEqualTo("Any application by the defendant in relation to CPR 32.7 must be made by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("date3")
                 .isEqualTo(LocalDate.now().plusWeeks(6).toString());
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFact").extracting("input6")
@@ -641,7 +642,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input1")
                 .isEqualTo("Each party must upload to the Digital Portal copies of the statements of all witnesses of "
-                               + "fact on whom they intend to rely. This is limited to");
+                               + "fact on whom they intend to rely.");
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").doesNotHaveToString("input2");
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").doesNotHaveToString("input3");
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input4")
@@ -656,9 +657,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("date")
                 .isEqualTo(LocalDate.now().plusWeeks(8).toString());
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input9")
-                .isEqualTo("Oral evidence will only be permitted at trial with permission from the Court from witnesses"
-                               + " whose statements have not been uploaded to the Digital Portal in accordance with"
-                               + " this order, or whose statements that have been served late.");
+                .isEqualTo("Evidence will not be permitted at trial from a witness"
+                               + " whose statement has not been uploaded in accordance with"
+                               + " this Order. "
+                               + "Evidence not uploaded, or uploaded late, "
+                               + "will not be permitted except with permission from the Court.");
 
             assertThat(response.getData()).extracting("fastTrackSchedulesOfLoss").extracting("input1")
                 .isEqualTo("The claimant must upload to the Digital Portal an up-to-date schedule of loss to the "
@@ -735,10 +738,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + " claimant's legal advisers and experts of these original notes on 7 days written"
                                + " notice.");
             assertThat(response.getData()).extracting("fastTrackClinicalNegligence").extracting("input4")
-                .isEqualTo("c) Legible copies of the medical and educational records of the claimant, the deceased,"
-                               + " and the claimant's mother are to be placed in a separate paginated bundle by the"
-                               + " claimant's solicitors and kept up to date. All references to medical notes are to be"
-                               + " made by reference to the pages in that bundle.");
+                .isEqualTo("c) Legible copies of the medical and educational records of the claimant are to be placed "
+                               + "in a separate paginated bundle by the claimant's solicitors and kept up to date. "
+                               + "All references to medical notes are to be made by reference "
+                               + "to the pages in that bundle.");
 
             assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input1")
                 .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
@@ -794,12 +797,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "  •  Defendant’s response\n"
                                + "  •  Reserved for Judge’s use");
             assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("input3")
-                .isEqualTo("The claimant must uploaded to the Digital Portal the Scott Schedule with the relevant "
+                .isEqualTo("The claimant must upload to the Digital Portal the Scott Schedule with the relevant "
                                + "columns completed by 4pm on");
             assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(10).toString());
             assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("input4")
-                .isEqualTo("The defendant must uploaded to the Digital Portal the amended Scott Schedule with the "
+                .isEqualTo("The defendant must upload to the Digital Portal the amended Scott Schedule with the "
                                + "relevant columns in response completed by 4pm on");
             assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("date2")
                 .isEqualTo(LocalDate.now().plusWeeks(12).toString());
@@ -839,7 +842,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "notification. The hearing will have a time estimate of");
             assertThat(response.getData()).extracting("smallClaimsHearing").extracting("input2")
                 .isEqualTo("The claimant must by no later than 4 weeks before the hearing date, pay the court the "
-                               + "required hearing fee or submit a fully completed application for Help with Fees. "
+                               + "required hearing fee or submit a fully completed application for Help with Fees. \n"
                                + "If the claimant fails to pay the fee or obtain a fee exemption by that time the "
                                + "claim will be struck without further order.");
 
@@ -910,7 +913,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "hearing, save with permission of the Trial Judge.");
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input4")
                 .isEqualTo("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
-                               + "later than 4pm on.");
+                               + "later than 4pm on");
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date2")
                 .isEqualTo(LocalDate.now().plusWeeks(6).toString());
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input5")
@@ -954,10 +957,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingHearingTime").extracting("dateTo")
                 .isEqualTo(LocalDate.now().plusWeeks(16).toString());
             assertThat(response.getData()).extracting("disposalOrderWithoutHearing").extracting("input")
-                .isEqualTo(String.format("Each party has the right to apply to have this Order set aside or varied. "
-                                             + "Any such application must be received by the Court (together with the "
-                                             + "appropriate fee) by 4pm on %s.",
-                                         date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))));
+                .isEqualTo(String.format(
+                    "Each party has the right to apply to have this Order set aside or varied. "
+                        + "Any such application must be received by the Court (together with the "
+                        + "appropriate fee) by 4pm on %s.",
+                    date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
+                ));
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("helpText1")
                 .isEqualTo("If either party considers that the time estimate is insufficient, "
                                + "they must inform the court within 7 days of the date of this order.");
@@ -969,11 +974,13 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "the contents of the bundle before it is filed. The bundle will include a case "
                                + "summary and a chronology.");
             assertThat(response.getData()).extracting("fastTrackOrderWithoutJudgement").extracting("input")
-                .isEqualTo(String.format("This order has been made without hearing. Each party has the right to apply "
-                                             + "to have this Order set aside or varied. Any such application must be "
-                                             + "received by the Court (together with the appropriate fee) by 4pm "
-                                             + "on %s.",
-                                         date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))));
+                .isEqualTo(String.format(
+                    "This order has been made without hearing. Each party has the right to apply "
+                        + "to have this Order set aside or varied. Any such application must be "
+                        + "received by the Court (together with the appropriate fee) by 4pm "
+                        + "on %s.",
+                    date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
+                ));
 
         }
 
@@ -989,7 +996,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("smallClaimsHearing").extracting("input2")
                 .isEqualTo("The claimant must by no later than 14 days before the hearing date, pay the court the "
-                               + "required hearing fee or submit a fully completed application for Help with Fees. "
+                               + "required hearing fee or submit a fully completed application for Help with Fees. \n"
                                + "If the claimant fails to pay the fee or obtain a fee exemption by that time the "
                                + "claim will be struck without further order.");
 
