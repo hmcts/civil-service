@@ -74,7 +74,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -252,8 +251,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         caseDataBuilder.claimFee(feesService
-            .getFeeDataByClaimValue(caseData.getClaimValue(), isSpecCaseCategory(caseData,
-                                                              featureToggleService.isAccessProfilesEnabled())))
+            .getFeeDataByClaimValue(caseData.getClaimValue()))
             .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
             .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
 

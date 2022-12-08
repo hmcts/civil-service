@@ -18,7 +18,6 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_FEE;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Service
 @RequiredArgsConstructor
@@ -50,8 +49,7 @@ public class ValidateFeeCallbackHandler extends CallbackHandler {
     private CallbackResponse validateFee(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
-        var fee = feesService.getFeeDataByClaimValue(caseData.getClaimValue(),
-                                   isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled()));
+        var fee = feesService.getFeeDataByClaimValue(caseData.getClaimValue());
         if (!caseData.getClaimFee().equals(fee)) {
             errors.add(ERROR_MESSAGE);
         }

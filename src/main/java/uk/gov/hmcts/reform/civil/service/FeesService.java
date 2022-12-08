@@ -21,18 +21,17 @@ public class FeesService {
     private final FeesClient feesClient;
     private final FeesConfiguration feesConfiguration;
 
-    public Fee getFeeDataByClaimValue(ClaimValue claimValue, boolean isSpecified) {
-        FeeLookupResponseDto feeLookupResponseDto = lookupFee(claimValue, isSpecified);
+    public Fee getFeeDataByClaimValue(ClaimValue claimValue) {
+        FeeLookupResponseDto feeLookupResponseDto = lookupFee(claimValue);
 
         return buildFeeDto(feeLookupResponseDto);
     }
 
-    private FeeLookupResponseDto lookupFee(ClaimValue claimValue, Boolean isSpecified) {
+    private FeeLookupResponseDto lookupFee(ClaimValue claimValue) {
         return feesClient.lookupFee(
             feesConfiguration.getChannel(),
             feesConfiguration.getEvent(),
-            claimValue.toPounds(),
-            isSpecified
+            claimValue.toPounds()
         );
     }
 
@@ -62,8 +61,7 @@ public class FeesService {
         return feesClient.lookupFee(
             feesConfiguration.getChannel(),
             feesConfiguration.getEvent(),
-            totalClaimAmount.setScale(2),
-            true
+            totalClaimAmount.setScale(2)
         );
     }
 
@@ -76,8 +74,7 @@ public class FeesService {
         return feesClient.lookupFee(
             feesConfiguration.getChannel(),
             feesConfiguration.getHearingEvent(),
-            totalClaimAmount.setScale(2),
-            true
+            totalClaimAmount.setScale(2)
         );
     }
 

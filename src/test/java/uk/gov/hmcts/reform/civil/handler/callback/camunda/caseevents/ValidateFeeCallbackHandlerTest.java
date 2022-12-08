@@ -41,7 +41,7 @@ class ValidateFeeCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldReturnErrors_whenInitialFeeSsDifferentAfterReCalculation() {
-        when(feesService.getFeeDataByClaimValue(any(ClaimValue.class), any(Boolean.class)))
+        when(feesService.getFeeDataByClaimValue(any(ClaimValue.class)))
             .thenReturn(Fee.builder()
                             .calculatedAmountInPence(BigDecimal.valueOf(25))
                             .version("3")
@@ -58,7 +58,7 @@ class ValidateFeeCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldNotReturnErrors_whenInitialFeeIsSameAfterReCalculation() {
-        when(feesService.getFeeDataByClaimValue(any(ClaimValue.class), any(Boolean.class)))
+        when(feesService.getFeeDataByClaimValue(any(ClaimValue.class)))
             .thenReturn(Fee.builder()
                             .calculatedAmountInPence(BigDecimal.valueOf(100))
                             .version("1")

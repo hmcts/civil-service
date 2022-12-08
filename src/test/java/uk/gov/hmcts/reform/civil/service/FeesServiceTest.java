@@ -44,7 +44,7 @@ class FeesServiceTest {
 
     @BeforeEach
     void setUp() {
-        given(feesClient.lookupFee(any(), any(), any(), any(Boolean.class)))
+        given(feesClient.lookupFee(any(), any(), any()))
             .willReturn(FeeLookupResponseDto.builder()
                             .feeAmount(TEST_FEE_AMOUNT_POUNDS)
                             .code("test_fee_code")
@@ -68,9 +68,9 @@ class FeesServiceTest {
             .version("1")
             .build();
 
-        Fee feeDto = feesService.getFeeDataByClaimValue(claimValue, true);
+        Fee feeDto = feesService.getFeeDataByClaimValue(claimValue);
 
-        verify(feesClient).lookupFee(CHANNEL, EVENT, new BigDecimal("50.00"), true);
+        verify(feesClient).lookupFee(CHANNEL, EVENT, new BigDecimal("50.00"));
         assertThat(feeDto).isEqualTo(expectedFeeDto);
     }
 
@@ -85,7 +85,7 @@ class FeesServiceTest {
 
         Fee feeDto = feesService.getFeeDataByTotalClaimAmount(new BigDecimal("7000.00"));
 
-        verify(feesClient).lookupFee(CHANNEL, EVENT, new BigDecimal("7000.00"), true);
+        verify(feesClient).lookupFee(CHANNEL, EVENT, new BigDecimal("7000.00"));
         assertThat(feeDto).isEqualTo(expectedFeeDto);
     }
 
@@ -99,7 +99,7 @@ class FeesServiceTest {
 
         Fee feeDto = feesService.getHearingFeeDataByTotalClaimAmount(new BigDecimal("7000.00"));
 
-        verify(feesClient).lookupFee(CHANNEL, HEARING_EVENT, new BigDecimal("7000.00"), true);
+        verify(feesClient).lookupFee(CHANNEL, HEARING_EVENT, new BigDecimal("7000.00"));
         assertThat(feeDto).isEqualTo(expectedFeeDto);
     }
 
