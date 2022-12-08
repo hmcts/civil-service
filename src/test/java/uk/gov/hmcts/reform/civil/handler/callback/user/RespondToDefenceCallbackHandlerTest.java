@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
+import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -227,8 +228,9 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                   .applicant1DQHearing(Hearing.builder()
                                                            .unavailableDatesRequired(YES)
                                                            .unavailableDates(wrapElements(
-                                                               UnavailableDate.builder().date(
-                                                                   LocalDate.now().plusYears(5)).build()))
+                                                               UnavailableDate.builder()
+                                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                                   .date(LocalDate.now().plusYears(5)).build()))
                                                            .build())
                                   .build())
                 .build();
@@ -250,8 +252,9 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                   .applicant1DQHearing(Hearing.builder()
                                                            .unavailableDatesRequired(YES)
                                                            .unavailableDates(wrapElements(
-                                                               UnavailableDate.builder().date(
-                                                                   LocalDate.now().minusYears(5)).build()))
+                                                               UnavailableDate.builder()
+                                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                                   .date(LocalDate.now().minusYears(5)).build()))
                                                            .build())
                                   .build())
                 .build();
@@ -273,8 +276,9 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                   .applicant1DQHearing(Hearing.builder()
                                                            .unavailableDatesRequired(YES)
                                                            .unavailableDates(wrapElements(
-                                                               UnavailableDate.builder().date(
-                                                                   LocalDate.now().plusDays(5)).build()))
+                                                               UnavailableDate.builder()
+                                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                                   .date(LocalDate.now().plusDays(5)).build()))
                                                            .build())
                                   .build())
                 .build();

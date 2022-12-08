@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -454,7 +455,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(true);
             Hearing hearing = Hearing.builder()
                 .unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(UnavailableDate.builder().date(now().plusDays(5)).build()))
+                .unavailableDates(wrapElements(UnavailableDate.builder()
+                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                   .date(now().plusDays(5)).build()))
                 .build();
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
@@ -474,7 +477,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(false);
             Hearing hearing = Hearing.builder()
                 .unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(UnavailableDate.builder().date(now().plusDays(5)).build()))
+                .unavailableDates(wrapElements(UnavailableDate.builder()
+                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                   .date(now().plusDays(5)).build()))
                 .build();
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
@@ -494,7 +499,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenUnavailableDateIsMoreThanOneYearInFuture() {
             Hearing hearing = Hearing.builder()
                 .unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(UnavailableDate.builder().date(now().plusYears(5)).build()))
+                .unavailableDates(wrapElements(UnavailableDate.builder()
+                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                   .date(now().plusYears(5)).build()))
                 .build();
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
@@ -512,7 +519,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenUnavailableDateIsInPast() {
             Hearing hearing = Hearing.builder()
                 .unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(UnavailableDate.builder().date(now().minusYears(5)).build()))
+                .unavailableDates(wrapElements(UnavailableDate.builder()
+                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                   .date(now().minusYears(5)).build()))
                 .build();
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
@@ -529,7 +538,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnNoError_whenUnavailableDateIsValid() {
             Hearing hearing = Hearing.builder()
                 .unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(UnavailableDate.builder().date(now().plusDays(5)).build()))
+                .unavailableDates(wrapElements(UnavailableDate.builder()
+                                                   .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                   .date(now().plusDays(5)).build()))
                 .build();
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder().respondent1DQHearing(hearing).build())
