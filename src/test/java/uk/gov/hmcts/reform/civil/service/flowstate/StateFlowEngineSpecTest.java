@@ -45,7 +45,7 @@ class StateFlowEngineSpecTest {
         given(featureToggleService.isLrSpecEnabled()).willReturn(true);
         given(featureToggleService.isAccessProfilesEnabled()).willReturn(true);
         given(featureToggleService.isSpecRpaContinuousFeedEnabled()).willReturn(false);
-        given(featureToggleService.isRpaContinuousFeedEnabled()).willReturn(true);
+        given(featureToggleService.isRpaContinuousFeedEnabled()).willReturn(false);
         given(featureToggleService.isGeneralApplicationsEnabled()).willReturn(false);
         given(featureToggleService.isCertificateOfServiceEnabled()).willReturn(false);
         given(featureToggleService.isNoticeOfChangeEnabled()).willReturn(false);
@@ -94,7 +94,6 @@ class StateFlowEngineSpecTest {
 
     static Stream<Arguments> caseDataStreamTwoRespondentRepresentatives() {
         return Stream.of(
-            arguments(CaseDataBuilderSpec.builder().atStateClaimSubmittedTwoRespondentSameSolicitorSpec().build()),
             arguments(CaseDataBuilderSpec.builder().atStateClaimSubmittedTwoRespondentDifferentSolicitorSpec().build()),
             arguments(CaseDataBuilderSpec.builder().atStateSpec1v2Solicitor1UnregisteredSolicitor2Registered().build())
         );
@@ -130,7 +129,7 @@ class StateFlowEngineSpecTest {
             entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
             entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
             entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
-            entry(FlowFlag.RPA_CONTINUOUS_FEED.name(), true)
+            entry(FlowFlag.RPA_CONTINUOUS_FEED.name(), false)
         );
     }
 
