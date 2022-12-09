@@ -161,17 +161,14 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         }
         if (nonNull(expertJointFastTrack) && expertJointFastTrack.contains(EvidenceUploadExpert.JOINT_STATEMENT)
             || nonNull(expertJointSmallTrack) && expertJointSmallTrack.contains(EvidenceUploadExpert.JOINT_STATEMENT)) {
-            System.out.println("show_joint_expert");
             caseDataBuilder.expertJointFlag("show_joint_expert");
         }
         if (nonNull(trialAuthorityFastTrack) && trialAuthorityFastTrack.contains(EvidenceUploadTrial.AUTHORITIES)
             || nonNull(trialAuthoritySmallTrack) && trialAuthoritySmallTrack.contains(EvidenceUploadTrial.AUTHORITIES)) {
-            System.out.println("show_trial_authority");
             caseDataBuilder.trialAuthorityFlag("show_trial_authority");
         }
         if (nonNull(trialDocumentaryFastTrack) && trialDocumentaryFastTrack.contains(EvidenceUploadTrial.DOCUMENTARY)
             || nonNull(trialDocumentarySmallTrack) && trialDocumentarySmallTrack.contains(EvidenceUploadTrial.DOCUMENTARY)) {
-            System.out.println("show_trial_documentary");
             caseDataBuilder.trialDocumentaryFlag("show_trial_documentary");
         }
 
@@ -183,7 +180,6 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     CallbackResponse validate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         return validateValues(callbackParams.getCaseData());
-
     }
 
     CallbackResponse validateValuesParty(List<Element<UploadEvidenceWitness>> uploadEvidenceWitness1,
@@ -254,7 +250,6 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                              "Invalid date: \"Answers to questions asked by the other party\" "
                                  + "date entered must not be in the future (6).");
 
-        System.out.println(uploadEvidenceWitness1);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
