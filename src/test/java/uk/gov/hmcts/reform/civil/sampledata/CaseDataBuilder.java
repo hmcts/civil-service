@@ -2002,12 +2002,13 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder changeOrganisationRequestField(boolean isApplicant, boolean isRespondent2Replaced,
-                                                          String newOrgID, String oldOrgId) {
+                                                          String newOrgID, String oldOrgId, String email) {
         String caseRole = isApplicant ? CaseRole.APPLICANTSOLICITORONE.getFormattedName() :
             isRespondent2Replaced ? CaseRole.RESPONDENTSOLICITORTWO.getFormattedName() :
                 CaseRole.RESPONDENTSOLICITORONE.getFormattedName();
         changeOrganisationRequest = ChangeOrganisationRequest.builder()
             .requestTimestamp(LocalDateTime.now())
+            .createdBy(email)
             .caseRoleId(DynamicList.builder()
                             .value(DynamicListElement.builder()
                                        .code(caseRole)
