@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.service.notify.NotificationClientException;
 
-import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.function.Function;
 

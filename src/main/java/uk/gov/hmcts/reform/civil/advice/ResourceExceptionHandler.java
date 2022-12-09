@@ -16,9 +16,7 @@ import uk.gov.service.notify.NotificationClientException;
 import java.net.UnknownHostException;
 import java.net.SocketTimeoutException;
 
-import java.net.UnknownHostException;
-
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.FAILED_DEPENDENCY;
 
 @Slf4j
 @ControllerAdvice
