@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,11 +16,14 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilderUnspec;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
+import java.util.function.Function;
+import java.util.stream.Stream;
+
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
 
@@ -37,397 +42,146 @@ public class StateFlowEngineUnspecTest {
 
     @BeforeEach
     void setup() {
-        when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
+        given(featureToggleService.isAccessProfilesEnabled()).willReturn(true);
+        given(featureToggleService.isRpaContinuousFeedEnabled()).willReturn(false);
+        given(featureToggleService.isGeneralApplicationsEnabled()).willReturn(false);
+        given(featureToggleService.isCertificateOfServiceEnabled()).willReturn(false);
+        given(featureToggleService.isNoticeOfChangeEnabled()).willReturn(false);
     }
 
-    @Nested
-    class EvaluateStateFlowEngine {
+    static Stream<Arguments> caseDataStream() {
+        return Stream.of(
+            //AC 1 (1V1  represented and registered)
+            arguments(CaseDataBuilderUnspec.builder().atStateClaimSubmitted().build()),
+            //AC 2 (1V2 same defendant solicitor),
+            arguments(CaseDataBuilderUnspec.builder().atStateClaimSubmittedTwoRespondentSameSolicitor().build()),
+            //AC 3 (1V2 different defendant solicitor)
+            arguments(CaseDataBuilderUnspec.builder().atStateClaimSubmittedTwoRespondentRepresentatives().build()),
+            //AC 4 (2v1)
+            arguments(CaseDataBuilderUnspec.builder().atStateClaimSubmitted2v1().build()),
+            //AC 5 (1V1 unrepresented defendant)
+            arguments(CaseDataBuilderUnspec.builder().atState1v1DefendantUnrepresentedClaimSubmitted().build()),
+            //AC 6 (2V1 unrepresented defendant)
+            arguments(CaseDataBuilderUnspec.builder().atState2v1DefendantUnrepresentedClaimSubmitted().build()),
+            //AC 7 (1V2 one unrepresented defendant)
+            arguments(CaseDataBuilderUnspec.builder().atState1v2OneDefendantUnrepresentedClaimSubmitted().build()),
+            //AC 8 (1V2 both defendants unrepresented )
+            arguments(CaseDataBuilderUnspec.builder().atState1v2BothDefendantUnrepresentedClaimSubmitted().build()),
+            //AC 9 (1V1  defendant represented, solicitor unregistered)
+            arguments(CaseDataBuilderUnspec.builder().atState1v1DefendantUnregisteredClaimSubmitted().build()),
+            //AC 10 (2V1  defendant represented, solicitor unregistered )
+            arguments(CaseDataBuilderUnspec.builder().atState2v1DefendantUnregisteredClaimSubmitted().build()),
+            //AC 11 1v2 def 1 represented solicitor unregistered, and def 2 solicitor registered
+            arguments(CaseDataBuilderUnspec.builder().atState1v2Solicitor1UnregisteredSolicitor2Registered().build()),
+            //AC 13 1v2 defendant 1 represented solicitor unregistered,and defendant 2 unrepresented
+            arguments(CaseDataBuilderUnspec.builder().atState1v2OneDefendantRepresentedUnregisteredOtherUnrepresentedClaimSubmitted().build()),
+            //AC 14 1v2 Both defendants represented and both defendant solicitors unregistered
+            arguments(CaseDataBuilderUnspec.builder().atState1v2BothDefendantRepresentedAndUnregistered().build())
+        );
+    }
 
-        /**
-         * case1: 1V1 represented and registered.
-         */
-        @Test
-        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmittedWithOneRespondentAndNoSecondRespondent() {
-            CaseData caseData = CaseDataBuilderUnspec.builder().atStateClaimSubmitted()
-                .build();
+    static Stream<Arguments> caseDataStreamOneRespondentRepresentative() {
+        return Stream.of(
+            arguments(CaseDataBuilderUnspec.builder().atStateClaimSubmitted().build()),
+            arguments(CaseDataBuilderUnspec.builder().atStateClaimSubmittedTwoRespondentSameSolicitor().build()),
+            arguments(CaseDataBuilderUnspec.builder().atStateClaimSubmitted2v1().build()),
+            arguments(CaseDataBuilderUnspec.builder().atState1v1DefendantUnregisteredClaimSubmitted().build()),
+            arguments(CaseDataBuilderUnspec.builder().atState2v1DefendantUnregisteredClaimSubmitted().build())
+        );
+    }
 
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+    static Stream<Arguments> caseDataStreamTwoRespondentRepresentatives() {
+        return Stream.of(
+            arguments(CaseDataBuilderUnspec.builder().atStateClaimSubmittedTwoRespondentRepresentatives().build()),
+            arguments(CaseDataBuilderUnspec.builder().atState1v2Solicitor1UnregisteredSolicitor2Registered().build())
+        );
+    }
 
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(CLAIM_SUBMITTED.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(2)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
-            verify(featureToggleService).isRpaContinuousFeedEnabled();
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry("RPA_CONTINUOUS_FEED", true)
-            );
-        }
+    @ParameterizedTest(name = "{index}: The state is transitioned correctly from DRAFT to CLAIM_SUBMITTED")
+    @MethodSource("caseDataStream")
+    void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted(CaseData caseData) {
+        // When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
-        /**
-         * case2: 1V2 same defendant solicitor.
-         */
-        @Test
-        void shouldReturnClaimSubmitted_Respondent1RepresentedAndSecondRespondentHasSameLegalRepresentative() {
-            CaseData caseData = CaseDataBuilderUnspec.builder().atStateClaimSubmittedTwoRespondentSameSolicitor()
-                .build();
+        // Then Claim will go through state DRAFT and finish at state CLAIM_SUBMITTED
+        assertThat(stateFlow.getState())
+            .extracting(State::getName)
+            .isNotNull()
+            .isEqualTo(CLAIM_SUBMITTED.fullName());
+        assertThat(stateFlow.getStateHistory())
+            .hasSize(2)
+            .extracting(State::getName)
+            .containsExactly(
+                DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
+    }
 
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+    @ParameterizedTest(name = "{index}: The common state flow flags are present for a case transitioned to CLAIM_SUBMITTED")
+    @MethodSource("caseDataStream")
+    void shouldContainCommonFlags_whenCaseDataAtStateClaimSubmitted(CaseData caseData) {
+        //When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(CLAIM_SUBMITTED.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(2)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
-            verify(featureToggleService).isRpaContinuousFeedEnabled();
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry("RPA_CONTINUOUS_FEED", true)
-            );
-        }
+        // Then Claim will have NOTICE_OF_CHANGE, GENERAL_APPLICATION_ENABLED, CERTIFICATE_OF_SERVICE and RPA_CONTINUOUS_FEED
+        assertThat(stateFlow.getFlags()).contains(
+            entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+            entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+            entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
+            entry(FlowFlag.RPA_CONTINUOUS_FEED.name(), false)
+        );
+    }
 
-        /**
-         * case3: 1V2 different defendant solicitors.
-         */
-        @Test
-        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmittedTwoRespondentRepresentatives() {
-            CaseData caseData = CaseDataBuilderUnspec.builder()
-                .atStateClaimSubmittedTwoRespondentRepresentatives()
-                .build();
-            if (caseData.getRespondent2OrgRegistered() != null
-                && caseData.getRespondent2Represented() == null) {
-                caseData = caseData.toBuilder()
-                    .respondent2Represented(YES)
-                    .build();
-            }
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+    @ParameterizedTest(name = "{index}: The state flow flag ONE_RESPONDENT_REPRESENTATIVE is set to true (for appropriate cases)")
+    @MethodSource("caseDataStreamOneRespondentRepresentative")
+    void shouldHaveOneRespondentRepresentativeFlagsSet_whenCaseDataAtStateClaimSubmitted(CaseData caseData) {
+        // When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(CLAIM_SUBMITTED.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(2)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
-            verify(featureToggleService).isRpaContinuousFeedEnabled();
+        // Then Claim will have ONE_RESPONDENT_REPRESENTATIVE set to true
+        assertThat(stateFlow.getFlags()).contains(
+            entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true)
+        );
+        assertThat(stateFlow.getFlags()).hasSize(6);    // bonus: if this fails, a flag was added/removed but tests were not updated
+    }
 
-            assertThat(stateFlow.getFlags()).hasSize(6).contains(
-                entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                entry("RPA_CONTINUOUS_FEED", true),
-                entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false)
-            );
-        }
+    @ParameterizedTest(name = "{index}: The state flow flags ONE_RESPONDENT_REPRESENTATIVE " +
+        "and TWO_RESPONDENT_REPRESENTATIVES are present and set to the correct values (for appropriate cases)")
+    @MethodSource("caseDataStreamTwoRespondentRepresentatives")
+    void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1v2DifferentSolicitor(CaseData caseData) {
+        //When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
-        /**
-         * case4: 2V1 represented.
-         */
-        @Test
-        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted2V1() {
-            CaseData caseData = CaseDataBuilderUnspec.builder().atStateClaimSubmitted2v1()
-                .build();
+        // Then Claim will have ONE_RESPONDENT_REPRESENTATIVE=false and TWO_RESPONDENT_REPRESENTATIVES=true
+        assertThat(stateFlow.getFlags()).contains(
+            entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false),
+            entry(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true)
+        );
+        assertThat(stateFlow.getFlags()).hasSize(7);    // bonus: if this fails, a flag was added/removed but tests were not updated
+    }
 
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+    public interface StubbingFn extends Function<FeatureToggleService, OngoingStubbing<Boolean>> {
+    }
 
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(CLAIM_SUBMITTED.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(2)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
-            verify(featureToggleService).isRpaContinuousFeedEnabled();
+    static Stream<Arguments> commonFlagNames() {
+        return Stream.of(
+            arguments(FlowFlag.NOTICE_OF_CHANGE.name(), (StubbingFn)(featureToggleService) -> when(featureToggleService.isNoticeOfChangeEnabled())),
+            arguments(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), (StubbingFn)(featureToggleService) -> when(featureToggleService.isGeneralApplicationsEnabled())),
+            arguments(FlowFlag.CERTIFICATE_OF_SERVICE.name(), (StubbingFn)(featureToggleService) -> when(featureToggleService.isCertificateOfServiceEnabled())),
+            arguments(FlowFlag.RPA_CONTINUOUS_FEED.name(), (StubbingFn)(featureToggleService) -> when(featureToggleService.isRpaContinuousFeedEnabled()))
+        );
+    }
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry("RPA_CONTINUOUS_FEED", true),
-                entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false)
-            );
-        }
+    @ParameterizedTest(name = "{index}: The feature flags are carried to the appropriate state flow flags")
+    @MethodSource("commonFlagNames")
+    void shouldUseTrueFeatureFlag_whenCaseDataAtStateClaimSubmitted(String flagName, StubbingFn stubbingFunction) {
+        // Given: some case data (which one shouldn't matter)
+        CaseData caseData = CaseDataBuilderUnspec.builder().atStateClaimSubmitted().build();
 
-        /**
-         * case5: 1V1 unrepresented defendant.
-         */
-        @Test
-        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1V1UnRepresented() {
-            CaseData caseData =
-                CaseDataBuilderUnspec.builder().atState1v1DefendantUnrepresentedClaimSubmitted().build();
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+        //When: I set a specific feature flag to true
+        stubbingFunction.apply(featureToggleService).thenReturn(true);
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(CLAIM_SUBMITTED.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(2)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
-            verify(featureToggleService).isRpaContinuousFeedEnabled();
-
-            assertThat(stateFlow.getFlags()).hasSize(4).contains(
-                entry("RPA_CONTINUOUS_FEED", true),
-                entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false)
-            );
-        }
-
-        /**
-         * case6: 2V1 unrepresented defendant.
-         */
-        @Test
-        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted2V1UnRepresented() {
-            CaseData caseData =
-                CaseDataBuilderUnspec.builder().atState2v1DefendantUnrepresentedClaimSubmitted().build();
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(CLAIM_SUBMITTED.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(2)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
-            verify(featureToggleService).isRpaContinuousFeedEnabled();
-
-            assertThat(stateFlow.getFlags()).hasSize(4).contains(
-                entry("RPA_CONTINUOUS_FEED", true),
-                entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false)
-            );
-        }
-
-        /**
-         * case7: 1V2 one unrepresented defendant.
-         */
-        @Test
-        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1V2OneUnRepresented() {
-            CaseData caseData =
-                CaseDataBuilderUnspec.builder().atState1v2OneDefendantUnrepresentedClaimSubmitted().build();
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(CLAIM_SUBMITTED.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(2)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
-            verify(featureToggleService).isRpaContinuousFeedEnabled();
-
-            assertThat(stateFlow.getFlags()).hasSize(4).contains(
-                entry("RPA_CONTINUOUS_FEED", true),
-                entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false)
-            );
-        }
-
-        /**
-         * case8: 1V2 both unrepresented defendant.
-         */
-        @Test
-        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1V2BothUnRepresented() {
-            CaseData caseData =
-                CaseDataBuilderUnspec.builder().atState1v2BothDefendantUnrepresentedClaimSubmitted().build();
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(CLAIM_SUBMITTED.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(2)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
-            verify(featureToggleService).isRpaContinuousFeedEnabled();
-
-            assertThat(stateFlow.getFlags()).hasSize(4).contains(
-                entry("RPA_CONTINUOUS_FEED", true),
-                entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false)
-            );
-        }
-
-        /**
-         * case9: 1V1 represented unregistered.
-         */
-        @Test
-        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1V1RepresentedUnregistered() {
-            CaseData caseData =
-                CaseDataBuilderUnspec.builder().atState1v1DefendantUnregisteredClaimSubmitted().build();
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(CLAIM_SUBMITTED.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(2)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
-            verify(featureToggleService).isRpaContinuousFeedEnabled();
-
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                entry("RPA_CONTINUOUS_FEED", true),
-                entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true)
-            );
-        }
-
-        /**
-         * case10: 2V1  defendant represented unregistered.
-         */
-        @Test
-        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted2V1RepresentedUnregistered() {
-            CaseData caseData =
-                CaseDataBuilderUnspec.builder().atState2v1DefendantUnregisteredClaimSubmitted().build();
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(CLAIM_SUBMITTED.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(2)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
-            verify(featureToggleService).isRpaContinuousFeedEnabled();
-
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                entry("RPA_CONTINUOUS_FEED", true),
-                entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true)
-            );
-        }
-
-        /**
-         * case11: 1V2 one represented unregistered and other registered defendant.
-         */
-        @Test
-        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1V2OneRepresentedUnregiOtherRegistered() {
-            CaseData caseData =
-                CaseDataBuilderUnspec.builder().atState1v2Solicitor1UnregisteredSolicitor2Registered().build();
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(CLAIM_SUBMITTED.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(2)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
-            verify(featureToggleService).isRpaContinuousFeedEnabled();
-
-            assertThat(stateFlow.getFlags()).hasSize(6).contains(
-                entry("RPA_CONTINUOUS_FEED", true),
-                entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                entry("TWO_RESPONDENT_REPRESENTATIVES", true)
-            );
-        }
-
-
-        /**
-         * case 12 : 1V2 one represented unregistered and other unrepresented defendant.
-         */
-        @Test
-        void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1v2OneRepresentedUnregiOtherUnrepresented() {
-            CaseData caseData = CaseDataBuilderUnspec.builder()
-                .atState1v2OneDefendantRepresentedUnregisteredOtherUnrepresentedClaimSubmitted()
-                .build();
-
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(CLAIM_SUBMITTED.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(2)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
-            verify(featureToggleService).isRpaContinuousFeedEnabled();
-
-            assertThat(stateFlow.getFlags()).hasSize(4).contains(
-                entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry("RPA_CONTINUOUS_FEED", true)
-            );
-        }
-
-        /**
-         * case 13 : 1V2 both represented unregistered defendant.
-         */
-        @Test
-        void shouldReturnClaimSubmitted_1v2BothDefendantRepresentedAndUnregistered() {
-            CaseData caseData = CaseDataBuilderUnspec.builder().atState1v2BothDefendantRepresentedAndUnregistered()
-                .build();
-
-            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-            assertThat(stateFlow.getState())
-                .extracting(State::getName)
-                .isNotNull()
-                .isEqualTo(CLAIM_SUBMITTED.fullName());
-            assertThat(stateFlow.getStateHistory())
-                .hasSize(2)
-                .extracting(State::getName)
-                .containsExactly(
-                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
-            verify(featureToggleService).isRpaContinuousFeedEnabled();
-
-            assertThat(stateFlow.getFlags()).hasSize(4).contains(
-                entry(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry("RPA_CONTINUOUS_FEED", true)
-            );
-        }
+        // Then: The corresponding flag in the StateFlow must be set to true
+        assertThat(stateFlow.getFlags()).contains(entry(flagName, true));
     }
 }
-
 
