@@ -135,8 +135,7 @@ public class RoboticsNotificationService {
         String recipient = isMultiParty ? roboticsEmailConfiguration
             .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
         log.info("EMAIl:---------" + recipient);
-        return isMultiParty ? roboticsEmailConfiguration
-            .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
+        return recipient;
     }
 
     public static String findLatestEventTriggerReason(EventHistory eventHistory) {
