@@ -147,7 +147,8 @@ class StateFlowEngineSpecTest {
         assertThat(stateFlow.getFlags()).hasSize(6);    // bonus: if this fails, a flag was added/removed but tests were not updated
     }
 
-    @ParameterizedTest(name = "{index}: The state flow flags ONE_RESPONDENT_REPRESENTATIVE and TWO_RESPONDENT_REPRESENTATIVES are present and set to the correct values (for appropriate cases)")
+    @ParameterizedTest(name = "{index}: The state flow flags ONE_RESPONDENT_REPRESENTATIVE and " +
+        "TWO_RESPONDENT_REPRESENTATIVES are present and set to the correct values (for appropriate cases)")
     @MethodSource("caseDataStreamTwoRespondentRepresentatives")
     void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1v2DifferentSolicitorSpecified(CaseData caseData) {
         //When
@@ -166,11 +167,16 @@ class StateFlowEngineSpecTest {
 
     static Stream<Arguments> commonFlagNames() {
         return Stream.of(
-            arguments(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), (StubbingFn)(featureToggleService) -> when(featureToggleService.isSpecRpaContinuousFeedEnabled())),
-            arguments(FlowFlag.NOTICE_OF_CHANGE.name(), (StubbingFn)(featureToggleService) -> when(featureToggleService.isNoticeOfChangeEnabled())),
-            arguments(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), (StubbingFn)(featureToggleService) -> when(featureToggleService.isGeneralApplicationsEnabled())),
-            arguments(FlowFlag.CERTIFICATE_OF_SERVICE.name(), (StubbingFn)(featureToggleService) -> when(featureToggleService.isCertificateOfServiceEnabled())),
-            arguments(FlowFlag.RPA_CONTINUOUS_FEED.name(), (StubbingFn)(featureToggleService) -> when(featureToggleService.isRpaContinuousFeedEnabled()))
+            arguments(FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), (StubbingFn)(featureToggleService)
+                -> when(featureToggleService.isSpecRpaContinuousFeedEnabled())),
+            arguments(FlowFlag.NOTICE_OF_CHANGE.name(), (StubbingFn)(featureToggleService)
+                -> when(featureToggleService.isNoticeOfChangeEnabled())),
+            arguments(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), (StubbingFn)(featureToggleService)
+                -> when(featureToggleService.isGeneralApplicationsEnabled())),
+            arguments(FlowFlag.CERTIFICATE_OF_SERVICE.name(), (StubbingFn)(featureToggleService)
+                -> when(featureToggleService.isCertificateOfServiceEnabled())),
+            arguments(FlowFlag.RPA_CONTINUOUS_FEED.name(), (StubbingFn)(featureToggleService)
+                -> when(featureToggleService.isRpaContinuousFeedEnabled()))
         );
     }
 
