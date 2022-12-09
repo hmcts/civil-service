@@ -299,35 +299,27 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     }
 
     private LocalDateTime getServiceDate(CaseData caseData) {
+        LocalDateTime date = time.now();
+
         if (Objects.nonNull(caseData.getCosNotifyClaimDefendant1())
-            && Objects.nonNull(caseData.getCosNotifyClaimDefendant2())) {
-
-            if (caseData.getCosNotifyClaimDefendant1().getCosDateOfServiceForDefendant()
-                .isEqual(caseData.getCosNotifyClaimDefendant2().getCosDateOfServiceForDefendant())) {
-
-                return  caseData.getCosNotifyClaimDefendant1().getCosDateOfServiceForDefendant().atStartOfDay();
-
-            } else if (caseData.getCosNotifyClaimDefendant1().getCosDateOfServiceForDefendant()
-                .isBefore(caseData.getCosNotifyClaimDefendant2().getCosDateOfServiceForDefendant())) {
-
-                return  caseData.getCosNotifyClaimDefendant1().getCosDateOfServiceForDefendant().atStartOfDay();
-
-            } else if (caseData.getCosNotifyClaimDefendant1().getCosDateOfServiceForDefendant()
-                .isAfter(caseData.getCosNotifyClaimDefendant2().getCosDateOfServiceForDefendant())) {
-
-                return caseData.getCosNotifyClaimDefendant2().getCosDateOfServiceForDefendant().atStartOfDay();
+            && Objects.nonNull(caseData
+                                   .getCosNotifyClaimDefendant1().getCosDateOfServiceForDefendant())) {
+            LocalDateTime cosDate1 = caseData.getCosNotifyClaimDefendant1()
+                .getCosDateOfServiceForDefendant().atStartOfDay();
+            if (cosDate1.isBefore(date)) {
+                date = cosDate1;
             }
-
-        } else if (Objects.isNull(caseData.getCosNotifyClaimDefendant1())
-            && Objects.nonNull(caseData.getCosNotifyClaimDefendant2())) {
-
-            return  caseData.getCosNotifyClaimDefendant2().getCosDateOfServiceForDefendant().atStartOfDay();
-
-        } else if (Objects.nonNull(caseData.getCosNotifyClaimDefendant1())
-            && Objects.isNull(caseData.getCosNotifyClaimDefendant2())) {
-
-            return caseData.getCosNotifyClaimDefendant1().getCosDateOfServiceForDefendant().atStartOfDay();
         }
-        return time.now();
+
+        if (Objects.nonNull(caseData.getCosNotifyClaimDefendant2())
+            && Objects.nonNull(caseData
+                                   .getCosNotifyClaimDefendant2().getCosDateOfServiceForDefendant())) {
+            LocalDateTime cosDate2 = caseData.getCosNotifyClaimDefendant2()
+                .getCosDateOfServiceForDefendant().atStartOfDay();
+            if (cosDate2.isBefore(date)) {
+                date = cosDate2;
+            }
+        }
+        return date;
     }
 }
