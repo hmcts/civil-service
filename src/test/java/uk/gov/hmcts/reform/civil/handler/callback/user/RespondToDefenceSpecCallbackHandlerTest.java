@@ -55,6 +55,7 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -790,5 +791,31 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
             return objectMapper.convertValue(response.getData(), CaseData.class);
         }
+    }
+
+    @Test
+    void shouldConvertPartAdmitPaidValueFromPenniesToPounds() {
+        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+        RespondToClaim respondToAdmittedClaim =
+            RespondToClaim.builder()
+                .howMuchWasPaid(BigDecimal.valueOf(1050))
+                .build();
+
+        CaseData caseData = CaseData.builder()
+            .respondToAdmittedClaim(respondToAdmittedClaim)
+            .build();
+        CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        BigDecimal result = getCaseData(response).getPartAdmitPaidValuePounds();
+
+        assertThat(result).isEqualTo(new BigDecimal("10.50"));
+    }
+
+    private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
+        return objectMapper.convertValue(response.getData(), CaseData.class);
     }
 }
