@@ -44,9 +44,8 @@ class StateFlowEngineSpecTest {
     void setup() {
         given(featureToggleService.isLrSpecEnabled()).willReturn(true);
         given(featureToggleService.isAccessProfilesEnabled()).willReturn(true);
-
         given(featureToggleService.isSpecRpaContinuousFeedEnabled()).willReturn(false);
-        given(featureToggleService.isRpaContinuousFeedEnabled()).willReturn(false);
+        given(featureToggleService.isRpaContinuousFeedEnabled()).willReturn(true);
         given(featureToggleService.isGeneralApplicationsEnabled()).willReturn(false);
         given(featureToggleService.isCertificateOfServiceEnabled()).willReturn(false);
         given(featureToggleService.isNoticeOfChangeEnabled()).willReturn(false);
@@ -54,19 +53,32 @@ class StateFlowEngineSpecTest {
 
     static Stream<Arguments> caseDataStream() {
         return Stream.of(
-            arguments(CaseDataBuilderSpec.builder().atStateSpec1v1ClaimSubmitted().build()),    // AC 1
-            arguments(CaseDataBuilderSpec.builder().atStateClaimSubmittedTwoRespondentSameSolicitorSpec().build()), // AC 2
-            arguments(CaseDataBuilderSpec.builder().atStateClaimSubmittedTwoRespondentDifferentSolicitorSpec().build()),    // AC 3
-            arguments(CaseDataBuilderSpec.builder().atStateClaimSubmitted2v1().build()),    // AC 4
-            arguments(CaseDataBuilderSpec.builder().atStateSpec1v1DefendantUnrepresentedClaimSubmitted().build()),  // AC 5
-            arguments(CaseDataBuilderSpec.builder().atStateSpec2v1DefendantUnrepresentedClaimSubmitted().build()),  // AC 6
-            arguments(CaseDataBuilderSpec.builder().atStateSpec1v2OneDefendantUnrepresentedClaimSubmitted().build()),   // AC 7
-            arguments(CaseDataBuilderSpec.builder().atStateSpec1v2BothDefendantUnrepresentedClaimSubmitted().build()),  // AC 8
-            arguments(CaseDataBuilderSpec.builder().atStateSpec1v1DefendantUnregisteredClaimSubmitted().build()),   // AC 9
-            arguments(CaseDataBuilderSpec.builder().atStateSpec2v1DefendantUnregisteredClaimSubmitted().build()),   // AC 10
-            arguments(CaseDataBuilderSpec.builder().atStateSpec1v2Solicitor1UnregisteredSolicitor2Registered().build()),    // AC 11
-            arguments(CaseDataBuilderSpec.builder().atStateSpec1v2OneDefendantRepresentedUnregisteredOtherUnrepresentedClaimSubmitted().build()),   // AC 13
-            arguments(CaseDataBuilderSpec.builder().atStateSpec1v2BothDefendantRepresentedAndUnregistered().build())    // AC 14
+            //AC 1 (1V1  represented and registered)
+            arguments(CaseDataBuilderSpec.builder().atStateSpec1v1ClaimSubmitted().build()),
+            //AC 2 (1V2 same defendant solicitor)
+            arguments(CaseDataBuilderSpec.builder().atStateClaimSubmittedTwoRespondentSameSolicitorSpec().build()),
+            //AC 3 (1V2 different defendant solicitor)
+            arguments(CaseDataBuilderSpec.builder().atStateClaimSubmittedTwoRespondentDifferentSolicitorSpec().build()),
+            //AC 4 (2v1)
+            arguments(CaseDataBuilderSpec.builder().atStateClaimSubmitted2v1().build()),
+            //AC 5 (1V1 unrepresented defendant)
+            arguments(CaseDataBuilderSpec.builder().atStateSpec1v1DefendantUnrepresentedClaimSubmitted().build()),
+            //AC 6 (2V1 unrepresented defendant)
+            arguments(CaseDataBuilderSpec.builder().atStateSpec2v1DefendantUnrepresentedClaimSubmitted().build()),
+            //AC 7 (1V2 one unrepresented defendant)
+            arguments(CaseDataBuilderSpec.builder().atStateSpec1v2OneDefendantUnrepresentedClaimSubmitted().build()),
+            //AC 8 (1V2 both defendants unrepresented )
+            arguments(CaseDataBuilderSpec.builder().atStateSpec1v2BothDefendantUnrepresentedClaimSubmitted().build()),
+            //AC 9 (1V1  defendant represented, solicitor unregistered)
+            arguments(CaseDataBuilderSpec.builder().atStateSpec1v1DefendantUnregisteredClaimSubmitted().build()),
+            //AC 10 (2V1  defendant represented, solicitor unregistered )
+            arguments(CaseDataBuilderSpec.builder().atStateSpec2v1DefendantUnregisteredClaimSubmitted().build()),
+            //AC 11 1v2 def 1 represented solicitor unregistered, and def 2 solicitor registered
+            arguments(CaseDataBuilderSpec.builder().atStateSpec1v2Solicitor1UnregisteredSolicitor2Registered().build()),
+            //AC 13 1v2 defendant 1 represented solicitor unregistered,and defendant 2 unrepresented
+            arguments(CaseDataBuilderSpec.builder().atStateSpec1v2OneDefendantRepresentedUnregisteredOtherUnrepresentedClaimSubmitted().build()),
+            //AC 14 1v2 Both defendants represented and both defendant solicitors unregistered
+            arguments(CaseDataBuilderSpec.builder().atStateSpec1v2BothDefendantRepresentedAndUnregistered().build())
         );
     }
 
@@ -82,6 +94,7 @@ class StateFlowEngineSpecTest {
 
     static Stream<Arguments> caseDataStreamTwoRespondentRepresentatives() {
         return Stream.of(
+            arguments(CaseDataBuilderSpec.builder().atStateClaimSubmittedTwoRespondentSameSolicitorSpec().build()),
             arguments(CaseDataBuilderSpec.builder().atStateClaimSubmittedTwoRespondentDifferentSolicitorSpec().build()),
             arguments(CaseDataBuilderSpec.builder().atStateSpec1v2Solicitor1UnregisteredSolicitor2Registered().build())
         );
@@ -117,7 +130,7 @@ class StateFlowEngineSpecTest {
             entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
             entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
             entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
-            entry(FlowFlag.RPA_CONTINUOUS_FEED.name(), false)
+            entry(FlowFlag.RPA_CONTINUOUS_FEED.name(), true)
         );
     }
 
@@ -170,6 +183,8 @@ class StateFlowEngineSpecTest {
         //When: I set a specific feature flag to true
         stubbingFunction.apply(featureToggleService).thenReturn(true);
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+        System.out.println("flags are " + stateFlow.getFlags());
 
         // Then: The corresponding flag in the StateFlow must be set to true
         assertThat(stateFlow.getFlags()).contains(entry(flagName, true));
