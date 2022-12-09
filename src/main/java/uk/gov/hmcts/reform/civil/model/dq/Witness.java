@@ -8,5 +8,9 @@ import lombok.Data;
 public class Witness {
 
     private final String name;
+    private final String firstName;
+    private final String lastName;
+    private final String emailAddress;
+    private final String phoneNumber;
     private final String reasonForWitness;
 }
