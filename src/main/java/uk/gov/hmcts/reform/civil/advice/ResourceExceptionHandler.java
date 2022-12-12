@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
+import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -82,5 +83,13 @@ public class ResourceExceptionHandler {
         return ResponseEntity
             .status(FAILED_DEPENDENCY)
             .body(exception.getMessage());
+    }
+
+    @ExceptionHandler({
+        JsonSchemaValidationException.class
+    })
+    public ResponseEntity<Object> handleJsonSchemaValidationException(JsonSchemaValidationException exception) {
+        log.debug(exception.getMessage(), exception);
+        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.EXPECTATION_FAILED);
     }
 }

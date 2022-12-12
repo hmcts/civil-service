@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
+import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -150,6 +151,16 @@ class ResourceExceptionHandlerTest {
         assertThat(result.getStatusCode()).isSameAs(expectedStatus);
         assertThat(result.getBody()).isNotNull()
             .extracting(Object::toString).asString().contains(message);
+    }
+
+    @Test
+    public void shouldReturnExpectationFailed_whenJsonSchemaValidationExceptionThrown() {
+        testTemplate(
+            "expected exception from json schema rpa",
+            str -> new JsonSchemaValidationException("expected exception from json schema rpa", new Throwable()),
+            handler::handleJsonSchemaValidationException,
+            HttpStatus.EXPECTATION_FAILED
+        );
     }
 
 }
