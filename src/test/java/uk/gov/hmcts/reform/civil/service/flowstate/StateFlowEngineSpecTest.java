@@ -148,7 +148,7 @@ class StateFlowEngineSpecTest {
     @ParameterizedTest(name = "{index}: The state flow flags ONE_RESPONDENT_REPRESENTATIVE and " +
         "TWO_RESPONDENT_REPRESENTATIVES are present and set to the correct values (for appropriate cases)")
     @MethodSource("caseDataStreamTwoRespondentRepresentatives")
-    void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1v2DifferentSolicitor(CaseData caseData) {
+    void shouldReturnFlags_whenAtStateClaimSubmitted1v2DiffSol_OrSolicitor1UnrepAndSolicitor2Registered(CaseData caseData) {
         //When
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
