@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
+package uk.gov.hmcts.reform.civil.service.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
@@ -57,7 +57,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         try {
-            log.info("calling payment service request " + caseData.getCcdCaseReference());
+            log.info("calling payment service request {}", caseData.getCcdCaseReference());
             var serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
                 .getServiceRequestReference();
 
@@ -78,7 +78,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
             }
 
         } catch (FeignException e) {
-            log.info(String.format("Http Status %s ", e.status()), e);
+            log.error("Http Status {}", e.status());
             errors.add(ERROR_MESSAGE);
         }
 

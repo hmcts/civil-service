@@ -94,7 +94,7 @@ public class PaymentsService {
 
         if (caseData.getHearingDate() == null) {
             serviceRequestPBADetails = caseData.getClaimIssuedPBADetails();
-        } else if (caseData.getHearingDate() != null) {
+        } else {
             serviceRequestPBADetails = caseData.getHearingFeePBADetails();
         }
 
@@ -118,7 +118,7 @@ public class PaymentsService {
         if (caseData.getHearingDate() == null) {
             serviceRequestPBADetails = caseData.getClaimIssuedPBADetails();
             srFee = caseData.getClaimFee().toFeeDto();
-        } else if (caseData.getHearingDate() != null) {
+        } else {
             serviceRequestPBADetails = caseData.getHearingFeePBADetails();
             srFee = caseData.getHearingFee().toFeeDto();
         }
@@ -149,7 +149,7 @@ public class PaymentsService {
         String serviceReqReference = null;
         if (caseData.getHearingDate() == null) {
             serviceReqReference = caseData.getClaimIssuedPBADetails().getServiceReqReference();
-        } else if (caseData.getHearingDate() != null) {
+        } else {
             serviceReqReference = caseData.getHearingFeePBADetails().getServiceReqReference();
         }
         return paymentsClient.createPbaPayment(serviceReqReference, authToken, buildRequest1(caseData));
@@ -174,7 +174,7 @@ public class PaymentsService {
         if (caseData.getHearingDate() == null) {
             callbackURLUsed = callBackUrlClaimIssued;
             feeResponse = caseData.getClaimFee().toFeeDto();
-        } else if (caseData.getHearingDate() != null) {
+        } else {
             callbackURLUsed = callBackUrl;
             feeResponse = caseData.getHearingFee().toFeeDto();
         }

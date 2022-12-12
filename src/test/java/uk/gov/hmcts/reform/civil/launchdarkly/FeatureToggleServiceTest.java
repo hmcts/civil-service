@@ -195,6 +195,6 @@ class FeatureToggleServiceTest {
         givenToggle(pbaV3Key, true);
 
         assertThat(featureToggleService.isPbaV3Enabled()).isTrue();
-        //verifyBoolVariationCalled(pbaV3Key, List.of("timestamp", "environment"));
+        verifyBoolVariationCalled(pbaV3Key, List.of("timestamp", "environment"));
     }
 }

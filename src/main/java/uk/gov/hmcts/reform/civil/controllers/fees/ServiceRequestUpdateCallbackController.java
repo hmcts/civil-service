@@ -28,14 +28,6 @@ public class ServiceRequestUpdateCallbackController {
         @ApiResponse(code = 200, message = "Callback processed.", response = CallbackResponse.class),
         @ApiResponse(code = 400, message = "Bad Request")})
     public void serviceRequestUpdate(@RequestBody ServiceRequestUpdateDto serviceRequestUpdateDto) {
-        try {
             requestUpdateCallbackService.processCallback(serviceRequestUpdateDto, FeeType.HEARING.name());
-        } catch (Exception ex) {
-            log.error(
-                "Payment callback is unsuccessful for the CaseID: {}",
-                serviceRequestUpdateDto.getCcdCaseNumber()
-            );
-        }
     }
-
 }

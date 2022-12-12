@@ -99,7 +99,7 @@ public class FeatureToggleService {
     }
 
     public boolean isSDOEnabled() {
-        return internalClient.boolVariation("enableSDO", createLDUser().build(), false);
+        return internalClient.boolVariation("enableSDO", createLDUser().build(), true);
     }
 
     private void close() {

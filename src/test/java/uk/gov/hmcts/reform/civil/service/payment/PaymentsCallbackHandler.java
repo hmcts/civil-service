@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
+package uk.gov.hmcts.reform.civil.service.payment;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
@@ -35,7 +35,7 @@ import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PaymentsCallbackPBAHandler extends CallbackHandler {
+public class PaymentsCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(MAKE_PBA_PAYMENT);
     private static final String ERROR_MESSAGE = "Technical error occurred";
@@ -45,7 +45,6 @@ public class PaymentsCallbackPBAHandler extends CallbackHandler {
 
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
-    private final FeatureToggleService featureToggleService;
     private final Time time;
 
     @Override
@@ -62,14 +61,10 @@ public class PaymentsCallbackPBAHandler extends CallbackHandler {
 
     @Override
     public List<CaseEvent> handledEvents() {
-        if (featureToggleService.isPbaV3Enabled()) {
-            return EVENTS;
-        } else {
-            return Collections.emptyList();
-        }
+        return EVENTS;
     }
 
-    private CaseData updateWithDuplicatePaymentError(CaseData caseData) {
+    private CaseData updateWithDuplicatePaymentError(CaseData caseData, InvalidPaymentRequestException e) {
         var paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
             .map(PaymentDetails::toBuilder)
             .orElse(PaymentDetails.builder())
@@ -87,9 +82,7 @@ public class PaymentsCallbackPBAHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         try {
             log.info("processing payment for case " + caseData.getCcdCaseReference());
-            var paymentReference = paymentsService.createCreditAccountPayment1(caseData, authToken)
-                .getPaymentReference();
-
+            var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken).getReference();
             PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
                 .map(PaymentDetails::toBuilder)
                 .orElse(PaymentDetails.builder())
@@ -102,6 +95,7 @@ public class PaymentsCallbackPBAHandler extends CallbackHandler {
             caseData = caseData.toBuilder()
                 .claimIssuedPaymentDetails(paymentDetails)
                 .paymentSuccessfulDate(time.now())
+                .ccdState(CaseState.CASE_ISSUED)
                 .build();
 
         } catch (FeignException e) {
@@ -115,7 +109,7 @@ public class PaymentsCallbackPBAHandler extends CallbackHandler {
             log.error(String.format("Duplicate Payment error status code 400 for case: %s, response body: %s",
                                     caseData.getCcdCaseReference(), e.getMessage()
             ));
-            caseData = updateWithDuplicatePaymentError(caseData);
+            caseData = updateWithDuplicatePaymentError(caseData, e);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -128,7 +122,7 @@ public class PaymentsCallbackPBAHandler extends CallbackHandler {
         try {
             var paymentDto = objectMapper.readValue(e.contentUTF8(), PaymentDto.class);
             var statusHistory = paymentDto.getStatusHistories()[0];
-            PaymentDetails paymentDetailsErrored = ofNullable(caseData.getClaimIssuedPaymentDetails())
+            PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
                 .map(PaymentDetails::toBuilder).orElse(PaymentDetails.builder())
                 .status(FAILED)
                 .errorCode(statusHistory.getErrorCode())
@@ -136,7 +130,7 @@ public class PaymentsCallbackPBAHandler extends CallbackHandler {
                 .build();
 
             return caseData.toBuilder()
-                .claimIssuedPaymentDetails(paymentDetailsErrored)
+                .claimIssuedPaymentDetails(paymentDetails)
                 .build();
         } catch (JsonProcessingException jsonException) {
             log.error(jsonException.getMessage());

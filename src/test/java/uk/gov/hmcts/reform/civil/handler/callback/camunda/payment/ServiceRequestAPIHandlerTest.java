@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.payment.ServiceRequestAPIHandler;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 
 import java.time.LocalDateTime;

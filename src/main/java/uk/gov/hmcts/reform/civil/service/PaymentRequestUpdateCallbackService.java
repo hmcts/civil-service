@@ -58,7 +58,7 @@ public class PaymentRequestUpdateCallbackService {
             }
 
         } else {
-            log.error("Service request status is not PAID for Case id {}",
+            log.info("Service request status is not PAID for Case id {}",
                       serviceRequestUpdateDto.getCcdCaseNumber());
         }
     }
@@ -90,7 +90,7 @@ public class PaymentRequestUpdateCallbackService {
         if (feeType.equals(FeeType.HEARING.name())) {
             return SERVICE_REQUEST_RECEIVED;
         } else if (feeType.equals(FeeType.CLAIMISSUED.name())
-                   && isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled() ? true : false)) {
+                   && isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
             return CREATE_CLAIM_SPEC_AFTER_PAYMENT;
         } else {
             return CREATE_CLAIM_AFTER_PAYMENT;
