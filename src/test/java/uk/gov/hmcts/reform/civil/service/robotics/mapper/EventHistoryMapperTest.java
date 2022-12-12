@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PartyRole;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -45,6 +44,7 @@ import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
@@ -1574,7 +1574,7 @@ class EventHistoryMapperTest {
 
             if (!featureToggleService.isSDOEnabled()) {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .setSuperClaimTypeToSpecClaim()
+                    .setClaimTypeToSpecClaim()
                     .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                     .atState(FlowState.Main.FULL_DEFENCE)
                     .atStateRespondent1v1FullDefenceSpec()
@@ -1667,7 +1667,7 @@ class EventHistoryMapperTest {
 
             if (featureToggleService.isSDOEnabled()) {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .setSuperClaimTypeToSpecClaim()
+                    .setClaimTypeToSpecClaim()
                     .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
                     .atState(TAKEN_OFFLINE_SDO_NOT_DRAWN)
                     .atStateRespondent1v1FullDefenceSpec()
@@ -1746,7 +1746,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenClaimWithFullDefence1v1AllPaid() {
             BigDecimal claimValue = BigDecimal.valueOf(1000);
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.FULL_DEFENCE)
                 .atStateRespondent1v1FullDefenceSpec()
@@ -1825,7 +1825,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_when1v1ClaimWithRespondentFullAdmissionToBoth() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateSpec1v1ClaimSubmitted()
                 .atStateRespondent1v1FullAdmissionSpec()
                 .build();
@@ -1874,7 +1874,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_when2v1ClaimWithRespondentFullAdmissionToBoth() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateSpec2v1ClaimSubmitted()
                 .atStateRespondent2v1FullAdmission()
                 .build();
@@ -1923,7 +1923,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_when1v2ClaimWithRespondentFullAdmissionToBoth() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateSpec1v2ClaimSubmitted()
                 .atStateRespondent1v2FullAdmission()
                 .build();
@@ -1979,7 +1979,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_when2v1ClaimWithRespondentPartAdmissionToBoth() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateSpec2v1ClaimSubmitted()
                 .atStateRespondent2v1PartAdmission()
                 .build();
@@ -2032,7 +2032,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_when2v1ClaimWithRespondentCounterClaimToBoth() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateSpec2v1ClaimSubmitted()
                 .atStateRespondent2v1CounterClaim()
                 .build();
@@ -3021,7 +3021,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWith1v2DiffSolicitorResp1PartAdmitsResp2FullDef() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atState(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateRespondent1v2FullDefence_AdmitPart()
@@ -3087,7 +3087,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWith1v2DiffSolicitorResp1FullyAdmitsResp2FullDef() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atState(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED)
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateRespondent1v2FullDefence_AdmitFull()
@@ -3496,7 +3496,7 @@ class EventHistoryMapperTest {
         @Test
         void shouldPrepareExpectedEvents_whenClaimWith1v2ssR1FullAdmissionR2FullDefenceNoOptionalEventsSpec() {
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .multiPartyClaimOneDefendantSolicitor()
                 .atState1v2SameSolicitorDivergentResponse(FULL_ADMISSION, FULL_DEFENCE)
                 .respondentResponseIsSame(NO)
@@ -6897,7 +6897,7 @@ class EventHistoryMapperTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v2UnrepresentedDefendant()
             .build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(SPEC_CLAIM)
             .build();
         when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
         when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(false);
@@ -6952,7 +6952,7 @@ class EventHistoryMapperTest {
                            .note("my note")
                            .build())
             .build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(SPEC_CLAIM)
             .respondent1LitigationFriendCreatedDate(LocalDateTime.now())
             .build();
         when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
@@ -7019,7 +7019,7 @@ class EventHistoryMapperTest {
                            .note("my note")
                            .build())
             .build().toBuilder()
-            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .caseAccessCategory(SPEC_CLAIM)
             .respondent2(Party.builder()
                              .type(Party.Type.COMPANY)
                              .companyName("Company Name")
@@ -7092,7 +7092,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenCaseEntersBreathingSpace() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addEnterBreathingSpace()
@@ -7112,7 +7112,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenCaseLiftsBreathingSpace() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addEnterBreathingSpace()
@@ -7133,7 +7133,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenCaseEntersMentalBreathingSpace() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addEnterMentalHealthBreathingSpace()
@@ -7153,7 +7153,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenCaseLiftsMentalHealthBreathingSpace() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addLiftMentalBreathingSpace()
@@ -7173,7 +7173,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenCaseEntersBreathingSpaceOptionalDataNull() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addEnterBreathingSpaceWithoutOptionalData()
@@ -7193,7 +7193,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenCaseLiftsBreathingSpaceWithoutOptionalData() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addEnterBreathingSpace()
@@ -7214,7 +7214,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenCaseEntersMentalBreathingSpaceWithoutOptionalData() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addEnterMentalHealthBreathingSpaceNoOptionalData()
@@ -7234,7 +7234,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenCaseLiftsMentalHealthBreathingSpaceWithoutOptionalData() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addLiftMentalBreathingSpace()
@@ -7254,7 +7254,7 @@ class EventHistoryMapperTest {
         void shouldPrepareExpectedEvents_whenCaseEntersBreathingSpaceWithOnlyReferenceInfo() {
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .addEnterBreathingSpaceWithOnlyReferenceInfo()
@@ -7281,7 +7281,7 @@ class EventHistoryMapperTest {
             LocalDateTime datetime = LocalDateTime.now();
 
             CaseData caseData = CaseDataBuilder.builder()
-                .setSuperClaimTypeToSpecClaim()
+                .setClaimTypeToSpecClaim()
                 .atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .atState(FlowState.Main.CLAIM_ISSUED)
                 .respondentSolicitor1AgreedDeadlineExtension(extensionDateRespondent1)

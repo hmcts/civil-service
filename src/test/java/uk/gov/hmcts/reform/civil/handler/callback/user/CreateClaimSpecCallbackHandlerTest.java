@@ -1113,16 +1113,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
-            when(toggleService.isAccessProfilesEnabled()).thenReturn(true);
-        }
-
-        // TODO: move this test case to AboutToSubmitCallbackV0 after release
-        @Test
-        void shouldSetCaseCategoryToSpec_whenInvoked() {
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .containsEntry("CaseAccessCategory", CaseCategory.SPEC_CLAIM.toString());
         }
 
         // TODO: move this test case to AboutToSubmitCallbackV0 after release
@@ -1195,10 +1185,18 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .accessCode(
                                     AccessCodeGenerator.generateAccessCode())
                                 .respondentCaseRole(
-                                    CaseRole.RESPONDENTSOLICITORONESPEC.getFormattedName())
+                                    CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
                                 .expiryDate(LocalDate.now().plusDays(
                                     180))
                                 .build());
+        }
+
+        @Test
+        void shouldSetCaseCategoryToSpec_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .containsEntry("CaseAccessCategory", CaseCategory.SPEC_CLAIM.toString());
         }
 
         @Test

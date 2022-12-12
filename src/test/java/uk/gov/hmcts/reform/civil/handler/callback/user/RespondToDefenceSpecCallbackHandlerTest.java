@@ -144,7 +144,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 ABOUT_TO_START
             );
 
-            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("respondent1Copy")

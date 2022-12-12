@@ -57,6 +57,7 @@ import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
@@ -74,7 +75,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITIN
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 @Service
@@ -91,7 +91,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         DocmosisTemplates templateId;
         DocmosisDocument docmosisDocument;
         DirectionsQuestionnaireForm templateData;
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (isClaimantResponse(caseData)) {
                 templateId = DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
             } else {
@@ -237,7 +237,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
 
         boolean claimantResponseLRspec = isClaimantResponse(caseData)
-            && isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled());
+            && SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
 
         DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = DirectionsQuestionnaireForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
@@ -248,7 +248,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .applicants(claimantResponseLRspec ? getApplicants(caseData) : null)
             .allocatedTrack(caseData.getAllocatedTrack());
 
-        if (!isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             builder.statementOfTruthText(createStatementOfTruthText(isRespondentState(caseData)));
         }
         DQ dq = getDQAndSetSubmittedOn(builder, caseData);
@@ -261,13 +261,13 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
         Integer witnessesIncludingDefendants = null;
         String state = stateFlowEngine.evaluate(caseData).getState().getName();
-        if (!(isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
+        if (!(SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && state.equals(FULL_ADMISSION.fullName()))) {
             witnessesIncludingDefendants = countWitnessesIncludingDefendant(witnesses, caseData);
         }
 
         boolean specAndSmallClaim = false;
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && "SMALL_CLAIM".equals(caseData.getResponseClaimTrack())) {
             witnesses = getWitnessesSmallClaim(witnessesIncludingDefendants);
             specAndSmallClaim = true;
@@ -296,7 +296,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         var applicant2 = caseData.getApplicant2();
         var respondentRepresentative = representativeService.getApplicantRepresentative(caseData);
         var litigationFriend = caseData.getRespondent1LitigationFriend();
-        if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
                 return List.of(Party.builder()
                                    .name(applicant.getPartyName())
@@ -540,7 +540,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         }
         String state = stateFlowEngine.evaluate(caseData).getState().getName();
 
-        return isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
+        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION
             || state.equals(FULL_DEFENCE.fullName())
             || state.equals(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
@@ -574,7 +574,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
             List<Party> respondents = new ArrayList<>();
 
-            if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
+            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 && !ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
                 if ((ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))
                     && YES.equals(caseData.getRespondentResponseIsSame()))

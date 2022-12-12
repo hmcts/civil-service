@@ -151,8 +151,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToStartCallbackV0 {
 
-        private static final String SUPER_CLAIM_KEY = "superClaimType";
-
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -164,19 +162,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
-        }
-
-        @Test
-        void shouldSetSuperClaimType_WhenAboutToStartIsInvoked() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStatePendingClaimIssued()
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
-
-            assertThat(response.getData().get(SUPER_CLAIM_KEY)).isEqualTo("UNSPEC_CLAIM");
         }
     }
 
@@ -837,7 +822,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(response.getErrors()).containsExactly("Enter an email address in the correct format,"
                                                                      + " for example john.smith@example.com");
             }
-
         }
     }
 
@@ -863,17 +847,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
-            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
             when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
-        }
-
-        //Move this test to AboutToSubmitCallbackV0 after CIV-3521 release and migration
-        @Test
-        void shouldSetCaseCategoryToUnspec_whenInvoked() {
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .containsEntry("CaseAccessCategory", CaseCategory.UNSPEC_CLAIM.toString());
         }
     }
 
@@ -1109,6 +1083,14 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData()).extracting("addLegalRepDeadline")
                     .isEqualTo(submittedDate.format(ISO_DATE_TIME));
+            }
+
+            @Test
+            void shouldSetCaseCategoryToUnspec_whenInvoked() {
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                assertThat(response.getData())
+                    .containsEntry("CaseAccessCategory", CaseCategory.UNSPEC_CLAIM.toString());
             }
 
         }

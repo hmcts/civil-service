@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
@@ -110,6 +109,8 @@ import java.util.List;
 import static java.time.LocalDate.now;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_CASE_DETAILS_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
@@ -127,8 +128,6 @@ import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.PersonalInjuryType.ROAD_ACCIDENT;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.FULL_DEFENCE;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
@@ -231,7 +230,6 @@ public class CaseDataBuilder {
     protected OrganisationPolicy respondent1OrganisationPolicy;
     protected OrganisationPolicy respondent2OrganisationPolicy;
     protected YesOrNo addApplicant2;
-    protected SuperClaimType superClaimType;
     protected YesOrNo addRespondent2;
     protected CaseCategory caseAccessCategory;
 
@@ -2671,7 +2669,7 @@ public class CaseDataBuilder {
         respondent2Responds(respondent2Response);
         respondent1ResponseDate = LocalDateTime.now().plusDays(1);
         respondentResponseIsSame(NO);
-        if (superClaimType != SPEC_CLAIM) {
+        if (caseAccessCategory != SPEC_CLAIM) {
             // at least in spec claims, respondent2 response date is null by front-end
             respondent2ResponseDate = respondent1ResponseDate;
         } else {
@@ -3367,7 +3365,7 @@ public class CaseDataBuilder {
         respondent1MediationRequired = YES;
         respondent2MediationRequired = YES;
         responseClaimTrack = SMALL_CLAIM.name();
-        superClaimType = SPEC_CLAIM;
+        caseAccessCategory = SPEC_CLAIM;
 
         atStateApplicantRespondToDefenceAndProceed(mpScenario);
 
@@ -3522,13 +3520,13 @@ public class CaseDataBuilder {
         return cases;
     }
 
-    public CaseDataBuilder setSuperClaimTypeToSpecClaim() {
-        this.superClaimType = SPEC_CLAIM;
+    public CaseDataBuilder setClaimTypeToSpecClaim() {
+        this.caseAccessCategory = SPEC_CLAIM;
         return this;
     }
 
-    public CaseDataBuilder setSuperClaimTypeToUnspecClaim() {
-        this.superClaimType = UNSPEC_CLAIM;
+    public CaseDataBuilder setClaimTypeToUnspecClaim() {
+        this.caseAccessCategory = UNSPEC_CLAIM;
         return this;
     }
 
@@ -3851,7 +3849,7 @@ public class CaseDataBuilder {
             .hearingDate(hearingDate)
             //ui field
             .uiStatementOfTruth(uiStatementOfTruth)
-            .superClaimType(superClaimType == null ? UNSPEC_CLAIM : superClaimType)
+            .caseAccessCategory(caseAccessCategory == null ? UNSPEC_CLAIM : caseAccessCategory)
             .caseBundles(caseBundles)
             .respondToClaim(respondToClaim)
             //spec route

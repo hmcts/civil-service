@@ -36,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
@@ -48,7 +49,6 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSINESS_DAY;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Service
 @RequiredArgsConstructor
@@ -124,7 +124,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             currentResponseDeadline = caseData.getRespondent2ResponseDeadline();
         }
         //TODO: update to get correct deadline as a part of CMC-1346
-        if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && toggleService.isLrSpecEnabled()) {
             var isAoSApplied = SPEC_ACKNOWLEDGEMENT_OF_SERVICE.equals(caseData.getBusinessProcess().getCamundaEvent());
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -182,7 +182,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         String body;
         LocalDateTime responseDeadline = !solicitorRepresentsOnlyRespondent2(callbackParams)
             ? caseData.getRespondent1ResponseDeadline() : caseData.getRespondent2ResponseDeadline();
-        if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled()) && toggleService.isLrSpecEnabled()) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             body = format(
                 "<h2 class=\"govuk-heading-m\">What happens next</h2>You need to respond before %s",
                 formatLocalDateTime(responseDeadline, DATE_TIME_AT)

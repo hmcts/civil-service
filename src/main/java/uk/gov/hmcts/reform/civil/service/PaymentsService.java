@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.payments.request.CreditAccountPaymentRequest;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +41,7 @@ public class PaymentsService {
             .orElse(caseData.getPaymentReference());
         CreditAccountPaymentRequest creditAccountPaymentRequest = null;
 
-        if (!isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled()))  {
+        if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory()))  {
             creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
                 .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
                 .amount(claimFee.getCalculatedAmount())
@@ -54,7 +54,7 @@ public class PaymentsService {
                 .siteId(paymentsConfiguration.getSiteId())
                 .fees(new FeeDto[]{claimFee})
                 .build();
-        } else if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        } else if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
                 .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
                 .amount(claimFee.getCalculatedAmount())
