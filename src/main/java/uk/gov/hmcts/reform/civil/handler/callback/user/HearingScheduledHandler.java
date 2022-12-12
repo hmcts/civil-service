@@ -166,7 +166,6 @@ public class HearingScheduledHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (nonNull(caseData.getListingOrRelisting())
             && caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
-            System.out.println(caseData.getListingOrRelisting());
             if (LocalDate.now().isBefore(caseData.getHearingDate().minusWeeks(4))) {
                 caseDataBuilder.hearingDueDate(
                     HearingUtils.addBusinessDays(
