@@ -622,25 +622,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<Document>> documentEvidenceForTrialRes;
     private final LocalDateTime caseDocumentUploadDateRes;
 
-    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure1;
-    private final List<Element<UploadEvidenceDisclosure>> documentUploadDisclosure2;
-
-    private final List<Element<UploadEvidenceWitness>> documentUploadWitness1;
-    private final List<Element<UploadEvidenceWitness>> documentUploadWitness2;
-    private final List<Element<UploadEvidenceWitness>> documentUploadWitness3;
-    private final List<Element<UploadEvidenceWitness>> documentUploadWitness4;
-
-    private final List<Element<UploadEvidenceExpert>> documentUploadExpert1;
-    private final List<Element<UploadEvidenceExpert>> documentUploadExpert2;
-    private final List<Element<UploadEvidenceExpert>> documentUploadExpert3;
-    private final List<Element<UploadEvidenceExpert>> documentUploadExpert4;
-
-    private final List<Element<DocumentUploadTrial>> documentUploadTrial1;
-    private final List<Element<DocumentUploadTrial>> documentUploadTrial2;
-    private final List<Element<DocumentUploadTrial>> documentUploadTrial3;
-    private final List<Element<DocumentUploadTrial>> documentUploadTrial4;
-    private final LocalDateTime caseDocumentUploadDate;
-
     /**
      * There are several fields that can hold the I2P of applicant1 depending
      * on multiparty scenario, which complicates all conditions depending on it.
