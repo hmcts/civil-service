@@ -43,9 +43,6 @@ public class NotificationsProperties {
     private String failedPaymentForSpec;
 
     @NotEmpty
-    private String solicitorClaimDismissed;
-
-    @NotEmpty
     private String solicitorClaimDismissedWithin4Months;
 
     @NotEmpty
@@ -185,9 +182,6 @@ public class NotificationsProperties {
     private String respondentLipResponseSubmissionTemplate;
 
     @NotEmpty
-    private String evidenceUploadTemplate;
-
-    @NotEmpty
     private String hearingListedFeeClaimantLrTemplate;
 
     @NotEmpty
@@ -198,5 +192,8 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String claimantSolicitorClaimContinuingOnlineCos;
+
+    @NotEmpty
+    private String evidenceUploadTemplate;
 
 }
