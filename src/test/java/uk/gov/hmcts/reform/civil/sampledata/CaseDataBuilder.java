@@ -1165,8 +1165,6 @@ public class CaseDataBuilder {
         respondent2OrganisationPolicy = OrganisationPolicy.builder()
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
             .build();
-        defendant1LIPAtClaimIssued = YES;
-        defendant2LIPAtClaimIssued = YES;
         respondent1OrgRegistered = null;
         respondent2OrgRegistered = null;
         return this;
@@ -1232,7 +1230,6 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondentSolicitor1OrganisationDetails = null;
-        defendant2LIPAtClaimIssued = YES;
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY R").build())
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
@@ -2101,7 +2098,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimNotified1v2Respondent2LiP(CertificateOfService  certificateOfService) {
+    public CaseDataBuilder atStateClaimNotified1v2RespondentLiP() {
         atStatePendingClaimIssued();
         ccdState = CASE_ISSUED;
         respondent2Represented = NO;
@@ -2109,7 +2106,6 @@ public class CaseDataBuilder {
             .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
             .build();
         legacyCaseReference = LEGACY_CASE_REFERENCE;
-        cosNotifyClaimDefendant2 = certificateOfService;
         claimDetailsNotificationDeadline = DEADLINE;
         defendant2LIPAtClaimIssued = YES;
         return this;
