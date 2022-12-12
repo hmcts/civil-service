@@ -107,13 +107,11 @@ public class UnavailableDateValidator implements
         List<String> errors = new ArrayList<>();
         unavailableDate.forEach(element -> {
             UnavailableDate unavailableDateElement = element.getValue();
-            if (UnavailableDateType.SINGLE_DATE.toString()
-                .equals(unavailableDateElement.getUnavailableDateType().toString())
+            if (UnavailableDateType.SINGLE_DATE == unavailableDateElement.getUnavailableDateType()
                 && unavailableDateElement.getDate() == null) {
                 errors.add("Details of unavailable date required");
             }
-            if (UnavailableDateType.DATE_RANGE.toString()
-                .equals(unavailableDateElement.getUnavailableDateType().toString())) {
+            if (UnavailableDateType.DATE_RANGE == unavailableDateElement.getUnavailableDateType()) {
                 if (unavailableDateElement.getFromDate() == null
                     || unavailableDateElement.getToDate() == null) {
                     errors.add("Details of unavailable date required");
