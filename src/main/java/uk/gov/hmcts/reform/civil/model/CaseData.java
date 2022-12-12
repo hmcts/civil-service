@@ -35,6 +35,9 @@ import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
 import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
@@ -589,6 +592,20 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<DocumentWithName>> documentOnly;
     private final List<Element<DocumentAndNote>> documentAndNote;
     private final CaseNoteType caseNoteType;
+    private final String caseTypeFlag;
+    private final String witnessStatementFlag;
+    private final String witnessSummaryFlag;
+    private final String witnessReferredStatementFlag;
+    private final String expertReportFlag;
+    private final String expertJointFlag;
+    private final String trialAuthorityFlag;
+    private final String trialDocumentaryFlag;
+    private final List<EvidenceUploadWitness> witnessSelectionEvidenceRes;
+    private final List<EvidenceUploadWitness> witnessSelectionEvidenceSmallClaimRes;
+    private final List<EvidenceUploadExpert> expertSelectionEvidenceRes;
+    private final List<EvidenceUploadExpert> expertSelectionEvidenceSmallClaimRes;
+    private final List<EvidenceUploadTrial> trialSelectionEvidenceRes;
+    private final List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaimRes;
     //applicant
     private final List<Element<Document>> documentDisclosureList;
     private final List<Element<Document>> documentForDisclosure;
@@ -620,6 +637,21 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<Document>> documentSkeletonArgumentRes;
     private final List<Element<Document>> documentAuthoritiesRes;
     private final List<Element<Document>> documentEvidenceForTrialRes;
+    //these fields are shown if the solicitor is for respondent 2 and respondents have different solicitors
+    private final List<Element<Document>> documentDisclosureListRes2;
+    private final List<Element<Document>> documentForDisclosureRes2;
+    private final List<Element<UploadEvidenceWitness>> documentWitnessStatementRes2;
+    private final List<Element<UploadEvidenceWitness>> documentWitnessSummaryRes2;
+    private final List<Element<UploadEvidenceWitness>> documentHearsayNoticeRes2;
+    private final List<Element<UploadEvidenceWitness>> documentReferredInStatementRes2;
+    private final List<Element<UploadEvidenceExpert>> documentExpertReportRes2;
+    private final List<Element<UploadEvidenceExpert>> documentJointStatementRes2;
+    private final List<Element<UploadEvidenceExpert>> documentQuestionsRes2;
+    private final List<Element<UploadEvidenceExpert>> documentAnswersRes2;
+    private final List<Element<Document>> documentCaseSummaryRes2;
+    private final List<Element<Document>> documentSkeletonArgumentRes2;
+    private final List<Element<Document>> documentAuthoritiesRes2;
+    private final List<Element<Document>> documentEvidenceForTrialRes2;
     private final LocalDateTime caseDocumentUploadDateRes;
 
     /**
