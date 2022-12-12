@@ -45,7 +45,6 @@ class StateFlowEngineSpecTest {
         given(featureToggleService.isLrSpecEnabled()).willReturn(true);
         given(featureToggleService.isAccessProfilesEnabled()).willReturn(true);
         given(featureToggleService.isSpecRpaContinuousFeedEnabled()).willReturn(false);
-        given(featureToggleService.isRpaContinuousFeedEnabled()).willReturn(false);
         given(featureToggleService.isGeneralApplicationsEnabled()).willReturn(false);
         given(featureToggleService.isCertificateOfServiceEnabled()).willReturn(false);
         given(featureToggleService.isNoticeOfChangeEnabled()).willReturn(false);
@@ -74,7 +73,7 @@ class StateFlowEngineSpecTest {
             //AC 10 (2V1  defendant represented, solicitor unregistered )
             arguments(CaseDataBuilderSpec.builder().atStateSpec2v1DefendantUnregisteredClaimSubmitted().build()),
             //AC 11 1v2 def 1 represented solicitor unregistered, and def 2 solicitor registered
-            arguments(CaseDataBuilderSpec.builder().atStateSpec1v2Solicitor1UnregisteredSolicitor2Registered().build()),
+            arguments(CaseDataBuilderSpec.builder().atStateSpec1v2Solicitor1UnregisteredSolicitor2RegisteredAndRepresented().build()),
             //AC 13 1v2 defendant 1 represented solicitor unregistered,and defendant 2 unrepresented
             arguments(CaseDataBuilderSpec.builder().atStateSpec1v2OneDefendantRepresentedUnregisteredOtherUnrepresentedClaimSubmitted().build()),
             //AC 14 1v2 Both defendants represented and both defendant solicitors unregistered
@@ -95,7 +94,7 @@ class StateFlowEngineSpecTest {
     static Stream<Arguments> caseDataStreamTwoRespondentRepresentatives() {
         return Stream.of(
             arguments(CaseDataBuilderSpec.builder().atStateClaimSubmittedTwoRespondentDifferentSolicitorSpec().build()),
-            arguments(CaseDataBuilderSpec.builder().atStateSpec1v2Solicitor1UnregisteredSolicitor2Registered().build())
+            arguments(CaseDataBuilderSpec.builder().atStateSpec1v2Solicitor1UnregisteredSolicitor2RegisteredAndRepresented().build())
         );
     }
 
@@ -149,7 +148,7 @@ class StateFlowEngineSpecTest {
     @ParameterizedTest(name = "{index}: The state flow flags ONE_RESPONDENT_REPRESENTATIVE and " +
         "TWO_RESPONDENT_REPRESENTATIVES are present and set to the correct values (for appropriate cases)")
     @MethodSource("caseDataStreamTwoRespondentRepresentatives")
-    void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1v2DifferentSolicitorSpecified(CaseData caseData) {
+    void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmitted1v2DifferentSolicitor(CaseData caseData) {
         //When
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 

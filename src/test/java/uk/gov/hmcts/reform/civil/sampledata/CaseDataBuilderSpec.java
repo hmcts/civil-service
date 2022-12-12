@@ -309,7 +309,7 @@ public class CaseDataBuilderSpec {
         return this;
     }
 
-    public CaseDataBuilderSpec atStateSpec1v2Solicitor1UnregisteredSolicitor2Registered() {
+    public CaseDataBuilderSpec atStateSpec1v2Solicitor1UnregisteredSolicitor2RegisteredAndRepresented() {
         atStateSpec1v1ClaimSubmitted();
         addRespondent2 = YES;
         respondent2 = PartyBuilder.builder().individual().build();
