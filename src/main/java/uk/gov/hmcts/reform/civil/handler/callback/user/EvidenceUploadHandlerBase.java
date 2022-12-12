@@ -250,7 +250,6 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                              "Invalid date: \"Answers to questions asked by the other party\" "
                                  + "date entered must not be in the future (6).");
 
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
