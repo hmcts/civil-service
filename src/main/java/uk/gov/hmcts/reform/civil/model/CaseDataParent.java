@@ -301,9 +301,6 @@ public class CaseDataParent implements MappableObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal partAdmitPaidValuePounds;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final BigDecimal partAdmitPaidValuePounds;
-
     @JsonProperty("CaseAccessCategory")
     private final CaseCategory caseAccessCategory;
 
