@@ -298,6 +298,8 @@ public class CaseDataParent implements MappableObject {
      */
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal respondToAdmittedClaimOwingAmountPounds2;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal partAdmitPaidValuePounds;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal partAdmitPaidValuePounds;
