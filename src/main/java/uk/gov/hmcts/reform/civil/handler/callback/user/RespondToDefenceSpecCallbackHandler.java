@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,11 +41,13 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
 import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.ArrayList;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -87,18 +90,19 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(MID, "experts"), this::validateApplicantExperts,
-            callbackKey(MID, "witnesses"), this::validateApplicantWitnesses,
-            callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
-            callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
-            callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag,
-            callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false),
-            callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true),
-            callbackKey(ABOUT_TO_START), this::populateCaseData,
-            callbackKey(V_1, ABOUT_TO_START), this::populateCaseData,
-            callbackKey(SUBMITTED), this::buildConfirmation
-        );
+        return new ImmutableMap.Builder<String, Callback>()
+            .put(callbackKey(MID, "experts"), this::validateApplicantExperts)
+            .put(callbackKey(MID, "witnesses"), this::validateApplicantWitnesses)
+            .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
+            .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
+            .put(callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag)
+            .put(callbackKey(V_1, MID, "validate-respondent-payment-date"), this::validatePaymentDate)
+            .put(callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false))
+            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true))
+            .put(callbackKey(ABOUT_TO_START), this::populateCaseData)
+            .put(callbackKey(V_1, ABOUT_TO_START), this::populateCaseData)
+            .put(callbackKey(SUBMITTED), this::buildConfirmation)
+            .build();
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
@@ -412,5 +416,22 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             }
         }
         return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID;
+    }
+
+    private CallbackResponse validatePaymentDate(CallbackParams callbackParams) {
+
+        var caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+
+        if (checkPastDateValidation(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())) {
+            errors.add("Enter a date that is today or in the future");
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private boolean checkPastDateValidation(LocalDate localDate) {
+        return localDate != null && localDate.isBefore(LocalDate.now());
     }
 }
