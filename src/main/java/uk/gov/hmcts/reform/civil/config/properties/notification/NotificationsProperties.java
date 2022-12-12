@@ -46,6 +46,17 @@ public class NotificationsProperties {
     private String solicitorClaimDismissed;
 
     @NotEmpty
+    private String solicitorClaimDismissedWithin4Months;
+
+    @NotEmpty
+    private String solicitorClaimDismissedWithin14Days;
+
+    @NotEmpty
+    private String solicitorClaimDismissedWithinDeadline;
+
+    @NotEmpty String solicitorHearingFeeUnpaid;
+
+    @NotEmpty
     private String claimantSolicitorCaseWillProgressOffline;
 
     @NotEmpty
@@ -175,5 +186,17 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String evidenceUploadTemplate;
+
+    @NotEmpty
+    private String hearingListedFeeClaimantLrTemplate;
+
+    @NotEmpty
+    private String hearingListedNoFeeClaimantLrTemplate;
+
+    @NotEmpty
+    private String hearingListedNoFeeDefendantLrTemplate;
+
+    @NotEmpty
+    private String claimantSolicitorClaimContinuingOnlineCos;
 
 }
