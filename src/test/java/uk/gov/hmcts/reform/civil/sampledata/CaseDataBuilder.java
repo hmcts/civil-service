@@ -362,6 +362,8 @@ public class CaseDataBuilder {
 
     private BigDecimal ccjPaymentPaidSomeAmount;
 
+    private BigDecimal ccjJudgmentAmountClaimFee;
+
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
         return this;
@@ -1085,6 +1087,8 @@ public class CaseDataBuilder {
                 return atStateClaimDismissedPastClaimNotificationDeadline();
             case TAKEN_OFFLINE_SDO_NOT_DRAWN:
                 return atStateTakenOfflineSDONotDrawn(mpScenario);
+            //case TAKEN_OFFLINE_AFTER_SDO:
+               // return atStateTakenOfflineAfterSDO(mpScenario);
             default:
                 throw new IllegalArgumentException("Invalid internal state: " + flowState);
         }
@@ -1689,11 +1693,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateSdoDisposal() {
         disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
-             .input(String.format(
-            "Each party has the right to apply to have this Order set "
-                + "aside or varied. Any such application must be received "
-                + "by the Court (together with the appropriate fee) "
-                + "by 4pm on %s.", LocalDate.parse("2022-01-30")))
+            .input(String.format(
+                "Each party has the right to apply to have this Order set "
+                    + "aside or varied. Any such application must be received "
+                    + "by the Court (together with the appropriate fee) "
+                    + "by 4pm on %s.", LocalDate.parse("2022-01-30")))
             .build();
         disposalHearingHearingTime = DisposalHearingHearingTime.builder()
             .input("This claim will be listed for final disposal before a judge on the first available date after")
@@ -1756,10 +1760,10 @@ public class CaseDataBuilder {
             .build();
         trialOrderMadeWithoutHearingDJ = TrialOrderMadeWithoutHearingDJ.builder()
             .input("This order has been made without a hearing. "
-                    + "Each party has the right to apply to have this Order "
-                    + "set aside or varied. Any such application must be "
-                    + "received by the Court "
-                    + "(together with the appropriate fee) by 4pm on 01 12 2022.")
+                       + "Each party has the right to apply to have this Order "
+                       + "set aside or varied. Any such application must be "
+                       + "received by the Court "
+                       + "(together with the appropriate fee) by 4pm on 01 12 2022.")
             .build();
         return this;
     }
@@ -2667,7 +2671,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atState1v2SameSolicitorDivergentResponse(RespondentResponseType respondent1Response,
-                                                       RespondentResponseType respondent2Response) {
+                                                                    RespondentResponseType respondent2Response) {
         atStateClaimDetailsNotified();
         respondent1ClaimResponseType = respondent1Response;
         respondent2Responds(respondent2Response);
@@ -2713,10 +2717,10 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addEnterBreathingSpace() {
         this.enter = BreathingSpaceEnterInfo.builder()
-                    .type(BreathingSpaceType.STANDARD)
-                    .reference("12345")
-                    .start(LocalDate.now())
-                    .build();
+            .type(BreathingSpaceType.STANDARD)
+            .reference("12345")
+            .start(LocalDate.now())
+            .build();
 
         this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
 
@@ -2725,10 +2729,10 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addEnterMentalHealthBreathingSpace() {
         this.enter = BreathingSpaceEnterInfo.builder()
-                    .type(BreathingSpaceType.MENTAL_HEALTH)
-                    .reference("12345")
-                    .start(LocalDate.now())
-                    .build();
+            .type(BreathingSpaceType.MENTAL_HEALTH)
+            .reference("12345")
+            .start(LocalDate.now())
+            .build();
 
         this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
 
@@ -3010,7 +3014,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atState1v2SameSolicitorDivergentResponseSpec(RespondentResponseTypeSpec respondent1Response,
-                                                                       RespondentResponseTypeSpec respondent2Response) {
+                                                                        RespondentResponseTypeSpec respondent2Response) {
         atStateNotificationAcknowledged();
         respondent1ClaimResponseTypeForSpec = respondent1Response;
         respondent2RespondsSpec(respondent2Response);
@@ -3355,10 +3359,27 @@ public class CaseDataBuilder {
         }
 
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+
         reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-                                                   .input("unforeseen complexities")
-                                                   .build();
+            .input("unforeseen complexities")
+            .build();
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflineAfterSDO(MultiPartyScenario mpScenario) {
+
+        atStateApplicantRespondToDefenceAndProceed(mpScenario);
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP) {
+            atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2();
+        } else if (mpScenario == TWO_V_ONE) {
+            atStateBothApplicantsRespondToDefenceAndProceed_2v1();
+        }
+
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+
+        takenOfflineDate = applicant1ResponseDate.plusDays(1);
         return this;
     }
 

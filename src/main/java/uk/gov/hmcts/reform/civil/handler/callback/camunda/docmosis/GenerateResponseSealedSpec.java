@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 
 @Service
 @RequiredArgsConstructor
@@ -40,13 +42,15 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
     private final CivilDocumentStitchingService civilDocumentStitchingService;
     private final FeatureToggleService toggleService;
 
+
     @Value("${stitching.enabled:true}")
     private boolean stitchEnabled;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::prepareSealedForm
+            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::prepareSealedForm,
+            callbackKey(V_1, ABOUT_TO_SUBMIT), this::prepareSealedForm
         );
     }
 
@@ -73,12 +77,12 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 sealedForm.getDocumentName(),
                 caseData
             );
-            if (toggleService.isPinInPostEnabled()) {
+            if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
                 builder.respondent1ClaimResponseDocumentSpec(stitchedDocument);
             }
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
         } else {
-            if (toggleService.isPinInPostEnabled()) {
+            if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
                 builder.respondent1ClaimResponseDocumentSpec(sealedForm);
             }
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(sealedForm));
