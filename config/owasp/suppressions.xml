@@ -5,4 +5,8 @@
     Also, it is not applicable to us as it applies only to serialization/deserialization in the Java "native" way, which we don't use.</notes>
     <cve>CVE-2016-1000027</cve>
   </suppress>
+  <suppress>
+    <notes>Temporariy suppressing it as the latest camunda connector 1.5.6 seem to have the vulnerability.</notes>
+    <cve>CVE-2021-37533</cve>
+  </suppress>
 </suppressions>

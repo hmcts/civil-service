@@ -126,7 +126,7 @@ class GenAppStateHelperServiceTest {
                     .getTestCaseDataWithDetails(CaseData.builder().build(),
                             true,
                             true,
-                            true,
+                            true, true,
                             getOriginalStatusOfGeneralApplication_applicationClosed());
 
             CaseData updatedData = service.updateApplicationDetailsInClaim(
@@ -152,7 +152,7 @@ class GenAppStateHelperServiceTest {
                     .getTestCaseDataWithDetails(CaseData.builder().build(),
                             false,
                             false,
-                            false,
+                            false, false,
                             Map.of());
 
             CaseData response = service.updateApplicationDetailsInClaim(
@@ -163,8 +163,9 @@ class GenAppStateHelperServiceTest {
             CaseData updatedData = mapper.convertValue(response, CaseData.class);
 
             assertThat(updatedData.getGeneralApplications()).isEmpty();
-            assertThat(updatedData.getGeneralApplicationsDetails()).isNull();
-            assertThat(updatedData.getGaDetailsRespondentSol()).isNull();
+            assertThat(updatedData.getClaimantGaAppDetails()).isNull();
+            assertThat(updatedData.getRespondentSolGaAppDetails()).isNull();
+            assertThat(updatedData.getRespondentSolTwoGaAppDetails()).isNull();
             verifyNoMoreInteractions(coreCaseDataService);
         }
 
@@ -178,7 +179,7 @@ class GenAppStateHelperServiceTest {
                     .getTestCaseDataWithDetails(CaseData.builder().build(),
                             true,
                             true,
-                            true,
+                            true, true,
                             applications);
             CaseData updatedData = service.updateApplicationDetailsInClaim(
                     caseData,
@@ -195,7 +196,7 @@ class GenAppStateHelperServiceTest {
                     .getTestCaseDataWithDetails(CaseData.builder().build(),
                             true,
                             true,
-                            true,
+                            true, true,
                             getOriginalStatusOfGeneralApplication_applicationOffline());
 
             CaseData updatedData = service.updateApplicationDetailsInClaim(
@@ -222,7 +223,7 @@ class GenAppStateHelperServiceTest {
                     .getTestCaseDataWithDetails(CaseData.builder().build(),
                             false,
                             false,
-                            false,
+                            false, false,
                             Map.of());
 
             CaseData response = service.updateApplicationDetailsInClaim(
@@ -233,8 +234,9 @@ class GenAppStateHelperServiceTest {
             CaseData updatedData = mapper.convertValue(response, CaseData.class);
 
             assertThat(updatedData.getGeneralApplications()).isEmpty();
-            assertThat(updatedData.getGeneralApplicationsDetails()).isNull();
-            assertThat(updatedData.getGaDetailsRespondentSol()).isNull();
+            assertThat(updatedData.getClaimantGaAppDetails()).isNull();
+            assertThat(updatedData.getRespondentSolGaAppDetails()).isNull();
+            assertThat(updatedData.getRespondentSolTwoGaAppDetails()).isNull();
             verifyNoMoreInteractions(coreCaseDataService);
         }
 
@@ -248,7 +250,7 @@ class GenAppStateHelperServiceTest {
                     .getTestCaseDataWithDetails(CaseData.builder().build(),
                             true,
                             true,
-                            true,
+                            true, true,
                             applications);
             CaseData updatedData = service.updateApplicationDetailsInClaim(
                     caseData,
@@ -262,16 +264,22 @@ class GenAppStateHelperServiceTest {
                                                          boolean shouldApplicationBeInClosedState) {
             assertThat(getGADetailsFromUpdatedCaseData(updatedData, childCaseRef)).isNotNull();
             assertThat(getGARespDetailsFromUpdatedCaseData(updatedData, childCaseRef)).isNotNull();
+            assertThat(getGARespTwoDetailsFromUpdatedCaseData(updatedData, childCaseRef)).isNotNull();
+
             if (shouldApplicationBeInClosedState) {
                 assertThat(getGADetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
                         .isEqualTo(APPLICATION_CLOSED_TEXT);
                 assertThat(getGARespDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
                         .isEqualTo(APPLICATION_CLOSED_TEXT);
+                assertThat(getGARespTwoDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
+                    .isEqualTo(APPLICATION_CLOSED_TEXT);
             } else {
                 assertThat(getGADetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
                         .isNotEqualTo(APPLICATION_CLOSED_TEXT);
                 assertThat(getGARespDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
                         .isNotEqualTo(APPLICATION_CLOSED_TEXT);
+                assertThat(getGARespTwoDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
+                    .isNotEqualTo(APPLICATION_CLOSED_TEXT);
             }
         }
 
@@ -279,30 +287,43 @@ class GenAppStateHelperServiceTest {
                                                           boolean shouldApplicationBeInOfflineState) {
             assertThat(getGADetailsFromUpdatedCaseData(updatedData, childCaseRef)).isNotNull();
             assertThat(getGARespDetailsFromUpdatedCaseData(updatedData, childCaseRef)).isNotNull();
+            assertThat(getGARespTwoDetailsFromUpdatedCaseData(updatedData, childCaseRef)).isNotNull();
+
             if (shouldApplicationBeInOfflineState) {
                 assertThat(getGADetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
                         .isEqualTo(APPLICATION_OFFLINE_TEXT);
                 assertThat(getGARespDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
                         .isEqualTo(APPLICATION_OFFLINE_TEXT);
+                assertThat(getGARespTwoDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
+                    .isEqualTo(APPLICATION_OFFLINE_TEXT);
             } else {
                 assertThat(getGADetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
                         .isNotEqualTo(APPLICATION_OFFLINE_TEXT);
                 assertThat(getGARespDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
                         .isNotEqualTo(APPLICATION_OFFLINE_TEXT);
+                assertThat(getGARespTwoDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
+                    .isNotEqualTo(APPLICATION_OFFLINE_TEXT);
             }
         }
 
         private GeneralApplicationsDetails getGADetailsFromUpdatedCaseData(CaseData caseData,
                                                                            String gaCaseRef) {
-            Optional<Element<GeneralApplicationsDetails>> first = caseData.getGeneralApplicationsDetails().stream()
+            Optional<Element<GeneralApplicationsDetails>> first = caseData.getClaimantGaAppDetails().stream()
                     .filter(ga -> gaCaseRef.equals(ga.getValue().getCaseLink().getCaseReference())).findFirst();
             return first.map(Element::getValue).orElse(null);
         }
 
         private GADetailsRespondentSol getGARespDetailsFromUpdatedCaseData(CaseData caseData,
                                                                            String gaCaseRef) {
-            Optional<Element<GADetailsRespondentSol>> first = caseData.getGaDetailsRespondentSol().stream()
+            Optional<Element<GADetailsRespondentSol>> first = caseData.getRespondentSolGaAppDetails().stream()
                     .filter(ga -> gaCaseRef.equals(ga.getValue().getCaseLink().getCaseReference())).findFirst();
+            return first.map(Element::getValue).orElse(null);
+        }
+
+        private GADetailsRespondentSol getGARespTwoDetailsFromUpdatedCaseData(CaseData caseData,
+                                                                           String gaCaseRef) {
+            Optional<Element<GADetailsRespondentSol>> first = caseData.getRespondentSolTwoGaAppDetails().stream()
+                .filter(ga -> gaCaseRef.equals(ga.getValue().getCaseLink().getCaseReference())).findFirst();
             return first.map(Element::getValue).orElse(null);
         }
 
@@ -358,7 +379,7 @@ class GenAppStateHelperServiceTest {
                     .getTestCaseDataWithDetails(CaseData.builder().build(),
                             true,
                             true,
-                            true,
+                            true, true,
                             getOriginalStatusOfGeneralApplication());
 
             service.triggerEvent(caseData, MAIN_CASE_CLOSED);
