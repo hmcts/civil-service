@@ -9,6 +9,7 @@ import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -324,6 +325,11 @@ public class CaseDataParent implements MappableObject {
     private final CaseDocument respondent2ClaimResponseDocumentSpec;
     private final String respondent1PaymentDateToStringSpec;
     private final LocalDate applicant1RequestedPaymentDateForDefendantSpec;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal applicant1SuggestInstalmentsPaymentAmountForDefendantSpec;
+    private final PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
+    private final LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
+    private final String currentDateboxDefendantSpec;
 
     private final String migrationId;
 
