@@ -98,6 +98,11 @@ public class FeatureToggleService {
         return internalClient.boolVariation("enableSDO", createLDUser().build(), false);
     }
 
+    public boolean isCertificateOfServiceEnabled() {
+        return internalClient.boolVariation("isCertificateOfServiceEnabled",
+                                            createLDUser().build(), false);
+    }
+
     private void close() {
         try {
             internalClient.close();

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -50,6 +51,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSINESS_DAY;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
@@ -142,6 +144,12 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         LocalDate agreedExtension = solicitorRepresentsOnlyRespondent2(callbackParams)
             ? caseData.getRespondentSolicitor2AgreedDeadlineExtension()
             : caseData.getRespondentSolicitor1AgreedDeadlineExtension();
+        log.info("Setting response deadline  Respondent2 Present ({}) AgreedExtensionDate({})",
+                 solicitorRepresentsOnlyRespondent2(callbackParams), agreedExtension
+        );
+        if (agreedExtension == null) {
+            throw new IllegalArgumentException(String.format("Agreed extension date cannot be null"));
+        }
         LocalDateTime newDeadline = deadlinesCalculator.calculateFirstWorkingDay(agreedExtension)
             .atTime(END_OF_BUSINESS_DAY);
 

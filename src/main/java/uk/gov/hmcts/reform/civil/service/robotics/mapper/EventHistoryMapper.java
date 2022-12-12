@@ -217,6 +217,9 @@ public class EventHistoryMapper {
                     case TAKEN_OFFLINE_SDO_NOT_DRAWN:
                         buildSDONotDrawn(builder, caseData);
                         break;
+                    case TAKEN_OFFLINE_AFTER_SDO:
+                        buildClaimTakenOfflineAfterSDO(builder, caseData);
+                        break;
                     default:
                         break;
                 }
@@ -2005,5 +2008,20 @@ public class EventHistoryMapper {
             List<Event> miscTextEvent = prepareMiscEventList(builder, caseData, miscTextList, eventDate);
             builder.miscellaneous(miscTextEvent);
         }
+    }
+
+    private void buildClaimTakenOfflineAfterSDO(EventHistory.EventHistoryBuilder builder,
+                                                             CaseData caseData) {
+        String detailsText = "RPA Reason: Case Proceeds in Caseman.";
+        builder.miscellaneous(
+            Event.builder()
+                .eventSequence(prepareEventSequence(builder.build()))
+                .eventCode(MISCELLANEOUS.getCode())
+                .dateReceived(caseData.getTakenOfflineDate())
+                .eventDetailsText(detailsText)
+                .eventDetails(EventDetails.builder()
+                                  .miscText(detailsText)
+                                  .build())
+                .build());
     }
 }
