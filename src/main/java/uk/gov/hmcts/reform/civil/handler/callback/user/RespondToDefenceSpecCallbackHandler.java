@@ -45,12 +45,12 @@ import java.time.format.DateTimeFormatter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.ArrayList;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -105,6 +105,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(V_1, MID, "validate-respondent-payment-date"), this::validatePaymentDate)
             .put(callbackKey(V_1, MID, "get-payment-date"), this::getPaymentDate)
             .put(callbackKey(V_1, MID, "validate-suggest-instalments"), this::suggestInstalmentsValidation)
+            .put(callbackKey(V_1, MID, "validate-amount-paid"), this::validateAmountPaid)
             .put(callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false))
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true))
             .put(callbackKey(ABOUT_TO_START), this::populateCaseData)
@@ -480,5 +481,19 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private boolean checkPastDateValidation(LocalDate localDate) {
         return localDate != null && localDate.isBefore(LocalDate.now());
+    }
+
+    private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+        if (caseData.getCcjPaymentPaidSomeAmount() != null) {
+            if (caseData.getCcjPaymentPaidSomeAmount()
+                .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0) {
+                errors.add("The amount paid must be less than the full claim amount.");
+            }
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
     }
 }

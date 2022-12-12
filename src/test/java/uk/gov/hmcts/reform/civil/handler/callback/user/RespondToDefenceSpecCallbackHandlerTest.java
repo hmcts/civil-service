@@ -54,6 +54,7 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -793,4 +794,22 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+    @Nested
+    class MidEventCallbackValidateAmountPaidFlag {
+
+        private static final String PAGE_ID = "validate-amount-paid";
+
+        @Test
+        void shouldSetApplicant1Proceed_whenCaseIs2v1AndApplicantIntendsToProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .ccjPaymentPaidSomeAmount(new BigDecimal(150000))
+                .totalClaimAmount(new BigDecimal(1000))
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains("The amount paid must be less than the full claim amount.");
+        }
+    }
 }
