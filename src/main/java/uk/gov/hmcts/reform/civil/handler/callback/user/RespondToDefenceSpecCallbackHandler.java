@@ -420,23 +420,28 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
         log.info("CaseData : ", caseData);
         List<String> errors = new ArrayList<>();
         if (caseData.getCcjPaymentPaidSomeAmount() != null) {
             if (caseData.getCcjPaymentPaidSomeAmount()
                 .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0) {
                 errors.add("The amount paid must be less than the full claim amount.");
+
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(errors)
+                    .build();
+            } else {
+                updatedCaseData.ccjJudgmentAmountClaimFee(
+                    MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence()));
+//                updatedCaseData.ccjPaymentPaidSomeAmountInPounds(
+//                    MonetaryConversions.penniesToPounds(caseData.getCcjPaymentPaidSomeAmount())
+//                );
             }
-            //TODO - move to seperate fun
-            var ccjJudgmentAmountClaimFee = MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
-            log.info("ClaimFee :", ccjJudgmentAmountClaimFee);
-
-            var ccjPaymentPaidSomeAmountInPounds = MonetaryConversions.penniesToPounds(caseData.getCcjPaymentPaidSomeAmount());
-            log.info("ccjPaymentPaidSomeAmountInPounds :", ccjPaymentPaidSomeAmountInPounds);
-
         }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
+            .data(updatedCaseData.build().toMap(objectMapper))
             .build();
     }
 }
