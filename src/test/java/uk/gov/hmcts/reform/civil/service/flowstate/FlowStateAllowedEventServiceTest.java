@@ -95,6 +95,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CL
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_BY_STAFF;
@@ -496,7 +497,8 @@ class FlowStateAllowedEventServiceTest {
                         HEARING_FEE_PAID,
                         SERVICE_REQUEST_RECEIVED,
                         REFER_TO_JUDGE,
-                        migrateCase
+                        migrateCase,
+                        TAKE_CASE_OFFLINE
                     }
                 ),
                 of(
@@ -697,7 +699,8 @@ class FlowStateAllowedEventServiceTest {
                     CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName(),
                     AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName(),
                     AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()}),
-                of(NOTIFY_DEFENDANT_OF_CLAIM, new String[]{CLAIM_ISSUED.fullName()}),
+                of(NOTIFY_DEFENDANT_OF_CLAIM, new String[]{CLAIM_ISSUED.fullName(),
+                    PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()}),
                 of(CLAIMANT_RESPONSE, new String[]{FULL_DEFENCE.fullName()}),
                 of(
                     DEFENDANT_RESPONSE,

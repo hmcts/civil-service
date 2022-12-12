@@ -50,6 +50,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
@@ -238,10 +239,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
                 if (featureToggleService.isCourtLocationDynamicListEnabled()) {
                     applicant1DQBuilder.applicant1DQRequestedCourt(
-                            RequestedCourt.builder()
-                                .caseLocation(caseData.getCourtLocation().getCaseLocation())
-                                .responseCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
-                                .build());
+                        RequestedCourt.builder()
+                            .caseLocation(caseData.getCourtLocation().getCaseLocation())
+                            .responseCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                            .build());
                 }
 
                 builder.applicant1DQ(applicant1DQBuilder.build());
@@ -270,15 +271,18 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         builder.nextDeadline(null);
         AboutToStartOrSubmitCallbackResponse response = null;
 
+        AllocatedTrack allocatedTrack =
+            getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType());
+
         if (v1 && featureToggleService.isSdoEnabled()
-            && !AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
+            && !AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
             if (caseData.getRespondent1ClaimResponseType().equals(RespondentResponseType.FULL_DEFENCE)) {
                 if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE))
                     || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
                     response = AboutToStartOrSubmitCallbackResponse.builder()
-                    .data(builder.build().toMap(objectMapper))
-                    .state(CaseState.JUDICIAL_REFERRAL.name())
-                    .build();
+                        .data(builder.build().toMap(objectMapper))
+                        .state(CaseState.JUDICIAL_REFERRAL.name())
+                        .build();
                 } else if (multiPartyScenario.equals(ONE_V_TWO_TWO_LEGAL_REP)) {
                     if (caseData.getRespondent2ClaimResponseType()
                         .equals(RespondentResponseType.FULL_DEFENCE)) {
@@ -300,6 +304,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         } else {
             response = AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder.build().toMap(objectMapper))
+                .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
                 .build();
         }
 

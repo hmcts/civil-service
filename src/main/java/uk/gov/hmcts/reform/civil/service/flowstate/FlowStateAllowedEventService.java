@@ -457,7 +457,8 @@ public class FlowStateAllowedEventService {
                 HEARING_FEE_PAID,
                 SERVICE_REQUEST_RECEIVED,
                 REFER_TO_JUDGE,
-                migrateCase
+                migrateCase,
+                TAKE_CASE_OFFLINE
             )
         ),
 
@@ -516,6 +517,7 @@ public class FlowStateAllowedEventService {
                 NOC_REQUEST,
                     APPLY_NOC_DECISION,
                     TAKE_CASE_OFFLINE,
+                    NOTIFY_DEFENDANT_OF_CLAIM,
                     APPLICATION_OFFLINE_UPDATE_CLAIM,
                     migrateCase
             )
@@ -862,7 +864,8 @@ public class FlowStateAllowedEventService {
                 HEARING_FEE_UNPAID,
                 HEARING_FEE_PAID,
                 REFER_TO_JUDGE,
-                migrateCase
+                migrateCase,
+                TAKE_CASE_OFFLINE
             )
         ),
 
