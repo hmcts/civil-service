@@ -28,6 +28,6 @@ public class ServiceRequestUpdateCallbackController {
         @ApiResponse(code = 200, message = "Callback processed.", response = CallbackResponse.class),
         @ApiResponse(code = 400, message = "Bad Request")})
     public void serviceRequestUpdate(@RequestBody ServiceRequestUpdateDto serviceRequestUpdateDto) {
-            requestUpdateCallbackService.processCallback(serviceRequestUpdateDto, FeeType.HEARING.name());
+        requestUpdateCallbackService.processCallback(serviceRequestUpdateDto, FeeType.HEARING.name());
     }
 }
