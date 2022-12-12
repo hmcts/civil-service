@@ -49,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
@@ -58,7 +59,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
@@ -455,7 +455,8 @@ public class FlowStateAllowedEventService {
                 HEARING_SCHEDULED,
                 HEARING_FEE_UNPAID,
                 REFER_TO_JUDGE,
-                migrateCase
+                migrateCase,
+                TAKE_CASE_OFFLINE
             )
         ),
 
@@ -514,6 +515,7 @@ public class FlowStateAllowedEventService {
                 NOC_REQUEST,
                     APPLY_NOC_DECISION,
                     TAKE_CASE_OFFLINE,
+                    NOTIFY_DEFENDANT_OF_CLAIM,
                     APPLICATION_OFFLINE_UPDATE_CLAIM,
                     migrateCase
             )
@@ -861,7 +863,8 @@ public class FlowStateAllowedEventService {
                 HEARING_SCHEDULED,
                 HEARING_FEE_UNPAID,
                 REFER_TO_JUDGE,
-                migrateCase
+                migrateCase,
+                TAKE_CASE_OFFLINE
             )
         ),
 
