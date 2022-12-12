@@ -764,6 +764,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             return objectMapper.convertValue(response.getData(), CaseData.class);
         }
     }
+
     @Nested
     class PaymentDateValidationCallback {
 
