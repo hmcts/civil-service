@@ -62,7 +62,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
 
             if (caseData.getHearingDate() != null) {
                 if (caseData.getHearingFeePBADetails() == null || (caseData.getHearingFeePBADetails() != null
-                    && caseData.getHearingFeePBADetails().getServiceReqReference() == null )) {
+                    && caseData.getHearingFeePBADetails().getServiceReqReference() == null)) {
                     serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
                         .getServiceRequestReference();
 
