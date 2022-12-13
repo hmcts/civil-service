@@ -19,21 +19,18 @@ import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 
 public class DocmosisTemplateDataUtils {
-
-    private static final Logger LOG = LoggerFactory.getLogger(DocmosisTemplateDataUtils.class);
 
     public static final int CASE_NAME_LENGTH_TO_FIT_IN_DOCS = 37;
     public static final String REFERENCE_NOT_PROVIDED = "Not Provided";
     //TODO Need to confirm the case name logic
     public static final Function<CaseData, String> toCaseName = caseData -> {
         String caseName = null;
-        try {
-            caseName = fetchApplicantName(caseData) + " vs " + fetchRespondentName(caseData);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        caseName = fetchApplicantName(caseData) + " vs " + fetchRespondentName(caseData);
+
 
         return caseName.length() > CASE_NAME_LENGTH_TO_FIT_IN_DOCS
             ? caseName.replace(" vs ", " \nvs ")
@@ -62,7 +59,7 @@ public class DocmosisTemplateDataUtils {
         return respondentNameBuilder.toString();
     }
 
-    public static String fetchApplicantName(CaseData caseData) throws IOException {
+    public static String fetchApplicantName(CaseData caseData) {
         StringBuilder applicantNameBuilder = new StringBuilder();
 
         if (caseData.getApplicant1() != null && caseData.getApplicant2() != null) {
@@ -77,7 +74,10 @@ public class DocmosisTemplateDataUtils {
             soleTraderCompany(caseData.getApplicant1(), applicantNameBuilder);
             litigationFriend(caseData.getApplicant1LitigationFriend(), applicantNameBuilder);
         } else {
-            throw new IllegalArgumentException("Applicant1 not found for claim number: " + caseData.getCcdCaseReference());
+            String errorMsg = String.format("Applicant1 not found for claim number: "
+                                                + caseData.getCcdCaseReference());
+            log.error(errorMsg);
+            throw new IllegalArgumentException(errorMsg);
         }
         return applicantNameBuilder.toString();
     }
