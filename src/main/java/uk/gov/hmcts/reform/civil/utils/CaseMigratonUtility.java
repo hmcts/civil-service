@@ -44,6 +44,9 @@ public class CaseMigratonUtility {
         log.info("Migrate Case Management location for spec and unspec");
 
         caseDataBuilder.caseManagementLocation(caseLocation);
+
+        log.info("Migrated Case Management location for spec and unspec");
+
     }
 
     public static void migrateUnspecCoutLocation(String authToken, CaseData oldCaseData,
@@ -53,10 +56,14 @@ public class CaseMigratonUtility {
 
         CourtLocation location = oldCaseData.getCourtLocation();
         if (ofNullable(location).isPresent()) {
+            log.info("Fetch data from LRD");
             LocationRefData refData = locationRefDataService.getCourtLocation(
                 authToken,
                 location.getApplicantPreferredCourt()
             );
+            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refData.getCourtLocationCode()
+                , refData.getRegionId(), refData.getEpimmsId());
+
             CaseLocation caseLocation = CaseLocation.builder().baseLocation(refData.getEpimmsId())
                 .region(refData.getRegionId()).build();
             caseDataBuilder.courtLocation(oldCaseData.getCourtLocation().toBuilder().caseLocation(caseLocation)
@@ -93,18 +100,19 @@ public class CaseMigratonUtility {
                                              CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                              LocationRefDataService locationRefDataService,
                                              CaseLocation caseLocation) {
-
+        log.info("Migrate respondent 1 DQ start");
         Respondent1DQ respondent1DQ = oldCaseData.getRespondent1DQ();
         if (ofNullable(respondent1DQ).isPresent()
             && ofNullable(respondent1DQ.getRespondent1DQRequestedCourt()).isPresent()
             && ofNullable(respondent1DQ.getRespondent1DQRequestedCourt().getResponseCourtCode()).isPresent()) {
-
+            log.info("Fetch data from LRD");
             LocationRefData refdata = locationRefDataService.getCourtLocation(
                 authToken,
                 respondent1DQ.getRespondent1DQRequestedCourt()
                     .getResponseCourtCode()
             );
-
+            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refdata.getCourtLocationCode()
+                , refdata.getRegionId(), refdata.getEpimmsId());
             CaseLocation location =  CaseLocation.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegionId()).build();
 
@@ -141,24 +149,26 @@ public class CaseMigratonUtility {
                                                                                .caseLocation(caseLocation)
                                                                                .build()).build());
         }*/
+        log.info("Migrate respondent 1 DQ end");
     }
 
     private static void migrateRespondent2DQ(String authToken, CaseData oldCaseData,
                                              CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                              LocationRefDataService locationRefDataService,
                                              CaseLocation caseLocation) {
-
+        log.info("Migrate respondent 2 DQ start");
         Respondent2DQ respondent2DQ = oldCaseData.getRespondent2DQ();
         if (ofNullable(respondent2DQ).isPresent()
             && ofNullable(respondent2DQ.getRespondent2DQRequestedCourt()).isPresent()
             && ofNullable(respondent2DQ.getRespondent2DQRequestedCourt().getResponseCourtCode()).isPresent()) {
-
+            log.info("Fetch data from LRD");
             LocationRefData refdata = locationRefDataService.getCourtLocation(
                 authToken,
                 respondent2DQ.getRespondent2DQRequestedCourt()
                     .getResponseCourtCode()
             );
-
+            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refdata.getCourtLocationCode()
+                , refdata.getRegionId(), refdata.getEpimmsId());
             CaseLocation location =  CaseLocation.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegionId()).build();
 
@@ -193,24 +203,26 @@ public class CaseMigratonUtility {
                                                                                .caseLocation(caseLocation)
                                                                                .build()).build());
         }*/
+        log.info("Migrate respondent 2 DQ end");
     }
 
     private static void migrateRespondent1DQUnspec(String authToken, CaseData oldCaseData,
                                                    CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                                    LocationRefDataService locationRefDataService,
                                                    CaseLocation caseLocation) {
-
+        log.info("Migrate respondent 1 DQ start unpec");
         Respondent1DQ respondent1DQ = oldCaseData.getRespondent1DQ();
         if (ofNullable(respondent1DQ).isPresent()
             && ofNullable(respondent1DQ.getRespondent1DQRequestedCourt()).isPresent()
             && ofNullable(respondent1DQ.getRespondent1DQRequestedCourt().getResponseCourtCode()).isPresent()) {
-
+            log.info("Fetch data from LRD");
             LocationRefData refdata = locationRefDataService.getCourtLocation(
                 authToken,
                 respondent1DQ.getRespondent1DQRequestedCourt()
                     .getResponseCourtCode()
             );
-
+            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refdata.getCourtLocationCode()
+                , refdata.getRegionId(), refdata.getEpimmsId());
             CaseLocation location =  CaseLocation.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegionId()).build();
 
@@ -231,24 +243,26 @@ public class CaseMigratonUtility {
                                                                                .build()).build());
 
         }
+        log.info("Migrate respondent 1 DQ end unpec end");
     }
 
     private static void migrateRespondent2DQUnSpec(String authToken, CaseData oldCaseData,
                                                    CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                                    LocationRefDataService locationRefDataService,
                                                    CaseLocation caseLocation) {
-
+        log.info("Migrate respondent 1 DQ start unpec");
         Respondent2DQ respondent2DQ = oldCaseData.getRespondent2DQ();
         if (ofNullable(respondent2DQ).isPresent()
             && ofNullable(respondent2DQ.getRespondent2DQRequestedCourt()).isPresent()
             && ofNullable(respondent2DQ.getRespondent2DQRequestedCourt().getResponseCourtCode()).isPresent()) {
-
+            log.info("Fetch data from LRD");
             LocationRefData refdata = locationRefDataService.getCourtLocation(
                 authToken,
                 respondent2DQ.getRespondent2DQRequestedCourt()
                     .getResponseCourtCode()
             );
-
+            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refdata.getCourtLocationCode()
+                , refdata.getRegionId(), refdata.getEpimmsId());
             CaseLocation location =  CaseLocation.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegionId()).build();
 
@@ -274,17 +288,18 @@ public class CaseMigratonUtility {
                                             CaseLocation caseLocation) {
 
         Applicant1DQ applicant1DQ = oldCaseData.getApplicant1DQ();
-
+        log.info("Migrate applicant 1 DQ start ");
         if (ofNullable(applicant1DQ).isPresent()
             && ofNullable(applicant1DQ.getApplicant1DQRequestedCourt()).isPresent()
             && ofNullable(applicant1DQ.getApplicant1DQRequestedCourt().getResponseCourtCode()).isPresent()) {
-
+            log.info("Fetch data from LRD");
             LocationRefData refdata = locationRefDataService.getCourtLocation(
                 authToken,
                 applicant1DQ.getApplicant1DQRequestedCourt()
                     .getResponseCourtCode()
             );
-
+            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refdata.getCourtLocationCode()
+                , refdata.getRegionId(), refdata.getEpimmsId());
             CaseLocation location =  CaseLocation.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegionId()).build();
 
@@ -308,10 +323,13 @@ public class CaseMigratonUtility {
 
         } else if (ofNullable(applicant1DQ).isPresent() && ofNullable(oldCaseData.getCourtLocation()).isPresent()
             && ofNullable(applicant1DQ.getExperts()).isPresent()) {
+            log.info("Fetch data from LRD");
             LocationRefData refData = locationRefDataService.getCourtLocation(
                 authToken,
                 oldCaseData.getCourtLocation().getApplicantPreferredCourt()
             );
+            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refData.getCourtLocationCode()
+                , refData.getRegionId(), refData.getEpimmsId());
             caseLocation = CaseLocation.builder().baseLocation(refData.getEpimmsId())
                 .region(refData.getRegionId()).build();
             caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
