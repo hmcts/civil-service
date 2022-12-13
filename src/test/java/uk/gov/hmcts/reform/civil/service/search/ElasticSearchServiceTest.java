@@ -39,6 +39,7 @@ abstract class ElasticSearchServiceTest {
 
         assertThat(searchService.getCases()).isEqualTo(searchResult.getCases());
         verify(coreCaseDataService).searchCases(queryCaptor.capture());
+        assertThat(queryCaptor.getValue()).usingRecursiveComparison().isEqualTo(buildQuery(0));
     }
 
     @Test
