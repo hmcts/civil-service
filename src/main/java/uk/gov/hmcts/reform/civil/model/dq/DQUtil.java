@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
-import uk.gov.hmcts.reform.civil.model.UnavailableDateLRspec;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
@@ -11,13 +10,13 @@ import java.util.stream.Collectors;
 
 public class DQUtil {
 
-    public Hearing buildFastTrackHearing(HearingLRspec hearingLRspec) {
+    public Hearing buildFastTrackHearing(Hearing hearingLRspec) {
         return Hearing.builder()
             .hearingLength(hearingLRspec.getHearingLength())
             .hearingLengthDays(hearingLRspec.getHearingLengthDays())
             .hearingLengthHours(hearingLRspec.getHearingLengthHours())
             .unavailableDatesRequired(hearingLRspec.getUnavailableDatesRequired())
-            .unavailableDates(mapDates(hearingLRspec.getUnavailableDatesLRspec()))
+            .unavailableDates(mapDates(hearingLRspec.getUnavailableDates()))
             .build();
     }
 
@@ -28,7 +27,7 @@ public class DQUtil {
             .build();
     }
 
-    private List<Element<UnavailableDate>> mapDates(List<Element<UnavailableDateLRspec>> lrDates) {
+    private List<Element<UnavailableDate>> mapDates(List<Element<UnavailableDate>> lrDates) {
         if (lrDates == null) {
             return Collections.emptyList();
         } else {
@@ -39,7 +38,7 @@ public class DQUtil {
         }
     }
 
-    private UnavailableDate mapDate(UnavailableDateLRspec lrSpec) {
+    private UnavailableDate mapDate(UnavailableDate lrSpec) {
         UnavailableDate.UnavailableDateBuilder builder = UnavailableDate.builder()
             .who(lrSpec.getWho());
         if (lrSpec.getDate() != null) {
