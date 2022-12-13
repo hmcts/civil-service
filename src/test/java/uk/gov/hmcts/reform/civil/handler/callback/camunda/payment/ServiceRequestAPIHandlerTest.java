@@ -14,10 +14,11 @@ import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.hearing.HearingFeeServiceRequestDetails;
+import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.payment.ServiceRequestAPIHandler;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 
 import java.time.LocalDateTime;
@@ -77,7 +78,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
-            assertThat(extractPaymentDetailsFromResponse(response).getServiceRequestReference())
+            assertThat(extractPaymentDetailsFromResponse(response).getServiceReqReference())
                 .isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
         }
 
@@ -87,9 +88,9 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
-    private HearingFeeServiceRequestDetails
+    private SRPbaDetails
         extractPaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-        return responseCaseData.getHearingFeeServiceRequestDetails();
+        return responseCaseData.getClaimIssuedPBADetails();
     }
 }

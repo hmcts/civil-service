@@ -175,7 +175,11 @@ public class HearingScheduledHandler extends CallbackHandler {
             }
             switch (caseData.getAllocatedTrack()) {
                 case SMALL_CLAIM:
+<<<<<<<<< Temporary merge branch 1
+                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(545)).build());
+=========
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
+>>>>>>>>> Temporary merge branch 2
                     break;
                 case FAST_CLAIM:
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(
@@ -183,7 +187,11 @@ public class HearingScheduledHandler extends CallbackHandler {
                             caseData.getClaimFee().getCalculatedAmountInPence().intValue())).build());
                     break;
                 case MULTI_CLAIM:
+<<<<<<<<< Temporary merge branch 1
+                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(1175)).build());
+=========
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(117500)).build());
+>>>>>>>>> Temporary merge branch 2
                     break;
                 default:
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(0)).build());
@@ -194,6 +202,9 @@ public class HearingScheduledHandler extends CallbackHandler {
             locationList.setListItems(null);
             caseDataBuilder.hearingLocation(locationList);
         }
+<<<<<<<<< Temporary merge branch 1
+        return AboutToStartOrSubmitCallbackResponse.builder()
+=========
         var state = "HEARING_READINESS";
         caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
         return AboutToStartOrSubmitCallbackResponse.builder()

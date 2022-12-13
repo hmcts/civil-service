@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
+package uk.gov.hmcts.reform.civil.service.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
@@ -11,8 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
-import uk.gov.hmcts.reform.civil.model.hearing.HearingFeeServiceRequestDetails;
+import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 
 import java.util.ArrayList;
@@ -44,7 +43,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::makeServiceReq
+            callbackKey(ABOUT_TO_SUBMIT), this::makePaymentServiceReq
         );
     }
 
@@ -53,27 +52,36 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse makeServiceReq(CallbackParams callbackParams) {
+    private CallbackResponse makePaymentServiceReq(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
-        if (caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
-            try {
-                log.info("calling payment service request " + caseData.getCcdCaseReference());
-                var serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
-                    .getServiceRequestReference();
-                HearingFeeServiceRequestDetails hearingFeeDetails = caseData.getHearingFeeServiceRequestDetails();
-                caseData = caseData.toBuilder()
-                    .hearingFeeServiceRequestDetails(HearingFeeServiceRequestDetails.builder()
-                                                         .fee(caseData.getHearingFee())
-                                                         .serviceRequestReference(serviceRequestReference).build())
-                    .build();
+        try {
+            log.info("calling payment service request {}", caseData.getCcdCaseReference());
+            var serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
+                .getServiceRequestReference();
 
-            } catch (FeignException e) {
-                log.info(String.format("Http Status %s ", e.status()), e);
-                errors.add(ERROR_MESSAGE);
+            if (caseData.getHearingDate() != null) {
+                caseData = caseData.toBuilder()
+                    .hearingFeePBADetails(SRPbaDetails.builder()
+                                                  .applicantsPbaAccounts(caseData.getApplicantSolicitor1PbaAccounts())
+                                                  .fee(caseData.getHearingFee())
+                                                  .serviceReqReference(serviceRequestReference).build())
+                    .build();
+            } else {
+                caseData = caseData.toBuilder()
+                    .claimIssuedPBADetails(SRPbaDetails.builder()
+                                                  .applicantsPbaAccounts(caseData.getApplicantSolicitor1PbaAccounts())
+                                                  .fee(caseData.getClaimFee())
+                                                  .serviceReqReference(serviceRequestReference).build())
+                    .build();
             }
+
+        } catch (FeignException e) {
+            log.error("Http Status {}", e.status());
+            errors.add(ERROR_MESSAGE);
         }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .errors(errors)
