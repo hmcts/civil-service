@@ -44,10 +44,11 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
         private final DefendantPinToPostLRspec givenPin =
             DefendantPinToPostLRspec.builder()
                 .expiryDate(LocalDate.of(
-                    2021,
-                    1,
-                    1)
-)
+                                2021,
+                                1,
+                                1
+                            )
+                )
                 .citizenCaseRole("citizen")
                 .respondentCaseRole("citizen")
                 .accessCode("123").build();
@@ -57,6 +58,7 @@ public class ResetPinCUICallbackHandlerTest extends BaseCallbackHandlerTest {
                 .citizenCaseRole("citizen")
                 .respondentCaseRole("citizen")
                 .accessCode("123").build();
+
         @Test
         void shouldResetPinExpiryDate() {
             given(defendantPinToPostLRspecService.resetPinExpiryDate(any())).willReturn(pin);
