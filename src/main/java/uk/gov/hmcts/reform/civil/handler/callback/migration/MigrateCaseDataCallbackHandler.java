@@ -15,8 +15,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CaseMigratonUtility;
 
 import java.util.Collections;
@@ -38,44 +36,42 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
     private static final String MIGRATION_ID_VALUE = "GSMigration";
 
     private final ObjectMapper objectMapper;
-
-    private final CoreCaseDataService coreCaseDataService;
-    private final LocationRefDataService locationRefDataService;
+    private final CaseMigratonUtility caseMigratonUtility;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_SUBMIT), this::migrateCaseData)
-            .put(callbackKey(SUBMITTED), this::migrateSuppmentryData)
+            .put(callbackKey(SUBMITTED), this::migrateSupplementaryData)
             .build();
     }
 
     private CallbackResponse migrateCaseData(CallbackParams callbackParams) {
         CaseData oldCaseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
-
         log.info("Migrating data for case: {}", oldCaseData.getCcdCaseReference());
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-
-        CaseLocation caseLocation = CaseLocation.builder().baseLocation("420219").region("2").build();
         if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
-            CaseMigratonUtility.migrateGS(oldCaseData, caseDataBuilder
+            caseMigratonUtility.migrateGS(oldCaseData, caseDataBuilder
             );
 
-            CaseMigratonUtility.migrateCaseManagementLocation(caseDataBuilder, caseLocation);
+            caseMigratonUtility.migrateCaseManagementLocation(
+                caseDataBuilder,
+                CaseLocation.builder().baseLocation("420219").region("2").build()
+            );
         } else {
-            caseLocation = CaseLocation.builder().baseLocation("192280").region("4").build();
-            CaseMigratonUtility.migrateCaseManagementLocation(caseDataBuilder, caseLocation);
-            CaseMigratonUtility.migrateGS(oldCaseData, caseDataBuilder);
-
-            CaseMigratonUtility.migrateUnspecCoutLocation(authToken, oldCaseData, caseDataBuilder,
-                                                          locationRefDataService
+            caseMigratonUtility.migrateCaseManagementLocation(
+                caseDataBuilder,
+                CaseLocation.builder().baseLocation("192280").region("4").build()
             );
-
+            caseMigratonUtility.migrateGS(oldCaseData, caseDataBuilder);
+            caseMigratonUtility.migrateUnspecCourtLocation(authToken, oldCaseData, caseDataBuilder);
         }
-        caseLocation = CaseLocation.builder().baseLocation("420219").region("2").build();
-        CaseMigratonUtility.migrateRespondentAndApplicantDQUnSpec(authToken, oldCaseData, caseDataBuilder,
-                                                                  locationRefDataService, caseLocation
+        caseMigratonUtility.migrateRespondentAndApplicantDQUnSpec(
+            authToken,
+            oldCaseData,
+            caseDataBuilder,
+            CaseLocation.builder().baseLocation("420219").region("2").build()
         );
 
         caseDataBuilder.migrationId(MIGRATION_ID_VALUE);
@@ -84,19 +80,24 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CallbackResponse migrateSuppmentryData(CallbackParams callbackParams) {
+    private CallbackResponse migrateSupplementaryData(CallbackParams callbackParams) {
         CaseData oldCaseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
         if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
-            CaseMigratonUtility.setSupplementaryData(oldCaseData.getCcdCaseReference(), coreCaseDataService,
-                                                     "AAA6");
+            caseMigratonUtility.setSupplementaryData(
+                oldCaseData.getCcdCaseReference(),
+                "AAA6"
+            );
         } else {
-            CaseMigratonUtility.setSupplementaryData(oldCaseData.getCcdCaseReference(), coreCaseDataService,
-                                                     "AAA7");
+            caseMigratonUtility.setSupplementaryData(
+                oldCaseData.getCcdCaseReference(),
+                "AAA7"
+            );
 
         }
         return SubmittedCallbackResponse.builder().build();
     }
+
     /*private CallbackResponse migrateCaseData(CallbackParams callbackParams) {
         CaseData oldCaseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
