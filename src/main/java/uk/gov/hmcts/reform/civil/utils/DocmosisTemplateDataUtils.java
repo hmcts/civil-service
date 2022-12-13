@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +28,12 @@ public class DocmosisTemplateDataUtils {
     public static final String REFERENCE_NOT_PROVIDED = "Not Provided";
     //TODO Need to confirm the case name logic
     public static final Function<CaseData, String> toCaseName = caseData -> {
-        String caseName = fetchApplicantName(caseData) + " vs " + fetchRespondentName(caseData);
+        String caseName = null;
+        try {
+            caseName = fetchApplicantName(caseData) + " vs " + fetchRespondentName(caseData);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return caseName.length() > CASE_NAME_LENGTH_TO_FIT_IN_DOCS
             ? caseName.replace(" vs ", " \nvs ")
@@ -56,7 +62,7 @@ public class DocmosisTemplateDataUtils {
         return respondentNameBuilder.toString();
     }
 
-    public static String fetchApplicantName(CaseData caseData) {
+    public static String fetchApplicantName(CaseData caseData) throws IOException {
         StringBuilder applicantNameBuilder = new StringBuilder();
 
         if (caseData.getApplicant1() != null && caseData.getApplicant2() != null) {
@@ -71,9 +77,8 @@ public class DocmosisTemplateDataUtils {
             soleTraderCompany(caseData.getApplicant1(), applicantNameBuilder);
             litigationFriend(caseData.getApplicant1LitigationFriend(), applicantNameBuilder);
         } else {
-            LOG.info("Applicant1 not found for claim number: " + caseData.getCcdCaseReference());
+            throw new IllegalArgumentException("Applicant1 not found for claim number: " + caseData.getCcdCaseReference());
         }
-
         return applicantNameBuilder.toString();
     }
 

@@ -7,16 +7,20 @@ import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 
+import java.io.IOException;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.fetchApplicantName;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.fetchSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.toCaseName;
 
 class DocmosisTemplateDataUtilsTest {
 
     @Test
-    void shouldReturnNull_whenBothApplicant1NotFount() {
+    void shouldReturnNull_whenBothApplicant1NotFount() throws IOException {
         CaseData caseData = CaseData.builder()
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
@@ -27,9 +31,7 @@ class DocmosisTemplateDataUtilsTest {
                              .build())
             .ccdCaseReference(1L)
             .build();
-        String caseName = toCaseName.apply(caseData);
-        assertThat(caseData.getApplicant1()).isNull();
-        assertThat(caseName).isNotEqualTo("Mr. Sam Clark vs Mr. Alex Richards");
+        assertThatThrownBy(() -> fetchApplicantName(caseData)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
