@@ -7,8 +7,8 @@ import uk.gov.hmcts.contino.AppPipelineDsl
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdDefBranch = "switchoncos"
-def camundaBranch = "cosintegration"
+def ccdDefBranch = "master"
+def camundaBranch = "CIV-6413-CaseWorker-caseOffline"
 
 AppPipelineConfig pipelineConf
 
