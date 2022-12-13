@@ -35,22 +35,6 @@ public class LocationRefDataService {
     private final LRDConfiguration lrdConfiguration;
     private final AuthTokenGenerator authTokenGenerator;
 
-    public List<String> getCourtLocations(String authToken) {
-        try {
-            ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
-                buildURI(),
-                HttpMethod.GET,
-                getHeaders(authToken),
-                new ParameterizedTypeReference<List<LocationRefData>>() {
-                }
-            );
-            return onlyEnglandAndWalesLocations(responseEntity.getBody());
-        } catch (Exception e) {
-            log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
-        }
-        return new ArrayList<>();
-    }
-
     public LocationRefData getCcmccLocation(String authToken) {
         try {
             ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
@@ -92,10 +76,28 @@ public class LocationRefDataService {
         return new ArrayList<>();
     }
 
+    public List<LocationRefData> getCourtLocationsForGeneralApplication(String authToken) {
+        try {
+            ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
+                buildURI(),
+                HttpMethod.GET,
+                getHeaders(authToken),
+                new ParameterizedTypeReference<>() {
+                }
+            );
+            return responseEntity.getBody();
+        } catch (Exception e) {
+            log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
+        }
+        return new ArrayList<>();
+    }
+
     private URI buildURI() {
         String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
             .queryParam("is_hearing_location", "Y")
+            .queryParam("is_case_management_location", "Y")
+            .queryParam("court_type_id", "10")
             .queryParam("location_type", "Court");
         return builder.buildAndExpand(new HashMap<>()).toUri();
     }
