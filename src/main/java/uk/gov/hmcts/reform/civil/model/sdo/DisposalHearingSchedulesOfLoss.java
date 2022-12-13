@@ -19,14 +19,14 @@ public class DisposalHearingSchedulesOfLoss {
      *
      * @deprecated since CIV-6302
      */
-    @Deprecated
+    @Deprecated(forRemoval = true, since = "CIV-6302")
     private String input1;
     /**
      * First date. Meaning depends on disposal template and ccd labels.
      *
      * @deprecated since CIV-6302
      */
-    @Deprecated
+    @Deprecated(forRemoval = true, since = "CIV-6302")
     @Future(message = "The date entered must be in the future")
     private LocalDate date1;
     private String input2;
