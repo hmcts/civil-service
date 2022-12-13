@@ -34,7 +34,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CaseMigratonUtility {
+public class CaseMigrationUtility {
 
     private final LocationRefDataService locationRefDataService;
     private final CoreCaseDataService coreCaseDataService;

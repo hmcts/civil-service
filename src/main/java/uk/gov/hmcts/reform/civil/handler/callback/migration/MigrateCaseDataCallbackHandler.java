@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
-import uk.gov.hmcts.reform.civil.utils.CaseMigratonUtility;
+import uk.gov.hmcts.reform.civil.utils.CaseMigrationUtility;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +36,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
     private static final String MIGRATION_ID_VALUE = "GSMigration";
 
     private final ObjectMapper objectMapper;
-    private final CaseMigratonUtility caseMigratonUtility;
+    private final CaseMigrationUtility caseMigrationUtility;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -52,22 +52,22 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
-            caseMigratonUtility.migrateGS(oldCaseData, caseDataBuilder
+            caseMigrationUtility.migrateGS(oldCaseData, caseDataBuilder
             );
 
-            caseMigratonUtility.migrateCaseManagementLocation(
+            caseMigrationUtility.migrateCaseManagementLocation(
                 caseDataBuilder,
                 CaseLocation.builder().baseLocation("420219").region("2").build()
             );
         } else {
-            caseMigratonUtility.migrateCaseManagementLocation(
+            caseMigrationUtility.migrateCaseManagementLocation(
                 caseDataBuilder,
                 CaseLocation.builder().baseLocation("192280").region("4").build()
             );
-            caseMigratonUtility.migrateGS(oldCaseData, caseDataBuilder);
-            caseMigratonUtility.migrateUnspecCourtLocation(authToken, oldCaseData, caseDataBuilder);
+            caseMigrationUtility.migrateGS(oldCaseData, caseDataBuilder);
+            caseMigrationUtility.migrateUnspecCourtLocation(authToken, oldCaseData, caseDataBuilder);
         }
-        caseMigratonUtility.migrateRespondentAndApplicantDQUnSpec(
+        caseMigrationUtility.migrateRespondentAndApplicantDQUnSpec(
             authToken,
             oldCaseData,
             caseDataBuilder,
@@ -84,12 +84,12 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
         CaseData oldCaseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
         if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
-            caseMigratonUtility.setSupplementaryData(
+            caseMigrationUtility.setSupplementaryData(
                 oldCaseData.getCcdCaseReference(),
                 "AAA6"
             );
         } else {
-            caseMigratonUtility.setSupplementaryData(
+            caseMigrationUtility.setSupplementaryData(
                 oldCaseData.getCcdCaseReference(),
                 "AAA7"
             );
