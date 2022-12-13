@@ -30,7 +30,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @SpringBootTest(classes = {
@@ -129,9 +128,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getApplicantSolicitor1ServiceAddress())
                 .isEqualTo(getNewOrgDetails().getAddress());
 
-            assertThat(updatedCaseData.getApplicantSolicitor1PbaAccounts().getListItems().get(0).getLabel())
-                .isEqualTo("account");
-            assertThat(updatedCaseData.getApplicantSolicitor1PbaAccountsIsEmpty()).isEqualTo(NO);
+            assertThat(updatedCaseData.getApplicantSolicitor1PbaAccounts()).isNull();
+            assertThat(updatedCaseData.getApplicantSolicitor1PbaAccountsIsEmpty()).isEqualTo(YES);
             assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
 
             assertSolicitorReferences(true, false, caseData, updatedCaseData);

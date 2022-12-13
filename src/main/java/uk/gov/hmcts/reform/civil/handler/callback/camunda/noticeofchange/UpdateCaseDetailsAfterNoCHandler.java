@@ -29,7 +29,6 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DETAILS_AFTER_NOC;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Address.fromContactInformation;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
@@ -206,24 +205,22 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
 
     private void updateApplicantSolicitorDetails(CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                                  UserDetails addedSolicitorDetails, Organisation addedOrganisation) {
-        if (addedOrganisation.getPaymentAccount() != null && !addedOrganisation.getPaymentAccount().isEmpty()) {
-            caseDataBuilder.applicantSolicitor1PbaAccounts(DynamicList.fromList(addedOrganisation.getPaymentAccount()))
-                .applicantSolicitor1PbaAccountsIsEmpty(NO);
-        } else {
-            caseDataBuilder.applicantSolicitor1PbaAccountsIsEmpty(YES);
-        }
-        caseDataBuilder.applicantSolicitor1ServiceAddress(getUpdatedSolicitorAddress(addedOrganisation).getAddress())
+        caseDataBuilder
+            .applicantSolicitor1PbaAccounts(null)
+            .applicantSolicitor1PbaAccountsIsEmpty(YES)
+            .applicantSolicitor1ServiceAddress(getUpdatedSolicitorAddress(addedOrganisation).getAddress())
             .applicantSolicitor1ServiceAddressRequired(YES);
 
         if (addedSolicitorDetails.getEmail() != null) {
-            caseDataBuilder.applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                               .id(addedSolicitorDetails.getId())
-                                                               .email(addedSolicitorDetails.getEmail())
-                                                               .build());
+            caseDataBuilder.applicantSolicitor1UserDetails(
+                IdamUserDetails.builder()
+                    .id(addedSolicitorDetails.getId())
+                    .email(addedSolicitorDetails.getEmail())
+                    .build()
+            );
         } else {
             caseDataBuilder.applicantSolicitor1UserDetails(null);
         }
-
     }
 
     // todo SolicitorOrganisationDetails field is spec!

@@ -67,13 +67,11 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
 
         CaseData updatedCaseData = objectMapper.convertValue(applyDecision.getData(), CaseData.class);
         CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = updatedCaseData.toBuilder();
-
         updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(updatedCaseData, updatedCaseDataBuilder);
-
         updatedCaseDataBuilder
             .businessProcess(BusinessProcess.ready(APPLY_NOC_DECISION))
             .changeOfRepresentation(getChangeOfRepresentation(
-                callbackParams.getCaseData().getChangeOrganisationRequestField(), updatedCaseData));
+                    callbackParams.getCaseData().getChangeOrganisationRequestField(), updatedCaseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseDataBuilder.build().toMap(objectMapper)).build();
@@ -96,7 +94,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     }
 
     /** After applying the NoC decision the ChangeOrganisationRequest field is nullified
-     * To auto assigned the case to the new user, Assign case access checks for:
+     * To auto assign the case to the new user, Assign case access checks for:
      * 1. ChangeOrganisationRequest field in case data, it does this by looking for the OrganisationToAdd node
      * 2. checks if caseroleID field is null
      *

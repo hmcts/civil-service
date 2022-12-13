@@ -32,7 +32,7 @@ public class Respondent1DQ implements DQ {
     private Witnesses respondent1DQWitnesses;
     private Hearing respondent1DQHearing;
     private SmallClaimHearing respondent1DQHearingSmallClaim;
-    private HearingLRspec respondent1DQHearingFastClaim;
+    private Hearing respondent1DQHearingFastClaim;
     private Document respondent1DQDraftDirections;
     private RequestedCourt respondent1DQRequestedCourt;
     private HearingSupport respondent1DQHearingSupport;
