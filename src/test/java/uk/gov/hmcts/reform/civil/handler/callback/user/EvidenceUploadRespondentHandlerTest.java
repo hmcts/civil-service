@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,7 +59,9 @@ import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpe
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert.JOINT_STATEMENT;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial.AUTHORITIES;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial.DOCUMENTARY;
-import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness.*;
+import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness.DOCUMENTS_REFERRED;
+import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness.WITNESS_STATEMENT;
+import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness.WITNESS_SUMMARY;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(SpringExtension.class)
@@ -198,7 +203,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         );
     }
 
-    static Stream<Arguments> OptionsNotSelected() {
+    static Stream<Arguments> optionsNotSelected() {
 
         return Stream.of(
             arguments(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -218,8 +223,9 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData()).extracting("witnessSummaryFlag").isEqualTo("show_witness_summary");
         assertThat(response.getData()).extracting("witnessReferredStatementFlag").isEqualTo("show_witness_referred");
     }
+
     @ParameterizedTest
-    @MethodSource("OptionsNotSelected")
+    @MethodSource("optionsNotSelected")
     void shouldNotSetWitnessFlag_whenWitnessOptionsAreNotSelected(CaseData caseData) {
         // Given
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
@@ -242,8 +248,9 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData()).extracting("expertReportFlag").isEqualTo("show_expert_report");
         assertThat(response.getData()).extracting("expertJointFlag").isEqualTo("show_joint_expert");
     }
+
     @ParameterizedTest
-    @MethodSource("OptionsNotSelected")
+    @MethodSource("optionsNotSelected")
     void shouldNotSetExpertFlag_whenExpertOptionsAreNotSelected(CaseData caseData) {
         // Given
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
@@ -265,8 +272,9 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData()).extracting("trialAuthorityFlag").isEqualTo("show_trial_authority");
         assertThat(response.getData()).extracting("trialDocumentaryFlag").isEqualTo("show_trial_documentary");
     }
+
     @ParameterizedTest
-    @MethodSource("OptionsNotSelected")
+    @MethodSource("optionsNotSelected")
     void shouldNotSetTrialFlag_whenTrialOptionsAreNotSelected(CaseData caseData) {
         // Given
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
@@ -276,7 +284,6 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData()).extracting("trialAuthorityFlag").isEqualTo("do_not_show");
         assertThat(response.getData()).extracting("trialDocumentaryFlag").isEqualTo("do_not_show");
     }
-
 
     @ParameterizedTest
     @CsvSource({
