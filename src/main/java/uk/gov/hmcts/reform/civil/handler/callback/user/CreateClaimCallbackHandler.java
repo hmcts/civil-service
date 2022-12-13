@@ -70,6 +70,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -153,6 +154,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
+            .put(callbackKey(MID, "populateClaimantSolicitor"), this::populateClaimantSolicitor)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
@@ -177,6 +179,21 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                    .build());
         }
 
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper)).build();
+    }
+
+    private CallbackResponse populateClaimantSolicitor(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        Optional<Organisation> organisation = organisationService.findOrganisation(authToken);
+        organisation.ifPresent(value -> caseDataBuilder.applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                 .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                 .organisationID(value.getOrganisationIdentifier()).build())
+                 .orgPolicyReference(null)
+                 .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
+                 .build()));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
@@ -218,8 +235,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData caseData = callbackParams.getCaseData();
         OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
         YesOrNo respondent1OrgRegistered = caseData.getRespondent1OrgRegistered();
-        List<String> errors = orgPolicyValidator.validate(respondent1OrganisationPolicy, respondent1OrgRegistered);
-
+        List<String> errors;
+        errors = orgPolicyValidator.validate(respondent1OrganisationPolicy, respondent1OrgRegistered);
+        if (errors.isEmpty()) {
+            errors = orgPolicyValidator.validateSolicitorOrganisations(caseData);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
@@ -230,7 +250,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         OrganisationPolicy respondent2OrganisationPolicy = caseData.getRespondent2OrganisationPolicy();
         YesOrNo respondent2OrgRegistered = caseData.getRespondent2OrgRegistered();
         List<String> errors = orgPolicyValidator.validate(respondent2OrganisationPolicy, respondent2OrgRegistered);
-
+        if (errors.isEmpty()) {
+            errors = orgPolicyValidator.validateSolicitorOrganisations(caseData);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
@@ -397,9 +419,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         if (toggleService.isNoticeOfChangeEnabled()) {
             // LiP are not represented or registered
-            if (areAnyRespondentsLitigantInPerson(caseData) == true) {
-                dataBuilder.addLegalRepDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(time.now()));
-            }
             OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
         }
 

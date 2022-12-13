@@ -348,7 +348,7 @@ public class CaseDataBuilder {
     private GAApplicationType generalAppType;
     private GAHearingDateGAspec generalAppHearingDate;
 
-    private List<Element<ChangeOfRepresentation>> changeOfRepresentation;
+    private ChangeOfRepresentation changeOfRepresentation;
     private ChangeOrganisationRequest changeOrganisationRequest;
 
     private String unassignedCaseListDisplayOrganisationReferences;
@@ -1110,6 +1110,8 @@ public class CaseDataBuilder {
                 return atStateClaimDismissedPastClaimNotificationDeadline();
             case TAKEN_OFFLINE_SDO_NOT_DRAWN:
                 return atStateTakenOfflineSDONotDrawn(mpScenario);
+            case TAKEN_OFFLINE_AFTER_SDO:
+                return atStateTakenOfflineAfterSDO(mpScenario);
             default:
                 throw new IllegalArgumentException("Invalid internal state: " + flowState);
         }
@@ -1163,8 +1165,6 @@ public class CaseDataBuilder {
         respondent2OrganisationPolicy = OrganisationPolicy.builder()
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
             .build();
-        defendant1LIPAtClaimIssued = YES;
-        defendant2LIPAtClaimIssued = YES;
         respondent1OrgRegistered = null;
         respondent2OrgRegistered = null;
         return this;
@@ -1230,7 +1230,6 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondentSolicitor1OrganisationDetails = null;
-        defendant2LIPAtClaimIssued = YES;
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY R").build())
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
@@ -1557,17 +1556,14 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder multiPartyClaimTwoDefendantLips() {
-        //TODO replace with LIPS data
         atStateClaimDraft();
         respondent1OrganisationPolicy = null;
-        respondent1Represented = NO;
-        respondent1OrgRegistered = NO;
+        defendant1LIPAtClaimIssued = YES;
 
         addRespondent2 = YES;
         respondent2OrganisationPolicy = null;
-        respondent2Represented = NO;
-        respondent2OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
+        defendant2LIPAtClaimIssued = YES;
         return this;
     }
 
@@ -2037,7 +2033,7 @@ public class CaseDataBuilder {
             .organisationToRemoveID(oldOrgId)
             .timestamp(LocalDateTime.now())
             .build();
-        changeOfRepresentation = wrapElements(newChange);
+        changeOfRepresentation = newChange;
         return this;
     }
 
@@ -2102,7 +2098,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimNotified1v2Respondent2LiP(CertificateOfService  certificateOfService) {
+    public CaseDataBuilder atStateClaimNotified1v2RespondentLiP() {
         atStatePendingClaimIssued();
         ccdState = CASE_ISSUED;
         respondent2Represented = NO;
@@ -2110,7 +2106,6 @@ public class CaseDataBuilder {
             .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
             .build();
         legacyCaseReference = LEGACY_CASE_REFERENCE;
-        cosNotifyClaimDefendant2 = certificateOfService;
         claimDetailsNotificationDeadline = DEADLINE;
         defendant2LIPAtClaimIssued = YES;
         return this;
@@ -3438,10 +3433,27 @@ public class CaseDataBuilder {
         }
 
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+
         reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
                                                    .input("unforeseen complexities")
-                                                   .build();
+            .build();
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflineAfterSDO(MultiPartyScenario mpScenario) {
+
+        atStateApplicantRespondToDefenceAndProceed(mpScenario);
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP) {
+            atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2();
+        } else if (mpScenario == TWO_V_ONE) {
+            atStateBothApplicantsRespondToDefenceAndProceed_2v1();
+        }
+
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+
+        takenOfflineDate = applicant1ResponseDate.plusDays(1);
         return this;
     }
 
@@ -3813,6 +3825,11 @@ public class CaseDataBuilder {
                 .documentFileName("file-name")
                 .documentBinaryUrl("binary-url")
                 .build());
+        List<Element<Document>> files2 = wrapElements(Document.builder()
+                .documentUrl("fake-url2")
+                .documentFileName("file-name2")
+                .documentBinaryUrl("binary-url2")
+                .build());
         if (setCos1) {
             CertificateOfService.CertificateOfServiceBuilder cos1Builder = CertificateOfService.builder()
                     .cosDateOfServiceForDefendant(cos1Date);
@@ -3825,7 +3842,7 @@ public class CaseDataBuilder {
             CertificateOfService.CertificateOfServiceBuilder cos2Builder = CertificateOfService.builder()
                     .cosDateOfServiceForDefendant(cos2Date);
             if (file2) {
-                cos2Builder.cosEvidenceDocument(files);
+                cos2Builder.cosEvidenceDocument(files2);
             }
             this.cosNotifyClaimDetails2 = cos2Builder.build();
         }
@@ -4049,9 +4066,9 @@ public class CaseDataBuilder {
             .disposalHearingFinalDisposalHearingTimeDJ(disposalHearingFinalDisposalHearingTimeDJ)
             .trialHearingTimeDJ(trialHearingTimeDJ)
             .trialOrderMadeWithoutHearingDJ(trialOrderMadeWithoutHearingDJ)
-                //Certificate of Service
-                .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
-                .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
+            //Certificate of Service
+            .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
+            .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
             .build();
     }
 
