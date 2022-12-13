@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
-import uk.gov.hmcts.reform.civil.utils.CaseMigrationUtility;
+import uk.gov.hmcts.reform.civil.utils.CaseMigratonUtility;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +36,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
     private static final String MIGRATION_ID_VALUE = "GSMigration";
 
     private final ObjectMapper objectMapper;
-    private final CaseMigrationUtility caseMigrationUtility;
+    private final CaseMigratonUtility caseMigratonUtility;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -47,63 +47,49 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse migrateCaseData(CallbackParams callbackParams) {
-        try {
-            CaseData oldCaseData = callbackParams.getCaseData();
-            log.info("Migrating data for case: {}", oldCaseData.getCcdCaseReference());
-            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
-            if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
-                log.info("Process SPEC claim: {}", oldCaseData.getCcdCaseReference());
+        CaseData oldCaseData = callbackParams.getCaseData();
+        log.info("Migrating data for case: {}", oldCaseData.getCcdCaseReference());
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
+            caseMigratonUtility.migrateGS(oldCaseData, caseDataBuilder
+            );
 
-                caseMigrationUtility.migrateGS(oldCaseData, caseDataBuilder
-                );
-
-                caseMigrationUtility.migrateCaseManagementLocation(
-                    caseDataBuilder,
-                    CaseLocation.builder().baseLocation("420219").region("2").build()
-                );
-            } else {
-                log.info("Process UNSPEC claim: {}", oldCaseData.getCcdCaseReference());
-                caseMigrationUtility.migrateCaseManagementLocation(
-                    caseDataBuilder,
-                    CaseLocation.builder().baseLocation("192280").region("4").build()
-                );
-                caseMigrationUtility.migrateGS(oldCaseData, caseDataBuilder);
-                caseMigrationUtility.migrateUnspecCourtLocation(
-                    callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                    oldCaseData,
-                    caseDataBuilder
-                );
-            }
-            log.info("Start DQ migration: {}", oldCaseData.getCcdCaseReference());
-            caseMigrationUtility.migrateRespondentAndApplicantDQUnSpec(
-                callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                oldCaseData,
+            caseMigratonUtility.migrateCaseManagementLocation(
                 caseDataBuilder,
                 CaseLocation.builder().baseLocation("420219").region("2").build()
             );
-            log.info("Add migration ID: {}", oldCaseData.getCcdCaseReference());
-            caseDataBuilder.migrationId(MIGRATION_ID_VALUE);
-
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(objectMapper))
-                .build();
-        } catch (Throwable exception) {
-            log.error("Exception during migration about to submit event- " + exception.getMessage(), exception);
-            throw exception;
+        } else {
+            caseMigratonUtility.migrateCaseManagementLocation(
+                caseDataBuilder,
+                CaseLocation.builder().baseLocation("192280").region("4").build()
+            );
+            caseMigratonUtility.migrateGS(oldCaseData, caseDataBuilder);
+            caseMigratonUtility.migrateUnspecCourtLocation(authToken, oldCaseData, caseDataBuilder);
         }
+        caseMigratonUtility.migrateRespondentAndApplicantDQUnSpec(
+            authToken,
+            oldCaseData,
+            caseDataBuilder,
+            CaseLocation.builder().baseLocation("420219").region("2").build()
+        );
 
+        caseDataBuilder.migrationId(MIGRATION_ID_VALUE);
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse migrateSupplementaryData(CallbackParams callbackParams) {
         CaseData oldCaseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
         if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
-            caseMigrationUtility.setSupplementaryData(
+            caseMigratonUtility.setSupplementaryData(
                 oldCaseData.getCcdCaseReference(),
                 "AAA6"
             );
         } else {
-            caseMigrationUtility.setSupplementaryData(
+            caseMigratonUtility.setSupplementaryData(
                 oldCaseData.getCcdCaseReference(),
                 "AAA7"
             );
@@ -112,6 +98,54 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
         return SubmittedCallbackResponse.builder().build();
     }
 
+    /*private CallbackResponse migrateCaseData(CallbackParams callbackParams) {
+        CaseData oldCaseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
+
+        log.info("Migrating data for case: {}", oldCaseData.getCcdCaseReference());
+
+        if (SuperClaimType.SPEC_CLAIM.equals(oldCaseData.getSuperClaimType())) {
+            caseDataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
+            updateOrgPolicyCaseRole(oldCaseData, caseDataBuilder);
+        } else {
+            caseDataBuilder.caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+        }
+
+        caseDataBuilder.migrationId(MIGRATION_ID_VALUE);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private void updateOrgPolicyCaseRole(CaseData oldCaseData,
+                                         CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        OrganisationPolicy applicant1OrganisationPolicy = oldCaseData.getApplicant1OrganisationPolicy();
+        caseDataBuilder.applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                             .orgPolicyReference(applicant1OrganisationPolicy.getOrgPolicyReference())
+                             .orgPolicyCaseAssignedRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
+                             .organisation(applicant1OrganisationPolicy.getOrganisation())
+                             .build());
+
+        OrganisationPolicy respondent1OrganisationPolicy = oldCaseData.getRespondent1OrganisationPolicy();
+        if (respondent1OrganisationPolicy != null) {
+            caseDataBuilder.respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                              .organisation(respondent1OrganisationPolicy.getOrganisation())
+                              .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
+                              .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                              .build());
+        }
+
+        OrganisationPolicy respondent2OrganisationPolicy = oldCaseData.getRespondent2OrganisationPolicy();
+        if (respondent2OrganisationPolicy != null) {
+            caseDataBuilder.respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                            .organisation(respondent2OrganisationPolicy.getOrganisation())
+                            .orgPolicyReference(respondent2OrganisationPolicy.getOrgPolicyReference())
+                            .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                            .build());
+        }
+    }
+*/
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
