@@ -25,13 +25,17 @@ import java.util.Map;
 import static java.util.Collections.singletonMap;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC;
 
 @Service
 @RequiredArgsConstructor
 public class AssignCaseToUserHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(ASSIGN_CASE_TO_APPLICANT_SOLICITOR1);
+    private static final List<CaseEvent> EVENTS = List.of(
+        ASSIGN_CASE_TO_APPLICANT_SOLICITOR1,
+        ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC);
     public static final String TASK_ID = "CaseAssignmentToApplicantSolicitor1";
+    public static final String TASK_ID_SPEC = "CaseAssignmentToApplicantSolicitor1ForSpec";
 
     private final CoreCaseUserService coreCaseUserService;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -49,7 +53,12 @@ public class AssignCaseToUserHandler extends CallbackHandler {
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        if (ASSIGN_CASE_TO_APPLICANT_SOLICITOR1.equals(caseEvent)) {
+            return TASK_ID;
+        } else {
+            return TASK_ID_SPEC;
+        }
     }
 
     @Override
