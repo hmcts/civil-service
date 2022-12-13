@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.payment;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
