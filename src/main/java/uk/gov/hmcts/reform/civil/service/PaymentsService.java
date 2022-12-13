@@ -171,7 +171,7 @@ public class PaymentsService {
         String callbackURLUsed = null;
         FeeDto feeResponse = null;
 
-        if (caseData.getHearingDate() == null) {
+        if (caseData.getHearingDueDate() == null) {
             callbackURLUsed = callBackUrlClaimIssued;
             feeResponse = caseData.getClaimFee().toFeeDto();
         } else {

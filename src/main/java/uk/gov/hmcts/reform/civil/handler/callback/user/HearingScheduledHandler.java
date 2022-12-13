@@ -162,8 +162,7 @@ public class HearingScheduledHandler extends CallbackHandler {
     private CallbackResponse getDueDateAndFee(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        if (nonNull(caseData.getListingOrRelisting())
-            && caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
+        if (caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
             if (LocalDate.now().isBefore(caseData.getHearingDate().minusWeeks(4))) {
                 caseDataBuilder.hearingDueDate(
                     HearingUtils.addBusinessDays(
@@ -173,38 +172,28 @@ public class HearingScheduledHandler extends CallbackHandler {
                     HearingUtils.addBusinessDays(
                         LocalDate.now(), 20, publicHolidaysCollection.getPublicHolidays()));
             }
+            Fee hearingFee = Fee.builder().code("FEE0202").version("4").build();
             switch (caseData.getAllocatedTrack()) {
                 case SMALL_CLAIM:
-<<<<<<<<< Temporary merge branch 1
-                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(545)).build());
-=========
-                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
->>>>>>>>> Temporary merge branch 2
+                    hearingFee.setCalculatedAmountInPence(new BigDecimal(54500));
                     break;
                 case FAST_CLAIM:
-                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(
-                        HearingUtils.getFastTrackFee(
-                            caseData.getClaimFee().getCalculatedAmountInPence().intValue())).build());
+                    hearingFee.setCalculatedAmountInPence(HearingUtils.getFastTrackFee(
+                        caseData.getClaimValue().getStatementOfValueInPennies().intValue()));
                     break;
                 case MULTI_CLAIM:
-<<<<<<<<< Temporary merge branch 1
-                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(1175)).build());
-=========
-                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(117500)).build());
->>>>>>>>> Temporary merge branch 2
+                    hearingFee.setCalculatedAmountInPence(new BigDecimal(117500));
                     break;
                 default:
-                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(0)).build());
+                    hearingFee.setCalculatedAmountInPence(new BigDecimal(0));
             }
+            caseDataBuilder.hearingFee(hearingFee).build();
         }
         if (nonNull(caseData.getHearingLocation())) {
             DynamicList locationList = caseData.getHearingLocation();
             locationList.setListItems(null);
             caseDataBuilder.hearingLocation(locationList);
         }
-<<<<<<<<< Temporary merge branch 1
-        return AboutToStartOrSubmitCallbackResponse.builder()
-=========
         var state = "HEARING_READINESS";
         caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
         return AboutToStartOrSubmitCallbackResponse.builder()

@@ -164,11 +164,7 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getHearingFee()).isEqualTo(
-<<<<<<<<< Temporary merge branch 1
-                Fee.builder().calculatedAmountInPence(new BigDecimal(545)).build());
-=========
-                Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
->>>>>>>>> Temporary merge branch 2
+                Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(54500)).build());
         }
 
         @Test
@@ -187,11 +183,7 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getHearingFee()).isEqualTo(
-<<<<<<<<< Temporary merge branch 1
-                Fee.builder().calculatedAmountInPence(new BigDecimal(1175)).build());
-=========
-                Fee.builder().calculatedAmountInPence(new BigDecimal(117500)).build());
->>>>>>>>> Temporary merge branch 2
+                Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(117500)).build());
         }
 
         @Test
@@ -210,11 +202,7 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getHearingFee()).isEqualTo(
-<<<<<<<<< Temporary merge branch 1
-                Fee.builder().calculatedAmountInPence(new BigDecimal(27)).build());
-=========
-                Fee.builder().calculatedAmountInPence(new BigDecimal(2700)).build());
->>>>>>>>> Temporary merge branch 2
+                Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(34600)).build());
         }
     }
 

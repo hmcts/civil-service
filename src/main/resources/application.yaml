@@ -49,13 +49,20 @@ cmc-claim-store:
   api:
     url: ${CLAIM_STORE_URL:http://localhost:8765}
 
-<<<<<<<<< Temporary merge branch 1
+
 serviceRequest:
   api:
     callback-url : ${SERVICE_REQUEST_UPDATE:}
     site_id : AAA7
     service : CIVIL
-=========
+
+serviceRequestClaimIssued:
+  api:
+    callback-url: ${SERVICE_REQUEST_UPDATE_CLAIM_ISSUED:}
+    site_id: AAA7
+    service: CIVIL
+
+
 send-letter:
   url: ${SEND_LETTER_URL:http://localhost:8765}
 
