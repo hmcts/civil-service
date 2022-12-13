@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.stateflow.exception;
 
-public class StateFlowException extends RuntimeException {
+import uk.gov.hmcts.reform.civil.exceptions.NotRetryableException;
+
+public class StateFlowException extends NotRetryableException {
 
     public StateFlowException(String message, Throwable cause) {
         super(message, cause);

@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
@@ -69,7 +70,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -98,6 +99,20 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         + "the defendant within 4 months. "
         + "%n%nOnce you have served the claim, send the Certificate of Service and supporting documents to the County"
         + " Court Claims Centre.";
+
+    public static final String LIP_CONFIRMATION_BODY_COS = "<br />[Download the sealed claim form](%s)"
+        + "%n%n Your claim will not be issued until payment of the issue fee is confirmed."
+        + " Once payment is confirmed you will receive an email. The email will also include the date when you need"
+        + " to notify the Defendant of the Claim.%n%nYou must notify the Defendant of the claim"
+        + " within 4 months of the claim being issued.%n%nIf the defendant(s) include a litigant in person you must"
+        + " serve the claim outside of the digital portal using the claim form PDF provided on the link above."
+        + " This includes an information page for litigants in person. The claim will remain in the digital portal to"
+        + " allow the litigant in person time to appoint a legal representative who can respond to the claim via the "
+        + " portal.%n%nIf service of the claim and claim details are processed outside the of the digital portal you "
+        + " must complete the next steps option 'confirm service' for both the service of the claim form and the claim"
+        + "  details. %n%nIf notification of the claim is processed in the digital portal, the exact date"
+        + " when you must notify the claim details will be provided when you first notify the Defendant legal"
+        + " representative of the claim.";
 
     private final ClaimIssueConfiguration claimIssueConfiguration;
     private final ExitSurveyContentService exitSurveyContentService;
@@ -139,6 +154,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
+            .put(callbackKey(MID, "populateClaimantSolicitor"), this::populateClaimantSolicitor)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
@@ -163,6 +179,21 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                    .build());
         }
 
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper)).build();
+    }
+
+    private CallbackResponse populateClaimantSolicitor(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        Optional<Organisation> organisation = organisationService.findOrganisation(authToken);
+        organisation.ifPresent(value -> caseDataBuilder.applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                 .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                 .organisationID(value.getOrganisationIdentifier()).build())
+                 .orgPolicyReference(null)
+                 .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
+                 .build()));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
@@ -204,8 +235,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData caseData = callbackParams.getCaseData();
         OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
         YesOrNo respondent1OrgRegistered = caseData.getRespondent1OrgRegistered();
-        List<String> errors = orgPolicyValidator.validate(respondent1OrganisationPolicy, respondent1OrgRegistered);
-
+        List<String> errors;
+        errors = orgPolicyValidator.validate(respondent1OrganisationPolicy, respondent1OrgRegistered);
+        if (errors.isEmpty()) {
+            errors = orgPolicyValidator.validateSolicitorOrganisations(caseData);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
@@ -216,7 +250,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         OrganisationPolicy respondent2OrganisationPolicy = caseData.getRespondent2OrganisationPolicy();
         YesOrNo respondent2OrgRegistered = caseData.getRespondent2OrgRegistered();
         List<String> errors = orgPolicyValidator.validate(respondent2OrganisationPolicy, respondent2OrgRegistered);
-
+        if (errors.isEmpty()) {
+            errors = orgPolicyValidator.validateSolicitorOrganisations(caseData);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
@@ -315,12 +351,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         if (caseData.getRespondent2SameLegalRepresentative() == YES) {
             OrganisationPolicy.OrganisationPolicyBuilder organisationPolicy2Builder = OrganisationPolicy.builder();
 
-            if (caseData.getRespondent1OrgRegistered() == YES) {
-                OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
-                organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
-                    .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
-                    .build();
-            }
+            OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
+            organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
+                .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
+                .build();
 
             organisationPolicy2Builder.orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
             caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2Builder.build());
@@ -388,7 +422,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             if (areAnyRespondentsLitigantInPerson(caseData) == true) {
                 dataBuilder.addLegalRepDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(time.now()));
             }
-            populateBlankOrgPolicies(dataBuilder, caseData);
+            OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
         }
 
         // temporarily default to yes for CIV-2659
@@ -416,6 +450,22 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             log.info("Case management equals: " + caseData.getCaseManagementCategory());
             log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
         }
+        //Adding variables for feature Certificate of Service
+        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCertificateOfServiceEnabled()) {
+            if (caseData.getRespondent1Represented().equals(NO)) {
+                dataBuilder.defendant1LIPAtClaimIssued(YES);
+            } else {
+                dataBuilder.defendant1LIPAtClaimIssued(NO);
+            }
+
+            if (YES.equals(caseData.getAddRespondent2())) {
+                if (caseData.getRespondent2Represented() == NO) {
+                    dataBuilder.defendant2LIPAtClaimIssued(YES);
+                } else {
+                    dataBuilder.defendant2LIPAtClaimIssued(NO);
+                }
+            }
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
@@ -431,21 +481,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                       YES.equals(caseData.getAddRespondent2())
                           && NO.equals(caseData.getRespondent2SameLegalRepresentative())
                             ? ", " + caseData.getRespondent2().getPartyName() : "");
-    }
-
-    private void populateBlankOrgPolicies(CaseData.CaseDataBuilder dataBuilder, CaseData caseData) {
-        if (caseData.getRespondent1OrganisationPolicy() == null) {
-            dataBuilder
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
-                                                   .build());
-        }
-        if (caseData.getRespondent2OrganisationPolicy() == null) {
-            dataBuilder
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
-                                                   .build());
-        }
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
@@ -483,14 +518,20 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private String getHeader(CaseData caseData) {
+
         if (areRespondentsRepresentedAndRegistered(caseData)) {
             return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
         }
 
-        return format(
-            "# Your claim has been received and will progress offline%n## Claim number: %s",
-            caseData.getLegacyCaseReference()
-        );
+        if (toggleService.isCertificateOfServiceEnabled()) {
+            return format(
+                "# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
+        } else {
+            return format(
+                "# Your claim has been received and will progress offline%n## Claim number: %s",
+                caseData.getLegacyCaseReference()
+            );
+        }
     }
 
     private boolean areRespondentsRepresentedAndRegistered(CaseData caseData) {
@@ -502,17 +543,31 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private boolean areAnyRespondentsLitigantInPerson(CaseData caseData) {
         return caseData.getRespondent1Represented() == NO
-            || (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
+            ||  isSecondRespondentLitigantInPerson(caseData);
+    }
+
+    private boolean isSecondRespondentLitigantInPerson(CaseData caseData) {
+        return (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
     }
 
     private String getBody(CaseData caseData) {
-        return format(
-            areRespondentsRepresentedAndRegistered(caseData)
-                ? CONFIRMATION_SUMMARY
-                : LIP_CONFIRMATION_BODY,
-            format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
-            claimIssueConfiguration.getResponsePackLink()
-        ) + exitSurveyContentService.applicantSurvey();
+        if (toggleService.isCertificateOfServiceEnabled()) {
+            return format(
+                areRespondentsRepresentedAndRegistered(caseData)
+                    ? CONFIRMATION_SUMMARY
+                    : LIP_CONFIRMATION_BODY_COS,
+                format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
+                claimIssueConfiguration.getResponsePackLink()
+            ) + exitSurveyContentService.applicantSurvey();
+        } else {
+            return format(
+                areRespondentsRepresentedAndRegistered(caseData)
+                    ? CONFIRMATION_SUMMARY
+                    : LIP_CONFIRMATION_BODY,
+                format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
+                claimIssueConfiguration.getResponsePackLink()
+            ) + exitSurveyContentService.applicantSurvey();
+        }
     }
 
     private List<String> validateCourtChoice(CaseData caseData) {

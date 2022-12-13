@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.tasks;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -17,7 +17,7 @@ import static java.lang.String.format;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-@ConditionalOnExpression("${POLLING_EVENT_EMITTER_ENABLED:true}")
+@ConditionalOnProperty(prefix = "polling", name = "event.emitter.enabled", havingValue = "true")
 public class PollingEventEmitterHandler implements BaseExternalTaskHandler {
 
     private final CaseReadyBusinessProcessSearchService caseSearchService;
