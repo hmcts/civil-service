@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.model;
 
 import lombok.Builder;
 import lombok.Data;
+import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.validation.groups.UnavailableDateGroup;
 import uk.gov.hmcts.reform.civil.validation.interfaces.IsPresentOrEqualToOrLessThanOneYearInTheFuture;
 
@@ -16,4 +17,5 @@ public class UnavailableDate {
     private final LocalDate date;
     private final LocalDate fromDate;
     private final LocalDate toDate;
+    private final UnavailableDateType unavailableDateType;
 }
