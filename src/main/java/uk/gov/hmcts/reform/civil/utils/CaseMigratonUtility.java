@@ -56,7 +56,7 @@ public class CaseMigratonUtility {
 
         CourtLocation location = oldCaseData.getCourtLocation();
         if (ofNullable(location).isPresent()) {
-            log.info("Fetch data from LRD");
+            log.info("Fetch data from LRD preferred code  : {} ",location.getApplicantPreferredCourt());
             LocationRefData refData = locationRefDataService.getCourtLocation(
                 authToken,
                 location.getApplicantPreferredCourt()
@@ -105,7 +105,8 @@ public class CaseMigratonUtility {
         if (ofNullable(respondent1DQ).isPresent()
             && ofNullable(respondent1DQ.getRespondent1DQRequestedCourt()).isPresent()
             && ofNullable(respondent1DQ.getRespondent1DQRequestedCourt().getResponseCourtCode()).isPresent()) {
-            log.info("Fetch data from LRD");
+            log.info("Fetch data from LRD preferred code  : {} ", respondent1DQ.getRespondent1DQRequestedCourt()
+                .getResponseCourtCode());
             LocationRefData refdata = locationRefDataService.getCourtLocation(
                 authToken,
                 respondent1DQ.getRespondent1DQRequestedCourt()
@@ -161,7 +162,8 @@ public class CaseMigratonUtility {
         if (ofNullable(respondent2DQ).isPresent()
             && ofNullable(respondent2DQ.getRespondent2DQRequestedCourt()).isPresent()
             && ofNullable(respondent2DQ.getRespondent2DQRequestedCourt().getResponseCourtCode()).isPresent()) {
-            log.info("Fetch data from LRD");
+            log.info("Fetch data from LRD preferred code  : {} ", respondent2DQ.getRespondent2DQRequestedCourt()
+                .getResponseCourtCode());
             LocationRefData refdata = locationRefDataService.getCourtLocation(
                 authToken,
                 respondent2DQ.getRespondent2DQRequestedCourt()
@@ -215,7 +217,8 @@ public class CaseMigratonUtility {
         if (ofNullable(respondent1DQ).isPresent()
             && ofNullable(respondent1DQ.getRespondent1DQRequestedCourt()).isPresent()
             && ofNullable(respondent1DQ.getRespondent1DQRequestedCourt().getResponseCourtCode()).isPresent()) {
-            log.info("Fetch data from LRD");
+            log.info("Fetch data from LRD preferred code  : {} ", respondent1DQ.getRespondent1DQRequestedCourt()
+                .getResponseCourtCode());
             LocationRefData refdata = locationRefDataService.getCourtLocation(
                 authToken,
                 respondent1DQ.getRespondent1DQRequestedCourt()
@@ -255,7 +258,8 @@ public class CaseMigratonUtility {
         if (ofNullable(respondent2DQ).isPresent()
             && ofNullable(respondent2DQ.getRespondent2DQRequestedCourt()).isPresent()
             && ofNullable(respondent2DQ.getRespondent2DQRequestedCourt().getResponseCourtCode()).isPresent()) {
-            log.info("Fetch data from LRD");
+            log.info("Fetch data from LRD preferred code  : {} ", respondent2DQ.getRespondent2DQRequestedCourt()
+                .getResponseCourtCode());
             LocationRefData refdata = locationRefDataService.getCourtLocation(
                 authToken,
                 respondent2DQ.getRespondent2DQRequestedCourt()
@@ -292,7 +296,8 @@ public class CaseMigratonUtility {
         if (ofNullable(applicant1DQ).isPresent()
             && ofNullable(applicant1DQ.getApplicant1DQRequestedCourt()).isPresent()
             && ofNullable(applicant1DQ.getApplicant1DQRequestedCourt().getResponseCourtCode()).isPresent()) {
-            log.info("Fetch data from LRD");
+            log.info("Fetch data from LRD preferred code  : {} ", applicant1DQ.getApplicant1DQRequestedCourt()
+                .getResponseCourtCode());
             LocationRefData refdata = locationRefDataService.getCourtLocation(
                 authToken,
                 applicant1DQ.getApplicant1DQRequestedCourt()
@@ -323,7 +328,8 @@ public class CaseMigratonUtility {
 
         } else if (ofNullable(applicant1DQ).isPresent() && ofNullable(oldCaseData.getCourtLocation()).isPresent()
             && ofNullable(applicant1DQ.getExperts()).isPresent()) {
-            log.info("Fetch data from LRD");
+            log.info("Fetch data from LRD preferred code  : {} ", oldCaseData.getCourtLocation()
+                .getApplicantPreferredCourt());
             LocationRefData refData = locationRefDataService.getCourtLocation(
                 authToken,
                 oldCaseData.getCourtLocation().getApplicantPreferredCourt()
