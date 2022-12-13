@@ -56,7 +56,7 @@ public class CaseMigratonUtility {
 
         CourtLocation location = oldCaseData.getCourtLocation();
         if (ofNullable(location).isPresent()) {
-            log.info("Fetch data from LRD preferred code  : {} ",location.getApplicantPreferredCourt());
+            log.info("Fetch data from LRD preferred code  : {} ", location.getApplicantPreferredCourt());
             LocationRefData refData = locationRefDataService.getCourtLocation(
                 authToken,
                 location.getApplicantPreferredCourt()
@@ -334,8 +334,8 @@ public class CaseMigratonUtility {
                 authToken,
                 oldCaseData.getCourtLocation().getApplicantPreferredCourt()
             );
-            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refData.getCourtLocationCode()
-                , refData.getRegionId(), refData.getEpimmsId());
+            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refData.getCourtLocationCode(),
+                     refData.getRegionId(), refData.getEpimmsId());
             caseLocation = CaseLocation.builder().baseLocation(refData.getEpimmsId())
                 .region(refData.getRegionId()).build();
             caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
