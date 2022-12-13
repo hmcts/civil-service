@@ -61,8 +61,8 @@ public class CaseMigratonUtility {
                 authToken,
                 location.getApplicantPreferredCourt()
             );
-            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refData.getCourtLocationCode()
-                , refData.getRegionId(), refData.getEpimmsId());
+            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refData.getCourtLocationCode(),
+                     refData.getRegionId(), refData.getEpimmsId());
 
             CaseLocation caseLocation = CaseLocation.builder().baseLocation(refData.getEpimmsId())
                 .region(refData.getRegionId()).build();
@@ -112,8 +112,8 @@ public class CaseMigratonUtility {
                 respondent1DQ.getRespondent1DQRequestedCourt()
                     .getResponseCourtCode()
             );
-            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refdata.getCourtLocationCode()
-                , refdata.getRegionId(), refdata.getEpimmsId());
+            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refdata.getCourtLocationCode(),
+                     refdata.getRegionId(), refdata.getEpimmsId());
             CaseLocation location =  CaseLocation.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegionId()).build();
 
@@ -169,8 +169,8 @@ public class CaseMigratonUtility {
                 respondent2DQ.getRespondent2DQRequestedCourt()
                     .getResponseCourtCode()
             );
-            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refdata.getCourtLocationCode()
-                , refdata.getRegionId(), refdata.getEpimmsId());
+            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refdata.getCourtLocationCode(),
+                     refdata.getRegionId(), refdata.getEpimmsId());
             CaseLocation location =  CaseLocation.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegionId()).build();
 
@@ -224,8 +224,8 @@ public class CaseMigratonUtility {
                 respondent1DQ.getRespondent1DQRequestedCourt()
                     .getResponseCourtCode()
             );
-            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refdata.getCourtLocationCode()
-                , refdata.getRegionId(), refdata.getEpimmsId());
+            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refdata.getCourtLocationCode(),
+                     refdata.getRegionId(), refdata.getEpimmsId());
             CaseLocation location =  CaseLocation.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegionId()).build();
 
@@ -265,8 +265,8 @@ public class CaseMigratonUtility {
                 respondent2DQ.getRespondent2DQRequestedCourt()
                     .getResponseCourtCode()
             );
-            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refdata.getCourtLocationCode()
-                , refdata.getRegionId(), refdata.getEpimmsId());
+            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refdata.getCourtLocationCode(),
+                     refdata.getRegionId(), refdata.getEpimmsId());
             CaseLocation location =  CaseLocation.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegionId()).build();
 
@@ -303,8 +303,8 @@ public class CaseMigratonUtility {
                 applicant1DQ.getApplicant1DQRequestedCourt()
                     .getResponseCourtCode()
             );
-            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refdata.getCourtLocationCode()
-                , refdata.getRegionId(), refdata.getEpimmsId());
+            log.info("Location details ,courtcode : {} region : {} ,baseLocation {} ", refdata.getCourtLocationCode(),
+                     refdata.getRegionId(), refdata.getEpimmsId());
             CaseLocation location =  CaseLocation.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegionId()).build();
 
