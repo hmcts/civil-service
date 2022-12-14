@@ -38,7 +38,7 @@ class ResourceExceptionHandlerTest {
     @Test
     void shouldReturnPreconditionFailed_whenStateFlowExceptionThrown() {
         testTemplate(
-            "expected exception for missing callback handler",
+            "expected exception for state flow",
             StateFlowException::new,
             handler::incorrectStateFlowOrIllegalArgument,
             HttpStatus.PRECONDITION_FAILED
@@ -48,9 +48,9 @@ class ResourceExceptionHandlerTest {
     @Test
     void shouldReturnUnauthorized_whenFeignExceptionUnauthorizedExceptionThrown() {
         testTemplate(
-            "expected exception for missing callback handler",
+            "expected exception for feing unauthorized",
             str -> new FeignException.Unauthorized(
-                "expected exception for missing callback handler",
+                "expected exception for feing unauthorized",
                 Mockito.mock(feign.Request.class),
                 new byte[]{}
             ),
@@ -62,9 +62,19 @@ class ResourceExceptionHandlerTest {
     @Test
     void shouldReturnMethodNotAllowed_whenUnknownHostException() {
         testTemplate(
-            "expected exception for missing callback handler",
+            "expected exception for unknown host",
             UnknownHostException::new,
-            handler::unknownHost,
+            handler::unknownHostAndInvalidPayment,
+            HttpStatus.NOT_ACCEPTABLE
+        );
+    }
+
+    @Test
+    void shouldReturnMethodNotAllowed_whenInvalidPaymentRequestExceptionException() {
+        testTemplate(
+            "expected exception for invalid payment request",
+            UnknownHostException::new,
+            handler::unknownHostAndInvalidPayment,
             HttpStatus.NOT_ACCEPTABLE
         );
     }
@@ -72,9 +82,9 @@ class ResourceExceptionHandlerTest {
     @Test
     void shouldReturnForbidden_whenFeignExceptionForbiddenExceptionThrown() {
         testTemplate(
-            "expected exception for missing callback handler",
+            "expected exception for feing forbidden",
             str -> new FeignException.Unauthorized(
-                "expected exception for missing callback handler",
+                "expected exception for feing forbidden",
                 Mockito.mock(feign.Request.class),
                 new byte[]{}
             ),
@@ -86,7 +96,7 @@ class ResourceExceptionHandlerTest {
     @Test
     void shouldReturnMethodNotAllowed_whenNoSuchMethodErrorThrown() {
         testTemplate(
-            "expected exception for missing callback handler",
+            "expected exception for no such method error",
             NoSuchMethodError::new,
             handler::noSuchMethodError,
             HttpStatus.METHOD_NOT_ALLOWED
@@ -96,7 +106,7 @@ class ResourceExceptionHandlerTest {
     @Test
     void shouldReturnPreconditionFailed_whenIllegalArgumentExceptionThrown() {
         testTemplate(
-            "expected exception for missing callback handler",
+            "expected exception for illegal argument exception",
             IllegalArgumentException::new,
             handler::incorrectStateFlowOrIllegalArgument,
             HttpStatus.PRECONDITION_FAILED
@@ -106,10 +116,10 @@ class ResourceExceptionHandlerTest {
     @Test
     void shouldReturnBadRequest_whenHttpClientErrorExceptionThrown() {
         testTemplate(
-            "expected exception for missing callback handler",
+            "expected exception for client error bad request",
             exp -> new HttpClientErrorException(
                 HttpStatus.BAD_REQUEST,
-                "expected exception for missing callback handler"
+                "expected exception for client error bad request"
             ),
             handler::badRequest,
             HttpStatus.BAD_REQUEST

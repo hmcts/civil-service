@@ -190,8 +190,9 @@ public class LocationRefDataService {
             }
         } catch (Exception e) {
             log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
+            throw e;
         }
-        return LocationRefData.builder().build();
+
     }
 
     private URI buildURIforCourtCode(String courtCode) {
