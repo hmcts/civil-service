@@ -56,14 +56,16 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
 
         log.info("Migrating data for case: {}", oldCaseData.getCcdCaseReference());
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-
+        log.info("After getting the access token Type : {}", oldCaseData.getCaseAccessCategory());
         CaseLocation caseLocation = CaseLocation.builder().baseLocation("420219").region("2").build();
         if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
+            log.info("Inside IF SPEC CLAIM ");
             CaseMigratonUtility.migrateGS(oldCaseData, caseDataBuilder
             );
 
             CaseMigratonUtility.migrateCaseManagementLocation(caseDataBuilder, caseLocation);
         } else {
+            log.info("Inside ELSE UNSPEC CLAIM ");
             caseLocation = CaseLocation.builder().baseLocation("192280").region("4").build();
             CaseMigratonUtility.migrateCaseManagementLocation(caseDataBuilder, caseLocation);
             CaseMigratonUtility.migrateGS(oldCaseData, caseDataBuilder);
@@ -73,11 +75,12 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
             );
 
         }
+        log.info("Update respondent and applicant DQ ");
         caseLocation = CaseLocation.builder().baseLocation("420219").region("2").build();
         CaseMigratonUtility.migrateRespondentAndApplicantDQUnSpec(authToken, oldCaseData, caseDataBuilder,
                                                                   locationRefDataService, caseLocation
         );
-
+        log.info("Update migration ID ");
         caseDataBuilder.migrationId(MIGRATION_ID_VALUE);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
