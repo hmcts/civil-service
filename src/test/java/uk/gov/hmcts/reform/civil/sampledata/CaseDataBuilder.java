@@ -1089,8 +1089,8 @@ public class CaseDataBuilder {
                 return atStateClaimDismissedPastClaimNotificationDeadline();
             case TAKEN_OFFLINE_SDO_NOT_DRAWN:
                 return atStateTakenOfflineSDONotDrawn(mpScenario);
-            //case TAKEN_OFFLINE_AFTER_SDO:
-               // return atStateTakenOfflineAfterSDO(mpScenario);
+            case TAKEN_OFFLINE_AFTER_SDO:
+                return atStateTakenOfflineAfterSDO(mpScenario);
             default:
                 throw new IllegalArgumentException("Invalid internal state: " + flowState);
         }
