@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
 import java.math.BigDecimal;
+import static java.math.BigDecimal.ZERO;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -420,23 +421,34 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        log.info("CaseData : ", caseData);
+        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
         if (caseData.getCcjPaymentPaidSomeAmount() != null) {
             if (caseData.getCcjPaymentPaidSomeAmount()
                 .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0) {
                 errors.add("The amount paid must be less than the full claim amount.");
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(errors)
+                    .build();
             }
-            //TODO - move to seperate fun
-            var ccjJudgmentAmountClaimFee = MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
-            log.info("ClaimFee :", ccjJudgmentAmountClaimFee);
-
-            var ccjPaymentPaidSomeAmountInPounds = MonetaryConversions.penniesToPounds(caseData.getCcjPaymentPaidSomeAmount());
-            log.info("ccjPaymentPaidSomeAmountInPounds :", ccjPaymentPaidSomeAmountInPounds);
-
         }
+        buildJudgmentAmountSummaryDetails(caseData, updatedCaseData);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
+            .data(updatedCaseData.build().toMap(objectMapper))
             .build();
+    }
+
+    private void buildJudgmentAmountSummaryDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        BigDecimal claimFee =  MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
+        BigDecimal paidAmount = (caseData.getCcjPaymentPaidSomeOption() == YesOrNo.YES) ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentPaidSomeAmount()) : ZERO;
+        BigDecimal subTotal = caseData.getTotalClaimAmount().add(claimFee).add(caseData.getTotalInterest());
+        BigDecimal finalTotal = subTotal.subtract(paidAmount);
+
+        updatedCaseData.ccjJudgmentAmountClaimFee(claimFee);
+        updatedCaseData.ccjJudgmentSummarySubtotalAmount(subTotal);
+        updatedCaseData.ccjJudgmentTotalStillOwed(finalTotal);
+        updatedCaseData.ccjJudgmentAmountInterestToDate(caseData.getTotalInterest());
+        updatedCaseData.ccjPaymentPaidSomeAmountInPounds(paidAmount);
     }
 }

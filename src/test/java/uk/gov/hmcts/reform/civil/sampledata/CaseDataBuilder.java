@@ -280,6 +280,7 @@ public class CaseDataBuilder {
     private InterestClaimFromType interestClaimFrom;
     private InterestClaimUntilType interestClaimUntil;
     private BigDecimal totalClaimAmount;
+    private BigDecimal totalInterest;
     private LocalDate interestFromSpecificDate;
     private BigDecimal breakDownInterestTotal;
     protected LocalDateTime respondent1LitigationFriendDate;
@@ -362,12 +363,13 @@ public class CaseDataBuilder {
 
     private BigDecimal ccjPaymentPaidSomeAmount;
 
-    private BigDecimal ccjJudgmentAmountClaimFee;
+    private YesOrNo ccjPaymentPaidSomeOption;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
         return this;
     }
+
 
     public CaseDataBuilder generalAppVaryJudgementType(YesOrNo generalAppVaryJudgementType) {
         this.generalAppVaryJudgementType = generalAppVaryJudgementType;
@@ -3742,6 +3744,21 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder ccjPaymentPaidSomeOption(YesOrNo paymentOption){
+        this.ccjPaymentPaidSomeOption = paymentOption;
+        return this;
+    }
+
+    public CaseDataBuilder claimFee(Fee fee){
+        this.claimFee = fee;
+        return this;
+    }
+
+    public CaseDataBuilder totalInterest(BigDecimal interest){
+        this.totalInterest = interest;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -3789,6 +3806,7 @@ public class CaseDataBuilder {
             .interestFromSpecificDate(interestFromSpecificDate)
             .breakDownInterestTotal(breakDownInterestTotal)
             .totalClaimAmount(totalClaimAmount)
+            .totalInterest(totalInterest)
             //Deadline extension
             .respondentSolicitor1AgreedDeadlineExtension(respondentSolicitor1AgreedDeadlineExtension)
             .respondentSolicitor2AgreedDeadlineExtension(respondentSolicitor2AgreedDeadlineExtension)
@@ -3956,7 +3974,9 @@ public class CaseDataBuilder {
             .trialHearingTimeDJ(trialHearingTimeDJ)
             .trialOrderMadeWithoutHearingDJ(trialOrderMadeWithoutHearingDJ)
             .ccjPaymentPaidSomeAmount(ccjPaymentPaidSomeAmount)
+            .ccjPaymentPaidSomeOption(ccjPaymentPaidSomeOption)
             .build();
     }
+
 
 }

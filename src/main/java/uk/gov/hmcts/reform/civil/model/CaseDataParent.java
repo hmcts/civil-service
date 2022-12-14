@@ -325,6 +325,14 @@ public class CaseDataParent implements MappableObject {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal ccjJudgmentAmountClaimFee;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal ccjPaymentPaidSomeAmountInPounds;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal ccjJudgmentSummarySubtotalAmount;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal ccjJudgmentTotalStillOwed;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal ccjJudgmentAmountInterestToDate;
     private final String migrationId;
 
 }
