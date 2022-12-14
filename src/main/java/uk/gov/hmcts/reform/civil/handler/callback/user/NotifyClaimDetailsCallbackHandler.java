@@ -81,6 +81,9 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     public static final String DOC_SERVED_DATE_IN_FUTURE =
             "Date you served the documents must be today or in the past";
 
+    public static final String DOC_SERVED_DATE_OLDER_THAN_14DAYS =
+        "Date of Service should not be more than 14 days old";
+
     public static final String DOC_SERVED_MANDATORY =
             "Supporting evidence is required";
 
