@@ -4019,7 +4019,7 @@ class StateFlowEngineTest {
                                                               .build());
 
             Assertions.assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
-            Assertions.assertEquals(Boolean.TRUE,newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
+            Assertions.assertEquals(Boolean.TRUE, newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
         }
     }
 
