@@ -7,6 +7,7 @@ import lombok.Data;
 @Builder
 public class Witness {
 
+    @Deprecated
     private final String name;
     private final String firstName;
     private final String lastName;
