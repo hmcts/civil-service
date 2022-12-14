@@ -146,6 +146,31 @@ class LocationRefDataServiceTest {
     }
 
     @Nested
+    class CourtLocationsForGeneralApplicationTest {
+        @Test
+        void shouldReturnLocations_whenLRDReturnsAllLocationsForDefaultJudgments() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(restTemplate.exchange(
+                uriCaptor.capture(),
+                httpMethodCaptor.capture(),
+                httpEntityCaptor.capture(),
+                ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
+                .thenReturn(getAllLocationsRefDataResponse());
+
+            List<LocationRefData> courtLocations = refDataService
+                .getCourtLocationsForGeneralApplication("user_token");
+
+            assertThat(courtLocations).isNotNull();
+            verify(lrdConfiguration, times(1)).getUrl();
+            verify(lrdConfiguration, times(1)).getEndpoint();
+            assertThat(httpMethodCaptor.getValue()).isEqualTo(HttpMethod.GET);
+            assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("Authorization")).isEqualTo("user_token");
+            assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("ServiceAuthorization"))
+                .isEqualTo("service_token");
+        }
+    }
+
+    @Nested
     class CourtLocationsForDefaultJudgementTest {
         @Test
         void shouldReturnLocations_whenLRDReturnsAllLocationsForDefaultJudgments() {
