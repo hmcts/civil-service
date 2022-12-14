@@ -252,6 +252,28 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
             assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(newDate.minusDays(2));
         }
+
+        @Test
+        void shouldUpdate_to_earliest_day_whenSubmitted() {
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+            LocalDate cos1Date = localDateTime.minusDays(2).toLocalDate();
+            LocalDate cos2Date = localDateTime.minusDays(2).toLocalDate();
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos1Date.atStartOfDay()))
+                    .thenReturn(newDate.minusDays(2));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos2Date.atStartOfDay()))
+                    .thenReturn(newDate.minusDays(3));
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
+                    .setCoSClaimDetailsWithDate(true, true, cos1Date, cos2Date, true, true)
+                    .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(2);
+            assertThat(updatedData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
+            assertThat(updatedData.getCosNotifyClaimDetails2().getCosDocSaved()).isEqualTo(YES);
+            assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(newDate.minusDays(3));
+        }
     }
 
     @Nested
@@ -372,7 +394,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldPassValidateCertificateOfService_whenHasNoFile() {
+    void shouldFailValidateCertificateOfService_whenHasNoFile() {
         when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
         LocalDate past = LocalDate.now().minusDays(1);
         CaseData caseData = CaseDataBuilder.builder()
