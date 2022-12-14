@@ -353,9 +353,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder
             .trialHearingDisclosureOfDocumentsDJ(TrialHearingDisclosureOfDocuments
                                                      .builder()
-                                                     .input1("Documents will be disclosed by uploading to the Digital "
-                                                                 + "Portal a list with a disclosure"
-                                                                 + " statement by 4pm on")
+                                                     .input1("Documents must be disclosed by uploading to the"
+                                                                 + " Digital Portal a standard disclosure "
+                                                                 + "list by 4pm on")
                                                      .date1(LocalDate.now().plusWeeks(4))
                                                      .input2("Any request to inspect a document, or for a copy of a "
                                                                  + "document, shall be made directly to the other"
@@ -376,8 +376,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                              .input1("Each party must upload to the Digital Portal copies of the "
                                                          + "statements of all witnesses of fact on whom they "
                                                          + "intend to rely.")
+                                             .input2("3")
+                                             .input3("3")
                                              .input4("For this limitation, a party is counted as witness.")
                                              .input5("Each witness statement should be no more than")
+                                             .input6("10")
                                              .input7("A4 pages. Statements should be double spaced "
                                                          + "using a font size of 12.")
                                              .input8("Witness statements shall be uploaded to the "
@@ -404,14 +407,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                            + "case on periodical payments. "
                                                            + "then they must do so in the respective schedule "
                                                            + "and counter-schedule")
-                                               .input4("Upon it being noted that the schedule of loss "
-                                                           + "contains no claim for continuing loss and is "
-                                                           + "therefore final, no further schedule of loss shall"
-                                                           + " be uploaded without permission to amend. "
-                                                           + "The defendant shall upload to the Digital Portal"
-                                                           + " an up-to-date counter "
-                                                           + "schedule of loss by 4pm on")
-                                               .date3(LocalDate.now().plusWeeks(12))
                                                .build());
 
         caseDataBuilder.trialHearingTrialDJ(TrialHearingTrial
