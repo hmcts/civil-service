@@ -1567,6 +1567,18 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder multiPartyClaimTwoDefendant1Lip1Lr() {
+        atStateClaimDraft();
+        respondent1OrganisationPolicy = null;
+        defendant1LIPAtClaimIssued = YES;
+
+        addRespondent2 = YES;
+        respondent2OrganisationPolicy = null;
+        respondent2SameLegalRepresentative = NO;
+        defendant2LIPAtClaimIssued = NO;
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimSubmitted() {
         atStateClaimDraft();
         legacyCaseReference = LEGACY_CASE_REFERENCE;
@@ -3777,6 +3789,12 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimDetailsNotified_1v2_andNotifyBothCoS() {
         atStateClaimDetailsNotified();
         multiPartyClaimTwoDefendantLips();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotified_1v2_1Lip_1Lr() {
+        atStateClaimDetailsNotified();
+        multiPartyClaimTwoDefendant1Lip1Lr();
         return this;
     }
 
