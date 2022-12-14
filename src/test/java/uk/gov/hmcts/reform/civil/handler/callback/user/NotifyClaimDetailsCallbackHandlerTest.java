@@ -438,6 +438,21 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
+    void shouldPassValidateCertificateOfService_1Lr1Lip_whenDateIsPast() {
+        when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+        LocalDate past = LocalDate.now().minusDays(1);
+        CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_1Lr_1Lip()
+                .setCoSClaimDetailsWithDate(true, false, past, null, true, false)
+                .build();
+        CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
+        AboutToStartOrSubmitCallbackResponse successResponse =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(successResponse.getErrors()).isEmpty();
+        assertThat(params.getCaseData().getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(NO);
+    }
+
+    @Test
     void shouldIgnoreValidateCertificateOfService_whenDisabled() {
         when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
         LocalDate past = LocalDate.now().minusDays(1);
@@ -502,6 +517,19 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
                 .setCoSClaimDetailsWithDate(true, true, past, past, true, true)
+                .build();
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+        SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+        assertThat(response.getConfirmationHeader()).contains("Certificate of Service");
+    }
+
+    @Test
+    void shouldReturnCoSConfirmation_1Lip1Lr_whenCosNotifyDetailsSuccess() {
+        when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+        LocalDate past = LocalDate.now().minusDays(1);
+        CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_1Lip_1Lr()
+                .setCoSClaimDetailsWithDate(true, false, past, null, true, false)
                 .build();
         CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
         SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);

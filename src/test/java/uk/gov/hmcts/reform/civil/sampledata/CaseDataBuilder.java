@@ -134,8 +134,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
 import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.FIFTEEN_MINUTES;
-import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.FIFTEEN_MINUTES;
-import static uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator.DISPOSAL_HEARING;
 import static uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator.DISPOSAL_HEARING;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -1576,6 +1574,18 @@ public class CaseDataBuilder {
         respondent2OrganisationPolicy = null;
         respondent2SameLegalRepresentative = NO;
         defendant2LIPAtClaimIssued = NO;
+        return this;
+    }
+
+    public CaseDataBuilder multiPartyClaimTwoDefendant1Lr1Lip() {
+        atStateClaimDraft();
+        respondent1OrganisationPolicy = null;
+        defendant1LIPAtClaimIssued = NO;
+
+        addRespondent2 = YES;
+        respondent2OrganisationPolicy = null;
+        respondent2SameLegalRepresentative = NO;
+        defendant2LIPAtClaimIssued = YES;
         return this;
     }
 
@@ -3789,12 +3799,21 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimDetailsNotified_1v2_andNotifyBothCoS() {
         atStateClaimDetailsNotified();
         multiPartyClaimTwoDefendantLips();
+        respondent2 = PartyBuilder.builder().soleTrader().build();
         return this;
     }
 
     public CaseDataBuilder atStateClaimDetailsNotified_1v2_1Lip_1Lr() {
         atStateClaimDetailsNotified();
         multiPartyClaimTwoDefendant1Lip1Lr();
+        respondent2 = PartyBuilder.builder().soleTrader().build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotified_1v2_1Lr_1Lip() {
+        atStateClaimDetailsNotified();
+        multiPartyClaimTwoDefendant1Lr1Lip();
+        respondent2 = PartyBuilder.builder().soleTrader().build();
         return this;
     }
 
