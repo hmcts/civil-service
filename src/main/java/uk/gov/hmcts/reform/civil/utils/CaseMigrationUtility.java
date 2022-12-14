@@ -61,16 +61,13 @@ public class CaseMigrationUtility {
                 authToken,
                 location.getApplicantPreferredCourt()
             );
-            if (ofNullable(refData.getEpimmsId()).isPresent()) {
 
-            }
             log.info(
                 "Location details found:: court code : {} region : {} , EpimmsId {} ",
                 refData.getCourtLocationCode(),
                 refData.getRegionId(),
                 refData.getEpimmsId()
             );
-
 
             CaseLocation caseLocation = CaseLocation.builder()
                 .baseLocation(refData.getEpimmsId())
