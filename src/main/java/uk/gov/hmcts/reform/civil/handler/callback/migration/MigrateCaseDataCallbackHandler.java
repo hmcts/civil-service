@@ -81,7 +81,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
             );
             log.info("Add migration ID");
             caseDataBuilder.migrationId(MIGRATION_ID_VALUE);
-        }catch (Exception exception) {
+        } catch (Exception exception) {
             log.error("Exception during migration about to submit event- " + exception.getMessage(), exception);
             throw exception;
         }
