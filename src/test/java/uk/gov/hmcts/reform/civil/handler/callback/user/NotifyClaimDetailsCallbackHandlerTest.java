@@ -236,7 +236,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldUpdateCertificateOfService_and_documents_whenSubmitted() {
+        void shouldUpdateCertificateOfService_and_documents_cos1_whenSubmitted() {
             when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             LocalDate cosDate = localDateTime.minusDays(2).toLocalDate();
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDate.atStartOfDay()))
@@ -254,13 +254,53 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldUpdate_to_earliest_day_whenSubmitted() {
+        void shouldUpdateCertificateOfService_and_documents_cos2_whenSubmitted() {
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+            LocalDate cosDate = localDateTime.minusDays(2).toLocalDate();
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDate.atStartOfDay()))
+                    .thenReturn(newDate.minusDays(2));
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
+                    .setCoSClaimDetailsWithDate(false, true, null, cosDate, false, true)
+                    .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(1);
+            assertThat(updatedData.getCosNotifyClaimDetails2().getCosDocSaved()).isEqualTo(YES);
+            assertThat(updatedData.getNextDeadline()).isEqualTo(newDate.minusDays(2).toLocalDate());
+        }
+
+        @Test
+        void shouldUpdate_to_earliest_day_cos2_is_earliest_whenSubmitted() {
             when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             LocalDate cos1Date = localDateTime.minusDays(2).toLocalDate();
-            LocalDate cos2Date = localDateTime.minusDays(2).toLocalDate();
+            LocalDate cos2Date = localDateTime.minusDays(3).toLocalDate();
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos1Date.atStartOfDay()))
                     .thenReturn(newDate.minusDays(2));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos2Date.atStartOfDay()))
+                    .thenReturn(newDate.minusDays(3));
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
+                    .setCoSClaimDetailsWithDate(true, true, cos1Date, cos2Date, true, true)
+                    .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(2);
+            assertThat(updatedData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
+            assertThat(updatedData.getCosNotifyClaimDetails2().getCosDocSaved()).isEqualTo(YES);
+            assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(newDate.minusDays(3));
+        }
+
+        @Test
+        void shouldUpdate_to_earliest_day_cos1_is_earliest_whenSubmitted() {
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+            LocalDate cos2Date = localDateTime.minusDays(2).toLocalDate();
+            LocalDate cos1Date = localDateTime.minusDays(3).toLocalDate();
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos2Date.atStartOfDay()))
+                    .thenReturn(newDate.minusDays(2));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos1Date.atStartOfDay()))
                     .thenReturn(newDate.minusDays(3));
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
