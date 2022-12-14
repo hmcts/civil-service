@@ -7,10 +7,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
+import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
+import uk.gov.service.notify.NotificationClientException;
 
+import java.net.UnknownHostException;
 import java.net.SocketTimeoutException;
+
+import static org.springframework.http.HttpStatus.FAILED_DEPENDENCY;
 
 @Slf4j
 @ControllerAdvice
@@ -22,17 +28,62 @@ public class ResourceExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(value = StateFlowException.class)
-    public ResponseEntity<Object> incorrectStateFlow(Exception exception) {
+    @ExceptionHandler({
+        StateFlowException.class,
+        IllegalArgumentException.class
+    })
+    public ResponseEntity<Object> incorrectStateFlowOrIllegalArgument(Exception exception) {
         log.debug(exception.getMessage(), exception);
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.PRECONDITION_FAILED);
+    }
+
+    @ExceptionHandler(value = HttpClientErrorException.BadRequest.class)
+    public ResponseEntity<Object> badRequest(Exception exception) {
+        log.debug(exception.getMessage(), exception);
+        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({
+        UnknownHostException.class,
+        InvalidPaymentRequestException.class
+    })
+    public ResponseEntity<Object> unknownHostAndInvalidPayment(Exception exception) {
+        log.debug(exception.getMessage(), exception);
+        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @ExceptionHandler(value =  FeignException.Unauthorized.class)
+    public ResponseEntity<Object> unauthorizedFeign(Exception exception) {
+        log.debug(exception.getMessage(), exception);
+        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(value =  FeignException.Forbidden.class)
+    public ResponseEntity<Object> forbiddenFeign(Exception exception) {
+        log.debug(exception.getMessage(), exception);
+        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(value = NoSuchMethodError.class)
+    public ResponseEntity<Object> noSuchMethodError(Throwable error) {
+        log.debug(error.getMessage(), error);
+        return new ResponseEntity<>(error.getMessage(), new HttpHeaders(), HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     @ExceptionHandler({FeignException.GatewayTimeout.class, SocketTimeoutException.class})
     public ResponseEntity<String> handleFeignExceptionGatewayTimeout(Exception exception) {
         log.debug(exception.getMessage(), exception);
         return new ResponseEntity<>(exception.getMessage(),
-                                    new HttpHeaders(), HttpStatus.GATEWAY_TIMEOUT);
+                                    new HttpHeaders(), HttpStatus.GATEWAY_TIMEOUT
+        );
+    }
+
+    @ExceptionHandler(NotificationClientException.class)
+    public ResponseEntity<Object> handleNotificationClientException(NotificationClientException exception) {
+        log.debug(exception.getMessage(), exception);
+        return ResponseEntity
+            .status(FAILED_DEPENDENCY)
+            .body(exception.getMessage());
     }
 
 }

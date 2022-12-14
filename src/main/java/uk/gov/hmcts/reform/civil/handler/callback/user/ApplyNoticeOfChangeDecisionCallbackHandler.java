@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.noc.DecisionRequest;
 
@@ -31,8 +30,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
 @RequiredArgsConstructor
@@ -70,34 +67,14 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
 
         CaseData updatedCaseData = objectMapper.convertValue(applyDecision.getData(), CaseData.class);
         CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = updatedCaseData.toBuilder();
-
         updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(updatedCaseData, updatedCaseDataBuilder);
-
-        updatedCaseDataBuilder.businessProcess(BusinessProcess.ready(APPLY_NOC_DECISION));
-
-        updateChangeOfRepresentationHistory(callbackParams.getCaseData().getChangeOrganisationRequestField(),
-                                            updatedCaseData, updatedCaseDataBuilder);
+        updatedCaseDataBuilder
+            .businessProcess(BusinessProcess.ready(APPLY_NOC_DECISION))
+            .changeOfRepresentation(getChangeOfRepresentation(
+                    callbackParams.getCaseData().getChangeOrganisationRequestField(), updatedCaseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseDataBuilder.build().toMap(objectMapper)).build();
-    }
-
-    private void updateChangeOfRepresentationHistory(ChangeOrganisationRequest corFieldBeforeNoC,
-                                                     CaseData updatedCaseData,
-                                                     CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder) {
-        List<Element<ChangeOfRepresentation>> changeOfRepresentationHistory =
-            updatedCaseData.getChangeOfRepresentation();
-
-        ChangeOfRepresentation newChangeOfRepresentation =
-            getChangeOfRepresentation(corFieldBeforeNoC, updatedCaseData);
-
-        if (changeOfRepresentationHistory != null
-            && !changeOfRepresentationHistory.isEmpty()) {
-            changeOfRepresentationHistory.add(element(newChangeOfRepresentation));
-            updatedCaseDataBuilder.changeOfRepresentation(changeOfRepresentationHistory);
-        } else {
-            updatedCaseDataBuilder.changeOfRepresentation(wrapElements(newChangeOfRepresentation));
-        }
     }
 
     private ChangeOfRepresentation getChangeOfRepresentation(ChangeOrganisationRequest corFieldBeforeNoC,
@@ -115,7 +92,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     }
 
     /** After applying the NoC decision the ChangeOrganisationRequest field is nullified
-     * To auto assigned the case to the new user, Assign case access checks for:
+     * To auto assign the case to the new user, Assign case access checks for:
      * 1. ChangeOrganisationRequest field in case data, it does this by looking for the OrganisationToAdd node
      * 2. checks if caseroleID field is null
      *
