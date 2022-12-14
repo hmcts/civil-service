@@ -434,7 +434,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
         buildJudgmentAmountSummaryDetails(caseData, updatedCaseData);
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
+       return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
     }

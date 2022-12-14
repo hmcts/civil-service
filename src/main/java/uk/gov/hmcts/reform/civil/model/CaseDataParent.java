@@ -320,9 +320,9 @@ public class CaseDataParent implements MappableObject {
     private final CaseDocument respondent2ClaimResponseDocumentSpec;
     private final String respondent1PaymentDateToStringSpec;
     private final YesOrNo ccjPaymentPaidSomeOption;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal ccjPaymentPaidSomeAmount;
-
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal ccjJudgmentAmountClaimFee;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
@@ -333,6 +333,7 @@ public class CaseDataParent implements MappableObject {
     private final BigDecimal ccjJudgmentTotalStillOwed;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal ccjJudgmentAmountInterestToDate;
+
     private final String migrationId;
 
 }
