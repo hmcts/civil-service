@@ -239,10 +239,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
                 if (featureToggleService.isCourtLocationDynamicListEnabled()) {
                     applicant1DQBuilder.applicant1DQRequestedCourt(
-                            RequestedCourt.builder()
-                                .caseLocation(caseData.getCourtLocation().getCaseLocation())
-                                .responseCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
-                                .build());
+                        RequestedCourt.builder()
+                            .caseLocation(caseData.getCourtLocation().getCaseLocation())
+                            .responseCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+                            .build());
                 }
 
                 builder.applicant1DQ(applicant1DQBuilder.build());
@@ -280,9 +280,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE))
                     || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
                     response = AboutToStartOrSubmitCallbackResponse.builder()
-                    .data(builder.build().toMap(objectMapper))
-                    .state(CaseState.JUDICIAL_REFERRAL.name())
-                    .build();
+                        .data(builder.build().toMap(objectMapper))
+                        .state(CaseState.JUDICIAL_REFERRAL.name())
+                        .build();
                 } else if (multiPartyScenario.equals(ONE_V_TWO_TWO_LEGAL_REP)) {
                     if (caseData.getRespondent2ClaimResponseType()
                         .equals(RespondentResponseType.FULL_DEFENCE)) {

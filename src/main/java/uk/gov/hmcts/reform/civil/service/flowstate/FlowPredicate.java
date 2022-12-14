@@ -67,6 +67,13 @@ public class FlowPredicate {
     public static final Predicate<CaseData> noticeOfChangeEnabledAndLiP = caseData ->
         caseData.getAddLegalRepDeadline() != null;
 
+    public static final Predicate<CaseData> certificateOfServiceEnabled = caseData ->
+        (caseData.getDefendant1LIPAtClaimIssued() != null
+        && caseData.getDefendant1LIPAtClaimIssued() == YES)
+            ||
+            (caseData.getDefendant2LIPAtClaimIssued() != null
+            && caseData.getDefendant2LIPAtClaimIssued() == YES);
+
     public static final Predicate<CaseData> claimSubmittedBothRespondentUnrepresented = caseData ->
         caseData.getSubmittedDate() != null
             && caseData.getAddRespondent2() == YES
@@ -400,6 +407,9 @@ public class FlowPredicate {
         getPredicateForClaimantIntentionNotProceed(caseData);
 
     public static final Predicate<CaseData> takenOfflineBySystem = caseData ->
+        caseData.getTakenOfflineDate() != null;
+
+    public static final Predicate<CaseData> takenOfflineAfterSDO = caseData ->
         caseData.getTakenOfflineDate() != null;
 
     public static final Predicate<CaseData> takenOfflineByStaff = caseData ->
