@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.service.notify.NotificationClientException;
@@ -103,6 +104,18 @@ class ResourceExceptionHandlerTest {
     }
 
     @Test
+    void shouldReturnBadRequest_whenHttpClientErrorExceptionThrown() {
+        testTemplate(
+            "expected exception for missing callback handler",
+            exp -> new HttpClientErrorException(
+                HttpStatus.BAD_REQUEST,
+                "expected exception for missing callback handler"
+            ),
+            handler::badRequest,
+            HttpStatus.BAD_REQUEST
+        );
+    }
+
     public void testFeignExceptionGatewayTimeoutException() {
         testTemplate(
             "gateway time out message",

@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDism
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotifiedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedPastHearingFeeDue;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.certificateOfServiceEnabled;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
@@ -157,6 +158,7 @@ public class StateFlowEngine {
                         FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
                         FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                        FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
                     )))
             .transitionTo(CLAIM_SUBMITTED)
@@ -171,6 +173,7 @@ public class StateFlowEngine {
                         FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
                         FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                        FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
                     )))
             // To be removed when NOC is released. Needed for cases with unregistered and unrepresented defendants
@@ -188,6 +191,7 @@ public class StateFlowEngine {
                         FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
                         FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                        FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
                     )))
             // Only one unrepresented defendant
@@ -199,6 +203,7 @@ public class StateFlowEngine {
                         FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
                         FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                        FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
                     )))
             // Unrepresented defendant 1
@@ -214,6 +219,7 @@ public class StateFlowEngine {
                         FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
                         FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                        FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
                     )))
             // Unrepresented defendant 2
@@ -228,6 +234,7 @@ public class StateFlowEngine {
                         FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
                         FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                        FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
                     )))
             // Unrepresented defendants
@@ -241,6 +248,7 @@ public class StateFlowEngine {
                         FlowFlag.RPA_CONTINUOUS_FEED.name(), featureToggleService.isRpaContinuousFeedEnabled(),
                         FlowFlag.SPEC_RPA_CONTINUOUS_FEED.name(), featureToggleService.isSpecRpaContinuousFeedEnabled(),
                         FlowFlag.NOTICE_OF_CHANGE.name(), featureToggleService.isNoticeOfChangeEnabled(),
+                        FlowFlag.CERTIFICATE_OF_SERVICE.name(), featureToggleService.isCertificateOfServiceEnabled(),
                         GENERAL_APPLICATION_ENABLED.name(), featureToggleService.isGeneralApplicationsEnabled()
                     )))
             .state(CLAIM_SUBMITTED)
@@ -256,10 +264,10 @@ public class StateFlowEngine {
             // 2. Def1 unrepresented, Def2 registered
             // 3. Def1 registered, Def 2 unrepresented
             .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
-            .onlyIf((respondent1NotRepresented.and(respondent2NotRepresented))
-                        .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
-                        .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented))
-                        .and(not(specClaim)))
+                .onlyIf((respondent1NotRepresented.and(respondent2NotRepresented))
+                            .or(respondent1NotRepresented.and(respondent2OrgNotRegistered.negate()))
+                            .or(respondent1OrgNotRegistered.negate().and(respondent2NotRepresented))
+                            .and(not(specClaim)))
             .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC)
                 .onlyIf(oneVsOneCase.and(respondent1NotRepresented).and(specClaim))
             .set(flags -> {
@@ -300,6 +308,10 @@ public class StateFlowEngine {
                             .and(respondent2NotRepresented)))
             .state(PENDING_CLAIM_ISSUED)
                 .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued)
+            .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
+                .transitionTo(CLAIM_ISSUED).onlyIf(claimIssued
+                                                       .and(not(specClaim))
+                                                       .and(certificateOfServiceEnabled))
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
                 .transitionTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT)
                     .onlyIf(takenOfflineBySystem.and(pastAddLegalRepDeadline))
