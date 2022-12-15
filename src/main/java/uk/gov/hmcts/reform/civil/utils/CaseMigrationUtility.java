@@ -230,7 +230,6 @@ public class CaseMigrationUtility {
         }*/
         log.info("Migrate respondent 2 DQ end");
     }
-
     private void migrateRespondent1DQUnspec(String authToken, CaseData oldCaseData,
                                             CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                             CaseLocation caseLocation) {
@@ -239,10 +238,12 @@ public class CaseMigrationUtility {
         if (ofNullable(respondent1DQ).isPresent()
             && ofNullable(respondent1DQ.getRespondent1DQRequestedCourt()).isPresent()
             && ofNullable(respondent1DQ.getRespondent1DQRequestedCourt().getResponseCourtCode()).isPresent()) {
-            log.info("migrateRespondent1DQUnspec Fetch data from LRD preferred code  : {}, ref {} ",
-                     respondent1DQ.getRespondent1DQRequestedCourt()
-                .getResponseCourtCode(),
-                     oldCaseData.getCcdCaseReference());
+            log.info(
+                "migrateRespondent1DQUnspec Fetch data from LRD preferred code  : {}, ref {} ",
+                respondent1DQ.getRespondent1DQRequestedCourt()
+                    .getResponseCourtCode(),
+                oldCaseData.getCcdCaseReference()
+            );
             LocationRefData refdata = locationRefDataService.getCourtLocation(
                 authToken,
                 respondent1DQ.getRespondent1DQRequestedCourt()
@@ -250,8 +251,8 @@ public class CaseMigrationUtility {
             );
             log.info("migrateRespondent1DQUnspec Location details ,courtcode :" +
                          " {} region : {} ,baseLocation {}, ref {} ", refdata.getCourtLocationCode(),
-                     refdata.getRegionId(), refdata.getEpimmsId(),oldCaseData.getCcdCaseReference()
-                                 );
+                     refdata.getRegionId(), refdata.getEpimmsId(), oldCaseData.getCcdCaseReference()
+            );
             CaseLocation location = CaseLocation.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegionId()).build();
 
