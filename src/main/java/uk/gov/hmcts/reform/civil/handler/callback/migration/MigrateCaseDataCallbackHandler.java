@@ -47,10 +47,10 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse migrateCaseData(CallbackParams callbackParams) {
+        try {
         CaseData oldCaseData = callbackParams.getCaseData();
         log.info("Migrating data for case: {}", oldCaseData.getCcdCaseReference());
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
-        try {
             log.info("Inside try block");
             if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
                 log.info("Process SPEC claim");
@@ -84,13 +84,15 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
             );
             log.info("Add migration ID");
             caseDataBuilder.migrationId(MIGRATION_ID_VALUE);
+
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
         } catch (Exception exception) {
             log.error("Exception during migration about to submit event- " + exception.getMessage(), exception);
             throw exception;
         }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+
     }
 
     private CallbackResponse migrateSupplementaryData(CallbackParams callbackParams) {
