@@ -230,6 +230,7 @@ public class CaseMigrationUtility {
         }*/
         log.info("Migrate respondent 2 DQ end");
     }
+
     private void migrateRespondent1DQUnspec(String authToken, CaseData oldCaseData,
                                             CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                             CaseLocation caseLocation) {
