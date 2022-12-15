@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseMigrationUtility;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -24,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 
 @SpringBootTest(classes = {
     MigrateCaseDataCallbackHandler.class,
+    CaseMigrationUtility.class,
     JacksonAutoConfiguration.class})
 public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest {
 
