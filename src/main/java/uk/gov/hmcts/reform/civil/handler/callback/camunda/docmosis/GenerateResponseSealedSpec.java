@@ -42,7 +42,6 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
     private final CivilDocumentStitchingService civilDocumentStitchingService;
     private final FeatureToggleService toggleService;
 
-
     @Value("${stitching.enabled:true}")
     private boolean stitchEnabled;
 
