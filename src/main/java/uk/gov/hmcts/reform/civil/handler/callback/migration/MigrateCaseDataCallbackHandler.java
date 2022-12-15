@@ -46,14 +46,12 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CallbackResponse migrateCaseData(CallbackParams callbackParams)  {
+    private CallbackResponse migrateCaseData(CallbackParams callbackParams) {
         CaseData oldCaseData = callbackParams.getCaseData();
         log.info("Migrating data for case: {}", oldCaseData.getCcdCaseReference());
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
         try {
             log.info("Inside try block");
-          //  String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-
             if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
                 log.info("Process SPEC claim");
 
@@ -74,7 +72,8 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
                 caseMigrationUtility.migrateUnspecCourtLocation(
                     callbackParams.getParams().get(BEARER_TOKEN).toString(),
                     oldCaseData,
-                    caseDataBuilder);
+                    caseDataBuilder
+                );
             }
             log.info("Start DQ migration");
             caseMigrationUtility.migrateRespondentAndApplicantDQUnSpec(
