@@ -14,21 +14,6 @@ import javax.validation.constraints.Future;
 @AllArgsConstructor
 public class DisposalHearingSchedulesOfLoss {
 
-    /**
-     * First paragraph. Meaning depends on disposal template and ccd labels.
-     *
-     * @deprecated since CIV-6302
-     */
-    @Deprecated(forRemoval = true, since = "CIV-6302")
-    private String input1;
-    /**
-     * First date. Meaning depends on disposal template and ccd labels.
-     *
-     * @deprecated since CIV-6302
-     */
-    @Deprecated(forRemoval = true, since = "CIV-6302")
-    @Future(message = "The date entered must be in the future")
-    private LocalDate date1;
     private String input2;
     @Future(message = "The date entered must be in the future")
     private LocalDate date2;
