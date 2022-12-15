@@ -145,9 +145,9 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         ArrayList<String> errors = new ArrayList<>();
-        final String dateValidationErrorMessage= getServiceOfDateValidationMessage(caseData
+        final String dateValidationErrorMessage = getServiceOfDateValidationMessage(caseData
                                                                                        .getCosNotifyClaimDefendant1());
-        if(!dateValidationErrorMessage.isEmpty()){
+        if (!dateValidationErrorMessage.isEmpty()) {
             errors.add(dateValidationErrorMessage);
         }
 
@@ -162,9 +162,9 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         ArrayList<String> errors = new ArrayList<>();
-        final String dateValidationErrorMessage= getServiceOfDateValidationMessage(caseData
+        final String dateValidationErrorMessage = getServiceOfDateValidationMessage(caseData
                                                                                        .getCosNotifyClaimDefendant2());
-        if(!dateValidationErrorMessage.isEmpty()){
+        if (!dateValidationErrorMessage.isEmpty()) {
             errors.add(dateValidationErrorMessage);
         }
 
@@ -285,14 +285,15 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     }
 
     private boolean isCosDefendantNotifyDateFutureDate(LocalDate cosDateOfServiceForDefendant) {
-        return LocalDate.now().isBefore(cosDateOfServiceForDefendant);
+        return time.now().toLocalDate().isBefore(cosDateOfServiceForDefendant);
     }
 
     private boolean isCosDefendantNotifyDateOlderThan14Days(LocalDate cosDateOfServiceForDefendant) {
-        return LocalDateTime.now().isAfter(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDateOfServiceForDefendant
+        return time.now().isAfter(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDateOfServiceForDefendant
                                                         .atTime(time.now().toLocalTime())));
 
     }
+
     private boolean isConfirmationForLip(CaseData caseData) {
         return (caseData.getDefendant1LIPAtClaimIssued() != null
             && caseData.getDefendant1LIPAtClaimIssued() == YesOrNo.YES)
@@ -306,12 +307,12 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             || (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
     }
 
-    private String getServiceOfDateValidationMessage(CertificateOfService certificateOfService){
+    private String getServiceOfDateValidationMessage(CertificateOfService certificateOfService) {
         final String errorMessage = "";
         if (Objects.nonNull(certificateOfService)) {
-            if(isCosDefendantNotifyDateFutureDate(certificateOfService.getCosDateOfServiceForDefendant())) {
+            if (isCosDefendantNotifyDateFutureDate(certificateOfService.getCosDateOfServiceForDefendant())) {
                 return DOC_SERVED_DATE_IN_FUTURE;
-            } else if(isCosDefendantNotifyDateOlderThan14Days(certificateOfService.getCosDateOfServiceForDefendant())) {
+            } else if (isCosDefendantNotifyDateOlderThan14Days(certificateOfService.getCosDateOfServiceForDefendant())) {
                 return DOC_SERVED_DATE_OLDER_THAN_14DAYS;
             }
         }
