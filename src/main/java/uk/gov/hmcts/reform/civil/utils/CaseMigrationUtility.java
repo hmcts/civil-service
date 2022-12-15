@@ -52,7 +52,7 @@ public class CaseMigrationUtility {
 
     public void migrateUnspecCourtLocation(String authToken, CaseData oldCaseData,
                                            CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
-        log.info("Migrate Case  location for  unspec");
+        log.info("Migrate Case  location for  unspec: {}", oldCaseData.getCcdCaseReference());
 
         CourtLocation location = oldCaseData.getCourtLocation();
         if (ofNullable(location).isPresent()) {
@@ -93,12 +93,12 @@ public class CaseMigrationUtility {
         log.info("CaseCategory is : {}", oldCaseData.getCaseAccessCategory());
 
         if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
-            log.info("Spec DQ Migration");
+            log.info("Spec DQ Migration: {}", oldCaseData.getCcdCaseReference());
 
             migrateRespondent1DQ(authToken, oldCaseData, caseDataBuilder, caseLocation);
             migrateRespondent2DQ(authToken, oldCaseData, caseDataBuilder, caseLocation);
         } else {
-            log.info("UNSpec DQ Migration");
+            log.info("UNSpec DQ Migration: {}", oldCaseData.getCcdCaseReference());
             migrateRespondent1DQUnspec(authToken, oldCaseData, caseDataBuilder, caseLocation);
             migrateRespondent2DQUnSpec(authToken, oldCaseData, caseDataBuilder, caseLocation);
         }
@@ -111,7 +111,7 @@ public class CaseMigrationUtility {
     private void migrateRespondent1DQ(String authToken, CaseData oldCaseData,
                                       CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                       CaseLocation caseLocation) {
-        log.info("Migrate respondent 1 DQ start");
+        log.info("Migrate respondent 1 DQ start: {}", oldCaseData.getCcdCaseReference());
         Respondent1DQ respondent1DQ = oldCaseData.getRespondent1DQ();
         if (ofNullable(respondent1DQ).isPresent()
             && ofNullable(respondent1DQ.getRespondent1DQRequestedCourt()).isPresent()
@@ -168,7 +168,7 @@ public class CaseMigrationUtility {
     private void migrateRespondent2DQ(String authToken, CaseData oldCaseData,
                                       CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                       CaseLocation caseLocation) {
-        log.info("Migrate respondent 2 DQ start");
+        log.info("Migrate respondent 2 DQ start: {}", oldCaseData.getCcdCaseReference());
         Respondent2DQ respondent2DQ = oldCaseData.getRespondent2DQ();
         if (ofNullable(respondent2DQ).isPresent()
             && ofNullable(respondent2DQ.getRespondent2DQRequestedCourt()).isPresent()
@@ -223,7 +223,7 @@ public class CaseMigrationUtility {
     private void migrateRespondent1DQUnspec(String authToken, CaseData oldCaseData,
                                             CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                             CaseLocation caseLocation) {
-        log.info("Migrate respondent 1 DQ start unpec");
+        log.info("Migrate respondent 1 DQ start unpec: {}", oldCaseData.getCcdCaseReference());
         Respondent1DQ respondent1DQ = oldCaseData.getRespondent1DQ();
         if (ofNullable(respondent1DQ).isPresent()
             && ofNullable(respondent1DQ.getRespondent1DQRequestedCourt()).isPresent()
@@ -264,7 +264,7 @@ public class CaseMigrationUtility {
     private void migrateRespondent2DQUnSpec(String authToken, CaseData oldCaseData,
                                             CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                             CaseLocation caseLocation) {
-        log.info("migrateRespondent2DQUnSpec: Migrate respondent 1 DQ start unpec");
+        log.info("migrateRespondent2DQUnSpec: Migrate respondent 1 DQ start unpec: {}", oldCaseData.getCcdCaseReference());
         Respondent2DQ respondent2DQ = oldCaseData.getRespondent2DQ();
         if (ofNullable(respondent2DQ).isPresent()
             && ofNullable(respondent2DQ.getRespondent2DQRequestedCourt()).isPresent()
@@ -305,7 +305,7 @@ public class CaseMigrationUtility {
                                      CaseLocation caseLocation) {
 
         Applicant1DQ applicant1DQ = oldCaseData.getApplicant1DQ();
-        log.info("Migrate applicant 1 DQ start ");
+        log.info("Migrate applicant 1 DQ start : {}", oldCaseData.getCcdCaseReference());
         if (ofNullable(applicant1DQ).isPresent()
             && ofNullable(applicant1DQ.getApplicant1DQRequestedCourt()).isPresent()
             && ofNullable(applicant1DQ.getApplicant1DQRequestedCourt().getResponseCourtCode()).isPresent()) {
