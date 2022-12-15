@@ -159,13 +159,13 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         caseDataBuilder.bothDefendantsSpec("One");
         // populate the title of next screen if only one defendant chosen
         var currentDefendantString = ("Has " + caseData.getDefendantDetailsSpec()
-            .getValue().getLabel() +  " paid some of the amounttt owed?");
+            .getValue().getLabel() +  " paid some of the amount owed?");
         var currentDefendantName = (caseData.getDefendantDetailsSpec()
             .getValue().getLabel());
         if (caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith("Both")) {
             caseDataBuilder.bothDefendantsSpec(caseData.getDefendantDetailsSpec().getValue().getLabel());
             // populate the title of next screen if both defendants chosen
-            currentDefendantString = ("Have the defendants paid some of the amounttt owed?");
+            currentDefendantString = ("Have the defendants paid some of the amount owed?");
             currentDefendantName = ("both defendants");
         }
         caseDataBuilder.currentDefendant(currentDefendantString);
