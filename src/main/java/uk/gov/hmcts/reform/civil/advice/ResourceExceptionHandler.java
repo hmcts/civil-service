@@ -11,14 +11,13 @@ import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
+import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.net.UnknownHostException;
 import java.net.SocketTimeoutException;
 
 import static org.springframework.http.HttpStatus.FAILED_DEPENDENCY;
-
-import java.net.UnknownHostException;
 
 @Slf4j
 @ControllerAdvice
@@ -45,8 +44,11 @@ public class ResourceExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(value = UnknownHostException.class)
-    public ResponseEntity<Object> unknownHost(Exception exception) {
+    @ExceptionHandler({
+        UnknownHostException.class,
+        InvalidPaymentRequestException.class
+    })
+    public ResponseEntity<Object> unknownHostAndInvalidPayment(Exception exception) {
         log.debug(exception.getMessage(), exception);
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_ACCEPTABLE);
     }
