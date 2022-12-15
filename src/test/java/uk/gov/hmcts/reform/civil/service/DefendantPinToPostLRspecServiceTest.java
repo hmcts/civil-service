@@ -165,7 +165,6 @@ class DefendantPinToPostLRspecServiceTest {
                                                .expiryDate(expiryDate)
                                                .build();
 
-
         DefendantPinToPostLRspec resetPin = defendantPinToPostLRspecService.resetPinExpiryDate(initialPin);
 
         assertThat(resetPin.getExpiryDate()).isEqualTo(LocalDate.now().plusDays(180));
