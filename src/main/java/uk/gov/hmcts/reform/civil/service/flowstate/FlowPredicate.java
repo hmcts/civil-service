@@ -64,9 +64,13 @@ public class FlowPredicate {
             || (caseData.getRespondent2OrgRegistered() == YES && caseData.getRespondent1OrgRegistered() == NO));
 
     // have to use this for now because cannot use featureToggleService.isNoticeOfChangeEnabled() as predicate
-    public static final Predicate<CaseData> noticeOfChangeEnabledAndLiP = caseData ->
-        caseData.getAddLegalRepDeadline() != null;
-
+    public static final Predicate<CaseData> noticeOfChangeEnabled = caseData ->
+        (caseData.getDefendant1LIPAtClaimIssued() != null
+            && caseData.getDefendant1LIPAtClaimIssued() == YES)
+            ||
+            (caseData.getDefendant2LIPAtClaimIssued() != null
+                && caseData.getDefendant2LIPAtClaimIssued() == YES);
+    // certificateOfServiceEnabled predicate will be removed when CoS go live.
     public static final Predicate<CaseData> certificateOfServiceEnabled = caseData ->
         (caseData.getDefendant1LIPAtClaimIssued() != null
         && caseData.getDefendant1LIPAtClaimIssued() == YES)
@@ -573,13 +577,6 @@ public class FlowPredicate {
             && caseData.getClaimDetailsNotificationDeadline().isBefore(LocalDateTime.now())
             && caseData.getClaimDetailsNotificationDate() == null
             && caseData.getClaimNotificationDate() != null;
-
-    public static final Predicate<CaseData> pastAddLegalRepDeadline = (caseData) ->
-        // when notify change is merged, replace with this code
-        // caseData.getAddLegalRepDeadline() != null && caseData.getAddLegalRepDeadline().isBefore(LocalDateTime.now());
-        caseData.getAddLegalRepDeadline() == null
-            ? true
-            : caseData.getAddLegalRepDeadline().isBefore(LocalDateTime.now());
 
     public static final Predicate<CaseData> claimDismissedByCamunda = caseData ->
         caseData.getClaimDismissedDate() != null;
