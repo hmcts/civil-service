@@ -29,7 +29,6 @@ import javax.validation.constraints.NotNull;
 
 import static java.util.List.of;
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MISCELLANEOUS;
 import static uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment.json;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;

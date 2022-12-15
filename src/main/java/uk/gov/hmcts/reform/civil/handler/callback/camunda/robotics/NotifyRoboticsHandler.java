@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.robotics;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.networknt.schema.ValidationMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
@@ -22,9 +23,9 @@ import java.util.Set;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
+@Slf4j
 @RequiredArgsConstructor
 public abstract class NotifyRoboticsHandler extends CallbackHandler {
 
