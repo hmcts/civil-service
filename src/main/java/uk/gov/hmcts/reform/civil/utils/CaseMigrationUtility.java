@@ -63,7 +63,7 @@ public class CaseMigrationUtility {
                 authToken,
                 location.getApplicantPreferredCourt()
             );
-
+            validateLocation(refData, location.getApplicantPreferredCourt());
             log.info(
                 "migrateUnspecCourtLocation Location details found:: " +
                     "court code : {} region : {} , EpimmsId {} ,case reference {}",
@@ -129,6 +129,7 @@ public class CaseMigrationUtility {
                 respondent1DQ.getRespondent1DQRequestedCourt()
                     .getResponseCourtCode()
             );
+            validateLocation(refdata, respondent1DQ.getRespondent1DQRequestedCourt().getResponseCourtCode());
             log.info("migrateRespondent1DQ Location details ," +
                          "courtcode : {} region : {} ,baseLocation {}, case reference {} ",
                      refdata.getCourtLocationCode(),
@@ -189,6 +190,7 @@ public class CaseMigrationUtility {
                 respondent2DQ.getRespondent2DQRequestedCourt()
                     .getResponseCourtCode()
             );
+            validateLocation(refdata, respondent2DQ.getRespondent2DQRequestedCourt().getResponseCourtCode());
             log.info("migrateRespondent2DQ Location details ,courtcode : {} region : {} ,baseLocation {}, case ref {} ",
                      refdata.getCourtLocationCode(),
                      refdata.getRegionId(), refdata.getEpimmsId(),
@@ -250,6 +252,7 @@ public class CaseMigrationUtility {
                 respondent1DQ.getRespondent1DQRequestedCourt()
                     .getResponseCourtCode()
             );
+            validateLocation(refdata, respondent1DQ.getRespondent1DQRequestedCourt().getResponseCourtCode());
             log.info("migrateRespondent1DQUnspec Location details ,courtcode :" +
                          " {} region : {} ,baseLocation {}, ref {} ", refdata.getCourtLocationCode(),
                      refdata.getRegionId(), refdata.getEpimmsId(), oldCaseData.getCcdCaseReference()
@@ -294,6 +297,7 @@ public class CaseMigrationUtility {
                 respondent2DQ.getRespondent2DQRequestedCourt()
                     .getResponseCourtCode()
             );
+            validateLocation(refdata, respondent2DQ.getRespondent2DQRequestedCourt().getResponseCourtCode());
             log.info("migrateRespondent2DQUnSpec Location details ,courtcode :" +
                          " {} region : {} ,baseLocation {}, ref {} ", refdata.getCourtLocationCode(),
                      refdata.getRegionId(), refdata.getEpimmsId(), oldCaseData.getCcdCaseReference()
@@ -336,6 +340,7 @@ public class CaseMigrationUtility {
                 applicant1DQ.getApplicant1DQRequestedCourt()
                     .getResponseCourtCode()
             );
+            validateLocation(refdata, applicant1DQ.getApplicant1DQRequestedCourt().getResponseCourtCode());
             log.info("migrateApplicant1DQ Location details ,courtcode : {} region : {} ,baseLocation {}, ref {} ",
                      refdata.getCourtLocationCode(),
                      refdata.getRegionId(), refdata.getEpimmsId(), oldCaseData.getCcdCaseReference()
@@ -370,6 +375,7 @@ public class CaseMigrationUtility {
                 authToken,
                 oldCaseData.getCourtLocation().getApplicantPreferredCourt()
             );
+            validateLocation(refData, applicant1DQ.getApplicant1DQRequestedCourt().getResponseCourtCode());
             log.info("migrateApplicant1DQ Location details ,courtcode : {} region : {} ,baseLocation {}, Ref {} ",
                      refData.getCourtLocationCode(),
                      refData.getRegionId(), refData.getEpimmsId(), oldCaseData.getCcdCaseReference()
@@ -490,6 +496,14 @@ public class CaseMigrationUtility {
                             .getPartyName());
         }
         return participantString;
+
+    }
+
+    private void validateLocation(LocationRefData refData, String courtCode) {
+        if(ofNullable(refData.getRegionId()).isEmpty()) {
+            log.error("No court Location Found for three digit court code : {}", courtCode);
+            throw new RuntimeException("No court Location Found for three digit court code :"+ courtCode);
+        }
 
     }
 

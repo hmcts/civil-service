@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.apache.logging.log4j.util.Strings.concat;
+import static org.apache.logging.log4j.util.Strings.isEmpty;
 
 @Slf4j
 @Service
@@ -181,9 +182,6 @@ public class LocationRefDataService {
             if (locations == null || locations.isEmpty()) {
                 return LocationRefData.builder().build();
             } else {
-                if (locations.size() > 1) {
-                    log.warn("Location Reference Data Lookup returned more than one {} location", threeDigitCode);
-                }
                 return filterCourtLocation(locations, threeDigitCode);
 
             }
@@ -219,9 +217,10 @@ public class LocationRefDataService {
     }
 
     private LocationRefData filterCourtLocation(List<LocationRefData> locations, String courtCode) {
-       return locations.stream().filter(location -> location.getCourtLocationCode()
-           .equals(courtCode))
-           .collect(Collectors.toList()).get(0);
+        List<LocationRefData> filteredLocations = locations.stream().filter(location -> location.getCourtLocationCode()
+                .equals(courtCode))
+            .collect(Collectors.toList());
+        return filteredLocations.isEmpty() ? LocationRefData.builder().build() : filteredLocations.get(0);
 
     }
 
