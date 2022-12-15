@@ -51,7 +51,6 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
             CaseData oldCaseData = callbackParams.getCaseData();
             log.info("Migrating data for case: {}", oldCaseData.getCcdCaseReference());
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
-            log.info("Inside try block: {}", oldCaseData.getCcdCaseReference());
             if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
                 log.info("Process SPEC claim: {}", oldCaseData.getCcdCaseReference());
 
