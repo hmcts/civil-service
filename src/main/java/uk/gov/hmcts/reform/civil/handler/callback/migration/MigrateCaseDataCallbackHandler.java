@@ -88,7 +88,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
-        } catch (Exception exception) {
+        } catch (Throwable exception) {
             log.error("Exception during migration about to submit event- " + exception.getMessage(), exception);
             throw exception;
         }
