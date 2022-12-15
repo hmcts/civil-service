@@ -108,11 +108,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         + " serve the claim outside of the digital portal using the claim form PDF provided on the link above."
         + " This includes an information page for litigants in person. The claim will remain in the digital portal to"
         + " allow the litigant in person time to appoint a legal representative who can respond to the claim via the "
-        + " portal.%n%nIf service of the claim and claim details are processed outside the of the digital portal you "
-        + " must complete the next steps option 'confirm service' for both the service of the claim form and the claim"
-        + "  details. %n%nIf notification of the claim is processed in the digital portal, the exact date"
-        + " when you must notify the claim details will be provided when you first notify the Defendant legal"
-        + " representative of the claim.";
+        + " portal.%n%nIf service of the claim and claim details are processed outside of the digital portal you "
+        + "must complete the next steps option 'notify claim' for the service of the claim form and "
+        + "'notify claim details' for service of the claim details. %n%nIf notification of the claim is "
+        + "processed in the digital portal, the exact date when you must notify the claim details will be "
+        + "provided when you first notify the Defendant legal representative of the claim.";
 
     private final ClaimIssueConfiguration claimIssueConfiguration;
     private final ExitSurveyContentService exitSurveyContentService;
