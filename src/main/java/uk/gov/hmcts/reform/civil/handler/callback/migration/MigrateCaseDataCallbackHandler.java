@@ -46,13 +46,12 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CallbackResponse migrateCaseData(CallbackParams callbackParams)  {
-        CaseData oldCaseData = callbackParams.getCaseData();
-        log.info("Migrating data for case: {}", oldCaseData.getCcdCaseReference());
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
+    private CallbackResponse migrateCaseData(CallbackParams callbackParams) {
         try {
-            String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-            log.info("After getting auth token");
+            CaseData oldCaseData = callbackParams.getCaseData();
+            log.info("Migrating data for case: {}", oldCaseData.getCcdCaseReference());
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
+            log.info("Inside try block");
             if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
                 log.info("Process SPEC claim");
 
@@ -70,24 +69,30 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
                     CaseLocation.builder().baseLocation("192280").region("4").build()
                 );
                 caseMigrationUtility.migrateGS(oldCaseData, caseDataBuilder);
-                caseMigrationUtility.migrateUnspecCourtLocation(authToken, oldCaseData, caseDataBuilder);
+                caseMigrationUtility.migrateUnspecCourtLocation(
+                    callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                    oldCaseData,
+                    caseDataBuilder
+                );
             }
             log.info("Start DQ migration");
             caseMigrationUtility.migrateRespondentAndApplicantDQUnSpec(
-                authToken,
+                callbackParams.getParams().get(BEARER_TOKEN).toString(),
                 oldCaseData,
                 caseDataBuilder,
                 CaseLocation.builder().baseLocation("420219").region("2").build()
             );
             log.info("Add migration ID");
             caseDataBuilder.migrationId(MIGRATION_ID_VALUE);
-        } catch (Exception exception) {
+
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
+        } catch (Throwable exception) {
             log.error("Exception during migration about to submit event- " + exception.getMessage(), exception);
             throw exception;
         }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+
     }
 
     private CallbackResponse migrateSupplementaryData(CallbackParams callbackParams) {
