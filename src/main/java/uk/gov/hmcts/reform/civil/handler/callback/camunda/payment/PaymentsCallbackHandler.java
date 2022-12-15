@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.payment;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,11 +12,12 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.util.ArrayList;
@@ -27,24 +28,24 @@ import java.util.Map;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAKE_PBA_PAYMENT_SPEC;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAKE_PBA_PAYMENT;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PaymentsForSpecCallbackHandler extends CallbackHandler {
+public class PaymentsCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(MAKE_PBA_PAYMENT_SPEC);
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(MAKE_PBA_PAYMENT);
     private static final String ERROR_MESSAGE = "Technical error occurred";
-    private static final String TASK_ID = "CreateClaimMakePaymentForSpec";
+    private static final String TASK_ID = "CreateClaimMakePayment";
+    public static final String DUPLICATE_PAYMENT_MESSAGE
+        = "You attempted to retry the payment to soon. Try again later.";
 
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
     private final Time time;
-    private final FeatureToggleService toggleService;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -60,20 +61,19 @@ public class PaymentsForSpecCallbackHandler extends CallbackHandler {
 
     @Override
     public List<CaseEvent> handledEvents() {
-        if (toggleService.isLrSpecEnabled()) {
-            return EVENTS;
-        } else {
-            return Collections.emptyList();
-        }
+        return EVENTS;
     }
 
-    private CaseData updateWithDuplicatePaymentError(CaseData caseData, FeignException e) {
-        return caseData.toBuilder()
-            .paymentDetails(PaymentDetails.builder()
-                                .status(FAILED)
-                                .errorMessage(e.contentUTF8())
-                                .build())
+    private CaseData updateWithDuplicatePaymentError(CaseData caseData, InvalidPaymentRequestException e) {
+        var paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
+            .map(PaymentDetails::toBuilder)
+            .orElse(PaymentDetails.builder())
+            .status(FAILED)
+            .errorCode(null)
+            .errorMessage(DUPLICATE_PAYMENT_MESSAGE)
             .build();
+
+        return caseData.toBuilder().claimIssuedPaymentDetails(paymentDetails).build();
     }
 
     private CallbackResponse makePbaPayment(CallbackParams callbackParams) {
@@ -81,8 +81,8 @@ public class PaymentsForSpecCallbackHandler extends CallbackHandler {
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         try {
-            var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken)
-                .getPaymentReference();
+            log.info("processing payment for case " + caseData.getCcdCaseReference());
+            var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken).getReference();
             PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
                 .map(PaymentDetails::toBuilder)
                 .orElse(PaymentDetails.builder())
@@ -95,26 +95,26 @@ public class PaymentsForSpecCallbackHandler extends CallbackHandler {
             caseData = caseData.toBuilder()
                 .claimIssuedPaymentDetails(paymentDetails)
                 .paymentSuccessfulDate(time.now())
+                .ccdState(CaseState.CASE_ISSUED)
                 .build();
 
         } catch (FeignException e) {
             log.info(String.format("Http Status %s ", e.status()), e);
-            if (e.status() == 403) {
+            if (e.status() == 403 || e.status() == 422 || e.status() == 504) {
                 caseData = updateWithBusinessError(caseData, e);
-            } else if (e.status() == 400) {
-                log.error(String.format("Payment error status code 400 for case: %s, response body: %s",
-                                        caseData.getCcdCaseReference(), e.contentUTF8()
-                ));
-                caseData = updateWithDuplicatePaymentError(caseData, e);
             } else {
                 errors.add(ERROR_MESSAGE);
             }
+        } catch (InvalidPaymentRequestException e) {
+            log.error(String.format("Duplicate Payment error status code 400 for case: %s, response body: %s",
+                                    caseData.getCcdCaseReference(), e.getMessage()
+            ));
+            caseData = updateWithDuplicatePaymentError(caseData, e);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .errors(errors)
-            .state(CASE_ISSUED.toString())
             .build();
     }
 
@@ -133,6 +133,7 @@ public class PaymentsForSpecCallbackHandler extends CallbackHandler {
                 .claimIssuedPaymentDetails(paymentDetails)
                 .build();
         } catch (JsonProcessingException jsonException) {
+            log.error(jsonException.getMessage());
             log.error(String.format("Unknown payment error for case: %s, response body: %s",
                                     caseData.getCcdCaseReference(), e.contentUTF8()
             ));
