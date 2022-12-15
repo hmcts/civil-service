@@ -184,7 +184,8 @@ public class LocationRefDataService {
                 if (locations.size() > 1) {
                     log.warn("Location Reference Data Lookup returned more than one {} location", threeDigitCode);
                 }
-                return locations.get(0);
+                return filterCourtLocation(locations, threeDigitCode);
+
             }
         } catch (Exception e) {
             log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
@@ -215,6 +216,13 @@ public class LocationRefDataService {
         builder
             .caseManagementLocation(buildCaseLocation(location))
             .locationName(location.getSiteName());
+    }
+
+    private LocationRefData filterCourtLocation(List<LocationRefData> locations, String courtCode) {
+       return locations.stream().filter(location -> location.getCourtLocationCode()
+           .equals(courtCode))
+           .collect(Collectors.toList()).get(0);
+
     }
 
 }
