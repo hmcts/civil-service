@@ -181,8 +181,10 @@ public class LocationRefDataService {
             if (locations == null || locations.isEmpty()) {
                 return LocationRefData.builder().build();
             } else {
-                return filterCourtLocation(locations, threeDigitCode);
-
+                if (locations.size() > 1) {
+                    log.warn("Location Reference Data Lookup returned more than one {} location",threeDigitCode);
+                }
+                return locations.get(0);
             }
         } catch (Exception e) {
             log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
@@ -213,22 +215,6 @@ public class LocationRefDataService {
         builder
             .caseManagementLocation(buildCaseLocation(location))
             .locationName(location.getSiteName());
-    }
-
-    private LocationRefData filterCourtLocation(List<LocationRefData> locations, String courtCode) {
-        List<LocationRefData> filteredLocations = locations.stream().filter(location -> location.getCourtLocationCode()
-                .equals(courtCode))
-            .collect(Collectors.toList());
-        if (filteredLocations.isEmpty()) {
-            log.warn("No court Location Found for three digit court code : {}", courtCode);
-            throw new LocationRefDataException("No court Location Found for three digit court code : " + courtCode);
-        } else if (filteredLocations.size() > 1) {
-            log.warn("More than one court location found : {}", courtCode);
-            throw new LocationRefDataException("More than one court location found : " + courtCode);
-        }
-
-        return filteredLocations.get(0);
-
     }
 
 }
