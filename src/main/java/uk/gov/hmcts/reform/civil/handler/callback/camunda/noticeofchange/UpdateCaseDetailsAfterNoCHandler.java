@@ -102,7 +102,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         boolean isApplicantSolicitorRole = isApplicantOrRespondent(replacedSolicitorCaseRole);
 
         if (isApplicantSolicitorRole) {
-            updateApplicantSolicitorDetails(caseDataBuilder, addedSolicitorDetails, addedOrganisation);
+            updateApplicantSolicitorDetails(caseDataBuilder, addedSolicitorDetails);
         } else {
             if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
                 updateRespondentSolicitor1Details(caseDataBuilder, addedOrganisation, addedSolicitorDetails);
@@ -119,7 +119,6 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
 
         if(!is1v1(caseData)) {
             if(isSameSolicitorScenario(caseData)) {
-                //ToDo: more to update?
                 caseDataBuilder.respondent2SameLegalRepresentative(YES);
             } else {
                 caseDataBuilder.respondent2SameLegalRepresentative(NO);
@@ -160,18 +159,21 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
         Organisation addedOrganisation,
         UserDetails addedSolicitorDetails) {
+        CaseData caseData = caseDataBuilder.build();
 
-        SolicitorOrganisationDetails updatedSolicitorAddress = getUpdatedSolicitorAddress(addedOrganisation);
+        caseDataBuilder.respondent2OrgRegistered(YES);
 
-        caseDataBuilder.respondentSolicitor2ServiceAddress(updatedSolicitorAddress.getAddress())
-            .respondentSolicitor2ServiceAddressRequired(NO)
-            .respondentSolicitor2ServiceAddress(null)
-            .respondentSolicitor2OrganisationDetails(updatedSolicitorAddress)
-            .respondent2OrganisationIDCopy(addedOrganisation.getOrganisationIdentifier())
-            .respondent2Represented(YES)
-            .respondent2OrgRegistered(YES)
-            //ToDo Change depending on case category?
-            .specRespondent2Represented(YES);
+        if(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            caseDataBuilder.respondentSolicitor2ServiceAddress(null)
+                .respondentSolicitor2ServiceAddressRequired(NO)
+                .respondentSolicitor2ServiceAddress(null)
+                .respondentSolicitor2OrganisationDetails(null)
+                .respondent2OrganisationIDCopy(addedOrganisation.getOrganisationIdentifier())
+                .respondent2Represented(YES);
+        } else {
+            caseDataBuilder.specRespondent2Represented(YES)
+                .specAoSRespondentCorrespondenceAddressdetails(null);
+        }
 
         if (addedSolicitorDetails.getEmail() != null) {
             caseDataBuilder.respondentSolicitor2EmailAddress(addedSolicitorDetails.getEmail());
@@ -183,19 +185,20 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
     private void updateRespondentSolicitor1Details(CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                                    Organisation addedOrganisation, UserDetails addedSolicitorDetails) {
         CaseData caseData = caseDataBuilder.build();
-        SolicitorOrganisationDetails updatedSolicitorAddress = getUpdatedSolicitorAddress(addedOrganisation);
+
+        caseDataBuilder.respondent1OrgRegistered(YES);
 
         if(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            caseDataBuilder.respondentSolicitor1ServiceAddress(updatedSolicitorAddress.getAddress())
+            caseDataBuilder.respondentSolicitor1ServiceAddress(null)
                 .respondentSolicitor1ServiceAddressRequired(NO)
                 .respondentSolicitor1OrganisationDetails(null)
                 .respondent1OrganisationIDCopy(addedOrganisation.getOrganisationIdentifier())
-                .respondent1Represented(YES)
-                .respondent1OrgRegistered(YES);
+                .respondent1Represented(YES);
         } else {
             caseDataBuilder.specApplicantCorrespondenceAddressRequired(NO)
                 .specRespondentCorrespondenceAddressdetails(null)
                 .specAoSRespondentCorrespondenceAddressdetails(null)
+                .specAoSRespondentCorrespondenceAddressRequired(NO)
                 .specRespondent1Represented(YES);
         }
 
@@ -207,15 +210,22 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
     }
 
     private void updateApplicantSolicitorDetails(CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                                                 UserDetails addedSolicitorDetails, Organisation addedOrganisation) {
-        caseDataBuilder
-            .applicantSolicitor1PbaAccounts(null)
-            .applicantSolicitor1PbaAccountsIsEmpty(YES)
-            .applicantSolicitor1ServiceAddressRequired(NO)
-            .applicantSolicitor1ServiceAddress(null)
-            //ToDo Change depending on case category?
-            .specApplicantCorrespondenceAddressdetails(null)
-            .specAoSApplicantCorrespondenceAddressdetails(null);
+                                                 UserDetails addedSolicitorDetails) {
+        CaseData caseData = caseDataBuilder.build();
+
+        if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            caseDataBuilder
+                .applicantSolicitor1PbaAccounts(null)
+                .applicantSolicitor1PbaAccountsIsEmpty(YES)
+                .applicantSolicitor1ServiceAddressRequired(NO)
+                .applicantSolicitor1ServiceAddress(null);
+        } else {
+            caseDataBuilder
+                .specApplicantCorrespondenceAddressdetails(null)
+                .specApplicantCorrespondenceAddressRequired(NO)
+                .specAoSApplicantCorrespondenceAddressRequired(NO)
+                .specAoSApplicantCorrespondenceAddressdetails(null);
+        }
 
         if (addedSolicitorDetails.getEmail() != null) {
             caseDataBuilder.applicantSolicitor1UserDetails(
@@ -227,28 +237,6 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         } else {
             caseDataBuilder.applicantSolicitor1UserDetails(null);
         }
-    }
-
-    // todo remove?
-    // todo SolicitorOrganisationDetails field is spec!
-    private SolicitorOrganisationDetails getUpdatedSolicitorAddress(Organisation addedOrganisation) {
-        List<ContactInformation> contactInformation = addedOrganisation.getContactInformation();
-        SolicitorOrganisationDetails.SolicitorOrganisationDetailsBuilder solicitorOrganisationDetailsBuilder
-            = SolicitorOrganisationDetails.builder();
-
-        if (contactInformation != null && !contactInformation.isEmpty()) {
-            ContactInformation info = contactInformation.get(0);
-            if (info != null) {
-                solicitorOrganisationDetailsBuilder.address(fromContactInformation(contactInformation.get(0)));
-                if (info.getDxAddress() != null) {
-                    solicitorOrganisationDetailsBuilder.dx(info.getDxAddress().toString());
-                }
-                solicitorOrganisationDetailsBuilder.organisationName(addedOrganisation.getName());
-                // todo is phonenumber == company number?
-                solicitorOrganisationDetailsBuilder.phoneNumber(addedOrganisation.getCompanyNumber());
-            }
-        }
-        return solicitorOrganisationDetailsBuilder.build();
     }
 
     private void updateSolicitorReferences(CaseData caseData,
