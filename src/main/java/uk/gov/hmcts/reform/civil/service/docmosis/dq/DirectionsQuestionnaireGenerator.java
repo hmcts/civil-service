@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -34,12 +35,14 @@ import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -52,6 +55,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -74,6 +78,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITIN
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.CIVIL_COURT_TYPE_ID;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
@@ -86,6 +91,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     private final StateFlowEngine stateFlowEngine;
     private final RepresentativeService representativeService;
     private final FeatureToggleService featureToggleService;
+    private final LocationRefDataService locationRefDataService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         DocmosisTemplates templateId;
@@ -437,12 +443,19 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         RequestedCourt rc = dq.getRequestedCourt();
         if (rc == null) {
             return RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(YES)
+                .requestHearingAtSpecificCourt(NO)
                 .build();
         } else {
+            List<LocationRefData> courtLocations = (locationRefDataService
+                .getCourtLocationsByEpimmsId(
+                    CallbackParams.Params.BEARER_TOKEN.toString(),
+                    rc.getCaseLocation().getBaseLocation()
+                ));
             return RequestedCourt.builder()
                 .requestHearingAtSpecificCourt(YES)
-                .responseCourtCode(rc.getResponseCourtCode())
+                .responseCourtName(courtLocations.isEmpty() ? null : courtLocations.stream()
+                    .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
+                    .collect(Collectors.toList()).get(0).getCourtName())
                 .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt())
                 .build();
         }

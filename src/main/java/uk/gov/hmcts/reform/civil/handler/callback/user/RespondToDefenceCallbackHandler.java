@@ -250,6 +250,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                             .responseCourtCode(courtLocations.isEmpty() ? null : courtLocations.stream()
                                                    .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
                                                    .collect(Collectors.toList()).get(0).getCourtLocationCode())
+                            .responseCourtName(courtLocations.isEmpty() ? null : courtLocations.stream()
+                                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
+                                .collect(Collectors.toList()).get(0).getCourtName())
                             .build());
                 }
 
