@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -64,8 +65,10 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     }
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
+        LocalDate issueDate = time.now().toLocalDate();
         CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
         caseDataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
+        caseDataBuilder.issueDate(issueDate);
         caseDataBuilder.submittedDate(time.now());
         if (null != callbackParams.getRequest().getEventId()) {
             caseDataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
