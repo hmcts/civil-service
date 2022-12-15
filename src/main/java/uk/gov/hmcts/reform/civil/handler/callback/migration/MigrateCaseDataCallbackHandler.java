@@ -51,9 +51,9 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
             CaseData oldCaseData = callbackParams.getCaseData();
             log.info("Migrating data for case: {}", oldCaseData.getCcdCaseReference());
             CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
-            log.info("Inside try block");
+            log.info("Inside try block: {}", oldCaseData.getCcdCaseReference());
             if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
-                log.info("Process SPEC claim");
+                log.info("Process SPEC claim: {}", oldCaseData.getCcdCaseReference());
 
                 caseMigrationUtility.migrateGS(oldCaseData, caseDataBuilder
                 );
@@ -63,7 +63,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
                     CaseLocation.builder().baseLocation("420219").region("2").build()
                 );
             } else {
-                log.info("Process UNSPEC claim");
+                log.info("Process UNSPEC claim: {}", oldCaseData.getCcdCaseReference());
                 caseMigrationUtility.migrateCaseManagementLocation(
                     caseDataBuilder,
                     CaseLocation.builder().baseLocation("192280").region("4").build()
@@ -75,14 +75,14 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
                     caseDataBuilder
                 );
             }
-            log.info("Start DQ migration");
+            log.info("Start DQ migration: {}", oldCaseData.getCcdCaseReference());
             caseMigrationUtility.migrateRespondentAndApplicantDQUnSpec(
                 callbackParams.getParams().get(BEARER_TOKEN).toString(),
                 oldCaseData,
                 caseDataBuilder,
                 CaseLocation.builder().baseLocation("420219").region("2").build()
             );
-            log.info("Add migration ID");
+            log.info("Add migration ID: {}", oldCaseData.getCcdCaseReference());
             caseDataBuilder.migrationId(MIGRATION_ID_VALUE);
 
             return AboutToStartOrSubmitCallbackResponse.builder()
