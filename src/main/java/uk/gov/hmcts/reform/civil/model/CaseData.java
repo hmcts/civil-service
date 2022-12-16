@@ -144,7 +144,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @Builder.Default
     private final List<Element<GeneralApplication>> generalApplications = new ArrayList<>();
 
-    private final List<Element<GeneralApplicationsDetails>> claimantGaAppDetails;
+    private final List<Element<GeneralApplicationsDetails>> claimantGaAppDetails;-
     private final List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection;
     private final List<Element<GADetailsRespondentSol>> respondentSolGaAppDetails;
     private final List<Element<GADetailsRespondentSol>> respondentSolTwoGaAppDetails;
