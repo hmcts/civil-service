@@ -460,10 +460,6 @@ class LocationRefDataServiceTest {
                 .siteName("site_name").regionId("4").region("North West").courtType("County Court")
                 .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
                 .venueName("CCMCC").courtLocationCode("10").build();
-//            LocationRefData  ccmccLocationDuplicate = LocationRefData.builder().courtVenueId("9263").epimmsId("192280")
-//                .siteName("site_name").regionId("4").region("North West").courtType("County Court")
-//                .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
-//                .venueName("CCMCC").courtLocationCode("10").build();
 
             ResponseEntity<List<LocationRefData>> mockedResponse = new ResponseEntity<>(
                 List.of(ccmccLocation), OK);
@@ -528,6 +524,7 @@ class LocationRefDataServiceTest {
                 assertThat(result.getRegionId()).isEqualTo("4");
             } catch (LocationRefDataException exception) {
 
+                exception.printStackTrace();
             }
 
         }
