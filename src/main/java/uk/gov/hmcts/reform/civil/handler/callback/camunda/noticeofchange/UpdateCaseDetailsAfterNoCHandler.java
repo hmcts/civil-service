@@ -15,24 +15,18 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.prd.model.ContactInformation;
-import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DETAILS_AFTER_NOC;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.model.Address.fromContactInformation;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
 
@@ -46,7 +40,6 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
     public static final String TASK_ID = "UpdateCaseDetailsAfterNoC";
 
     private final ObjectMapper objectMapper;
-    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -65,11 +58,6 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    // TODO waiting on CCD-3538 to update the user email
-    private UserDetails getInvokerDetails(String authToken, CaseDetails caseDetails) {
-        return UserDetails.builder().build();
-    }
-
     private CallbackResponse updateCaseDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
@@ -84,18 +72,16 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
                 .build();
         }
 
-        uk.gov.hmcts.reform.prd.model.Organisation addedOrganisation = organisationService.findOrganisationById(
-            caseData.getChangeOfRepresentation().getOrganisationToAddID()).orElse(null);
+        String addedOrganisation = caseData.getChangeOfRepresentation().getOrganisationToAddID();
+
         if (addedOrganisation == null) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of("Organisation to add is null"))
                 .build();
         }
 
-        UserDetails addedSolicitorDetails = getInvokerDetails(
-            callbackParams.getParams().get(BEARER_TOKEN).toString(),
-            callbackParams.getRequest().getCaseDetails()
-        );
+        // TODO waiting on CCD-3538 to update the user email
+        UserDetails addedSolicitorDetails = null;
 
         String replacedSolicitorCaseRole = caseData.getChangeOfRepresentation().getCaseRole();
 
@@ -157,25 +143,25 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
 
     private void updateRespondentSolicitor2Details(
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-        Organisation addedOrganisation,
+        String addedOrganisation,
         UserDetails addedSolicitorDetails) {
         CaseData caseData = caseDataBuilder.build();
 
-        caseDataBuilder.respondent2OrgRegistered(YES);
+        caseDataBuilder.respondent2OrgRegistered(YES)
+            .respondentSolicitor2OrganisationDetails(null);
 
         if(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder.respondentSolicitor2ServiceAddress(null)
                 .respondentSolicitor2ServiceAddressRequired(NO)
                 .respondentSolicitor2ServiceAddress(null)
-                .respondentSolicitor2OrganisationDetails(null)
-                .respondent2OrganisationIDCopy(addedOrganisation.getOrganisationIdentifier())
+                .respondent2OrganisationIDCopy(addedOrganisation)
                 .respondent2Represented(YES);
         } else {
             caseDataBuilder.specRespondent2Represented(YES)
                 .specAoSRespondentCorrespondenceAddressdetails(null);
         }
 
-        if (addedSolicitorDetails.getEmail() != null) {
+        if (addedSolicitorDetails != null) {
             caseDataBuilder.respondentSolicitor2EmailAddress(addedSolicitorDetails.getEmail());
         } else {
             caseDataBuilder.respondentSolicitor2EmailAddress(null);
@@ -183,16 +169,16 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
     }
 
     private void updateRespondentSolicitor1Details(CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                                                   Organisation addedOrganisation, UserDetails addedSolicitorDetails) {
+                                                   String addedOrganisation, UserDetails addedSolicitorDetails) {
         CaseData caseData = caseDataBuilder.build();
 
-        caseDataBuilder.respondent1OrgRegistered(YES);
+        caseDataBuilder.respondent1OrgRegistered(YES)
+            .respondentSolicitor1OrganisationDetails(null);
 
         if(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder.respondentSolicitor1ServiceAddress(null)
                 .respondentSolicitor1ServiceAddressRequired(NO)
-                .respondentSolicitor1OrganisationDetails(null)
-                .respondent1OrganisationIDCopy(addedOrganisation.getOrganisationIdentifier())
+                .respondent1OrganisationIDCopy(addedOrganisation)
                 .respondent1Represented(YES);
         } else {
             caseDataBuilder.specApplicantCorrespondenceAddressRequired(NO)
@@ -202,7 +188,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
                 .specRespondent1Represented(YES);
         }
 
-        if (addedSolicitorDetails.getEmail() != null) {
+        if (addedSolicitorDetails != null) {
             caseDataBuilder.respondentSolicitor1EmailAddress(addedSolicitorDetails.getEmail());
         } else {
             caseDataBuilder.respondentSolicitor1EmailAddress(null);
@@ -227,7 +213,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
                 .specAoSApplicantCorrespondenceAddressdetails(null);
         }
 
-        if (addedSolicitorDetails.getEmail() != null) {
+        if (addedSolicitorDetails != null) {
             caseDataBuilder.applicantSolicitor1UserDetails(
                 IdamUserDetails.builder()
                     .id(addedSolicitorDetails.getId())
