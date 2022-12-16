@@ -139,7 +139,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
                 respondent1OrganisationPolicy.toBuilder().orgPolicyReference(null).build();
             caseDataBuilder.respondent1OrganisationPolicy(updatedOrgPolicy);
         } else if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(replacedSolicitorCaseRole)) {
-            OrganisationPolicy respondent2OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
+            OrganisationPolicy respondent2OrganisationPolicy = caseData.getRespondent2OrganisationPolicy();
             OrganisationPolicy updatedOrgPolicy =
                 respondent2OrganisationPolicy.toBuilder().orgPolicyReference(null).build();
             caseDataBuilder.respondent2OrganisationPolicy(updatedOrgPolicy);
