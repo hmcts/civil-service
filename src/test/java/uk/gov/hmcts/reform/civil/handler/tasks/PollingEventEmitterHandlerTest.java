@@ -29,8 +29,7 @@ import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    PollingEventEmitterHandler.class},
-    properties = {"polling.event.emitter.enabled=true"})
+    PollingEventEmitterHandler.class})
 class PollingEventEmitterHandlerTest {
 
     @MockBean
