@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -497,7 +498,6 @@ class LocationRefDataServiceTest {
                 .siteName("site_name").regionId("4").region("North West").courtType("County Court")
                 .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
                 .venueName("CCMCC").courtLocationCode("10").build();
-            try {
                 ResponseEntity<List<LocationRefData>> mockedResponse = new ResponseEntity<>(
                     List.of(ccmccLocation, ccmccLocationDuplicate), OK);
                 when(authTokenGenerator.generate()).thenReturn("service_token");
@@ -508,24 +508,12 @@ class LocationRefDataServiceTest {
                     ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()
                 ))
                     .thenReturn(mockedResponse);
+            assertThrows(
+                LocationRefDataException.class,
+                () -> refDataService.getCourtLocation("user_token", "10")
+            );
 
-                LocationRefData result = refDataService.getCourtLocation("user_token", "10");
 
-                verify(lrdConfiguration, times(1)).getUrl();
-                verify(lrdConfiguration, times(1)).getEndpoint();
-                assertThat(uriCaptor.getValue().toString()).isEqualTo(
-                    "dummy_url/fees-register/fees/lookup?court_type_id=10&is_case_management_location=Y" +
-                        "&court_location_code=10&court_status=Open");
-                assertThat(httpMethodCaptor.getValue()).isEqualTo(HttpMethod.GET);
-                assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("Authorization")).isEqualTo("user_token");
-                assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("ServiceAuthorization"))
-                    .isEqualTo("service_token");
-                assertThat(result.getEpimmsId()).isEqualTo("192280");
-                assertThat(result.getRegionId()).isEqualTo("4");
-            } catch (LocationRefDataException exception) {
-
-                exception.printStackTrace();
-            }
 
         }
     }
