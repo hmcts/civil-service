@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -47,6 +46,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_C
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
@@ -58,25 +58,25 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
     private static final String CONFIRMATION_HEADER = "# Defendant notified%n## Claim number: %s";
     private static final String CONFIRMATION_SUMMARY = "<br />The defendant legal representative's organisation has"
-        + " been notified of the claim details.%n%n"
-        + "They must respond by %s. Your account will be updated and you will be sent an email.";
+            + " been notified of the claim details.%n%n"
+            + "They must respond by %s. Your account will be updated and you will be sent an email.";
     private static final String CONFIRMATION_COS_HEADER =
             "# Certificate of Service - notify claim details successful %n## %s";
     private static final String CONFIRMATION_COS_SUMMARY =
             "<br /><h2 class=\"govuk-heading-m\">What happens next</h2> "
-            + "%n%n The defendant(s) must respond to the claim by %s. "
-            + "If the defendant(s) appoint a legal representative who respond online "
-            + "your account will be updated.%n%n"
-            + "If the defendant(s) do not wish for the claim to remain online and respond offline, "
-            + "the claim will be moved and will continue offline.%n%n "
-            + "This is a new online process - " + "you don't need to file any further documents to the court.";
+                    + "%n%n The defendant(s) must respond to the claim by %s. "
+                    + "If the defendant(s) appoint a legal representative who respond online "
+                    + "your account will be updated.%n%n"
+                    + "If the defendant(s) do not wish for the claim to remain online and respond offline, "
+                    + "the claim will be moved and will continue offline.%n%n "
+                    + "This is a new online process - " + "you don't need to file any further documents to the court.";
 
     public static final String NOTIFICATION_ONE_PARTY_SUMMARY = "<br />Notification of claim details sent to "
-        + "1 Defendant legal representative only.%n%n"
-        + "Your claim will proceed offline.";
+            + "1 Defendant legal representative only.%n%n"
+            + "Your claim will proceed offline.";
 
     public static final String WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR =
-        "Your claim will progress offline if you only notify one Defendant of the claim details.";
+            "Your claim will progress offline if you only notify one Defendant of the claim details.";
 
     public static final String DOC_SERVED_DATE_IN_FUTURE =
             "Date you served the documents must be today or in the past";
@@ -93,13 +93,13 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::prepareDefendantSolicitorOptions,
-            callbackKey(MID, "validateNotificationOption"), this::validateNotificationOption,
-            callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim,
-            callbackKey(MID, "validateCosNotifyClaimDetails1"), this::validateCertificateOfService,
-            callbackKey(MID, "validateCosNotifyClaimDetails2"), this::validateCertificateOfService,
-            callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
-            callbackKey(SUBMITTED), this::buildConfirmationWithSolicitorOptions
+                callbackKey(ABOUT_TO_START), this::prepareDefendantSolicitorOptions,
+                callbackKey(MID, "validateNotificationOption"), this::validateNotificationOption,
+                callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim,
+                callbackKey(MID, "validateCosNotifyClaimDetails1"), this::validateCertificateOfService,
+                callbackKey(MID, "validateCosNotifyClaimDetails2"), this::validateCertificateOfService,
+                callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
+                callbackKey(SUBMITTED), this::buildConfirmationWithSolicitorOptions
         );
     }
 
@@ -119,35 +119,80 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
         LocalDate notificationDate = notificationDateTime.toLocalDate();
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+        if (toggleService.isCertificateOfServiceEnabled()
+            && multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP
+            && isConfirmationForLip(caseData)) {
+            multiPartyScenario = null;
+        }
         CaseData updatedCaseData;
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             updatedCaseData = caseData.toBuilder()
-                .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS))
-                .claimDetailsNotificationDate(notificationDateTime)
-                .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
-                .respondent2ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
-                .nextDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime).toLocalDate())
-                .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
-                    6,
-                    notificationDate
-                ))
-                .build();
+                    .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS))
+                    .claimDetailsNotificationDate(notificationDateTime)
+                    .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
+                    .respondent2ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
+                    .nextDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime).toLocalDate())
+                    .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
+                            6,
+                            notificationDate
+                    ))
+                    .build();
         } else {
-            updatedCaseData = caseData.toBuilder()
-                .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS))
-                .claimDetailsNotificationDate(notificationDateTime)
-                .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
-                .nextDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime).toLocalDate())
-                .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
-                    6,
-                    notificationDate
-                ))
-                .build();
+            notificationDateTime = getEarliestDateOfService(caseData);
+            notificationDate = notificationDateTime.toLocalDate();
+
+            CaseData.CaseDataBuilder builder = caseData.toBuilder()
+                    .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS))
+                    .claimDetailsNotificationDate(notificationDateTime)
+                    .nextDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime).toLocalDate())
+                    .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
+                            6,
+                            notificationDate
+                    ));
+
+            if (Objects.nonNull(caseData.getRespondent1())) {
+                builder.respondent1ResponseDeadline(
+                        deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime));
+            }
+            if (Objects.nonNull(caseData.getRespondent2())
+                && YES.equals(caseData.getAddRespondent2())) {
+                builder.respondent2ResponseDeadline(
+                        deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime));
+            }
+            updatedCaseData = builder.build();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
-            .build();
+                .data(updatedCaseData.toMap(objectMapper))
+                .build();
+    }
+
+    private LocalDateTime getEarliestDateOfService(CaseData caseData) {
+        LocalDateTime date = time.now();
+
+        if (toggleService.isCertificateOfServiceEnabled()) {
+            if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
+                    && Objects.nonNull(caseData
+                    .getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant())) {
+                LocalDateTime cosDate1 = caseData.getCosNotifyClaimDetails1()
+                        .getCosDateOfServiceForDefendant().atStartOfDay();
+                if (cosDate1.isBefore(date)) {
+                    date = cosDate1;
+                }
+            }
+            if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
+                    && Objects.nonNull(caseData
+                    .getCosNotifyClaimDetails2().getCosDateOfServiceForDefendant())) {
+                LocalDateTime cosDate2 = caseData.getCosNotifyClaimDetails2()
+                        .getCosDateOfServiceForDefendant().atStartOfDay();
+                if (cosDate2.isBefore(date)) {
+                    date = cosDate2;
+                }
+            }
+        }
+
+        return date;
+
     }
 
     private CaseData saveCoSDetailsDoc(CaseData caseData, int lipNumber) {
@@ -158,7 +203,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             cosNotifyClaimDetails = caseData.getCosNotifyClaimDetails2();
         }
         if (Objects.nonNull(cosNotifyClaimDetails)) {
-            cosNotifyClaimDetails.setCosDocSaved(YesOrNo.YES);
+            cosNotifyClaimDetails.setCosDocSaved(YES);
             if (Objects.isNull(caseData.getServedDocumentFiles())) {
                 caseData = caseData.toBuilder()
                         .servedDocumentFiles(ServedDocumentFiles.builder().build()).build();
@@ -193,12 +238,12 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 ? "" : exitSurveyContentService.applicantSurvey());
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(String.format(
-                getConfirmationHeader(caseData),
-                caseData.getLegacyCaseReference()
-            ))
-            .confirmationBody(body)
-            .build();
+                .confirmationHeader(String.format(
+                        getConfirmationHeader(caseData),
+                        caseData.getLegacyCaseReference()
+                ))
+                .confirmationBody(body)
+                .build();
     }
 
     private String getConfirmationBody(CaseData caseData) {
@@ -208,8 +253,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 : NOTIFICATION_ONE_PARTY_SUMMARY;
         if (toggleService.isCertificateOfServiceEnabled()) {
             return isConfirmationForLip(caseData)
-                            ? CONFIRMATION_COS_SUMMARY
-                            : confirmationTextLR;
+                    ? CONFIRMATION_COS_SUMMARY
+                    : confirmationTextLR;
         } else {
             return confirmationTextLR;
         }
@@ -227,9 +272,9 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
     private boolean isConfirmationForLip(CaseData caseData) {
         return (caseData.getDefendant1LIPAtClaimIssued() != null
-                && caseData.getDefendant1LIPAtClaimIssued() == YesOrNo.YES)
+                && caseData.getDefendant1LIPAtClaimIssued() == YES)
                 || (caseData.getDefendant2LIPAtClaimIssued() != null
-                && caseData.getDefendant2LIPAtClaimIssued() == YesOrNo.YES);
+                && caseData.getDefendant2LIPAtClaimIssued() == YES);
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
@@ -241,12 +286,12 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 ? "" : exitSurveyContentService.applicantSurvey());
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(String.format(
-                getConfirmationHeader(caseData),
-                caseData.getLegacyCaseReference()
-            ))
-            .confirmationBody(body)
-            .build();
+                .confirmationHeader(String.format(
+                        getConfirmationHeader(caseData),
+                        caseData.getLegacyCaseReference()
+                ))
+                .confirmationBody(body)
+                .build();
     }
 
     private CallbackResponse prepareDefendantSolicitorOptions(CallbackParams callbackParams) {
@@ -264,8 +309,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         caseDataBuilder.defendantSolicitorNotifyClaimDetailsOptions(DynamicList.fromList(dynamicListOptions));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
     }
 
     private CallbackResponse validateNotificationOption(CallbackParams callbackParams) {
@@ -278,17 +323,17 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .warnings(warnings)
-            .build();
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .warnings(warnings)
+                .build();
     }
 
     protected boolean isNotificationDetailsToBothSolicitors(CaseData caseData) {
         return Optional.ofNullable(caseData.getDefendantSolicitorNotifyClaimDetailsOptions())
-            .map(DynamicList::getValue)
-            .map(DynamicListElement::getLabel)
-            .orElse("")
-            .equalsIgnoreCase("Both");
+                .map(DynamicList::getValue)
+                .map(DynamicListElement::getLabel)
+                .orElse("")
+                .equalsIgnoreCase("Both");
     }
 
     private CallbackResponse validateCertificateOfService(final CallbackParams callbackParams) {
@@ -312,7 +357,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             }
             if ((Objects.nonNull(caseData.getCosNotifyClaimDetails1())
                     && Objects.isNull(caseData.getCosNotifyClaimDetails1().getCosEvidenceDocument()))
-                || (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
+                    || (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
                     && Objects.isNull(caseData.getCosNotifyClaimDetails2().getCosEvidenceDocument()))) {
                 errors.add(DOC_SERVED_MANDATORY);
             }
