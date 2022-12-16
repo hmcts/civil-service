@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,6 +54,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
@@ -87,18 +89,19 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(MID, "experts"), this::validateApplicantExperts,
-            callbackKey(MID, "witnesses"), this::validateApplicantWitnesses,
-            callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
-            callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
-            callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag,
-            callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false),
-            callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true),
-            callbackKey(ABOUT_TO_START), this::populateCaseData,
-            callbackKey(V_1, ABOUT_TO_START), this::populateCaseData,
-            callbackKey(SUBMITTED), this::buildConfirmation
-        );
+        return new ImmutableMap.Builder<String, Callback>()
+            .put(callbackKey(MID, "experts"), this::validateApplicantExperts)
+            .put(callbackKey(MID, "witnesses"), this::validateApplicantWitnesses)
+            .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
+            .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
+            .put(callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag)
+            .put(callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false))
+            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true))
+            .put(callbackKey(ABOUT_TO_START), this::populateCaseData)
+            .put(callbackKey(V_1, ABOUT_TO_START), this::populateCaseData)
+            .put(callbackKey(V_2, ABOUT_TO_START), this::populateCaseData)
+            .put(callbackKey(SUBMITTED), this::buildConfirmation)
+            .build();
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
@@ -272,7 +275,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                                              .build());
         }
 
-        if (V_1.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
+        if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
             updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
             updatedCaseData.respondent1PaymentDateToStringSpec(setUpPayDateToString(caseData));
         }
