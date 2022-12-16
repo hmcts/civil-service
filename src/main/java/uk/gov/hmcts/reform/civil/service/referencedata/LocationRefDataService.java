@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.util.Optional.ofNullable;
 import static org.apache.logging.log4j.util.Strings.concat;
 import static org.apache.logging.log4j.util.Strings.isEmpty;
 
@@ -220,7 +221,15 @@ public class LocationRefDataService {
         List<LocationRefData> filteredLocations = locations.stream().filter(location -> location.getCourtLocationCode()
                 .equals(courtCode))
             .collect(Collectors.toList());
-        return filteredLocations.isEmpty() ? LocationRefData.builder().build() : filteredLocations.get(0);
+        if (filteredLocations.isEmpty()) {
+            log.warn("No court Location Found for three digit court code : {}", courtCode);
+            new RuntimeException("No court Location Found for three digit court code : " + courtCode);
+        }else if (filteredLocations.size() > 1) {
+            log.warn("More than one court location found : {}", courtCode);
+            new RuntimeException("More than one court location found : " + courtCode);
+        }
+
+        return filteredLocations.get(0);
 
     }
 
