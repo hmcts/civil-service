@@ -498,23 +498,20 @@ class LocationRefDataServiceTest {
                 .siteName("site_name").regionId("4").region("North West").courtType("County Court")
                 .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
                 .venueName("CCMCC").courtLocationCode("10").build();
-                ResponseEntity<List<LocationRefData>> mockedResponse = new ResponseEntity<>(
-                    List.of(ccmccLocation, ccmccLocationDuplicate), OK);
-                when(authTokenGenerator.generate()).thenReturn("service_token");
-                when(restTemplate.exchange(
-                    uriCaptor.capture(),
-                    httpMethodCaptor.capture(),
-                    httpEntityCaptor.capture(),
-                    ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()
-                ))
-                    .thenReturn(mockedResponse);
+            ResponseEntity<List<LocationRefData>> mockedResponse = new ResponseEntity<>(
+                List.of(ccmccLocation, ccmccLocationDuplicate), OK);
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(restTemplate.exchange(
+                uriCaptor.capture(),
+                httpMethodCaptor.capture(),
+                httpEntityCaptor.capture(),
+                ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()
+            ))
+                .thenReturn(mockedResponse);
             assertThrows(
                 LocationRefDataException.class,
                 () -> refDataService.getCourtLocation("user_token", "10")
             );
-
-
-
         }
     }
 
