@@ -134,8 +134,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
 import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.FIFTEEN_MINUTES;
-import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.FIFTEEN_MINUTES;
-import static uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator.DISPOSAL_HEARING;
 import static uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator.DISPOSAL_HEARING;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -1174,8 +1172,6 @@ public class CaseDataBuilder {
         respondent2OrganisationPolicy = OrganisationPolicy.builder()
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
             .build();
-        defendant1LIPAtClaimIssued = YES;
-        defendant2LIPAtClaimIssued = YES;
         respondent1OrgRegistered = null;
         respondent2OrgRegistered = null;
         return this;
@@ -1241,7 +1237,6 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondentSolicitor1OrganisationDetails = null;
-        defendant2LIPAtClaimIssued = YES;
         respondent1OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY R").build())
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
@@ -1571,6 +1566,30 @@ public class CaseDataBuilder {
         atStateClaimDraft();
         respondent1OrganisationPolicy = null;
         defendant1LIPAtClaimIssued = YES;
+
+        addRespondent2 = YES;
+        respondent2OrganisationPolicy = null;
+        respondent2SameLegalRepresentative = NO;
+        defendant2LIPAtClaimIssued = YES;
+        return this;
+    }
+
+    public CaseDataBuilder multiPartyClaimTwoDefendant1Lip1Lr() {
+        atStateClaimDraft();
+        respondent1OrganisationPolicy = null;
+        defendant1LIPAtClaimIssued = YES;
+
+        addRespondent2 = YES;
+        respondent2OrganisationPolicy = null;
+        respondent2SameLegalRepresentative = NO;
+        defendant2LIPAtClaimIssued = NO;
+        return this;
+    }
+
+    public CaseDataBuilder multiPartyClaimTwoDefendant1Lr1Lip() {
+        atStateClaimDraft();
+        respondent1OrganisationPolicy = null;
+        defendant1LIPAtClaimIssued = NO;
 
         addRespondent2 = YES;
         respondent2OrganisationPolicy = null;
@@ -2110,7 +2129,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateClaimNotified1v2Respondent2LiP(CertificateOfService  certificateOfService) {
+    public CaseDataBuilder atStateClaimNotified1v2RespondentLiP() {
         atStatePendingClaimIssued();
         ccdState = CASE_ISSUED;
         respondent2Represented = NO;
@@ -2118,7 +2137,6 @@ public class CaseDataBuilder {
             .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
             .build();
         legacyCaseReference = LEGACY_CASE_REFERENCE;
-        cosNotifyClaimDefendant2 = certificateOfService;
         claimDetailsNotificationDeadline = DEADLINE;
         defendant2LIPAtClaimIssued = YES;
         return this;
@@ -3790,6 +3808,21 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimDetailsNotified_1v2_andNotifyBothCoS() {
         atStateClaimDetailsNotified();
         multiPartyClaimTwoDefendantLips();
+        respondent2 = PartyBuilder.builder().soleTrader().build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotified_1v2_1Lip_1Lr() {
+        atStateClaimDetailsNotified();
+        multiPartyClaimTwoDefendant1Lip1Lr();
+        respondent2 = PartyBuilder.builder().soleTrader().build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotified_1v2_1Lr_1Lip() {
+        atStateClaimDetailsNotified();
+        multiPartyClaimTwoDefendant1Lr1Lip();
+        respondent2 = PartyBuilder.builder().soleTrader().build();
         return this;
     }
 
@@ -3838,6 +3871,11 @@ public class CaseDataBuilder {
                 .documentFileName("file-name")
                 .documentBinaryUrl("binary-url")
                 .build());
+        List<Element<Document>> files2 = wrapElements(Document.builder()
+                .documentUrl("fake-url2")
+                .documentFileName("file-name2")
+                .documentBinaryUrl("binary-url2")
+                .build());
         if (setCos1) {
             CertificateOfService.CertificateOfServiceBuilder cos1Builder = CertificateOfService.builder()
                     .cosDateOfServiceForDefendant(cos1Date);
@@ -3850,7 +3888,7 @@ public class CaseDataBuilder {
             CertificateOfService.CertificateOfServiceBuilder cos2Builder = CertificateOfService.builder()
                     .cosDateOfServiceForDefendant(cos2Date);
             if (file2) {
-                cos2Builder.cosEvidenceDocument(files);
+                cos2Builder.cosEvidenceDocument(files2);
             }
             this.cosNotifyClaimDetails2 = cos2Builder.build();
         }
@@ -4074,9 +4112,9 @@ public class CaseDataBuilder {
             .disposalHearingFinalDisposalHearingTimeDJ(disposalHearingFinalDisposalHearingTimeDJ)
             .trialHearingTimeDJ(trialHearingTimeDJ)
             .trialOrderMadeWithoutHearingDJ(trialOrderMadeWithoutHearingDJ)
-                //Certificate of Service
-                .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
-                .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
+            //Certificate of Service
+            .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
+            .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
             .build();
     }
 
