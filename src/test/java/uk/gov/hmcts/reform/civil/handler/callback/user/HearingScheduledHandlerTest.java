@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -203,6 +205,55 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getHearingFee()).isEqualTo(
                 Fee.builder().calculatedAmountInPence(new BigDecimal(2700)).build());
+        }
+
+        @Test
+        void shouldChangeStateSmallClaim_whenRelistingAboutToSubmit() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .addRespondent2(NO)
+                .listingOrRelisting(ListingOrRelisting.RELISTING)
+                .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                .ccdState(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            Assertions.assertEquals(updatedData.getListingOrRelisting(), ListingOrRelisting.RELISTING);
+            assertThat(response.getState().equals(
+                CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING));
+
+        }
+
+        @Test
+        void shouldChangeStateFastClaim_whenRelistingAboutToSubmit() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .addRespondent2(NO)
+                .listingOrRelisting(ListingOrRelisting.RELISTING)
+                .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+                .ccdState(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            Assertions.assertEquals(updatedData.getListingOrRelisting(), ListingOrRelisting.RELISTING);
+            assertThat(response.getState().equals(
+                CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING));
+        }
+
+        @Test
+        void shouldChangeStateMultiClaim_whenRelistingAboutToSubmit() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .addRespondent2(NO)
+                .listingOrRelisting(ListingOrRelisting.RELISTING)
+                .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
+                .ccdState(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            Assertions.assertEquals(updatedData.getListingOrRelisting(), ListingOrRelisting.RELISTING);
+            assertThat(response.getState().equals(
+                CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING));
         }
     }
 
