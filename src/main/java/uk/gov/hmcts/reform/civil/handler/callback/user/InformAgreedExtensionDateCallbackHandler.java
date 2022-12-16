@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -11,7 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -49,7 +49,9 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSINESS_DAY;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
+import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
@@ -124,7 +126,8 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             currentResponseDeadline = caseData.getRespondent2ResponseDeadline();
         }
         //TODO: update to get correct deadline as a part of CMC-1346
-        if (caseData.getSuperClaimType() == SuperClaimType.SPEC_CLAIM && toggleService.isLrSpecEnabled()) {
+        if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())
+            && toggleService.isLrSpecEnabled()) {
             var isAoSApplied = SPEC_ACKNOWLEDGEMENT_OF_SERVICE.equals(caseData.getBusinessProcess().getCamundaEvent());
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline, isAoSApplied))
@@ -141,6 +144,12 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         LocalDate agreedExtension = solicitorRepresentsOnlyRespondent2(callbackParams)
             ? caseData.getRespondentSolicitor2AgreedDeadlineExtension()
             : caseData.getRespondentSolicitor1AgreedDeadlineExtension();
+        log.info("Setting response deadline  Respondent2 Present ({}) AgreedExtensionDate({})",
+                 solicitorRepresentsOnlyRespondent2(callbackParams), agreedExtension
+        );
+        if (agreedExtension == null) {
+            throw new IllegalArgumentException(String.format("Agreed extension date cannot be null"));
+        }
         LocalDateTime newDeadline = deadlinesCalculator.calculateFirstWorkingDay(agreedExtension)
             .atTime(END_OF_BUSINESS_DAY);
 
@@ -181,7 +190,7 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
         String body;
         LocalDateTime responseDeadline = !solicitorRepresentsOnlyRespondent2(callbackParams)
             ? caseData.getRespondent1ResponseDeadline() : caseData.getRespondent2ResponseDeadline();
-        if (caseData.getSuperClaimType() == SuperClaimType.SPEC_CLAIM && toggleService.isLrSpecEnabled()) {
+        if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled()) && toggleService.isLrSpecEnabled()) {
             body = format(
                 "<h2 class=\"govuk-heading-m\">What happens next</h2>You need to respond before %s",
                 formatLocalDateTime(responseDeadline, DATE_TIME_AT)

@@ -146,6 +146,30 @@ class RoboticsDataMapperTest {
     }
 
     @Test
+    void atStatePaymentSuccessfulWithCopyOrganisationIdPresent() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessfulWithCopyOrganisationOnly().build();
+
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
+
+        var firstSolicitor = roboticsCaseData.getSolicitors().get(0);
+        assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
+        assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
+        assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
+        CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
+            .isEqualTo(firstSolicitor.getAddresses().getContactAddress());
+
+        var secondSolicitor = roboticsCaseData.getSolicitors().get(1);
+        assertThat(secondSolicitor.getOrganisationId()).isEqualTo("QWERTY R");
+        assertThat(secondSolicitor.getName()).isEqualTo("Org Name");
+        assertThat(secondSolicitor.getContactDX()).isEqualTo("DX 12345");
+        CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
+            .isEqualTo(secondSolicitor.getAddresses().getContactAddress());
+    }
+
+    @Test
     void shouldMapToRoboticsCaseData_whenOrganisationPolicyIsPresentWithProvidedServiceAddress() {
         var solicitorServiceAddress = Address.builder()
             .addressLine1("line 1 provided")

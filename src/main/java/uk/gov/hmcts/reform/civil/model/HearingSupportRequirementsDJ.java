@@ -15,7 +15,6 @@ public class HearingSupportRequirementsDJ {
     private final String hearingType;
     private final String hearingTypeTelephoneHearing;
     private final DynamicList hearingTemporaryLocation;
-    private final String hearingPreferredLocation;
     private final String hearingPreferredTelephoneNumber1;
     private final String hearingPreferredEmail;
     private final String hearingLengthEstimate;
@@ -30,4 +29,6 @@ public class HearingSupportRequirementsDJ {
     private final String[] hearingSupportRequirementOther;
     private final String hearingSupportRequirementOtherDropdown;
     private final List<Element<HearingDates>> hearingDates;
+    private final YesOrNo hearingSupportQuestion;
+    private final String hearingSupportAdditional;
 }

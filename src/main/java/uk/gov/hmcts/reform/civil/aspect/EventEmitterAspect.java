@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.EventEmitterService;
 
+import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 
@@ -26,7 +27,12 @@ public class EventEmitterAspect {
         throws Throwable {
         if (callbackParams.getType() == SUBMITTED) {
             CaseData caseData = callbackParams.getCaseData();
-            if (caseData.getBusinessProcess() != null && caseData.getBusinessProcess().getStatus() == READY) {
+            var businessProcess = caseData.getBusinessProcess();
+            var camundaEvent = businessProcess.getCamundaEvent();
+            var caseId = caseData.getCcdCaseReference();
+            if (businessProcess != null && businessProcess.getStatus() == READY) {
+                log.info(format("Emitting %s camunda event for case through submitted callback: %d",
+                                camundaEvent, caseId));
                 eventEmitterService.emitBusinessProcessCamundaEvent(caseData, false);
             }
         }

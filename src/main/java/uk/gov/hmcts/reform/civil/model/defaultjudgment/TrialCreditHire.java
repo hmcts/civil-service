@@ -26,7 +26,8 @@ public class TrialCreditHire {
     @Future(message = "The date entered must be in the future")
     private LocalDate date3;
     private String input6;
+    private String input7;
     @Future(message = "The date entered must be in the future")
     private LocalDate date4;
-    private String input7;
+    private String input8;
 }

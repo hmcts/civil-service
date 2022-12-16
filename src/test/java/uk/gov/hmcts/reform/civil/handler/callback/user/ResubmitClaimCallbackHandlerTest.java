@@ -97,8 +97,7 @@ class ResubmitClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
-                .extracting("businessProcess")
-                .isNull();
+                .doesNotHaveToString("businessProcess");
         }
     }
 

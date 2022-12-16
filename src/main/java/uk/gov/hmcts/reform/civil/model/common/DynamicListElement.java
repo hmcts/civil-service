@@ -21,7 +21,7 @@ public class DynamicListElement {
     /**
      * Property that maps to the value attribute of the option tag.
      */
-    private final UUID code;
+    private final String code;
 
     /**
      * Property that maps to the label attribute of the option tag.
@@ -30,7 +30,7 @@ public class DynamicListElement {
 
     public static DynamicListElement dynamicElement(String label) {
         return DynamicListElement.builder()
-            .code(UUID.randomUUID())
+            .code(UUID.randomUUID().toString())
             .label(label)
             .build();
     }

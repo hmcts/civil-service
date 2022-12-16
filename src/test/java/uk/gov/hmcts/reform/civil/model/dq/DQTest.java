@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
-import uk.gov.hmcts.reform.civil.model.UnavailableDateLRspec;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 
 import java.math.BigDecimal;
@@ -45,7 +44,6 @@ abstract class DQTest {
         return RequestedCourt.builder()
             .responseCourtCode("343")
             .reasonForHearingAtSpecificCourt("reason for court")
-            .requestHearingAtSpecificCourt(YES)
             .build();
     }
 
@@ -67,13 +65,13 @@ abstract class DQTest {
             .build();
     }
 
-    protected HearingLRspec hearingLRspec() {
-        return HearingLRspec.builder()
+    protected Hearing hearingLRspec() {
+        return Hearing.builder()
             .hearingLength(HearingLength.LESS_THAN_DAY)
             .hearingLengthHours("1")
             .unavailableDatesRequired(YES)
-            .unavailableDatesLRspec(
-                wrapElements(UnavailableDateLRspec.builder().who("John Smith").date(LocalDate.now()).build()))
+            .unavailableDates(
+                wrapElements(UnavailableDate.builder().who("John Smith").date(LocalDate.now()).build()))
             .build();
     }
 

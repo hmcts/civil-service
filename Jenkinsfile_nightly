@@ -66,7 +66,7 @@ withNightlyPipeline(type, product, component) {
 
   enableFullFunctionalTest(200)
 
-  after('fullFunctionalTest') {
+  afterSuccess('fullFunctionalTest') {
     //sh """ ./gradlew runRpaHandOffTests """  -- TO DO CMC-1986
     sh """ ./gradlew runEndToEndUnspecTests """
     archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
@@ -75,11 +75,11 @@ withNightlyPipeline(type, product, component) {
 
   enableCrossBrowserTest()
 
-  after('crossBrowserTest') {
+  afterSuccess('crossBrowserTest') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
   }
 
-  after('fortify-scan') {
+  afterSuccess('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
   }
 }

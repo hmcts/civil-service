@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -57,7 +58,9 @@ public class CreateSDORespondent2NotificationHandler extends CallbackHandler imp
         if (caseData.getRespondentSolicitor2EmailAddress() != null) {
             notificationService.sendMail(
                 caseData.getRespondentSolicitor2EmailAddress(),
-                notificationsProperties.getSdoOrdered(),
+                caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM
+                    ? notificationsProperties.getSdoOrderedSpec()
+                    : notificationsProperties.getSdoOrdered(),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );

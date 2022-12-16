@@ -11,10 +11,10 @@ import lombok.Data;
 public class JudgementSum {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private final Integer judgementSum;
+    private final Double judgementSum;
 
     @JsonCreator
-    public JudgementSum(@JsonProperty("judgementSum") Integer judgementSum) {
+    public JudgementSum(@JsonProperty("judgementSum") Double judgementSum) {
         this.judgementSum = judgementSum;
     }
 }

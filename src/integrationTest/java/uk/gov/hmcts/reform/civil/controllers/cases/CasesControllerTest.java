@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
+import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.ras.model.RoleAssignmentServiceResponse;
 
@@ -46,6 +47,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     private static final String CLAIMANT_CLAIMS_URL = "/cases/claimant/{submitterId}";
     private static final String DEFENDANT_CLAIMS_URL = "/cases/defendant/{submitterId}";
     private static final String SUBMIT_EVENT_URL = "/cases/{caseId}/citizen/{submitterId}/event";
+    private static final String CALCULATE_DEADLINE_URL = "/cases/response/deadline";
     private static final List<DashboardClaimInfo> claimResults =
         Collections.singletonList(DashboardClaimInfo.builder()
                                       .claimAmount(new BigDecimal(
@@ -79,18 +81,18 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @MockBean
     private CaseEventService caseEventService;
 
+    @MockBean
+    private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
+
     @Test
     @SneakyThrows
     public void shouldReturnHttp200() {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1L).build();
-        CaseData expectedCaseData = CaseData.builder().ccdCaseReference(1L).build();
 
         when(coreCaseDataService.getCase(1L, BEARER_TOKEN))
             .thenReturn(expectedCaseDetails);
-        when(caseDetailsConverter.toCaseData(expectedCaseDetails.getData()))
-            .thenReturn(expectedCaseData);
         doGet(BEARER_TOKEN, CASES_URL, 1L)
-            .andExpect(content().json(toJson(expectedCaseData)))
+            .andExpect(content().json(toJson(expectedCaseDetails)))
             .andExpect(status().isOk());
     }
 
@@ -124,6 +126,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .cases(Arrays
                        .asList(CaseDetails
                                    .builder()
+                                   .id(1L)
                                    .id(1L)
                                    .build()))
             .build();
@@ -174,6 +177,20 @@ public class CasesControllerTest extends BaseIntegrationTest {
             "123"
         )
             .andExpect(content().json(toJson(expectedCaseData)))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldCalculateDeadlineSuccessfully() {
+        LocalDate extensionDate = LocalDate.of(2022, 6, 6);
+        when(deadlineExtensionCalculatorService.calculateExtendedDeadline(any())).thenReturn(extensionDate);
+        doPost(
+            BEARER_TOKEN,
+            extensionDate,
+            CALCULATE_DEADLINE_URL
+        )
+            .andExpect(content().json(toJson(extensionDate)))
             .andExpect(status().isOk());
     }
 }

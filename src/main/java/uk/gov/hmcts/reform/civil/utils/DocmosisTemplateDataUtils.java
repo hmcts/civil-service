@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -193,5 +195,47 @@ public class DocmosisTemplateDataUtils {
                 .build();
         }
 
+    }
+
+    public static List<String> fetchResponseIntentionsDocmosisTemplate(CaseData caseData) {
+        List<String> responseIntentions = new ArrayList<>();
+
+        switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP:
+                if ((caseData.getRespondent1AcknowledgeNotificationDate() == null)
+                    && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
+                    //case where respondent 2 acknowledges first
+                    responseIntentions.add(caseData.getRespondent2ClaimResponseIntentionType().getLabel());
+                } else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null)
+                    && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
+                    if (caseData.getRespondent2AcknowledgeNotificationDate()
+                        .isAfter(caseData.getRespondent1AcknowledgeNotificationDate())) {
+                        //case where respondent 2 acknowledges 2nd
+                        responseIntentions.add(caseData.getRespondent2ClaimResponseIntentionType().getLabel());
+                    } else {
+                        //case where respondent 1 acknowledges 2nd
+                        responseIntentions.add(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+                    }
+                } else { //case where respondent 1 acknowledges first
+                    responseIntentions.add(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+                }
+                break;
+            case ONE_V_TWO_ONE_LEGAL_REP:
+                responseIntentions.add("Defendant 1 :"
+                                           + caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+                responseIntentions.add("Defendant 2 :"
+                                           + caseData.getRespondent2ClaimResponseIntentionType().getLabel());
+                break;
+            case TWO_V_ONE:
+                responseIntentions.add("Against Claimant 1: "
+                                           + caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+                responseIntentions.add("Against Claimant 2: "
+                                           + caseData.getRespondent1ClaimResponseIntentionTypeApplicant2().getLabel());
+                break;
+            default:
+                responseIntentions.add(caseData.getRespondent1ClaimResponseIntentionType().getLabel());
+                return responseIntentions;
+        }
+        return responseIntentions;
     }
 }

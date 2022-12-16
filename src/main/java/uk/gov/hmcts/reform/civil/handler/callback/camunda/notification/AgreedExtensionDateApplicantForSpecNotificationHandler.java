@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_FOR_SPEC_CC;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.fetchDefendantName;
 
 @Service
 @RequiredArgsConstructor
@@ -97,7 +98,8 @@ public class AgreedExtensionDateApplicantForSpecNotificationHandler
                 caseData
             ),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            AGREED_EXTENSION_DATE, formatLocalDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE)
+            AGREED_EXTENSION_DATE, formatLocalDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE),
+            DEFENDANT_NAME, fetchDefendantName(caseData)
         );
     }
 

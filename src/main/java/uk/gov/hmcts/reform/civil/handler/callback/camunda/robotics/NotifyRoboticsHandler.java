@@ -22,7 +22,7 @@ import java.util.Set;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @RequiredArgsConstructor
 public abstract class NotifyRoboticsHandler extends CallbackHandler {
@@ -42,7 +42,7 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
         try {
 
-            if (SPEC_CLAIM.equals(caseData.getSuperClaimType())) {
+            if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
                 if (toggleService.isLrSpecEnabled()) {
                     roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
                     errors = jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString());

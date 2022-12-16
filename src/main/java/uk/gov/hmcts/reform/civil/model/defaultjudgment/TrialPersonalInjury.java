@@ -21,4 +21,9 @@ public class TrialPersonalInjury {
     @Future(message = "The date entered must be in the future")
     private LocalDate date2;
     private String input3;
+    @Future(message = "The date entered must be in the future")
+    private LocalDate date3;
+    private String input4;
+    @Future(message = "The date entered must be in the future")
+    private LocalDate date4;
 }

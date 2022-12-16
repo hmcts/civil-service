@@ -17,11 +17,13 @@ public interface NotificationData {
     String AGREED_EXTENSION_DATE = "agreedExtensionDate";
     String REASON = "reason";
     String PARTY_REFERENCES = "partyReferences";
+    String ALLOCATED_TRACK = "allocatedTrack";
 
     String CLAIM_LEGAL_ORG_NAME_SPEC = "legalOrgName";
     String CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC = "defendantLegalRep";
     String DEFENDANT_NAME_SPEC = "defendantLR";
     String CLAIM_NAME_SPEC = "claimantLR";
+    String RESPONSE_INTENTION = "responseIntention";
 
     //Optional Multiparty fields for notifications
     String RESPONDENT_ONE_NAME = "defendantOneName";
@@ -33,6 +35,7 @@ public interface NotificationData {
     //Default judgment
     String LEGAL_ORG_SPECIFIED = "legalOrg";
     String CLAIM_NUMBER = "claimnumber";
+
     String DEFENDANT_NAME = "DefendantName";
     String BOTH_DEFENDANTS = "Both Defendants";
     String CLAIM_NUMBER_INTERIM = "Claim number";
@@ -42,6 +45,26 @@ public interface NotificationData {
     String DEFENDANT_EMAIL = "DefendantLegalOrgName";
     String CLAIMANT_EMAIL = "ClaimantLegalOrgName";
     String LEGAL_ORG_APPLICANT1 = "legalOrgApplicant1";
+    String PAYMENT_TYPE = "payment type";
+    String AMOUNT_CLAIMED = "amountClaimed";
+    String AMOUNT_OF_COSTS = "amountOfCosts";
+    String AMOUNT_PAID = "amountPaidBeforeJudgment";
+    String AMOUNT_OF_JUDGMENT = "amountOfJudgment";
+
+    // CUI Pin in Post
+    String CLAIMANT_NAME = "claimantName";
+    String RESPOND_URL = "respondToClaimUrl";
+    String PIN = "pin";
+    String FRONTEND_URL = "frontendBaseUrl";
+
+    //Case Progression
+    String EMAIL_ADDRESS = "emailAddress";
+    String HEARING_FEE = "hearingFee";
+    String HEARING_DATE = "hearingDate";
+    String HEARING_TIME = "hearingTime";
+    String HEARING_DUE_DATE = "hearingDueDate";
+    String CLAIMANT_REFERENCE_NUMBER = "claimantReferenceNumber";
+    String DEFENDANT_REFERENCE_NUMBER = "defendantReferenceNumber";
 
     Map<String, String> addProperties(CaseData caseData);
 

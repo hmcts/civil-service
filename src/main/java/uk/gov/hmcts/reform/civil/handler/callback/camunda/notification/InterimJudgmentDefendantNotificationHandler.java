@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_INTERIM_JUDGMENT_DEFENDANT;
 
@@ -86,7 +87,10 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
                                          String.format(REFERENCE_TEMPLATE_APPROVAL_DEF,
                                                        caseData.getLegacyCaseReference()));
         }
+
+        var state = "JUDICIAL_REFERRAL";
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .state(state)
             .data(caseData.toMap(objectMapper))
             .build();
     }
@@ -133,8 +137,7 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
 
     private String getLegalOrganizationNameDefendant2(final CaseData caseData) {
         Optional<Organisation> organisation = organisationService
-            .findOrganisationById(caseData.getRespondent2OrganisationPolicy()
-                                      .getOrganisation().getOrganisationID());
+            .findOrganisationById(getOrganisationIdRespondent2(caseData));
         if (organisation.isPresent()) {
             return organisation.get().getName();
         }
@@ -143,6 +146,15 @@ public class InterimJudgmentDefendantNotificationHandler extends CallbackHandler
 
     private Boolean checkIfBothDefendants(CaseData caseData) {
         return BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel());
+    }
+
+    private String getOrganisationIdRespondent2(final CaseData caseData) {
+        if (isNull(caseData.getRespondent2OrganisationPolicy())
+            || isNull(caseData.getRespondent2OrganisationPolicy().getOrganisation())) {
+            return caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+        } else {
+            return caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+        }
     }
 }
 

@@ -2,9 +2,10 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
@@ -17,6 +18,10 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_ONE_RESPONSE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_TWO_RESPONSE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE;
+import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -36,7 +41,8 @@ public class NotificationUtils {
             || getMultiPartyScenario(caseData).equals(TWO_V_ONE);
     }
 
-    public static Map<String, String> caseOfflineNotificationAddProperties(CaseData caseData) {
+    public static Map<String, String> caseOfflineNotificationAddProperties(
+        CaseData caseData, boolean accessProfilesEnabled) {
         if (getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
@@ -44,14 +50,14 @@ public class NotificationUtils {
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
         } else if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
-            String responseTypeToApplicant2 = SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+            String responseTypeToApplicant2 = isSpecCaseCategory(caseData, accessProfilesEnabled)
                 ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
                 : caseData.getRespondent1ClaimResponseTypeToApplicant2().toString();
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                REASON, SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
-                        ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
-                        : caseData.getRespondent1ClaimResponseType().getDisplayedValue()
+                REASON, isSpecCaseCategory(caseData, accessProfilesEnabled)
+                    ? caseData.getClaimant1ClaimResponseTypeForSpec().getDisplayedValue()
+                    : caseData.getRespondent1ClaimResponseType().getDisplayedValue()
                     .concat(" against " + caseData.getApplicant1().getPartyName())
                     .concat(" and " + responseTypeToApplicant2)
                     .concat(" against " + caseData.getApplicant2().getPartyName()),
@@ -63,14 +69,30 @@ public class NotificationUtils {
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()),
-                RESPONDENT_ONE_RESPONSE, SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+                RESPONDENT_ONE_RESPONSE, isSpecCaseCategory(caseData, accessProfilesEnabled)
                     ? caseData.getRespondent1ClaimResponseTypeForSpec().getDisplayedValue()
                     : caseData.getRespondent1ClaimResponseType().getDisplayedValue(),
-                RESPONDENT_TWO_RESPONSE, SuperClaimType.SPEC_CLAIM.equals(caseData.getSuperClaimType())
+                RESPONDENT_TWO_RESPONSE, isSpecCaseCategory(caseData, accessProfilesEnabled)
                     ? caseData.getRespondent2ClaimResponseTypeForSpec().getDisplayedValue()
                     : caseData.getRespondent2ClaimResponseType().getDisplayedValue(),
                 PARTY_REFERENCES, buildPartiesReferences(caseData)
             );
+        }
+    }
+
+    public static String getSolicitorClaimDismissedProperty(List<String> stateHistoryNameList,
+                                                            NotificationsProperties notificationsProperties) {
+        //scenerio 1: Claim notification does not happen within 4 months of issue
+        if (stateHistoryNameList.contains(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE.fullName())) {
+            return notificationsProperties.getSolicitorClaimDismissedWithin4Months();
+        } else if (stateHistoryNameList.contains(CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName())) {
+            //scenerio 2: Claims details notification is not completed within 14 days of the claim notification step
+            return notificationsProperties.getSolicitorClaimDismissedWithin14Days();
+        } else if (stateHistoryNameList.contains(CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName())) {
+            //scenerio 3 Claimant does not give their intention by the given deadline
+            return notificationsProperties.getSolicitorClaimDismissedWithinDeadline();
+        } else {
+            return notificationsProperties.getSolicitorClaimDismissedWithinDeadline();
         }
     }
 }
