@@ -7,7 +7,6 @@ import lombok.Data;
 @Builder
 public class Witness {
 
-    // CIV-5557 to be removed
     @Deprecated
     private final String name;
     private final String firstName;
