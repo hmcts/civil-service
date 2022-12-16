@@ -221,10 +221,10 @@ public class LocationRefDataService {
             .collect(Collectors.toList());
         if (filteredLocations.isEmpty()) {
             log.warn("No court Location Found for three digit court code : {}", courtCode);
-            new RuntimeException("No court Location Found for three digit court code : " + courtCode);
+            new LocationRefDataException("No court Location Found for three digit court code : " + courtCode);
         } else if (filteredLocations.size() > 1) {
             log.warn("More than one court location found : {}", courtCode);
-            new RuntimeException("More than one court location found : " + courtCode);
+            new LocationRefDataException("More than one court location found : " + courtCode);
         }
 
         return filteredLocations.get(0);
