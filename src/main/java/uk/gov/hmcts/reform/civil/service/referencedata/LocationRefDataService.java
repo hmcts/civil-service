@@ -184,7 +184,7 @@ public class LocationRefDataService {
                 return LocationRefData.builder().build();
             } else {
                 if (locations.size() > 1) {
-                    log.warn("Location Reference Data Lookup returned more than one CCMCC location");
+                    log.warn("Location Reference Data Lookup returned more than one {} location", threeDigitCode);
                 }
                 return locations.get(0);
             }
