@@ -99,8 +99,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 callbackKey(ABOUT_TO_START), this::prepareDefendantSolicitorOptions,
                 callbackKey(MID, "validateNotificationOption"), this::validateNotificationOption,
                 callbackKey(MID, "particulars-of-claim"), this::validateParticularsOfClaim,
-                callbackKey(MID, "validateCosNotifyClaimDetails1"), this::validateCertificateOfService,
-                callbackKey(MID, "validateCosNotifyClaimDetails2"), this::validateCertificateOfService,
+                callbackKey(MID, "validateCosNotifyClaimDetails1"), this::validateCoSDetailsDefendant1,
+                callbackKey(MID, "validateCosNotifyClaimDetails2"), this::validateCoSDetailsDefendant2,
                 callbackKey(ABOUT_TO_SUBMIT), this::submitClaim,
                 callbackKey(SUBMITTED), this::buildConfirmationWithSolicitorOptions
         );
@@ -339,7 +339,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 .equalsIgnoreCase("Both");
     }
 
-    private CallbackResponse validateCertificateOfService(final CallbackParams callbackParams) {
+    private CallbackResponse validateCoSDetailsDefendant1(final CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         ArrayList<String> errors = new ArrayList<>();
@@ -347,21 +347,15 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
                 caseData.getCosNotifyClaimDetails1().setCosDocSaved(NO);
             }
-            if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
-                caseData.getCosNotifyClaimDetails2().setCosDocSaved(NO);
+
+            final String dateValidationErrorMessage = getServiceOfDateValidationMessage(
+                caseData.getCosNotifyClaimDetails1());
+
+            if (!dateValidationErrorMessage.isEmpty()) {
+                errors.add(dateValidationErrorMessage);
             }
-            if ((Objects.nonNull(caseData.getCosNotifyClaimDetails1())
-                    && LocalDate.now().isBefore(
-                    caseData.getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant()))
-                    || (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
-                    && LocalDate.now().isBefore(
-                    caseData.getCosNotifyClaimDetails2().getCosDateOfServiceForDefendant()))) {
-                errors.add(DOC_SERVED_DATE_IN_FUTURE);
-            }
-            if ((Objects.nonNull(caseData.getCosNotifyClaimDetails1())
-                    && Objects.isNull(caseData.getCosNotifyClaimDetails1().getCosEvidenceDocument()))
-                    || (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
-                    && Objects.isNull(caseData.getCosNotifyClaimDetails2().getCosEvidenceDocument()))) {
+            if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
+                    && isMandatoryDocMissing(caseData.getCosNotifyClaimDetails1())) {
                 errors.add(DOC_SERVED_MANDATORY);
             }
         }
@@ -371,5 +365,59 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 .data(caseDataBuilder.build().toMap(objectMapper))
                 .errors(errors)
                 .build();
+    }
+
+    private CallbackResponse validateCoSDetailsDefendant2(final CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        ArrayList<String> errors = new ArrayList<>();
+        if (toggleService.isCertificateOfServiceEnabled()) {
+            if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
+                caseData.getCosNotifyClaimDetails2().setCosDocSaved(NO);
+            }
+            final String dateValidationErrorMessage = getServiceOfDateValidationMessage(
+                caseData.getCosNotifyClaimDetails2());
+
+            if (!dateValidationErrorMessage.isEmpty()) {
+                errors.add(dateValidationErrorMessage);
+            }
+
+            if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
+                && isMandatoryDocMissing(caseData.getCosNotifyClaimDetails2())) {
+                errors.add(DOC_SERVED_MANDATORY);
+            }
+        }
+
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .errors(errors)
+            .build();
+    }
+
+    private boolean isMandatoryDocMissing(CertificateOfService certificateOfService) {
+        return Objects.isNull(certificateOfService.getCosEvidenceDocument());
+    }
+
+    private String getServiceOfDateValidationMessage(CertificateOfService certificateOfService) {
+        final String errorMessage = "";
+        if (Objects.nonNull(certificateOfService)) {
+            if (isCosDefendantNotifyDateFutureDate(certificateOfService.getCosDateOfServiceForDefendant())) {
+                return DOC_SERVED_DATE_IN_FUTURE;
+            } else if (isCosDefendantNotifyDateOlderThan14Days(certificateOfService.getCosDateOfServiceForDefendant())) {
+                return DOC_SERVED_DATE_OLDER_THAN_14DAYS;
+            }
+        }
+        return errorMessage;
+    }
+
+    private boolean isCosDefendantNotifyDateFutureDate(LocalDate cosDateOfServiceForDefendant) {
+        return time.now().toLocalDate().isBefore(cosDateOfServiceForDefendant);
+    }
+
+    private boolean isCosDefendantNotifyDateOlderThan14Days(LocalDate cosDateOfServiceForDefendant) {
+        return time.now().isAfter(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDateOfServiceForDefendant
+                                                                                  .atTime(time.now().toLocalTime())));
+
     }
 }
