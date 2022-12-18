@@ -221,7 +221,8 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             Assertions.assertEquals(updatedData.getListingOrRelisting(), ListingOrRelisting.RELISTING);
             assertThat(response.getState().equals(
                 CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING));
-
+            assertThat(updatedData.getHearingFee()).isEqualTo(
+                null);
         }
 
         @Test
@@ -238,6 +239,8 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             Assertions.assertEquals(updatedData.getListingOrRelisting(), ListingOrRelisting.RELISTING);
             assertThat(response.getState().equals(
                 CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING));
+            assertThat(updatedData.getHearingFee()).isEqualTo(
+                null);
         }
 
         @Test
@@ -254,6 +257,8 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             Assertions.assertEquals(updatedData.getListingOrRelisting(), ListingOrRelisting.RELISTING);
             assertThat(response.getState().equals(
                 CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING));
+            assertThat(updatedData.getHearingFee()).isEqualTo(
+                null);
         }
     }
 
