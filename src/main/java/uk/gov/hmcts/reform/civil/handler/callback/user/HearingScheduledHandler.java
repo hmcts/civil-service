@@ -164,6 +164,11 @@ public class HearingScheduledHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         String state = null;
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        if (nonNull(caseData.getHearingLocation())) {
+            DynamicList locationList = caseData.getHearingLocation();
+            locationList.setListItems(null);
+            caseDataBuilder.hearingLocation(locationList);
+        }
         if (nonNull(caseData.getListingOrRelisting())
             && caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
             if (LocalDate.now().isBefore(caseData.getHearingDate().minusWeeks(4))) {
@@ -190,11 +195,6 @@ public class HearingScheduledHandler extends CallbackHandler {
                 default:
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(0)).build());
             }
-            if (nonNull(caseData.getHearingLocation())) {
-                DynamicList locationList = caseData.getHearingLocation();
-                locationList.setListItems(null);
-                caseDataBuilder.hearingLocation(locationList);
-            }
             state = "HEARING_READINESS";
             caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -202,11 +202,6 @@ public class HearingScheduledHandler extends CallbackHandler {
                 .data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
         } else {
-            if (nonNull(caseData.getHearingLocation())) {
-                DynamicList locationList = caseData.getHearingLocation();
-                locationList.setListItems(null);
-                caseDataBuilder.hearingLocation(locationList);
-            }
             state = "PREPARE_FOR_HEARING_CONDUCT_HEARING";
             caseDataBuilder.businessProcess(BusinessProcess.ready(PREPARE_FOR_HEARING_CONDUCT_HEARING));
             return AboutToStartOrSubmitCallbackResponse.builder()
