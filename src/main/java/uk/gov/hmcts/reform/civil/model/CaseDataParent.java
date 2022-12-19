@@ -125,7 +125,8 @@ public class CaseDataParent implements MappableObject {
     private final Witnesses applicant1DQWitnessesSmallClaim;
     private final Witnesses respondent1DQWitnessesSmallClaim;
     private final Witnesses respondent2DQWitnessesSmallClaim;
-    
+
+    @Deprecated
     private final LocalDateTime addLegalRepDeadline;
 
     @Builder.Default
