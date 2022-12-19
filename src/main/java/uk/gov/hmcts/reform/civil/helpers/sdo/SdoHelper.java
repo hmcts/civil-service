@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 
 import java.util.List;
+import java.util.Locale;
 
 public class SdoHelper {
 
@@ -96,7 +97,7 @@ public class SdoHelper {
         SmallClaimsHearing smallClaimHearing = caseData.getSmallClaimsHearing();
 
         if (smallClaimHearing != null) {
-            return smallClaimHearing.getTime().getLabel();
+            return smallClaimHearing.getTime().getLabel().toLowerCase(Locale.ROOT);
         }
 
         return "";
