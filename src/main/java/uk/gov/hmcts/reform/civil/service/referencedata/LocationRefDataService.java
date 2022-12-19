@@ -182,14 +182,15 @@ public class LocationRefDataService {
                 return LocationRefData.builder().build();
             } else {
                 if (locations.size() > 1) {
-                    log.warn("Location Reference Data Lookup returned more than one CCMCC location");
+                    log.warn("Location Reference Data Lookup returned more than one {} location", threeDigitCode);
                 }
                 return locations.get(0);
             }
         } catch (Exception e) {
             log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
+            throw e;
         }
-        return LocationRefData.builder().build();
+
     }
 
     private URI buildURIforCourtCode(String courtCode) {
