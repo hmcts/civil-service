@@ -3981,10 +3981,8 @@ public class CaseDataBuilder {
             .applicant1DefenceResponseDocument(applicant1DefenceResponseDocument)
             .claimantDefenceResDocToDefendant2(applicant2DefenceResponseDocument)
             .defendantDetails(defendantDetails)
-
             //Case procceds in Caseman
             .claimProceedsInCaseman(claimProceedsInCaseman)
-
             .ccdState(ccdState)
             .businessProcess(businessProcess)
             .ccdCaseReference(ccdCaseReference)
@@ -4136,6 +4134,4 @@ public class CaseDataBuilder {
             .ccjPaymentPaidSomeOption(ccjPaymentPaidSomeOption)
             .build();
     }
-
-
 }
