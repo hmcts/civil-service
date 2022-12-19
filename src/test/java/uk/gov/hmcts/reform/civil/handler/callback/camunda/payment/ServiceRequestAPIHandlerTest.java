@@ -102,17 +102,17 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         void handleEventsReturnsTheExpectedCallbackEvent() {
             assertThat(handler.handledEvents()).contains(CREATE_SERVICE_REQUEST_API);
         }
-    }
 
-    private SRPbaDetails
-    extractHearingFeePaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-        return responseCaseData.getHearingFeePBADetails();
-    }
+        private SRPbaDetails
+        extractHearingFeePaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            return responseCaseData.getHearingFeePBADetails();
+        }
 
-    private SRPbaDetails
+        private SRPbaDetails
         extractClaimFeePaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-        return responseCaseData.getClaimIssuedPBADetails();
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            return responseCaseData.getClaimIssuedPBADetails();
+        }
     }
 }
