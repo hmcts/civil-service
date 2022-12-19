@@ -178,7 +178,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                     && Objects.nonNull(caseData
                     .getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant())) {
                 LocalDateTime cosDate1 = caseData.getCosNotifyClaimDetails1()
-                        .getCosDateOfServiceForDefendant().atStartOfDay();
+                        .getCosDateOfServiceForDefendant().atTime(time.now().toLocalTime());
                 if (cosDate1.isBefore(date)) {
                     date = cosDate1;
                 }
@@ -187,7 +187,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                     && Objects.nonNull(caseData
                     .getCosNotifyClaimDetails2().getCosDateOfServiceForDefendant())) {
                 LocalDateTime cosDate2 = caseData.getCosNotifyClaimDetails2()
-                        .getCosDateOfServiceForDefendant().atStartOfDay();
+                        .getCosDateOfServiceForDefendant().atTime(time.now().toLocalTime());
                 if (cosDate2.isBefore(date)) {
                     date = cosDate2;
                 }

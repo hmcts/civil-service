@@ -240,7 +240,8 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateCertificateOfService_and_documents_cos1_whenSubmitted() {
             when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             LocalDate cosDate = localDateTime.minusDays(2).toLocalDate();
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDate.atStartOfDay()))
+            when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDate.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(2));
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
@@ -258,7 +259,8 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateCertificateOfService_and_documents_cos2_whenSubmitted() {
             when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             LocalDate cosDate = localDateTime.minusDays(2).toLocalDate();
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDate.atStartOfDay()))
+            when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDate.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(2));
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
@@ -277,9 +279,10 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             LocalDate cos1Date = localDateTime.minusDays(2).toLocalDate();
             LocalDate cos2Date = localDateTime.minusDays(3).toLocalDate();
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos1Date.atStartOfDay()))
+            when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos1Date.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(2));
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos2Date.atStartOfDay()))
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos2Date.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(3));
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
@@ -299,9 +302,10 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             LocalDate cos1Date = localDateTime.minusDays(3).toLocalDate();
             LocalDate cos2Date = localDateTime.minusDays(2).toLocalDate();
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos1Date.atStartOfDay()))
+            when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos1Date.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(3));
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos2Date.atStartOfDay()))
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos2Date.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(2));
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
