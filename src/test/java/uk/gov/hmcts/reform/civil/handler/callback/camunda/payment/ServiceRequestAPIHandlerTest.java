@@ -103,8 +103,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
-    private CaseData
-    extractResponseCaseData(AboutToStartOrSubmitCallbackResponse response) {
+    private CaseData extractResponseCaseData(AboutToStartOrSubmitCallbackResponse response) {
         return objectMapper.convertValue(response.getData(), CaseData.class);
     }
 }
