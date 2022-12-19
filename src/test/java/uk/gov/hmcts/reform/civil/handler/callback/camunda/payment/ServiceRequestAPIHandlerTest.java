@@ -71,7 +71,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldMakePaymentServiceRequestForClaimFee_whenInvoked() throws Exception {
+        void shouldMakePaymentServiceRequestForClaimFee_whenInvoked() {
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(paymentServiceResponse.builder()
                             .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
@@ -84,7 +84,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldMakePaymentServiceRequestForHearingFee_whenInvoked() throws Exception {
+        void shouldMakePaymentServiceRequestForHearingFee_whenInvoked() {
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDate();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
@@ -105,14 +105,14 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private SRPbaDetails
-        extractClaimFeePaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
-        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-        return responseCaseData.getClaimIssuedPBADetails();
-    }
-
-    private SRPbaDetails
     extractHearingFeePaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
         return responseCaseData.getHearingFeePBADetails();
+    }
+
+    private SRPbaDetails
+        extractClaimFeePaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
+        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+        return responseCaseData.getClaimIssuedPBADetails();
     }
 }
