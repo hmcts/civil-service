@@ -85,7 +85,7 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestShouldNotThrowAnError_whenValidCaseDataIsProvided() {
-        CaseData caseData = CaseDataBuilder.builder().buildMakePaymentsCaseData();
+        CaseData caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithPBADetails();
         paymentsService.validateRequest(caseData);
         assertThat(caseData).isNotNull();
     }
