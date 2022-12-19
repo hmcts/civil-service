@@ -375,7 +375,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-
     public CaseDataBuilder generalAppVaryJudgementType(YesOrNo generalAppVaryJudgementType) {
         this.generalAppVaryJudgementType = generalAppVaryJudgementType;
         return this;
@@ -3865,12 +3864,12 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder ccjPaymentPaidSomeOption(YesOrNo paymentOption){
+    public CaseDataBuilder ccjPaymentPaidSomeOption(YesOrNo paymentOption) {
         this.ccjPaymentPaidSomeOption = paymentOption;
         return this;
     }
 
-    public CaseDataBuilder claimFee(Fee fee){
+    public CaseDataBuilder claimFee(Fee fee) {
         this.claimFee = fee;
         return this;
     }
