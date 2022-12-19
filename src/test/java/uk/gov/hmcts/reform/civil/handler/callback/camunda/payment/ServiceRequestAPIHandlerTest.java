@@ -71,7 +71,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldMakePaymentServiceRequest_whenInvoked() throws Exception {
+        void shouldMakePaymentServiceRequestForClaimFee_whenInvoked() throws Exception {
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(paymentServiceResponse.builder()
                             .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
@@ -79,7 +79,22 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
-            assertThat(extractPaymentDetailsFromResponse(response).getServiceReqReference())
+            assertThat(extractClaimFeePaymentDetailsFromResponse(response).getServiceReqReference())
+                .isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
+        }
+
+        @Test
+        void shouldMakePaymentServiceRequestForHearingFee_whenInvoked() throws Exception {
+            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDate();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(paymentsService.createServiceRequest(any(), any()))
+                .thenReturn(paymentServiceResponse.builder()
+                                .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
+            assertThat(extractHearingFeePaymentDetailsFromResponse(response).getServiceReqReference())
                 .isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
         }
 
@@ -90,8 +105,14 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private SRPbaDetails
-        extractPaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
+        extractClaimFeePaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
         return responseCaseData.getClaimIssuedPBADetails();
+    }
+
+    private SRPbaDetails
+    extractHearingFeePaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
+        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+        return responseCaseData.getHearingFeePBADetails();
     }
 }
