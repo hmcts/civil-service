@@ -102,8 +102,10 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
 
         updateOrgPolicyReferences(caseData, caseDataBuilder, replacedSolicitorCaseRole);
 
-        if (!is1v1(caseData)) {
-            if (isSameSolicitorScenario(caseData)) {
+        CaseData tempUpdatedCaseData = caseDataBuilder.build();
+
+        if (!is1v1(tempUpdatedCaseData)) {
+            if (isSameSolicitorScenario(tempUpdatedCaseData)) {
                 caseDataBuilder.respondent2SameLegalRepresentative(YES);
             } else {
                 caseDataBuilder.respondent2SameLegalRepresentative(NO);
@@ -272,10 +274,17 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
     }
 
     private boolean isSameSolicitorScenario(CaseData caseData) {
-        return caseData.getRespondent2() != null
+        return (caseData.getRespondent2() != null
+            && UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && caseData.getRespondent1OrganisationIDCopy() != null
+            && caseData.getRespondent2OrganisationIDCopy() != null
+            // need to check ID because orgID is null after create claim for unspec
+            && caseData.getRespondent1OrganisationIDCopy().equals(
+            caseData.getRespondent2OrganisationIDCopy()))
+            || (caseData.getRespondent2() != null
             && caseData.getRespondent1OrganisationPolicy().getOrganisation() != null
             && caseData.getRespondent2OrganisationPolicy().getOrganisation() != null
             && caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID().equals(
-            caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID());
+            caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID()));
     }
 }
