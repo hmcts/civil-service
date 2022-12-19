@@ -61,12 +61,15 @@ public class RaisingClaimAgainstLitigantInPersonForSpecNotificationHandler exten
     private CallbackResponse notifyApplicantSolicitorCaseHandedOffline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        System.out.println("inside notify method");
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
             notificationsProperties.getClaimantSolicitorSpecCaseWillProgressOffline(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
+        System.out.println("template id " + notificationsProperties.getClaimantSolicitorSpecCaseWillProgressOffline());
+        System.out.println("email been sent out");
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
