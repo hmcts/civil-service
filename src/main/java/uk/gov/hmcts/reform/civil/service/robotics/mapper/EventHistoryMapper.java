@@ -2074,7 +2074,7 @@ public class EventHistoryMapper {
 
     private Element<GeneralApplicationsDetails> getGeneralApplicationDetailsJudeDecisionWithStruckOutDefence(
         String caseLinkId, CaseData caseData) {
-        return caseData.getGeneralApplicationsDetails().stream()
+        return caseData.getGaDetailsMasterCollection().stream()
                 .filter(generalApplicationsDetailsElement ->
                        generalApplicationsDetailsElement
                            .getValue()
