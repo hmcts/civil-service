@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
@@ -103,8 +102,8 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
 
         updateOrgPolicyReferences(caseData, caseDataBuilder, replacedSolicitorCaseRole);
 
-        if(!is1v1(caseData)) {
-            if(isSameSolicitorScenario(caseData)) {
+        if (!is1v1(caseData)) {
+            if (isSameSolicitorScenario(caseData)) {
                 caseDataBuilder.respondent2SameLegalRepresentative(YES);
             } else {
                 caseDataBuilder.respondent2SameLegalRepresentative(NO);
@@ -150,7 +149,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         caseDataBuilder.respondent2OrgRegistered(YES)
             .respondentSolicitor2OrganisationDetails(null);
 
-        if(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+        if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder.respondentSolicitor2ServiceAddress(null)
                 .respondentSolicitor2ServiceAddressRequired(NO)
                 .respondentSolicitor2ServiceAddress(null)
@@ -175,7 +174,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         caseDataBuilder.respondent1OrgRegistered(YES)
             .respondentSolicitor1OrganisationDetails(null);
 
-        if(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+        if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder.respondentSolicitor1ServiceAddress(null)
                 .respondentSolicitor1ServiceAddressRequired(NO)
                 .respondent1OrganisationIDCopy(addedOrganisation)
@@ -199,10 +198,11 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
                                                  UserDetails addedSolicitorDetails) {
         CaseData caseData = caseDataBuilder.build();
 
+        caseDataBuilder.applicantSolicitor1PbaAccounts(null)
+            .applicantSolicitor1PbaAccountsIsEmpty(YES);
+
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder
-                .applicantSolicitor1PbaAccounts(null)
-                .applicantSolicitor1PbaAccountsIsEmpty(YES)
                 .applicantSolicitor1ServiceAddressRequired(NO)
                 .applicantSolicitor1ServiceAddress(null);
         } else {

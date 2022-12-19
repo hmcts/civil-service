@@ -3807,11 +3807,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder setCaseCategoryToUnspecClaim() {
-        this.caseAccessCategory = CaseCategory.UNSPEC_CLAIM;
-        return this;
-    }
-
     public CaseDataBuilder removeSolicitorReferences() {
         this.solicitorReferences = null;
         this.respondentSolicitor2Reference = null;
