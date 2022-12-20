@@ -58,10 +58,8 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandler exten
 
     private CallbackResponse notifyApplicantForClaimContinuingOnline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        generateEmail(caseData);
 
-        if (caseData.getRespondent1() != null && caseData.getRespondent1().getPartyEmail() != null) {
-            generateEmail(caseData);
-        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
