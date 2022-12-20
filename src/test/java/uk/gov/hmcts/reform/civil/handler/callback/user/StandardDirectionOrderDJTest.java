@@ -254,8 +254,9 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
             //trialHearingDisclosureOfDocumentsDJ
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input1")
-                .isEqualTo("Documents must be disclosed by uploading to the"
-                               + " Digital Portal a standard disclosure list by 4pm on");
+                .isEqualTo("Standard disclosure shall be provided by "
+                               + "the parties by uploading to the digital "
+                               + "portal their lists of documents by 4pm on");
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(4).toString());
             assertThat(response.getData()).extracting("trialHearingDisclosureOfDocumentsDJ").extracting("input2")

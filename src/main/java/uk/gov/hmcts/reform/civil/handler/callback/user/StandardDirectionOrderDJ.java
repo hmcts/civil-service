@@ -353,9 +353,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder
             .trialHearingDisclosureOfDocumentsDJ(TrialHearingDisclosureOfDocuments
                                                      .builder()
-                                                     .input1("Documents must be disclosed by uploading to the"
-                                                                 + " Digital Portal a standard disclosure "
-                                                                 + "list by 4pm on")
+                                                     .input1("Standard disclosure shall be provided by "
+                                                                 + "the parties by uploading to the digital "
+                                                                 + "portal their lists of documents by 4pm on")
                                                      .date1(LocalDate.now().plusWeeks(4))
                                                      .input2("Any request to inspect a document, or for a copy of a "
                                                                  + "document, shall be made directly to the other"
