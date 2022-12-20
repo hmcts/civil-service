@@ -12,7 +12,7 @@ public enum GeneralApplicationTypes {
     EXTEND_TIME("Extend time"),
     AMEND_A_STMT_OF_CASE("Amend a statement of case"),
     RELIEF_FROM_SANCTIONS("Relief from sanctions"),
-    PROCEEDS_IN_HERITAGE("Proceeds in Heritage"),
+    PROCEEDS_IN_HERITAGE("Proceeds In Heritage"),
 
     SET_ASIDE_JUDGEMENT("Set aside judgment"),
     VARY_ORDER("Vary order"),

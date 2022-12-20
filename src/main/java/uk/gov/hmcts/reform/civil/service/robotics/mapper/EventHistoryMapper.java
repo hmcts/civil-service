@@ -190,7 +190,9 @@ public class EventHistoryMapper {
                         break;
                     case TAKEN_OFFLINE_BY_STAFF:
                         buildTakenOfflineByStaff(builder, caseData);
-                        buildGeneralFormApplicationEventsStrikeOutOrder(builder, caseData);
+                        if (featureToggleService.isGeneralApplicationRpaEnabled()) {
+                            buildGeneralFormApplicationEventsStrikeOutOrder(builder, caseData);
+                        }
                         break;
                     case CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE:
                         buildClaimDismissedPastDeadline(builder, caseData,

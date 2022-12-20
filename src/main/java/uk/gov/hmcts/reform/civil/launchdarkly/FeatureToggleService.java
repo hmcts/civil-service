@@ -107,6 +107,11 @@ public class FeatureToggleService {
                                             createLDUser().build(), false);
     }
 
+    public boolean isGeneralApplicationRpaEnabled() {
+        return internalClient.boolVariation("general-application-rpa",
+                createLDUser().build(), false);
+    }
+
     private void close() {
         try {
             internalClient.close();
