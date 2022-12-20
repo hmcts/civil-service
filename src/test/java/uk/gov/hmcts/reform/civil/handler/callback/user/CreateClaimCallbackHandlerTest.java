@@ -61,7 +61,6 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
-import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -1184,49 +1183,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Nested
-        class AddLegalRepDeadline {
-            @Test
-            void shouldSetAddLegalRepDeadline_whenInvoked() {
-                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
-                caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant().build();
-
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
-
-                assertThat(response.getData()).extracting("addLegalRepDeadline")
-                    .isEqualTo(submittedDate.format(ISO_DATE_TIME));
-            }
-
-            @Test
-            void shouldSetAddLegalRepDeadline_1v2_2LiPs_whenInvoked() {
-                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
-                caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
-
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
-
-                assertThat(response.getData()).extracting("addLegalRepDeadline")
-                    .isEqualTo(submittedDate.format(ISO_DATE_TIME));
-            }
-
-            @Test
-            void shouldSetAddLegalRepDeadline_1v2_1LiP_whenInvoked() {
-                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
-                caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().build();
-
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
-
-                assertThat(response.getData()).extracting("addLegalRepDeadline")
-                    .isEqualTo(submittedDate.format(ISO_DATE_TIME));
-            }
-
-        }
-
-        @Nested
         class DefendantLipAtClaimIssued {
             @Test
             void shouldSetDefend1LipAtClaimIssued_when_defendant1LitigantParty() {
@@ -1273,7 +1229,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             }
 
             @Test
-            void shouldSetAddLegalRepDeadline_1v2_BothDefendantLitigantParty_whenInvoked() {
+            void shouldSetDefendantLIPAtClaim_1v2_BothDefendantLitigantParty_whenInvoked() {
                 when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
                 caseData = CaseDataBuilder.builder().atStateClaimSubmittedNoRespondentRepresented().build();
 
