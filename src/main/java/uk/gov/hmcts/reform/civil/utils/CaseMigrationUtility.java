@@ -88,9 +88,9 @@ public class CaseMigrationUtility {
 
     }
 
-    public void migrateRespondentAndApplicantDQUnSpec(String authToken, CaseData oldCaseData,
-                                                      CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                                                      CaseLocation caseLocation) {
+    public void migrateRespondentAndApplicantDQ(String authToken, CaseData oldCaseData,
+                                                CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
+                                                CaseLocation caseLocation) {
         log.info("CaseCategory is : {}", oldCaseData.getCaseAccessCategory());
 
         if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
@@ -146,7 +146,8 @@ public class CaseMigrationUtility {
                                                       .build()).responseClaimCourtLocationRequired(YES).build());
 
         } else if (ofNullable(respondent1DQ).isPresent()
-            && ofNullable(respondent1DQ.getRespondent1DQExperts()).isPresent()) {
+            && (ofNullable(respondent1DQ.getRespondent1DQExperts()).isPresent()
+            || ofNullable(respondent1DQ.getRespondent1DQStatementOfTruth()).isPresent())) {
 
             caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
                                               .respondent1DQRequestedCourt(RequestedCourt
@@ -207,7 +208,8 @@ public class CaseMigrationUtility {
                                               .build());
             caseDataBuilder.responseClaimCourtLocation2Required(YES);
         } else if (ofNullable(respondent2DQ).isPresent()
-            && ofNullable(respondent2DQ.getRespondent2DQExperts()).isPresent()) {
+            && (ofNullable(respondent2DQ.getRespondent2DQExperts()).isPresent()
+            || ofNullable(respondent2DQ.getRespondent2DQStatementOfTruth()).isPresent())) {
             caseDataBuilder.respondent2DQ(respondent2DQ.toBuilder()
                                               .respondent2DQRequestedCourt(RequestedCourt.builder()
                                                                                .caseLocation(caseLocation)
@@ -263,7 +265,8 @@ public class CaseMigrationUtility {
                                               .build());
 
         } else if (ofNullable(respondent1DQ).isPresent()
-            && ofNullable(respondent1DQ.getRespondent1DQExperts()).isPresent()) {
+            && (ofNullable(respondent1DQ.getRespondent1DQExperts()).isPresent()
+            || ofNullable(respondent1DQ.getRespondent1DQStatementOfTruth()).isPresent())) {
 
             caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
                                               .respondent1DQRequestedCourt(RequestedCourt.builder()
@@ -306,7 +309,8 @@ public class CaseMigrationUtility {
                                                                                .caseLocation(location)
                                                                                .build()).build());
         } else if (ofNullable(respondent2DQ).isPresent()
-            && ofNullable(respondent2DQ.getRespondent2DQExperts()).isPresent()) {
+            && (ofNullable(respondent2DQ.getRespondent2DQExperts()).isPresent()
+            || ofNullable(respondent2DQ.getRespondent2DQStatementOfTruth()).isPresent())) {
             caseDataBuilder.respondent2DQ(respondent2DQ.toBuilder()
                                               .respondent2DQRequestedCourt(RequestedCourt.builder()
                                                                                .caseLocation(caseLocation)
