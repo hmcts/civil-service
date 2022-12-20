@@ -117,7 +117,7 @@ class FeatureToggleServiceTest {
     //void shouldCallBoolVariation_whenIsPinInPostEnabledInvoked() {
     //    var pinInPostKey = "pin-in-post";
     //    givenToggle(pinInPostKey, true);
-//
+    //
     //    assertThat(featureToggleService.isPinInPostEnabled()).isTrue();
     //    verifyBoolVariationCalled(pinInPostKey, List.of("timestamp", "environment"));
     //}
