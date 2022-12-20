@@ -9,8 +9,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class
-NotificationService {
+public class NotificationService {
 
     private final NotificationClient notificationClient;
 
@@ -21,10 +20,7 @@ NotificationService {
         String reference
     ) {
         try {
-            System.out.println(" inside SendMail method");
-            targetEmail = "civilmoneyclaimsdemo@gmail.com";
             notificationClient.sendEmail(emailTemplate, targetEmail, parameters, reference);
-            System.out.println(" target email been changed and email been sent out to  " + targetEmail );
         } catch (NotificationClientException e) {
             throw new NotificationException(e);
         }

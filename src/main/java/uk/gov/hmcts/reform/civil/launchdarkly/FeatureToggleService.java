@@ -44,7 +44,7 @@ public class FeatureToggleService {
         return internalClient.boolVariation(
             "specified-rpa-continuous-feed",
             createLDUser().build(),
-            true
+            false
         );
     }
 
@@ -83,7 +83,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCourtLocationDynamicListEnabled() {
-        return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), true);
+        return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), false);
     }
 
     public boolean isPinInPostEnabled() {
