@@ -87,7 +87,7 @@ public class FeatureToggleService {
     }
 
     public boolean isPinInPostEnabled() {
-        return false;
+        return internalClient.boolVariation("pin-in-post", createLDUser().build(), false);
     }
 
     public boolean isAccessProfilesEnabled() {
