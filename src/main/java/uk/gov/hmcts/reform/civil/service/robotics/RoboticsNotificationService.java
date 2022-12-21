@@ -136,12 +136,11 @@ public class RoboticsNotificationService {
             return isMultiParty && !toggleService.isSpecRpaContinuousFeedEnabled() ? roboticsEmailConfiguration
                     .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
         }
-        String recipient = isMultiParty ? roboticsEmailConfiguration
-            .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
+        String recipient = isMultiParty && !toggleService.isRpaContinuousFeedEnabled() ? roboticsEmailConfiguration
+                .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
 
         log.info(String.format("EMAIl:--------- %s", recipient));
-        return isMultiParty && !toggleService.isRpaContinuousFeedEnabled() ? roboticsEmailConfiguration
-                .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
+        return recipient;
     }
 
     public static String findLatestEventTriggerReason(EventHistory eventHistory) {
