@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
@@ -40,6 +41,7 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldBeValidDate_whenLessThanOneYearInTheFuture() {
             UnavailableDate date = UnavailableDate.builder()
+                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
                 .date(LocalDate.now().plusMonths(4))
                 .build();
 
@@ -49,6 +51,7 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldBeValidDate_whenIsExactlyThanOneYearInTheFuture() {
             UnavailableDate date = UnavailableDate.builder()
+                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
                 .date(LocalDate.now().plusYears(1))
                 .build();
 
@@ -58,6 +61,7 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldBeInvalidDate_whenIsOneDayMoreThanOneYearInTheFuture() {
             UnavailableDate date = UnavailableDate.builder()
+                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
                 .date(LocalDate.now().plusYears(1).plusDays(1))
                 .build();
 
@@ -67,6 +71,7 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldBeInvalidDate_whenIsMoreThanOneYearInTheFuture() {
             UnavailableDate date = UnavailableDate.builder()
+                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
                 .date(LocalDate.now().plusYears(2))
                 .build();
 
@@ -76,6 +81,7 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldBeInvalidDate_whenInThePast() {
             UnavailableDate date = UnavailableDate.builder()
+                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
                 .date(LocalDate.now().minusYears(1))
                 .build();
 
@@ -85,6 +91,7 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldBeValidDate_whenToday() {
             UnavailableDate date = UnavailableDate.builder()
+                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
                 .date(LocalDate.now())
                 .build();
 
@@ -101,7 +108,9 @@ class UnavailableDateValidatorTest {
 
         @Test
         void shouldReturnNoError_whenToday() {
-            UnavailableDate unavailableDate = UnavailableDate.builder().date(LocalDate.now()).build();
+            UnavailableDate unavailableDate = UnavailableDate.builder()
+                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .date(LocalDate.now()).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
 
             Hearing hearing = Hearing.builder()
@@ -114,7 +123,9 @@ class UnavailableDateValidatorTest {
 
         @Test
         void shouldReturnError_whenMoreThanOneYearInFuture() {
-            UnavailableDate unavailableDate = UnavailableDate.builder().date(LocalDate.now().plusYears(5)).build();
+            UnavailableDate unavailableDate = UnavailableDate.builder()
+                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .date(LocalDate.now().plusYears(5)).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
 
             Hearing hearing = Hearing.builder()
@@ -123,12 +134,14 @@ class UnavailableDateValidatorTest {
                 .build();
 
             assertThat(validator.validate(hearing))
-                .containsExactly("The date cannot be in the past and must not be more than a year in the future");
+                .containsExactly("Dates must be within the next 12 months.");
         }
 
         @Test
         void shouldReturnError_whenInPast() {
-            UnavailableDate unavailableDate = UnavailableDate.builder().date(LocalDate.now().minusDays(5)).build();
+            UnavailableDate unavailableDate = UnavailableDate.builder()
+                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .date(LocalDate.now().minusDays(5)).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
 
             Hearing hearing = Hearing.builder()
@@ -137,7 +150,7 @@ class UnavailableDateValidatorTest {
                 .build();
 
             assertThat(validator.validate(hearing))
-                .containsExactly("The date cannot be in the past and must not be more than a year in the future");
+                .containsExactly("Unavailable Date cannot be past date");
         }
 
         @Test
