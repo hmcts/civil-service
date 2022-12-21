@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
