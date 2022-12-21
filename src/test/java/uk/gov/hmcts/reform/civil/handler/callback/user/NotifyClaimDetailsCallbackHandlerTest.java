@@ -236,18 +236,83 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldUpdateCertificateOfService_and_documents_whenSubmitted() {
+        void shouldUpdateCertificateOfService_and_documents_cos1_whenSubmitted() {
             when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
-            LocalDate past = LocalDate.now().minusDays(1);
+            LocalDate cosDate = localDateTime.minusDays(2).toLocalDate();
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDate.atStartOfDay()))
+                    .thenReturn(newDate.minusDays(2));
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
-                    .setCoSClaimDetailsWithDate(true, false, past, null, true, false)
+                    .setCoSClaimDetailsWithDate(true, false, cosDate, null, true, false)
                     .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(1);
             assertThat(updatedData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
+            assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(newDate.minusDays(2));
+        }
+
+        @Test
+        void shouldUpdateCertificateOfService_and_documents_cos2_whenSubmitted() {
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+            LocalDate cosDate = localDateTime.minusDays(2).toLocalDate();
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDate.atStartOfDay()))
+                    .thenReturn(newDate.minusDays(2));
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
+                    .setCoSClaimDetailsWithDate(false, true, null, cosDate, false, true)
+                    .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(1);
+            assertThat(updatedData.getCosNotifyClaimDetails2().getCosDocSaved()).isEqualTo(YES);
+            assertThat(updatedData.getNextDeadline()).isEqualTo(newDate.minusDays(2).toLocalDate());
+        }
+
+        @Test
+        void shouldUpdate_to_earliest_day_cos2_is_earliest_whenSubmitted() {
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+            LocalDate cos1Date = localDateTime.minusDays(2).toLocalDate();
+            LocalDate cos2Date = localDateTime.minusDays(3).toLocalDate();
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos1Date.atStartOfDay()))
+                    .thenReturn(newDate.minusDays(2));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos2Date.atStartOfDay()))
+                    .thenReturn(newDate.minusDays(3));
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
+                    .setCoSClaimDetailsWithDate(true, true, cos1Date, cos2Date, true, true)
+                    .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(2);
+            assertThat(updatedData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
+            assertThat(updatedData.getCosNotifyClaimDetails2().getCosDocSaved()).isEqualTo(YES);
+            assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(newDate.minusDays(3));
+        }
+
+        @Test
+        void shouldUpdate_to_earliest_day_cos1_is_earliest_whenSubmitted() {
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+            LocalDate cos1Date = localDateTime.minusDays(3).toLocalDate();
+            LocalDate cos2Date = localDateTime.minusDays(2).toLocalDate();
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos1Date.atStartOfDay()))
+                    .thenReturn(newDate.minusDays(3));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos2Date.atStartOfDay()))
+                    .thenReturn(newDate.minusDays(2));
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
+                    .setCoSClaimDetailsWithDate(true, true, cos1Date, cos2Date, true, true)
+                    .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(2);
+            assertThat(updatedData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
+            assertThat(updatedData.getCosNotifyClaimDetails2().getCosDocSaved()).isEqualTo(YES);
+            assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(newDate.minusDays(3));
         }
     }
 
@@ -277,6 +342,24 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .confirmationHeader(format("# Defendant notified%n## Claim number: 000DC001"))
                     .confirmationBody(confirmationBody)
                     .build());
+        }
+
+        @Test
+        void shouldReturnExpectedSubmittedCallbackResponse_with_cos_whenInvoked() {
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String formattedDeadline = formatLocalDateTime(RESPONSE_DEADLINE, DATE_TIME_AT);
+            String confirmationBody = format(CONFIRMATION_SUMMARY, formattedDeadline)
+                    + exitSurveyContentService.applicantSurvey();
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                            .confirmationHeader(format("# Defendant notified%n## Claim number: 000DC001"))
+                            .confirmationBody(confirmationBody)
+                            .build());
         }
 
         @Test
@@ -330,13 +413,58 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         LocalDate past = LocalDate.now().minusDays(1);
         CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
-                .setCoSClaimDetailsWithDate(true, false, past, null, true, true)
+                .setCoSClaimDetailsWithDate(true, false, past, null, true, false)
                 .build();
         CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
         AboutToStartOrSubmitCallbackResponse successResponse =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(successResponse.getErrors()).isEmpty();
         assertThat(params.getCaseData().getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(NO);
+    }
+
+    @Test
+    void shouldPassValidateCertificateOfService_1Lip1Lr_whenDateIsPast() {
+        when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+        LocalDate past = LocalDate.now().minusDays(1);
+        CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_1Lip_1Lr()
+                .setCoSClaimDetailsWithDate(true, false, past, null, true, false)
+                .build();
+        CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
+        AboutToStartOrSubmitCallbackResponse successResponse =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(successResponse.getErrors()).isEmpty();
+        assertThat(params.getCaseData().getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(NO);
+    }
+
+    @Test
+    void shouldPassValidateCertificateOfService_1Lr1Lip_whenDateIsPast() {
+        when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+        LocalDate past = LocalDate.now().minusDays(1);
+        CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_1Lr_1Lip()
+                .setCoSClaimDetailsWithDate(true, false, past, null, true, false)
+                .build();
+        CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
+        AboutToStartOrSubmitCallbackResponse successResponse =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(successResponse.getErrors()).isEmpty();
+        assertThat(params.getCaseData().getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(NO);
+    }
+
+    @Test
+    void shouldIgnoreValidateCertificateOfService_whenDisabled() {
+        when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
+        LocalDate past = LocalDate.now().minusDays(1);
+        LocalDate future = LocalDate.now().plusDays(1);
+        CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
+                .setCoSClaimDetailsWithDate(true, true, past, future, true, true)
+                .build();
+        CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails2");
+        AboutToStartOrSubmitCallbackResponse successResponse =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(successResponse.getErrors().size()).isEqualTo(0);
     }
 
     @Test
@@ -369,7 +497,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldPassValidateCertificateOfService_whenHasNoFile() {
+    void shouldFailValidateCertificateOfService_whenHasNoFile() {
         when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
         LocalDate past = LocalDate.now().minusDays(1);
         CaseData caseData = CaseDataBuilder.builder()
@@ -389,6 +517,19 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
                 .setCoSClaimDetailsWithDate(true, true, past, past, true, true)
+                .build();
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+        SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+        assertThat(response.getConfirmationHeader()).contains("Certificate of Service");
+    }
+
+    @Test
+    void shouldReturnCoSConfirmation_1Lip1Lr_whenCosNotifyDetailsSuccess() {
+        when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+        LocalDate past = LocalDate.now().minusDays(1);
+        CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_1Lip_1Lr()
+                .setCoSClaimDetailsWithDate(true, false, past, null, true, false)
                 .build();
         CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
         SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
