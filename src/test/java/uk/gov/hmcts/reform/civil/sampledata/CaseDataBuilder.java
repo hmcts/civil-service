@@ -337,7 +337,6 @@ public class CaseDataBuilder {
     private LocalDate hearingDueDate;
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
-
     private CaseLocation caseManagementLocation;
     private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
     private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
@@ -562,6 +561,31 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent1DQWithoutSotAndExperts() {
+        respondent1DQ = Respondent1DQ.builder()
+            .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
+                                                          .explainedToClient(List.of("CONFIRM"))
+                                                          .oneMonthStayRequested(YES)
+                                                          .reactionProtocolCompliedWith(YES)
+                                                          .build())
+            .respondent1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
+                                                              .reachedAgreement(YES)
+                                                              .build())
+            .respondent1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
+                                                                 .directionsForDisclosureProposed(NO)
+                                                                 .build())
+            .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
+            .respondent1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
+            .respondent1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
+            .respondent1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
+            .respondent1DQLanguage(WelshLanguageRequirements.builder().build())
+            .respondent1DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
+                                                     .vulnerabilityAdjustmentsRequired(NO).build())
+            .respondent1DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build())
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder respondent1DQWithLocation() {
         respondent1DQ = Respondent1DQ.builder()
             .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
@@ -594,6 +618,37 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent1DQWithLocationAndWithoutExperts() {
+        respondent1DQ = Respondent1DQ.builder()
+            .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
+                                                          .explainedToClient(List.of("CONFIRM"))
+                                                          .oneMonthStayRequested(YES)
+                                                          .reactionProtocolCompliedWith(YES)
+                                                          .build())
+            .respondent1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
+                                                              .reachedAgreement(YES)
+                                                              .build())
+            .respondent1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
+                                                                 .directionsForDisclosureProposed(NO)
+                                                                 .build())
+            .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
+            .respondent1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
+            .respondent1DQRequestedCourt(RequestedCourt.builder()
+                                             .responseCourtCode("444")
+                                             .caseLocation(CaseLocation.builder()
+                                                               .baseLocation("dummy base").region("dummy region")
+                                                               .build()).build())
+            .respondent1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
+            .respondent1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
+            .respondent1DQLanguage(WelshLanguageRequirements.builder().build())
+            .respondent1DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
+                                                     .vulnerabilityAdjustmentsRequired(NO).build())
+            .respondent1DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
+            .respondent1DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build())
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder respondent2DQWithLocation() {
         respondent2DQ = Respondent2DQ.builder()
             .respondent2DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
@@ -608,6 +663,37 @@ public class CaseDataBuilder {
                                                                  .directionsForDisclosureProposed(NO)
                                                                  .build())
             .respondent2DQExperts(Experts.builder().expertRequired(NO).build())
+            .respondent2DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
+            .respondent2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
+            .respondent2DQRequestedCourt(RequestedCourt.builder()
+                                             .responseCourtCode("444")
+                                             .caseLocation(CaseLocation.builder()
+                                                               .baseLocation("dummy base").region("dummy region")
+                                                               .build()).build())
+            .respondent2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
+            .respondent2DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
+            .respondent2DQLanguage(WelshLanguageRequirements.builder().build())
+            .respondent2DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
+                                                     .vulnerabilityAdjustmentsRequired(NO).build())
+            .respondent2DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
+            .respondent2DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder respondent2DQWithLocationAndWithoutExperts() {
+        respondent2DQ = Respondent2DQ.builder()
+            .respondent2DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
+                                                          .explainedToClient(List.of("CONFIRM"))
+                                                          .oneMonthStayRequested(YES)
+                                                          .reactionProtocolCompliedWith(YES)
+                                                          .build())
+            .respondent2DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
+                                                              .reachedAgreement(YES)
+                                                              .build())
+            .respondent2DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
+                                                                 .directionsForDisclosureProposed(NO)
+                                                                 .build())
             .respondent2DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
             .respondent2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .respondent2DQRequestedCourt(RequestedCourt.builder()
@@ -659,6 +745,32 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent2DQWithoutSotAndExperts() {
+        respondent2DQ = Respondent2DQ.builder()
+            .respondent2DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
+                                                          .explainedToClient(List.of("CONFIRM"))
+                                                          .oneMonthStayRequested(YES)
+                                                          .reactionProtocolCompliedWith(YES)
+                                                          .build())
+            .respondent2DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
+                                                              .reachedAgreement(YES)
+                                                              .build())
+            .respondent2DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
+                                                                 .directionsForDisclosureProposed(NO)
+                                                                 .build())
+            .respondent2DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
+            .respondent2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
+            .respondent2DQRequestedCourt(RequestedCourt.builder().build())
+            .respondent2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
+            .respondent2DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
+            .respondent2DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
+                                                     .vulnerabilityAdjustmentsRequired(NO).build())
+            .respondent2DQLanguage(WelshLanguageRequirements.builder().build())
+            .respondent2DQDraftDirections(DocumentBuilder.builder().documentName("defendant2-directions.pdf").build())
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder applicant1DQ() {
         applicant1DQ = Applicant1DQ.builder()
             .applicant1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
@@ -705,6 +817,36 @@ public class CaseDataBuilder {
                                                                 .directionsForDisclosureProposed(NO)
                                                                 .build())
             .applicant1DQExperts(Experts.builder().expertRequired(NO).build())
+            .applicant1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
+            .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
+            .applicant1DQRequestedCourt(RequestedCourt.builder()
+                                            .responseCourtCode("court4")
+                                            .caseLocation(CaseLocation.builder()
+                                                              .baseLocation("dummy base").region("dummy region")
+                                                              .build()).build())
+            .applicant1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
+            .applicant1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
+            .applicant1DQLanguage(WelshLanguageRequirements.builder().build())
+            .applicant1DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
+                                                    .vulnerabilityAdjustmentsRequired(NO).build())
+            .applicant1DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder applicant1DQWithLocationWithoutExperts() {
+        applicant1DQ = Applicant1DQ.builder()
+            .applicant1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
+                                                         .explainedToClient(List.of("OTHER"))
+                                                         .oneMonthStayRequested(NO)
+                                                         .reactionProtocolCompliedWith(YES)
+                                                         .build())
+            .applicant1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
+                                                             .reachedAgreement(YES)
+                                                             .build())
+            .applicant1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
+                                                                .directionsForDisclosureProposed(NO)
+                                                                .build())
             .applicant1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
             .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .applicant1DQRequestedCourt(RequestedCourt.builder()
@@ -1148,6 +1290,7 @@ public class CaseDataBuilder {
         ccdState = CASE_DISMISSED;
         caseDismissedHearingFeeDueDate = LocalDateTime.now();
         hearingDate = hearingDueDate.plusWeeks(2);
+
         return this;
     }
 
@@ -3115,13 +3258,6 @@ public class CaseDataBuilder {
             return this;
         }
 
-        return this;
-    }
-
-    public CaseDataBuilder atStateTrialReadyCheck() {
-        atStateHearingFeeDuePaid();
-        ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
-        hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
         return this;
     }
 

@@ -87,7 +87,6 @@ class PaymentRequestUpdateCallbackServiceTest {
         verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
         verify(coreCaseDataService, times(1)).startUpdate(any(), any());
         verify(coreCaseDataService, times(1)).submitUpdate(any(), any());
-        verify(coreCaseDataService, times(1)).triggerEvent(any(), any());
     }
 
     @Test
@@ -119,7 +118,6 @@ class PaymentRequestUpdateCallbackServiceTest {
         verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
         verify(coreCaseDataService, times(1)).startUpdate(any(), any());
         verify(coreCaseDataService, times(1)).submitUpdate(any(), any());
-        verify(coreCaseDataService, times(1)).triggerEvent(any(), any());
 
     }
 
@@ -140,7 +138,6 @@ class PaymentRequestUpdateCallbackServiceTest {
         verify(coreCaseDataService, never()).getCase(Long.valueOf(CASE_ID));
         verify(coreCaseDataService, never()).startUpdate(any(), any());
         verify(coreCaseDataService, never()).submitUpdate(any(), any());
-        verify(coreCaseDataService, never()).triggerEvent(any(), any());
     }
 
     private CaseDetails buildCaseDetails(CaseData caseData) {

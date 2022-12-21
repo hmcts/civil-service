@@ -51,6 +51,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_PAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
@@ -61,6 +62,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_C
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
@@ -275,6 +277,8 @@ class FlowStateAllowedEventServiceTest {
                         TAKE_CASE_OFFLINE,
                         EVIDENCE_UPLOAD_JUDGE,
                         HEARING_FEE_UNPAID,
+                        HEARING_FEE_PAID,
+                        SERVICE_REQUEST_RECEIVED,
                         HEARING_SCHEDULED,
                         EVIDENCE_UPLOAD,
                         migrateCase
@@ -490,6 +494,8 @@ class FlowStateAllowedEventServiceTest {
                         NotSuitable_SDO,
                         HEARING_SCHEDULED,
                         HEARING_FEE_UNPAID,
+                        HEARING_FEE_PAID,
+                        SERVICE_REQUEST_RECEIVED,
                         REFER_TO_JUDGE,
                         migrateCase,
                         TAKE_CASE_OFFLINE
@@ -536,6 +542,12 @@ class FlowStateAllowedEventServiceTest {
                         REFER_TO_JUDGE,
                         APPLICATION_CLOSED_UPDATE_CLAIM,
                         migrateCase
+                    }
+                ),
+                of(
+                    CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE,
+                    new CaseEvent[]{
+                        CASE_PROCEEDS_IN_CASEMAN
                     }
                 ),
                 of(
