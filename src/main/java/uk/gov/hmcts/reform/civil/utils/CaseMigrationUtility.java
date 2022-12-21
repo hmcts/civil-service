@@ -273,6 +273,8 @@ public class CaseMigrationUtility {
                                                                                .caseLocation(caseLocation)
                                                                                .build()).build());
 
+        } else if (ofNullable(respondent1DQ).isPresent()) {
+            log.warn("migrateRespondent1DQUnSpec: No condition fulfilled: {}", oldCaseData.getCcdCaseReference());
         }
         log.info("Migrate respondent 1 DQ end unpec end");
     }
@@ -315,8 +317,8 @@ public class CaseMigrationUtility {
                                               .respondent2DQRequestedCourt(RequestedCourt.builder()
                                                                                .caseLocation(caseLocation)
                                                                                .build()).build());
-        } else {
-            log.warn("migrateRespondent2DQUnSpec: No if condition succeeded.");
+        } else if (ofNullable(respondent2DQ).isPresent()) {
+            log.warn("migrateRespondent2DQUnSpec: No condition fulfilled: {}", oldCaseData.getCcdCaseReference());
         }
     }
 
