@@ -119,6 +119,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
@@ -333,9 +334,9 @@ public class CaseDataBuilder {
     private DisposalHearingBundleDJ disposalHearingBundleDJ;
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private TrialHearingTrial trialHearingTrialDJ;
+    private LocalDate hearingDueDate;
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
-    private LocalDate hearingDueDate;
 
     private CaseLocation caseManagementLocation;
     private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
@@ -3101,6 +3102,29 @@ public class CaseDataBuilder {
         }
     }
 
+    public CaseDataBuilder atStateTrialReadyCheck(MultiPartyScenario mpScenario) {
+        atStateApplicantRespondToDefenceAndProceed(mpScenario);
+        hearingDate = LocalDate.now().plusWeeks(5).plusDays(6);
+        ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
+
+        if (mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            solicitorReferences = SolicitorReferences.builder()
+                .applicantSolicitor1Reference("123456")
+                .respondentSolicitor1Reference("123456")
+                .respondentSolicitor2Reference("123456").build();
+            return this;
+        }
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateTrialReadyCheck() {
+        atStateHearingFeeDuePaid();
+        ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
+        hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
+        return this;
+    }
+
     public CaseDataBuilder atStateApplicantRespondToDefenceAndNotProceed() {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         applicant1ProceedWithClaim = NO;
@@ -3404,6 +3428,7 @@ public class CaseDataBuilder {
         return this;
     }
 
+
     public CaseDataBuilder atStateHearingFeeDueUnpaid() {
         atStateApplicantRespondToDefenceAndProceed();
         hearingDueDate = LocalDate.now().minusDays(1);
@@ -3414,7 +3439,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateHearingFeeDuePaid() {
         atStateApplicantRespondToDefenceAndProceed();
-        hearingDueDate = LocalDate.now().minusDays(1);
+        hearingDueDate = now().minusDays(1);
         hearingFeePaymentDetails = PaymentDetails.builder().status(SUCCESS).build();
         ccdState = HEARING_READINESS;
         return this;

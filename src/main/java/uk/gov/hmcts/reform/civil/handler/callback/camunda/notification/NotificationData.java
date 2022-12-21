@@ -65,6 +65,9 @@ public interface NotificationData {
     String HEARING_DUE_DATE = "hearingDueDate";
     String CLAIMANT_REFERENCE_NUMBER = "claimantReferenceNumber";
     String DEFENDANT_REFERENCE_NUMBER = "defendantReferenceNumber";
+    String HEARING_OR_TRIAL = "hearing/trial";
+    String CLAIMANT_DEFENDANT_REFERENCE = "claimant/defendantReferenceNumber";
+
 
     Map<String, String> addProperties(CaseData caseData);
 

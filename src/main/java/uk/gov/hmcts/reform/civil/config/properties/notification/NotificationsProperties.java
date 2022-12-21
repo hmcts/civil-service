@@ -87,6 +87,9 @@ public class NotificationsProperties {
     private String solicitorCaseTakenOffline;
 
     @NotEmpty
+    private String solicitorTrialReady;
+
+    @NotEmpty
     private String solicitorCaseTakenOfflineForSpec;
 
     @NotEmpty
