@@ -58,6 +58,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
@@ -103,6 +104,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true))
             .put(callbackKey(ABOUT_TO_START), this::populateCaseData)
             .put(callbackKey(V_1, ABOUT_TO_START), this::populateCaseData)
+            .put(callbackKey(V_2, ABOUT_TO_START), this::populateCaseData)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -278,7 +280,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                                              .build());
         }
 
-        if (V_1.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
+        if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
             updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
             updatedCaseData.respondent1PaymentDateToStringSpec(setUpPayDateToString(caseData));
         }
@@ -380,7 +382,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             && caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null) {
             return caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()
                 .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
-        } else if (caseData.getRespondent1ResponseDate() != null) {
+        }
+        if (caseData.getRespondent1ResponseDate() != null) {
             return caseData.getRespondent1ResponseDate().plusDays(5)
                 .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
         }

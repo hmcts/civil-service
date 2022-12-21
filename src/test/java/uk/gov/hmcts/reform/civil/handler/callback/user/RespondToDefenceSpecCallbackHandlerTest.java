@@ -75,6 +75,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
@@ -589,13 +590,13 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class SetUpOveVOneFlag {
 
         @Test
-        void shouldGetOneVOneFullDefenceFlagV1() {
+        void shouldGetOneVOneFullDefenceFlagV2() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -606,14 +607,14 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldGetOneVOnePartAdmitFlagV1() {
+        void shouldGetOneVOnePartAdmitFlagV2() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .specDefenceAdmittedRequired(YES)
                 .build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -624,7 +625,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldGetOneVOnePartAdmitBySetDateFlagV1() {
+        void shouldGetOneVOnePartAdmitBySetDateFlagV2() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
             CaseData caseData = CaseData.builder()
@@ -632,7 +633,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
                 .specDefenceAdmittedRequired(NO)
                 .build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -643,14 +644,14 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldGetOneVOneFullAdmitFlagV1() {
+        void shouldGetOneVOneFullAdmitFlagV2() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .specDefenceFullAdmittedRequired(YES)
                 .build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -660,7 +661,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldGetOneVOneFullAdmitBySetDateFlagV1() {
+        void shouldGetOneVOneFullAdmitBySetDateFlagV2() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
             CaseData caseData = CaseData.builder()
@@ -668,7 +669,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
                 .specDefenceFullAdmittedRequired(NO)
                 .build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -678,13 +679,13 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldGetOneVOneCounterClaimFlagV1() {
+        void shouldGetOneVOneCounterClaimFlagV2() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
                 .build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -695,13 +696,13 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldGetNullFlagV1() {
+        void shouldGetNullFlagV2() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
             CaseData caseData = CaseData.builder()
                 .respondent2(PartyBuilder.builder().company().build())
                 .build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -732,7 +733,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder()
                 .respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec)
                 .build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -752,7 +753,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder()
                 .respondent1ResponseDate(LocalDateTime.now())
                 .build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
