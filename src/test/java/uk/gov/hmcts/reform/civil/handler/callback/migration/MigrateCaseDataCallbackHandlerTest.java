@@ -242,7 +242,6 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
         assertThat(response.getErrors()).isNull();
     }
 
-
     @Test
     void shouldReturnNoError_whenAboutToSubmitIsInvoked_Spec() {
         CaseData caseData = CaseDataBuilder.builder()

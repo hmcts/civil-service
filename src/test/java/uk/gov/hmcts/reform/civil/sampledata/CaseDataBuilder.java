@@ -556,6 +556,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent1DQ(Respondent1DQ respondent1DQ) {
+        this.respondent1DQ = respondent1DQ;
+        return this;
+    }
+
     public CaseDataBuilder respondent1DQWithoutSotAndExperts() {
         respondent1DQ = Respondent1DQ.builder()
             .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
@@ -578,11 +583,6 @@ public class CaseDataBuilder {
                                                      .vulnerabilityAdjustmentsRequired(NO).build())
             .respondent1DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build())
             .build();
-        return this;
-    }
-
-    public CaseDataBuilder respondent1DQ(Respondent1DQ respondent1DQ) {
-        this.respondent1DQ = respondent1DQ;
         return this;
     }
 
@@ -740,6 +740,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent2DQ(Respondent2DQ respondent2DQ) {
+        this.respondent2DQ = respondent2DQ;
+        return this;
+    }
+
     public CaseDataBuilder respondent2DQWithoutSotAndExperts() {
         respondent2DQ = Respondent2DQ.builder()
             .respondent2DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
@@ -763,11 +768,6 @@ public class CaseDataBuilder {
             .respondent2DQLanguage(WelshLanguageRequirements.builder().build())
             .respondent2DQDraftDirections(DocumentBuilder.builder().documentName("defendant2-directions.pdf").build())
             .build();
-        return this;
-    }
-
-    public CaseDataBuilder respondent2DQ(Respondent2DQ respondent2DQ) {
-        this.respondent2DQ = respondent2DQ;
         return this;
     }
 
