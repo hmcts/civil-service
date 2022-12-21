@@ -12,6 +12,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -22,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @SpringBootTest(classes = {
     MigrateCaseDataCallbackHandler.class,
@@ -87,6 +91,7 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
                                                                   .getRespondent1DQRequestedCourt()
                                                                   .toBuilder()
                                                                   .responseCourtCode(null).build())
+                                                          .respondent1DQStatementOfTruth(new StatementOfTruth("name", "role"))
                                                           .build()).build();
         caseData = caseData.toBuilder()
             .respondent2DQ(caseData.getRespondent2DQ().toBuilder()
@@ -95,6 +100,10 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
                                        .getRespondent2DQRequestedCourt()
                                        .toBuilder()
                                        .responseCourtCode(null).build())
+                               .respondent2DQExperts(Experts.builder()
+                                                                   .expertRequired(YES)
+                                                                   .build())
+                               .respondent2DQStatementOfTruth(new StatementOfTruth("name", "role"))
                                .build()).build();
 
         caseData = caseData.toBuilder().applicant1DQ(caseData.getApplicant1DQ().toBuilder()
@@ -103,6 +112,10 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
                                                                  .getApplicant1DQRequestedCourt()
                                                                  .toBuilder()
                                                                  .responseCourtCode(null).build())
+                                                         .applicant1DQStatementOfTruth(new StatementOfTruth("name", "role"))
+                                                         .applicant1DQExperts(Experts.builder()
+                                                                                    .expertRequired(YES)
+                                                                                    .build())
                                                          .build()).build();
 
         caseData = caseData.toBuilder().applicant2DQ(caseData.getApplicant2DQ().toBuilder()
@@ -174,6 +187,10 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
                                                                   .getRespondent1DQRequestedCourt()
                                                                   .toBuilder()
                                                                   .responseCourtCode(null).build())
+                                                          .respondent1DQStatementOfTruth(new StatementOfTruth("name", "role"))
+                                                          .respondent1DQExperts(Experts.builder()
+                                                                                     .expertRequired(YES)
+                                                                                     .build())
                                                           .build()).build();
         caseData = caseData.toBuilder()
             .respondent2DQ(caseData.getRespondent2DQ().toBuilder()
@@ -182,6 +199,7 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
                                        .getRespondent2DQRequestedCourt()
                                        .toBuilder()
                                        .responseCourtCode(null).build())
+                               .respondent2DQStatementOfTruth(new StatementOfTruth("name", "role"))
                                .build()).build();
 
         caseData = caseData.toBuilder().applicant1DQ(caseData.getApplicant1DQ().toBuilder()
@@ -190,6 +208,7 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
                                                                  .getApplicant1DQRequestedCourt()
                                                                  .toBuilder()
                                                                  .responseCourtCode(null).build())
+                                                         .applicant1DQStatementOfTruth(new StatementOfTruth("name", "role"))
                                                          .build()).build();
 
         caseData = caseData.toBuilder().applicant2DQ(caseData.getApplicant2DQ().toBuilder()
