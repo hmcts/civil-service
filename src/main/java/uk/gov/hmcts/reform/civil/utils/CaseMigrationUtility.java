@@ -399,7 +399,7 @@ public class CaseMigrationUtility {
                      refData.getCourtLocationCode(),
                      refData.getRegionId(), refData.getEpimmsId(), oldCaseData.getCcdCaseReference()
             );
-            caseLocation = CaseLocation.builder().baseLocation(refData.getEpimmsId())
+            CaseLocation caseLocation = CaseLocation.builder().baseLocation(refData.getEpimmsId())
                 .region(refData.getRegionId()).build();
             caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
                                              .applicant1DQRequestedCourt(
