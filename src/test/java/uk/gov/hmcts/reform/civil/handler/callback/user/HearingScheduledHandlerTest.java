@@ -21,6 +21,8 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.HearingReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -227,11 +229,14 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldChangeStateFastClaim_whenRelistingAboutToSubmit() {
+            List<LocationRefData> locations = new ArrayList<>();
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .addRespondent2(NO)
                 .listingOrRelisting(ListingOrRelisting.RELISTING)
                 .allocatedTrack(AllocatedTrack.FAST_CLAIM)
                 .ccdState(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING)
+                .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
+                                     .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -250,6 +255,8 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
                 .listingOrRelisting(ListingOrRelisting.RELISTING)
                 .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
                 .ccdState(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING)
+                .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
+                                     .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
