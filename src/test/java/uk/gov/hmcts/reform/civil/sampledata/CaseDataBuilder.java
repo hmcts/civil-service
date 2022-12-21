@@ -3261,6 +3261,13 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateTrialReadyCheck() {
+        atStateHearingFeeDuePaid();
+        ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
+        hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
+        return this;
+    }
+
     public CaseDataBuilder atStateApplicantRespondToDefenceAndNotProceed() {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         applicant1ProceedWithClaim = NO;
@@ -3564,7 +3571,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-
     public CaseDataBuilder atStateHearingFeeDueUnpaid() {
         atStateApplicantRespondToDefenceAndProceed();
         hearingDueDate = LocalDate.now().minusDays(1);
@@ -3635,7 +3641,6 @@ public class CaseDataBuilder {
         }
 
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
-
         takenOfflineDate = applicant1ResponseDate.plusDays(1);
         return this;
     }
@@ -3668,13 +3673,6 @@ public class CaseDataBuilder {
         }
 
         return this;
-    }
-
-    public CaseDataBuilder atStateTrialReadyCheck() {
-        atStateApplicantRespondToDefenceAndProceed(ONE_V_ONE);
-        ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
-
-        return atStateApplicantRespondToDefenceAndProceed(ONE_V_ONE);
     }
 
     public CaseDataBuilder businessProcess(BusinessProcess businessProcess) {

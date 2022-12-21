@@ -3,13 +3,13 @@ package uk.gov.hmcts.reform.civil.service.search;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.ListingOrRelisting;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
@@ -29,7 +29,9 @@ public class TrialReadyNotificationSearchService extends ElasticSearchService {
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(rangeQuery("data.hearingDate").lt(LocalDate.now().plusWeeks(6)))
+                            .must(rangeQuery("data.hearingDate").lt(LocalDate.now()
+                                                                        .atTime(LocalTime.MIN)
+                                                                        .plusWeeks(6).toString()))
                             .must(beState(PREPARE_FOR_HEARING_CONDUCT_HEARING)))
                             .mustNot(matchQuery("data.listingOrRelisting", ListingOrRelisting.RELISTING))
                             .mustNot(matchQuery("data.trialReadyNotified", YesOrNo.YES)),

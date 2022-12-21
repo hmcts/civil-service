@@ -526,7 +526,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo trialReadyNotified;
     private YesOrNo trialReadyChecked;
 
-
     //default judgement SDO fields for trial/fast track
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
     private TrialHearingDisclosureOfDocuments trialHearingDisclosureOfDocumentsDJ;
