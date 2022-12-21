@@ -327,7 +327,7 @@ public class CaseMigrationUtility {
         if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
             migrateSpecApplicant1DQ(oldCaseData, authToken, caseDataBuilder, caseLocation);
         } else {
-            migrateUnSpecApplicant1DQ(oldCaseData, authToken, caseDataBuilder, caseLocation);
+            migrateUnSpecApplicant1DQ(oldCaseData, authToken, caseDataBuilder);
         }
     }
 
@@ -381,8 +381,7 @@ public class CaseMigrationUtility {
 
     private void migrateUnSpecApplicant1DQ(CaseData oldCaseData,
                                            String authToken,
-                                           CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                                           CaseLocation caseLocation) {
+                                           CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         Applicant1DQ applicant1DQ = oldCaseData.getApplicant1DQ();
         //if applicant dq has been submitted for unspec then copying applicant preferred code to dq
         if (ofNullable(applicant1DQ).isPresent()
