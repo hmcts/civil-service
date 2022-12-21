@@ -3534,6 +3534,13 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateTrialReadyCheck() {
+        atStateApplicantRespondToDefenceAndProceed(ONE_V_ONE);
+        ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
+
+        return atStateApplicantRespondToDefenceAndProceed(ONE_V_ONE);
+    }
+
     public CaseDataBuilder businessProcess(BusinessProcess businessProcess) {
         this.businessProcess = businessProcess;
         return this;
