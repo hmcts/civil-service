@@ -122,7 +122,7 @@ public class CaseDataParent implements MappableObject {
     // for witness
     private final YesOrNo respondent1DQWitnessesRequiredSpec;
     private final List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
-
+    private final Witnesses applicant1DQWitnessesSmallClaim;
     private final Witnesses respondent1DQWitnessesSmallClaim;
     private final Witnesses respondent2DQWitnessesSmallClaim;
 
