@@ -385,7 +385,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 errors.add(dateValidationErrorMessage);
             }
 
-            if(isBothDefendantLip(caseData) && !isBothDefendantWithDifferentDateOfService(caseData)){
+            if (isBothDefendantLip(caseData) && !isBothDefendantWithSameDateOfService(caseData)) {
                 errors.add(BOTH_CERTIFICATE_SERVED_SAME_DATE);
             }
 
@@ -434,15 +434,15 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             && (caseData.getDefendant2LIPAtClaimIssued() != null
             && caseData.getDefendant2LIPAtClaimIssued() == YES);
     }
-    private boolean isBothDefendantWithDifferentDateOfService(CaseData caseData){
-        if(Objects.nonNull(caseData.getCosNotifyClaimDetails1()) &&
-            Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
-            if(caseData.getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant()
+
+    private boolean isBothDefendantWithSameDateOfService(CaseData caseData) {
+        if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
+            && Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
+            if (caseData.getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant()
                 .equals(caseData.getCosNotifyClaimDetails2().getCosDateOfServiceForDefendant())) {
                 return true;
             }
         }
-
         return false;
     }
 }
