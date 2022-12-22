@@ -87,6 +87,9 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     public static final String DOC_SERVED_MANDATORY =
             "Supporting evidence is required";
 
+    public static final String BOTH_CERTIFICATE_SERVED_SAME_DATE =
+        "Date of Service for both certificate must be the same";
+
     private final ExitSurveyContentService exitSurveyContentService;
     private final ObjectMapper objectMapper;
     private final Time time;
@@ -382,6 +385,10 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 errors.add(dateValidationErrorMessage);
             }
 
+            if(isBothDefendantLip(caseData) && !isBothDefendantWithDifferentDateOfService(caseData)){
+                errors.add(BOTH_CERTIFICATE_SERVED_SAME_DATE);
+            }
+
             if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
                 && isMandatoryDocMissing(caseData.getCosNotifyClaimDetails2())) {
                 errors.add(DOC_SERVED_MANDATORY);
@@ -419,5 +426,23 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         return time.now().isAfter(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDateOfServiceForDefendant
                                                                                   .atTime(time.now().toLocalTime())));
 
+    }
+
+    private boolean isBothDefendantLip(CaseData caseData) {
+        return (caseData.getDefendant1LIPAtClaimIssued() != null
+            && caseData.getDefendant1LIPAtClaimIssued() == YES)
+            && (caseData.getDefendant2LIPAtClaimIssued() != null
+            && caseData.getDefendant2LIPAtClaimIssued() == YES);
+    }
+    private boolean isBothDefendantWithDifferentDateOfService(CaseData caseData){
+        if(Objects.nonNull(caseData.getCosNotifyClaimDetails1()) &&
+            Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
+            if(caseData.getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant()
+                .equals(caseData.getCosNotifyClaimDetails2().getCosDateOfServiceForDefendant())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
