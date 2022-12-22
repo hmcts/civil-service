@@ -6321,6 +6321,7 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareGeneralApplicationEvents_whenGeneralApplicationApplicant1DecisionDefenseStruckOut() {
+            when(featureToggleService.isGeneralApplicationRpaEnabled()).thenReturn(true);
             final String eventDetailText = "APPLICATION TO Strike Out";
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineByStaff()
@@ -6366,6 +6367,7 @@ class EventHistoryMapperTest {
 
         @Test
         void shouldPrepareGeneralApplicationEvents_whenGeneralApplicationApplicant2DecisionDefenseStruckOut() {
+            when(featureToggleService.isGeneralApplicationRpaEnabled()).thenReturn(true);
             String eventDetailText = "APPLICATION TO Strike Out";
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineByStaff()
