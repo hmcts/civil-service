@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -43,6 +44,8 @@ class ClaimContinuingOnlineApplicantNotificationHandlerTest extends BaseCallback
     private NotificationsProperties notificationsProperties;
     @Autowired
     private ClaimContinuingOnlineApplicantNotificationHandler handler;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToSubmitCallback {
@@ -50,6 +53,7 @@ class ClaimContinuingOnlineApplicantNotificationHandlerTest extends BaseCallback
         @BeforeEach
         void setup() {
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnline()).thenReturn("template-id");
+            when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineCos()).thenReturn("template-id-cos");
         }
 
         @Test
@@ -76,5 +80,38 @@ class ClaimContinuingOnlineApplicantNotificationHandlerTest extends BaseCallback
                 PARTY_REFERENCES, buildClaimantReference(caseData)
             );
         }
+
+        @Test
+        void shouldNotifyApplicantSolicitor_whenCosEnabled() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "applicantsolicitor@example.com",
+                "template-id-cos",
+                getNotificationDataMap(caseData),
+                "claim-continuing-online-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicantSolicitorWithOldTemplate_whenCosDisabled() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "applicantsolicitor@example.com",
+                "template-id",
+                getNotificationDataMap(caseData),
+                "claim-continuing-online-notification-000DC001"
+            );
+        }
+
     }
 }
