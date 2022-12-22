@@ -4263,7 +4263,7 @@ public class CaseDataBuilder {
             .breathing(breathing)
             .caseManagementOrderSelection(caseManagementOrderSelection)
             .generalApplications(generalApplications)
-            .generalApplicationsDetails(generalApplicationsDetails)
+            .gaDetailsMasterCollection(generalApplicationsDetails)
             .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
             .trialHearingMethodDJ(trialHearingMethodDJ)
             .disposalHearingMethodDJ(disposalHearingMethodDJ)
