@@ -413,7 +413,6 @@ public class InitiateGeneralApplicationServiceHelperTest {
         assertThat(result.getLitigiousPartyID()).isEqualTo("001");
     }
 
-
     @Test
     void shouldNotExceptionDefendent1DetialsSetToAppln() {
 

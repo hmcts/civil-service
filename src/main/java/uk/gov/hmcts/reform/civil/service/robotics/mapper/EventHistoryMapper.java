@@ -2089,7 +2089,6 @@ public class EventHistoryMapper {
             .orElse(null);
     }
 
-
     private void buildSDONotDrawn(EventHistory.EventHistoryBuilder builder,
                                   CaseData caseData) {
 
