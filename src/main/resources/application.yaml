@@ -169,6 +169,7 @@ notifications:
   solicitorLitigationFriendAdded: "bad02653-df70-4a33-9b02-d42d30c5022c"
   claimantSolicitorClaimContinuingOnlineForSpec: "cbc491af-e194-4582-934e-329f815d897d"
   claimantSolicitorClaimContinuingOnline1v2ForSpec: "1d734510-6a06-4372-aff2-d5da8bf19f72"
+  claimantClaimContinuingOnlineForSpec: "1fbb9833-8181-4438-acdf-9dd6bd0a47fb"
   respondentSolicitorClaimContinuingOnlineForSpec: "4b072a91-ff2c-4d64-a744-103d0b69152f"
   failedPaymentForSpec: "3b3e1135-5c89-4290-85df-67c566f75c88"
   solicitorCaseTakenOfflineForSpec: "e2d66249-3cc7-47ff-95d4-e476dbac30a0"
