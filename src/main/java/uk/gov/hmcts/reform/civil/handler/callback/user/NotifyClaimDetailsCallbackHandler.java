@@ -437,7 +437,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
     private boolean isBothDefendantWithSameDateOfService(CaseData caseData) {
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
-            && Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
+            && Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
             if (caseData.getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant()
                 .equals(caseData.getCosNotifyClaimDetails2().getCosDateOfServiceForDefendant())) {
                 return true;
