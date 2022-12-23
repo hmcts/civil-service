@@ -60,7 +60,6 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandler exten
         CaseData caseData = callbackParams.getCaseData();
         generateEmail(caseData);
 
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }
