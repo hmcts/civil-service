@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.civil.callback.UserType.USER;
 public enum CaseEvent {
     CREATE_CLAIM(USER),
     CREATE_CLAIM_SPEC(USER),
+    CREATE_LIP_CLAIM(USER),
     ENTER_BREATHING_SPACE_SPEC(USER),
     LIFT_BREATHING_SPACE_SPEC(USER),
     NOTIFY_DEFENDANT_OF_CLAIM(USER),
