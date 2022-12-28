@@ -47,6 +47,7 @@ public class CaseEventServiceTest {
     private static final String AUTHORISATION = "authorisation";
     private static final String USER_ID = "123";
     private static final String CASE_ID = "123";
+    private static final String DRAFT = "draft";
     private static final String EVENT_ID = "1";
     private static final StartEventResponse RESPONSE = StartEventResponse
         .builder()
@@ -60,12 +61,16 @@ public class CaseEventServiceTest {
         given(authTokenGenerator.generate()).willReturn(EVENT_TOKEN);
         given(coreCaseDataApi.startEventForCitizen(any(), any(), any(), any(), any(), any(), any()))
             .willReturn(RESPONSE);
+        given(coreCaseDataApi.startForCitizen(any(), any(), any(), any(), any(), any()))
+            .willReturn(RESPONSE);
         given(coreCaseDataApi.submitEventForCitizen(any(), any(), any(), any(), any(), any(), anyBoolean(), any()))
+            .willReturn(CASE_DETAILS);
+        given(coreCaseDataApi.submitForCitizen(any(), any(), any(), any(), any(), anyBoolean(), any()))
             .willReturn(CASE_DETAILS);
     }
 
     @Test
-    void shouldSubmitEventSuccessfully() {
+    void shouldSubmitEventForExistingClaimSuccessfully() {
         InOrder orderVerifier = inOrder(coreCaseDataApi);
         CaseDetails caseDetails = caseEventService.submitEvent(EventSubmissionParams
                                                                    .builder()
@@ -76,13 +81,14 @@ public class CaseEventServiceTest {
                                                                    .authorisation(AUTHORISATION)
                                                                    .build());
         assertThat(caseDetails).isEqualTo(CASE_DETAILS);
-        orderVerifier.verify(coreCaseDataApi).startEventForCitizen(AUTHORISATION,
-                                                                   EVENT_TOKEN,
-                                                                   USER_ID,
-                                                                   JURISDICTION,
-                                                                   CASE_TYPE,
-                                                                   CASE_ID,
-                                                                   CaseEvent.DEFENDANT_RESPONSE_SPEC.name()
+        orderVerifier.verify(coreCaseDataApi).startEventForCitizen(
+            AUTHORISATION,
+            EVENT_TOKEN,
+            USER_ID,
+            JURISDICTION,
+            CASE_TYPE,
+            CASE_ID,
+            CaseEvent.DEFENDANT_RESPONSE_SPEC.name()
         );
         orderVerifier.verify(coreCaseDataApi).submitEventForCitizen(AUTHORISATION, EVENT_TOKEN, USER_ID, JURISDICTION,
                                                                     CASE_TYPE, CASE_ID, true,
@@ -90,6 +96,36 @@ public class CaseEventServiceTest {
                                                                         RESPONSE,
                                                                         Map.of()
                                                                     )
+        );
+    }
+
+    @Test
+    void shouldSubmitEventForNewClaimSuccessfully() {
+        InOrder orderVerifier = inOrder(coreCaseDataApi);
+        CaseDetails caseDetails = caseEventService.submitEvent(EventSubmissionParams
+                                                                   .builder()
+                                                                   .updates(Maps.newHashMap())
+                                                                   .event(CaseEvent.DEFENDANT_RESPONSE_SPEC)
+                                                                   .caseId(DRAFT)
+                                                                   .userId(USER_ID)
+                                                                   .authorisation(AUTHORISATION)
+                                                                   .build());
+        assertThat(caseDetails).isEqualTo(CASE_DETAILS);
+        orderVerifier.verify(coreCaseDataApi).startForCitizen(
+            AUTHORISATION,
+            EVENT_TOKEN,
+            USER_ID,
+            JURISDICTION,
+            CASE_TYPE,
+            CaseEvent.DEFENDANT_RESPONSE_SPEC.name()
+        );
+
+        orderVerifier.verify(coreCaseDataApi).submitForCitizen(AUTHORISATION, EVENT_TOKEN, USER_ID, JURISDICTION,
+                                                               CASE_TYPE, true,
+                                                               caseDataContentFromStartEventResponse(
+                                                                   RESPONSE,
+                                                                   Map.of()
+                                                               )
         );
     }
 }
