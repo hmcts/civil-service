@@ -35,7 +35,7 @@ public class LocationRefDataService {
     private final LRDConfiguration lrdConfiguration;
     private final AuthTokenGenerator authTokenGenerator;
 
-    public List<String> getCourtLocations(String authToken) {
+    public List<LocationRefData> getCourtLocations(String authToken) {
         try {
             ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
                 buildURI(),
@@ -92,10 +92,28 @@ public class LocationRefDataService {
         return new ArrayList<>();
     }
 
+    public List<LocationRefData> getCourtLocationsForGeneralApplication(String authToken) {
+        try {
+            ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
+                buildURI(),
+                HttpMethod.GET,
+                getHeaders(authToken),
+                new ParameterizedTypeReference<>() {
+                }
+            );
+            return onlyEnglandAndWalesLocations(responseEntity.getBody());
+        } catch (Exception e) {
+            log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
+        }
+        return new ArrayList<>();
+    }
+
     private URI buildURI() {
         String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
             .queryParam("is_hearing_location", "Y")
+            .queryParam("is_case_management_location", "Y")
+            .queryParam("court_type_id", "10")
             .queryParam("location_type", "Court");
         return builder.buildAndExpand(new HashMap<>()).toUri();
     }
@@ -124,11 +142,11 @@ public class LocationRefDataService {
         return new HttpEntity<>(headers);
     }
 
-    private List<String> onlyEnglandAndWalesLocations(List<LocationRefData> locationRefData) {
+    private List<LocationRefData> onlyEnglandAndWalesLocations(List<LocationRefData> locationRefData) {
         return locationRefData == null
             ? new ArrayList<>()
             : locationRefData.stream().filter(location -> !"Scotland".equals(location.getRegion()))
-            .map(LocationRefDataService::getDisplayEntry).collect(Collectors.toList());
+            .collect(Collectors.toList());
     }
 
     public Optional<LocationRefData> getLocationMatchingLabel(String label, String bearerToken) {
