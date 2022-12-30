@@ -163,29 +163,25 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .isEqualTo(LocalDate.now().plusWeeks(4).toString());
 
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input1")
-                .isEqualTo("The claimant shall serve on every other party the witness statements of all witnesses of "
-                               + "fact on whose evidence reliance is to be placed by 4pm on");
+                .isEqualTo("The claimant must upload to the Digital Portal copies of "
+                               + "the witness statements of all witnesses "
+                               + "of fact on whose evidence reliance is "
+                               + "to be placed by 4pm on ");
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(4).toString());
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input2")
                 .isEqualTo("The provisions of CPR 32.6 apply to such evidence.");
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input3")
-                .isEqualTo("The claimant must upload to the Digital Portal copies of the "
-                               + "witness statements of all witnesses whose evidence they "
-                               + "wish the court to consider when deciding the amount of "
-                               + "damages by 4pm on ");
+                .isEqualTo("Any application by the defendant in relation to CPR 32.7 "
+                               + "must be made by 4pm on");
             assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("date2")
-                .isEqualTo(LocalDate.now().plusWeeks(4).toString());
-            assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input4")
-                .isEqualTo("The provisions of CPR 32.6 apply to such evidence.");
-            assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input5")
-                .isEqualTo("Any application by the defendant in relation to CPR 32.7 must be made by 4pm on");
-            assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("date3")
                 .isEqualTo(LocalDate.now().plusWeeks(2).toString());
-            assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input6")
-                .isEqualTo("and must be accompanied by proposed directions for allocation and listing for trial"
-                               + " on quantum. This is because cross-examination will cause the hearing to exceed"
-                               + " the 30 minute maximum time estimate for a disposal hearing");
+            assertThat(response.getData()).extracting("disposalHearingWitnessOfFactDJ").extracting("input4")
+                .isEqualTo("and must be accompanied by proposed directions for allocation"
+                               + " and listing for trial on quantum. This is because"
+                               + " cross-examination will cause the hearing to exceed"
+                               + " the 30 minute maximum time estimate for a disposal"
+                               + " hearing.");
 
             assertThat(response.getData()).extracting("disposalHearingMedicalEvidenceDJ").extracting("input1")
                 .isEqualTo("The claimant has permission to rely upon the"

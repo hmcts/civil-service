@@ -215,25 +215,20 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder
             .disposalHearingWitnessOfFactDJ(DisposalHearingWitnessOfFactDJ
                                                 .builder()
-                                                .input1("The claimant shall serve on every other party the witness "
-                                                            + "statements of all witnesses of fact"
-                                                            + " on whose evidence reliance is to be placed by 4pm on")
+                                                .input1("The claimant must upload to the Digital Portal copies of "
+                                                            + "the witness statements of all witnesses "
+                                                            + "of fact on whose evidence reliance is "
+                                                            + "to be placed by 4pm on ")
                                                 .date1(LocalDate.now().plusWeeks(4))
                                                 .input2("The provisions of CPR 32.6 apply to such evidence.")
-                                                .input3("The claimant must upload to the Digital Portal copies of the "
-                                                            + "witness statements of all witnesses whose evidence they "
-                                                            + "wish the court to consider when deciding the amount of "
-                                                            + "damages by 4pm on ")
-                                                .date2(LocalDate.now().plusWeeks(4))
-                                                .input4("The provisions of CPR 32.6 apply to such evidence.")
-                                                .input5("Any application by the defendant in relation to CPR 32.7 "
+                                                .input3("Any application by the defendant in relation to CPR 32.7 "
                                                             + "must be made by 4pm on")
-                                                .date3(LocalDate.now().plusWeeks(2))
-                                                .input6("and must be accompanied by proposed directions for allocation"
+                                                .date2(LocalDate.now().plusWeeks(2))
+                                                .input4("and must be accompanied by proposed directions for allocation"
                                                             + " and listing for trial on quantum. This is because"
                                                             + " cross-examination will cause the hearing to exceed"
                                                             + " the 30 minute maximum time estimate for a disposal"
-                                                            + " hearing")
+                                                            + " hearing.")
                                                 .build());
 
         caseDataBuilder.disposalHearingMedicalEvidenceDJ(DisposalHearingMedicalEvidenceDJ
