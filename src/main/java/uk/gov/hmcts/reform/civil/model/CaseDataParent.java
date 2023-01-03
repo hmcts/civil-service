@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -122,7 +123,7 @@ public class CaseDataParent implements MappableObject {
     // for witness
     private final YesOrNo respondent1DQWitnessesRequiredSpec;
     private final List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
-
+    private final Witnesses applicant1DQWitnessesSmallClaim;
     private final Witnesses respondent1DQWitnessesSmallClaim;
     private final Witnesses respondent2DQWitnessesSmallClaim;
 
@@ -312,8 +313,14 @@ public class CaseDataParent implements MappableObject {
     private final ScheduledHearing nextHearingDetails;
 
     private final String respondent1EmailAddress;
+    private final YesOrNo applicant1Represented;
 
     private final String migrationId;
+
+    @JsonIgnore
+    public boolean isApplicantNotRepresented() {
+        return  this.applicant1Represented == YesOrNo.NO;
+    }
 
     /**
      * Adding for Certificate of Service.
