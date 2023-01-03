@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -284,10 +283,6 @@ public class LocationRefSampleDataBuilder {
             .toBuilder()
             .generalApplications(wrapElements(application))
             .build();
-    }
-
-    protected List<String> getSampleCourLocations() {
-        return new ArrayList<>(Arrays.asList("ABCD - RG0 0 AL", "PQRS - GU0 0EE", "WXYZ - EW0 0HE", "LMNO - NE0 0BH"));
     }
 
     protected DynamicList getLocationDynamicList(CaseData responseCaseData) {
