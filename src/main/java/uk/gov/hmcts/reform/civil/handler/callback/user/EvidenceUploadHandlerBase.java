@@ -9,7 +9,6 @@ import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
-import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -38,7 +37,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWOSPEC;
 
-@Slf4j
 abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     private final List<CaseEvent> events;
@@ -91,7 +89,6 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         //For case which are 1v1, 2v1 and 1v2 (same solicitor) we show respondent fields for documents to be uploaded,
         //if a case is 1v2 and different solicitors we want to sure separate fields for each respondent solicitor,
         // below creates a show condition for these fields if user is respondent 2 solicitor
-        log.info("getCaseType being called");
         if (coreCaseUserService.userHasCaseRole(caseData
                                                    .getCcdCaseReference()
                                                    .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)
