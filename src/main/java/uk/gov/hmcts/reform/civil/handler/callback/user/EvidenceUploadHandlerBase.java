@@ -41,18 +41,17 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     private final List<CaseEvent> events;
     private final String pageId;
-    private final String createShowCondition;
+    //private final String createShowCondition;
     private final ObjectMapper objectMapper;
     private final Time time;
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
 
     protected EvidenceUploadHandlerBase(UserService userService, CoreCaseUserService coreCaseUserService,
-                                        ObjectMapper objectMapper, Time time, List<CaseEvent> events, String pageId,
-                                        String createShowCondition) {
+                                        ObjectMapper objectMapper, Time time, List<CaseEvent> events, String pageId) {
         this.objectMapper = objectMapper;
         this.time = time;
-        this.createShowCondition = createShowCondition;
+        //this.createShowCondition = createShowCondition;
         this.events = events;
         this.pageId = pageId;
         this.coreCaseUserService = coreCaseUserService;
@@ -73,11 +72,11 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::getCaseType)
-            .put(callbackKey(MID, createShowCondition), this::createShow)
-            .put(callbackKey(MID, pageId), this::validate)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::documentUploadTime)
-            .put(callbackKey(SUBMITTED), this::buildConfirmation)
+            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
+            //.put(callbackKey(MID, createShowCondition), this::createShow)
+            .put(callbackKey(MID, pageId), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse)
+            .put(callbackKey(SUBMITTED), this::emptyCallbackResponse)
             .build();
     }
 

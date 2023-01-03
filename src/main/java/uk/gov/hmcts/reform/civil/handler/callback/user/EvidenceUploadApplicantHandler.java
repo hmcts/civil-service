@@ -18,7 +18,7 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
 
     public EvidenceUploadApplicantHandler(UserService userService, CoreCaseUserService coreCaseUserService, ObjectMapper objectMapper, Time time) {
         super(userService, coreCaseUserService, objectMapper, time, Collections.singletonList(EVIDENCE_UPLOAD_APPLICANT),
-              "validateValuesApplicant", null);
+              "validateValuesApplicant");
     }
 
     @Override
