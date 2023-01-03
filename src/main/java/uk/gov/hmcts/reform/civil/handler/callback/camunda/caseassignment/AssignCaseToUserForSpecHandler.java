@@ -79,7 +79,6 @@ public class AssignCaseToUserForSpecHandler extends CallbackHandler {
             .build();
     }
 
-
     private CallbackResponse assignSolicitorCaseRoleSubmitted(CallbackParams callbackParams) {
         CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
         String caseId = caseData.getCcdCaseReference().toString();
