@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -34,22 +35,6 @@ public class LocationRefDataService {
     private final RestTemplate restTemplate;
     private final LRDConfiguration lrdConfiguration;
     private final AuthTokenGenerator authTokenGenerator;
-
-    public List<LocationRefData> getCourtLocations(String authToken) {
-        try {
-            ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
-                buildURI(),
-                HttpMethod.GET,
-                getHeaders(authToken),
-                new ParameterizedTypeReference<List<LocationRefData>>() {
-                }
-            );
-            return onlyEnglandAndWalesLocations(responseEntity.getBody());
-        } catch (Exception e) {
-            log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
-        }
-        return new ArrayList<>();
-    }
 
     public LocationRefData getCcmccLocation(String authToken) {
         try {
@@ -101,7 +86,8 @@ public class LocationRefDataService {
                 new ParameterizedTypeReference<>() {
                 }
             );
-            return onlyEnglandAndWalesLocations(responseEntity.getBody());
+            return onlyEnglandAndWalesLocations(responseEntity.getBody())
+                .stream().sorted(Comparator.comparing(LocationRefData::getSiteName)).collect(Collectors.toList());
         } catch (Exception e) {
             log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
         }
