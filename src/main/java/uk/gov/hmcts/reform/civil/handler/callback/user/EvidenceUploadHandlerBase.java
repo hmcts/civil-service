@@ -35,13 +35,15 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWOSPEC;
 
 @Slf4j
 abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
-    private final List<CaseEvent> events;
+    private static final List<CaseEvent> EVENTS = List.of(EVIDENCE_UPLOAD_RESPONDENT);
     private final String pageId;
     private final String createShowCondition;
     private final ObjectMapper objectMapper;
@@ -55,7 +57,6 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         this.objectMapper = objectMapper;
         this.time = time;
         this.createShowCondition = createShowCondition;
-        this.events = events;
         this.pageId = pageId;
         this.coreCaseUserService = coreCaseUserService;
         this.userService = userService;
@@ -69,18 +70,17 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return events;
+        return EVENTS;
     }
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::getCaseType)
-            .put(callbackKey(MID, createShowCondition), this::createShow)
-            .put(callbackKey(MID, pageId), this::validate)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::documentUploadTime)
-            .put(callbackKey(SUBMITTED), this::buildConfirmation)
-            .build();
+        return Map.of(
+            callbackKey(ABOUT_TO_START), this::getCaseType,
+            callbackKey(MID, createShowCondition), this::createShow,
+            callbackKey(MID, pageId), this::validate,
+            callbackKey(ABOUT_TO_SUBMIT), this::documentUploadTime,
+            callbackKey(SUBMITTED), this::buildConfirmation);
     }
 
     CallbackResponse getCaseType(CallbackParams callbackParams) {
