@@ -145,30 +145,43 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         ArrayList<String> errors = new ArrayList<>();
-        final String dateValidationErrorMessage = getServiceOfDateValidationMessage(caseData
-                                                                                       .getCosNotifyClaimDefendant1());
-        if (!dateValidationErrorMessage.isEmpty()) {
-            errors.add(dateValidationErrorMessage);
+        CertificateOfService certificateOfService = caseData.getCosNotifyClaimDefendant1();
+        final String dateValidErrorMessage = getServiceOfDateValidationMessage(certificateOfService);
+        if (!dateValidErrorMessage.isEmpty()) {
+            errors.add(dateValidErrorMessage);
         }
-
+        List<String> cosUISenderStatementOfTruthLabel = certificateOfService.getCosUISenderStatementOfTruthLabel();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        caseDataBuilder.cosNotifyClaimDefendant1(certificateOfService.toBuilder()
+                                                     .cosUISenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
+                                                     .cosSenderStatementOfTruthLabel(null)
+                                                     .build())
+            .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
             .build();
     }
 
+
     private CallbackResponse validateCosDefendant2(final CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        CertificateOfService certificateOfServiceDef2 = caseData.getCosNotifyClaimDefendant2();
         ArrayList<String> errors = new ArrayList<>();
-        final String dateValidationErrorMessage = getServiceOfDateValidationMessage(caseData
-                                                                                       .getCosNotifyClaimDefendant2());
+        final String dateValidationErrorMessage = getServiceOfDateValidationMessage(certificateOfServiceDef2);
         if (!dateValidationErrorMessage.isEmpty()) {
             errors.add(dateValidationErrorMessage);
         }
 
+        List<String> cosUISenderStatementOfTruthLabel = certificateOfServiceDef2.getCosUISenderStatementOfTruthLabel();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        caseDataBuilder.cosNotifyClaimDefendant2(certificateOfServiceDef2.toBuilder()
+                                                     .cosUISenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
+                                                     .cosSenderStatementOfTruthLabel(null)
+                                                     .build());
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)

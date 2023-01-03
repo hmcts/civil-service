@@ -18,7 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Builder
+@Builder(toBuilder = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -49,6 +49,8 @@ public class CertificateOfService {
     private String cosSenderFirm;
     @JsonProperty("cosSenderStatementOfTruthLabel")
     private List<String> cosSenderStatementOfTruthLabel;
+    @JsonProperty("cosSenderStatementOfTruthLabel")
+    private List<String> cosUISenderStatementOfTruthLabel;
     @JsonProperty("cosDocSaved")
     private YesOrNo cosDocSaved;
 }
