@@ -21,29 +21,5 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
               "validateValuesApplicant");
     }
 
-    @Override
-    CallbackResponse createShowCondition(CaseData caseData) {
-        return null;
-    }
-
-    @Override
-    CallbackResponse validateValues(CaseData caseData) {
-        return super.validateValuesParty(caseData.getDocumentWitnessStatement(),
-                                   caseData.getDocumentHearsayNotice(),
-                                   caseData.getDocumentExpertReport(),
-                                   caseData.getDocumentJointStatement(),
-                                   caseData.getDocumentQuestions(),
-                                   caseData.getDocumentAnswers(),
-                                   caseData.getDocumentWitnessStatementRes2(),
-                                   caseData.getDocumentHearsayNoticeRes2(),
-                                   caseData.getDocumentExpertReportRes2(),
-                                   caseData.getDocumentJointStatementRes2(),
-                                   caseData.getDocumentQuestionsRes2(),
-                                   caseData.getDocumentAnswersRes2());
-    }
-
-    void applyDocumentUploadDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, LocalDateTime now) {
-        caseDataBuilder.caseDocumentUploadDate(now);
-    }
 }
 
