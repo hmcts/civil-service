@@ -24,9 +24,7 @@ public class DocmosisTemplateDataUtils {
     public static final String REFERENCE_NOT_PROVIDED = "Not Provided";
     //TODO Need to confirm the case name logic
     public static final Function<CaseData, String> toCaseName = caseData -> {
-        String caseName = null;
-
-        caseName = fetchApplicantName(caseData) + " vs " + fetchRespondentName(caseData);
+    String caseName = fetchApplicantName(caseData) + " vs " + fetchRespondentName(caseData);
 
 
         return caseName.length() > CASE_NAME_LENGTH_TO_FIT_IN_DOCS
