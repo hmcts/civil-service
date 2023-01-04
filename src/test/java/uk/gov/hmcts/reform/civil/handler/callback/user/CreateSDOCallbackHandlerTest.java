@@ -785,7 +785,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date3")
                 .isEqualTo(LocalDate.now().plusWeeks(8).toString());
             assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input7")
-                .isEqualTo("and the claimant's evidence is reply if so advised to be uploaded by 4pm on");
+                .isEqualTo("and the claimant's evidence in reply if so advised to be uploaded by 4pm on");
             assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("date4")
                 .isEqualTo(LocalDate.now().plusWeeks(10).toString());
             assertThat(response.getData()).extracting("fastTrackCreditHire").extracting("input8")
@@ -930,7 +930,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date3")
                 .isEqualTo(LocalDate.now().plusWeeks(8).toString());
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input7")
-                .isEqualTo("and the claimant's evidence is reply if so advised to be uploaded by 4pm on");
+                .isEqualTo("and the claimant's evidence in reply if so advised to be uploaded by 4pm on");
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("date4")
                 .isEqualTo(LocalDate.now().plusWeeks(10).toString());
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input8")

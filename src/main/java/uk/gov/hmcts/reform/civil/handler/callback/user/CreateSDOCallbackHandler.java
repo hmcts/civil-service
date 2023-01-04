@@ -472,7 +472,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "is available.")
             .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
             .date3(LocalDate.now().plusWeeks(8))
-            .input7("and the claimant's evidence is reply if so advised to be uploaded by 4pm on")
+            .input7("and the claimant's evidence in reply if so advised to be uploaded by 4pm on")
             .date4(LocalDate.now().plusWeeks(10))
             .input8("This witness statement is limited to 10 pages per party, including any appendices.")
             .build();
@@ -621,7 +621,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "is available.")
             .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
             .date3(LocalDate.now().plusWeeks(8))
-            .input7("and the claimant's evidence is reply if so advised to be uploaded by 4pm on")
+            .input7("and the claimant's evidence in reply if so advised to be uploaded by 4pm on")
             .date4(LocalDate.now().plusWeeks(10))
             .input8("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
                         + "paragraph above, each party may rely upon the written evidence by way of witness statement "
