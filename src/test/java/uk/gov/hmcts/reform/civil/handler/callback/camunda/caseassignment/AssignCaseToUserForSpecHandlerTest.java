@@ -71,7 +71,7 @@ class AssignCaseToUserForSpecHandlerTest extends BaseCallbackHandlerTest {
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
-            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
+            params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
         }
 
         @Test
