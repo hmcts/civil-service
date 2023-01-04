@@ -110,7 +110,6 @@ public class AssignCaseToUserForSpecHandler extends CallbackHandler {
         IdamUserDetails userDetails = caseData.getApplicantSolicitor1UserDetails();
         String submitterId = userDetails.getId();
         String organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
-        System.out.println("INSIDE submit>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         coreCaseUserService.assignCase(caseId, submitterId, organisationId, CaseRole.APPLICANTSOLICITORONE);
         coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, submitterId, organisationId);
 
@@ -118,7 +117,6 @@ public class AssignCaseToUserForSpecHandler extends CallbackHandler {
         if (toggleService.isGlobalSearchEnabled()) {
             setSupplementaryData(caseData.getCcdCaseReference());
         }
-        System.out.println("INDISE s submit>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>After");
 
         return SubmittedCallbackResponse.builder().build();
 
