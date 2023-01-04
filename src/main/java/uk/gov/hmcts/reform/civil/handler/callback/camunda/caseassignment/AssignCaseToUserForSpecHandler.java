@@ -49,7 +49,7 @@ public class AssignCaseToUserForSpecHandler extends CallbackHandler {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT), this::assignSolicitorCaseRole,
             callbackKey(V_1, ABOUT_TO_SUBMIT), this::assignSolicitorCaseRole,
-            callbackKey(SUBMITTED), this::assignSolicitorCaseRoleSubmitted
+            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
     }
 
@@ -69,18 +69,6 @@ public class AssignCaseToUserForSpecHandler extends CallbackHandler {
 
     private CallbackResponse assignSolicitorCaseRole(CallbackParams callbackParams) {
         CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
-        IdamUserDetails userDetails = caseData.getApplicantSolicitor1UserDetails();
-        CaseData updated = caseData.toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(userDetails.getEmail()).build())
-            .build();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updated.toMap(objectMapper))
-            .build();
-    }
-
-    private CallbackResponse assignSolicitorCaseRoleSubmitted(CallbackParams callbackParams) {
-        CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
         String caseId = caseData.getCcdCaseReference().toString();
         IdamUserDetails userDetails = caseData.getApplicantSolicitor1UserDetails();
         String submitterId = userDetails.getId();
@@ -93,8 +81,31 @@ public class AssignCaseToUserForSpecHandler extends CallbackHandler {
         if (toggleService.isGlobalSearchEnabled()) {
             setSupplementaryData(caseData.getCcdCaseReference());
         }
-        return SubmittedCallbackResponse.builder().build();
+        CaseData updated = caseData.toBuilder()
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(userDetails.getEmail()).build())
+            .build();
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updated.toMap(objectMapper))
+            .build();
     }
+
+//    private CallbackResponse assignSolicitorCaseRoleSubmitted(CallbackParams callbackParams) {
+//        CaseData caseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+//        String caseId = caseData.getCcdCaseReference().toString();
+//        IdamUserDetails userDetails = caseData.getApplicantSolicitor1UserDetails();
+//        String submitterId = userDetails.getId();
+//        String organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+//
+//        coreCaseUserService.assignCase(caseId, submitterId, organisationId, CaseRole.APPLICANTSOLICITORONESPEC);
+//        coreCaseUserService.removeCreatorRoleCaseAssignment(caseId, submitterId, organisationId);
+//
+//        // This sets the "supplementary_data" value "HmctsServiceId to the Unspec service ID AAA6
+//        if (toggleService.isGlobalSearchEnabled()) {
+//            setSupplementaryData(caseData.getCcdCaseReference());
+//        }
+//        return SubmittedCallbackResponse.builder().build();
+//    }
 
     private void setSupplementaryData(Long caseId) {
         Map<String, Map<String, Map<String, Object>>> supplementaryDataCivil = new HashMap<>();
