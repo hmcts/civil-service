@@ -31,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
@@ -633,6 +634,7 @@ public class FlowStateAllowedEventService {
             DRAFT.fullName(),
             List.of(
                 CREATE_CLAIM,
+                CREATE_LIP_CLAIM,
                 migrateCase
             )
         ),
@@ -641,6 +643,7 @@ public class FlowStateAllowedEventService {
             SPEC_DRAFT.fullName(),
             List.of(
                 CREATE_CLAIM_SPEC,
+                CREATE_LIP_CLAIM,
                 migrateCase
             )
         ),
@@ -989,7 +992,7 @@ public class FlowStateAllowedEventService {
         }
 
         if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())
-            || CREATE_CLAIM_SPEC.equals(caseEvent)) {
+            || CREATE_CLAIM_SPEC.equals(caseEvent) || CREATE_LIP_CLAIM.equals(caseEvent)) {
             if (toggleService.isLrSpecEnabled()) {
                 StateFlow stateFlow = stateFlowEngine.evaluateSpec(caseDetails);
                 return isAllowedOnStateForSpec(stateFlow.getState().getName(), caseEvent);
