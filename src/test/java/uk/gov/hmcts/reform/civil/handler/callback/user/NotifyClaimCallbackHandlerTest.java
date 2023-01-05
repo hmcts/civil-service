@@ -243,7 +243,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(responseData.getCosNotifyClaimDefendant1()
                            .getCosSenderStatementOfTruthLabel().contains("Selected"));
             assertThat(responseData.getCosNotifyClaimDefendant1()
-                           .getCosUISenderStatementOfTruthLabel()==null);
+                           .getCosUISenderStatementOfTruthLabel() == null);
             assertThat(response.getErrors()).isEmpty();
         }
 
@@ -335,7 +335,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(responseData.getCosNotifyClaimDefendant2()
                            .getCosSenderStatementOfTruthLabel().contains("Selected"));
             assertThat(responseData.getCosNotifyClaimDefendant2()
-                           .getCosUISenderStatementOfTruthLabel()==null);
+                           .getCosUISenderStatementOfTruthLabel() == null);
             assertThat(response.getErrors()).isEmpty();
         }
 

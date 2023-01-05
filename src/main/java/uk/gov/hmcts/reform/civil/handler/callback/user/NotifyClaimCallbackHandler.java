@@ -164,7 +164,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             .build();
     }
 
-
     private CallbackResponse validateCosDefendant2(final CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CertificateOfService certificateOfServiceDef2 = caseData.getCosNotifyClaimDefendant2();

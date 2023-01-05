@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
@@ -468,8 +467,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(responseData.getCosNotifyClaimDetails2()
                            .getCosSenderStatementOfTruthLabel().contains("Selected"));
             assertThat(responseData.getCosNotifyClaimDetails2()
-                           .getCosUISenderStatementOfTruthLabel()==null);
-
+                           .getCosUISenderStatementOfTruthLabel() == null);
             assertThat(successResponse.getErrors()).isEmpty();
             assertThat(params.getCaseData().getCosNotifyClaimDetails2().getCosDocSaved()).isEqualTo(NO);
         }
@@ -495,7 +493,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(responseData.getCosNotifyClaimDetails1()
                            .getCosSenderStatementOfTruthLabel().contains("Selected"));
             assertThat(responseData.getCosNotifyClaimDetails1()
-                           .getCosUISenderStatementOfTruthLabel()==null);
+                           .getCosUISenderStatementOfTruthLabel() == null);
 
             assertThat(successResponse.getErrors()).isEmpty();
             assertThat(params.getCaseData().getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(NO);
