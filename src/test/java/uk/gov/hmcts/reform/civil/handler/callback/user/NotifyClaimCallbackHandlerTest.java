@@ -441,7 +441,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             }
 
             @Test
-            void shouldSetClaimDetailsNotificationAsNotificationDeadlineAt_when14DaysIsAfterThe4MonthDeadline() {
+            void shouldSetClaimNotificationAsNotificationDeadlineAt_when14DaysIsAfterThe4MonthDeadline() {
                 LocalDateTime claimNotificationDeadline = notificationDate.minusDays(5);
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
                     .claimNotificationDeadline(claimNotificationDeadline)
@@ -453,8 +453,8 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
-                    .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME))
-                    .containsEntry("nextDeadline", deadline.format(ISO_DATE));
+                    .containsEntry("claimDetailsNotificationDeadline", claimNotificationDeadline.format(ISO_DATE_TIME))
+                    .containsEntry("nextDeadline", claimNotificationDeadline.format(ISO_DATE));
             }
 
             @Test
@@ -477,7 +477,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Nested
         class SubmittedOnDeadlineDay {
 
-            LocalDateTime claimNotificationDeadline = LocalDateTime.of(2021, 4, 6, 23, 59, 59);
+            LocalDateTime claimNotificationDeadline = LocalDateTime.of(2021, 4, 16, 23, 59, 59);
             LocalDateTime claimDetailsNotificationDeadline = LocalDateTime.of(2021, 4, 15, 15, 15, 59);
             LocalDateTime expectedDeadline = claimDetailsNotificationDeadline;
 
@@ -515,6 +515,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
                     .claimNotificationDeadline(claimNotificationDeadline)
                     .build();
+
                 CallbackParams params = CallbackParamsBuilder.builder().of(
                     CallbackType.ABOUT_TO_SUBMIT,
                     caseData
@@ -539,6 +540,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .cosNotifyClaimDefendant1(CertificateOfService.builder()
                                                   .cosDateOfServiceForDefendant(cosNotifyDate)
                                                   .build())
+                    .claimNotificationDeadline(claimNotificationDeadline)
                     .addRespondent2(YesOrNo.YES)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
@@ -548,8 +550,10 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
-                    .containsEntry("claimDetailsNotificationDeadline",
-                                   expectedDeadline.format(ISO_DATE_TIME));
+                    .containsEntry(
+                        "claimDetailsNotificationDeadline",
+                        expectedDeadline.format(ISO_DATE_TIME)
+                    );
             }
 
             @Test
@@ -569,6 +573,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1Represented(YesOrNo.YES)
                     .respondent2Represented(YesOrNo.NO)
                     .addRespondent2(YesOrNo.YES)
+                    .claimNotificationDeadline(claimNotificationDeadline)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
                     CallbackType.ABOUT_TO_SUBMIT,
@@ -601,6 +606,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1Represented(YesOrNo.NO)
                     .respondent2Represented(YesOrNo.NO)
                     .addRespondent2(YesOrNo.YES)
+                    .claimNotificationDeadline(claimNotificationDeadline)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
                     CallbackType.ABOUT_TO_SUBMIT,
@@ -633,6 +639,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1Represented(YesOrNo.NO)
                     .respondent2Represented(YesOrNo.NO)
                     .addRespondent2(YesOrNo.YES)
+                    .claimNotificationDeadline(claimNotificationDeadline)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
                     CallbackType.ABOUT_TO_SUBMIT,
@@ -665,6 +672,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1Represented(YesOrNo.NO)
                     .respondent2Represented(YesOrNo.NO)
                     .addRespondent2(YesOrNo.YES)
+                    .claimNotificationDeadline(claimNotificationDeadline)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
                     CallbackType.ABOUT_TO_SUBMIT,
