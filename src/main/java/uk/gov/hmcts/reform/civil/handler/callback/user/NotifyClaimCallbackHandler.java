@@ -190,6 +190,11 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             claimDetailsNotificationDeadline = getDeadline(claimNotificationDate);
         }
 
+        if (claimDetailsNotificationDeadline.isAfter(caseData.getClaimNotificationDeadline())
+            || claimDetailsNotificationDeadline.isEqual(caseData.getClaimNotificationDeadline())) {
+            claimDetailsNotificationDeadline = caseData.getClaimNotificationDeadline();
+        }
+
         caseDataBuilder
             .claimDetailsNotificationDeadline(claimDetailsNotificationDeadline)
             .nextDeadline(claimDetailsNotificationDeadline.toLocalDate());
