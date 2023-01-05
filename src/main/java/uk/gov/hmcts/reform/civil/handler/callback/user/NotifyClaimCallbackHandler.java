@@ -183,8 +183,17 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         // set organisation policy after removing it in claim issue
         // workaround for hiding cases in CAA list before case notify
         setOrganisationPolicy(caseData, caseDataBuilder);
+        LocalDateTime claimDetailsNotificationDeadline;
+        if (featureToggleService.isCertificateOfServiceEnabled() && areAnyRespondentsLitigantInPerson(caseData)) {
+            claimDetailsNotificationDeadline = getDeadline(getServiceDate(caseData));
+        } else {
+            claimDetailsNotificationDeadline = getDeadline(claimNotificationDate);
+        }
 
-        LocalDateTime claimDetailsNotificationDeadline = getDeadline(claimNotificationDate);
+        if (claimDetailsNotificationDeadline.isAfter(caseData.getClaimNotificationDeadline())
+            || claimDetailsNotificationDeadline.isEqual(caseData.getClaimNotificationDeadline())) {
+            claimDetailsNotificationDeadline = caseData.getClaimNotificationDeadline();
+        }
 
         caseDataBuilder
             .claimDetailsNotificationDeadline(claimDetailsNotificationDeadline)
@@ -292,5 +301,30 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     private boolean areAnyRespondentsLitigantInPerson(CaseData caseData) {
         return caseData.getRespondent1Represented() == NO
             || (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
+    }
+
+    private LocalDateTime getServiceDate(CaseData caseData) {
+        LocalDateTime date = time.now();
+
+        if (Objects.nonNull(caseData.getCosNotifyClaimDefendant1())
+            && Objects.nonNull(caseData
+                                   .getCosNotifyClaimDefendant1().getCosDateOfServiceForDefendant())) {
+            LocalDateTime cosDate1 = caseData.getCosNotifyClaimDefendant1()
+                .getCosDateOfServiceForDefendant().atStartOfDay();
+            if (cosDate1.isBefore(date)) {
+                date = cosDate1;
+            }
+        }
+
+        if (Objects.nonNull(caseData.getCosNotifyClaimDefendant2())
+            && Objects.nonNull(caseData
+                                   .getCosNotifyClaimDefendant2().getCosDateOfServiceForDefendant())) {
+            LocalDateTime cosDate2 = caseData.getCosNotifyClaimDefendant2()
+                .getCosDateOfServiceForDefendant().atStartOfDay();
+            if (cosDate2.isBefore(date)) {
+                date = cosDate2;
+            }
+        }
+        return date;
     }
 }
