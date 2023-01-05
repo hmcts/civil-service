@@ -154,8 +154,8 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         caseDataBuilder.cosNotifyClaimDefendant1(certificateOfService.toBuilder()
-                                                     .cosUISenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
-                                                     .cosSenderStatementOfTruthLabel(null)
+                                                     .cosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
+                                                     .cosUISenderStatementOfTruthLabel(null)
                                                      .build())
             .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -178,8 +178,8 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         caseDataBuilder.cosNotifyClaimDefendant2(certificateOfServiceDef2.toBuilder()
-                                                     .cosUISenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
-                                                     .cosSenderStatementOfTruthLabel(null)
+                                                     .cosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
+                                                     .cosUISenderStatementOfTruthLabel(null)
                                                      .build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()

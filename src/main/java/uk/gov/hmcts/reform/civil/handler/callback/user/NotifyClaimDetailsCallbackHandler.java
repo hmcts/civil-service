@@ -346,8 +346,9 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         CaseData caseData = callbackParams.getCaseData();
 
         ArrayList<String> errors = new ArrayList<>();
+        CertificateOfService certificateOfService = caseData.getCosNotifyClaimDetails1();
         if (toggleService.isCertificateOfServiceEnabled()) {
-            if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
+            if (Objects.nonNull(certificateOfService)) {
                 caseData.getCosNotifyClaimDetails1().setCosDocSaved(NO);
             }
 
@@ -364,6 +365,11 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        List<String> cosUISenderStatementOfTruthLabel = certificateOfService.getCosUISenderStatementOfTruthLabel();
+        caseDataBuilder.cosNotifyClaimDetails1(certificateOfService.toBuilder()
+                                                   .cosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
+                                                   .cosUISenderStatementOfTruthLabel(null)
+                                                   .build());
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))
                 .errors(errors)
@@ -372,7 +378,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
     private CallbackResponse validateCoSDetailsDefendant2(final CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        CertificateOfService certificateOfServiceDef2 = caseData.getCosNotifyClaimDetails2();
         ArrayList<String> errors = new ArrayList<>();
         if (toggleService.isCertificateOfServiceEnabled()) {
             if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
@@ -396,6 +402,11 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        List<String> cosUISenderStatementOfTruthLabel = certificateOfServiceDef2.getCosUISenderStatementOfTruthLabel();
+        caseDataBuilder.cosNotifyClaimDetails2(certificateOfServiceDef2.toBuilder()
+                                                     .cosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
+                                                     .cosUISenderStatementOfTruthLabel(null)
+                                                     .build());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
