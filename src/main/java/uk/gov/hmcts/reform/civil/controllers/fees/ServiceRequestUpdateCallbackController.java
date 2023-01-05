@@ -31,7 +31,7 @@ public class ServiceRequestUpdateCallbackController {
             requestUpdateCallbackService.processCallback(serviceRequestUpdateDto);
         } catch (Exception ex) {
             log.error(
-                "Payment callback is unsuccessful for the CaseID: {}",
+                "Payment callback is unsuccessful for the CaseID: {} {}",
                 serviceRequestUpdateDto.getCcdCaseNumber(), ex.toString()
             );
         }
