@@ -348,7 +348,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         ArrayList<String> errors = new ArrayList<>();
         CertificateOfService certificateOfService = caseData.getCosNotifyClaimDetails1();
         if (toggleService.isCertificateOfServiceEnabled()) {
-            if (Objects.nonNull(certificateOfService)) {
+            if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
                 caseData.getCosNotifyClaimDetails1().setCosDocSaved(NO);
             }
 
