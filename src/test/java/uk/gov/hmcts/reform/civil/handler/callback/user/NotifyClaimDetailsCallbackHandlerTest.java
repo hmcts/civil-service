@@ -465,8 +465,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData responseData = mapper.convertValue(successResponse.getData(), CaseData.class);
             assertThat(responseData.getCosNotifyClaimDetails2()
-                           .getCosSenderStatementOfTruthLabel().contains("Selected"));
-            assertThat(responseData.getCosNotifyClaimDetails2()
                            .getCosUISenderStatementOfTruthLabel() == null);
             assertThat(successResponse.getErrors()).isEmpty();
             assertThat(params.getCaseData().getCosNotifyClaimDetails2().getCosDocSaved()).isEqualTo(NO);
@@ -490,8 +488,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData responseData = mapper.convertValue(successResponse.getData(), CaseData.class);
-            assertThat(responseData.getCosNotifyClaimDetails1()
-                           .getCosSenderStatementOfTruthLabel().contains("Selected"));
             assertThat(responseData.getCosNotifyClaimDetails1()
                            .getCosUISenderStatementOfTruthLabel() == null);
 

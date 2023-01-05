@@ -154,7 +154,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         caseDataBuilder.cosNotifyClaimDefendant1(certificateOfService.toBuilder()
-                                                     .cosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
                                                      .cosUISenderStatementOfTruthLabel(null)
                                                      .build())
             .build();
@@ -177,7 +176,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         caseDataBuilder.cosNotifyClaimDefendant2(certificateOfServiceDef2.toBuilder()
-                                                     .cosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
                                                      .cosUISenderStatementOfTruthLabel(null)
                                                      .build());
 
@@ -201,6 +199,18 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         LocalDateTime claimDetailsNotificationDeadline;
         if (featureToggleService.isCertificateOfServiceEnabled() && areAnyRespondentsLitigantInPerson(caseData)) {
             claimDetailsNotificationDeadline = getDeadline(getServiceDate(caseData));
+            if (Objects.nonNull(caseData.getCosNotifyClaimDefendant1())) {
+                caseDataBuilder
+                    .cosNotifyClaimDefendant1(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDefendant1()))
+                    .build();
+            }
+
+            if (Objects.nonNull(caseData.getCosNotifyClaimDefendant2())) {
+                caseDataBuilder
+                    .cosNotifyClaimDefendant2(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDefendant2()))
+                    .build();
+            }
+
         } else {
             claimDetailsNotificationDeadline = getDeadline(claimNotificationDate);
         }
@@ -359,5 +369,13 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             }
         }
         return date;
+    }
+
+    private CertificateOfService updateStatementOfTruthForLip(CertificateOfService certificateOfService) {
+        List<String> cosUISenderStatementOfTruthLabel = certificateOfService.getCosUISenderStatementOfTruthLabel();
+        return certificateOfService.toBuilder()
+            .cosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
+            .cosUISenderStatementOfTruthLabel(null)
+            .build();
     }
 }
