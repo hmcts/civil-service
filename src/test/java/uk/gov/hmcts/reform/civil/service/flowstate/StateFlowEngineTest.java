@@ -332,7 +332,7 @@ class StateFlowEngineTest {
             void shouldReturnProceedsWithOfflineJourney_1v1_whenCaseDataAtStateClaimDraftIssuedAndResUnrepresented() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued1v1UnrepresentedDefendant()
-                    .defendant1LIPAtClaimIssued(NO)
+                    .defendant1LIPAtClaimIssued(null)
                     .defendant2LIPAtClaimIssued(null)
                     .build();
 
@@ -366,7 +366,7 @@ class StateFlowEngineTest {
             void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedRespondentsNotRepresented() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendants()
-                    .defendant1LIPAtClaimIssued(NO)
+                    .defendant1LIPAtClaimIssued(null)
                     .defendant2LIPAtClaimIssued(null)
                     .build();
 
@@ -465,9 +465,9 @@ class StateFlowEngineTest {
             void shouldGoOffline_whenDeadlinePassed() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendants()
-                    .defendant2LIPAtClaimIssued(null)
-                    .defendant1LIPAtClaimIssued(null)
-                    .addLegalRepDeadline(LocalDateTime.now().minusHours(4))
+                    .defendant2LIPAtClaimIssued(YES)
+                    .defendant1LIPAtClaimIssued(YES)
+                    .claimNotificationDeadline(LocalDateTime.now().minusDays(1))
                     .build();
 
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -475,14 +475,14 @@ class StateFlowEngineTest {
                 assertThat(stateFlow.getState())
                     .extracting(State::getName)
                     .isNotNull()
-                    .isEqualTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName());
+                    .isEqualTo(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName());
                 assertThat(stateFlow.getStateHistory())
-                    .hasSize(5)
+                    .hasSize(6)
                     .extracting(State::getName)
                     .containsExactly(
                         DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                        PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
-                        TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
+                        PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(), CLAIM_ISSUED.fullName(),
+                        PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName()
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
                 assertThat(stateFlow.getFlags()).hasSize(7).contains(
@@ -502,9 +502,7 @@ class StateFlowEngineTest {
             void shouldContinueOnline_1v1_whenDefendantIsUnrepresented() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued1v1UnrepresentedDefendant()
-                    .addLegalRepDeadline(LocalDateTime.now().plusDays(14))
-                    .defendant1LIPAtClaimIssued(null)
-                    .defendant2LIPAtClaimIssued(null)
+                    .defendant1LIPAtClaimIssued(YES)
                     .build();
                 when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
 
@@ -538,7 +536,7 @@ class StateFlowEngineTest {
             void shouldContinueOnline_1v1_cos_whenDefendantIsUnrepresented() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued1v1UnrepresentedDefendant()
-                    .addLegalRepDeadline(LocalDateTime.now().plusDays(14))
+                    .defendant2LIPAtClaimIssued(YES)
                     .build();
                 when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -571,8 +569,9 @@ class StateFlowEngineTest {
             void shouldContinueOnline_1v1Spec_whenDefendantIsUnrepresented() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued1v1UnrepresentedDefendant()
-                    .addLegalRepDeadline(LocalDateTime.now().plusDays(14))
+                    .defendant1LIPAtClaimIssued(YES)
                     .build().toBuilder()
+                    .takenOfflineDate(null)
                     .superClaimType(SuperClaimType.SPEC_CLAIM).build();
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -605,9 +604,8 @@ class StateFlowEngineTest {
             void shouldContinueOnline_WhenBothDefendantsAreUnrepresented() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendants()
-                    .addLegalRepDeadline(LocalDateTime.now().plusDays(14))
-                    .defendant1LIPAtClaimIssued(null)
-                    .defendant2LIPAtClaimIssued(null)
+                    .defendant1LIPAtClaimIssued(YES)
+                    .defendant2LIPAtClaimIssued(YES)
                     .build();
                 when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -641,8 +639,6 @@ class StateFlowEngineTest {
             void shouldContinueOnline_WhenCaseDataAtStateClaimDraftIssuedAndRespondent1NotRepresented() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant1()
-                    .addLegalRepDeadline(LocalDateTime.now().plusDays(14))
-                    .defendant1LIPAtClaimIssued(null)
                     .build();
                 when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -676,7 +672,6 @@ class StateFlowEngineTest {
             void shouldContinueOnline_Cos_WhenCaseDataAtStateClaimDraftIssuedAndRespondent1NotRepresented() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant1()
-                    .addLegalRepDeadline(LocalDateTime.now().plusDays(14))
                     .build();
                 when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -710,8 +705,7 @@ class StateFlowEngineTest {
             void shouldContinueOnline_WhenCaseDataAtStateClaimDraftIssuedAndRespondent2NotRepresented() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant2()
-                    .addLegalRepDeadline(LocalDateTime.now().plusDays(14))
-                    .defendant2LIPAtClaimIssued(null)
+                    .defendant2LIPAtClaimIssued(YES)
                     .build();
                 when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -745,7 +739,7 @@ class StateFlowEngineTest {
             void shouldContinueOnline_Cos_WhenCaseDataAtStateClaimDraftIssuedAndRespondent2NotRepresented() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant2()
-                    .addLegalRepDeadline(LocalDateTime.now().plusDays(14))
+                    .defendant2LIPAtClaimIssued(YES)
                     .build();
 
                 when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
@@ -781,9 +775,7 @@ class StateFlowEngineTest {
             void shouldContinueOnline_WhenCaseDataAtStateClaimDraftIssuedAndRespondent2NotRepresentedSpec() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant2()
-                    .defendant2LIPAtClaimIssued(null)
-                    .addLegalRepDeadline(LocalDateTime.now().plusDays(14))
-
+                    .defendant2LIPAtClaimIssued(YES)
                     .build().toBuilder()
                     .superClaimType(SuperClaimType.SPEC_CLAIM).build();
 
