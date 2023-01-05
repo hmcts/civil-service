@@ -4010,9 +4010,12 @@ public class CaseDataBuilder {
                 .documentFileName("file-name2")
                 .documentBinaryUrl("binary-url2")
                 .build());
+        ArrayList<String> cosUIStatement = new ArrayList<>();
+        cosUIStatement.add("Selected");
         if (setCos1) {
             CertificateOfService.CertificateOfServiceBuilder cos1Builder = CertificateOfService.builder()
-                    .cosDateOfServiceForDefendant(cos1Date);
+                .cosUISenderStatementOfTruthLabel(cosUIStatement)
+                .cosDateOfServiceForDefendant(cos1Date);
             if (file1) {
                 cos1Builder.cosEvidenceDocument(files);
             }
@@ -4020,7 +4023,8 @@ public class CaseDataBuilder {
         }
         if (setCos2) {
             CertificateOfService.CertificateOfServiceBuilder cos2Builder = CertificateOfService.builder()
-                    .cosDateOfServiceForDefendant(cos2Date);
+                .cosUISenderStatementOfTruthLabel(cosUIStatement)
+                .cosDateOfServiceForDefendant(cos2Date);
             if (file2) {
                 cos2Builder.cosEvidenceDocument(files2);
             }
