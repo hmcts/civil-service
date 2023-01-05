@@ -22,12 +22,9 @@ public class RepresentativeService {
     private final FeatureToggleService featureToggleService;
 
     private boolean doesOrganisationPolicyExist(OrganisationPolicy organisationPolicy) {
-        if (featureToggleService.isNoticeOfChangeEnabled()) {
             return organisationPolicy != null
                 && organisationPolicy.getOrganisation() != null
                 && organisationPolicy.getOrganisation().getOrganisationID() != null;
-        }
-        return organisationPolicy != null;
     }
 
     public Representative getRespondent1Representative(CaseData caseData) {
