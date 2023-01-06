@@ -166,15 +166,15 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                         deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime));
             }
             if (toggleService.isCertificateOfServiceEnabled() && areAnyRespondentsLitigantInPerson(caseData)) {
-                if (Objects.nonNull(caseData.getCosNotifyClaimDefendant1())) {
+                if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
                     builder
-                        .cosNotifyClaimDefendant1(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDefendant1()))
+                        .cosNotifyClaimDetails1(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDetails1()))
                         .build();
                 }
 
-                if (Objects.nonNull(caseData.getCosNotifyClaimDefendant2())) {
+                if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
                     builder
-                        .cosNotifyClaimDefendant2(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDefendant2()))
+                        .cosNotifyClaimDetails2(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDetails2()))
                         .build();
                 }
 

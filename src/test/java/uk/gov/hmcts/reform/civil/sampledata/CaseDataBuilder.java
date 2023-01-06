@@ -1700,7 +1700,8 @@ public class CaseDataBuilder {
         atStateClaimDraft();
         respondent1OrganisationPolicy = null;
         defendant1LIPAtClaimIssued = YES;
-
+        respondent1Represented = NO;
+        respondent2Represented = NO;
         addRespondent2 = YES;
         respondent2OrganisationPolicy = null;
         respondent2SameLegalRepresentative = NO;
