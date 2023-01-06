@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.event.DismissClaimEvent;
+import uk.gov.hmcts.reform.civil.event.DecisionOutcomeEvent;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import static org.mockito.Mockito.verify;
@@ -22,7 +22,7 @@ class DecisionOutcomeEventHandlerTest {
 
     @Test
     void shouldCallMoveToDecisionOutcomeEventWithExpectedParams_WhenDismissClaimEvent() {
-        DismissClaimEvent event = new DismissClaimEvent(1L);
+        DecisionOutcomeEvent event = new DecisionOutcomeEvent(1L);
 
         handler.moveCaseToDecisionOutcome(event);
 

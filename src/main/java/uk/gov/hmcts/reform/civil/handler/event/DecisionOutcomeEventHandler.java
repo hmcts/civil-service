@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.event.DecisionOutcomeEvent;
 import uk.gov.hmcts.reform.civil.event.DismissClaimEvent;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
@@ -17,7 +18,7 @@ public class DecisionOutcomeEventHandler {
     private final CoreCaseDataService coreCaseDataService;
 
     @EventListener
-    public void moveCaseToDecisionOutcome(DismissClaimEvent event) {
+    public void moveCaseToDecisionOutcome(DecisionOutcomeEvent event) {
         coreCaseDataService.triggerEvent(event.getCaseId(), MOVE_TO_DECISION_OUTCOME);
     }
 }

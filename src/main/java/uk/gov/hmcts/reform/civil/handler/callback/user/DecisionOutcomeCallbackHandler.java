@@ -13,10 +13,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.DECISION_OUTCOME;
 
 @Service
 @RequiredArgsConstructor
@@ -27,18 +26,14 @@ public class DecisionOutcomeCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(ABOUT_TO_SUBMIT), this::changeState,
-            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+            callbackKey(ABOUT_TO_SUBMIT), this::changeState
         );
     }
 
     private CallbackResponse changeState(CallbackParams callbackParams) {
 
-        var state = "DECISION_OUTCOME";
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .state(state)
+            .state(DECISION_OUTCOME.name())
             .build();
     }
 

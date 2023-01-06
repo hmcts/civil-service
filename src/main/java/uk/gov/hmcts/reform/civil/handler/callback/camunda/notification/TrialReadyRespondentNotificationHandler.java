@@ -69,29 +69,30 @@ public class TrialReadyRespondentNotificationHandler extends CallbackHandler imp
         notificationService.sendMail(
             respondentEmail,
             notificationsProperties.getSolicitorTrialReady(),
-            isForRespondentSolicitor1(callbackParams) ? addPropertiesRep1(caseData) : addPropertiesRep2(caseData),
+            addPropertiesRep(caseData, isForRespondentSolicitor1(callbackParams) ? true : false),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    public Map<String, String> addPropertiesRep2(CaseData caseData) {
-
+    public Map<String, String> addPropertiesRep(CaseData caseData, boolean isFirst) {
+        String defRefNumber;
+        if (isFirst) {
+            if (caseData.getSolicitorReferences() == null
+                || caseData.getSolicitorReferences().getRespondentSolicitor1Reference() == null) {
+                defRefNumber = "";
+            } else {
+                defRefNumber = caseData.getSolicitorReferences().getRespondentSolicitor1Reference();
+            }
+        } else {
+            defRefNumber = caseData.getRespondentSolicitor2Reference() == null ? "" :
+                caseData.getRespondentSolicitor2Reference();
+        }
         return Map.of(
             HEARING_OR_TRIAL, addTrialOrHearing(caseData),
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIMANT_DEFENDANT_REFERENCE, caseData.getSolicitorReferences().getRespondentSolicitor2Reference()
-        );
-    }
-
-    public Map<String, String> addPropertiesRep1(CaseData caseData) {
-
-        return Map.of(
-            HEARING_OR_TRIAL, addTrialOrHearing(caseData),
-            HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIMANT_DEFENDANT_REFERENCE, caseData.getSolicitorReferences().getRespondentSolicitor1Reference()
+            CLAIMANT_DEFENDANT_REFERENCE, defRefNumber
         );
 
     }
