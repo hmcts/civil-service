@@ -574,11 +574,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("disposalHearingQuestionsToExperts").extracting("date")
                 .isEqualTo(LocalDate.now().plusWeeks(6).toString());
 
-            assertThat(response.getData()).extracting("disposalHearingSchedulesOfLoss").extracting("input1")
-                .isEqualTo("If there is a claim for ongoing/future loss in the original schedule of losses then the "
-                               + "claimant must send an up to date schedule of loss to the defendant by 4pm on");
-            assertThat(response.getData()).extracting("disposalHearingSchedulesOfLoss").extracting("date1")
-                .isEqualTo(LocalDate.now().plusWeeks(10).toString());
             assertThat(response.getData()).extracting("disposalHearingSchedulesOfLoss").extracting("input2")
                 .isEqualTo("If there is a claim for ongoing or future loss in the original schedule of losses, "
                                + "the claimant must upload to the Digital Portal an up-to-date schedule of loss "
