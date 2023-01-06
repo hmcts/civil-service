@@ -307,7 +307,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackJudgesRecital(tempFastTrackJudgesRecital).build();
 
         FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
-            .input1("Standard disclosure shall be provided by the parties by uploading to the digital portal their "
+            .input1("Standard disclosure shall be provided by the parties by uploading to the Digital Portal their "
                         + "list of documents by 4pm on")
             .date1(LocalDate.now().plusWeeks(4))
             .input2("Any request to inspect a document, or for a copy of a document, shall be made directly to "
