@@ -623,8 +623,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).doesNotHaveToString("fastTrackJudgementDeductionValue");
 
             assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input1")
-                .isEqualTo("Standard disclosure shall be provided by the parties by uploading to the digital "
-                               + "portal their list of documents by 4pm on");
+                .isEqualTo("Standard disclosure shall be provided by the parties by uploading to the Digital "
+                               + "Portal their list of documents by 4pm on");
             assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(4).toString());
             assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input2")
