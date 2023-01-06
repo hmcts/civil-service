@@ -353,7 +353,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if(caseData.getRespondent1Copy().getPrimaryAddress() == null) {
+        if (caseData.getRespondent1Copy().getPrimaryAddress() == null) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Primary Address cannot be empty");
         }
 
