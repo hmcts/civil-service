@@ -4011,7 +4011,7 @@ public class CaseDataBuilder {
                 .documentBinaryUrl("binary-url2")
                 .build());
         ArrayList<String> cosUIStatement = new ArrayList<>();
-        cosUIStatement.add("Selected");
+        cosUIStatement.add("CERTIFIED");
         if (setCos1) {
             CertificateOfService.CertificateOfServiceBuilder cos1Builder = CertificateOfService.builder()
                 .cosUISenderStatementOfTruthLabel(cosUIStatement)

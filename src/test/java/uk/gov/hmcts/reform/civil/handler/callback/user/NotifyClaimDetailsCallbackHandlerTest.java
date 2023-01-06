@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
@@ -250,6 +251,10 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getCosNotifyClaimDefendant1()
+                           .getCosSenderStatementOfTruthLabel().contains("CERTIFIED"));
+            assertThat(updatedData.getCosNotifyClaimDefendant1()
+                           .getCosUISenderStatementOfTruthLabel() == null);
             assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(1);
             assertThat(updatedData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
             assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(newDate.minusDays(2));
