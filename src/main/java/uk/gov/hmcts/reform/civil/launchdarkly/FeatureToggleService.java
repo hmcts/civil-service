@@ -64,6 +64,10 @@ public class FeatureToggleService {
         return isFeatureEnabled("enableSDO");
     }
 
+    public boolean isCaseFlagsToggleEnabled() {
+        return isFeatureEnabled("case-flags");
+    }
+
     public boolean isGeneralApplicationsEnabled() {
         return internalClient.boolVariation("general_applications_enabled", createLDUser().build(), false);
     }

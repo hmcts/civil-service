@@ -105,6 +105,15 @@ class FeatureToggleServiceTest {
     }
 
     @Test
+    void shouldCallBoolVariation_whenisCaseFlagsToggleEnabledInvoked() {
+        var cfDynamicListKey = "case-flags";
+        givenToggle(cfDynamicListKey, true);
+
+        assertThat(featureToggleService.isCaseFlagsToggleEnabled()).isTrue();
+        verifyBoolVariationCalled(cfDynamicListKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
     void shouldCallBoolVariation_whenIsGeneralApplicationsEnabledInvoked() {
         var generalApplicationsKey = "general_applications_enabled";
         givenToggle(generalApplicationsKey, true);
