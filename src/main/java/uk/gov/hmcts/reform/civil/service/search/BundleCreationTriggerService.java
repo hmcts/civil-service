@@ -26,7 +26,7 @@ public class BundleCreationTriggerService extends ElasticSearchService{
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(rangeQuery("data.hearingDate").lt(LocalDate.now().plusWeeks(BUNDLE_CREATION_TIME_RANGE)))
+                            .must(matchQuery("data.hearingDate",LocalDate.now().plusWeeks(BUNDLE_CREATION_TIME_RANGE)))
                             .must(beState(CaseState.HEARING_READINESS))
                 ), List.of("reference"), startIndex
         );
