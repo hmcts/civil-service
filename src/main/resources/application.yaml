@@ -52,13 +52,13 @@ cmc-claim-store:
 
 serviceRequest:
   api:
-    callback-url : https://${SERVICE_NAME}.preview.platform.hmcts.net/service-request-update
+    callback-url : ${SERVICE_REQUEST_UPDATE:}
     site_id : AAA7
     service : CIVIL
 
 serviceRequestClaimIssued:
   api:
-    callback-url: https://${SERVICE_NAME}.preview.platform.hmcts.net/service-request-update-claim-issued
+    callback-url: ${SERVICE_REQUEST_UPDATE_CLAIM_ISSUED:}
     site_id: AAA7
     service: CIVIL
 
