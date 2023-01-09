@@ -93,7 +93,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         DirectionsQuestionnaireForm templateData;
         if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
             if (isClaimantResponse(caseData)) {
-                templateId = DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
+                templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                    ? DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_HNL : DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
             } else {
                 templateId = featureToggleService.isHearingAndListingSDOEnabled()
                     ? DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_HNL : DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
@@ -283,6 +284,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .witnesses(witnesses)
             .witnessesIncludingDefendants(witnessesIncludingDefendants)
             .hearing(getHearing(dq))
+            //Remove hearingSupport after hnl released
             .hearingSupport(getHearingSupport(dq))
             .support(dq.getHearingSupport())
             .furtherInformation(getFurtherInformation(dq, caseData))
@@ -304,6 +306,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
                 return List.of(Party.builder()
                                    .name(applicant.getPartyName())
+                                   .emailAddress(caseData.getApplicant1().getPartyEmail())
+                                   .phoneNumber(caseData.getApplicant1().getPartyPhone())
                                    .primaryAddress(applicant.getPrimaryAddress())
                                    .representative(respondentRepresentative)
                                    .litigationFriendName(
@@ -315,6 +319,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                    .build(),
                                Party.builder()
                                    .name(applicant2.getPartyName())
+                                   .emailAddress(caseData.getApplicant2().getPartyEmail())
+                                   .phoneNumber(caseData.getApplicant2().getPartyPhone())
                                    .primaryAddress(applicant2.getPrimaryAddress())
                                    .representative(respondentRepresentative)
                                    .litigationFriendName(
@@ -328,6 +334,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         }
         return List.of(Party.builder()
                            .name(applicant.getPartyName())
+                           .emailAddress(applicant.getPartyEmail())
+                           .phoneNumber(applicant.getPartyPhone())
                            .primaryAddress(applicant.getPrimaryAddress())
                            .representative(respondentRepresentative)
                            .litigationFriendName(
@@ -602,6 +610,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                     ) {
                     respondents.add(Party.builder()
                                         .name(caseData.getRespondent1().getPartyName())
+                                        .emailAddress(caseData.getRespondent1().getPartyEmail())
+                                        .phoneNumber(caseData.getRespondent1().getPartyPhone())
                                         .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
                                         .representative(representativeService
                                                             .getRespondent1Representative(caseData))
@@ -614,6 +624,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                         .build());
                     respondents.add(Party.builder()
                                         .name(caseData.getRespondent2().getPartyName())
+                                        .emailAddress(caseData.getRespondent2().getPartyEmail())
+                                        .phoneNumber(caseData.getRespondent2().getPartyPhone())
                                         .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
                                         .representative(representativeService
                                                             .getRespondent2Representative(caseData))
@@ -627,6 +639,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 } else if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
                     respondents.add(Party.builder()
                                         .name(caseData.getRespondent1().getPartyName())
+                                        .emailAddress(caseData.getRespondent1().getPartyEmail())
+                                        .phoneNumber(caseData.getRespondent1().getPartyPhone())
                                         .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
                                         .representative(representativeService
                                                             .getRespondent1Representative(caseData))
@@ -644,6 +658,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             if (isProceedingAgainstRespondent1(caseData)) {
                 respondents.add(Party.builder()
                                     .name(caseData.getRespondent1().getPartyName())
+                                    .emailAddress(caseData.getRespondent1().getPartyEmail())
+                                    .phoneNumber(caseData.getRespondent1().getPartyPhone())
                                     .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
                                     .representative(representativeService
                                                         .getRespondent1Representative(caseData))
@@ -658,6 +674,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             if (isProceedingAgainstRespondent2(caseData)) {
                 respondents.add(Party.builder()
                                     .name(caseData.getRespondent2().getPartyName())
+                                    .emailAddress(caseData.getRespondent2().getPartyEmail())
+                                    .phoneNumber(caseData.getRespondent2().getPartyPhone())
                                     .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
                                     .representative(representativeService
                                                         .getRespondent2Representative(caseData))
@@ -780,7 +798,13 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         Expert expertDetails;
         if (experts != null) {
             expertDetails = Expert.builder()
+                //ToDo: Remove redundant name mapping when hnl toggle removed
                 .name(experts.getExpertName())
+                //===========================================================
+                .firstName(experts.getFirstName())
+                .lastName(experts.getLastName())
+                .phoneNumber(experts.getPhoneNumber())
+                .emailAddress(experts.getEmailAddress())
                 .formattedCost(MonetaryConversions.penniesToPounds(experts.getEstimatedCost()).toString())
                 .fieldOfExpertise(experts.getFieldofExpertise())
                 .whyRequired(experts.getWhyRequired())
@@ -808,7 +832,13 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         return unwrapElements(dq.getExperts().getDetails())
             .stream()
             .map(expert -> Expert.builder()
+                //ToDo: Remove redundant name mapping when hnl toggle removed
                 .name(expert.getName())
+                //===========================================================
+                .firstName(expert.getFirstName())
+                .lastName(expert.getLastName())
+                .phoneNumber(expert.getPhoneNumber())
+                .emailAddress(expert.getEmailAddress())
                 .fieldOfExpertise(expert.getFieldOfExpertise())
                 .whyRequired(expert.getWhyRequired())
                 .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
