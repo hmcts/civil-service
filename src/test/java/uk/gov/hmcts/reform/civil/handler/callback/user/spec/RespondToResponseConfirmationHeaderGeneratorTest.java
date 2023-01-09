@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.spec;
 
 import org.apache.commons.lang3.tuple.Pair;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -8,6 +9,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.AdmitProceedConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendNotProceedConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendProceedConfHeader;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.JudgmentSubmittedConfHeader;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.List;
@@ -30,7 +32,8 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             Pair.of(buildPartAdmitProceedCaseData(), AdmitProceedConfHeader.class),
             Pair.of(buildPartAdmitNotProceedCaseData(), AdmitNotProceedConfHeader.class),
             Pair.of(buildFullDefenceProceedCaseData(), DefendProceedConfHeader.class),
-            Pair.of(buildFullDefenceNotProceedCaseData(), DefendNotProceedConfHeader.class)
+            Pair.of(buildFullDefenceNotProceedCaseData(), DefendNotProceedConfHeader.class),
+            Pair.of(buildJudgmentSubmitProceedCaseData(), JudgmentSubmittedConfHeader.class)
         );
     }
 
@@ -85,6 +88,17 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .build();
+    }
+
+    public static CaseData buildJudgmentSubmitProceedCaseData(){
+        return CaseData.builder()
+            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .legacyCaseReference("claimNumber")
+            .applicant1ProceedWithClaim(null)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
             .build();
     }
 }
