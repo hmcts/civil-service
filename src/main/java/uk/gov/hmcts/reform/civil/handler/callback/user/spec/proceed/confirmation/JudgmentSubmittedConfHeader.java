@@ -32,7 +32,7 @@ public class JudgmentSubmittedConfHeader  implements RespondToResponseConfirmati
         if (((caseData.getApplicant1ProceedsWithClaimSpec() != null)
             || (YesOrNo.NO.equals(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec()))
             || (YesOrNo.NO.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec())))
-            && !ADMISSION.contains(caseData.getRespondent1ClaimResponseTypeForSpec())q
+            && !ADMISSION.contains(caseData.getRespondent1ClaimResponseTypeForSpec())
             && !PAYMENT_PLAN.contains(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
             return Optional.empty();
         }
