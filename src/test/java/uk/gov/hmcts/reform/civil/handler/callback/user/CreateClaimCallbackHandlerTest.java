@@ -61,7 +61,6 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.time.LocalDate.now;
-import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -77,6 +76,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY_COS;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
@@ -100,7 +100,8 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     PostcodeValidator.class,
     StateFlowEngine.class,
     ValidationAutoConfiguration.class,
-    ValidateEmailService.class},
+    ValidateEmailService.class,
+    OrganisationService.class},
     properties = {"reference.database.enabled=false"})
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -664,6 +665,49 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isEmpty();
         }
+
+        @Test
+        void shouldReturnError_whenBothSolicitorOrganisationsAreSame1v1() {
+
+            uk.gov.hmcts.reform.ccd.model.Organisation organisation
+                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .organisationID("orgId")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(
+                "The legal representative details for the claimant and defendant are the same.  "
+                     + "Please amend accordingly.");
+        }
+
+        @Test
+        void shouldReturnError_whenApplicantAndRespondent1SolicitorOrganisationsAreSame2v1() {
+
+            uk.gov.hmcts.reform.ccd.model.Organisation organisation
+                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .organisationID("orgId")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .multiPartyClaimTwoApplicants()
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(
+                "The legal representative details for the claimant and defendant are the same.  "
+                    + "Please amend accordingly.");
+        }
     }
 
     @Nested
@@ -733,6 +777,74 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnError_whenApplicantAndRespondent1SolicitorOrganisationsAreSame1v2() {
+
+            uk.gov.hmcts.reform.ccd.model.Organisation organisation
+                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .organisationID("orgId")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .respondent2Represented(YES)
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(
+                "The legal representative details for the claimant and defendant are the same.  "
+                     + "Please amend accordingly.");
+        }
+
+        @Test
+        void shouldReturnError_whenApplicantAndRespondent2SolicitorOrganisationsAreSame1v2() {
+
+            uk.gov.hmcts.reform.ccd.model.Organisation organisation
+                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .organisationID("orgId")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .respondent2Represented(YES)
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(
+                "The legal representative details for the claimant and defendant are the same.  "
+                     + "Please amend accordingly.");
+        }
+
+        @Test
+        void shouldReturnError_whenApplicantAndRespondent1SolicitorOrganisationsAreSame1v2SameSol() {
+
+            uk.gov.hmcts.reform.ccd.model.Organisation organisation
+                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                .organisationID("orgId")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .multiPartyClaimOneDefendantSolicitor()
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(
+                "The legal representative details for the claimant and defendant are the same.  "
+                    + "Please amend accordingly.");
         }
     }
 
@@ -1071,44 +1183,63 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Nested
-        class AddLegalRepDeadline {
+        class DefendantLipAtClaimIssued {
             @Test
-            void shouldSetAddLegalRepDeadline_whenInvoked() {
-                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
-                caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant().build();
-
+            void shouldSetDefend1LipAtClaimIssued_when_defendant1LitigantParty() {
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+                caseData = CaseDataBuilder.builder().atStateClaimSubmitted1v1AndNoRespondentRepresented().build();
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
 
-                assertThat(response.getData()).extracting("addLegalRepDeadline")
-                    .isEqualTo(submittedDate.format(ISO_DATE_TIME));
+                assertThat(response.getData()).extracting("defendant1LIPAtClaimIssued")
+                    .isEqualTo("Yes");
+                assertThat(response.getData()).extracting("defendant2LIPAtClaimIssued").isNull();
             }
 
             @Test
-            void shouldSetAddLegalRepDeadline_1v2_2LiPs_whenInvoked() {
-                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
-                caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
+            void shouldSetDefend1LipAtClaimIssued_1v2_defendant2LitigantParty_whenInvoked() {
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+                caseData = CaseDataBuilder.builder()
+                    .atStateClaimSubmitted1v2AndOnlyFirstRespondentIsRepresented()
+                    .build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
 
-                assertThat(response.getData()).extracting("addLegalRepDeadline")
-                    .isEqualTo(submittedDate.format(ISO_DATE_TIME));
+                assertThat(response.getData()).extracting("defendant1LIPAtClaimIssued")
+                    .isEqualTo("No");
+                assertThat(response.getData()).extracting("defendant2LIPAtClaimIssued")
+                    .isEqualTo("Yes");
             }
 
             @Test
-            void shouldSetAddLegalRepDeadline_1v2_1LiP_whenInvoked() {
-                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any())).thenReturn(submittedDate);
-                caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().build();
+            void shouldSetDefend1LipAtClaimIssued_1v2_defendant1LitigantParty_whenInvoked() {
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+                caseData = CaseDataBuilder.builder()
+                    .atStateClaimSubmitted1v2AndOnlySecondRespondentIsRepresented()
+                    .build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
 
-                assertThat(response.getData()).extracting("addLegalRepDeadline")
-                    .isEqualTo(submittedDate.format(ISO_DATE_TIME));
+                assertThat(response.getData()).extracting("defendant1LIPAtClaimIssued")
+                    .isEqualTo("Yes");
+                assertThat(response.getData()).extracting("defendant2LIPAtClaimIssued")
+                    .isEqualTo("No");
+            }
+
+            @Test
+            void shouldSetDefendantLIPAtClaim_1v2_BothDefendantLitigantParty_whenInvoked() {
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+                caseData = CaseDataBuilder.builder().atStateClaimSubmittedNoRespondentRepresented().build();
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+
+                assertThat(response.getData()).extracting("defendant1LIPAtClaimIssued")
+                    .isEqualTo("Yes");
+                assertThat(response.getData()).extracting("defendant2LIPAtClaimIssued")
+                    .isEqualTo("Yes");
             }
 
         }
@@ -1425,6 +1556,33 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .confirmationBody(body)
                         .build());
             }
+
+            @Test
+            void certificateOfService_shouldReturnExpectedResponse_whenRespondentsDoesNotHaveRepresentation() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
+
+                String body = format(
+                        LIP_CONFIRMATION_BODY_COS,
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                    responsePackLink,
+                    formatLocalDateTime(serviceDeadline, DATE_TIME_AT)
+                ) + exitSurveyContentService.applicantSurvey();
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# Your claim has been received%n## Claim number: %s",
+                            REFERENCE_NUMBER
+                        ))
+                        .confirmationBody(body)
+                        .build());
+            }
         }
 
         @Nested
@@ -1481,6 +1639,34 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .confirmationBody(body)
                         .build());
             }
+
+            @Test
+            void certificateOfService_shouldReturnExpectedResponse_whenRespondentsDoesNotHaveRepresentation() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
+
+                String body = format(
+                        LIP_CONFIRMATION_BODY_COS,
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                    responsePackLink,
+                    formatLocalDateTime(serviceDeadline, DATE_TIME_AT)
+                ) + exitSurveyContentService.applicantSurvey();
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# Your claim has been received%n## Claim number: %s",
+                            REFERENCE_NUMBER
+                        ))
+                        .confirmationBody(body)
+                        .build());
+            }
         }
 
         @Nested
@@ -1501,6 +1687,29 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                        + "Claim number: %s", REFERENCE_NUMBER))
                         .confirmationBody(format(
                             LIP_CONFIRMATION_BODY,
+                            format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                            responsePackLink
+                        ) + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
+
+            @Test
+            void certificateOfService_shouldReturnExpectedResponse_whenRespondent1SolicitorNotRegisteredInMyHmcts() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                    .respondent1Represented(YES)
+                    .respondent1OrgRegistered(NO)
+                    .build();
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format("# Your claim has been received%n## Claim number: %s",
+                                                   REFERENCE_NUMBER))
+                        .confirmationBody(format(
+                                LIP_CONFIRMATION_BODY_COS,
                             format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                             responsePackLink
                         ) + exitSurveyContentService.applicantSurvey())
@@ -1535,6 +1744,33 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .confirmationBody(body)
                         .build());
             }
+
+            @Test
+            void certificateOfService_shouldReturnExpectedResponse_whenRespondent2DoesNotHaveRepresentation() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
+
+                String body = format(
+                        LIP_CONFIRMATION_BODY_COS,
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                    responsePackLink,
+                    formatLocalDateTime(serviceDeadline, DATE_TIME_AT)
+                ) + exitSurveyContentService.applicantSurvey();
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# Your claim has been received%n## Claim number: %s",
+                            REFERENCE_NUMBER
+                        ))
+                        .confirmationBody(body)
+                        .build());
+            }
         }
 
         @Nested
@@ -1555,6 +1791,29 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                        + "Claim number: %s", REFERENCE_NUMBER))
                         .confirmationBody(format(
                             LIP_CONFIRMATION_BODY,
+                            format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                            responsePackLink
+                        ) + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
+
+            @Test
+            void certificateOfService_shouldReturnExpectedResponse_whenRespondent2SolicitorNotRegisteredInMyHmcts() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                    .respondent2Represented(YES)
+                    .respondent2OrgRegistered(NO)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format("# Your claim has been received%n## Claim number: %s",
+                                                   REFERENCE_NUMBER))
+                        .confirmationBody(format(
+                                LIP_CONFIRMATION_BODY_COS,
                             format("/cases/case-details/%s#CaseDocuments", CASE_ID),
                             responsePackLink
                         ) + exitSurveyContentService.applicantSurvey())
