@@ -912,8 +912,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            HttpClientErrorException exception = assertThrows(HttpClientErrorException.class,
-                                                              () -> handler.handle(params));
+            HttpClientErrorException exception = assertThrows(
+                HttpClientErrorException.class,
+                () -> handler.handle(params)
+            );
             assertEquals(exception.getMessage(), "400 Primary Address cannot be empty");
         }
 
