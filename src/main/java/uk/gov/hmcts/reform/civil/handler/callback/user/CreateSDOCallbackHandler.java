@@ -237,9 +237,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.disposalHearingQuestionsToExperts(tempDisposalHearingQuestionsToExperts).build();
 
         DisposalHearingSchedulesOfLoss tempDisposalHearingSchedulesOfLoss = DisposalHearingSchedulesOfLoss.builder()
-            .input1("If there is a claim for ongoing/future loss in the original schedule of losses then the claimant"
-                        + " must send an up to date schedule of loss to the defendant by 4pm on")
-            .date1(LocalDate.now().plusWeeks(10))
             .input2("If there is a claim for ongoing or future loss in the original schedule of losses, the claimant"
                         + " must upload to the Digital Portal an up-to-date schedule of loss by 4pm on")
             .date2(LocalDate.now().plusWeeks(10))
