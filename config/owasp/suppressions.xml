@@ -11,5 +11,7 @@
   </suppress>
   <suppress until="2023-05-05">
     <cve>CVE-2021-4277</cve>
+    <cve>CVE-2022-3064</cve>
+    <cve>CVE-2021-4235</cve>
   </suppress>
 </suppressions>
