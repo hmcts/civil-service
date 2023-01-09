@@ -250,6 +250,10 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getCosNotifyClaimDetails1()
+                           .getCosSenderStatementOfTruthLabel().contains("CERTIFIED"));
+            assertThat(updatedData.getCosNotifyClaimDetails1()
+                           .getCosUISenderStatementOfTruthLabel() == null);
             assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(1);
             assertThat(updatedData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
             assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(newDate.minusDays(2));
@@ -269,6 +273,10 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getCosNotifyClaimDetails2()
+                           .getCosSenderStatementOfTruthLabel().contains("CERTIFIED"));
+            assertThat(updatedData.getCosNotifyClaimDetails2()
+                           .getCosUISenderStatementOfTruthLabel() == null);
             assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(1);
             assertThat(updatedData.getCosNotifyClaimDetails2().getCosDocSaved()).isEqualTo(YES);
             assertThat(updatedData.getNextDeadline()).isEqualTo(newDate.minusDays(2).toLocalDate());

@@ -1700,7 +1700,8 @@ public class CaseDataBuilder {
         atStateClaimDraft();
         respondent1OrganisationPolicy = null;
         defendant1LIPAtClaimIssued = YES;
-
+        respondent1Represented = NO;
+        respondent2Represented = NO;
         addRespondent2 = YES;
         respondent2OrganisationPolicy = null;
         respondent2SameLegalRepresentative = NO;
@@ -4011,7 +4012,7 @@ public class CaseDataBuilder {
                 .documentBinaryUrl("binary-url2")
                 .build());
         ArrayList<String> cosUIStatement = new ArrayList<>();
-        cosUIStatement.add("Selected");
+        cosUIStatement.add("CERTIFIED");
         if (setCos1) {
             CertificateOfService.CertificateOfServiceBuilder cos1Builder = CertificateOfService.builder()
                 .cosUISenderStatementOfTruthLabel(cosUIStatement)
