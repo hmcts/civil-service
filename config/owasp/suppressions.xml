@@ -9,4 +9,7 @@
     <notes>Temporariy suppressing it as the latest camunda connector 1.5.6 seem to have the vulnerability.</notes>
     <cve>CVE-2021-37533</cve>
   </suppress>
+  <suppress until="2023-05-05">
+    <cve>CVE-2021-4277</cve>
+  </suppress>
 </suppressions>
