@@ -192,6 +192,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 }
             }
 
+            if (featureToggleService.isHearingAndListingSDOEnabled()) {
+                dq.applicant1DQWitnesses(builder.build().getApplicant1DQWitnessesSmallClaim());
+            }
+
             builder.applicant1DQ(dq.build());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             builder.uiStatementOfTruth(StatementOfTruth.builder().build());
