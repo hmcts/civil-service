@@ -43,6 +43,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
             .build();
     }
 
@@ -52,6 +53,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
             .build();
     }
 
@@ -61,6 +63,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
             .build();
     }
 
@@ -70,6 +73,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
             .build();
     }
 
@@ -79,6 +83,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
             .build();
     }
 
@@ -88,6 +93,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
             .build();
     }
 

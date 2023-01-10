@@ -15,8 +15,7 @@ public class DefendNotProceedConfText implements RespondToResponseConfirmationTe
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if ((caseData.getApplicant1ProceedsWithClaimSpec() == null)
-            || YesOrNo.YES.equals(caseData.getApplicant1ProceedsWithClaimSpec())
+        if (YesOrNo.YES.equals(caseData.getApplicant1ProceedsWithClaimSpec())
             || !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())) {
             return Optional.empty();
         }

@@ -16,11 +16,6 @@ import static java.lang.String.format;
 @Component
 public class JudgmentSubmittedConfText implements RespondToResponseConfirmationTextGenerator {
 
-    private static final Set<RespondentResponseTypeSpec> ADMISSION = EnumSet.of(
-        RespondentResponseTypeSpec.FULL_ADMISSION,
-        RespondentResponseTypeSpec.PART_ADMISSION
-    );
-
     private static final Set<RespondentResponsePartAdmissionPaymentTimeLRspec> PAYMENT_PLAN = EnumSet.of(
         RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN,
         RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE
@@ -28,10 +23,8 @@ public class JudgmentSubmittedConfText implements RespondToResponseConfirmationT
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (((caseData.getApplicant1ProceedsWithClaimSpec() != null)
-            || (YesOrNo.NO.equals(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec()))
-            || (YesOrNo.NO.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec())))
-            && !ADMISSION.contains(caseData.getRespondent1ClaimResponseTypeForSpec())
+        if ((YesOrNo.NO.equals(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec()))
+            || (YesOrNo.NO.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec()))
             && !PAYMENT_PLAN.contains(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
             return Optional.empty();
         }
