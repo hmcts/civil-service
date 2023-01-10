@@ -35,6 +35,7 @@ public enum DocmosisTemplates {
     DJ_SDO_TRIAL("CV-UNS-DEC-ENG-01133.docx", "Order_trial_%s.pdf"),
     DJ_SDO_HNL_TRIAL("CV-UNS-DEC-ENG-01133-HNL.docx", "Order_trial_%s.pdf"),
     CLAIMANT_RESPONSE_SPEC("CV-SPC-HRN-ENG-01062.docx", "%s_directions_questionnaire_form_%s.pdf"),
+    CLAIMANT_RESPONSE_SPEC_HNL("CV-SPC-HRN-ENG-01066.docx", "%s_directions_questionnaire_form_%s.pdf"),
     SDO_SMALL("CV-DAM-STD-ENG-00001.docx", "small_claims_sdo_%s.pdf"),
     SDO_SMALL_HNL("CV-DAM-STD-ENG-00004.docx", "small_claims_sdo_%s.pdf"),
     SDO_FAST("CV-DAM-STD-ENG-00002.docx", "fast_track_sdo_%s.pdf"),
