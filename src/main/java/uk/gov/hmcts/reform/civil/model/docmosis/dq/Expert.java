@@ -15,8 +15,4 @@ public class Expert {
     private final String fieldOfExpertise;
     private final String whyRequired;
     private final String formattedCost;
-    private final String firstName;
-    private final String lastName;
-    private final String phoneNumber;
-    private final String emailAddress;
 }
