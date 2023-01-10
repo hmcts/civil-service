@@ -27,7 +27,7 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_RESPONDENT1_FOR_CLAIMANT_AGREED_REPAYMENT);
     public static final String TASK_ID = "ClaimantAgreedRepaymentNotifyRespondent1";
-    private static final String REFERENCE_TEMPLATE = "claimant-ccj-respondent-notification-%s";
+    private static final String REFERENCE_TEMPLATE = "claimant-agree-repayment-respondent-notification-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -53,8 +53,13 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
 
     private CallbackResponse notifyRespondent1ForAgreedRepayment(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
+        if (caseData.getRespondent1().getPartyEmail() == null) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
+
         notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            addEmail(caseData),
             notificationsProperties.getRespondentCcjNotificationTemplate(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
@@ -69,5 +74,13 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
             FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
+    }
+
+    private String addEmail(CaseData caseData) {
+        if (caseData.getRespondent1().getPartyEmail() != null) {
+            return caseData.getRespondent1().getPartyEmail();
+        } else {
+            return caseData.getRespondentSolicitor1EmailAddress();
+        }
     }
 }
