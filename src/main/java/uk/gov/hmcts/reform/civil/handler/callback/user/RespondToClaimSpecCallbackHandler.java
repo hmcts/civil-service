@@ -58,6 +58,7 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -240,6 +241,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     // called on full_admit, also called after whenWillClaimBePaid
     private CallbackResponse handleAdmitPartOfClaim(CallbackParams callbackParams) {
+        System.out.println("handle Admin part of the claim ");
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = paymentDateValidator.validate(Optional.ofNullable(caseData.getRespondToAdmittedClaim())
                                                                 .orElseGet(() -> RespondToClaim.builder().build()));
@@ -262,6 +264,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (YES.equals(caseData.getIsRespondent1()) && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null) {
             updatedCaseData.defenceAdmitPartPaymentTimeRouteGeneric(
                 caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+            //if(caseData.getDefenceAdmitPartPaymentTimeRouteRequired().equals("IMMEDIATELY"))
         } else if (YES.equals(caseData.getIsRespondent2())
             && caseData.getDefenceAdmitPartPaymentTimeRouteRequired2() != null) {
             updatedCaseData.defenceAdmitPartPaymentTimeRouteGeneric(
@@ -1681,8 +1684,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
         }
 
-        CaseRole respondentTwoCaseRoleToCheck;
+        if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired().equals(IMMEDIATELY)) {
 
+            LocalDate whenBePaid = deadlinesCalculator.calculateWhenToBePaid(responseDate);
+            updatedData.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                          .whenWillThisAmountBePaid(whenBePaid).build());
+        }
+
+        CaseRole respondentTwoCaseRoleToCheck;
         if (V_1.equals(callbackParams.getVersion()) && toggleService.isAccessProfilesEnabled()) {
             respondentTwoCaseRoleToCheck = RESPONDENTSOLICITORTWO;
         } else {
@@ -1749,6 +1758,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
+        System.out.println("2nd sout");
         if (solicitorHasCaseRole(callbackParams, respondentTwoCaseRoleToCheck)
             && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
             updatedData.defenceAdmitPartPaymentTimeRouteRequired(null);
@@ -1756,12 +1766,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
-
+            System.out.println("111111");
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.build().toMap(objectMapper))
                 .build();
         } else if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && !isAwaitingAnotherDefendantResponse(caseData)) {
+            System.out.println("222");
             if (!FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                 || !FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
                 return AboutToStartOrSubmitCallbackResponse.builder()
@@ -1770,17 +1781,19 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     .build();
             }
         } else if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP && twoVsOneDivergent(caseData)) {
+            System.out.println("3333");
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.build().toMap(objectMapper))
                 .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
                 .build();
         } else if (getMultiPartyScenario(caseData) == TWO_V_ONE && twoVsOneDivergent(caseData)) {
+            System.out.println("444");
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.build().toMap(objectMapper))
                 .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
                 .build();
         }
-
+        System.out.println("55555");
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .state(CaseState.AWAITING_APPLICANT_INTENTION.name())

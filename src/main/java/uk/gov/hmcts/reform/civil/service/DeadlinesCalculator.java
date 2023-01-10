@@ -97,4 +97,16 @@ public class DeadlinesCalculator {
         }
         return currentDate;
     }
+
+    public LocalDate calculateWhenToBePaid(LocalDateTime responseDate) {
+        System.out.println("inside the calculateWhenToBePaid");
+        LocalDateTime dateTime = responseDate;
+        if (is4pmOrAfter(responseDate)) {
+            dateTime = responseDate.plusDays(1);
+        }
+        int daysToAdd = 5;
+        //return calculateFirstWorkingDay(dateTime.toLocalDate()).plusDays(daysToAdd).atTime(END_OF_BUSINESS_DAY);
+        System.out.println("when this amount will be paid " + calculateFirstWorkingDay(dateTime.toLocalDate()).plusDays(daysToAdd));
+        return calculateFirstWorkingDay(dateTime.toLocalDate()).plusDays(daysToAdd);
+    }
 }

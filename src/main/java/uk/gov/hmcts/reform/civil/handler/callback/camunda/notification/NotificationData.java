@@ -20,6 +20,7 @@ public interface NotificationData {
     String ALLOCATED_TRACK = "allocatedTrack";
 
     String CLAIM_LEGAL_ORG_NAME_SPEC = "legalOrgName";
+    String WHEN_WILL_BE_PAID_IMMEDIATELY = "payImmediately";
     String CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC = "defendantLegalRep";
     String DEFENDANT_NAME_SPEC = "defendantLR";
     String CLAIM_NAME_SPEC = "claimantLR";
