@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.civil.handler.tasks.ClaimDismissedHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -43,6 +45,8 @@ public class TestingSupportController {
     private final StateFlowEngine stateFlowEngine;
     private final EventHistoryMapper eventHistoryMapper;
     private final RoboticsDataMapper roboticsDataMapper;
+
+    private final ClaimDismissedHandler claimDismissedHandler;
 
     @GetMapping("/testing-support/case/{caseId}/business-process")
     public ResponseEntity<BusinessProcessInfo> getBusinessProcess(@PathVariable("caseId") Long caseId) {
@@ -150,5 +154,18 @@ public class TestingSupportController {
     public String getRPAJsonInformationForCaseData(
         @RequestBody CaseData caseData) throws JsonProcessingException {
         return roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+    }
+
+    @GetMapping("/testing-support/trigger-case-dismissal-scheduler")
+    public ResponseEntity<String> getCaseDismissalScheduler() {
+
+        String responseMsg = "success";
+        ExternalTaskImpl externalTask = new ExternalTaskImpl();
+        try {
+            claimDismissedHandler.handleTask(externalTask);
+        } catch (Exception e) {
+            responseMsg = "failed";
+        }
+        return new ResponseEntity<>(responseMsg, HttpStatus.OK);
     }
 }
