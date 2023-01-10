@@ -131,6 +131,7 @@ public class RoboticsDataMapper {
             .id(id)
             .isPayee(false)
             .organisationId(organisationId)
+            .contactEmailAddress(caseData.getRespondentSolicitor1EmailAddress())
             .reference(ofNullable(caseData.getSolicitorReferences())
                            .map(SolicitorReferences::getRespondentSolicitor1Reference)
                            .orElse(null)
