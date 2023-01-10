@@ -84,7 +84,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .disposalHearingBundleDJ(caseData.getDisposalHearingBundleDJ())
             .disposalHearingBundleDJAddSection(nonNull(caseData.getDisposalHearingBundleDJ()))
             .typeBundleInfo(nonNull(caseData.getDisposalHearingBundleDJ())
-                                ? fillTypeBundleInfo(caseData.getDisposalHearingBundleDJ().getType()) : null)
+                                ? fillTypeBundleInfoTrial() : null)
             .disposalHearingDisclosureOfDocumentsDJ(caseData.getDisposalHearingDisclosureOfDocumentsDJ())
             .disposalHearingDisclosureOfDocumentsDJAddSection(nonNull(
                 caseData.getDisposalHearingDisclosureOfDocumentsDJ()))
@@ -224,6 +224,11 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             default:
                 return null;
         }
+    }
+
+    private String fillTypeBundleInfoTrial() {
+        return "An indexed electronic bundle of documents for trial, with each page "
+            + "clearly numbered including a case summary limited to 500 words";
     }
 
     private String fillDisposalHearingTime(DisposalHearingFinalDisposalHearingTimeEstimate type) {
