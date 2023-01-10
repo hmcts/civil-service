@@ -678,7 +678,7 @@ public class CaseDataBuilder {
             .respondent2DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
                                                      .vulnerabilityAdjustmentsRequired(NO).build())
             .respondent2DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
-            .respondent2DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build())
+            .respondent2DQDraftDirections(DocumentBuilder.builder().documentName("defendant2-directions.pdf").build())
             .build();
         return this;
     }
@@ -2673,7 +2673,7 @@ public class CaseDataBuilder {
         respondent2ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant2-defence.pdf").build())
             .build();
-        respondent2DQ();
+        respondent2DQWithLocation();
         return this;
     }
 
@@ -3325,7 +3325,7 @@ public class CaseDataBuilder {
         applicant1DefenceResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
             .build();
-        applicant1DQ();
+        applicant1DQWithLocation();
         applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
         respondent2ClaimResponseIntentionType = FULL_DEFENCE;
         uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
@@ -3351,7 +3351,7 @@ public class CaseDataBuilder {
         applicant1DefenceResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("claimant-response-1.pdf").build())
             .build();
-        applicant1DQ();
+        applicant1DQWithLocation();
         applicant1ResponseDate = respondent1ResponseDate.plusDays(1);
         applicant2DefenceResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("claimant-response-1.pdf").build())

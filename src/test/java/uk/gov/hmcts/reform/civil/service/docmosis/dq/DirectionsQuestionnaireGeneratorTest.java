@@ -48,6 +48,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -128,6 +129,9 @@ class DirectionsQuestionnaireGeneratorTest {
 
     @Autowired
     private DirectionsQuestionnaireGenerator generator;
+
+    @MockBean
+    private LocationRefDataService locationRefDataService;
 
     @Nested
     class RespondentOne {
@@ -357,7 +361,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimOneDefendantSolicitor()
                     .atStateApplicantRespondToDefenceAndNotProceed_1v2()
-                    .applicant1DQ()
+                    .applicant1DQWithLocation()
                     .build()
                     .toBuilder()
                     .businessProcess(BusinessProcess.builder()
@@ -383,7 +387,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimOneDefendantSolicitor()
                     .atStateApplicantRespondToDefenceAndNotProceed_1v2_DiffSol()
-                    .applicant1DQ()
+                    .applicant1DQWithLocation()
                     .build()
                     .toBuilder()
                     .businessProcess(BusinessProcess.builder()
@@ -918,6 +922,8 @@ class DirectionsQuestionnaireGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
                 .multiPartyClaimTwoDefendantSolicitors()
+                .respondent1DQWithLocation()
+                .respondent2DQWithLocation()
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
@@ -948,6 +954,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 .atStateApplicantRespondToDefenceAndProceed()
                 .businessProcess(BusinessProcess.builder()
                                      .camundaEvent("CLAIMANT_RESPONSE").build())
+                .applicant1DQWithLocation()
                 .build();
 
             CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);

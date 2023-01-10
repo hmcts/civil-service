@@ -441,11 +441,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     private RequestedCourt getRequestedCourt(DQ dq) {
         RequestedCourt rc = dq.getRequestedCourt();
-        if (rc == null) {
-            return RequestedCourt.builder()
-                .requestHearingAtSpecificCourt(NO)
-                .build();
-        } else {
+        if (rc != null && null !=  rc.getCaseLocation()) {
             List<LocationRefData> courtLocations = (locationRefDataService
                 .getCourtLocationsByEpimmsId(
                     CallbackParams.Params.BEARER_TOKEN.toString(),
@@ -457,6 +453,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                     .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
                     .collect(Collectors.toList()).get(0).getCourtName())
                 .reasonForHearingAtSpecificCourt(rc.getReasonForHearingAtSpecificCourt())
+                .build();
+        } else {
+            return RequestedCourt.builder()
+                .requestHearingAtSpecificCourt(NO)
                 .build();
         }
     }
