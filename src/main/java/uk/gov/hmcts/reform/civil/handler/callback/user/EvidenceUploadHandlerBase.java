@@ -89,6 +89,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         //For case which are 1v1, 2v1 and 1v2 (same solicitor) we show respondent fields for documents to be uploaded,
         //if a case is 1v2 and different solicitors we want to sure separate fields for each respondent solicitor,
         // below creates a show condition for these fields if user is respondent 2 solicitor
+
+        System.out.println("logged user has roles of   " + coreCaseUserService.getUserCaseRoles(caseData.getCcdCaseReference().toString(),userInfo.getUid()));
         if (coreCaseUserService.userHasCaseRole(caseData
                                                    .getCcdCaseReference()
                                                    .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)
