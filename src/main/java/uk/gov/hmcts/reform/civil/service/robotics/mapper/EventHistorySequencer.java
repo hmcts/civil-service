@@ -88,11 +88,11 @@ public class EventHistorySequencer {
                 case MENTAL_HEALTH_BREATHING_SPACE_LIFTED:
                     builder.breathingSpaceMentalHealthLifted(event);
                     break;
-                case  INTERLOCUTORY_JUDGMENT_GRANTED:
-                        builder.interlocutoryJudgment(event);
+                case INTERLOCUTORY_JUDGMENT_GRANTED:
+                    builder.interlocutoryJudgment(event);
                     break;
-                case  DEFAULT_JUDGMENT_GRANTED:
-                        builder.defaultJudgment(event);
+                case DEFAULT_JUDGMENT_GRANTED:
+                    builder.defaultJudgment(event);
                     break;
                 default:
                     throw new IllegalStateException("Unexpected event type: " + eventType);

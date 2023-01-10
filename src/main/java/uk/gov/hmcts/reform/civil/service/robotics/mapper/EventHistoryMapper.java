@@ -94,13 +94,13 @@ import static uk.gov.hmcts.reform.civil.utils.PredicateUtils.defendant2ResponseE
 @Slf4j
 public class EventHistoryMapper {
 
+    public static final String BS_REF = "Breathing space reference";
+    public static final String BS_START_DT = "actual start date";
+    public static final String BS_END_DATE = "actual end date";
     private final StateFlowEngine stateFlowEngine;
     private final FeatureToggleService featureToggleService;
     private final EventHistorySequencer eventHistorySequencer;
     private final Time time;
-    public static final String BS_REF = "Breathing space reference";
-    public static final String BS_START_DT = "actual start date";
-    public static final String BS_END_DATE = "actual end date";
 
     public EventHistory buildEvents(CaseData caseData) {
         EventHistory.EventHistoryBuilder builder = EventHistory.builder()
@@ -246,10 +246,10 @@ public class EventHistoryMapper {
             }
         }
 
-            buildInterlocutoryJudgment(builder, caseData);
-            buildMiscellaneousIJEvent(builder, caseData);
-            buildDefaultJudgment(builder, caseData);
-            buildMiscellaneousDJEvent(builder, caseData);
+        buildInterlocutoryJudgment(builder, caseData);
+        buildMiscellaneousIJEvent(builder, caseData);
+        buildDefaultJudgment(builder, caseData);
+        buildMiscellaneousDJEvent(builder, caseData);
         buildInformAgreedExtensionDateForSpec(builder, caseData);
 
         return eventHistorySequencer.sortEvents(builder.build());
@@ -329,7 +329,7 @@ public class EventHistoryMapper {
                                   .equals(DJPaymentTypeSelection.IMMEDIATELY)) ? true : false)
                               .paymentInFullDate((caseData.getPaymentTypeSelection()
                                   .equals(DJPaymentTypeSelection.IMMEDIATELY))
-                                                     ?  LocalDateTime.now()
+                                                     ? LocalDateTime.now()
                                                      : (caseData.getPaymentTypeSelection()
                                   .equals(DJPaymentTypeSelection.SET_DATE))
                                   ? caseData.getPaymentSetDate().atStartOfDay() : null)
@@ -1205,10 +1205,10 @@ public class EventHistoryMapper {
 
                     if (NO.equals(proceedRespondent1) || NO.equals(proceedRespondent2)
                         || (claimType == SuperClaimType.SPEC_CLAIM
-                            && AllocatedTrack.SMALL_CLAIM.name().equals(track)
-                            && respondent1MediationRequired == YesOrNo.YES
-                            && applicant1MediationRequired == YesOrNo.YES
-                        )
+                        && AllocatedTrack.SMALL_CLAIM.name().equals(track)
+                        && respondent1MediationRequired == YesOrNo.YES
+                        && applicant1MediationRequired == YesOrNo.YES
+                    )
                     ) {
                         List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                         builder.miscellaneous(miscText);
@@ -1230,11 +1230,11 @@ public class EventHistoryMapper {
 
                     if (NO.equals(proceedRespondent1) || NO.equals(proceedRespondent2)
                         || (claimType == SuperClaimType.SPEC_CLAIM
-                            && AllocatedTrack.SMALL_CLAIM.name().equals(track)
-                            && respondent1MediationRequired == YesOrNo.YES
-                            && respondent2MediationRequired == YesOrNo.YES
-                            && applicant1MediationRequired == YesOrNo.YES
-                        )
+                        && AllocatedTrack.SMALL_CLAIM.name().equals(track)
+                        && respondent1MediationRequired == YesOrNo.YES
+                        && respondent2MediationRequired == YesOrNo.YES
+                        && applicant1MediationRequired == YesOrNo.YES
+                    )
                     ) {
                         List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                         builder.miscellaneous(miscText);
@@ -1253,11 +1253,11 @@ public class EventHistoryMapper {
 
                     if (NO.equals(applicant1Proceeds) || NO.equals(applicant2Proceeds)
                         || (claimType == SuperClaimType.SPEC_CLAIM
-                            && AllocatedTrack.SMALL_CLAIM.name().equals(track)
-                            && respondent1MediationRequired == YesOrNo.YES
-                            && applicant1MediationRequired == YesOrNo.YES
-                            && applicant2MediationRequired == YesOrNo.YES
-                        )
+                        && AllocatedTrack.SMALL_CLAIM.name().equals(track)
+                        && respondent1MediationRequired == YesOrNo.YES
+                        && applicant1MediationRequired == YesOrNo.YES
+                        && applicant2MediationRequired == YesOrNo.YES
+                    )
                     ) {
                         List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                         builder.miscellaneous(miscText);
@@ -1291,8 +1291,10 @@ public class EventHistoryMapper {
                                           .dq(caseData.getApplicant2DQ())
                                           .litigiousPartyID(APPLICANT2_ID)
                                           .responseDate(
-                                              isSpecCaseCategory(caseData,
-                                                                 featureToggleService.isAccessProfilesEnabled())
+                                              isSpecCaseCategory(
+                                                  caseData,
+                                                  featureToggleService.isAccessProfilesEnabled()
+                                              )
                                                   ? caseData.getApplicant1ResponseDate()
                                                   : caseData.getApplicant2ResponseDate())
                                           .build());
@@ -2111,7 +2113,7 @@ public class EventHistoryMapper {
     }
 
     private void buildClaimTakenOfflineAfterSDO(EventHistory.EventHistoryBuilder builder,
-                                                             CaseData caseData) {
+                                                CaseData caseData) {
         String detailsText = "RPA Reason: Case Proceeds in Caseman.";
         builder.miscellaneous(
             Event.builder()
@@ -2124,6 +2126,7 @@ public class EventHistoryMapper {
                                   .build())
                 .build());
     }
+
     private void buildMiscellaneousIJEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         Boolean grantedFlag = caseData.getRespondent2() != null
             && caseData.getDefendantDetails() != null
@@ -2203,7 +2206,7 @@ public class EventHistoryMapper {
         }
 
         return fixedCost != null && claimCost != null ? fixedCost.add(claimCost).setScale(2)
-            : claimCost != null  ? claimCost.setScale(2) : BigDecimal.ZERO;
+            : claimCost != null ? claimCost.setScale(2) : BigDecimal.ZERO;
 
     }
 
