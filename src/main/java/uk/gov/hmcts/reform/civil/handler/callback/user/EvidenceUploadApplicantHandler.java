@@ -28,7 +28,7 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
 
     @Override
     CallbackResponse validateValues(CaseData caseData) {
-        return super.validateValuesParty(caseData.getDocumentWitnessStatement(),
+        return validateValuesParty(caseData.getDocumentWitnessStatement(),
                                    caseData.getDocumentHearsayNotice(),
                                    caseData.getDocumentExpertReport(),
                                    caseData.getDocumentJointStatement(),
@@ -39,7 +39,13 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
                                    caseData.getDocumentExpertReportRes2(),
                                    caseData.getDocumentJointStatementRes2(),
                                    caseData.getDocumentQuestionsRes2(),
-                                   caseData.getDocumentAnswersRes2());
+                                   caseData.getDocumentAnswersRes2(),
+                                   caseData.getDocumentForDisclosure(),
+                                   caseData.getDocumentForDisclosureRes2(),
+                                   caseData.getDocumentReferredInStatement(),
+                                   caseData.getDocumentReferredInStatementRes2(),
+                                   caseData.getDocumentEvidenceForTrial(),
+                                   caseData.getDocumentEvidenceForTrialRes2());
     }
 
     void applyDocumentUploadDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, LocalDateTime now) {

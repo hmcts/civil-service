@@ -34,7 +34,13 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
                                    caseData.getDocumentExpertReportRes2(),
                                    caseData.getDocumentJointStatementRes2(),
                                    caseData.getDocumentQuestionsRes2(),
-                                   caseData.getDocumentAnswersRes2());
+                                   caseData.getDocumentAnswersRes2(),
+                                   caseData.getDocumentForDisclosureRes(),
+                                   caseData.getDocumentForDisclosureRes2(),
+                                   caseData.getDocumentReferredInStatementRes(),
+                                   caseData.getDocumentReferredInStatementRes2(),
+                                   caseData.getDocumentEvidenceForTrialRes(),
+                                   caseData.getDocumentEvidenceForTrialRes2());
 
     }
 
