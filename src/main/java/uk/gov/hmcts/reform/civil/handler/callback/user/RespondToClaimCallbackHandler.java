@@ -351,21 +351,22 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-        if (ofNullable(caseData.getRespondent1()).isPresent()
-            && ofNullable(caseData.getRespondent1Copy()).isPresent()) {
+        if (ofNullable(caseData.getRespondent1Copy()).isPresent()) {
+            if (caseData.getRespondent1Copy().getPrimaryAddress() == null) {
+                throw new IllegalArgumentException("Primary Address cannot be empty");
+            }
+        }
 
-            // persist respondent address (ccd issue)
-            var updatedRespondent1 = caseData.getRespondent1().toBuilder()
-                .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-                .build();
+        // persist respondent address (ccd issue)
+        var updatedRespondent1 = caseData.getRespondent1().toBuilder()
+            .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
+            .build();
 
-            updatedData = caseData.toBuilder()
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
 
-            updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
-        }
+        updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
 
         // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
         if (ofNullable(caseData.getRespondent2()).isPresent()
