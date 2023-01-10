@@ -13,10 +13,13 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 public class PartyUtils {
@@ -262,6 +265,17 @@ public class PartyUtils {
                 break;
         }
         return defendantNames.toString();
+    }
+
+    public static String getAllPartyNames(CaseData caseData) {
+        return format("%s%s V %s%s",
+                      caseData.getApplicant1().getPartyName(),
+                      YES.equals(caseData.getAddApplicant2())
+                          ? ", " + caseData.getApplicant2().getPartyName() : "",
+                      caseData.getRespondent1().getPartyName(),
+                      YES.equals(caseData.getAddRespondent2())
+                          && NO.equals(caseData.getRespondent2SameLegalRepresentative())
+                          ? ", " + caseData.getRespondent2().getPartyName() : "");
     }
 
 }

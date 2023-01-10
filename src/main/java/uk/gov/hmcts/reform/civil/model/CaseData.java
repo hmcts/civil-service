@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.DocumentUploadTrial;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDisclosure;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
@@ -610,6 +611,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<DocumentUploadTrial>> documentUploadTrial3;
     private final List<Element<DocumentUploadTrial>> documentUploadTrial4;
     private final LocalDateTime caseDocumentUploadDate;
+
+    private final Flags caseFlags;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending

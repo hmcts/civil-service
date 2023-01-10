@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
@@ -137,6 +138,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final FeatureToggleService toggleService;
     private final StateFlowEngine stateFlowEngine;
     private final FeatureToggleService featureToggleService;
+    private final CaseFlagsInitialiser caseFlagInitialiser;
 
     @Value("${court-location.specified-claim.region-id}")
     private String regionId;
