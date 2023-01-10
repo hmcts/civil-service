@@ -150,7 +150,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         if (!dateValidErrorMessage.isEmpty()) {
             errors.add(dateValidErrorMessage);
         }
-        List<String> cosUISenderStatementOfTruthLabel = certificateOfService.getCosUISenderStatementOfTruthLabel();
+
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         caseDataBuilder.cosNotifyClaimDefendant1(certificateOfService.toBuilder()
@@ -172,7 +172,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             errors.add(dateValidationErrorMessage);
         }
 
-        List<String> cosUISenderStatementOfTruthLabel = certificateOfServiceDef2.getCosUISenderStatementOfTruthLabel();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         caseDataBuilder.cosNotifyClaimDefendant2(certificateOfServiceDef2.toBuilder()

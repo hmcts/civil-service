@@ -311,7 +311,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).contains(DOC_SERVED_DATE_OLDER_THAN_14DAYS);
         }
 
-
         @Test
         void shouldNot_ThrowError_whenNotifyingDate_isCurrentDate() {
             ArrayList<String> cosUIStatement = new ArrayList<>();
