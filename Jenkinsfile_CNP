@@ -7,7 +7,7 @@ import uk.gov.hmcts.contino.AppPipelineDsl
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdDefBranch = "CIV-6014-apiTest"
+def ccdDefBranch = "6515tempapittest"
 AppPipelineConfig pipelineConf
 
 static Map<String, Object> secret(String secretName, String envVariable) {
