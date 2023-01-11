@@ -62,6 +62,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
     private static final String RESPONDENT_TWO_ORG_POLICY  = "respondent2OrganisationPolicy";
     private static final String APPLICANT_ONE_ORG_POLICY  = "applicant1OrganisationPolicy";
     private static final String NEW_ORG_ID = "new org id";
+    private static final String REQUESTER_EMAIL = "requester.email@example.com";
 
     @BeforeEach
     public void setup() {
@@ -80,7 +81,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
             @Test
             void shouldApplyNoticeOfChange_whenInvokedByRespondent1For1v1Represented() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-                    .changeOrganisationRequestField(false, false, "1234", "QWERTY R")
+                    .changeOrganisationRequestField(false, false, "1234", "QWERTY R", REQUESTER_EMAIL)
                     .build();
                 CallbackParams params = callbackParamsOf(caseData,
                                                          CaseDetails.builder().data(caseData.toMap(mapper)).build(),
@@ -109,7 +110,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
             @Test
             void shouldApplyNoticeOfChange_whenInvokedByRespondent1For1v1RepresentedOldOrgNullCopyExists() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-                    .changeOrganisationRequestField(false, false, "1234", null)
+                    .changeOrganisationRequestField(false, false, "1234", null, REQUESTER_EMAIL)
                     .build();
                 CallbackParams params = callbackParamsOf(caseData,
                                                          CaseDetails.builder().data(caseData.toMap(mapper)).build(),
@@ -138,7 +139,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
             @Test
             void shouldApplyNoticeOfChange_whenInvokedByRespondent1For1v1LiP() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
-                    .changeOrganisationRequestField(false, false, "1234", null)
+                    .changeOrganisationRequestField(false, false, "1234", null, REQUESTER_EMAIL)
                     .build();
                 caseData = caseData.toBuilder().respondent1OrganisationIDCopy(null).build();
                 CallbackParams params = callbackParamsOf(caseData,
@@ -168,7 +169,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
             @Test
             void shouldApplyNoticeOfChange_whenInvokedByApplicant1() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-                    .changeOrganisationRequestField(true, false, "1234", "QWERTY A")
+                    .changeOrganisationRequestField(true, false, "1234", "QWERTY A", REQUESTER_EMAIL)
                     .build();
                 CallbackParams params = callbackParamsOf(caseData,
                                                          CaseDetails.builder().data(caseData.toMap(mapper)).build(),
@@ -202,7 +203,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
             void shouldApplyNoticeOfChange_whenInvokedByApplicant1For1v2() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                     .multiPartyClaimTwoDefendantSolicitors()
-                    .changeOrganisationRequestField(true, false, "1234", "QWERTY A")
+                    .changeOrganisationRequestField(true, false, "1234", "QWERTY A", REQUESTER_EMAIL)
                     .build();
                 CallbackParams params = callbackParamsOf(caseData,
                                                          CaseDetails.builder().data(caseData.toMap(mapper)).build(),
@@ -232,7 +233,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
             void shouldApplyNoticeOfChange_whenInvokedByRespondent1For1v2DSRepresented() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                     .multiPartyClaimTwoDefendantSolicitors()
-                    .changeOrganisationRequestField(false, false, "1234", "QWERTY R")
+                    .changeOrganisationRequestField(false, false, "1234", "QWERTY R", REQUESTER_EMAIL)
                     .build();
                 CallbackParams params = callbackParamsOf(caseData,
                                                          CaseDetails.builder().data(caseData.toMap(mapper)).build(),
@@ -262,7 +263,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
             void shouldApplyNoticeOfChange_whenInvokedByRespondent2For1v2DSRepresented() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                     .multiPartyClaimTwoDefendantSolicitors()
-                    .changeOrganisationRequestField(false, true, "1234", "QWERTY R2")
+                    .changeOrganisationRequestField(false, true, "1234", "QWERTY R2", REQUESTER_EMAIL)
                     .build();
                 CallbackParams params = callbackParamsOf(caseData,
                                                          CaseDetails.builder().data(caseData.toMap(mapper)).build(),
@@ -293,7 +294,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                     .multiPartyClaimOneDefendantSolicitor()
                     .changeOrganisationRequestField(false, false,
-                                                    "1234", "QWERTY R")
+                                                    "1234", "QWERTY R", REQUESTER_EMAIL)
                     .build();
                 CallbackParams params = callbackParamsOf(caseData,
                                                          CaseDetails.builder().data(caseData.toMap(mapper)).build(),
@@ -324,7 +325,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
             void shouldApplyNoticeOfChange_whenInvokedByRespondent2For1v2SSRepresented() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                     .multiPartyClaimOneDefendantSolicitor()
-                    .changeOrganisationRequestField(false, true, "1234", "QWERTY R2")
+                    .changeOrganisationRequestField(false, true, "1234", "QWERTY R2", REQUESTER_EMAIL)
                     .build();
                 CallbackParams params = callbackParamsOf(caseData,
                                                          CaseDetails.builder().data(caseData.toMap(mapper)).build(),
@@ -354,7 +355,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
             void shouldApplyNoticeOfChange_whenInvokedByRespondent2For1v2DSOldOrgNullCopyExists() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                     .multiPartyClaimTwoDefendantSolicitors()
-                    .changeOrganisationRequestField(false, true, "1234", null)
+                    .changeOrganisationRequestField(false, true, "1234", null, REQUESTER_EMAIL)
                     .build();
                 CallbackParams params = callbackParamsOf(caseData,
                                                          CaseDetails.builder().data(caseData.toMap(mapper)).build(),
@@ -383,7 +384,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
             @Test
             void shouldApplyNoticeOfChange_whenInvokedByRespondent2For1v2DSLiP() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v2Respondent2LiP()
-                    .changeOrganisationRequestField(false, true, "1234", null)
+                    .changeOrganisationRequestField(false, true, "1234", null, REQUESTER_EMAIL)
                     .build();
                 caseData = caseData.toBuilder().respondent2OrganisationIDCopy(null).build();
                 CallbackParams params = callbackParamsOf(caseData,
@@ -413,7 +414,8 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
 
         @NotNull
         private CaseDetails caseDetailsAfterNoCApplied(CaseDetails caseDetails, String applicantOrRespondentOrgPolicy) {
-            caseDetails.getData().put(CHANGE_ORGANISATION_REQUEST_FIELD, null);
+            caseDetails.getData().put(CHANGE_ORGANISATION_REQUEST_FIELD,
+                                      ChangeOrganisationRequest.builder().createdBy(REQUESTER_EMAIL).build());
             caseDetails.getData().put(applicantOrRespondentOrgPolicy, OrganisationPolicy.builder()
                 .organisation(Organisation.builder()
                                   .organisationID(NEW_ORG_ID)
@@ -425,6 +427,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
             ChangeOrganisationRequest updatedCoR = mapper.convertValue(response.getData().get(
                 CHANGE_ORGANISATION_REQUEST_FIELD), ChangeOrganisationRequest.class);
 
+            assertThat(updatedCoR.getCreatedBy()).isEqualTo(REQUESTER_EMAIL);
             assertThat(updatedCoR.getApprovalStatus()).isNull();
             assertThat(updatedCoR.getRequestTimestamp()).isNull();
             assertThat(updatedCoR.getCaseRoleId()).isNull();
