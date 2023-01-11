@@ -125,8 +125,6 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 case FULL_DEFENCE_PROCEED:
                 case FULL_ADMIT_PROCEED:
                 case PART_ADMIT_PROCEED:
-                case FULL_ADMIT_AGREE_REPAYMENT:
-                case PART_ADMIT_AGREE_REPAYMENT:
                     return "RPA Reason: Claimant(s) proceeds.";
                 case FULL_DEFENCE_NOT_PROCEED:
                 case FULL_ADMIT_NOT_PROCEED:

@@ -202,4 +202,7 @@ public class NotificationsProperties {
     @NotEmpty
     private String respondentCcjNotificationTemplate;
 
+    @NotEmpty
+    private String respondentSolicitorCcjNotificationTemplate;
+
 }

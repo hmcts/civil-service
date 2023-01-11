@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
 
@@ -60,7 +61,7 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
 
         notificationService.sendMail(
             addEmail(caseData),
-            notificationsProperties.getRespondentCcjNotificationTemplate(),
+            addTemplate(caseData),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -77,10 +78,18 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
     }
 
     private String addEmail(CaseData caseData) {
-        if (caseData.getRespondent1().getPartyEmail() != null) {
-            return caseData.getRespondent1().getPartyEmail();
-        } else {
+        if (caseData.getRespondent1OrgRegistered().equals(YesOrNo.YES)) {
             return caseData.getRespondentSolicitor1EmailAddress();
+        } else {
+            return caseData.getRespondent1().getPartyEmail();
+        }
+    }
+
+    private String addTemplate(CaseData caseData) {
+        if (caseData.getRespondent1OrgRegistered().equals(YesOrNo.YES)) {
+            return notificationsProperties.getRespondentSolicitorCcjNotificationTemplate();
+        } else {
+            return notificationsProperties.getRespondentCcjNotificationTemplate();
         }
     }
 }
