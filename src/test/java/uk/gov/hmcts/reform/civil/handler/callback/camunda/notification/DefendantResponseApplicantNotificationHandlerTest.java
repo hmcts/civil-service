@@ -9,14 +9,12 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
-import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -29,7 +27,6 @@ import uk.gov.hmcts.reform.civil.service.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Optional;
@@ -39,7 +36,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.toStringValueForEmail;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -54,7 +50,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
-import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -85,6 +80,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             .thenReturn("spec-respondent-template-id");
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+        when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
+
     }
 
     @Nested
@@ -167,11 +164,44 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
                 LocalDate whenWillPay = LocalDate.now().plusMonths(1);
                 CaseData caseData = CaseDataBuilder.builder()
-                  //  .atStateApplicantRespondToDefenceAndProceed()
+                     .atStateNotificationAcknowledged()
+                     .build().toBuilder()
+                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                     .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                     .respondToClaimAdmitPartLRspec(
+                        RespondToClaimAdmitPartLRspec.builder()
+                            .whenWillThisAmountBePaid(whenWillPay)
+                            .build()
+                     )
+                     .build();
+                caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM).build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                        CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE").build())
+                    .build();
+
+                handler.handle(params);
+                final CaseData finalCaseData = caseData;
+                verify(notificationService).sendMail(
+                    ArgumentMatchers.eq("applicantsolicitor@example.com"),
+                    ArgumentMatchers.eq("templateImm-id"),
+                    ArgumentMatchers.argThat(map -> {
+                        Map<String, String> expected = getNotificationDataMapSpec(finalCaseData);
+                        return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
+                            && map.get(CLAIM_LEGAL_ORG_NAME_SPEC).equals(expected.get(CLAIM_LEGAL_ORG_NAME_SPEC));
+                    }),
+                    ArgumentMatchers.eq("defendant-response-applicant-notification-000DC001")
+                );
+            }
+
+            @Test
+            void shouldNotifyApplicantSolicitorSpecImmediately_whenInvoked() {
+
+                LocalDate whenWillPay = LocalDate.now().plusMonths(1);
+                CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged()
                     .build().toBuilder()
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
                     .respondToClaimAdmitPartLRspec(
                         RespondToClaimAdmitPartLRspec.builder()
                             .whenWillThisAmountBePaid(whenWillPay)
@@ -187,7 +217,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 final CaseData finalCaseData = caseData;
                 verify(notificationService).sendMail(
                     ArgumentMatchers.eq("applicantsolicitor@example.com"),
-                    ArgumentMatchers.eq("spec-claimant-template-id"),
+                    ArgumentMatchers.eq("templateImm-id"),
                     ArgumentMatchers.argThat(map -> {
                         Map<String, String> expected = getNotificationDataMapSpec(finalCaseData);
                         return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
