@@ -241,7 +241,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     // called on full_admit, also called after whenWillClaimBePaid
     private CallbackResponse handleAdmitPartOfClaim(CallbackParams callbackParams) {
-        System.out.println("handle Admin part of the claim ");
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = paymentDateValidator.validate(Optional.ofNullable(caseData.getRespondToAdmittedClaim())
                                                                 .orElseGet(() -> RespondToClaim.builder().build()));
@@ -264,7 +263,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (YES.equals(caseData.getIsRespondent1()) && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null) {
             updatedCaseData.defenceAdmitPartPaymentTimeRouteGeneric(
                 caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
-            //if(caseData.getDefenceAdmitPartPaymentTimeRouteRequired().equals("IMMEDIATELY"))
         } else if (YES.equals(caseData.getIsRespondent2())
             && caseData.getDefenceAdmitPartPaymentTimeRouteRequired2() != null) {
             updatedCaseData.defenceAdmitPartPaymentTimeRouteGeneric(
@@ -1789,7 +1787,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name())
                 .build();
         }
-        System.out.println("55555");
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .state(CaseState.AWAITING_APPLICANT_INTENTION.name())
