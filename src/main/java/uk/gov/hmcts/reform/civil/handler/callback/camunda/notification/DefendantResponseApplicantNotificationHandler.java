@@ -31,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -137,7 +138,12 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
         String emailTemplate;
         if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE)) {
 
-            emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
+            if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired().equals(IMMEDIATELY)) {
+                emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
+            } else {
+                emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
+            }
+
             notificationService.sendMail(
                 recipient,
                 emailTemplate,
@@ -192,11 +198,24 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
     public Map<String, String> addPropertiesSpec(CaseData caseData, CaseEvent caseEvent) {
         if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE)) {
-            return Map.of(
+            if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired().equals(IMMEDIATELY)) {
+                String shouldBePaidBy = caseData.getRespondToClaimAdmitPartLRspec()
+                    .getWhenWillThisAmountBePaid().getDayOfMonth()
+                    + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getMonth()
+                    + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getYear();
+                return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
-            );
+                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                WHEN_WILL_BE_PAID_IMMEDIATELY, shouldBePaidBy
+                );
+            } else {
+                return Map.of(
+                    CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
+                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                    RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+                );
+            }
         } else if (caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC)) {
             return Map.of(
                 CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),

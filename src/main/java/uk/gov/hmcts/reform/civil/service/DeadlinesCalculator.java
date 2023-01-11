@@ -97,4 +97,13 @@ public class DeadlinesCalculator {
         }
         return currentDate;
     }
+
+    public LocalDate calculateWhenToBePaid(LocalDateTime responseDate) {
+        LocalDateTime dateTime = responseDate;
+        if (is4pmOrAfter(responseDate)) {
+            dateTime = responseDate.plusDays(1);
+        }
+        int daysToAdd = 5;
+        return calculateFirstWorkingDay(dateTime.toLocalDate()).plusDays(daysToAdd);
+    }
 }

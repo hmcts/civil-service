@@ -58,6 +58,7 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -1679,6 +1680,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .build();
             updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
             updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
+        }
+
+        if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
+            &&  caseData.getDefenceAdmitPartPaymentTimeRouteRequired().equals(IMMEDIATELY)) {
+
+            LocalDate whenBePaid = deadlinesCalculator.calculateWhenToBePaid(responseDate);
+            updatedData.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                          .whenWillThisAmountBePaid(whenBePaid).build());
         }
 
         CaseRole respondentTwoCaseRoleToCheck;
