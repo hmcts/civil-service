@@ -80,6 +80,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
+import static uk.gov.hmcts.reform.civil.utils.FlagsUtils.addRespondentDQPartiesFlagStructure;
 
 @Service
 @RequiredArgsConstructor
@@ -528,6 +529,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .data(updatedData.build().toMap(objectMapper))
                 .build();
         }
+
+        addRespondentDQPartiesFlagStructure(updatedData, updatedData.build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))

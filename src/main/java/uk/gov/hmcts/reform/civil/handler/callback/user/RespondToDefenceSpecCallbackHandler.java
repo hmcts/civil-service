@@ -58,6 +58,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.FlagsUtils.addApplicantExpertAndWitnessFlagsStructure;
 
 @Service
 @RequiredArgsConstructor
@@ -206,6 +207,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 .data(builder.build().toMap(objectMapper));
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+
+        addApplicantExpertAndWitnessFlagsStructure(builder, builder.build());
 
         if (v1 && featureToggleService.isSdoEnabled()) {
             if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
