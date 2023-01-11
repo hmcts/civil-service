@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
@@ -236,9 +237,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.disposalHearingQuestionsToExperts(tempDisposalHearingQuestionsToExperts).build();
 
         DisposalHearingSchedulesOfLoss tempDisposalHearingSchedulesOfLoss = DisposalHearingSchedulesOfLoss.builder()
-            .input1("If there is a claim for ongoing/future loss in the original schedule of losses then the claimant"
-                        + " must send an up to date schedule of loss to the defendant by 4pm on")
-            .date1(LocalDate.now().plusWeeks(10))
             .input2("If there is a claim for ongoing or future loss in the original schedule of losses, the claimant"
                         + " must upload to the Digital Portal an up-to-date schedule of loss by 4pm on")
             .date2(LocalDate.now().plusWeeks(10))
@@ -306,8 +304,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackJudgesRecital(tempFastTrackJudgesRecital).build();
 
         FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
-            .input1("Documents will be disclosed by uploading to the Digital Portal a list with a disclosure "
-                        + "statement by 4pm on")
+            .input1("Standard disclosure shall be provided by the parties by uploading to the Digital Portal their "
+                        + "list of documents by 4pm on")
             .date1(LocalDate.now().plusWeeks(4))
             .input2("Any request to inspect a document, or for a copy of a document, shall be made directly to "
                         + "the other party by 4pm on")
@@ -323,11 +321,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         FastTrackWitnessOfFact tempFastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
             .input1("Each party must upload to the Digital Portal copies of the statements of all witnesses of "
                         + "fact on whom they intend to rely.")
-            .input2("")
-            .input3("")
+            .input2("3")
+            .input3("3")
             .input4("For this limitation, a party is counted as a witness.")
             .input5("Each witness statement should be no more than")
-            .input6("")
+            .input6("10")
             .input7("A4 pages. Statements should be double spaced using a font size of 12.")
             .input8("Witness statements shall be uploaded to the Digital Portal by 4pm on")
             .date(LocalDate.now().plusWeeks(8))
@@ -364,6 +362,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input2("If either party considers that the time estimate is insufficient, they must inform the court "
                         + "within 7 days of the date stated on this order.")
             .input3("At least 7 days before the trial, the claimant must upload to the Digital Portal")
+            .type(Collections.singletonList(FastTrackTrialBundleType.DOCUMENTS))
             .build();
 
         updatedData.fastTrackTrial(tempFastTrackTrial).build();
