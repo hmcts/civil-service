@@ -134,6 +134,7 @@ class RoboticsDataMapperTest {
         assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
         assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
         assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
+        assertThat(firstSolicitor.getContactEmailAddress()).isEqualTo("applicantsolicitor@example.com");
         CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
             .isEqualTo(firstSolicitor.getAddresses().getContactAddress());
 
@@ -141,6 +142,7 @@ class RoboticsDataMapperTest {
         assertThat(secondSolicitor.getOrganisationId()).isEqualTo("QWERTY R");
         assertThat(secondSolicitor.getName()).isEqualTo("Org Name");
         assertThat(secondSolicitor.getContactDX()).isEqualTo("DX 12345");
+        assertThat(secondSolicitor.getContactEmailAddress()).isEqualTo("respondentsolicitor@example.com");
         CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
             .isEqualTo(secondSolicitor.getAddresses().getContactAddress());
     }
@@ -158,6 +160,7 @@ class RoboticsDataMapperTest {
         assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
         assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
         assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
+        assertThat(firstSolicitor.getContactEmailAddress()).isEqualTo("applicantsolicitor@example.com");
         CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
             .isEqualTo(firstSolicitor.getAddresses().getContactAddress());
 
@@ -165,6 +168,7 @@ class RoboticsDataMapperTest {
         assertThat(secondSolicitor.getOrganisationId()).isEqualTo("QWERTY R");
         assertThat(secondSolicitor.getName()).isEqualTo("Org Name");
         assertThat(secondSolicitor.getContactDX()).isEqualTo("DX 12345");
+        assertThat(secondSolicitor.getContactEmailAddress()).isEqualTo("respondentsolicitor@example.com");
         CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
             .isEqualTo(secondSolicitor.getAddresses().getContactAddress());
     }
@@ -194,6 +198,7 @@ class RoboticsDataMapperTest {
         assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
         assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
         assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
+        assertThat(firstSolicitor.getContactEmailAddress()).isEqualTo("applicantsolicitor@example.com");
         CustomAssertions.assertThat(List.of(contactInformation))
             .isEqualTo(firstSolicitor.getAddresses().getContactAddress());
 
@@ -201,6 +206,7 @@ class RoboticsDataMapperTest {
         assertThat(secondSolicitor.getOrganisationId()).isEqualTo("QWERTY R");
         assertThat(secondSolicitor.getName()).isEqualTo("Org Name");
         assertThat(secondSolicitor.getContactDX()).isEqualTo("DX 12345");
+        assertThat(secondSolicitor.getContactEmailAddress()).isEqualTo("respondentsolicitor@example.com");
         CustomAssertions.assertThat(List.of(contactInformation))
             .isEqualTo(secondSolicitor.getAddresses().getContactAddress());
     }
@@ -220,6 +226,7 @@ class RoboticsDataMapperTest {
         assertThat(applicantSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
         assertThat(applicantSolicitor.getName()).isEqualTo("Org Name");
         assertThat(applicantSolicitor.getContactDX()).isEqualTo("DX 12345");
+        assertThat(applicantSolicitor.getContactEmailAddress()).isEqualTo("applicantsolicitor@example.com");
         CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
             .isEqualTo(applicantSolicitor.getAddresses().getContactAddress());
     }
