@@ -59,7 +59,7 @@ public class CreateReferToJudgeCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
 
-        dataBuilder.businessProcess(BusinessProcess.ready(REFER_TO_JUDGE));
+     //   dataBuilder.businessProcess(BusinessProcess.ready(REFER_TO_JUDGE));
         return dataBuilder;
     }
 
