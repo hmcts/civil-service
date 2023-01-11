@@ -38,11 +38,6 @@ class CaseFlagsInitialiserTest {
         var applicant2LitFriend = LitigationFriend.builder().firstName("Jenny").lastName("Carter").build();
 
         var expected = CaseData.builder()
-            .caseFlags(
-                Flags.builder()
-                    .partyName("Mr. John Rambo V Mr. Sole Trader")
-                    .roleOnCase("")
-                    .details(List.of()).build())
             .applicant1(
                 applicant1.toBuilder().flags(
                     Flags.builder()

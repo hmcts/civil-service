@@ -22,7 +22,6 @@ public class CaseFlagsInitialiser {
             case CREATE_CLAIM:
             case CREATE_CLAIM_SPEC: {
                 dataBuilder
-                    .caseFlags(CaseFlagUtils.createFlags(PartyUtils.getAllPartyNames(caseData), ""))
                     .applicant1(CaseFlagUtils.updateParty("Applicant 1", caseData.getApplicant1()))
                     .applicant2(CaseFlagUtils.updateParty("Applicant 2", caseData.getApplicant2()))
                     .respondent1(CaseFlagUtils.updateParty("Respondent 1", caseData.getRespondent1()))
