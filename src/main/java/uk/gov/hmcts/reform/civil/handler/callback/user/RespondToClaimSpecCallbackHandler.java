@@ -1684,7 +1684,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
         }
 
-        if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired().equals(IMMEDIATELY)) {
+        if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
+            &&  caseData.getDefenceAdmitPartPaymentTimeRouteRequired().equals(IMMEDIATELY)) {
 
             LocalDate whenBePaid = deadlinesCalculator.calculateWhenToBePaid(responseDate);
             updatedData.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
