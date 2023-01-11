@@ -13,9 +13,12 @@ import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsPro
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_CLAIMANT_AGREED_REPAYMENT;
@@ -32,6 +35,7 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final OrganisationService organisationService;
     private final PinInPostConfiguration pipInPostConfiguration;
 
     @Override
@@ -55,7 +59,11 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
     private CallbackResponse notifyRespondent1ForAgreedRepayment(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (caseData.getRespondent1().getPartyEmail() == null) {
+        if ((caseData.getRespondent1OrgRegistered().equals(YesOrNo.YES)
+            && caseData.getRespondentSolicitor1EmailAddress() == null)
+            || (!caseData.getRespondent1OrgRegistered().equals(YesOrNo.YES)
+            && caseData.getRespondent1().getPartyEmail() == null
+            )) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
@@ -70,11 +78,19 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
-        );
+        if (caseData.getRespondent1OrgRegistered().equals(YesOrNo.YES)) {
+            return Map.of(
+                CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
+                    caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            );
+        } else {
+            return Map.of(
+                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            );
+        }
     }
 
     private String addEmail(CaseData caseData) {
@@ -91,5 +107,14 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
         } else {
             return notificationsProperties.getRespondentCcjNotificationTemplate();
         }
+    }
+
+    public String getRespondentLegalOrganizationName(String id) {
+        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
+        String respondentLegalOrganizationName = null;
+        if (organisation.isPresent()) {
+            respondentLegalOrganizationName = organisation.get().getName();
+        }
+        return respondentLegalOrganizationName;
     }
 }
