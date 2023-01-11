@@ -276,6 +276,7 @@ public class StateFlowEngine {
                 if (featureToggleService.isPinInPostEnabled()) {
                     flags.put(FlowFlag.PIP_ENABLED.name(), true);
                 }
+                flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
             })
             .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
                 .onlyIf(multipartyCase.and(respondent1NotRepresented.and(respondent2NotRepresented)
@@ -286,6 +287,7 @@ public class StateFlowEngine {
                 if (featureToggleService.isPinInPostEnabled()) {
                     flags.put(FlowFlag.PIP_ENABLED.name(), true);
                 }
+                flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
             })
             // Unregistered
             // 1. Both def1 and def2 unregistered
