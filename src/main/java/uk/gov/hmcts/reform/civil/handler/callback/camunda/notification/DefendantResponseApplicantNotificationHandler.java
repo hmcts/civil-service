@@ -136,6 +136,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     private void sendNotificationToSolicitorSpec(CaseData caseData, String recipient, CaseEvent caseEvent) {
         String emailTemplate;
         if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE)) {
+
             emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
             notificationService.sendMail(
                 recipient,
