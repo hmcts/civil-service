@@ -192,5 +192,11 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String claimantSolicitorClaimContinuingOnlineCos;
+    @NotEmpty
+    private String updateCaseToPreventDefaultJudgementUntilBreathingSpaceLifted;
+    @NotEmpty
+    private String applicantSolicitor1BreathingSpaceEnter;
+    @NotEmpty
+    private String respondentSolicitor1BreathingSpaceEnter;
 
 }
