@@ -2010,7 +2010,7 @@ public class EventHistoryMapper {
                 .getGeneralApplications()
                 .stream()
                 .filter(application -> application.getValue().getGeneralAppType().getTypes().contains(STRIKE_OUT)
-                    && getGeneralApplicationDetailsJudeDecisionWithStruckOutDefence(
+                    && getGeneralApplicationDetailsJudgeDecisionWithStruckOutDefence(
                     application.getValue()
                         .getCaseLink()
                         .getCaseReference(),
@@ -2078,7 +2078,7 @@ public class EventHistoryMapper {
         builder.defenceStruckOut(generalApplicationsEvents);
     }
 
-    private Element<GeneralApplicationsDetails> getGeneralApplicationDetailsJudeDecisionWithStruckOutDefence(
+    private Element<GeneralApplicationsDetails> getGeneralApplicationDetailsJudgeDecisionWithStruckOutDefence(
         String caseLinkId, CaseData caseData) {
         return caseData.getGaDetailsMasterCollection().stream()
                 .filter(generalApplicationsDetailsElement ->

@@ -21,12 +21,11 @@
   </suppress>
   <suppress>
     <notes><![CDATA[
-   file name: tomcat-embed-websocket-10.1.1.jar
+   file name: launchdarkly-java-server-sdk-5.10.2.jar (shaded: org.yaml:snakeyaml:1.32)
    ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-websocket@.*$</packageUrl>
-    <cve>CVE-2022-45143</cve>
+    <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+    <cve>CVE-2022-3064</cve>
+    <cve>CVE-2021-4235</cve>
   </suppress>
-  <suppress until="2023-05-05">
-    <cve>CVE-2022-45143</cve>
-  </suppress>
+
 </suppressions>
