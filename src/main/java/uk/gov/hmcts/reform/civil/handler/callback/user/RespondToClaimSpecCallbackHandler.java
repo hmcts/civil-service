@@ -1755,7 +1755,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.defenceAdmitPartPaymentTimeRouteRequired(null);
         }
 
-        addRespondentDQPartiesFlagStructure(updatedData, updatedData.build());
+        if (toggleService.isCaseFlagsEnabled()) {
+            addRespondentDQPartiesFlagStructure(updatedData, updatedData.build());
+        }
 
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {

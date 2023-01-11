@@ -530,7 +530,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .build();
         }
 
-        addRespondentDQPartiesFlagStructure(updatedData, updatedData.build());
+        if (toggleService.isCaseFlagsEnabled()) {
+            addRespondentDQPartiesFlagStructure(updatedData, updatedData.build());
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))

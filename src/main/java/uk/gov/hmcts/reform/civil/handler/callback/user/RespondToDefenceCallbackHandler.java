@@ -264,7 +264,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         assembleResponseDocuments(caseData, builder);
 
-        addApplicantExpertAndWitnessFlagsStructure(builder, builder.build());
+        if (featureToggleService.isCaseFlagsEnabled()) {
+            addApplicantExpertAndWitnessFlagsStructure(builder, builder.build());
+        }
 
         if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {
             builder.respondentSharedClaimResponseDocument(null);

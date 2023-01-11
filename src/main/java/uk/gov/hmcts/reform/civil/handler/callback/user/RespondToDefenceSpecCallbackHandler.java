@@ -208,7 +208,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
-        addApplicantExpertAndWitnessFlagsStructure(builder, builder.build());
+        if (featureToggleService.isCaseFlagsEnabled()) {
+            addApplicantExpertAndWitnessFlagsStructure(builder, builder.build());
+        }
 
         if (v1 && featureToggleService.isSdoEnabled()) {
             if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
