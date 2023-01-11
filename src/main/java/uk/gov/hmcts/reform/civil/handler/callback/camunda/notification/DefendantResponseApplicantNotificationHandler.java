@@ -139,7 +139,6 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
         if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE)) {
 
             if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired().equals(IMMEDIATELY)) {
-                //emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
                 emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
             } else {
                 emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
