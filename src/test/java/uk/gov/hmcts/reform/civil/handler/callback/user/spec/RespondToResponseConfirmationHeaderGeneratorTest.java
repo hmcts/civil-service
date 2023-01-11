@@ -97,7 +97,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .build();
     }
 
-    public static CaseData buildJudgmentSubmitProceedCaseData(){
+    public static CaseData buildJudgmentSubmitProceedCaseData() {
         return CaseData.builder()
             .superClaimType(SuperClaimType.SPEC_CLAIM)
             .legacyCaseReference("claimNumber")
