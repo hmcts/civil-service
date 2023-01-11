@@ -149,14 +149,14 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         CaseData caseData = caseDataBuilder.build();
 
         caseDataBuilder.respondent2OrgRegistered(YES)
-            .respondentSolicitor2OrganisationDetails(null);
+            .respondentSolicitor2OrganisationDetails(null)
+            .respondent2Represented(YES);
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder.respondentSolicitor2ServiceAddress(null)
                 .respondentSolicitor2ServiceAddressRequired(NO)
                 .respondentSolicitor2ServiceAddress(null)
-                .respondent2OrganisationIDCopy(addedOrganisation)
-                .respondent2Represented(YES);
+                .respondent2OrganisationIDCopy(addedOrganisation);
         } else {
             caseDataBuilder.specRespondent2Represented(YES)
                 .specAoSRespondentCorrespondenceAddressdetails(null);
@@ -174,13 +174,13 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         CaseData caseData = caseDataBuilder.build();
 
         caseDataBuilder.respondent1OrgRegistered(YES)
-            .respondentSolicitor1OrganisationDetails(null);
+            .respondentSolicitor1OrganisationDetails(null)
+            .respondent1Represented(YES);
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder.respondentSolicitor1ServiceAddress(null)
                 .respondentSolicitor1ServiceAddressRequired(NO)
-                .respondent1OrganisationIDCopy(addedOrganisation)
-                .respondent1Represented(YES);
+                .respondent1OrganisationIDCopy(addedOrganisation);
         } else {
             caseDataBuilder.specApplicantCorrespondenceAddressRequired(NO)
                 .specRespondentCorrespondenceAddressdetails(null)
