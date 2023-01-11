@@ -12,7 +12,6 @@ import java.util.Set;
 
 import static java.lang.String.format;
 
-
 @Component
 public class JudgmentSubmittedConfHeader  implements RespondToResponseConfirmationHeaderGenerator {
 
