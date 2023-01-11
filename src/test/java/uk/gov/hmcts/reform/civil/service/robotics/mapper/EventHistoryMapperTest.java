@@ -7535,7 +7535,6 @@ class EventHistoryMapperTest {
     @Nested
     class InterlocutoryJudgment {
 
-
         @Test
         public void shouldgenerateRPAfeedfor_IJNoDivergent() {
 
