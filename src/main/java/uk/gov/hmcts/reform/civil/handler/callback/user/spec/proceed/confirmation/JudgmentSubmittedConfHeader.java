@@ -22,13 +22,13 @@ public class JudgmentSubmittedConfHeader  implements RespondToResponseConfirmati
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        String claimNumber = caseData.getLegacyCaseReference();
         if ((YesOrNo.NO.equals(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec()))
             || (YesOrNo.NO.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec()))
             && !PAYMENT_PLAN.contains(caseData.getDefenceAdmitPartPaymentTimeRouteRequired())) {
             return Optional.empty();
         }
 
+        String claimNumber = caseData.getLegacyCaseReference();
         return Optional.of(format(
             "# Judgment Submitted %n## A county court judgment(ccj) has been submitted for case %s",
             claimNumber
