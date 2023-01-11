@@ -1213,10 +1213,10 @@ public class EventHistoryMapper {
 
                     if (NO.equals(proceedRespondent1) || NO.equals(proceedRespondent2)
                         || (claimType == SuperClaimType.SPEC_CLAIM
-                        && AllocatedTrack.SMALL_CLAIM.name().equals(track)
-                        && respondent1MediationRequired == YesOrNo.YES
-                        && applicant1MediationRequired == YesOrNo.YES
-                    )
+                            && AllocatedTrack.SMALL_CLAIM.name().equals(track)
+                            && respondent1MediationRequired == YesOrNo.YES
+                            && applicant1MediationRequired == YesOrNo.YES
+                        )
                     ) {
                         List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                         builder.miscellaneous(miscText);
@@ -1238,11 +1238,11 @@ public class EventHistoryMapper {
 
                     if (NO.equals(proceedRespondent1) || NO.equals(proceedRespondent2)
                         || (claimType == SuperClaimType.SPEC_CLAIM
-                        && AllocatedTrack.SMALL_CLAIM.name().equals(track)
-                        && respondent1MediationRequired == YesOrNo.YES
-                        && respondent2MediationRequired == YesOrNo.YES
-                        && applicant1MediationRequired == YesOrNo.YES
-                    )
+                            && AllocatedTrack.SMALL_CLAIM.name().equals(track)
+                            && respondent1MediationRequired == YesOrNo.YES
+                            && respondent2MediationRequired == YesOrNo.YES
+                            && applicant1MediationRequired == YesOrNo.YES
+                        )
                     ) {
                         List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                         builder.miscellaneous(miscText);
@@ -1261,11 +1261,11 @@ public class EventHistoryMapper {
 
                     if (NO.equals(applicant1Proceeds) || NO.equals(applicant2Proceeds)
                         || (claimType == SuperClaimType.SPEC_CLAIM
-                        && AllocatedTrack.SMALL_CLAIM.name().equals(track)
-                        && respondent1MediationRequired == YesOrNo.YES
-                        && applicant1MediationRequired == YesOrNo.YES
-                        && applicant2MediationRequired == YesOrNo.YES
-                    )
+                            && AllocatedTrack.SMALL_CLAIM.name().equals(track)
+                            && respondent1MediationRequired == YesOrNo.YES
+                            && applicant1MediationRequired == YesOrNo.YES
+                            && applicant2MediationRequired == YesOrNo.YES
+                        )
                     ) {
                         List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                         builder.miscellaneous(miscText);
