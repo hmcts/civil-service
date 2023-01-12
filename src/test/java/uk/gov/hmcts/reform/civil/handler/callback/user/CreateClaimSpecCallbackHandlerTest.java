@@ -84,6 +84,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.CONFIRMATION_SUMMARY;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.CONFIRMATION_SUMMARY_PBA_V3;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.LIP_CONFIRMATION_BODY;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
@@ -1416,6 +1417,30 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 String body = format(
                     CONFIRMATION_SUMMARY,
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID)
+                ) + exitSurveyContentService.applicantSurvey();
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# Your claim has been received%n## Claim number: %s",
+                            REFERENCE_NUMBER
+                        ))
+                        .confirmationBody(body)
+                        .build());
+            }
+
+            @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentationAndPBAv3IsOn() {
+                Mockito.when(toggleService.isPbaV3Enabled()).thenReturn(true);
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                    .legacyCaseReference("000MC001")
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                String body = format(
+                    CONFIRMATION_SUMMARY_PBA_V3,
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID)
                 ) + exitSurveyContentService.applicantSurvey();
 
