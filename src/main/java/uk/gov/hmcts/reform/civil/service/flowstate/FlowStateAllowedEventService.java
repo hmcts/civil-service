@@ -31,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
@@ -50,6 +51,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_CUI_FOR_DEADLINE_EXTENSION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_CUI_FOR_DEADLINE_EXTENSION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
@@ -632,6 +635,7 @@ public class FlowStateAllowedEventService {
             DRAFT.fullName(),
             List.of(
                 CREATE_CLAIM,
+                CREATE_LIP_CLAIM,
                 migrateCase
             )
         ),
@@ -640,6 +644,7 @@ public class FlowStateAllowedEventService {
             SPEC_DRAFT.fullName(),
             List.of(
                 CREATE_CLAIM_SPEC,
+                CREATE_LIP_CLAIM,
                 migrateCase
             )
         ),
@@ -673,6 +678,8 @@ public class FlowStateAllowedEventService {
                 ACKNOWLEDGEMENT_OF_SERVICE,
                 INFORM_AGREED_EXTENSION_DATE,
                 INFORM_AGREED_EXTENSION_DATE_SPEC,
+                NOTIFY_DEFENDANT_CUI_FOR_DEADLINE_EXTENSION,
+                NOTIFY_CLAIMANT_CUI_FOR_DEADLINE_EXTENSION,
                 DEFENDANT_RESPONSE_SPEC,
                 DEFENDANT_RESPONSE_CUI,
                 DISMISS_CLAIM,
@@ -984,7 +991,7 @@ public class FlowStateAllowedEventService {
         }
 
         if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())
-            || CREATE_CLAIM_SPEC.equals(caseEvent)) {
+            || CREATE_CLAIM_SPEC.equals(caseEvent) || CREATE_LIP_CLAIM.equals(caseEvent)) {
             if (toggleService.isLrSpecEnabled()) {
                 StateFlow stateFlow = stateFlowEngine.evaluateSpec(caseDetails);
                 return isAllowedOnStateForSpec(stateFlow.getState().getName(), caseEvent);

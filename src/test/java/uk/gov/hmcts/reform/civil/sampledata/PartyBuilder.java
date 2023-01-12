@@ -121,6 +121,17 @@ public class PartyBuilder {
         return this;
     }
 
+    public PartyBuilder individualNoPrimaryAddress(String firstName) {
+        type = INDIVIDUAL;
+        individualTitle = "Mr.";
+        individualFirstName = firstName;
+        individualLastName = "Rambo";
+        individualDateOfBirth = DATE_OF_BIRTH;
+        partyName = individualTitle + " " + individualFirstName + " " + individualLastName;
+        primaryAddress = null;
+        return this;
+    }
+
     public PartyBuilder individualDateOfBirth(LocalDate dateOfBirth) {
         individualDateOfBirth = dateOfBirth;
         return this;
