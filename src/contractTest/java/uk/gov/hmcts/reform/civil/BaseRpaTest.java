@@ -50,6 +50,10 @@ public abstract class BaseRpaTest {
         return runPactTest(pact, pactTestRun);
     }
 
+    protected PactVerificationResult getPactVerificationResult(String payload) {
+        return getPactVerificationResult(payload, "description");
+    }
+
     protected RequestResponsePact preparePact(String description, String body, Map<String, String> headers) {
         // @formatter:off
         return ConsumerPactBuilder
