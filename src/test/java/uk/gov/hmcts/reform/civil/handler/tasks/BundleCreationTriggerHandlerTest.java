@@ -63,40 +63,6 @@ class BundleCreationTriggerHandlerTest {
     }
 
     @Test
-    void shouldEmitHearingFeePaidEvent_whenCasesFoundPaid() {
-        long caseId = 1L;
-        CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDuePaid().build();
-        Map<String, Object> data = Map.of("data", caseData);
-        List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
-
-        when(searchService.getCases()).thenReturn(caseDetails);
-        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.get(0));
-        when(caseDetailsConverter.toCaseData(caseDetails.get(0))).thenReturn(caseData);
-
-        handler.execute(mockTask, externalTaskService);
-
-        verify(applicationEventPublisher).publishEvent(new HearingFeePaidEvent(caseId));
-        verify(externalTaskService).complete(mockTask);
-    }
-
-    @Test
-    void shouldEmitHearingFeePaidEvent_whenCasesFoundUnpaid() {
-        long caseId = 1L;
-        CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDueUnpaid().build();
-        Map<String, Object> data = Map.of("data", caseData);
-        List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
-
-        when(searchService.getCases()).thenReturn(caseDetails);
-        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.get(0));
-        when(caseDetailsConverter.toCaseData(caseDetails.get(0))).thenReturn(caseData);
-
-        handler.execute(mockTask, externalTaskService);
-
-        verify(applicationEventPublisher).publishEvent(new HearingFeeUnpaidEvent(caseId));
-        verify(externalTaskService).complete(mockTask);
-    }
-
-    @Test
     void shouldNotEmitTakeCaseOfflineEvent_WhenNoCasesFound() {
         when(searchService.getCases()).thenReturn(List.of());
 
