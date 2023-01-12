@@ -352,6 +352,12 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
     private CallbackResponse setApplicantResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        if (ofNullable(caseData.getRespondent1Copy()).isPresent()) {
+            if (caseData.getRespondent1Copy().getPrimaryAddress() == null) {
+                throw new IllegalArgumentException("Primary Address cannot be empty");
+            }
+        }
+
         // persist respondent address (ccd issue)
         var updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
