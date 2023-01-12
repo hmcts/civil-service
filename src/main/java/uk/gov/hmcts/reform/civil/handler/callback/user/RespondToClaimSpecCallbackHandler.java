@@ -1755,6 +1755,18 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedData.defenceAdmitPartPaymentTimeRouteRequired(null);
         }
 
+        if (caseData.getRespondent1DQWitnessesSmallClaim() != null) {
+            updatedData.respondent1DQ(
+                updatedData.build().getRespondent1DQ().toBuilder().respondent1DQWitnesses(
+                    caseData.getRespondent1DQWitnessesSmallClaim()).build());
+        }
+
+        if (caseData.getRespondent2DQWitnessesSmallClaim() != null) {
+            updatedData.respondent2DQ(
+                updatedData.build().getRespondent2DQ().toBuilder().respondent2DQWitnesses(
+                    caseData.getRespondent2DQWitnessesSmallClaim()).build());
+        }
+
         if (toggleService.isCaseFlagsEnabled()) {
             addRespondentDQPartiesFlagStructure(updatedData, updatedData.build());
         }

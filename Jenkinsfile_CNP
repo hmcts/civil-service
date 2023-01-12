@@ -56,10 +56,6 @@ def publishRpaContract() {
 }
 
 withPipeline(type, product, component) {
-  pipelineConf = config
-  disableLegacyDeployment()
-  enableAksStagingDeployment()
-  enableSlackNotifications('#civil_notifications')
 
   onPR {
     env.ENVIRONMENT = "preview"
