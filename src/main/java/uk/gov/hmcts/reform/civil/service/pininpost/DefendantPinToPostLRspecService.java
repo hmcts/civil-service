@@ -27,6 +27,8 @@ public class DefendantPinToPostLRspecService {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
 
+    private static final int EXPIRY_PERIOD = 180;
+
     public void validatePin(CaseDetails caseDetails, String pin) {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
@@ -55,12 +57,21 @@ public class DefendantPinToPostLRspecService {
     }
 
     public DefendantPinToPostLRspec buildDefendantPinToPost() {
-        LocalDate expiryDate = LocalDate.now().plusDays(180);
+        LocalDate expiryDate = LocalDate.now().plusDays(EXPIRY_PERIOD);
         return DefendantPinToPostLRspec.builder()
             .accessCode(AccessCodeGenerator.generateAccessCode())
             .respondentCaseRole(
                 CaseRole.RESPONDENTSOLICITORONESPEC.getFormattedName())
             .expiryDate(expiryDate)
             .build();
+    }
+
+    public DefendantPinToPostLRspec resetPinExpiryDate(DefendantPinToPostLRspec pinInPostData) {
+        LocalDate expiryDate = LocalDate.now().plusDays(EXPIRY_PERIOD);
+        return DefendantPinToPostLRspec.builder()
+            .expiryDate(expiryDate)
+            .citizenCaseRole(pinInPostData.getCitizenCaseRole())
+            .respondentCaseRole(pinInPostData.getRespondentCaseRole())
+            .accessCode(pinInPostData.getAccessCode()).build();
     }
 }
