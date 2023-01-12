@@ -354,6 +354,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     caseData.getApplicant1DQ().getFileDirectionQuestionnaire(),
                     templateData.getFileDirectionsQuestionnaire()
                 );
+                assertEquals(
+                    templateData.getSupport(),
+                    caseData.getApplicant1DQ().getHearingSupport()
+                );
             }
 
             @Test
@@ -389,6 +393,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     templateData.getFileDirectionsQuestionnaire(),
                     caseData.getApplicant1DQ().getFileDirectionQuestionnaire()
                 );
+                assertEquals(
+                    templateData.getSupport(),
+                    caseData.getApplicant1DQ().getHearingSupport()
+                );
             }
 
             @Test
@@ -423,6 +431,10 @@ class DirectionsQuestionnaireGeneratorTest {
                 assertEquals(
                     templateData.getFileDirectionsQuestionnaire(),
                     caseData.getApplicant1DQ().getFileDirectionQuestionnaire()
+                );
+                assertEquals(
+                    templateData.getSupport(),
+                    caseData.getApplicant1DQ().getHearingSupport()
                 );
             }
 
@@ -780,6 +792,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
                                        .respondToClaimExperts(ExpertDetails.builder()
                                                                   .expertName("Mr Expert Defendant")
+                                                                  .firstName("Expert")
+                                                                  .lastName("Defendant")
+                                                                  .phoneNumber("07123456789")
+                                                                  .emailAddress("test@email.com")
                                                                   .fieldofExpertise("Roofing")
                                                                   .estimatedCost(new BigDecimal(434))
                                                                   .build())
@@ -854,6 +870,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
                                        .respondToClaimExperts(ExpertDetails.builder()
                                                                   .expertName("Mr Expert Defendant")
+                                                                  .firstName("Expert")
+                                                                  .lastName("Defendant")
+                                                                  .phoneNumber("07123456789")
+                                                                  .emailAddress("test@email.com")
                                                                   .fieldofExpertise("Roofing")
                                                                   .estimatedCost(new BigDecimal(434))
                                                                   .build())
@@ -1656,6 +1676,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .stream()
                     .map(expert -> Expert.builder()
                         .name(expert.getName())
+                        .firstName(expert.getFirstName())
+                        .lastName(expert.getLastName())
+                        .phoneNumber(expert.getPhoneNumber())
+                        .emailAddress(expert.getEmailAddress())
                         .fieldOfExpertise(expert.getFieldOfExpertise())
                         .whyRequired(expert.getWhyRequired())
                         .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)

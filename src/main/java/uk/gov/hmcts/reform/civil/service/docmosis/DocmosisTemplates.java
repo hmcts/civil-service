@@ -45,11 +45,13 @@ public enum DocmosisTemplates {
     HEARING_FAST_TRACK("CV-UNS-HNO-ENG-01198.docx", "hearing_fast_track_%s.pdf"),
     HEARING_APPLICATION("CV-UNS-HNO-ENG-01199.docx", "hearing_application_%s.pdf"),
     HEARING_OTHER("CV-UNS-HNO-ENG-01196.docx", "hearing_other_claim_%s.pdf"),
+
     PIN_IN_THE_POST_LETTER("CV-CMC-LET-ENG-PIP0001.docx", "PIP_letter.pdf"),
-    SDO_HNL_DISPOSAL("CV-DAM-STD-ENG-00003-HNL.docx", "disposal_hearing_sdo_%s.pdf"),
 
     //HNL uplifted docs to be replaced with original once ready
+    SDO_HNL_DISPOSAL("CV-DAM-STD-ENG-00003-HNL.docx", "disposal_hearing_sdo_%s.pdf"),
     DJ_SDO_HNL_DISPOSAL("CV-UNS-DEC-ENG-01200.docx", "Order_disposal_%s.pdf"),
+    DEFENDANT_RESPONSE_SPEC_HNL("CV-SPC-HRN-ENG-01209.docx", "%s_response_sealed_form.pdf"),
     HNL_DQ_RESPONSE_1V1("CV-UNS-HRN-ENG-01213.docx", "%s_directions_questionnaire_form_%s.pdf"),
     HNL_DQ_RESPONSE_1V2_DS("CV-UNS-HRN-ENG-01217.docx", "%s_directions_questionnaire_form_%s.pdf"),
     HNL_DQ_RESPONSE_1V2_SS("CV-UNS-HRN-ENG-01218.docx", "%s_directions_questionnaire_form_%s.pdf"),

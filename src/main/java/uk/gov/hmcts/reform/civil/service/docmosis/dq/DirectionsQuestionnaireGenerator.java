@@ -97,7 +97,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 templateId = featureToggleService.isHearingAndListingSDOEnabled()
                     ? DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_HNL : DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
             } else {
-                templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
+                templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                    ? DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_HNL : DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
             }
         } else {
             templateId = getDocmosisTemplate(caseData);
@@ -345,6 +346,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                ofNullable(litigationFriend)
                                    .map(LitigationFriend::getFullName)
                                    .orElse(""))
+                           .phoneNumber(applicant.getPartyPhone())
+                           .emailAddress(applicant.getPartyEmail())
                            .build());
     }
 
@@ -969,9 +972,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         return unwrapElements(dq.getExperts().getDetails())
             .stream()
             .map(expert -> Expert.builder()
-                //To do: Remove redundant name mapping when HNL toggle removed
+                //ToDo: Remove redundant name mapping when hnl toggle removed
                 .name(expert.getName())
-                //============================================================
+                //===========================================================
                 .firstName(expert.getFirstName())
                 .lastName(expert.getLastName())
                 .phoneNumber(expert.getPhoneNumber())
