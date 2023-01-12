@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -64,6 +65,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.CIVIL_COURT_TYPE_ID;
 
 @Service
 @RequiredArgsConstructor
@@ -236,15 +238,18 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                                          CallbackParams callbackParams) {
         RequestedCourt requestedCourt = caseData.getApplicant1DQ().getApplicant1DQRequestedCourt();
         if (requestedCourt != null) {
-            LocationRefData courtLocation = courtLocationUtils.findPreferredLocationData(
-                fetchLocationData(callbackParams), requestedCourt.getResponseCourtLocations());
-            if (Objects.nonNull(courtLocation)) {
+            List<LocationRefData> courtLocations = (locationRefDataService
+                .getCourtLocationsByEpimmsId(CallbackParams.Params.BEARER_TOKEN.toString(),
+                                             caseData.getCourtLocation().getCaseLocation().getBaseLocation()));
+            if (Objects.nonNull(courtLocations)) {
                 dataBuilder
                     .applicant1DQ(dq.applicant1DQRequestedCourt(
                         caseData.getApplicant1DQ().getApplicant1DQRequestedCourt().toBuilder()
                             .responseCourtLocations(null)
-                            .caseLocation(LocationRefDataService.buildCaseLocation(courtLocation))
-                            .responseCourtCode(courtLocation.getCourtLocationCode()).build()
+                            .caseLocation(caseData.getCourtLocation().getCaseLocation())
+                            .responseCourtCode(courtLocations.isEmpty() ? null : courtLocations.stream()
+                            .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
+                            .collect(Collectors.toList()).get(0).getCourtName()).build()
                     ).build());
             }
         }
