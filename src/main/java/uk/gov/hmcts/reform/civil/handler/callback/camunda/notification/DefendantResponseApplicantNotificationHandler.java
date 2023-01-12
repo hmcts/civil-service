@@ -138,7 +138,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
         String emailTemplate;
         if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE)) {
 
-            if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired().equals(IMMEDIATELY)) {
+            if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY) {
                 emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
             } else {
                 emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
@@ -198,7 +198,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
     public Map<String, String> addPropertiesSpec(CaseData caseData, CaseEvent caseEvent) {
         if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE)) {
-            if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired().equals(IMMEDIATELY)) {
+            if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY) {
                 String shouldBePaidBy = caseData.getRespondToClaimAdmitPartLRspec()
                     .getWhenWillThisAmountBePaid().getDayOfMonth()
                     + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getMonth()
