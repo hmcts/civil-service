@@ -1411,6 +1411,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentation() {
+                Mockito.when(toggleService.isPbaV3Enabled()).thenReturn(false);
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .legacyCaseReference("000MC001")
                     .build();
@@ -1462,6 +1463,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentationAndEventIdMissing() {
+                Mockito.when(toggleService.isPbaV3Enabled()).thenReturn(false);
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .legacyCaseReference("000MC001")
                     .build();
