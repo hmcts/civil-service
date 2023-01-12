@@ -164,6 +164,7 @@ notifications:
   claimantSolicitorConfirmsToProceed: "bf16b060-17b6-4d06-8367-e26a538a4911"
   claimantSolicitorConfirmsNotToProceed: "8d2b0c8c-7cb2-4559-ba2c-a2ed5f7982be"
   claimantSolicitorClaimContinuingOnline: "d6c71e08-a9c3-405c-8873-4370d4bdcca3"
+  claimantSolicitorClaimContinuingOnlineCos: "4825eb5d-4678-496e-8d19-203288dd598f"
   solicitorCaseTakenOffline: "5f1f497e-e1e0-40e0-8296-a0a1341f1e8c"
   solicitorLitigationFriendAdded: "bad02653-df70-4a33-9b02-d42d30c5022c"
   claimantSolicitorClaimContinuingOnlineForSpec: "cbc491af-e194-4582-934e-329f815d897d"
@@ -196,6 +197,8 @@ notifications:
   interimJudgmentRequestedDefendant: "d9e33565-ecdc-4475-a77b-e50cd4c07b61"
   interimJudgmentApprovalDefendant: "2e98fa16-ba9e-4229-b99f-fc72d40303f8"
   caseworkerDefaultJudgmentRequested: "b20f34f4-39c3-4488-9961-f6d4ae7247f4"
+  respondentDeadlineExtension: "13514e8a-8621-4d3a-a317-8fd0ba7a184f"
+  claimantDeadlineExtension: "74e33576-487f-4c63-bdef-fe12c4279faa"
   respondentChangeOfAddressNotificationTemplate: "174a9566-6ce2-4df5-9ffd-265bbd4787cc"
   respondentLipFullAdmitOrPartAdmitTemplate: "d41a95de-ab84-4442-b6d1-33db03b5e1b0"
   respondentLipFullDefenceWithMediationTemplate: "2177f3b0-3833-4788-bd7f-a473e32950af"
@@ -421,7 +424,3 @@ idam:
   api:
     url: http://ccd-test-stubs-service:5555
 
-polling:
-  event:
-    emitter:
-      enabled: ${POLLING_EVENT_EMITTER_ENABLED:false}

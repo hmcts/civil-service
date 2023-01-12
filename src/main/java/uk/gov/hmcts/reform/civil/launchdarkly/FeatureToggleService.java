@@ -86,6 +86,10 @@ public class FeatureToggleService {
         return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), false);
     }
 
+    public boolean isCaseFlagsEnabled() {
+        return internalClient.boolVariation("case-flags", createLDUser().build(), false);
+    }
+
     public boolean isPinInPostEnabled() {
         return internalClient.boolVariation("pin-in-post", createLDUser().build(), false);
     }
@@ -100,6 +104,11 @@ public class FeatureToggleService {
 
     public boolean isSDOEnabled() {
         return internalClient.boolVariation("enableSDO", createLDUser().build(), false);
+    }
+
+    public boolean isCertificateOfServiceEnabled() {
+        return internalClient.boolVariation("isCertificateOfServiceEnabled",
+                                            createLDUser().build(), false);
     }
 
     private void close() {
