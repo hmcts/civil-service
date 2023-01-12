@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
@@ -799,6 +800,68 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder applicant1DQ(Applicant1DQ applicant1DQ) {
         this.applicant1DQ = applicant1DQ;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1DQWithExperts() {
+        var applicant1DQBuilder = applicant1DQ != null
+            ? applicant1DQ.toBuilder() : applicant1DQ().build().getApplicant1DQ().toBuilder();
+        applicant1DQBuilder.applicant1DQExperts(
+            uk.gov.hmcts.reform.civil.model.dq.Experts.builder()
+                .expertRequired(YES)
+                .expertReportsSent(ExpertReportsSent.NO)
+                .jointExpertSuitable(NO)
+                .details(
+                    wrapElements(uk.gov.hmcts.reform.civil.model.dq.Expert.builder()
+                                     .firstName("Expert")
+                                     .lastName("One")
+                                     .phoneNumber("01482764322")
+                                     .emailAddress("fast.claim.expert1@example.com")
+                                     .whyRequired("Good reasons")
+                                     .fieldOfExpertise("Some field")
+                                     .estimatedCost(BigDecimal.valueOf(10000))
+                                     .build()
+                    )
+                )
+                .build()
+        );
+
+        applicant1DQ = applicant1DQBuilder.build();
+        return this;
+    }
+
+    public CaseDataBuilder applicant1DQWithWitnesses() {
+        var applicant1DQBuilder = applicant1DQ != null
+            ? applicant1DQ.toBuilder() : applicant1DQ().build().getApplicant1DQ().toBuilder();
+        applicant1DQBuilder.applicant1DQWitnesses(
+            Witnesses.builder()
+                .witnessesToAppear(YES)
+                .details(wrapElements(
+                    Witness.builder()
+                        .firstName("Witness")
+                        .lastName("One")
+                        .phoneNumber("01482764322")
+                        .emailAddress("witness.one@example.com")
+                        .reasonForWitness("Saw something")
+                        .build()))
+                .build());
+
+        applicant1DQ = applicant1DQBuilder.build();
+        return this;
+    }
+
+    public CaseDataBuilder applicant1DQWithHearingSupport() {
+        var applicant1DQBuilder = applicant1DQ != null
+            ? applicant1DQ.toBuilder() : applicant1DQ().build().getApplicant1DQ().toBuilder();
+
+        applicant1DQBuilder.applicant1DQHearingSupport(
+            HearingSupport.builder()
+                .supportRequirements(YES)
+                .supportRequirementsAdditional("Support requirements works!!!")
+                .build()
+        ).build();
+
+        applicant1DQ = applicant1DQBuilder.build();
         return this;
     }
 
@@ -2164,12 +2227,13 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder changeOrganisationRequestField(boolean isApplicant, boolean isRespondent2Replaced,
-                                                          String newOrgID, String oldOrgId) {
+                                                          String newOrgID, String oldOrgId, String email) {
         String caseRole = isApplicant ? CaseRole.APPLICANTSOLICITORONE.getFormattedName() :
             isRespondent2Replaced ? CaseRole.RESPONDENTSOLICITORTWO.getFormattedName() :
                 CaseRole.RESPONDENTSOLICITORONE.getFormattedName();
         changeOrganisationRequest = ChangeOrganisationRequest.builder()
             .requestTimestamp(LocalDateTime.now())
+            .createdBy(email)
             .caseRoleId(DynamicList.builder()
                             .value(DynamicListElement.builder()
                                        .code(caseRole)
