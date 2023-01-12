@@ -243,7 +243,6 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondent2OrgRegistered()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress())
                 .isEqualTo("requester@example.com");
-            //TODO uncomment after CIV-3227
             assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_ONE_LEGAL_REP);
         }
 
@@ -274,8 +273,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondent2OrgRegistered()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress())
                 .isEqualTo("requester@example.com");
-            //TODO uncomment after CIV-3227
-            //assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
+            assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
         }
 
         @Test
@@ -345,6 +343,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .atStateClaimIssued()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .changeOfRepresentation(true, false, NEW_ORG_ID, "QWERTY A")
+                .changeOrganisationRequestField(true, false, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
                 .setCaseListDisplayDefendantSolicitorReferences(true)
                 .setUnassignedCaseListDisplayOrganisationReferences()
@@ -365,8 +364,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .isEqualTo(updatedCaseData.getSolicitorReferences().getRespondentSolicitor1Reference());
             assertThat(updatedCaseData.getUnassignedCaseListDisplayOrganisationReferences()).isEmpty();
 
-            //TODO update this after CCD-3538
-            assertThat(updatedCaseData.getApplicantSolicitor1UserDetails()).isNull();
+            assertThat(updatedCaseData.getApplicantSolicitor1UserDetails().getEmail())
+                .isEqualTo("requester@example.com");
         }
 
         @Test
@@ -375,6 +374,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .atStateClaimIssued()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .changeOfRepresentation(false, false, NEW_ORG_ID, "QWERTY R")
+                .changeOrganisationRequestField(false, false, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
                 .setCaseListDisplayDefendantSolicitorReferences(true)
                 .setUnassignedCaseListDisplayOrganisationReferences()
@@ -395,9 +395,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getCaseListDisplayDefendantSolicitorReferences())
                 .isBlank();
             assertThat(updatedCaseData.getUnassignedCaseListDisplayOrganisationReferences()).isEmpty();
-
-            //TODO update this after CCD-3538
-            assertThat(updatedCaseData.getRespondentSolicitor1EmailAddress()).isNull();
+            assertThat(updatedCaseData.getRespondentSolicitor1EmailAddress())
+                .isEqualTo("requester@example.com");
         }
 
         @Test
@@ -406,6 +405,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .atStateClaimIssued1v1LiP()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .changeOfRepresentation(false, false, NEW_ORG_ID, null)
+                .changeOrganisationRequestField(false, false, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -421,8 +421,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondentSolicitor1OrganisationDetails()).isEqualTo(null);
             assertSolicitorReferences(false, false, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent1OrgRegistered()).isEqualTo(YES);
-            //TODO update this after CCD-3538
-            assertThat(updatedCaseData.getRespondentSolicitor1EmailAddress()).isNull();
+            assertThat(updatedCaseData.getRespondentSolicitor1EmailAddress())
+                .isEqualTo("requester@example.com");
         }
 
         @Test
@@ -432,6 +432,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .multiPartyClaimTwoDefendantSolicitors()
                 .changeOfRepresentation(false, true, NEW_ORG_ID, "QWERTY R2")
+                .changeOrganisationRequestField(false, true, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(false, true, NEW_ORG_ID)
                 .setCaseListDisplayDefendantSolicitorReferences(false)
                 .setUnassignedCaseListDisplayOrganisationReferences()
@@ -454,9 +455,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getCaseListDisplayDefendantSolicitorReferences())
                 .isEqualTo(updatedCaseData.getSolicitorReferences().getRespondentSolicitor1Reference());
             assertThat(updatedCaseData.getUnassignedCaseListDisplayOrganisationReferences()).isEmpty();
-
-            //TODO update this after CCD-3538
-            assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress()).isNull();
+            assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress())
+                .isEqualTo("requester@example.com");
         }
 
         @Test
@@ -466,6 +466,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .multiPartyClaimTwoDefendantSolicitors()
                 .changeOfRepresentation(false, true, "QWERTY R", "QWERTY R2")
+                .changeOrganisationRequestField(false, true, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(false, true, "QWERTY R")
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -481,9 +482,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getSpecRespondent2Represented()).isEqualTo(YES);
             assertSolicitorReferences(false, true, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent2OrgRegistered()).isEqualTo(YES);
-            //TODO update this after CCD-3538
-            assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress()).isNull();
-            //TODO uncomment after CIV-3227
+            assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress())
+                .isEqualTo("requester@example.com");
             assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_ONE_LEGAL_REP);
         }
 
@@ -494,6 +494,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .atStateClaimIssued()
                 .multiPartyClaimOneDefendantSolicitor()
                 .changeOfRepresentation(false, true, NEW_ORG_ID, "QWERTY R")
+                .changeOrganisationRequestField(false, true, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(false, true, NEW_ORG_ID)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -510,8 +511,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertSolicitorReferences(false, true, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent2OrgRegistered()).isEqualTo(YES);
             assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
-            //TODO update this after CCD-3538
-            assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress()).isNull();
+            assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress())
+                .isEqualTo("requester@example.com");
         }
 
         @Test
@@ -521,6 +522,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateClaimIssued1v2Respondent2LiP()
                 .changeOfRepresentation(false, true, NEW_ORG_ID, null)
+                .changeOrganisationRequestField(false, true, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(false, true, NEW_ORG_ID)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -537,8 +539,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertSolicitorReferences(false, true, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent2OrgRegistered()).isEqualTo(YES);
             assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
-            //TODO update this after CCD-3538
-            assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress()).isNull();
+            assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress())
+                .isEqualTo("requester@example.com");
         }
 
         @Test
@@ -549,6 +551,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .atStateClaimIssued1v2Respondent2LiP()
                 .atStateClaimIssued1v1LiP()
                 .changeOfRepresentation(false, true, NEW_ORG_ID, null)
+                .changeOrganisationRequestField(false, true, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(false, true, NEW_ORG_ID)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -565,8 +568,8 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertSolicitorReferences(false, true, caseData, updatedCaseData);
             assertThat(updatedCaseData.getRespondent2OrgRegistered()).isEqualTo(YES);
             assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
-            //TODO update this after CCD-3538
-            assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress()).isNull();
+            assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress())
+                .isEqualTo("requester@example.com");
         }
 
         private void assertSolicitorReferences(boolean isApplicant, boolean respondent2Exists,
