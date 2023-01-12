@@ -1763,7 +1763,8 @@ public class CaseDataBuilder {
         atStateClaimDraft();
         respondent1OrganisationPolicy = null;
         defendant1LIPAtClaimIssued = YES;
-
+        respondent1Represented = NO;
+        respondent2Represented = NO;
         addRespondent2 = YES;
         respondent2OrganisationPolicy = null;
         respondent2SameLegalRepresentative = NO;
@@ -4074,9 +4075,12 @@ public class CaseDataBuilder {
                 .documentFileName("file-name2")
                 .documentBinaryUrl("binary-url2")
                 .build());
+        ArrayList<String> cosUIStatement = new ArrayList<>();
+        cosUIStatement.add("CERTIFIED");
         if (setCos1) {
             CertificateOfService.CertificateOfServiceBuilder cos1Builder = CertificateOfService.builder()
-                    .cosDateOfServiceForDefendant(cos1Date);
+                .cosUISenderStatementOfTruthLabel(cosUIStatement)
+                .cosDateOfServiceForDefendant(cos1Date);
             if (file1) {
                 cos1Builder.cosEvidenceDocument(files);
             }
@@ -4084,7 +4088,8 @@ public class CaseDataBuilder {
         }
         if (setCos2) {
             CertificateOfService.CertificateOfServiceBuilder cos2Builder = CertificateOfService.builder()
-                    .cosDateOfServiceForDefendant(cos2Date);
+                .cosUISenderStatementOfTruthLabel(cosUIStatement)
+                .cosDateOfServiceForDefendant(cos2Date);
             if (file2) {
                 cos2Builder.cosEvidenceDocument(files2);
             }
