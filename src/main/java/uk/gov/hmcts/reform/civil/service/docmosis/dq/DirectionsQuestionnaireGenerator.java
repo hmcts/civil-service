@@ -355,8 +355,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         var applicant2PartyBuilder = Party.builder()
             .name(applicant.getPartyName())
             .primaryAddress(caseData.getApplicant1().getPrimaryAddress())
-            .partyEmail(applicant.getPartyEmail())
-            .partyPhone(applicant.getPartyPhone())
+            .emailAddress(applicant.getPartyEmail())
+            .phoneNumber(applicant.getPartyPhone())
             .representative(representativeService
                                 .getApplicantRepresentative(caseData))
             // remove litigationFriendName when HNL toggle is enabled
@@ -388,8 +388,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         var applicant1PartyBuilder = Party.builder()
             .name(applicant.getPartyName())
             .primaryAddress(caseData.getApplicant1().getPrimaryAddress())
-            .partyEmail(applicant.getPartyEmail())
-            .partyPhone(applicant.getPartyPhone())
+            .emailAddress(applicant.getPartyEmail())
+            .phoneNumber(applicant.getPartyPhone())
             .representative(representativeService
                                 .getApplicantRepresentative(caseData))
             // remove litigationFriendName when HNL toggle is enabled
@@ -693,11 +693,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 var litigationFriend = caseData.getRespondent1LitigationFriend();
                 var respondent1PartyBuilder = Party.builder()
                     .name(respondent.getPartyName())
-                    .emailAddress(caseData.getRespondent1().getPartyEmail())
-                    .phoneNumber(caseData.getRespondent1().getPartyPhone())
                     .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-                    .partyEmail(respondent.getPartyEmail())
-                    .partyPhone(respondent.getPartyPhone())
+                    .emailAddress(respondent.getPartyEmail())
+                    .phoneNumber(respondent.getPartyPhone())
                     .representative(representativeService
                                         .getRespondent1Representative(caseData))
                     // remove litigationFriendName when HNL toggle is enabled
@@ -727,11 +725,9 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 var litigationFriend = caseData.getRespondent2LitigationFriend();
                 var respondent2PartyBuilder = Party.builder()
                     .name(respondent.getPartyName())
-                    .emailAddress(caseData.getRespondent2().getPartyEmail())
-                    .phoneNumber(caseData.getRespondent2().getPartyPhone())
                     .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
-                    .partyEmail(respondent.getPartyEmail())
-                    .partyPhone(respondent.getPartyPhone())
+                    .emailAddress(respondent.getPartyEmail())
+                    .phoneNumber(respondent.getPartyPhone())
                     .representative(representativeService
                                         .getRespondent2Representative(caseData))
                     // remove litigationFriendName when HNL toggle is enabled
@@ -763,8 +759,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 var respondent1Party = Party.builder()
                         .name(caseData.getRespondent1().getPartyName())
                         .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-                        .partyEmail(caseData.getRespondent1().getPartyEmail())
-                        .partyPhone(caseData.getRespondent1().getPartyPhone())
+                        .emailAddress(caseData.getRespondent1().getPartyEmail())
+                        .phoneNumber(caseData.getRespondent1().getPartyPhone())
                         .representative(representativeService.getRespondent1Representative(caseData))
                          // remove litigationFriendName when HNL toggle is enabled
                          .litigationFriendName(
@@ -789,8 +785,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 var respondent2Party = Party.builder()
                         .name(caseData.getRespondent2().getPartyName())
                         .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
-                        .partyEmail(caseData.getRespondent2().getPartyEmail())
-                        .partyPhone(caseData.getRespondent2().getPartyPhone())
+                        .emailAddress(caseData.getRespondent2().getPartyEmail())
+                        .phoneNumber(caseData.getRespondent2().getPartyPhone())
                         .representative(representativeService.getRespondent2Representative(caseData))
                     // remove litigationFriendName when HNL toggle is enabled
                     .litigationFriendName(
@@ -819,8 +815,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                     var respondent1Party = Party.builder()
                             .name(caseData.getRespondent1().getPartyName())
                             .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-                            .partyEmail(caseData.getRespondent1().getPartyEmail())
-                            .partyPhone(caseData.getRespondent1().getPartyPhone())
+                            .emailAddress(caseData.getRespondent1().getPartyEmail())
+                            .phoneNumber(caseData.getRespondent1().getPartyPhone())
                             .representative(representativeService.getRespondent1Representative(caseData))
                         // remove litigationFriendName when HNL toggle is enabled
                         .litigationFriendName(
@@ -846,8 +842,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                     var respondent2Party = Party.builder()
                                        .name(caseData.getRespondent2().getPartyName())
                                        .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
-                        .partyEmail(caseData.getRespondent2().getPartyEmail())
-                        .partyPhone(caseData.getRespondent2().getPartyPhone())
+                        .emailAddress(caseData.getRespondent2().getPartyEmail())
+                        .phoneNumber(caseData.getRespondent2().getPartyPhone())
                         .representative(representativeService.getRespondent1Representative(caseData))
                         // remove litigationFriendName when HNL toggle is enabled
                         .litigationFriendName(
@@ -886,8 +882,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         var respondentParty = Party.builder()
             .name(respondent.getPartyName())
             .primaryAddress(respondent.getPrimaryAddress())
-            .partyEmail(respondent.getPartyEmail())
-            .partyPhone(respondent.getPartyPhone())
+            .emailAddress(respondent.getPartyEmail())
+            .phoneNumber(respondent.getPartyPhone())
             .representative(respondentRepresentative)
             // remove litigationFriendName when HNL toggle is enabled
             .litigationFriendName(
