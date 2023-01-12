@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -33,6 +34,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -97,12 +99,20 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                 .generalAppHearingDetails(
                     GAHearingDetails
                         .builder()
-                        .hearingPreferredLocation(fromList(locationRefDataService.getCourtLocations(authToken)))
+                        .hearingPreferredLocation(getLocationsFromList(locationRefDataService
+                                                               .getCourtLocationsForGeneralApplication(authToken)))
                         .build());
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
                 .data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
+    }
+
+    private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
+        return fromList(locations.stream().map(location -> new StringBuilder().append(location.getSiteName())
+                .append(" - ").append(location.getCourtAddress())
+                .append(" - ").append(location.getPostcode()).toString())
+                            .collect(Collectors.toList()));
     }
 
     private CallbackResponse gaValidateType(CallbackParams callbackParams) {

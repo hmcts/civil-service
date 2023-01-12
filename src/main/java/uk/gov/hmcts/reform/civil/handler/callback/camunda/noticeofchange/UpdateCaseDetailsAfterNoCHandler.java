@@ -79,8 +79,9 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
                 .build();
         }
 
-        // TODO waiting on CCD-3538 to update the user email
-        UserDetails addedSolicitorDetails = null;
+        UserDetails addedSolicitorDetails = UserDetails.builder()
+            .email(caseData.getChangeOrganisationRequestField().getCreatedBy())
+            .build();
 
         String replacedSolicitorCaseRole = caseData.getChangeOfRepresentation().getCaseRole();
 
