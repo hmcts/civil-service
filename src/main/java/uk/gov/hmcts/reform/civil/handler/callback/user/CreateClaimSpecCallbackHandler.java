@@ -430,6 +430,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
         }
 
+        caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM_SPEC, dataBuilder);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
