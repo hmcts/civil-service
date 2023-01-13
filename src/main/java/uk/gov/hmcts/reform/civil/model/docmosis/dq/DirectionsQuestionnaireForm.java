@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
+import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 
 import java.time.LocalDate;
 import java.util.List;
