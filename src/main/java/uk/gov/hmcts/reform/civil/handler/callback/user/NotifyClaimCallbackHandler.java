@@ -151,14 +151,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             errors.add(dateValidErrorMessage);
         }
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
-        caseDataBuilder.cosNotifyClaimDefendant1(certificateOfService.toBuilder()
-                                                     .cosUISenderStatementOfTruthLabel(null)
-                                                     .build())
-            .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
             .build();
     }
@@ -172,14 +165,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             errors.add(dateValidationErrorMessage);
         }
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
-        caseDataBuilder.cosNotifyClaimDefendant2(certificateOfServiceDef2.toBuilder()
-                                                     .cosUISenderStatementOfTruthLabel(null)
-                                                     .build());
-
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
             .build();
     }
@@ -371,10 +357,10 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     }
 
     private CertificateOfService updateStatementOfTruthForLip(CertificateOfService certificateOfService) {
-        List<String> cosUISenderStatementOfTruthLabel = certificateOfService.getCosUISenderStatementOfTruthLabel();
+        List<String> cosUISenderStatementOfTruthLabel = new ArrayList<>();
+        cosUISenderStatementOfTruthLabel.add("CERTIFIED");
         return certificateOfService.toBuilder()
             .cosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
-            .cosUISenderStatementOfTruthLabel(null)
             .build();
     }
 }
