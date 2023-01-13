@@ -171,7 +171,8 @@ public class InitiateGeneralApplicationService {
         //Setting Work Allocation location and location name
         applicationBuilder.caseManagementLocation(caseLocation.getLeft());
         applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
-        applicationBuilder.locationName(caseLocation.getLeft().getSiteName());
+        applicationBuilder.locationName(hasSDOBeenMade(caseData.getCcdState())
+                                            ? caseData.getLocationName() : caseLocation.getLeft().getSiteName());
 
         LocalDateTime deadline = deadlinesCalculator
             .calculateApplicantResponseDeadline(
