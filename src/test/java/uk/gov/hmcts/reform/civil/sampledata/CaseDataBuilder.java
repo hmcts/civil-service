@@ -2269,19 +2269,19 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder updateOrgPolicyAfterNoC(boolean isApplicant, boolean isRespondent2) {
+    public CaseDataBuilder updateOrgPolicyAfterNoC(boolean isApplicant, boolean isRespondent2, String newOrgId) {
         if (isApplicant) {
             applicant1OrganisationPolicy = OrganisationPolicy.builder()
-                .organisation(Organisation.builder().organisationID("1234").build())
+                .organisation(Organisation.builder().organisationID(newOrgId).build())
                 .orgPolicyCaseAssignedRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName()).build();
         } else {
             if (isRespondent2) {
                 respondent2OrganisationPolicy = OrganisationPolicy.builder()
-                    .organisation(Organisation.builder().organisationID("1234").build())
+                    .organisation(Organisation.builder().organisationID(newOrgId).build())
                     .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName()).build();
             } else {
                 respondent1OrganisationPolicy = OrganisationPolicy.builder()
-                    .organisation(Organisation.builder().organisationID("1234").build())
+                    .organisation(Organisation.builder().organisationID(newOrgId).build())
                     .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()).build();
             }
         }
@@ -3790,6 +3790,14 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder multiPartyClaimTwoDefendantsLiP() {
+        this.addRespondent2 = YES;
+        this.respondent2 = PartyBuilder.builder().individual().build();
+        this.respondent2Represented = NO;
+        this.respondent1Represented = NO;
+        return this;
+    }
+
     public CaseDataBuilder multiPartyClaimTwoDefendantSolicitorsForSdoMP() {
         this.addRespondent2 = YES;
         this.respondent2 = PartyBuilder.builder().individual().build();
@@ -4322,9 +4330,10 @@ public class CaseDataBuilder {
             .disposalHearingFinalDisposalHearingTimeDJ(disposalHearingFinalDisposalHearingTimeDJ)
             .trialHearingTimeDJ(trialHearingTimeDJ)
             .trialOrderMadeWithoutHearingDJ(trialOrderMadeWithoutHearingDJ)
-            //Certificate of Service
-            .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
-            .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
+                //Certificate of Service
+                .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
+                .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
+            .caseAccessCategory(caseAccessCategory)
             .ccjPaymentPaidSomeAmount(ccjPaymentPaidSomeAmount)
             .build();
     }

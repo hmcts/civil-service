@@ -96,7 +96,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 templateId = featureToggleService.isHearingAndListingSDOEnabled()
                     ? DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_HNL : DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
             } else {
-                templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
+                templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                    ? DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_HNL : DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
             }
         } else {
             templateId = getDocmosisTemplate(caseData);
@@ -313,6 +314,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                        ofNullable(litigationFriend)
                                            .map(LitigationFriend::getFullName)
                                            .orElse(""))
+                                   .phoneNumber(applicant.getPartyPhone())
+                                   .emailAddress(applicant.getPartyEmail())
                                    .build(),
                                Party.builder()
                                    .name(applicant2.getPartyName())
@@ -324,6 +327,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                        ofNullable(litigationFriend)
                                            .map(LitigationFriend::getFullName)
                                            .orElse(""))
+                                   .phoneNumber(applicant2.getPartyPhone())
+                                   .emailAddress(applicant2.getPartyEmail())
                                    .build());
             }
         }
@@ -337,6 +342,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                ofNullable(litigationFriend)
                                    .map(LitigationFriend::getFullName)
                                    .orElse(""))
+                           .phoneNumber(applicant.getPartyPhone())
+                           .emailAddress(applicant.getPartyEmail())
                            .build());
     }
 
@@ -350,6 +357,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 ofNullable(caseData.getApplicant2LitigationFriend())
                     .map(LitigationFriend::getFullName)
                     .orElse(""))
+            .phoneNumber(applicant.getPartyPhone())
+            .emailAddress(applicant.getPartyEmail())
             .build();
     }
 
@@ -363,6 +372,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 ofNullable(caseData.getApplicant1LitigationFriend())
                     .map(LitigationFriend::getFullName)
                     .orElse(""))
+            .phoneNumber(applicant.getPartyPhone())
+            .emailAddress(applicant.getPartyEmail())
             .build();
     }
 
@@ -608,6 +619,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                             ofNullable(caseData.getRespondent1LitigationFriend())
                                                 .map(LitigationFriend::getFullName)
                                                 .orElse(""))
+                                        .phoneNumber(caseData.getRespondent1().getPartyPhone())
+                                        .emailAddress(caseData.getRespondent1().getPartyEmail())
                                         .build());
                     respondents.add(Party.builder()
                                         .name(caseData.getRespondent2().getPartyName())
@@ -620,6 +633,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                             ofNullable(caseData.getRespondent2LitigationFriend())
                                                 .map(LitigationFriend::getFullName)
                                                 .orElse(""))
+                                        .phoneNumber(caseData.getRespondent2().getPartyPhone())
+                                        .emailAddress(caseData.getRespondent2().getPartyEmail())
                                         .build());
                 } else if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
                     respondents.add(Party.builder()
@@ -633,6 +648,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                             ofNullable(caseData.getRespondent1LitigationFriend())
                                                 .map(LitigationFriend::getFullName)
                                                 .orElse(""))
+                                        .phoneNumber(caseData.getRespondent1().getPartyPhone())
+                                        .emailAddress(caseData.getRespondent1().getPartyEmail())
                                         .build());
                 }
                 return respondents;
@@ -650,6 +667,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                         ofNullable(caseData.getRespondent1LitigationFriend())
                                             .map(LitigationFriend::getFullName)
                                             .orElse(""))
+                                    .phoneNumber(caseData.getRespondent1().getPartyPhone())
+                                    .emailAddress(caseData.getRespondent1().getPartyEmail())
                                     .build());
             }
             if (isProceedingAgainstRespondent2(caseData)) {
@@ -664,6 +683,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                         ofNullable(caseData.getRespondent2LitigationFriend())
                                             .map(LitigationFriend::getFullName)
                                             .orElse(""))
+                                    .phoneNumber(caseData.getRespondent2().getPartyPhone())
+                                    .emailAddress(caseData.getRespondent2().getPartyEmail())
                                     .build());
             }
             return respondents;
@@ -680,6 +701,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                             ofNullable(caseData.getRespondent1LitigationFriend())
                                 .map(LitigationFriend::getFullName)
                                 .orElse(""))
+                        .phoneNumber(caseData.getRespondent1().getPartyPhone())
+                        .emailAddress(caseData.getRespondent1().getPartyEmail())
                         .build(),
                     Party.builder()
                         .name(caseData.getRespondent2().getPartyName())
@@ -689,6 +712,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                             ofNullable(caseData.getRespondent2LitigationFriend())
                                 .map(LitigationFriend::getFullName)
                                 .orElse(""))
+                        .phoneNumber(caseData.getRespondent2().getPartyPhone())
+                        .emailAddress(caseData.getRespondent2().getPartyEmail())
                         .build()
                 );
             } else if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
@@ -702,6 +727,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                            ofNullable(caseData.getRespondent1LitigationFriend())
                                                .map(LitigationFriend::getFullName)
                                                .orElse(""))
+                                       .phoneNumber(caseData.getRespondent1().getPartyPhone())
+                                       .emailAddress(caseData.getRespondent1().getPartyEmail())
                                        .build());
                 } else if ("TWO".equals(defendantIdentifier)) {
                     return List.of(Party.builder()
@@ -712,6 +739,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                            ofNullable(caseData.getRespondent2LitigationFriend())
                                                .map(LitigationFriend::getFullName)
                                                .orElse(""))
+                                       .phoneNumber(caseData.getRespondent2().getPartyPhone())
+                                       .emailAddress(caseData.getRespondent2().getPartyEmail())
                                        .build());
                 }
             }
@@ -732,6 +761,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                ofNullable(litigationFriend)
                                    .map(LitigationFriend::getFullName)
                                    .orElse(""))
+                           .phoneNumber(respondent.getPartyPhone())
+                           .emailAddress(respondent.getPartyEmail())
                            .build());
     }
 
@@ -777,6 +808,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 .formattedCost(MonetaryConversions.penniesToPounds(experts.getEstimatedCost()).toString())
                 .fieldOfExpertise(experts.getFieldofExpertise())
                 .whyRequired(experts.getWhyRequired())
+                .firstName(experts.getFirstName())
+                .lastName(experts.getLastName())
+                .emailAddress(experts.getEmailAddress())
+                .phoneNumber(experts.getPhoneNumber())
                 .build();
         } else {
             expertDetails = Expert.builder().build();
@@ -808,6 +843,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 .whyRequired(expert.getWhyRequired())
                 .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
                                    .format(MonetaryConversions.penniesToPounds(expert.getEstimatedCost())))
+                .firstName(expert.getFirstName())
+                .lastName(expert.getLastName())
+                .phoneNumber(expert.getPhoneNumber())
+                .emailAddress(expert.getEmailAddress())
                 .build())
             .collect(toList());
     }
