@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -19,11 +20,13 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.TimelineEventDetails
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -32,7 +35,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.CIVIL_COURT_TYPE_ID;
 
 @Service
 @RequiredArgsConstructor
@@ -41,14 +47,22 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     private final RepresentativeService representativeService;
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
+    private final LocationRefDataService locationRefDataService;
 
     @Override
     public SealedClaimResponseFormForSpec getTemplateData(CaseData caseData) {
+        List<LocationRefData> courtLocations = (locationRefDataService
+            .getCourtLocationsByEpimmsId(
+                CallbackParams.Params.BEARER_TOKEN.toString(),
+                caseData.getCourtLocation().getCaseLocation().getBaseLocation()));
         SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder
             = SealedClaimResponseFormForSpec.builder()
             .referenceNumber(caseData.getLegacyCaseReference())
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .whyDisputeTheClaim(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
+            .hearingCourtLocation(courtLocations.isEmpty() ? null : courtLocations.stream()
+                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
+                .collect(Collectors.toList()).get(0).getCourtName())
             .statementOfTruth(caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth());
 
         if (MultiPartyScenario.getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
