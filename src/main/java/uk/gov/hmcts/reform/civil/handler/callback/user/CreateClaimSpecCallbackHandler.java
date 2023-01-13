@@ -77,6 +77,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -393,6 +394,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder.respondent2Represented(respondent2Represented);
         }
 
+        addOrgPolicy2ForSameLegalRepresentative(dataBuilder.build(), dataBuilder);
+
         if (isPinInPostCaseMatched(caseData)) {
             dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         }
@@ -429,9 +432,33 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
         }
 
+        CaseData temporaryCaseData = dataBuilder.build();
+
+        if (temporaryCaseData.getRespondent1OrgRegistered() == YES
+            && temporaryCaseData.getRespondent1Represented() == YES
+            && temporaryCaseData.getRespondent2SameLegalRepresentative() == YES) {
+            // Predicate: Def1 registered, Def 2 unregistered.
+            // This is required to ensure mutual exclusion in 1v2 same solicitor case.
+            dataBuilder.respondent2OrgRegistered(YES);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void addOrgPolicy2ForSameLegalRepresentative(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+        if (caseData.getRespondent2SameLegalRepresentative() == YES) {
+            OrganisationPolicy.OrganisationPolicyBuilder organisationPolicy2Builder = OrganisationPolicy.builder();
+
+            OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
+            organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
+                .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
+                .build();
+
+            organisationPolicy2Builder.orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
+            caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2Builder.build());
+        }
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {

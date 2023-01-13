@@ -145,13 +145,18 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         ArrayList<String> errors = new ArrayList<>();
-        final String dateValidationErrorMessage = getServiceOfDateValidationMessage(caseData
-                                                                                       .getCosNotifyClaimDefendant1());
-        if (!dateValidationErrorMessage.isEmpty()) {
-            errors.add(dateValidationErrorMessage);
+        CertificateOfService certificateOfService = caseData.getCosNotifyClaimDefendant1();
+        final String dateValidErrorMessage = getServiceOfDateValidationMessage(certificateOfService);
+        if (!dateValidErrorMessage.isEmpty()) {
+            errors.add(dateValidErrorMessage);
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        caseDataBuilder.cosNotifyClaimDefendant1(certificateOfService.toBuilder()
+                                                     .cosUISenderStatementOfTruthLabel(null)
+                                                     .build())
+            .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
@@ -160,15 +165,19 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateCosDefendant2(final CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        CertificateOfService certificateOfServiceDef2 = caseData.getCosNotifyClaimDefendant2();
         ArrayList<String> errors = new ArrayList<>();
-        final String dateValidationErrorMessage = getServiceOfDateValidationMessage(caseData
-                                                                                       .getCosNotifyClaimDefendant2());
+        final String dateValidationErrorMessage = getServiceOfDateValidationMessage(certificateOfServiceDef2);
         if (!dateValidationErrorMessage.isEmpty()) {
             errors.add(dateValidationErrorMessage);
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        caseDataBuilder.cosNotifyClaimDefendant2(certificateOfServiceDef2.toBuilder()
+                                                     .cosUISenderStatementOfTruthLabel(null)
+                                                     .build());
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
@@ -189,6 +198,18 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         LocalDateTime claimDetailsNotificationDeadline;
         if (featureToggleService.isCertificateOfServiceEnabled() && areAnyRespondentsLitigantInPerson(caseData)) {
             claimDetailsNotificationDeadline = getDeadline(getServiceDate(caseData));
+            if (Objects.nonNull(caseData.getCosNotifyClaimDefendant1())) {
+                caseDataBuilder
+                    .cosNotifyClaimDefendant1(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDefendant1()))
+                    .build();
+            }
+
+            if (Objects.nonNull(caseData.getCosNotifyClaimDefendant2())) {
+                caseDataBuilder
+                    .cosNotifyClaimDefendant2(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDefendant2()))
+                    .build();
+            }
+
         } else {
             claimDetailsNotificationDeadline = getDeadline(claimNotificationDate);
         }
@@ -347,5 +368,13 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             }
         }
         return date;
+    }
+
+    private CertificateOfService updateStatementOfTruthForLip(CertificateOfService certificateOfService) {
+        List<String> cosUISenderStatementOfTruthLabel = certificateOfService.getCosUISenderStatementOfTruthLabel();
+        return certificateOfService.toBuilder()
+            .cosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
+            .cosUISenderStatementOfTruthLabel(null)
+            .build();
     }
 }
