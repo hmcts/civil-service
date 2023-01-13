@@ -59,11 +59,11 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
     private CallbackResponse notifyRespondent1ForAgreedRepayment(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if ((caseData.getRespondent1OrgRegistered().equals(YesOrNo.YES)
+        if ((YesOrNo.YES.equals(caseData.getRespondent1OrgRegistered())
             && caseData.getRespondentSolicitor1EmailAddress() == null)
-            || (!caseData.getRespondent1OrgRegistered().equals(YesOrNo.YES)
+            || ((!YesOrNo.YES.equals(caseData.getRespondent1OrgRegistered())
             && caseData.getRespondent1().getPartyEmail() == null
-            )) {
+            ))) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
@@ -78,35 +78,41 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        if (caseData.getRespondent1OrgRegistered().equals(YesOrNo.YES)) {
+        if (YesOrNo.YES.equals(caseData.getRespondent1OrgRegistered())) {
             return Map.of(
                 CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
                     caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()),
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
             );
-        } else {
+        }
+        if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
             return Map.of(
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
             );
         }
+        return null;
     }
 
     private String addEmail(CaseData caseData) {
-        if (caseData.getRespondent1OrgRegistered().equals(YesOrNo.YES)) {
+        if (YesOrNo.YES.equals(caseData.getRespondent1OrgRegistered())) {
             return caseData.getRespondentSolicitor1EmailAddress();
-        } else {
+        }
+        if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
             return caseData.getRespondent1().getPartyEmail();
         }
+        return null;
     }
 
     private String addTemplate(CaseData caseData) {
-        if (caseData.getRespondent1OrgRegistered().equals(YesOrNo.YES)) {
+        if (YesOrNo.YES.equals(caseData.getRespondent1OrgRegistered())) {
             return notificationsProperties.getRespondentSolicitorCcjNotificationTemplate();
-        } else {
+        }
+        if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
             return notificationsProperties.getRespondentCcjNotificationTemplate();
         }
+        return null;
     }
 
     public String getRespondentLegalOrganizationName(String id) {

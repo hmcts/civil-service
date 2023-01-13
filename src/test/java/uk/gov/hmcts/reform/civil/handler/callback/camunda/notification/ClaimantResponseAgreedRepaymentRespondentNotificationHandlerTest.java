@@ -77,7 +77,8 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1(respondent1)
-                .respondent1OrgRegistered(YesOrNo.NO)
+                .respondent1OrgRegistered(null)
+                .specRespondent1Represented(YesOrNo.NO)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT1_FOR_CLAIMANT_AGREED_REPAYMENT")
