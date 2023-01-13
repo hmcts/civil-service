@@ -377,10 +377,14 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 errors.add(DOC_SERVED_MANDATORY);
             }
         }
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.cosNotifyClaimDetails1(certificateOfService.toBuilder()
+                                                   .build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(errors)
-                .build();
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .errors(errors)
+            .build();
     }
 
     private CallbackResponse validateCoSDetailsDefendant2(final CallbackParams callbackParams) {
@@ -407,8 +411,12 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 errors.add(DOC_SERVED_MANDATORY);
             }
         }
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.cosNotifyClaimDetails2(certificateOfServiceDef2.toBuilder()
+                                                   .build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
             .build();
     }
