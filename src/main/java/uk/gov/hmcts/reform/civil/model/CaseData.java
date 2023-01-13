@@ -608,7 +608,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<EvidenceUploadTrial> trialSelectionEvidenceRes;
     private final List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaimRes;
     //applicant
-    private final List<Element<Document>> documentDisclosureList;
+    private final List<Element<UploadEvidenceDocumentType>> documentDisclosureList;
     private final List<Element<UploadEvidenceDocumentType>> documentForDisclosure;
     private final List<Element<UploadEvidenceWitness>> documentWitnessStatement;
     private final List<Element<UploadEvidenceWitness>> documentWitnessSummary;
@@ -618,14 +618,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<UploadEvidenceExpert>> documentJointStatement;
     private final List<Element<UploadEvidenceExpert>> documentQuestions;
     private final List<Element<UploadEvidenceExpert>> documentAnswers;
-    private final List<Element<Document>> documentCaseSummary;
-    private final List<Element<Document>> documentSkeletonArgument;
-    private final List<Element<Document>> documentAuthorities;
-    private final List<Element<Document>> documentCosts;
+    private final List<Element<UploadEvidenceDocumentType>> documentCaseSummary;
+    private final List<Element<UploadEvidenceDocumentType>> documentSkeletonArgument;
+    private final List<Element<UploadEvidenceDocumentType>> documentAuthorities;
+    private final List<Element<UploadEvidenceDocumentType>> documentCosts;
     private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrial;
     private final LocalDateTime caseDocumentUploadDate;
     //respondent
-    private final List<Element<Document>> documentDisclosureListRes;
+    private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListRes;
     private final List<Element<UploadEvidenceDocumentType>> documentForDisclosureRes;
     private final List<Element<UploadEvidenceWitness>> documentWitnessStatementRes;
     private final List<Element<UploadEvidenceWitness>> documentWitnessSummaryRes;
@@ -635,13 +635,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<UploadEvidenceExpert>> documentJointStatementRes;
     private final List<Element<UploadEvidenceExpert>> documentQuestionsRes;
     private final List<Element<UploadEvidenceExpert>> documentAnswersRes;
-    private final List<Element<Document>> documentCaseSummaryRes;
-    private final List<Element<Document>> documentSkeletonArgumentRes;
-    private final List<Element<Document>> documentAuthoritiesRes;
-    private final List<Element<Document>> documentCostsRes;
+    private final List<Element<UploadEvidenceDocumentType>> documentCaseSummaryRes;
+    private final List<Element<UploadEvidenceDocumentType>> documentSkeletonArgumentRes;
+    private final List<Element<UploadEvidenceDocumentType>> documentAuthoritiesRes;
+    private final List<Element<UploadEvidenceDocumentType>> documentCostsRes;
     private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialRes;
     //these fields are shown if the solicitor is for respondent 2 and respondents have different solicitors
-    private final List<Element<Document>> documentDisclosureListRes2;
+    private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListRes2;
     private final List<Element<UploadEvidenceDocumentType>> documentForDisclosureRes2;
     private final List<Element<UploadEvidenceWitness>> documentWitnessStatementRes2;
     private final List<Element<UploadEvidenceWitness>> documentWitnessSummaryRes2;
@@ -651,10 +651,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<UploadEvidenceExpert>> documentJointStatementRes2;
     private final List<Element<UploadEvidenceExpert>> documentQuestionsRes2;
     private final List<Element<UploadEvidenceExpert>> documentAnswersRes2;
-    private final List<Element<Document>> documentCaseSummaryRes2;
-    private final List<Element<Document>> documentSkeletonArgumentRes2;
-    private final List<Element<Document>> documentAuthoritiesRes2;
-    private final List<Element<Document>> documentCostsRes2;
+    private final List<Element<UploadEvidenceDocumentType>> documentCaseSummaryRes2;
+    private final List<Element<UploadEvidenceDocumentType>> documentSkeletonArgumentRes2;
+    private final List<Element<UploadEvidenceDocumentType>> documentAuthoritiesRes2;
+    private final List<Element<UploadEvidenceDocumentType>> documentCostsRes2;
     private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialRes2;
     private final LocalDateTime caseDocumentUploadDateRes;
 
