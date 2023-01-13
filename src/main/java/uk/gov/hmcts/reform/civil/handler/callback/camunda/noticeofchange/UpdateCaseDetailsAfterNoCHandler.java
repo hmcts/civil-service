@@ -211,9 +211,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         } else {
             caseDataBuilder
                 .specApplicantCorrespondenceAddressdetails(null)
-                .specApplicantCorrespondenceAddressRequired(NO)
-                .specAoSApplicantCorrespondenceAddressRequired(NO)
-                .specAoSApplicantCorrespondenceAddressdetails(null);
+                .specApplicantCorrespondenceAddressRequired(NO);
         }
 
         if (addedSolicitorDetails != null) {
