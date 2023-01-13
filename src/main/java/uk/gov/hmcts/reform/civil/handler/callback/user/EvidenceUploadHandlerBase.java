@@ -21,8 +21,6 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
-import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
-import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -90,7 +88,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         //For case which are 1v1, 2v1 and 1v2 (same solicitor) we show respondent fields for documents to be uploaded,
         //if a case is 1v2 and different solicitors we want to sure separate fields for each respondent solicitor,
         // below creates a show condition for these fields if user is respondent 2 solicitor
-        System.out.println("logged user has roles of   " + coreCaseUserService.getUserCaseRoles(caseData.getCcdCaseReference().toString(),userInfo.getUid()));
+        System.out.println("logged user has roles of   " + coreCaseUserService.getUserCaseRoles(caseData.getCcdCaseReference().toString(), userInfo.getUid()));
         //default flag for respondent 1 solictor
         caseDataBuilder.caseTypeFlag("do_not_show");
         //set flag for respondent2
@@ -188,13 +186,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     }
 
     CallbackResponse validateValuesParty(List<Element<UploadEvidenceDocumentType>> uploadEvidenceDocumentType,
-                                         List<Element<UploadEvidenceWitness>> uploadEvidenceWitness1,
-                                         List<Element<UploadEvidenceWitness>> uploadEvidenceWitness3,
+                                         List<Element<UploadEvidenceDocumentType>> uploadEvidenceWitness1,
+                                         List<Element<UploadEvidenceDocumentType>> uploadEvidenceWitness3,
                                          List<Element<UploadEvidenceDocumentType>> witnessDocumentReferred,
-                                         List<Element<UploadEvidenceExpert>> uploadEvidenceExpert1,
-                                         List<Element<UploadEvidenceExpert>> uploadEvidenceExpert2,
-                                         List<Element<UploadEvidenceExpert>> uploadEvidenceExpert3,
-                                         List<Element<UploadEvidenceExpert>> uploadEvidenceExpert4,
+                                         List<Element<UploadEvidenceDocumentType>> uploadEvidenceExpert1,
+                                         List<Element<UploadEvidenceDocumentType>> uploadEvidenceExpert2,
+                                         List<Element<UploadEvidenceDocumentType>> uploadEvidenceExpert3,
+                                         List<Element<UploadEvidenceDocumentType>> uploadEvidenceExpert4,
                                          List<Element<UploadEvidenceDocumentType>> trialDocumentEvidence) {
         List<String> errors = new ArrayList<>();
 
@@ -238,9 +236,6 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                  .getDocumentIssuedDate(),
                              "Invalid date: \"Documentary evidence for trial\" "
                                  + "date entered must not be in the future (9).");
-
-        // date checks for respondent 2 fields
-
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)

@@ -25,8 +25,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
-import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
-import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -69,9 +67,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
 
-    private final UploadEvidenceExpert uploadEvidenceDate = new UploadEvidenceExpert();
-    private final UploadEvidenceWitness uploadEvidenceDate2 = new UploadEvidenceWitness();
-    private final UploadEvidenceDocumentType uploadEvidenceDate3 = new UploadEvidenceDocumentType();
+    private final UploadEvidenceDocumentType uploadEvidenceDate = new UploadEvidenceDocumentType();
 
     private static final String PAGE_ID = "validateValuesApplicant";
 
@@ -124,7 +120,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotReturnError_whenDocumentTypeUploadDatePast(String dateField, String collectionField) {
         // Given
         List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate3.toBuilder(), dateField, time.now()
+        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now()
             .toLocalDate().minusWeeks(1)).build()));
 
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -148,7 +144,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotReturnError_whenDocumentTypeUploadDatePresent(String dateField, String collectionField) {
         // Given
         List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate3.toBuilder(), dateField, time.now()
+        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now()
             .toLocalDate()).build()));
 
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -176,7 +172,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
                                                             String expectedErrorMessage) {
         // Given
         List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate3.toBuilder(), dateField, time.now()
+        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now()
             .toLocalDate().plusWeeks(1)).build()));
 
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -200,7 +196,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     })
     void shouldNotReturnError_whenExpertOptionUploadDatePast(String dateField, String collectionField) {
         // Given
-        List<Element<UploadEvidenceExpert>> date = new ArrayList<>();
+        List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
         date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now()
             .toLocalDate().minusWeeks(1)).build()));
 
@@ -225,7 +221,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     })
     void shouldNotReturnError_whenExpertOptionUploadDatePresent(String dateField, String collectionField) {
         // Given
-        List<Element<UploadEvidenceExpert>> date = new ArrayList<>();
+        List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
         date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now()
             .toLocalDate()).build()));
 
@@ -255,7 +251,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     void shouldReturnError_whenExpertOptionUploadDateFuture(String dateField, String collectionField,
                                                             String expectedErrorMessage) {
         // Given
-        List<Element<UploadEvidenceExpert>> date = new ArrayList<>();
+        List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
         date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now()
             .toLocalDate().plusWeeks(1)).build()));
 
@@ -281,8 +277,8 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     void shouldReturnError_whenWitnessOptionUploadDateInFuture(String dateField, String collectionField,
                                                                String expectedErrorMessage) {
         // Given
-        List<Element<UploadEvidenceWitness>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate2.toBuilder(), dateField,
+        List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
+        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField,
                                    time.now().toLocalDate().plusWeeks(1)).build()));
 
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
@@ -304,8 +300,8 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     })
     void shouldNotReturnError_whenWitnessOptionUploadDatePresent(String dateField, String collectionField) {
         // Given
-        List<Element<UploadEvidenceWitness>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate2.toBuilder(), dateField,
+        List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
+        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField,
                                    time.now().toLocalDate()).build()));
 
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
@@ -327,8 +323,8 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     })
     void shouldNotReturnError_whenWitnessOptionUploadDatePast(String dateField, String collectionField) {
         // Given
-        List<Element<UploadEvidenceWitness>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate2.toBuilder(), dateField,
+        List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
+        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField,
                                    time.now().toLocalDate().minusWeeks(1)).build()));
 
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
@@ -354,11 +350,11 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         // these dates should all be in the past, otherwise an error will be populated
 
         // Given
-        List<Element<UploadEvidenceWitness>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate2.toBuilder(), dateField, time.now().toLocalDate().minusWeeks(1)).build()));
-        date.add(1, element(invoke(uploadEvidenceDate2.toBuilder(), dateField, time.now().toLocalDate().plusWeeks(1)).build()));
+        List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
+        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now().toLocalDate().minusWeeks(1)).build()));
+        date.add(1, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now().toLocalDate().plusWeeks(1)).build()));
         //dates above represent valid past dates, date below represents invalid future date.
-        date.add(2, element(invoke(uploadEvidenceDate2.toBuilder(), dateField, time.now().toLocalDate().minusWeeks(1)).build()));
+        date.add(2, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now().toLocalDate().minusWeeks(1)).build()));
 
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, date).build();
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -386,7 +382,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         // these dates should all be in the past, otherwise an error will be populated
 
         // Given
-        List<Element<UploadEvidenceExpert>> date = new ArrayList<>();
+        List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
         date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now().toLocalDate().minusWeeks(1)).build()));
         date.add(1, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now().toLocalDate().plusWeeks(1)).build()));
         //dates above represent valid past dates, date below represents invalid future date.

@@ -17,5 +17,17 @@ public class UploadEvidenceDocumentType {
     private String typeOfDocument;
     private LocalDate documentIssuedDate;
     private Document documentUpload;
+    private String expertOptionName;
+    private String expertOptionName2;
+    private String expertOptionName3;
+    private String expertOptionExpertise;
+    private String expertOptionExpertises;
+    private String expertOptionOtherParty;
+    private String expertDocumentQuestion;
+    private String expertDocumentAnswer;
+    private LocalDate expertOptionUploadDate;
+    private String witnessOptionName;
+    private LocalDate witnessOptionUploadDate;
+
 }
 

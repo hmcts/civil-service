@@ -31,8 +31,6 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
-import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
-import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -84,9 +82,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
 
-    private final UploadEvidenceExpert uploadEvidenceDate = new UploadEvidenceExpert();
-    private final UploadEvidenceWitness uploadEvidenceDate2 = new UploadEvidenceWitness();
-    private final UploadEvidenceDocumentType uploadEvidenceDate3 = new UploadEvidenceDocumentType();
+    private final UploadEvidenceDocumentType uploadEvidenceDate = new UploadEvidenceDocumentType();
 
     private static final String PAGE_ID = "validateValuesRespondent";
 
@@ -290,21 +286,66 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @CsvSource({
         "documentIssuedDate,documentForDisclosureRes",
-        "documentIssuedDate,documentForDisclosureRes2",
+        "witnessOptionUploadDate,documentWitnessStatementRes",
+        "witnessOptionUploadDate,documentHearsayNoticeRes",
         "documentIssuedDate,documentReferredInStatementRes",
-        "documentIssuedDate,documentReferredInStatementRes2",
+        "expertOptionUploadDate,documentExpertReportRes",
+        "expertOptionUploadDate,documentJointStatementRes",
+        "expertOptionUploadDate,documentQuestionsRes",
+        "expertOptionUploadDate,documentAnswersRes",
         "documentIssuedDate,documentEvidenceForTrialRes",
-        "documentIssuedDate,documentEvidenceForTrialRes2",
     })
-    void shouldNotReturnError_whenDocumentTypeUploadDatePast(String dateField, String collectionField) {
+    void shouldNotReturnError_whenDocumentTypeUploadDatePastRespondentOne(String dateField, String collectionField) {
         // Given
         List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate3.toBuilder(), dateField, time.now()
+        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now()
             .toLocalDate().minusWeeks(1)).build()));
 
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
                                        .build().toBuilder(), collectionField, date)
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(YES)
             .build();
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).willReturn(false);
+        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "documentIssuedDate,documentForDisclosureRes2",
+        "witnessOptionUploadDate,documentWitnessStatementRes2",
+        "witnessOptionUploadDate,documentHearsayNoticeRes2",
+        "documentIssuedDate,documentReferredInStatementRes2",
+        "expertOptionUploadDate,documentExpertReportRes2",
+        "expertOptionUploadDate,documentJointStatementRes2",
+        "expertOptionUploadDate,documentQuestionsRes2",
+        "expertOptionUploadDate,documentAnswersRes2",
+        "documentIssuedDate,documentEvidenceForTrialRes2",
+    })
+    void shouldNotReturnError_whenDocumentTypeUploadDatePastRespondentTwo(String dateField, String collectionField) {
+        // Given
+        List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
+        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now()
+            .toLocalDate().minusWeeks(1)).build()));
+
+        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                                       .build().toBuilder(), collectionField, date)
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(YES)
+            .build();
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -317,21 +358,66 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @CsvSource({
         "documentIssuedDate,documentForDisclosureRes",
-        "documentIssuedDate,documentForDisclosureRes2",
+        "witnessOptionUploadDate,documentWitnessStatementRes",
+        "witnessOptionUploadDate,documentHearsayNoticeRes",
         "documentIssuedDate,documentReferredInStatementRes",
-        "documentIssuedDate,documentReferredInStatementRes2",
+        "expertOptionUploadDate,documentExpertReportRes",
+        "expertOptionUploadDate,documentJointStatementRes",
+        "expertOptionUploadDate,documentQuestionsRes",
+        "expertOptionUploadDate,documentAnswersRes",
         "documentIssuedDate,documentEvidenceForTrialRes",
-        "documentIssuedDate,documentEvidenceForTrialRes2",
     })
-    void shouldNotReturnError_whenDocumentTypeUploadDatePresent(String dateField, String collectionField) {
+    void shouldNotReturnError_whenDocumentTypeUploadDatePresentOneRespondent(String dateField, String collectionField) {
         // Given
         List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate3.toBuilder(), dateField, time.now()
+        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now()
             .toLocalDate()).build()));
 
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
                                        .build().toBuilder(), collectionField, date)
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(YES)
             .build();
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).willReturn(false);
+        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        // Then
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "documentIssuedDate,documentForDisclosureRes2",
+        "witnessOptionUploadDate,documentWitnessStatementRes2",
+        "witnessOptionUploadDate,documentHearsayNoticeRes2",
+        "documentIssuedDate,documentReferredInStatementRes2",
+        "expertOptionUploadDate,documentExpertReportRes2",
+        "expertOptionUploadDate,documentJointStatementRes2",
+        "expertOptionUploadDate,documentQuestionsRes2",
+        "expertOptionUploadDate,documentAnswersRes2",
+        "documentIssuedDate,documentEvidenceForTrialRes2",
+    })
+    void shouldNotReturnError_whenDocumentTypeUploadDatePresentTwoRespondent(String dateField, String collectionField) {
+        // Given
+        List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
+        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now()
+            .toLocalDate()).build()));
+
+        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                                       .build().toBuilder(), collectionField, date)
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(YES)
+            .build();
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -345,27 +431,37 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @CsvSource({
         "documentIssuedDate,documentForDisclosureRes, Invalid date: \"Documents for disclosure\""
             + " date entered must not be in the future (1).",
-        "documentIssuedDate,documentForDisclosureRes2, Invalid date: \"Documents for disclosure\""
-            + " date entered must not be in the future (1).",
+        "witnessOptionUploadDate,documentWitnessStatementRes,Invalid date: \"witness statement\" "
+            + "date entered must not be in the future (2).",
+        "witnessOptionUploadDate,documentHearsayNoticeRes,Invalid date: \"Notice of the intention to rely on"
+            + " hearsay evidence\" date entered must not be in the future (3).",
         "documentIssuedDate,documentReferredInStatementRes, Invalid date: \"Documents referred to in the statement\""
             + " date entered must not be in the future (4).",
-        "documentIssuedDate,documentReferredInStatementRes2, Invalid date: \"Documents referred to in the statement\""
-            + " date entered must not be in the future (4).",
+        "expertOptionUploadDate,documentExpertReportRes,Invalid date: \"Expert's report\""
+            + " date entered must not be in the future (5).",
+        "expertOptionUploadDate,documentJointStatementRes,Invalid date: \"Joint statement of experts\" "
+            + "date entered must not be in the future (6).",
+        "expertOptionUploadDate,documentQuestionsRes,Invalid date: \"Questions for other party's expert "
+            + "or joint experts\" expert statement date entered must not be in the future (7).",
+        "expertOptionUploadDate,documentAnswersRes,Invalid date: \"Answers to questions asked by the other party\" "
+            + "date entered must not be in the future (8).",
         "documentIssuedDate,documentEvidenceForTrialRes, Invalid date: \"Documentary evidence for trial\""
             + " date entered must not be in the future (9).",
-        "documentIssuedDate,documentEvidenceForTrialRes2, Invalid date: \"Documentary evidence for trial\""
-            + " date entered must not be in the future (9).",
     })
-    void shouldReturnError_whenDocumentTypeUploadDateFuture(String dateField, String collectionField,
+    void shouldReturnError_whenDocumentTypeUploadDateFutureOneRespondent(String dateField, String collectionField,
                                                             String expectedErrorMessage) {
         // Given
         List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate3.toBuilder(), dateField, time.now()
+        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now()
             .toLocalDate().plusWeeks(1)).build()));
 
         CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
                                        .build().toBuilder(), collectionField, date)
+            .addRespondent2(NO)
             .build();
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -377,72 +473,14 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOptionUploadDate,documentExpertReportRes",
-        "expertOptionUploadDate,documentJointStatementRes",
-        "expertOptionUploadDate,documentQuestionsRes",
-        "expertOptionUploadDate,documentAnswersRes",
-        "expertOptionUploadDate,documentExpertReportRes2",
-        "expertOptionUploadDate,documentJointStatementRes2",
-        "expertOptionUploadDate,documentQuestionsRes2",
-        "expertOptionUploadDate,documentAnswersRes2"
-    })
-    void shouldNotReturnError_whenExpert2OptionUploadDatePast(String dateField, String collectionField) {
-        // Given
-        List<Element<UploadEvidenceExpert>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now()
-            .toLocalDate().minusWeeks(1)).build()));
-
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                                       .build().toBuilder(), collectionField, date)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-        // When
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        // Then
-        assertThat(response.getErrors()).isEmpty();
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        "expertOptionUploadDate,documentExpertReportRes",
-        "expertOptionUploadDate,documentJointStatementRes",
-        "expertOptionUploadDate,documentQuestionsRes",
-        "expertOptionUploadDate,documentAnswersRes",
-        "expertOptionUploadDate,documentExpertReportRes2",
-        "expertOptionUploadDate,documentJointStatementRes2",
-        "expertOptionUploadDate,documentQuestionsRes2",
-        "expertOptionUploadDate,documentAnswersRes2"
-    })
-    void shouldNotReturnError_whenExpertOptionUploadDatePresent(String dateField, String collectionField) {
-        // Given
-        List<Element<UploadEvidenceExpert>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now()
-            .toLocalDate()).build()));
-
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
-                                       .build().toBuilder(), collectionField, date)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-        // When
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        // Then
-        assertThat(response.getErrors()).isEmpty();
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        "expertOptionUploadDate,documentExpertReportRes,Invalid date: \"Expert's report\""
-        + " date entered must not be in the future (5).",
-        "expertOptionUploadDate,documentJointStatementRes,Invalid date: \"Joint statement of experts\" "
-            + "date entered must not be in the future (6).",
-        "expertOptionUploadDate,documentQuestionsRes,Invalid date: \"Questions for other party's expert "
-            + "or joint experts\" expert statement date entered must not be in the future (7).",
-        "expertOptionUploadDate,documentAnswersRes,Invalid date: \"Answers to questions asked by the other party\" "
-            + "date entered must not be in the future (8).",
+        "documentIssuedDate,documentForDisclosureRes2, Invalid date: \"Documents for disclosure\""
+            + " date entered must not be in the future (1).",
+        "witnessOptionUploadDate,documentWitnessStatementRes2,Invalid date: \"witness statement\" "
+            + "date entered must not be in the future (2).",
+        "witnessOptionUploadDate,documentHearsayNoticeRes2,Invalid date: \"Notice of the intention to rely on"
+            + " hearsay evidence\" date entered must not be in the future (3).",
+        "documentIssuedDate,documentReferredInStatementRes2, Invalid date: \"Documents referred to in the statement\""
+            + " date entered must not be in the future (4).",
         "expertOptionUploadDate,documentExpertReportRes2,Invalid date: \"Expert's report\""
             + " date entered must not be in the future (5).",
         "expertOptionUploadDate,documentJointStatementRes2,Invalid date: \"Joint statement of experts\" "
@@ -450,18 +488,26 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         "expertOptionUploadDate,documentQuestionsRes2,Invalid date: \"Questions for other party's expert "
             + "or joint experts\" expert statement date entered must not be in the future (7).",
         "expertOptionUploadDate,documentAnswersRes2,Invalid date: \"Answers to questions asked by the other party\" "
-            + "date entered must not be in the future (8)."
+            + "date entered must not be in the future (8).",
+        "documentIssuedDate,documentEvidenceForTrialRes2, Invalid date: \"Documentary evidence for trial\""
+            + " date entered must not be in the future (9).",
     })
-    void shouldReturnError_whenExpertOptionUploadDateFuture(String dateField, String collectionField,
-                                                            String expectedErrorMessage) {
+    void shouldReturnError_whenDocumentTypeUploadDateFutureTwoRespondent(String dateField, String collectionField,
+                                                                         String expectedErrorMessage) {
         // Given
-        List<Element<UploadEvidenceExpert>> date = new ArrayList<>();
+        List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
         date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now()
             .toLocalDate().plusWeeks(1)).build()));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-                                   collectionField, date)
+        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                                       .build().toBuilder(), collectionField, date)
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(YES)
             .build();
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -469,86 +515,6 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
         // Then
         assertThat(response.getErrors()).contains(expectedErrorMessage);
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        "witnessOptionUploadDate,documentWitnessStatementRes,Invalid date: \"witness statement\" "
-            + "date entered must not be in the future (2).",
-        "witnessOptionUploadDate,documentHearsayNoticeRes,Invalid date: \"Notice of the intention to rely on"
-            + " hearsay evidence\" date entered must not be in the future (3).",
-        "witnessOptionUploadDate,documentWitnessStatementRes2,Invalid date: \"witness statement\" "
-            + "date entered must not be in the future (2).",
-        "witnessOptionUploadDate,documentHearsayNoticeRes2,Invalid date: \"Notice of the intention to rely on"
-            + " hearsay evidence\" date entered must not be in the future (3)."
-    })
-    void shouldReturnError_whenWitnessOptionUploadDateInFuture(String dateField, String collectionField,
-                                                               String expectedErrorMessage) {
-        // Given
-        List<Element<UploadEvidenceWitness>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate2.toBuilder(), dateField,
-                                   time.now().toLocalDate().plusWeeks(1)).build()));
-
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-                                   collectionField, date)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-        // When
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        // Then
-        assertThat(response.getErrors()).contains(expectedErrorMessage);
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        "witnessOptionUploadDate,documentWitnessStatementRes",
-        "witnessOptionUploadDate,documentHearsayNoticeRes",
-        "witnessOptionUploadDate,documentWitnessStatementRes2",
-        "witnessOptionUploadDate,documentHearsayNoticeRes2"
-    })
-    void shouldNotReturnError_whenWitnessOptionUploadDatePresent(String dateField, String collectionField) {
-        // Given
-        List<Element<UploadEvidenceWitness>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate2.toBuilder(), dateField,
-                                   time.now().toLocalDate()).build()));
-
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-                                   collectionField, date)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-        // When
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        // Then
-        assertThat(response.getErrors()).isEmpty();
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        "witnessOptionUploadDate,documentWitnessStatementRes",
-        "witnessOptionUploadDate,documentHearsayNoticeRes",
-        "witnessOptionUploadDate,documentWitnessStatementRes",
-        "witnessOptionUploadDate,documentHearsayNoticeRes"
-    })
-    void shouldNotReturnError_whenWitnessOptionUploadDatePast(String dateField, String collectionField) {
-        // Given
-        List<Element<UploadEvidenceWitness>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate2.toBuilder(), dateField,
-                                   time.now().toLocalDate().minusWeeks(1)).build()));
-
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(),
-                                   collectionField, date)
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-        // When
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        // Then
-        assertThat(response.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
@@ -556,22 +522,27 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         "witnessOptionUploadDate,documentWitnessStatementRes,Invalid date: \"witness statement\" date entered must not be in the future (2).",
         "witnessOptionUploadDate,documentHearsayNoticeRes,Invalid date: \"Notice of the intention to rely on hearsay evidence\" " +
             "date entered must not be in the future (3).",
-        "witnessOptionUploadDate,documentWitnessStatementRes2,Invalid date: \"witness statement\" date entered must not be in the future (2).",
-        "witnessOptionUploadDate,documentHearsayNoticeRes2,Invalid date: \"Notice of the intention to rely on hearsay evidence\" " +
+        "witnessOptionUploadDate,documentWitnessStatementRes,Invalid date: \"witness statement\" date entered must not be in the future (2).",
+        "witnessOptionUploadDate,documentHearsayNoticeRes,Invalid date: \"Notice of the intention to rely on hearsay evidence\" " +
             "date entered must not be in the future (3)."
     })
-    void shouldReturnError_whenOneDateIsInFutureForWitnessStatements(String dateField, String collectionField, String errorMessage) {
-        //documentUploadWitness1 represents a collection so can have multiple dates entered at any time,
+    void shouldReturnError_whenOneDateIsInFutureForOneRespondent(String dateField, String collectionField, String errorMessage) {
+        //uploadEvidenceDate represents a collection so can have multiple dates entered at any time,
         // these dates should all be in the past, otherwise an error will be populated
 
         // Given
-        List<Element<UploadEvidenceWitness>> date = new ArrayList<>();
-        date.add(0, element(invoke(uploadEvidenceDate2.toBuilder(), dateField, time.now().toLocalDate().minusWeeks(1)).build()));
-        date.add(1, element(invoke(uploadEvidenceDate2.toBuilder(), dateField, time.now().toLocalDate().plusWeeks(1)).build()));
+        List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
+        date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now().toLocalDate().minusWeeks(1)).build()));
+        date.add(1, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now().toLocalDate().plusWeeks(1)).build()));
         //dates above represent valid past dates, date below represents invalid future date.
-        date.add(2, element(invoke(uploadEvidenceDate2.toBuilder(), dateField, time.now().toLocalDate().minusWeeks(1)).build()));
+        date.add(2, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now().toLocalDate().minusWeeks(1)).build()));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, date).build();
+        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, date)
+            .addRespondent2(NO)
+            .build();
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
@@ -583,15 +554,15 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOptionUploadDate,documentExpertReportRes,Invalid date: \"Expert's report\""
+        "expertOptionUploadDate,documentExpertReportRes2,Invalid date: \"Expert's report\""
             + " date entered must not be in the future (5).",
-        "expertOptionUploadDate,documentJointStatementRes,Invalid date: \"Joint statement of experts\" "
+        "expertOptionUploadDate,documentJointStatementRes2,Invalid date: \"Joint statement of experts\" "
             + "date entered must not be in the future (6).",
-        "expertOptionUploadDate,documentQuestionsRes,Invalid date: \"Questions for other party's expert "
+        "expertOptionUploadDate,documentQuestionsRes2,Invalid date: \"Questions for other party's expert "
             + "or joint experts\" expert statement date entered must not be in the future (7).",
-        "expertOptionUploadDate,documentAnswersRes,Invalid date: \"Answers to questions asked by the other party\" "
+        "expertOptionUploadDate,documentAnswersRes2,Invalid date: \"Answers to questions asked by the other party\" "
             + "date entered must not be in the future (8).",
-        "expertOptionUploadDate,documentExpertReportRes,Invalid date: \"Expert's report\""
+        "expertOptionUploadDate,documentExpertReportRes2,Invalid date: \"Expert's report\""
             + " date entered must not be in the future (5).",
         "expertOptionUploadDate,documentJointStatementRes2,Invalid date: \"Joint statement of experts\" "
             + "date entered must not be in the future (6).",
@@ -600,18 +571,25 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         "expertOptionUploadDate,documentAnswersRes2,Invalid date: \"Answers to questions asked by the other party\" "
             + "date entered must not be in the future (8)."
     })
-    void shouldReturnError_whenOneDateIsInFutureForExpertStatements(String dateField, String collectionField, String errorMessage) {
-        //documentUploadWitness1 represents a collection so can have multiple dates entered at any time,
+    void shouldReturnError_whenOneDateIsInFutureForTwoRespondents(String dateField, String collectionField, String errorMessage) {
+        //uploadEvidenceDate represents a collection so can have multiple dates entered at any time,
         // these dates should all be in the past, otherwise an error will be populated
 
         // Given
-        List<Element<UploadEvidenceExpert>> date = new ArrayList<>();
+        List<Element<UploadEvidenceDocumentType>> date = new ArrayList<>();
         date.add(0, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now().toLocalDate().minusWeeks(1)).build()));
         date.add(1, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now().toLocalDate().plusWeeks(1)).build()));
         //dates above represent valid past dates, date below represents invalid future date.
         date.add(2, element(invoke(uploadEvidenceDate.toBuilder(), dateField, time.now().toLocalDate().minusWeeks(1)).build()));
 
-        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, date).build();
+        CaseData caseData = invoke(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder(), collectionField, date)
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(YES)
+            .build();
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).willReturn(true);
         CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
         // When
