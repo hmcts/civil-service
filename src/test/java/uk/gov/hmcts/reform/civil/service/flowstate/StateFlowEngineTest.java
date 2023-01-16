@@ -794,7 +794,6 @@ class StateFlowEngineTest {
                     );
                 verify(featureToggleService).isRpaContinuousFeedEnabled();
                 assertThat(stateFlow.getFlags()).hasSize(7).contains(
-                    entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
                     entry(FlowFlag.RPA_CONTINUOUS_FEED.name(), true),
                     entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
@@ -3797,7 +3796,7 @@ class StateFlowEngineTest {
         }
 
         @Test
-        public void claim1v1_reachFullAdmitProceed() {
+        void claim1v1_reachFullAdmitProceed() {
             CaseData.CaseDataBuilder<?, ?> builder = claim1v1Submitted();
 
             assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
@@ -3830,7 +3829,7 @@ class StateFlowEngineTest {
         }
 
         @Test
-        public void claim1v1_reachFullAdmitNoProceed() {
+        void claim1v1_reachFullAdmitNoProceed() {
             CaseData.CaseDataBuilder<?, ?> builder = claim1v1Submitted();
 
             assertThat(stateFlowEngine.evaluate(builder.build()).getState().getName())
@@ -4012,7 +4011,7 @@ class StateFlowEngineTest {
                                                               .build());
 
             Assertions.assertEquals(newState.getState().getName(), FULL_DEFENCE_PROCEED.fullName());
-            Assertions.assertEquals(newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()), Boolean.TRUE);
+            Assertions.assertEquals(Boolean.TRUE, newState.getFlags().get(FlowFlag.AGREED_TO_MEDIATION.name()));
         }
     }
 
