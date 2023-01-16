@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
@@ -26,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +40,7 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
     private final SealedClaimResponseFormGeneratorForSpec formGenerator;
 
     private final CivilDocumentStitchingService civilDocumentStitchingService;
+    private final FeatureToggleService toggleService;
 
     @Value("${stitching.enabled:true}")
     private boolean stitchEnabled;
@@ -44,7 +48,8 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::prepareSealedForm
+            callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::prepareSealedForm,
+            callbackKey(V_1, ABOUT_TO_SUBMIT), this::prepareSealedForm
         );
     }
 
@@ -71,8 +76,14 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 sealedForm.getDocumentName(),
                 caseData
             );
+            if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
+                builder.respondent1ClaimResponseDocumentSpec(stitchedDocument);
+            }
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
         } else {
+            if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
+                builder.respondent1ClaimResponseDocumentSpec(sealedForm);
+            }
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(sealedForm));
         }
 
