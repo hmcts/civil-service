@@ -64,7 +64,6 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
                                        caseData.getDocumentEvidenceForTrialRes());
         }
 
-
     }
 
     @Override
