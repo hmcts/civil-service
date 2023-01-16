@@ -150,8 +150,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         if (!dateValidErrorMessage.isEmpty()) {
             errors.add(dateValidErrorMessage);
         }
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.cosNotifyClaimDefendant1(certificateOfService.toBuilder().build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -169,7 +168,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             errors.add(dateValidationErrorMessage);
         }
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         caseDataBuilder.cosNotifyClaimDefendant2(certificateOfServiceDef2.toBuilder().build());
 
