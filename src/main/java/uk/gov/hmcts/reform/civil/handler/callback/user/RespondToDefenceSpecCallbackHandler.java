@@ -464,8 +464,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-        //Set the hint date for repayment to be 30 days in the future
-        String formattedDeadline = formatLocalDateTime(LocalDateTime.now().plusDays(30), DATE);
+        String formattedDeadline = formatLocalDateTime(LocalDateTime.now(), DATE);
         caseDataBuilder.currentDateboxDefendantSpec(formattedDeadline);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -483,15 +482,19 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         BigDecimal regularRepaymentAmountPennies = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
         BigDecimal regularRepaymentAmountPounds = MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies);
 
-        if (regularRepaymentAmountPounds.compareTo(totalClaimAmount) > 0) {
-            errors.add("Regular payment cannot exceed the full claim amount");
+        if (regularRepaymentAmountPounds == null || regularRepaymentAmountPounds.compareTo(BigDecimal.ZERO) < 0) {
+            errors.add("Enter an amount of £1 or more");
+        }
+
+        if (regularRepaymentAmountPounds.compareTo(totalClaimAmount.subtract(BigDecimal.ONE)) > 0) {
+            errors.add("Enter a valid amount for equal instalments");
         }
 
         LocalDate eligibleDate;
-        formatLocalDate(eligibleDate = LocalDate.now().plusDays(30), DATE);
+        formatLocalDate(eligibleDate = LocalDate.now(), DATE);
         if (caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec().isBefore(eligibleDate.plusDays(
             1))) {
-            errors.add("Selected date must be after " + formatLocalDate(eligibleDate, DATE));
+            errors.add("Enter a first payment date in the future");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
