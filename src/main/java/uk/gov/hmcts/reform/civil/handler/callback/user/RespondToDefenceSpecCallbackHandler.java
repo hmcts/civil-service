@@ -483,8 +483,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         BigDecimal regularRepaymentAmountPennies = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
         BigDecimal regularRepaymentAmountPounds = MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies);
 
-        if (regularRepaymentAmountPounds.compareTo(totalClaimAmount) > 0) {
-            errors.add("Regular payment cannot exceed the full claim amount");
+        if (regularRepaymentAmountPounds == null || regularRepaymentAmountPounds.compareTo(BigDecimal.ZERO) <= 0) {
+            errors.add("Enter an amount of £1 or more");
+        }
+
+        if (regularRepaymentAmountPounds.compareTo(totalClaimAmount.subtract(BigDecimal.ONE)) > 0) {
+            errors.add("Enter a valid amount for equal instalments");
         }
 
         LocalDate eligibleDate;

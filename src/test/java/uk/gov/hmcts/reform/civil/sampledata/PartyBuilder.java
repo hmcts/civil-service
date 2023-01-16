@@ -61,6 +61,8 @@ public class PartyBuilder {
         soleTraderTradingAs = "Sole Trader co";
         partyName = soleTraderTitle + " " + soleTraderFirstName + " " + soleTraderLastName;
         primaryAddress = AddressBuilder.defaults().build();
+        partyPhone = "0123456789";
+        partyEmail = "sole.trader@email.com";
         return this;
     }
 
@@ -69,6 +71,8 @@ public class PartyBuilder {
         companyName = "Company ltd";
         partyName = companyName;
         primaryAddress = AddressBuilder.defaults().build();
+        partyPhone = "0123456789";
+        partyEmail = "company@email.com";
         return this;
     }
 
@@ -85,6 +89,8 @@ public class PartyBuilder {
         companyName = repeat("C", MAX_ALLOWED);
         partyName = companyName;
         primaryAddress = AddressBuilder.maximal().build();
+        partyPhone = "0123456789";
+        partyEmail = "company@email.com";
         return this;
     }
 
@@ -93,6 +99,8 @@ public class PartyBuilder {
         organisationName = "The Organisation";
         partyName = organisationName;
         primaryAddress = AddressBuilder.defaults().build();
+        partyPhone = "0123456789";
+        partyEmail = "organisation@email.com";
         return this;
     }
 
@@ -108,6 +116,8 @@ public class PartyBuilder {
         individualDateOfBirth = DATE_OF_BIRTH;
         partyName = individualTitle + " " + individualFirstName + " " + individualLastName;
         primaryAddress = AddressBuilder.defaults().build();
+        partyPhone = "0123456789";
+        partyEmail = "rambo@email.com";
         return this;
     }
 
@@ -153,8 +163,8 @@ public class PartyBuilder {
             .soleTraderLastName(soleTraderLastName)
             .soleTraderDateOfBirth(soleTraderDateOfBirth)
             .soleTraderTradingAs(soleTraderTradingAs)
-            .partyEmail(partyEmail)
             .partyPhone(partyPhone)
+            .partyEmail(partyEmail)
             .build();
     }
 }
