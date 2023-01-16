@@ -94,7 +94,15 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private static final List<CaseEvent> EVENTS = Collections.singletonList(
         CaseEvent.CREATE_CLAIM_SPEC
     );
+
     public static final String CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
+        + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
+        + "receive an email. The email will also include the date when you eed to notify the Defendant legal "
+        + "representative of the claim.%n%nYou must notify the Defendant legal representative of the claim within 4 "
+        + "months of the claim being issued. The exact date when you must notify the claim details will be provided "
+        + "when you first notify the Defendant legal representative of the claim.";
+
+    public static final String CONFIRMATION_SUMMARY_PBAV3 = "<br/>[Download the sealed claim form](%s)"
         + "%n%nYour claim will not be issued until payment has been made via the Service Request Tab. Once payment is "
         + "confirmed you will receive an email. The email will also include the date when you eed to notify the Defendant "
         + "legal representative of the claim.%n%nYou must notify the Defendant legal representative of the claim within 4 "
@@ -110,6 +118,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + " Court Claims Centre.";
 
     public static final String SPEC_CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
+        + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
+        + "receive an email. The email will also include the date that the defendants have to respond.";
+
+    public static final String SPEC_CONFIRMATION_SUMMARY_PBAV3 = "<br/>[Download the sealed claim form](%s)"
         + "%n%nYour claim will not be issued until payment has been made via the Service Request Tab. Once payment is "
         + "confirmed you will receive an email. The email will also include the date that the defendants have to respond.";
 
@@ -193,6 +205,20 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         } else {
             return Collections.emptyList();
         }
+    }
+
+    private String getConfirmationSummary() {
+        if(toggleService.isPbaV3Enabled()) {
+            return CONFIRMATION_SUMMARY_PBAV3;
+        }
+        return CONFIRMATION_SUMMARY;
+    }
+
+    private String getSpecConfirmationSummary() {
+        if(toggleService.isPbaV3Enabled()) {
+            return SPEC_CONFIRMATION_SUMMARY_PBAV3;
+        }
+        return SPEC_CONFIRMATION_SUMMARY;
     }
 
     private CallbackResponse eligibilityCheck(CallbackParams callbackParams) {
@@ -526,7 +552,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         return format(
             (areRespondentsRepresentedAndRegistered(caseData)
                 || isPinInPostCaseMatched(caseData))
-                ? CONFIRMATION_SUMMARY
+                ? getConfirmationSummary()
                 : LIP_CONFIRMATION_BODY,
             format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
             claimIssueConfiguration.getResponsePackLink(),
@@ -705,7 +731,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         return format(
             (areRespondentsRepresentedAndRegistered(caseData)
                 || isPinInPostCaseMatched(caseData))
-                ? SPEC_CONFIRMATION_SUMMARY
+                ? getSpecConfirmationSummary()
                 : SPEC_LIP_CONFIRMATION_BODY,
             format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
             claimIssueConfiguration.getResponsePackLink(),
