@@ -199,7 +199,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 }
             }
 
-            if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            if (featureToggleService.isHearingAndListingLegalRepEnabled()) {
                 dq.applicant1DQWitnesses(builder.build().getApplicant1DQWitnessesSmallClaim());
             }
 

@@ -813,7 +813,7 @@ class DirectionsQuestionnaireGeneratorTest {
 
             @Test
             void whenSmallClaimSpecAndWitnesses_withHnlEnabled() {
-                when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
+                when(featureToggleService.isHearingAndListingLegalRepEnabled()).thenReturn(true);
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()

@@ -94,10 +94,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         DirectionsQuestionnaireForm templateData;
         if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
             if (isClaimantResponse(caseData)) {
-                templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                templateId = featureToggleService.isHearingAndListingLegalRepEnabled()
                     ? DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_HNL : DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
             } else {
-                templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                templateId = featureToggleService.isHearingAndListingLegalRepEnabled()
                     ? DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_HNL : DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
             }
         } else {
@@ -116,26 +116,26 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
-        DocmosisTemplates templateId = featureToggleService.isHearingAndListingSDOEnabled()
+        DocmosisTemplates templateId = featureToggleService.isHearingAndListingLegalRepEnabled()
             ? HNL_DQ_RESPONSE_1V1 : N181;
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 if (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
-                    templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                    templateId = featureToggleService.isHearingAndListingLegalRepEnabled()
                         ? DocmosisTemplates.HNL_DQ_RESPONSE_1V2_DS : N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
                 }
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
-                    templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                    templateId = featureToggleService.isHearingAndListingLegalRepEnabled()
                         ? DocmosisTemplates.HNL_DQ_RESPONSE_1V2_SS : N181_MULTIPARTY_SAME_SOL;
                 }
                 break;
             case TWO_V_ONE:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
-                    templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                    templateId = featureToggleService.isHearingAndListingLegalRepEnabled()
                         ? DocmosisTemplates.HNL_DQ_RESPONSE_2V1 : N181_2V1;
                 }
                 break;
@@ -149,7 +149,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                                               String respondent) {
         DocmosisTemplates templateId = TWO_V_ONE.equals(MultiPartyScenario
                                                             .getMultiPartyScenario(caseData)) ? N181_2V1 :
-            (featureToggleService.isHearingAndListingSDOEnabled() ? HNL_DQ_RESPONSE_2V1 : N181);
+            (featureToggleService.isHearingAndListingLegalRepEnabled() ? HNL_DQ_RESPONSE_2V1 : N181);
         DirectionsQuestionnaireForm templateData;
 
         if (respondent.equals("ONE")) {
@@ -161,7 +161,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         }
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
-            templateData, featureToggleService.isHearingAndListingSDOEnabled() ? HNL_DQ_RESPONSE_1V1 : N181);
+            templateData, featureToggleService.isHearingAndListingLegalRepEnabled() ? HNL_DQ_RESPONSE_1V1 : N181);
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
@@ -177,7 +177,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         // TODO check if this is the correct template, I just copy-pasted from generateDQFor1v2SingleSolDiffResponse
         DocmosisTemplates templateId = TWO_V_ONE.equals(MultiPartyScenario
                                                             .getMultiPartyScenario(caseData)) ? N181_2V1 :
-            (featureToggleService.isHearingAndListingSDOEnabled() ? HNL_DQ_RESPONSE_2V1 : N181);
+            (featureToggleService.isHearingAndListingLegalRepEnabled() ? HNL_DQ_RESPONSE_2V1 : N181);
         String fileName = getFileName(caseData, templateId);
         LocalDateTime responseDate;
         if ("ONE".equals(respondent)) {
@@ -207,7 +207,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         }
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
-            templateData, featureToggleService.isHearingAndListingSDOEnabled() ? HNL_DQ_RESPONSE_1V1 : N181);
+            templateData, featureToggleService.isHearingAndListingLegalRepEnabled() ? HNL_DQ_RESPONSE_1V1 : N181);
         CaseDocument document = documentManagementService.uploadDocument(
             authorisation,
             new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
@@ -279,7 +279,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         boolean specAndSmallClaim = false;
         if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())
             && "SMALL_CLAIM".equals(caseData.getResponseClaimTrack())) {
-            if (!featureToggleService.isHearingAndListingSDOEnabled()) {
+            if (!featureToggleService.isHearingAndListingLegalRepEnabled()) {
                 witnesses = getWitnessesSmallClaim(witnessesIncludingDefendants);
             }
             specAndSmallClaim = true;
