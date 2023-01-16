@@ -16,6 +16,7 @@ import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 
 public class DocmosisTemplateDataUtils {
 
@@ -24,6 +25,7 @@ public class DocmosisTemplateDataUtils {
     //TODO Need to confirm the case name logic
     public static final Function<CaseData, String> toCaseName = caseData -> {
         String caseName = fetchApplicantName(caseData) + " vs " + fetchRespondentName(caseData);
+
 
         return caseName.length() > CASE_NAME_LENGTH_TO_FIT_IN_DOCS
             ? caseName.replace(" vs ", " \nvs ")
@@ -55,19 +57,23 @@ public class DocmosisTemplateDataUtils {
     public static String fetchApplicantName(CaseData caseData) {
         StringBuilder applicantNameBuilder = new StringBuilder();
 
-        if (caseData.getApplicant2() != null) {
+        if (caseData.getApplicant1() != null && caseData.getApplicant2() != null) {
             applicantNameBuilder.append("1 ");
             applicantNameBuilder.append(caseData.getApplicant1().getPartyName());
             soleTraderCompany(caseData.getApplicant1(), applicantNameBuilder);
             applicantNameBuilder.append(" & 2 ");
             applicantNameBuilder.append(caseData.getApplicant2().getPartyName());
             soleTraderCompany(caseData.getApplicant2(), applicantNameBuilder);
-        } else {
+        } else if (caseData.getApplicant1() != null) {
             applicantNameBuilder.append(caseData.getApplicant1().getPartyName());
             soleTraderCompany(caseData.getApplicant1(), applicantNameBuilder);
             litigationFriend(caseData.getApplicant1LitigationFriend(), applicantNameBuilder);
+        } else {
+            String errorMsg = String.format("Applicant1 not found for claim number: "
+                                                + caseData.getCcdCaseReference());
+            log.error(errorMsg);
+            throw new IllegalArgumentException(errorMsg);
         }
-
         return applicantNameBuilder.toString();
     }
 
