@@ -117,7 +117,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         }
 
         //build options for field (Default Value & List Options), add to case data
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.defendantSolicitorNotifyClaimOptions(DynamicList.fromList(dynamicListOptions));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -134,7 +134,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             warnings.add(WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
         }
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .warnings(warnings)
@@ -182,7 +182,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime claimNotificationDate = time.now();
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM))
             .claimNotificationDate(claimNotificationDate);
 
