@@ -483,7 +483,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         BigDecimal regularRepaymentAmountPennies = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
         BigDecimal regularRepaymentAmountPounds = MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies);
 
-        if (regularRepaymentAmountPounds == null || regularRepaymentAmountPounds.compareTo(BigDecimal.ZERO) <= 0) {
+        if (regularRepaymentAmountPounds.compareTo(BigDecimal.ZERO) <= 0) {
             errors.add("Enter an amount of £1 or more");
         }
 
