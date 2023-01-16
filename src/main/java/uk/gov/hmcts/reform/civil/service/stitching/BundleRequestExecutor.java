@@ -69,6 +69,38 @@ public class BundleRequestExecutor {
         }
         return null;
     }
+    public CaseData post(final BundleRequest payload, final String endpoint) {
+        requireNonNull(payload, "payload must not be null");
+        requireNonNull(endpoint, "endpoint must not be null");
+
+        final String serviceAuthorizationToken = serviceAuthTokenGenerator.generate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+        headers.set(SERVICE_AUTHORIZATION, serviceAuthorizationToken);
+
+        try {
+            ResponseEntity<CaseDetails> response1 = restTemplate.exchange(
+                endpoint,
+                HttpMethod.POST,
+                new HttpEntity<>(payload, headers),
+                CaseDetails.class
+            );
+            if (response1.getStatusCode().equals(HttpStatus.OK)) {
+                return caseDetailsConverter.toCaseData(requireNonNull(response1.getBody()));
+            } else {
+                log.warn("The call to the endpoint with URL {} returned a non positive outcome (HTTP-{}). This may "
+                             + "cause problems down the line.", endpoint, response1.getStatusCode().value());
+            }
+
+        } catch (RestClientResponseException e) {
+            log.debug(e.getMessage(), e);
+            log.error("The call to the endpoint with URL {} failed. This is likely to cause problems down the line.",
+                      endpoint);
+            logRelevantInfoQuietly(e);
+        }
+        return null;
+    }
 
     @SuppressWarnings("unchecked")
     private void logRelevantInfoQuietly(RestClientResponseException e) {

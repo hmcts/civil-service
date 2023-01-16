@@ -1,31 +1,13 @@
 package uk.gov.hmcts.reform.civil.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.ClaimType;
-import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
-import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
-import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
@@ -43,6 +25,10 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.complextypes.FurtherEvidence;
+import uk.gov.hmcts.reform.civil.model.complextypes.OtherDocuments;
+import uk.gov.hmcts.reform.civil.model.complextypes.ResponseDocuments;
+import uk.gov.hmcts.reform.civil.model.complextypes.UploadedDocuments;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingAddNewDirectionsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
@@ -610,6 +596,32 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<DocumentUploadTrial>> documentUploadTrial3;
     private final List<Element<DocumentUploadTrial>> documentUploadTrial4;
     private final LocalDateTime caseDocumentUploadDate;
+
+    /**
+     * Bundle.
+     */
+    @JsonProperty("bundleInformation")
+    private BundlingInformation bundleInformation;
+    @JsonAlias({"applicantCaseName", "applicantOrRespondentCaseName"})
+    private final String applicantCaseName;
+    private final List<Element<OtherDocuments>> otherDocuments;
+    private final List<Element<OrderDetails>> orderCollection;
+
+    @JsonProperty("citizenUploadedDocumentList")
+    private final List<Element<UploadedDocuments>> citizenUploadedDocumentList;
+    @JsonProperty("LanguagePreferenceWelsh")
+    private final YesOrNo languagePreferenceWelsh;
+    @JsonProperty("finalWelshDocument")
+    private final Document finalWelshDocument;
+    @JsonProperty("c1AWelshDocument")
+    private final Document c1AWelshDocument;
+    @JsonProperty("finalDocument")
+    private final Document finalDocument;
+    @JsonProperty("c1ADocument")
+    private final Document c1ADocument;
+    private final List<Element<FurtherEvidence>> furtherEvidences;
+    @JsonProperty("citizenResponseC7DocumentList")
+    private final List<Element<ResponseDocuments>> citizenResponseC7DocumentList;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
