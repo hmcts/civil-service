@@ -24,7 +24,7 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
     private final UserService userService;
     private final CoreCaseUserService coreCaseUserService;
 
-    public EvidenceUploadRespondentHandler(UserService userService, CoreCaseUserService coreCaseUserService, ObjectMapper objectMapper, Time time, UserService userService1, CoreCaseUserService coreCaseUserService1) {
+    public EvidenceUploadRespondentHandler(UserService userService, CoreCaseUserService coreCaseUserService, ObjectMapper objectMapper, Time time) {
         super(userService, coreCaseUserService, objectMapper, time, Collections.singletonList(EVIDENCE_UPLOAD_RESPONDENT),
               "validateValuesRespondent", "createShowCondition");
         this.userService = userService;
