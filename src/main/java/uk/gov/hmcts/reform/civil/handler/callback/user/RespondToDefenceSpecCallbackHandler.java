@@ -136,6 +136,14 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             && YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
             updatedCaseData.applicant1ProceedWithClaim(YES);
         }
+        if (NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())
+            || caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)
+            && caseData.getApplicant1ProceedWithClaim().equals(YES)
+            && caseData.getApplicant1ProceedWithClaimSpec2v1().equals(YES)) {
+            updatedCaseData.uploadDefenceDocument(YES);
+        } else {
+            updatedCaseData.uploadDefenceDocument(NO);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
