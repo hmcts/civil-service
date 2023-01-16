@@ -263,6 +263,10 @@ public class CaseDataParent implements MappableObject {
     private final ResponseSpecDocument respondent2SpecDefenceResponseDocument;
     private final TimelineUploadTypeSpec specClaimResponseTimelineList2;
     private final List<TimelineOfEvents> specResponseTimelineOfEvents2;
+    private final YesOrNo responseClaimMediationSpecRequired;
+    private final YesOrNo responseClaimExpertSpecRequired;
+    private final YesOrNo responseClaimCourtLocationRequired;
+    private final String responseClaimWitnesses;
     private final String responseClaimMediationSpecLabelRes2;
     private final YesOrNo responseClaimMediationSpec2Required;
     private final YesOrNo responseClaimExpertSpecRequired2;

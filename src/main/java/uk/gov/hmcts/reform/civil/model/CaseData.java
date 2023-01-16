@@ -329,11 +329,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String responseToClaimAdmitPartWhyNotPayLRspec;
     // Fields related to ROC-9453 & ROC-9455
     private final YesOrNo responseClaimMediationSpecRequired;
+    private final YesOrNo responseClaimMediationSpec2Required;
     private final SmallClaimMedicalLRspec applicant1ClaimMediationSpecRequired;
     private final YesOrNo defenceAdmitPartEmploymentTypeRequired;
     private final YesOrNo responseClaimExpertSpecRequired;
+    private final YesOrNo responseClaimExpertSpecRequired2;
     private final YesOrNo applicant1ClaimExpertSpecRequired;
     private final String responseClaimWitnesses;
+    private final String responseClaimWitnesses2;
     private final String applicant1ClaimWitnesses;
     private final YesOrNo smallClaimHearingInterpreterRequired;
     private final String smallClaimHearingInterpreterDescription;
