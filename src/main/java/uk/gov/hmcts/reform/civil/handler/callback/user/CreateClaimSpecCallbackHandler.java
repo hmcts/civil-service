@@ -208,14 +208,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private String getConfirmationSummary() {
-        if(toggleService.isPbaV3Enabled()) {
+        if (toggleService.isPbaV3Enabled()) {
             return CONFIRMATION_SUMMARY_PBAV3;
         }
         return CONFIRMATION_SUMMARY;
     }
 
     private String getSpecConfirmationSummary() {
-        if(toggleService.isPbaV3Enabled()) {
+        if (toggleService.isPbaV3Enabled()) {
             return SPEC_CONFIRMATION_SUMMARY_PBAV3;
         }
         return SPEC_CONFIRMATION_SUMMARY;

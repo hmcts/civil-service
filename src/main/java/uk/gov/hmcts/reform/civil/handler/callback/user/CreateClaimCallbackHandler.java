@@ -177,7 +177,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private String getConfirmationSummary() {
-        if(toggleService.isPbaV3Enabled()) {
+        if (toggleService.isPbaV3Enabled()) {
             return CONFIRMATION_SUMMARY_PBAV3;
         }
         return CONFIRMATION_SUMMARY;
