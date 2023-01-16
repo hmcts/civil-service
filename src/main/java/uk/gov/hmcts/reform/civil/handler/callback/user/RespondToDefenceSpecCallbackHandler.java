@@ -511,8 +511,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
         if (caseData.getCcjPaymentPaidSomeAmount() != null && caseData.getCcjPaymentPaidSomeAmount()
-                .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0) {
-                errors.add("The amount paid must be less than the full claim amount.");
+            .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0) {
+            errors.add("The amount paid must be less than the full claim amount.");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
