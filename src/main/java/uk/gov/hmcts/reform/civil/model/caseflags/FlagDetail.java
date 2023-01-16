@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model;
+package uk.gov.hmcts.reform.civil.model.caseflags;
 
 import lombok.Builder;
 import lombok.Data;

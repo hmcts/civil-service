@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Flags;
 import uk.gov.hmcts.reform.civil.model.DQPartyFlagStructure;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
-public class FlagsUtils {
+public class CaseFlagUtils {
 
     public static String RESPONDENT_SOLICITOR_ONE_WITNESS = "Respondent solicitor 1 witness";
     public static String RESPONDENT_SOLICITOR_ONE_EXPERT = "Respondent solicitor 1 expert";
@@ -25,8 +25,25 @@ public class FlagsUtils {
     public static String APPLICANT_SOLICITOR_WITNESS = "Applicant solicitor witness";
     public static String APPLICANT_SOLICITOR_EXPERT = "Applicant solicitor expert";
 
-    private FlagsUtils() {
+    private CaseFlagUtils() {
         //NO-OP
+    }
+
+    public static Flags createFlags(String flagsPartyName, String roleOnCase) {
+        return Flags.builder()
+            .partyName(flagsPartyName)
+            .roleOnCase(roleOnCase)
+            .details(List.of())
+            .build();
+    }
+
+    private static DQPartyFlagStructure createDQPartiesCaseFlagsField(String firstName, String lastName, String roleOnCase) {
+        String partyName = String.format("%s %s", firstName, lastName);
+        return DQPartyFlagStructure.builder()
+            .firstName(firstName)
+            .lastName(lastName)
+            .flags(createFlags(partyName, roleOnCase))
+            .build();
     }
 
     private static List<Element<DQPartyFlagStructure>> getTopLevelFieldForWitnessesWithFlagsStructure(
@@ -49,22 +66,6 @@ public class FlagsUtils {
             list.add(element(build));
         }
         return list;
-    }
-
-    private static DQPartyFlagStructure createDQPartiesCaseFlagsField(String firstName, String lastName, String roleOnCase) {
-        return DQPartyFlagStructure.builder()
-            .firstName(firstName)
-            .lastName(lastName)
-            .flags(createCaseFlagsField(firstName, lastName, roleOnCase))
-            .build();
-    }
-
-    private static Flags createCaseFlagsField(String firstName, String lastName, String roleOnCase) {
-        return Flags.builder()
-                       .partyName(String.format("%s %s", firstName, lastName))
-                       .roleOnCase(roleOnCase)
-                       .details(List.of())
-                       .build();
     }
 
     public static void addRespondentDQPartiesFlagStructure(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {

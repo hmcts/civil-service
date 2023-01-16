@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
@@ -64,7 +65,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.utils.FlagsUtils.addApplicantExpertAndWitnessFlagsStructure;
 
 @Service
 @RequiredArgsConstructor
@@ -82,6 +82,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService featureToggleService;
     private final LocationHelper locationHelper;
+    private final CaseFlagsInitialiser caseFlagsInitialiser;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -200,7 +201,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 }
             }
 
-            if (featureToggleService.isHearingAndListingSDOEnabled()) {
+            if (featureToggleService.isHearingAndListingSDOEnabled()
+                && caseData.getApplicant1DQWitnessesSmallClaim() != null) {
                 dq.applicant1DQWitnesses(builder.build().getApplicant1DQWitnessesSmallClaim());
             }
 
@@ -209,15 +211,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             builder.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
 
+        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
+
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder.build().toMap(objectMapper));
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-
-        if (featureToggleService.isCaseFlagsEnabled()) {
-            addApplicantExpertAndWitnessFlagsStructure(builder, builder.build());
-        }
 
         if (v1 && featureToggleService.isSdoEnabled()) {
             if (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)) {
