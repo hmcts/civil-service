@@ -366,6 +366,8 @@ public class CaseDataBuilder {
     private TrialHearingTimeDJ trialHearingTimeDJ;
     private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
 
+    private YesOrNo applicant1AcceptAdmitAmountPaidSpec;
+
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
         return this;
@@ -4115,6 +4117,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder getApplicant1AcceptAdmitAmountPaidSpec(YesOrNo isPartPayAccepted) {
+       this.applicant1AcceptAdmitAmountPaidSpec = isPartPayAccepted;
+       return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -4336,6 +4343,7 @@ public class CaseDataBuilder {
                 .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
                 .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
             .caseAccessCategory(caseAccessCategory)
+            .applicant1AcceptAdmitAmountPaidSpec(applicant1AcceptAdmitAmountPaidSpec)
             .build();
     }
 

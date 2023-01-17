@@ -387,6 +387,35 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(null);
         }
 
+        @Test
+        void shouldSetApplicantDefenceRespDoc_whenClaimantRejectPartPaymentPlan() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .getApplicant1AcceptAdmitAmountPaidSpec(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("applicantDefenceResponseDocument"))
+                .isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldNotSetApplicantDefenceRespDoc_whenClaimantAcceptPartPaymentPlan() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .getApplicant1AcceptAdmitAmountPaidSpec(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("applicantDefenceResponseDocument"))
+                .isEqualTo("No");
+        }
+
     }
 
     @Nested
@@ -764,5 +793,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
             return objectMapper.convertValue(response.getData(), CaseData.class);
         }
+
     }
 }
