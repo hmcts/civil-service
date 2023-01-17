@@ -41,7 +41,6 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
             || coreCaseUserService.userHasCaseRole(caseData
                                                        .getCcdCaseReference()
                                                        .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWOSPEC)) {
-            System.out.println("respondent2 returning");
             return validateValuesParty(caseData.getDocumentForDisclosureRes2(),
                                        caseData.getDocumentWitnessStatementRes2(),
                                        caseData.getDocumentHearsayNoticeRes2(),
@@ -52,7 +51,6 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
                                        caseData.getDocumentAnswersRes2(),
                                        caseData.getDocumentEvidenceForTrialRes2());
         } else {
-            System.out.println("respondent1 returning");
             return validateValuesParty(caseData.getDocumentForDisclosureRes(),
                                        caseData.getDocumentWitnessStatementRes(),
                                        caseData.getDocumentHearsayNoticeRes(),

@@ -209,12 +209,12 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
                 .specClaimTemplateDocumentFiles(new Document("fake-url",
                                                              "binary-url",
                                                              "file-name",
-                                                             null))
+                                                             null, null))
 
                 .specClaimDetailsDocumentFiles(new Document("fake-url",
                                                              "binary-url",
                                                              "file-name",
-                                                             null))
+                                                             null, null))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
