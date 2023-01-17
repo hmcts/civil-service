@@ -82,7 +82,7 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
 
         notificationService.sendMail(
             emailAddress,
-            notificationsProperties.getSolicitorTrialReady(),
+            notificationsProperties.getOtherPartyTrialReady(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
