@@ -2705,7 +2705,7 @@ public class CaseDataBuilder {
         respondent1ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant1-defence.pdf").build())
             .build();
-        respondent1DQ();
+        respondent1DQWithLocation();
         respondent1ResponseDate = LocalDateTime.now().minusDays(1);
         return this;
     }
@@ -2716,7 +2716,7 @@ public class CaseDataBuilder {
         respondent2ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
             .build();
-        respondent2DQ();
+        respondent2DQWithLocation();
         respondent2ResponseDate = LocalDateTime.now().minusDays(1);
         return this;
     }
