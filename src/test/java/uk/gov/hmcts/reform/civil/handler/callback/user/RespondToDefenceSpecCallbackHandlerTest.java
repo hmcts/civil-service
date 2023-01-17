@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,11 +39,9 @@ import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
-import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -93,7 +90,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     UnavailableDateValidator.class,
     CaseDetailsConverter.class,
     CourtLocationUtils.class,
-    LocationHelper.class
+    LocationHelper.class,
+    LocationRefDataService.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -493,26 +491,13 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Nested
         class HandleCourtLocation {
-            @BeforeEach
-            void setup() {
-                when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
-            }
 
             @Test
             void shouldHandleCourtLocationData() {
-                LocationRefData locationA = LocationRefData.builder()
-                    .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
-                    .courtAddress("Lane 1").postcode("123").build();
-                when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
-                    .thenReturn(locationA);
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .applicant1DQ(
-                        Applicant1DQ.builder().applicant1DQRequestedCourt(
-                            RequestedCourt.builder()
-                                .responseCourtLocations(DynamicList.builder().build())
-                                .build()).build())
+                    .applicant1DQWithLocation()
                     .build();
 
                 CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
@@ -526,11 +511,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .extracting("applicant1DQRequestedCourt")
                     .extracting("caseLocation")
                     .extracting("region", "baseLocation")
-                    .containsExactly("regionId1", "epimmsId1");
+                    .containsExactly("dummy region", "dummy base");
 
                 assertThat(response.getData())
                     .extracting("applicant1DQRequestedCourt")
-                    .extracting("responseCourtCode").isEqualTo("312");
+                    .extracting("responseCourtCode").isEqualTo("court4");
             }
 
         }
