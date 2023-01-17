@@ -5,21 +5,28 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseFormForSpec;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 
 import java.time.LocalDateTime;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 public class SealedClaimResponseFormGeneratorForSpecTest {
@@ -34,11 +41,18 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
     private DocumentGeneratorService documentGeneratorService;
     @Mock
     private DocumentManagementService documentManagementService;
+    @MockBean
+    private CourtLocationUtils courtLocationUtils;
     @Mock
     private LocationRefDataService locationRefDataService;
 
     @Test
     public void contentCheckRespondent1() {
+        LocationRefData locationA = LocationRefData.builder()
+           .courtName("test").build();
+        when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
+            .thenReturn(locationA);
+
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("case reference")
             .detailsOfWhyDoesYouDisputeTheClaim("why dispute the claim")
@@ -79,6 +93,8 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
                             templateData.getStatementOfTruth().getName());
         Assert.assertEquals(caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth().getRole(),
                             templateData.getStatementOfTruth().getRole());
+        Assert.assertEquals(locationA.getCourtName(),
+                            templateData.getHearingCourtLocation());
     }
 
     @Test
