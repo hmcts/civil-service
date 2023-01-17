@@ -91,7 +91,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService featureToggleService;
     private final LocationHelper locationHelper;
-    private final String datePattern = "dd MMMM yyyy";
+    private static final String datePattern = "dd MMMM yyyy";
 
     @Override
     public List<CaseEvent> handledEvents() {
