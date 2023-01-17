@@ -6,12 +6,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.PaymentMethod;
-import uk.gov.hmcts.reform.civil.model.RespondToClaim;
-import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
-import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.SpecifiedParty;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
@@ -51,10 +46,19 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
 
     @Override
     public SealedClaimResponseFormForSpec getTemplateData(CaseData caseData) {
+        String requestedCourt = null;
+        StatementOfTruth statementOfTruth = null;
+        if (caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() != null) {
+            requestedCourt = caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getCaseLocation().getBaseLocation();
+            statementOfTruth = caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth();
+        } else if (caseData.getRespondent2DQ().getRespondent2DQRequestedCourt() != null) {
+            requestedCourt = caseData.getRespondent2DQ().getRespondent2DQRequestedCourt().getCaseLocation().getBaseLocation();
+            statementOfTruth = caseData.getRespondent2DQ().getRespondent2DQStatementOfTruth();
+        }
         List<LocationRefData> courtLocations = (locationRefDataService
             .getCourtLocationsByEpimmsId(
                 CallbackParams.Params.BEARER_TOKEN.toString(),
-                caseData.getCourtLocation().getCaseLocation().getBaseLocation()));
+                requestedCourt));
         SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder
             = SealedClaimResponseFormForSpec.builder()
             .referenceNumber(caseData.getLegacyCaseReference())
@@ -63,7 +67,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             .hearingCourtLocation(courtLocations.isEmpty() ? null : courtLocations.stream()
                 .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
                 .collect(Collectors.toList()).get(0).getCourtName())
-            .statementOfTruth(caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth());
+            .statementOfTruth(statementOfTruth);
 
         if (MultiPartyScenario.getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
             builder.respondent1(getDefendant1v2ds(caseData));
