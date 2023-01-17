@@ -4118,8 +4118,8 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder getApplicant1AcceptAdmitAmountPaidSpec(YesOrNo isPartPayAccepted) {
-       this.applicant1AcceptAdmitAmountPaidSpec = isPartPayAccepted;
-       return this;
+        this.applicant1AcceptAdmitAmountPaidSpec = isPartPayAccepted;
+        return this;
     }
 
     public static CaseDataBuilder builder() {
