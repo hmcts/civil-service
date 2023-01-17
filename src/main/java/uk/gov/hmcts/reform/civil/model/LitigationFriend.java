@@ -8,9 +8,10 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.util.List;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class LitigationFriend {
 
+    // CIV-5557 to be removed
     private final String fullName;
     private final String firstName;
     private final String lastName;
