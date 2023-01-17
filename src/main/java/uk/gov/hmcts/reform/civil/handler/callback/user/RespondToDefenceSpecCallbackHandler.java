@@ -95,6 +95,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
             .put(callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag)
+            .put(callbackKey(V_1, MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag)
             .put(callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false))
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true))
             .put(callbackKey(ABOUT_TO_START), this::populateCaseData)
@@ -136,14 +137,17 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             && YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
             updatedCaseData.applicant1ProceedWithClaim(YES);
         }
-        if (NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())
-            || caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)
-            && caseData.getApplicant1ProceedWithClaim().equals(YES)
-            && caseData.getApplicant1ProceedWithClaimSpec2v1().equals(YES)) {
-            updatedCaseData.uploadDefenceDocument(YES);
-        } else {
-            updatedCaseData.uploadDefenceDocument(NO);
+        if (V_1.equals(callbackParams.getVersion())) {
+            if (NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())
+                || (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)
+                && !(NO.equals(caseData.getApplicant1ProceedWithClaim()))
+                && !(NO.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())))) {
+                updatedCaseData.uploadDefenceDocument(YES);
+            } else {
+                updatedCaseData.uploadDefenceDocument(NO);
+            }
         }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
