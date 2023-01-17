@@ -75,7 +75,7 @@ public class TrialReadyRespondentNotificationHandler extends CallbackHandler imp
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
-    public Map<String, String> addPropertiesRep(CaseData caseData, boolean isFirst) {
+    private Map<String, String> addPropertiesRep(CaseData caseData, boolean isFirst) {
         String defRefNumber;
         if (isFirst) {
             if (caseData.getSolicitorReferences() == null
