@@ -10,7 +10,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseFormForSpec;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
@@ -24,6 +23,8 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -48,10 +49,12 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
 
     @Test
     public void contentCheckRespondent1() {
-        LocationRefData locationA = LocationRefData.builder()
-           .courtName("test").build();
-        when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
-            .thenReturn(locationA);
+        List<LocationRefData> locations = new ArrayList<>();
+        locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
+                          .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
+                          .courtTypeId("10").courtLocationCode("121")
+                          .epimmsId("000000").build());
+        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("case reference")
@@ -93,12 +96,18 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
                             templateData.getStatementOfTruth().getName());
         Assert.assertEquals(caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth().getRole(),
                             templateData.getStatementOfTruth().getRole());
-        Assert.assertEquals(locationA.getCourtName(),
+        Assert.assertEquals(locations.get(0).getCourtName(),
                             templateData.getHearingCourtLocation());
     }
 
     @Test
     public void contentCheckRespondent2() {
+        List<LocationRefData> locations = new ArrayList<>();
+        locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
+                          .courtName("Court Name2").region("Region").regionId("4").courtVenueId("000")
+                          .courtTypeId("10").courtLocationCode("121")
+                          .epimmsId("000000").build());
+        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("case reference")
             .detailsOfWhyDoesYouDisputeTheClaim("why dispute the claim")
@@ -117,7 +126,6 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
                                .respondent2DQRequestedCourt(
                                    RequestedCourt.builder()
                                        .responseCourtCode("121")
-                                       .reasonForHearingAtSpecificCourt("test")
                                        .caseLocation(CaseLocation.builder()
                                                          .region("2")
                                                          .baseLocation("000000")
@@ -149,5 +157,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
                             templateData.getStatementOfTruth().getName());
         Assert.assertEquals(caseData.getRespondent2DQ().getRespondent2DQStatementOfTruth().getRole(),
                             templateData.getStatementOfTruth().getRole());
+        Assert.assertEquals(locations.get(0).getCourtName(),
+                            templateData.getHearingCourtLocation());
     }
 }
