@@ -69,6 +69,9 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
     public static final String DOC_SERVED_DATE_IN_FUTURE =
         "Date you served the documents must be today or in the past";
+
+    public static final String DOC_SERVED_DATE_OLDER_THAN_14DAYS =
+        "Date of Service should not be more than 14 days old";
     public static final String ERROR_PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT = "There is a problem"
         + "\n"
         + "This action cannot currently be performed because it has either already"
@@ -142,13 +145,18 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         ArrayList<String> errors = new ArrayList<>();
-        if (Objects.nonNull(caseData.getCosNotifyClaimDefendant1())
-            && isCosDefendantNotifyDateFutureDate(caseData.getCosNotifyClaimDefendant1())) {
-
-            errors.add(DOC_SERVED_DATE_IN_FUTURE);
+        CertificateOfService certificateOfService = caseData.getCosNotifyClaimDefendant1();
+        final String dateValidErrorMessage = getServiceOfDateValidationMessage(certificateOfService);
+        if (!dateValidErrorMessage.isEmpty()) {
+            errors.add(dateValidErrorMessage);
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        caseDataBuilder.cosNotifyClaimDefendant1(certificateOfService.toBuilder()
+                                                     .cosUISenderStatementOfTruthLabel(null)
+                                                     .build())
+            .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
@@ -157,15 +165,19 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateCosDefendant2(final CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        CertificateOfService certificateOfServiceDef2 = caseData.getCosNotifyClaimDefendant2();
         ArrayList<String> errors = new ArrayList<>();
-        if ((Objects.nonNull(caseData.getCosNotifyClaimDefendant2()))
-            && isCosDefendantNotifyDateFutureDate(caseData.getCosNotifyClaimDefendant2())) {
-
-            errors.add(DOC_SERVED_DATE_IN_FUTURE);
+        final String dateValidationErrorMessage = getServiceOfDateValidationMessage(certificateOfServiceDef2);
+        if (!dateValidationErrorMessage.isEmpty()) {
+            errors.add(dateValidationErrorMessage);
         }
 
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+
+        caseDataBuilder.cosNotifyClaimDefendant2(certificateOfServiceDef2.toBuilder()
+                                                     .cosUISenderStatementOfTruthLabel(null)
+                                                     .build());
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
@@ -186,6 +198,18 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         LocalDateTime claimDetailsNotificationDeadline;
         if (featureToggleService.isCertificateOfServiceEnabled() && areAnyRespondentsLitigantInPerson(caseData)) {
             claimDetailsNotificationDeadline = getDeadline(getServiceDate(caseData));
+            if (Objects.nonNull(caseData.getCosNotifyClaimDefendant1())) {
+                caseDataBuilder
+                    .cosNotifyClaimDefendant1(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDefendant1()))
+                    .build();
+            }
+
+            if (Objects.nonNull(caseData.getCosNotifyClaimDefendant2())) {
+                caseDataBuilder
+                    .cosNotifyClaimDefendant2(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDefendant2()))
+                    .build();
+            }
+
         } else {
             claimDetailsNotificationDeadline = getDeadline(claimNotificationDate);
         }
@@ -286,8 +310,14 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         return Objects.equals("Both", caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel());
     }
 
-    private boolean isCosDefendantNotifyDateFutureDate(CertificateOfService cosNotifyClaimDefendant) {
-        return LocalDate.now().isBefore(cosNotifyClaimDefendant.getCosDateOfServiceForDefendant());
+    private boolean isCosDefendantNotifyDateFutureDate(LocalDate cosDateOfServiceForDefendant) {
+        return time.now().toLocalDate().isBefore(cosDateOfServiceForDefendant);
+    }
+
+    private boolean isCosDefendantNotifyDateOlderThan14Days(LocalDate cosDateOfServiceForDefendant) {
+        return time.now().isAfter(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDateOfServiceForDefendant
+                                                        .atTime(time.now().toLocalTime())));
+
     }
 
     private boolean isConfirmationForLip(CaseData caseData) {
@@ -303,6 +333,18 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             || (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
     }
 
+    private String getServiceOfDateValidationMessage(CertificateOfService certificateOfService) {
+        final String errorMessage = "";
+        if (Objects.nonNull(certificateOfService)) {
+            if (isCosDefendantNotifyDateFutureDate(certificateOfService.getCosDateOfServiceForDefendant())) {
+                return DOC_SERVED_DATE_IN_FUTURE;
+            } else if (isCosDefendantNotifyDateOlderThan14Days(certificateOfService.getCosDateOfServiceForDefendant())) {
+                return DOC_SERVED_DATE_OLDER_THAN_14DAYS;
+            }
+        }
+        return errorMessage;
+    }
+
     private LocalDateTime getServiceDate(CaseData caseData) {
         LocalDateTime date = time.now();
 
@@ -310,7 +352,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             && Objects.nonNull(caseData
                                    .getCosNotifyClaimDefendant1().getCosDateOfServiceForDefendant())) {
             LocalDateTime cosDate1 = caseData.getCosNotifyClaimDefendant1()
-                .getCosDateOfServiceForDefendant().atStartOfDay();
+                .getCosDateOfServiceForDefendant().atTime(time.now().toLocalTime());
             if (cosDate1.isBefore(date)) {
                 date = cosDate1;
             }
@@ -320,11 +362,19 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             && Objects.nonNull(caseData
                                    .getCosNotifyClaimDefendant2().getCosDateOfServiceForDefendant())) {
             LocalDateTime cosDate2 = caseData.getCosNotifyClaimDefendant2()
-                .getCosDateOfServiceForDefendant().atStartOfDay();
+                .getCosDateOfServiceForDefendant().atTime(time.now().toLocalTime());
             if (cosDate2.isBefore(date)) {
                 date = cosDate2;
             }
         }
         return date;
+    }
+
+    private CertificateOfService updateStatementOfTruthForLip(CertificateOfService certificateOfService) {
+        List<String> cosUISenderStatementOfTruthLabel = certificateOfService.getCosUISenderStatementOfTruthLabel();
+        return certificateOfService.toBuilder()
+            .cosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
+            .cosUISenderStatementOfTruthLabel(null)
+            .build();
     }
 }
