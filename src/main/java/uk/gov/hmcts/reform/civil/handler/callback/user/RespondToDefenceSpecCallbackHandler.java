@@ -91,6 +91,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService featureToggleService;
     private final LocationHelper locationHelper;
+    private final String datePattern = "dd MMMM yyyy";
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -400,16 +401,16 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (caseData.getRespondToClaimAdmitPartLRspec() != null
             && caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null) {
             return caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()
-                .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
+                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
         }
         if (caseData.getRespondToAdmittedClaim() != null
             && caseData.getRespondToAdmittedClaim().getWhenWasThisAmountPaid() != null) {
             return caseData.getRespondToAdmittedClaim().getWhenWasThisAmountPaid()
-                .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
+                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
         }
         if (caseData.getRespondent1ResponseDate() != null) {
             return caseData.getRespondent1ResponseDate().plusDays(5)
-                .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
+                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
         }
         return null;
     }
@@ -483,7 +484,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         BigDecimal regularRepaymentAmountPennies = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
         BigDecimal regularRepaymentAmountPounds = MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies);
 
-        if (regularRepaymentAmountPounds == null || regularRepaymentAmountPounds.compareTo(BigDecimal.ZERO) <= 0) {
+        if (regularRepaymentAmountPounds.compareTo(BigDecimal.ZERO) <= 0) {
             errors.add("Enter an amount of £1 or more");
         }
 
@@ -509,11 +510,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
-        if (caseData.getCcjPaymentPaidSomeAmount() != null) {
-            if (caseData.getCcjPaymentPaidSomeAmount()
-                .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0) {
-                errors.add("The amount paid must be less than the full claim amount.");
-            }
+        if (caseData.getCcjPaymentPaidSomeAmount() != null && caseData.getCcjPaymentPaidSomeAmount()
+            .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0) {
+            errors.add("The amount paid must be less than the full claim amount.");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
