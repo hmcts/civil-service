@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -122,10 +124,11 @@ public class CaseDataParent implements MappableObject {
     // for witness
     private final YesOrNo respondent1DQWitnessesRequiredSpec;
     private final List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
-
+    private final Witnesses applicant1DQWitnessesSmallClaim;
     private final Witnesses respondent1DQWitnessesSmallClaim;
     private final Witnesses respondent2DQWitnessesSmallClaim;
 
+    @Deprecated
     private final LocalDateTime addLegalRepDeadline;
 
     @Builder.Default
@@ -311,8 +314,25 @@ public class CaseDataParent implements MappableObject {
     private final ScheduledHearing nextHearingDetails;
 
     private final String respondent1EmailAddress;
+    private final YesOrNo applicant1Represented;
+
+    /**
+     * Adding for LR ITP Update.
+     */
+    private final ResponseOneVOneShowTag showResponseOneVOneFlag;
+    private final YesOrNo applicant1AcceptAdmitAmountPaidSpec;
+    private final YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec;
+    private final YesOrNo applicant1AcceptPartAdmitPaymentPlanSpec;
+    private final CaseDocument respondent1ClaimResponseDocumentSpec;
+    private final CaseDocument respondent2ClaimResponseDocumentSpec;
+    private final String respondent1PaymentDateToStringSpec;
 
     private final String migrationId;
+
+    @JsonIgnore
+    public boolean isApplicantNotRepresented() {
+        return  this.applicant1Represented == YesOrNo.NO;
+    }
 
     /**
      * Adding for Certificate of Service.

@@ -47,6 +47,7 @@ public class RoboticsNotificationService {
 
     public void notifyRobotics(@NotNull CaseData caseData, boolean isMultiParty) {
         requireNonNull(caseData);
+        log.info(String.format("Start notifyRobotics and case data is not null %s", caseData.getLegacyCaseReference()));
         Optional<EmailData> emailData = prepareEmailData(caseData, isMultiParty);
         emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
     }
@@ -63,6 +64,7 @@ public class RoboticsNotificationService {
 
     private Optional<EmailData> prepareEmailData(CaseData caseData, boolean isMultiParty) {
 
+        log.info(String.format("Start prepareEmailData %s", caseData.getLegacyCaseReference()));
         byte[] roboticsJsonData;
         try {
             String fileName = String.format("CaseData_%s.json", caseData.getLegacyCaseReference());
@@ -80,6 +82,7 @@ public class RoboticsNotificationService {
                 RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseData.getEvents());
                 roboticsJsonData = roboticsCaseData.toJsonString().getBytes();
+                log.info(String.format("triggerEvent %s", triggerEvent));
             }
             return Optional.of(EmailData.builder()
                                    .message(getMessage(caseData, isMultiParty))
@@ -123,20 +126,20 @@ public class RoboticsNotificationService {
                 caseData.getLegacyCaseReference()
             );
         }
-        log.info("Subject--------" + subject);
+        log.info(String.format("Subject-------- %s", subject));
         return subject;
     }
 
     private String getRoboticsEmailRecipient(boolean isMultiParty, boolean isSpecClaim) {
         if (isSpecClaim) {
-            log.info("EMAIl:---------" + roboticsEmailConfiguration.getSpecRecipient());
+            log.info(String.format("EMAIl:--------- %s", roboticsEmailConfiguration.getSpecRecipient()));
             return roboticsEmailConfiguration.getSpecRecipient();
         }
         String recipient = isMultiParty ? roboticsEmailConfiguration
             .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
-        log.info("EMAIl:---------" + recipient);
-        return isMultiParty ? roboticsEmailConfiguration
-            .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
+
+        log.info(String.format("EMAIl:--------- %s", recipient));
+        return recipient;
     }
 
     public static String findLatestEventTriggerReason(EventHistory eventHistory) {
