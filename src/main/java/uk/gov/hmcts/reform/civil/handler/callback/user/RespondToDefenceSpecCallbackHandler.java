@@ -138,7 +138,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-    private CaseData setApplicant1ProceedFlagToYes(CaseData caseData){
+    private CaseData setApplicant1ProceedFlagToYes(CaseData caseData) {
         var updatedCaseData = caseData.toBuilder();
 
         if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))
@@ -151,7 +151,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private CaseData setApplicantDefenceResponseDocFlag(CaseData caseData) {
         var updatedCaseData = caseData.toBuilder();
 
-        if (NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec()) || (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE) && !(NO.equals(caseData.getApplicant1ProceedWithClaim())) && !(NO.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())))) {
+        if (NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())
+            || (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)
+                && !(NO.equals(caseData.getApplicant1ProceedWithClaim()))
+                && !(NO.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())))) {
             updatedCaseData.applicantDefenceResponseDocument(YES);
         } else {
             updatedCaseData.applicantDefenceResponseDocument(NO);
@@ -159,7 +162,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return updatedCaseData.build();
     }
 
-    private CallbackResponse setApplicantRouteFlags (CallbackParams callbackParams) {
+    private CallbackResponse setApplicantRouteFlags(CallbackParams callbackParams) {
         CaseData updatedCaseData = setApplicantDefenceResponseDocFlag(setApplicant1ProceedFlagToYes(callbackParams.getCaseData()));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
