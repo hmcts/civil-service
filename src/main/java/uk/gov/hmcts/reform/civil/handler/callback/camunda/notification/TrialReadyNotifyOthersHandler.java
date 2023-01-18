@@ -42,7 +42,7 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
     private final NotificationsProperties notificationsProperties;
 
     @Override
-    protected Map<String, Callback> callbacks(){
+    protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT), this::notifySolicitorForOtherTrialReady
         );
