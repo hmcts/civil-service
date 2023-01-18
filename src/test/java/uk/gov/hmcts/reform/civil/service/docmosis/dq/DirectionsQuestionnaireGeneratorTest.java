@@ -98,8 +98,6 @@ class DirectionsQuestionnaireGeneratorTest {
     private static final String HNL_FILE_NAME_DEFENDANT = format(HNL_DQ_RESPONSE_1V1.getDocumentTitle(), "defendant", REFERENCE_NUMBER);
     private static final String FILE_NAME_CLAIMANT = format(N181.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
     private static final String HNL_FILE_NAME_CLAIMANT = format(HNL_DQ_RESPONSE_1V1.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
-
-
     private static final CaseDocument CASE_DOCUMENT_DEFENDANT =
         CaseDocumentBuilder.builder()
             .documentName(FILE_NAME_DEFENDANT)
