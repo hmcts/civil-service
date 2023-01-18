@@ -389,9 +389,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class MidEventCallbackSetApplicantRoutesFlag{
+    class MidEventCallbackSetApplicantRoutesFlag {
 
         private static final String PAGE_ID = "set-applicant-route_flags";
+
         @Test
         void shouldSetApplicantDefenceRespDoc_whenClaimantRejectPartPaymentPlan() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -420,8 +421,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("applicantDefenceResponseDocument"))
                 .isEqualTo("No");
         }
-
-
     }
 
     @Nested
