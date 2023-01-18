@@ -202,4 +202,7 @@ public class NotificationsProperties {
     @NotEmpty
     private String claimantSolicitorClaimContinuingOnlineCos;
 
+    @NotEmpty
+    private String evidenceUploadTemplate;
+
 }
