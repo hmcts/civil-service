@@ -346,6 +346,4 @@ public class CaseDataParent implements MappableObject {
 
     private final IdamUserDetails claimantUserDetails;
 
-    private final IdamUserDetails defendantUserDetails;
-
 }
