@@ -165,6 +165,20 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 builder.respondent2ResponseDeadline(
                         deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime));
             }
+            if (toggleService.isCertificateOfServiceEnabled() && areAnyRespondentsLitigantInPerson(caseData)) {
+                if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
+                    builder
+                        .cosNotifyClaimDetails1(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDetails1()))
+                        .build();
+                }
+
+                if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
+                    builder
+                        .cosNotifyClaimDetails2(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDetails2()))
+                        .build();
+                }
+
+            }
             updatedCaseData = builder.build();
         }
 
@@ -346,6 +360,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         CaseData caseData = callbackParams.getCaseData();
 
         ArrayList<String> errors = new ArrayList<>();
+        CertificateOfService certificateOfService = caseData.getCosNotifyClaimDetails1();
         if (toggleService.isCertificateOfServiceEnabled()) {
             if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
                 caseData.getCosNotifyClaimDetails1().setCosDocSaved(NO);
@@ -362,17 +377,19 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 errors.add(DOC_SERVED_MANDATORY);
             }
         }
-
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.cosNotifyClaimDetails1(certificateOfService.toBuilder()
+                                                   .build());
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(objectMapper))
-                .errors(errors)
-                .build();
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .errors(errors)
+            .build();
     }
 
     private CallbackResponse validateCoSDetailsDefendant2(final CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        CertificateOfService certificateOfServiceDef2 = caseData.getCosNotifyClaimDetails2();
         ArrayList<String> errors = new ArrayList<>();
         if (toggleService.isCertificateOfServiceEnabled()) {
             if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
@@ -394,8 +411,10 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 errors.add(DOC_SERVED_MANDATORY);
             }
         }
-
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.cosNotifyClaimDetails2(certificateOfServiceDef2.toBuilder()
+                                                   .build());
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
@@ -444,5 +463,18 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             }
         }
         return false;
+    }
+
+    private CertificateOfService updateStatementOfTruthForLip(CertificateOfService certificateOfService) {
+        List<String> cosUISenderStatementOfTruthLabel = new ArrayList<>();
+        cosUISenderStatementOfTruthLabel.add("CERTIFIED");
+        return certificateOfService.toBuilder()
+            .cosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
+            .build();
+    }
+
+    private boolean areAnyRespondentsLitigantInPerson(CaseData caseData) {
+        return caseData.getRespondent1Represented() == NO
+            || (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
     }
 }

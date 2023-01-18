@@ -508,6 +508,30 @@
       },
       "additionalProperties": false
     },
+    "noticeOfChange": {
+      "$id": "#/properties/noticeOfChange",
+      "type": ["array", "null"],
+      "items": {
+        "$id": "#/properties/noticeOfChange/items",
+        "required": [
+          "litigiousPartyID",
+          "dateOfNoC"
+        ],
+        "properties": {
+          "litigiousPartyId": {
+            "$id": "#/properties/noticeOfChange/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": "Solicitor ID"
+          },
+          "dateOfNoC": {
+            "$id": "#/properties/noticeOfChange/items/properties/dateOfNoc",
+            "$ref": "#/definitions/formatDate",
+            "description": "Date of the notice of change"
+          }
+        }
+      },
+      "additionalItems": false
+    },
     "breathingSpace": {
       "$id": "#/properties/breathing",
       "type": [
