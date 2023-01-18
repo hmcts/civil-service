@@ -68,6 +68,7 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
         return Map.of(
             callbackKey(ABOUT_TO_START), this::populateIsRespondent1Flag,
             callbackKey(MID, "extension-date"), this::validateExtensionDate,
+            callbackKey(MID, "response-deadline-extension"), this::validateProposedDeadlineAdmin,
             callbackKey(ABOUT_TO_SUBMIT), this::setResponseDeadline,
             callbackKey(SUBMITTED), this::buildConfirmation
         );
@@ -105,6 +106,16 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
         var isAoSApplied = caseData.getBusinessProcess().getCamundaEvent().equals(SPEC_ACKNOWLEDGEMENT_OF_SERVICE);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(validator.specValidateProposedDeadline(agreedExtension, currentResponseDeadline, isAoSApplied))
+            .build();
+    }
+
+    private CallbackResponse validateProposedDeadlineAdmin(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        LocalDate agreedExtension = caseData.getRespondentSolicitor1AgreedDeadlineExtension();
+
+        LocalDateTime currentResponseDeadline = caseData.getRespondent1ResponseDeadline();
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(validator.validateProposedDeadline(agreedExtension, currentResponseDeadline))
             .build();
     }
 
