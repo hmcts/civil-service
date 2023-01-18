@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.CaseDefinitionConstants;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -62,6 +63,7 @@ import java.util.Optional;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.WA_3_5;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -169,7 +171,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private CallbackResponse startClaim(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
         caseDataBuilder.claimStarted(YES);
-
+        caseDataBuilder.featureToggleWA(CaseDefinitionConstants.WA_3_5);
         if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);
 

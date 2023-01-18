@@ -728,6 +728,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.superClaimType(SPEC_CLAIM);
+        caseDataBuilder.featureToggleWA("WA3.5");
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
