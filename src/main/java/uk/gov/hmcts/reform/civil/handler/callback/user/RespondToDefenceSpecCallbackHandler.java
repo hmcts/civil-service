@@ -70,7 +70,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
@@ -416,35 +415,35 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private ResponseOneVOneShowTag setUpOneVOneFlowForPartAdmit(CaseData caseData) {
-        if (caseData.getSpecDefenceAdmittedRequired() == NO) {
-            switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
-                case IMMEDIATELY:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY;
-                case BY_SET_DATE:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE;
-                case SUGGESTION_OF_REPAYMENT_PLAN:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT;
-                default:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT;
-            }
+        if (YES.equals(caseData.getSpecDefenceAdmittedRequired())) {
+            return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_HAS_PAID;
         }
-        return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_HAS_PAID;
+        switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
+            case IMMEDIATELY:
+                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY;
+            case BY_SET_DATE:
+                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE;
+            case SUGGESTION_OF_REPAYMENT_PLAN:
+                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT;
+            default:
+                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT;
+        }
     }
 
     private ResponseOneVOneShowTag setUpOneVOneFlowForFullAdmit(CaseData caseData) {
-        if (caseData.getSpecDefenceFullAdmittedRequired() == NO) {
-            switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
-                case IMMEDIATELY:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_IMMEDIATELY;
-                case BY_SET_DATE:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_BY_SET_DATE;
-                case SUGGESTION_OF_REPAYMENT_PLAN:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_INSTALMENT;
-                default:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT;
-            }
+        if (YES.equals(caseData.getSpecDefenceFullAdmittedRequired())) {
+            return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID;
         }
-        return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID;
+        switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
+            case IMMEDIATELY:
+                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_IMMEDIATELY;
+            case BY_SET_DATE:
+                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_BY_SET_DATE;
+            case SUGGESTION_OF_REPAYMENT_PLAN:
+                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_INSTALMENT;
+            default:
+                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT;
+        }
     }
 
     private CallbackResponse validatePaymentDate(CallbackParams callbackParams) {
