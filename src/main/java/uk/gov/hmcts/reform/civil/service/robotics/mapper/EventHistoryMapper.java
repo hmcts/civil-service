@@ -1377,7 +1377,7 @@ public class EventHistoryMapper {
                 ));
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
                 Party respondent2 = caseData.getRespondent2();
-                Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
+                Respondent1DQ respondent2DQ = caseData.getRespondent1DQ();
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
 
