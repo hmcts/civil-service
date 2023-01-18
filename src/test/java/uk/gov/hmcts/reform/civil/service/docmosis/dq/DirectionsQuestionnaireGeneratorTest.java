@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
@@ -75,6 +76,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HNL_DQ_RESPONSE_1V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HNL_DQ_RESPONSE_2V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HNL_DQ_RESPONSE_1V2_DS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HNL_DQ_RESPONSE_1V2_SS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_2V1;
@@ -98,6 +100,7 @@ class DirectionsQuestionnaireGeneratorTest {
     private static final String HNL_FILE_NAME_DEFENDANT = format(HNL_DQ_RESPONSE_1V1.getDocumentTitle(), "defendant", REFERENCE_NUMBER);
     private static final String FILE_NAME_CLAIMANT = format(N181.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
     private static final String HNL_FILE_NAME_CLAIMANT = format(HNL_DQ_RESPONSE_1V1.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
+    private static final String HNL_FILE_NAME_CLAIMANT_1v2 = format(HNL_DQ_RESPONSE_1V2_DS.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
     private static final CaseDocument CASE_DOCUMENT_DEFENDANT =
         CaseDocumentBuilder.builder()
             .documentName(FILE_NAME_DEFENDANT)
@@ -1282,6 +1285,40 @@ class DirectionsQuestionnaireGeneratorTest {
                 .uploadDocument(BEARER_TOKEN, new PDF(HNL_FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
             verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
                                                                       eq(HNL_DQ_RESPONSE_1V1));
+        }
+
+        @Test
+        void shouldGenerateClaimantDQ_for1v2_DS_withHnlToggleEnabled() {
+            when(featureToggleService.isHearingAndListingLegalRepEnabled()).thenReturn(true);
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HNL_DQ_RESPONSE_1V2_DS)))
+                .thenReturn(new DocmosisDocument(HNL_DQ_RESPONSE_1V2_DS.getDocumentTitle(), bytes));
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(HNL_FILE_NAME_CLAIMANT_1v2, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(HNL_CASE_DOCUMENT_DEFENDANT);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
+                .respondent2SameLegalRepresentative(NO)
+                .respondent2AcknowledgeNotificationDate(LocalDateTime.now())
+                .respondent2ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+                .businessProcess(BusinessProcess.builder().camundaEvent("CLAIMANT_RESPONSE").build())
+                .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+            assertThat(caseDocument).isNotNull().isEqualTo(HNL_CASE_DOCUMENT_DEFENDANT);
+
+            verify(representativeService).getRespondent2Representative(caseData);
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(HNL_FILE_NAME_CLAIMANT_1v2, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
+                                                                      eq(HNL_DQ_RESPONSE_1V2_DS));
         }
 
         @Test
