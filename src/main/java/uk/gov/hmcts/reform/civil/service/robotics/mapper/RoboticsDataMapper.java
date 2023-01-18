@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.ClaimDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
@@ -30,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
@@ -55,11 +58,12 @@ public class RoboticsDataMapper {
     private final EventHistoryMapper eventHistoryMapper;
     private final OrganisationService organisationService;
     private final FeatureToggleService featureToggleService;
+    private final LocationRefDataService locationRefDataService;
 
-    public RoboticsCaseData toRoboticsCaseData(CaseData caseData) {
+    public RoboticsCaseData toRoboticsCaseData(CaseData caseData, String authToken) {
         requireNonNull(caseData);
         var roboticsBuilder = RoboticsCaseData.builder()
-            .header(buildCaseHeader(caseData))
+            .header(buildCaseHeader(caseData, authToken))
             .litigiousParties(buildLitigiousParties(caseData))
             .solicitors(buildSolicitors(caseData))
             .claimDetails(buildClaimDetails(caseData))
@@ -86,15 +90,26 @@ public class RoboticsDataMapper {
             .build();
     }
 
-    private CaseHeader buildCaseHeader(CaseData caseData) {
+    private CaseHeader buildCaseHeader(CaseData caseData, String authToken) {
         return CaseHeader.builder()
             .caseNumber(caseData.getLegacyCaseReference())
             .owningCourtCode("390")
             .owningCourtName("CCMCC")
             .caseType("PERSONAL INJURY")
-            .preferredCourtCode(caseData.getCourtLocation().getApplicantPreferredCourt())
+            .preferredCourtCode(getPreferredCourtCode(caseData, authToken))
             .caseAllocatedTo(buildAllocatedTrack(caseData.getAllocatedTrack()))
             .build();
+    }
+
+    public String getPreferredCourtCode(CaseData caseData, String authToken) {
+        List<LocationRefData> courtLocations = locationRefDataService.getCourtLocationsByEpimmsId(
+                authToken, caseData.getCourtLocation().getCaseLocation().getBaseLocation());
+        if (!courtLocations.isEmpty()) {
+            return courtLocations.stream()
+                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
+                .collect(Collectors.toList()).get(0).getCourtLocationCode();
+        }
+        return null;
     }
 
     private String buildAllocatedTrack(AllocatedTrack allocatedTrack) {
