@@ -242,7 +242,7 @@ public class FlowStateAllowedEventService {
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
-                SERVICE_REQUEST_RECEIVED
+                SERVICE_REQUEST_RECEIVED,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT
