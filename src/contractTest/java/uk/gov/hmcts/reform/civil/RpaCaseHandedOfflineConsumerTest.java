@@ -71,7 +71,7 @@ class RpaCaseHandedOfflineConsumerTest extends BaseRpaTest {
     PrdAdminUserConfiguration userConfig;
     @MockBean
     private Time time;
-
+    private static final String BEARER_TOKEN = "Bearer Token";
     LocalDateTime localDateTime;
 
     @BeforeEach
@@ -89,7 +89,7 @@ class RpaCaseHandedOfflineConsumerTest extends BaseRpaTest {
             .atState(FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED)
             .legacyCaseReference("100DC001")
             .build();
-        String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+        String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
         System.out.println("PAYLOAD");
         System.out.println(payload);
@@ -121,7 +121,7 @@ class RpaCaseHandedOfflineConsumerTest extends BaseRpaTest {
                                 .build()).build()))
                     .build())
             .build();
-        String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+        String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
         System.out.println("PAYLOAD");
         System.out.println(payload);
