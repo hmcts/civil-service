@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -38,8 +40,10 @@ import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -50,6 +54,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
@@ -58,6 +63,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @Service
 @RequiredArgsConstructor
@@ -83,18 +89,19 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(MID, "experts"), this::validateApplicantExperts,
-            callbackKey(MID, "witnesses"), this::validateApplicantWitnesses,
-            callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth,
-            callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates,
-            callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag,
-            callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false),
-            callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true),
-            callbackKey(ABOUT_TO_START), this::populateCaseData,
-            callbackKey(V_1, ABOUT_TO_START), this::populateCaseData,
-            callbackKey(SUBMITTED), this::buildConfirmation
-        );
+        return new ImmutableMap.Builder<String, Callback>()
+            .put(callbackKey(MID, "experts"), this::validateApplicantExperts)
+            .put(callbackKey(MID, "witnesses"), this::validateApplicantWitnesses)
+            .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
+            .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
+            .put(callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag)
+            .put(callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false))
+            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true))
+            .put(callbackKey(ABOUT_TO_START), this::populateCaseData)
+            .put(callbackKey(V_1, ABOUT_TO_START), this::populateCaseData)
+            .put(callbackKey(V_2, ABOUT_TO_START), this::populateCaseData)
+            .put(callbackKey(SUBMITTED), this::buildConfirmation)
+            .build();
     }
 
     private CallbackResponse validateUnavailableDates(CallbackParams callbackParams) {
@@ -192,6 +199,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 }
             }
 
+            if (featureToggleService.isHearingAndListingSDOEnabled()) {
+                dq.applicant1DQWitnesses(builder.build().getApplicant1DQWitnessesSmallClaim());
+            }
+
             builder.applicant1DQ(dq.build());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             builder.uiStatementOfTruth(StatementOfTruth.builder().build());
@@ -268,6 +279,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                                              .build());
         }
 
+        if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
+            updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
+            updatedCaseData.respondent1PaymentDateToStringSpec(setUpPayDateToString(caseData));
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
@@ -337,5 +353,71 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 claimNumber
             );
         }
+    }
+
+    private ResponseOneVOneShowTag setUpOneVOneFlow(CaseData caseData) {
+        if (ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
+            if (caseData.getRespondent1ClaimResponseTypeForSpec() == null) {
+                return null;
+            }
+            switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
+                case FULL_DEFENCE:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE;
+                case FULL_ADMISSION:
+                    return setUpOneVOneFlowForFullAdmit(caseData);
+                case PART_ADMISSION:
+                    return setUpOneVOneFlowForPartAdmit(caseData);
+                case COUNTER_CLAIM:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_COUNTER_CLAIM;
+                default:
+                    return null;
+            }
+        }
+        return null;
+    }
+
+    private String setUpPayDateToString(CaseData caseData) {
+        if (caseData.getRespondToClaimAdmitPartLRspec() != null
+            && caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null) {
+            return caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()
+                .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
+        }
+        if (caseData.getRespondent1ResponseDate() != null) {
+            return caseData.getRespondent1ResponseDate().plusDays(5)
+                .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
+        }
+        return null;
+    }
+
+    private ResponseOneVOneShowTag setUpOneVOneFlowForPartAdmit(CaseData caseData) {
+        if (caseData.getSpecDefenceAdmittedRequired() == NO) {
+            switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
+                case IMMEDIATELY:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY;
+                case BY_SET_DATE:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE;
+                case SUGGESTION_OF_REPAYMENT_PLAN:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT;
+                default:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT;
+            }
+        }
+        return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_HAS_PAID;
+    }
+
+    private ResponseOneVOneShowTag setUpOneVOneFlowForFullAdmit(CaseData caseData) {
+        if (caseData.getSpecDefenceFullAdmittedRequired() == NO) {
+            switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
+                case IMMEDIATELY:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_IMMEDIATELY;
+                case BY_SET_DATE:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_BY_SET_DATE;
+                case SUGGESTION_OF_REPAYMENT_PLAN:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_INSTALMENT;
+                default:
+                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT;
+            }
+        }
+        return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID;
     }
 }
