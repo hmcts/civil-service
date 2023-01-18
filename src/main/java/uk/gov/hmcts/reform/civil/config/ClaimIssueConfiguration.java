@@ -23,3 +23,4 @@ public class ClaimIssueConfiguration {
         this.n215Link = n215Link;
     }
 }
+
