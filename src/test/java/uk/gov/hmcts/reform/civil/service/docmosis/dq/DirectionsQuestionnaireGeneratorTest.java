@@ -346,6 +346,39 @@ class DirectionsQuestionnaireGeneratorTest {
             );
         }
 
+        @Test
+        void specGenerateClaimantDQ_withHnlToggleEnabled() {
+            when(featureToggleService.isHearingAndListingLegalRepEnabled()).thenReturn(true);
+            when(documentGeneratorService.generateDocmosisDocument(
+                any(MappableObject.class), eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_HNL)))
+                .thenReturn(new DocmosisDocument(
+                    DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_HNL.getDocumentTitle(), bytes));
+
+            String expectedTitle = format(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_HNL.getDocumentTitle(),
+                                          "claimant", REFERENCE_NUMBER
+            );
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(HNL_CASE_DOCUMENT_CLAIMANT);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .businessProcess(BusinessProcess.builder().camundaEvent("CLAIMANT_RESPONSE").build())
+                .build().toBuilder()
+                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .build();
+
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+            assertThat(caseDocument).isNotNull().isEqualTo(HNL_CASE_DOCUMENT_CLAIMANT);
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(
+                any(DirectionsQuestionnaireForm.class),
+                eq(DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_HNL)
+            );
+        }
+
         @Nested
         class GetTemplateData {
 
