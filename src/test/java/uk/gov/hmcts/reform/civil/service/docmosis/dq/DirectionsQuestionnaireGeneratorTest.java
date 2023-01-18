@@ -73,6 +73,9 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.DIRECTIONS_QUESTIONNAIRE;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HNL_DQ_RESPONSE_1V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HNL_DQ_RESPONSE_2V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HNL_DQ_RESPONSE_1V2_SS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_2V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_MULTIPARTY_SAME_SOL;
@@ -92,16 +95,31 @@ class DirectionsQuestionnaireGeneratorTest {
     private static final String REFERENCE_NUMBER = "000DC001";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String FILE_NAME_DEFENDANT = format(N181.getDocumentTitle(), "defendant", REFERENCE_NUMBER);
+    private static final String HNL_FILE_NAME_DEFENDANT = format(HNL_DQ_RESPONSE_1V1.getDocumentTitle(), "defendant", REFERENCE_NUMBER);
     private static final String FILE_NAME_CLAIMANT = format(N181.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
+    private static final String HNL_FILE_NAME_CLAIMANT = format(HNL_DQ_RESPONSE_1V1.getDocumentTitle(), "claimant", REFERENCE_NUMBER);
+
 
     private static final CaseDocument CASE_DOCUMENT_DEFENDANT =
         CaseDocumentBuilder.builder()
             .documentName(FILE_NAME_DEFENDANT)
             .documentType(DIRECTIONS_QUESTIONNAIRE)
             .build();
+
+    private static final CaseDocument HNL_CASE_DOCUMENT_DEFENDANT =
+        CaseDocumentBuilder.builder()
+            .documentName(HNL_FILE_NAME_DEFENDANT)
+            .documentType(DIRECTIONS_QUESTIONNAIRE)
+            .build();
     private static final CaseDocument CASE_DOCUMENT_CLAIMANT =
         CaseDocumentBuilder.builder()
             .documentName(FILE_NAME_CLAIMANT)
+            .documentType(DIRECTIONS_QUESTIONNAIRE)
+            .build();
+
+    private static final CaseDocument HNL_CASE_DOCUMENT_CLAIMANT =
+        CaseDocumentBuilder.builder()
+            .documentName(HNL_FILE_NAME_CLAIMANT)
             .documentType(DIRECTIONS_QUESTIONNAIRE)
             .build();
 
@@ -207,6 +225,33 @@ class DirectionsQuestionnaireGeneratorTest {
         }
 
         @Test
+        void shouldGenerateDQ_when2v1ScenarioWithFullDefence_withHnlToggleEnabled() {
+            when(featureToggleService.isHearingAndListingLegalRepEnabled()).thenReturn(true);
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HNL_DQ_RESPONSE_2V1)))
+                .thenReturn(new DocmosisDocument(HNL_DQ_RESPONSE_2V1.getDocumentTitle(), bytes));
+
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(HNL_FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(HNL_CASE_DOCUMENT_DEFENDANT);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoApplicants()
+                .build();
+
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+            assertThat(caseDocument).isNotNull().isEqualTo(HNL_CASE_DOCUMENT_DEFENDANT);
+            verify(representativeService).getRespondent1Representative(caseData);
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(HNL_FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(
+                any(DirectionsQuestionnaireForm.class),
+                eq(HNL_DQ_RESPONSE_2V1)
+            );
+        }
+
+        @Test
         void shouldGenerateDQ_when1v2SameSolicitorScenarioWithFullDefence() {
             when(documentGeneratorService.generateDocmosisDocument(
                 any(MappableObject.class), eq(N181_MULTIPARTY_SAME_SOL)))
@@ -268,6 +313,38 @@ class DirectionsQuestionnaireGeneratorTest {
             verify(documentGeneratorService).generateDocmosisDocument(
                 any(DirectionsQuestionnaireForm.class),
                 eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC)
+            );
+        }
+
+        @Test
+        void specGenerate_withHnlToggleEnabled() {
+            when(featureToggleService.isHearingAndListingLegalRepEnabled()).thenReturn(true);
+            when(documentGeneratorService.generateDocmosisDocument(
+                any(MappableObject.class), eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_HNL)))
+                .thenReturn(new DocmosisDocument(
+                    DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_HNL.getDocumentTitle(), bytes));
+
+            String expectedTitle = format(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_HNL.getDocumentTitle(),
+                                          "defendant", REFERENCE_NUMBER
+            );
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(HNL_CASE_DOCUMENT_DEFENDANT);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence()
+                .build().toBuilder()
+                .superClaimType(SuperClaimType.SPEC_CLAIM)
+                .build();
+
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+            assertThat(caseDocument).isNotNull().isEqualTo(HNL_CASE_DOCUMENT_DEFENDANT);
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(expectedTitle, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(
+                any(DirectionsQuestionnaireForm.class),
+                eq(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_HNL)
             );
         }
 
@@ -1147,6 +1224,36 @@ class DirectionsQuestionnaireGeneratorTest {
         }
 
         @Test
+        void shouldGenerateRespondentTwoCertificateOfService_whenStateFlowIsFullDefenceForBoth_withHnlToggleEnabled() {
+            when(featureToggleService.isHearingAndListingLegalRepEnabled()).thenReturn(true);
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HNL_DQ_RESPONSE_1V1)))
+                .thenReturn(new DocmosisDocument(HNL_DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(HNL_FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(HNL_CASE_DOCUMENT_DEFENDANT);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+            if (caseData.getRespondent2OrgRegistered() != null
+                && caseData.getRespondent2Represented() == null) {
+                caseData = caseData.toBuilder()
+                    .respondent2Represented(YES)
+                    .build();
+            }
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+            assertThat(caseDocument).isNotNull().isEqualTo(HNL_CASE_DOCUMENT_DEFENDANT);
+
+            verify(representativeService).getRespondent2Representative(caseData);
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(HNL_FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
+                                                                      eq(HNL_DQ_RESPONSE_1V1));
+        }
+
+        @Test
         void shouldGenerateClaimantCertificateOfService_whenStateFlowIsRespondToDefenceAndProceed() {
             when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
                 .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
@@ -1793,6 +1900,34 @@ class DirectionsQuestionnaireGeneratorTest {
         }
 
         @Test
+        void shouldGenerateN181Document_whenTwoApplicantRespondWithOnlyFirstIntendsToProceed_withHNlToggleEnabled() {
+            when(featureToggleService.isHearingAndListingLegalRepEnabled()).thenReturn(true);
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HNL_DQ_RESPONSE_1V1)))
+                .thenReturn(new DocmosisDocument(HNL_DQ_RESPONSE_1V1.getDocumentTitle(), bytes));
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(HNL_FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(HNL_CASE_DOCUMENT_CLAIMANT);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoApplicants()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE").build())
+                .applicantsProceedIntention(YES)
+                .applicant1ProceedWithClaimMultiParty2v1(YES)
+                .applicant2ProceedWithClaimMultiParty2v1(NO)
+                .build();
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+            assertThat(caseDocument).isNotNull().isEqualTo(HNL_CASE_DOCUMENT_CLAIMANT);
+
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(HNL_FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(any(DirectionsQuestionnaireForm.class),
+                                                                      eq(HNL_DQ_RESPONSE_1V1));
+        }
+
+        @Test
         void shouldGenerateN181Document_whenTwoApplicantRespondWithOnlySecondIntendsToProceed() {
             when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N181)))
                 .thenReturn(new DocmosisDocument(N181.getDocumentTitle(), bytes));
@@ -1901,6 +2036,39 @@ class DirectionsQuestionnaireGeneratorTest {
             verify(documentGeneratorService).generateDocmosisDocument(
                 any(DirectionsQuestionnaireForm.class),
                 eq(N181_MULTIPARTY_SAME_SOL)
+            );
+        }
+
+        @Test
+        void shouldGenerateN181Document_whenOneApplicantIntendsToProceedAgainstBothDefendant_withHNLToggleEnabled() {
+            when(featureToggleService.isHearingAndListingLegalRepEnabled()).thenReturn(true);
+            when(documentGeneratorService.generateDocmosisDocument(
+                any(MappableObject.class),
+                eq(HNL_DQ_RESPONSE_1V2_SS)
+            ))
+                .thenReturn(new DocmosisDocument(HNL_DQ_RESPONSE_1V2_SS.getDocumentTitle(), bytes));
+            when(documentManagementService.uploadDocument(
+                BEARER_TOKEN, new PDF(FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE))
+            ).thenReturn(HNL_CASE_DOCUMENT_CLAIMANT);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimOneDefendantSolicitor()
+                .businessProcess(BusinessProcess.builder()
+                                     .camundaEvent("CLAIMANT_RESPONSE").build())
+                .applicantsProceedIntention(YesOrNo.YES)
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YesOrNo.YES)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YesOrNo.YES)
+                .build();
+            CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+            assertThat(caseDocument).isNotNull().isEqualTo(HNL_CASE_DOCUMENT_CLAIMANT);
+
+            verify(documentManagementService)
+                .uploadDocument(BEARER_TOKEN, new PDF(HNL_FILE_NAME_CLAIMANT, bytes, DIRECTIONS_QUESTIONNAIRE));
+            verify(documentGeneratorService).generateDocmosisDocument(
+                any(DirectionsQuestionnaireForm.class),
+                eq(HNL_DQ_RESPONSE_1V2_SS)
             );
         }
     }
