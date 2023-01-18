@@ -148,6 +148,12 @@ public class NotificationsProperties {
     private String respondentSolicitorCounterClaimForSpec;
 
     @NotEmpty
+    private String respondentDeadlineExtension;
+
+    @NotEmpty
+    private String claimantDeadlineExtension;
+
+    @NotEmpty
     private String respondentSolicitor1DefaultJudgmentRequested;
 
     @NotEmpty
@@ -196,5 +202,8 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String claimantSolicitorClaimContinuingOnlineCos;
+
+    @NotEmpty
+    private String evidenceUploadTemplate;
 
 }

@@ -14,9 +14,6 @@ import javax.validation.constraints.Future;
 @AllArgsConstructor
 public class DisposalHearingSchedulesOfLoss {
 
-    private String input1;
-    @Future(message = "The date entered must be in the future")
-    private LocalDate date1;
     private String input2;
     @Future(message = "The date entered must be in the future")
     private LocalDate date2;

@@ -14,6 +14,7 @@ import java.util.Map;
 
 import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.GENERAL_APPLICATION_ENABLED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLipCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allResponsesReceived;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.applicantOutOfTimeProcessedByCamunda;
@@ -252,6 +253,7 @@ public class StateFlowEngine {
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyIf(paymentFailed)
+                .transitionTo(PENDING_CLAIM_ISSUED).onlyIf(isLipCase)
             .state(CLAIM_ISSUED_PAYMENT_FAILED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
             .state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL)
@@ -271,6 +273,7 @@ public class StateFlowEngine {
                 if (featureToggleService.isPinInPostEnabled()) {
                     flags.put(FlowFlag.PIP_ENABLED.name(), true);
                 }
+                flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
             })
             .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
                 .onlyIf(multipartyCase.and(respondent1NotRepresented.and(respondent2NotRepresented)
@@ -281,6 +284,7 @@ public class StateFlowEngine {
                 if (featureToggleService.isPinInPostEnabled()) {
                     flags.put(FlowFlag.PIP_ENABLED.name(), true);
                 }
+                flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
             })
             // Unregistered
             // 1. Both def1 and def2 unregistered
