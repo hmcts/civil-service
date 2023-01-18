@@ -59,9 +59,9 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
     private CallbackResponse notifyRespondent1ForAgreedRepayment(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if ((YesOrNo.YES.equals(caseData.getRespondent1OrgRegistered())
+        if ((isRespondentSolicitorRegistered(caseData)
             && caseData.getRespondentSolicitor1EmailAddress() == null)
-            || ((!YesOrNo.YES.equals(caseData.getRespondent1OrgRegistered())
+            || ((!isRespondentSolicitorRegistered(caseData)
             && caseData.getRespondent1().getPartyEmail() == null
             ))) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -78,14 +78,14 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        if (YesOrNo.YES.equals(caseData.getRespondent1OrgRegistered())) {
+        if (isRespondentSolicitorRegistered(caseData)) {
             return Map.of(
                 CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(
                     caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()),
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
             );
         }
-        if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
+        if (isRespondentNotRepresented(caseData)) {
             return Map.of(
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
@@ -96,20 +96,20 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
     }
 
     private String addEmail(CaseData caseData) {
-        if (YesOrNo.YES.equals(caseData.getRespondent1OrgRegistered())) {
+        if (isRespondentSolicitorRegistered(caseData)) {
             return caseData.getRespondentSolicitor1EmailAddress();
         }
-        if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
+        if (isRespondentNotRepresented(caseData)) {
             return caseData.getRespondent1().getPartyEmail();
         }
         return null;
     }
 
     private String addTemplate(CaseData caseData) {
-        if (YesOrNo.YES.equals(caseData.getRespondent1OrgRegistered())) {
+        if (isRespondentSolicitorRegistered(caseData)) {
             return notificationsProperties.getRespondentSolicitorCcjNotificationTemplate();
         }
-        if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
+        if (isRespondentNotRepresented(caseData)) {
             return notificationsProperties.getRespondentCcjNotificationTemplate();
         }
         return null;
@@ -122,5 +122,13 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
             respondentLegalOrganizationName = organisation.get().getName();
         }
         return respondentLegalOrganizationName;
+    }
+
+    public boolean isRespondentNotRepresented(CaseData caseData) {
+        return YesOrNo.NO.equals(caseData.getSpecRespondent1Represented());
+    }
+
+    public boolean isRespondentSolicitorRegistered(CaseData caseData) {
+        return YesOrNo.YES.equals(caseData.getRespondent1OrgRegistered());
     }
 }
