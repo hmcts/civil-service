@@ -117,7 +117,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         }
 
         //build options for field (Default Value & List Options), add to case data
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.defendantSolicitorNotifyClaimOptions(DynamicList.fromList(dynamicListOptions));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -134,7 +134,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             warnings.add(WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
         }
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .warnings(warnings)
@@ -150,13 +150,9 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         if (!dateValidErrorMessage.isEmpty()) {
             errors.add(dateValidErrorMessage);
         }
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.cosNotifyClaimDefendant1(certificateOfService.toBuilder().build());
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
-        caseDataBuilder.cosNotifyClaimDefendant1(certificateOfService.toBuilder()
-                                                     .cosUISenderStatementOfTruthLabel(null)
-                                                     .build())
-            .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
@@ -172,11 +168,9 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             errors.add(dateValidationErrorMessage);
         }
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        caseDataBuilder.cosNotifyClaimDefendant2(certificateOfServiceDef2.toBuilder()
-                                                     .cosUISenderStatementOfTruthLabel(null)
-                                                     .build());
+        caseDataBuilder.cosNotifyClaimDefendant2(certificateOfServiceDef2.toBuilder().build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -188,7 +182,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime claimNotificationDate = time.now();
 
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder()
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM))
             .claimNotificationDate(claimNotificationDate);
 
@@ -371,10 +365,10 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     }
 
     private CertificateOfService updateStatementOfTruthForLip(CertificateOfService certificateOfService) {
-        List<String> cosUISenderStatementOfTruthLabel = certificateOfService.getCosUISenderStatementOfTruthLabel();
+        List<String> cosUISenderStatementOfTruthLabel = new ArrayList<>();
+        cosUISenderStatementOfTruthLabel.add("CERTIFIED");
         return certificateOfService.toBuilder()
             .cosSenderStatementOfTruthLabel(cosUISenderStatementOfTruthLabel)
-            .cosUISenderStatementOfTruthLabel(null)
             .build();
     }
 }
