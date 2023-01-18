@@ -14,7 +14,7 @@ public interface ExpertsValidator {
     default CallbackResponse validateExperts(DQ dq) {
         var experts = dq.getExperts();
         List<String> errors = new ArrayList<>();
-        if (experts.getExpertRequired() == YES && experts.getDetails() == null) {
+        if (experts != null && experts.getExpertRequired() == YES && experts.getDetails() == null) {
             errors.add("Expert details required");
         }
 

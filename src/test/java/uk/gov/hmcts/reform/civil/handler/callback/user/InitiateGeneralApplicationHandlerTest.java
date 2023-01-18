@@ -10,14 +10,18 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
@@ -32,6 +36,7 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -48,10 +53,14 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OTHER_SUPPORT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_UNAVAILABILITY_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.TRIAL_DATE_FROM_REQUIRED;
@@ -186,6 +195,128 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_URGENCY_DATE_PAGE);
             when(initiateGeneralAppService.validateUrgencyDates(any())).thenCallRealMethod();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    public CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
+        return objectMapper.convertValue(response.getData(), CaseData.class);
+    }
+
+    @Nested
+    class MidEventForVaryJudgement extends LocationRefSampleDataBuilder {
+
+        private static final String VALIDATE_GA_TYPE = "ga-validate-type";
+
+        @Test
+        void shouldNotCauseAnyErrors_whenGaTypeIsNotVaryJudgement() {
+
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT);
+            CaseData caseData = CaseDataBuilder
+                .builder().generalAppType(GAApplicationType.builder().types(types).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_TYPE);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData responseCaseData = getCaseData(response);
+
+            assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(NO);
+            assertThat(response.getErrors()).isEqualTo(null);
+        }
+
+        @Test
+        void shouldNotCauseAnyErrorsWhenGaTypeIsVaryJudgement() {
+            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
+            CaseData caseData = CaseDataBuilder
+                .builder().generalAppType(GAApplicationType.builder().types(types).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_TYPE);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData responseCaseData = getCaseData(response);
+
+            assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(YES);
+            assertThat(response.getErrors()).isEqualTo(null);
+        }
+
+        @Test
+        void shouldNotCauseAnyErrorsWhenGaTypeIsMultipleType() {
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_JUDGEMENT);
+            CaseData caseData = CaseDataBuilder
+                .builder().generalAppType(GAApplicationType.builder().types(types).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_GA_TYPE);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData responseCaseData = getCaseData(response);
+
+            assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(YES);
+            assertThat(response.getErrors()).isEqualTo(null);
+        }
+
+    }
+
+    @Nested
+    class MidEventForHearingDateValidation extends LocationRefSampleDataBuilder {
+
+        private static final String INVALID_HEARING_DATE = "The hearing date must be in the future";
+        private static final String VALIDATE_HEARING_DATE = "ga-validate-hearing-date";
+
+        @Test
+        void shouldThrowErrorsWhenHearingDateIsPast() {
+            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
+            CaseData caseData = CaseDataBuilder
+                .builder()
+                .generalAppHearingDate(GAHearingDateGAspec.builder().hearingScheduledPreferenceYesNo(YES)
+                                           .hearingScheduledDate(LocalDate.now().minusDays(3))
+                                           .build())
+                .generalAppType(GAApplicationType.builder().types(types).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_DATE);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors().size()).isEqualTo(1);
+
+            assertThat(response.getErrors().get(0)).isEqualTo(INVALID_HEARING_DATE);
+        }
+
+        @Test
+        void shouldNotCauseAnyErrorsWhenHearingDateIsPresent() {
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_JUDGEMENT);
+
+            CaseData caseData = CaseDataBuilder
+                .builder()
+                .generalAppHearingDate(GAHearingDateGAspec.builder().hearingScheduledPreferenceYesNo(YES)
+                                           .hearingScheduledDate(LocalDate.now())
+                                           .build())
+                .generalAppType(GAApplicationType.builder().types(types).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_DATE);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNotCauseAnyErrorsWhenHearingDateIsFuture() {
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_JUDGEMENT);
+
+            CaseData caseData = CaseDataBuilder
+                .builder()
+                .generalAppHearingDate(GAHearingDateGAspec.builder().hearingScheduledPreferenceYesNo(YES)
+                                           .hearingScheduledDate(LocalDate.now().plusDays(4))
+                                           .build())
+                .generalAppType(GAApplicationType.builder().types(types).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_HEARING_DATE);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -624,6 +755,27 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo(IN_PERSON);
             assertThat(application.getIsMultiParty()).isEqualTo(NO);
         }
+
+        @Test
+        void shouldSetDynamicListWhenPreferredLocationValueIsNull() {
+
+            CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+                .getTestCaseDataWithEmptyPreferredLocation(CaseData.builder().build());
+            when(feesService.getFeeForGA(any())).thenReturn(feeFromFeeService);
+            when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder().id(STRING_CONSTANT)
+                                                                        .email(APPLICANT_EMAIL_ID_CONSTANT)
+                                                                        .build());
+            when(initiateGeneralAppService.buildCaseData(any(CaseData.CaseDataBuilder.class),
+                                                         any(CaseData.class), any(UserDetails.class), anyString()))
+                .thenReturn(getMockServiceData(caseData));
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+            DynamicList dynamicList = getLocationDynamicList(data);
+            assertThat(data.getGeneralAppHearingDetails()).isNotNull();
+            assertThat(dynamicList).isNull();
+        }
     }
 
     @Nested
@@ -648,9 +800,14 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotReturnErrors_whenRespondentSolAssignedToCase() {
+
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
+                              .courtName("Court Name").region("Region").build());
+            given(locationRefDataService.getCourtLocationsForGeneralApplication(any())).willReturn(locations);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
-            given(locationRefDataService.getCourtLocations(any())).willReturn(getSampleCourLocations());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -664,14 +821,18 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getGeneralAppHearingDetails()).isNotNull();
             assertThat(dynamicList).isNotNull();
             assertThat(locationsFromDynamicList(dynamicList))
-                    .containsOnly("ABCD - RG0 0 AL", "PQRS - GU0 0EE", "WXYZ - EW0 0HE", "LMNO - NE0 0BH");
+                    .containsOnly("siteName - court Address - post code");
         }
 
         @Test
         void shouldReturnErrors_whenNoRespondentSolAssignedToCase() {
+
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
+                              .courtName("Court Name").region("Region").build());
+            given(locationRefDataService.getCourtLocationsForGeneralApplication(any())).willReturn(locations);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             given(initiateGeneralAppService.respondentAssigned(any())).willReturn(false);
-            given(locationRefDataService.getCourtLocations(any())).willReturn(getSampleCourLocations());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 

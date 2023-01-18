@@ -136,8 +136,10 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            CLAIM_NOTIFICATION_DEADLINE,
-            formatLocalDate(caseData.getClaimNotificationDeadline().toLocalDate(), DATE),
+            CLAIM_DETAILS_NOTIFICATION_DEADLINE,
+            formatLocalDate(caseData
+                                .getClaimDetailsNotificationDeadline()
+                                .toLocalDate(), DATE),
             PARTY_REFERENCES, buildPartiesReferences(caseData)
         );
     }

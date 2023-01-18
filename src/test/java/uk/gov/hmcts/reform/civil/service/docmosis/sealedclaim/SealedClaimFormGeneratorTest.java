@@ -395,6 +395,8 @@ class SealedClaimFormGeneratorTest {
         private List<Party> getRespondent(CaseData caseData) {
             var respondent = caseData.getRespondent1();
             return List.of(Party.builder()
+                               .type(respondent.getType().getDisplayValue())
+                               .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent))
                                .name(respondent.getPartyName())
                                .primaryAddress(respondent.getPrimaryAddress())
                                .representative(representative1)
@@ -406,11 +408,15 @@ class SealedClaimFormGeneratorTest {
             var respondent2 = caseData.getRespondent2();
             return List.of(
                 Party.builder()
+                    .type(respondent1.getType().getDisplayValue())
+                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent1))
                     .name(respondent1.getPartyName())
                     .primaryAddress(respondent1.getPrimaryAddress())
                     .representative(representative1)
                     .build(),
                 Party.builder()
+                    .type(respondent2.getType().getDisplayValue())
+                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent2))
                     .name(respondent2.getPartyName())
                     .primaryAddress(respondent2.getPrimaryAddress())
                     .representative(representative1)
@@ -423,11 +429,15 @@ class SealedClaimFormGeneratorTest {
             var respondent2 = caseData.getRespondent2();
             return List.of(
                 Party.builder()
+                    .type(respondent1.getType().getDisplayValue())
+                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent1))
                     .name(respondent1.getPartyName())
                     .primaryAddress(respondent1.getPrimaryAddress())
                     .representative(representative1)
                     .build(),
                 Party.builder()
+                    .type(respondent2.getType().getDisplayValue())
+                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(respondent2))
                     .name(respondent2.getPartyName())
                     .primaryAddress(respondent2.getPrimaryAddress())
                     .representative(representative2)
@@ -438,6 +448,8 @@ class SealedClaimFormGeneratorTest {
         private List<Party> getApplicant(CaseData caseData) {
             var applicant = caseData.getApplicant1();
             return List.of(Party.builder()
+                               .type(applicant.getType().getDisplayValue())
+                               .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant))
                                .name(applicant.getPartyName())
                                .primaryAddress(applicant.getPrimaryAddress())
                                .litigationFriendName("applicant LF")
@@ -450,12 +462,16 @@ class SealedClaimFormGeneratorTest {
             var applicant2 = caseData.getApplicant2();
             return List.of(
                 Party.builder()
+                    .type(applicant.getType().getDisplayValue())
+                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant))
                     .name(applicant.getPartyName())
                     .primaryAddress(applicant.getPrimaryAddress())
                     .litigationFriendName("applicant LF")
                     .representative(getRepresentative())
                     .build(),
                 Party.builder()
+                    .type(applicant2.getType().getDisplayValue())
+                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant2))
                     .name(applicant2.getPartyName())
                     .primaryAddress(applicant2.getPrimaryAddress())
                     .litigationFriendName("applicant2 LF")

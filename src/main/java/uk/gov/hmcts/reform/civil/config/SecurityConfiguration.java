@@ -29,6 +29,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "caseworker-civil",
         "caseworker-civil-solicitor",
         "caseworker",
+        "caseworker-caa",
+        "caseworker-approver",
         "citizen"
     };
 
@@ -45,7 +47,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/health/readiness",
         "/status/health",
         "/",
-        "/loggers/**"
+        "/loggers/**",
+        "/assignment/**",
+        "/service-request-update",
+        "/case/document/downloadSealedDoc"
     };
 
     @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")

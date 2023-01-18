@@ -48,8 +48,24 @@ public class FeatureToggleService {
         );
     }
 
+    public boolean isGlobalSearchEnabled() {
+        return internalClient.boolVariation(
+            "global-search-specified",
+            createLDUser().build(),
+            false
+        );
+    }
+
     public boolean isLrSpecEnabled() {
         return isFeatureEnabled("specified-lr-journey");
+    }
+
+    public boolean isSdoEnabled() {
+        return isFeatureEnabled("enableSDO");
+    }
+
+    public boolean isGeneralApplicationsEnabled() {
+        return internalClient.boolVariation("general_applications_enabled", createLDUser().build(), false);
     }
 
     public LDUser.Builder createLDUser() {
@@ -60,6 +76,39 @@ public class FeatureToggleService {
 
     public boolean isNoticeOfChangeEnabled() {
         return internalClient.boolVariation("notice-of-change", createLDUser().build(), false);
+    }
+
+    public boolean isHearingAndListingSDOEnabled() {
+        return internalClient.boolVariation("hearing-and-listing-sdo", createLDUser().build(), false);
+    }
+
+    public boolean isCourtLocationDynamicListEnabled() {
+        return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), false);
+    }
+
+    public boolean isCaseFlagsEnabled() {
+        return internalClient.boolVariation("case-flags", createLDUser().build(), false);
+    }
+
+    public boolean isPinInPostEnabled() {
+        return internalClient.boolVariation("pin-in-post", createLDUser().build(), false);
+    }
+
+    public boolean isAccessProfilesEnabled() {
+        return internalClient.boolVariation("access-profiles", createLDUser().build(), false);
+    }
+
+    public boolean isPbaV3Enabled() {
+        return internalClient.boolVariation("pba-version-3-ways-to-pay", createLDUser().build(), false);
+    }
+
+    public boolean isSDOEnabled() {
+        return internalClient.boolVariation("enableSDO", createLDUser().build(), false);
+    }
+
+    public boolean isCertificateOfServiceEnabled() {
+        return internalClient.boolVariation("isCertificateOfServiceEnabled",
+                                            createLDUser().build(), false);
     }
 
     private void close() {

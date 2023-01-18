@@ -9,6 +9,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
+import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED_NOTICE_OF_CHANGE;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 
@@ -18,7 +19,7 @@ class UnrepresentedOrUnregisteredScenarioTest {
     class Unrepresented {
         @Test
         void shouldReturnUnrepresentedDefendantNames_WhenBothDefendantsUnrepresentedScenario() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendants().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
 
             assertThat(getDefendantNames(UNREPRESENTED, caseData)).isEqualTo(
                 List.of(
@@ -30,7 +31,7 @@ class UnrepresentedOrUnregisteredScenarioTest {
 
         @Test
         void shouldReturnUnrepresentedDefendantNames_WhenDefendant1UnrepresentedScenario() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant1().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().build();
 
             assertThat(getDefendantNames(UNREPRESENTED, caseData)).isEqualTo(
                 List.of(
@@ -41,7 +42,7 @@ class UnrepresentedOrUnregisteredScenarioTest {
 
         @Test
         void shouldReturnUnrepresentedDefendantNames_WhenDefendant2UnrepresentedScenario() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnrepresentedDefendant2().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant2().build();
 
             assertThat(getDefendantNames(UNREPRESENTED, caseData)).isEqualTo(
                 List.of(
@@ -81,7 +82,9 @@ class UnrepresentedOrUnregisteredScenarioTest {
         void shouldReturnUnregisteredDefendantNames_WhenBothDefendantsUnregisteredScenario() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnregisteredDefendants().build();
 
-            assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
+            // To be changed to UNREGISTERED when NOC is merged
+            // assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
+            assertThat(getDefendantNames(UNREGISTERED_NOTICE_OF_CHANGE, caseData)).isEqualTo(
                 List.of(
                     caseData.getRespondent1().getPartyName(),
                     caseData.getRespondent2().getPartyName()
@@ -93,7 +96,9 @@ class UnrepresentedOrUnregisteredScenarioTest {
         void shouldReturnUnregisteredDefendantNames_WhenUnregisteredDefendant1Scenario() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnregisteredDefendant1().build();
 
-            assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
+            // To be changed to UNREGISTERED when NOC is merged
+            // assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
+            assertThat(getDefendantNames(UNREGISTERED_NOTICE_OF_CHANGE, caseData)).isEqualTo(
                 List.of(
                     caseData.getRespondent1().getPartyName()
                 )
@@ -104,7 +109,9 @@ class UnrepresentedOrUnregisteredScenarioTest {
         void shouldReturnUnregisteredDefendantNames_WhenUnregisteredDefendant2Scenario() {
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineUnregisteredDefendant2().build();
 
-            assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
+            // To be changed to UNREGISTERED when NOC is merged
+            // assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
+            assertThat(getDefendantNames(UNREGISTERED_NOTICE_OF_CHANGE, caseData)).isEqualTo(
                 List.of(
                     caseData.getRespondent2().getPartyName()
                 )
@@ -116,7 +123,9 @@ class UnrepresentedOrUnregisteredScenarioTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2().build();
 
-            assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
+            // To be changed to UNREGISTERED when NOC is merged
+            // assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
+            assertThat(getDefendantNames(UNREGISTERED_NOTICE_OF_CHANGE, caseData)).isEqualTo(
                 List.of(
                     caseData.getRespondent2().getPartyName()
                 )
@@ -127,6 +136,87 @@ class UnrepresentedOrUnregisteredScenarioTest {
         void shouldReturnUnregisteredDefendantNames_WhenUnregisteredDefendant1UnrepresentedDefendant2Scenario() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateProceedsOfflineUnregisteredDefendant1UnrepresentedDefendant2().build();
+
+            // To be changed to UNREGISTERED when NOC is merged
+            // assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
+            assertThat(getDefendantNames(UNREGISTERED_NOTICE_OF_CHANGE, caseData)).isEqualTo(
+                List.of(
+                    caseData.getRespondent1().getPartyName()
+                )
+            );
+        }
+    }
+
+    @Nested
+    class ToBeRemovedAfterNocUnregistered {
+        @Test
+        void shouldReturnUnregisteredDefendantNames_WhenBothDefendantsUnregisteredScenario() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateProceedsOfflineUnregisteredDefendants()
+                .respondent1OrganisationPolicy(null)
+                .respondent2OrganisationPolicy(null)
+                .build();
+
+            assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
+                List.of(
+                    caseData.getRespondent1().getPartyName(),
+                    caseData.getRespondent2().getPartyName()
+                )
+            );
+        }
+
+        @Test
+        void shouldReturnUnregisteredDefendantNames_WhenUnregisteredDefendant1Scenario() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateProceedsOfflineUnregisteredDefendant1()
+                .respondent1OrganisationPolicy(null)
+                .respondent2OrganisationPolicy(null)
+                .build();
+
+            assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
+                List.of(
+                    caseData.getRespondent1().getPartyName()
+                )
+            );
+        }
+
+        @Test
+        void shouldReturnUnregisteredDefendantNames_WhenUnregisteredDefendant2Scenario() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateProceedsOfflineUnregisteredDefendant2()
+                .respondent1OrganisationPolicy(null)
+                .respondent2OrganisationPolicy(null)
+                .build();
+
+            assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
+                List.of(
+                    caseData.getRespondent2().getPartyName()
+                )
+            );
+        }
+
+        @Test
+        void shouldReturnUnregisteredDefendantNames_WhenUnrepresentedDefendant1UnregisteredDefendant2Scenario() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2()
+                .respondent1OrganisationPolicy(null)
+                .respondent2OrganisationPolicy(null)
+                .build();
+
+            assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
+                List.of(
+                    caseData.getRespondent2().getPartyName()
+                )
+            );
+        }
+
+        @Test
+        void shouldReturnUnregisteredDefendantNames_WhenUnregisteredDefendant1UnrepresentedDefendant2Scenario() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateProceedsOfflineUnregisteredDefendant1UnrepresentedDefendant2()
+                .respondent1OrganisationPolicy(null)
+                .respondent2OrganisationPolicy(null)
+                .build();
 
             assertThat(getDefendantNames(UNREGISTERED, caseData)).isEqualTo(
                 List.of(

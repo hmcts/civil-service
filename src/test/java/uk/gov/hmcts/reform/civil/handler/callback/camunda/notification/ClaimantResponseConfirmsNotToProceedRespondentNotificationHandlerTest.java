@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -53,6 +54,8 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
     private NotificationsProperties notificationsProperties;
     @Autowired
     private ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler handler;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToSubmitCallback {
@@ -138,6 +141,27 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
                 "respondentsolicitor2@example.com",
                 "template-id",
                 getNotificationDataMap(caseData),
+                "claimant-confirms-not-to-proceed-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondentSolicitor2_whenInvoked_spec() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .setSuperClaimTypeToSpecClaim()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentsolicitor2@example.com",
+                "spec-template-id",
+                getNotificationDataMapSpec(caseData,
+                                           CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_NOT_TO_PROCEED),
                 "claimant-confirms-not-to-proceed-respondent-notification-000DC001"
             );
         }

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.search;
 
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
@@ -10,6 +11,7 @@ import java.util.List;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 
 @Service
 public class TakeCaseOfflineSearchService extends ElasticSearchService {
@@ -21,16 +23,17 @@ public class TakeCaseOfflineSearchService extends ElasticSearchService {
     public Query query(int startIndex) {
         return new Query(
             boolQuery()
-                .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
-                .must(beValidState()),
+                .minimumShouldMatch(1)
+                .should(boolQuery()
+                            .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
+                            .must(beState(AWAITING_APPLICANT_INTENTION))),
             List.of("reference"),
             startIndex
         );
     }
 
-    private QueryBuilder beValidState() {
+    private QueryBuilder beState(CaseState caseState) {
         return boolQuery()
-            .minimumShouldMatch(1)
-            .should(matchQuery("state", "AWAITING_APPLICANT_INTENTION"));
+            .must(matchQuery("state", caseState.toString()));
     }
 }

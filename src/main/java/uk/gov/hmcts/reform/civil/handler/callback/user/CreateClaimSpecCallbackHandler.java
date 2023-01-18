@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -13,10 +15,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
+import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -26,14 +32,21 @@ import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
+import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.OrgPolicyValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
@@ -61,13 +74,18 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CreateClaimSpecCallbackHandler extends CallbackHandler implements ParticularsOfClaimValidator {
@@ -109,6 +127,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final DateOfBirthValidator dateOfBirthValidator;
     private final FeesService feesService;
     private final OrganisationService organisationService;
+    private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final IdamClient idamClient;
     private final OrgPolicyValidator orgPolicyValidator;
     private final ObjectMapper objectMapper;
@@ -117,11 +136,19 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final PostcodeValidator postcodeValidator;
     private final InterestCalculator interestCalculator;
     private final FeatureToggleService toggleService;
+    private final StateFlowEngine stateFlowEngine;
+    private final FeatureToggleService featureToggleService;
+
+    @Value("${court-location.specified-claim.region-id}")
+    private String regionId;
+    @Value("${court-location.specified-claim.epimms-id}")
+    private String epimmsId;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::setSuperClaimType)
+            .put(callbackKey(V_1, ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "eligibilityCheck"), this::eligibilityCheck)
             .put(callbackKey(MID, "applicant"), this::validateClaimant1Details)
             .put(callbackKey(MID, "applicant2"), this::validateClaimant2Details)
@@ -135,6 +162,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
+            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(MID, "respondent1"), this::validateRespondent1Address)
             .put(callbackKey(MID, "respondent2"), this::validateRespondent2Address)
@@ -333,6 +361,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse resetStatementOfTruth(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        StateFlow evaluation = stateFlowEngine.evaluate(caseData);
+        State state = evaluation.getState();
+        Map<String, Boolean> flags = evaluation.getFlags();
+
         // resetting statement of truth field, this resets in the page, but the data is still sent to the db.
         // must be to do with the way XUI cache data entered through the lifecycle of an event.
         CaseData updatedCaseData = caseData.toBuilder()
@@ -357,14 +389,75 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         if (callbackParams.getRequest().getEventId() != null) {
             var respondent1Represented = caseData.getSpecRespondent1Represented();
             dataBuilder.respondent1Represented(respondent1Represented);
+            var respondent2Represented = caseData.getSpecRespondent2Represented();
+            dataBuilder.respondent2Represented(respondent2Represented);
+        }
+
+        addOrgPolicy2ForSameLegalRepresentative(dataBuilder.build(), dataBuilder);
+
+        if (isPinInPostCaseMatched(caseData)) {
+            dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
+        }
+
+        if (V_1.equals(callbackParams.getVersion())
+            && toggleService.isCourtLocationDynamicListEnabled()) {
+            dataBuilder.caseManagementLocation(CaseLocation.builder().region(regionId).baseLocation(epimmsId).build());
         }
 
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
         ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
 
+        if (V_1.equals(callbackParams.getVersion())
+            && toggleService.isAccessProfilesEnabled()) {
+            dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
+        }
+
+        //assign case management category to the case and caseNameHMCTSinternal
+        if (V_1.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {
+            dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
+
+            CaseManagementCategoryElement civil =
+                CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
+            List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
+            itemList.add(element(civil));
+            dataBuilder.caseManagementCategory(
+                CaseManagementCategory.builder().value(civil).list_items(itemList).build());
+            log.info("Case management equals: " + caseData.getCaseManagementCategory());
+            log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
+
+        }
+
+        if (featureToggleService.isNoticeOfChangeEnabled()) {
+            OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
+        }
+
+        CaseData temporaryCaseData = dataBuilder.build();
+
+        if (temporaryCaseData.getRespondent1OrgRegistered() == YES
+            && temporaryCaseData.getRespondent1Represented() == YES
+            && temporaryCaseData.getRespondent2SameLegalRepresentative() == YES) {
+            // Predicate: Def1 registered, Def 2 unregistered.
+            // This is required to ensure mutual exclusion in 1v2 same solicitor case.
+            dataBuilder.respondent2OrgRegistered(YES);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void addOrgPolicy2ForSameLegalRepresentative(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+        if (caseData.getRespondent2SameLegalRepresentative() == YES) {
+            OrganisationPolicy.OrganisationPolicyBuilder organisationPolicy2Builder = OrganisationPolicy.builder();
+
+            OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
+            organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
+                .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
+                .build();
+
+            organisationPolicy2Builder.orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
+            caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2Builder.build());
+        }
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
@@ -375,18 +468,16 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         CorrectEmail applicantSolicitor1CheckEmail = caseData.getApplicantSolicitor1CheckEmail();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
 
-        if (applicantSolicitor1CheckEmail.isCorrect()) {
+        if (applicantSolicitor1CheckEmail != null && applicantSolicitor1CheckEmail.isCorrect()) {
             dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1CheckEmail.getEmail()).build());
         } else {
             IdamUserDetails applicantSolicitor1UserDetails = caseData.getApplicantSolicitor1UserDetails();
             dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1UserDetails.getEmail()).build());
         }
 
-        dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
         dataBuilder.submittedDate(time.now());
 
         if (null != callbackParams.getRequest().getEventId()) {
-            System.out.println(" inside if condition ");
             dataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
             dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
         }
@@ -413,13 +504,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private String getHeader(CaseData caseData) {
-        if (caseData.getRespondent1Represented() == NO || caseData.getRespondent1OrgRegistered() == NO) {
-            return format(
-                "# Your claim has been received and will progress offline%n## Claim number: %s",
-                caseData.getLegacyCaseReference()
-            );
+        if (areRespondentsRepresentedAndRegistered(caseData)
+            || isPinInPostCaseMatched(caseData)) {
+            return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
         }
-        return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
+        return format(
+            "# Your claim has been received and will progress offline%n## Claim number: %s",
+            caseData.getLegacyCaseReference()
+        );
     }
 
     private String getBody(CaseData caseData) {
@@ -427,9 +519,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
 
         return format(
-            caseData.getRespondent1Represented() == NO || caseData.getRespondent1OrgRegistered() == NO
-                ? LIP_CONFIRMATION_BODY
-                : CONFIRMATION_SUMMARY,
+            (areRespondentsRepresentedAndRegistered(caseData)
+                || isPinInPostCaseMatched(caseData))
+                ? CONFIRMATION_SUMMARY
+                : LIP_CONFIRMATION_BODY,
             format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
             claimIssueConfiguration.getResponsePackLink(),
             formattedServiceDeadline
@@ -590,13 +683,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private String getSpecHeader(CaseData caseData) {
-        if (caseData.getRespondent1Represented() == NO || caseData.getRespondent1OrgRegistered() == NO) {
-            return format(
-                "# Your claim has been received and will progress offline%n## Claim number: %s",
-                caseData.getLegacyCaseReference()
-            );
+        if (areRespondentsRepresentedAndRegistered(caseData)
+            || isPinInPostCaseMatched(caseData)) {
+            return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
         }
-        return format("# Your claim has been received%n## Claim number: %s", caseData.getLegacyCaseReference());
+        return format(
+            "# Your claim has been received and will progress offline%n## Claim number: %s",
+            caseData.getLegacyCaseReference()
+        );
     }
 
     private String getSpecBody(CaseData caseData) {
@@ -604,9 +698,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
 
         return format(
-            caseData.getRespondent1Represented() == NO || caseData.getRespondent1OrgRegistered() == NO
-                ? SPEC_LIP_CONFIRMATION_BODY
-                : SPEC_CONFIRMATION_SUMMARY,
+            (areRespondentsRepresentedAndRegistered(caseData)
+                || isPinInPostCaseMatched(caseData))
+                ? SPEC_CONFIRMATION_SUMMARY
+                : SPEC_LIP_CONFIRMATION_BODY,
             format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
             claimIssueConfiguration.getResponsePackLink(),
             formattedServiceDeadline
@@ -649,5 +744,43 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private boolean isPinInPostCaseMatched(CaseData caseData) {
+        return (caseData.getRespondent1Represented() == NO
+            && caseData.getAddRespondent2() == NO
+            && caseData.getAddApplicant2() == NO
+            && toggleService.isPinInPostEnabled());
+    }
+
+    private boolean areRespondentsRepresentedAndRegistered(CaseData caseData) {
+        return !(caseData.getRespondent1Represented() == NO
+            || caseData.getRespondent1OrgRegistered() == NO
+            || caseData.getRespondent2Represented() == NO
+            || caseData.getRespondent2OrgRegistered() == NO);
+    }
+
+    public StringBuilder caseParticipants(CaseData caseData) {
+        StringBuilder participantString = new StringBuilder();
+        MultiPartyScenario multiPartyScenario  = getMultiPartyScenario(caseData);
+        if (multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+            || multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)) {
+            participantString.append(caseData.getApplicant1().getPartyName())
+                .append(" v ").append(caseData.getRespondent1().getPartyName())
+                .append(" and ").append(caseData.getRespondent2().getPartyName());
+
+        } else if (multiPartyScenario.equals(MultiPartyScenario.TWO_V_ONE)) {
+            participantString.append(caseData.getApplicant1().getPartyName())
+                .append(" and ").append(caseData.getApplicant2().getPartyName()).append(" v ")
+                .append(caseData.getRespondent1()
+                            .getPartyName());
+
+        } else {
+            participantString.append(caseData.getApplicant1().getPartyName()).append(" v ")
+                .append(caseData.getRespondent1()
+                            .getPartyName());
+        }
+        return participantString;
+
     }
 }

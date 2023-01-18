@@ -358,8 +358,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .repaymentSuggestion(suggest)
                 .repaymentDate(testDate)
                 .build();
-            System.out.println("due" + caseData.getRepaymentDue());
-            System.out.println("suggest" + caseData.getRepaymentSuggestion());
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isEmpty();
@@ -376,8 +374,6 @@ public class DefaultJudgementSpecHandlerTest extends BaseCallbackHandlerTest {
                 .repaymentSuggestion(suggest)
                 .repaymentDate(testDate)
                 .build();
-            System.out.println("due" + caseData.getRepaymentDue());
-            System.out.println("suggest" + caseData.getRepaymentSuggestion());
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

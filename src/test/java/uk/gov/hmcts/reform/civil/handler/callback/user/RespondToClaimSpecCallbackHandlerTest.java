@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.assertj.core.api.AbstractObjectAssert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -20,11 +22,14 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToClaimConfirmationHeaderSpecGenerator;
@@ -40,16 +45,22 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmatio
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.SpecResponse1v2DivergentText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse1v2DivergentHeaderText;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.response.confirmation.header.SpecResponse2v1DifferentHeaderText;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -58,9 +69,13 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
+import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
@@ -71,6 +86,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 
 import static java.lang.String.format;
@@ -79,10 +95,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWOSPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -118,6 +138,12 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private StateFlow mockedStateFlow;
     @Mock
     private StateFlowEngine stateFlowEngine;
+    @Mock
+    private DateOfBirthValidator dateOfBirthValidator;
+    @Mock
+    private LocationRefDataService locationRefDataService;
+    @Mock
+    private CourtLocationUtils courtLocationUtils;
 
     @Spy
     private List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextGenerators = List.of(
@@ -143,9 +169,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         ReflectionTestUtils.setField(handler, "objectMapper", new ObjectMapper().registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
         ReflectionTestUtils.setField(handler, "confirmationTextSpecGenerators",
-                                     confirmationTextGenerators);
+                                     confirmationTextGenerators
+        );
         ReflectionTestUtils.setField(handler, "confirmationHeaderGenerators",
-                                     confirmationHeaderSpecGenerators);
+                                     confirmationHeaderSpecGenerators
+        );
     }
 
     @Test
@@ -450,7 +478,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(deadlinesCalculator.calculateApplicantResponseDeadline(any(), any())).thenReturn(LocalDateTime.now());
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                .thenReturn(LocalDateTime.now());
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -487,7 +516,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(deadlinesCalculator.calculateApplicantResponseDeadline(any(), any())).thenReturn(LocalDateTime.now());
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                .thenReturn(LocalDateTime.now());
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -501,6 +531,301 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("respondent2").extracting("primaryAddress")
                 .extracting("AddressLine3").isEqualTo("address line 3");
+        }
+
+        @Test
+        void defendantResponsePopulatesWitnessesData() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).thenReturn(true);
+
+            var res1witnesses = Witnesses.builder().details(
+                wrapElements(
+                    Witness.builder()
+                        .firstName("Witness")
+                        .lastName("One")
+                        .emailAddress("test-witness-one@example.com")
+                        .phoneNumber("07865456789")
+                        .reasonForWitness("great reasons")
+                        .build())
+            ).build();
+
+            var res2witnesses = Witnesses.builder().details(
+                wrapElements(
+                    Witness.builder()
+                        .firstName("Witness")
+                        .lastName("Two")
+                        .emailAddress("test-witness-two@example.com")
+                        .phoneNumber("07532628263")
+                        .reasonForWitness("good reasons")
+                        .build())
+            ).build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .respondent2DQ()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSRespondent2HomeAddressRequired(NO)
+                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
+                .build().toBuilder()
+                .respondent1DQWitnessesSmallClaim(res1witnesses)
+                .respondent2DQWitnessesSmallClaim(res2witnesses)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                .thenReturn(LocalDateTime.now());
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData())
+                .extracting("respondent1DQWitnesses")
+                .isEqualTo(new ObjectMapper().convertValue(res1witnesses, new TypeReference<>() {
+                }));
+            assertThat(response.getData())
+                .extracting("respondent2DQWitnesses")
+                .isEqualTo(new ObjectMapper().convertValue(res2witnesses, new TypeReference<>() {
+                }));
+        }
+    }
+
+    @Nested
+    class AboutToSubmitTestsV1 {
+
+        @BeforeEach
+        void setup() {
+            when(toggleService.isAccessProfilesEnabled()).thenReturn(true);
+        }
+
+        @Test
+        void updateRespondent1AddressWhenUpdated() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+
+            Address changedAddress = AddressBuilder.maximal().build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .respondent2DQ()
+                .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
+                .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                .thenReturn(LocalDateTime.now());
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData())
+                .extracting("respondent1").extracting("primaryAddress")
+                .extracting("AddressLine1").isEqualTo(changedAddress.getAddressLine1());
+            assertThat(response.getData())
+                .extracting("respondent1").extracting("primaryAddress")
+                .extracting("AddressLine2").isEqualTo(changedAddress.getAddressLine2());
+            assertThat(response.getData())
+                .extracting("respondent1").extracting("primaryAddress")
+                .extracting("AddressLine3").isEqualTo(changedAddress.getAddressLine3());
+        }
+
+        @Test
+        void updateRespondent2AddressWhenUpdated() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+
+            Address changedAddress = AddressBuilder.maximal().build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .respondent2DQ()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSRespondent2HomeAddressRequired(NO)
+                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                .thenReturn(LocalDateTime.now());
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData())
+                .extracting("respondent2").extracting("primaryAddress")
+                .extracting("AddressLine1").isEqualTo("address line 1");
+            assertThat(response.getData())
+                .extracting("respondent2").extracting("primaryAddress")
+                .extracting("AddressLine2").isEqualTo("address line 2");
+            assertThat(response.getData())
+                .extracting("respondent2").extracting("primaryAddress")
+                .extracting("AddressLine3").isEqualTo("address line 3");
+        }
+
+        @Nested
+        class HandleLocations {
+
+            @Test
+            void oneVOne() {
+                DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
+                DynamicList preferredCourt = DynamicList.builder()
+                    .listItems(locationValues.getListItems())
+                    .value(locationValues.getListItems().get(0))
+                    .build();
+                when(toggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
+                Party defendant1 = Party.builder()
+                    .type(Party.Type.COMPANY)
+                    .companyName("company")
+                    .build();
+                CaseData caseData = CaseData.builder()
+                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .ccdCaseReference(354L)
+                    .respondent1(defendant1)
+                    .respondent1Copy(defendant1)
+                    .respondent1DQ(
+                        Respondent1DQ.builder()
+                            .respondToCourtLocation(
+                                RequestedCourt.builder()
+                                    .responseCourtLocations(preferredCourt)
+                                    .reasonForHearingAtSpecificCourt("Reason")
+                                    .build()
+                            )
+                            .build()
+                    )
+                    .showConditionFlags(EnumSet.of(
+                        DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1
+                    ))
+                    .build();
+                CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+
+                List<LocationRefData> locations = List.of(LocationRefData.builder().build());
+                when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                    .thenReturn(locations);
+                LocationRefData completePreferredLocation = LocationRefData.builder()
+                    .regionId("regionId")
+                    .epimmsId("epimms")
+                    .courtLocationCode("code")
+                    .build();
+                when(courtLocationUtils.findPreferredLocationData(
+                    locations, preferredCourt
+                )).thenReturn(completePreferredLocation);
+                StateFlow flow = mock(StateFlow.class);
+                when(flow.isFlagSet(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(false);
+                when(stateFlowEngine.evaluate(caseData))
+                    .thenReturn(flow);
+                when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
+                    .thenReturn(true);
+                UserInfo userInfo = UserInfo.builder().uid("798").build();
+                when(userService.getUserInfo(anyString())).thenReturn(userInfo);
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                AbstractObjectAssert<?, ?> sent1 = assertThat(response.getData())
+                    .extracting("respondent1DQRequestedCourt");
+                sent1.extracting("caseLocation")
+                    .extracting("region")
+                    .isEqualTo(completePreferredLocation.getRegionId());
+                sent1.extracting("caseLocation")
+                    .extracting("baseLocation")
+                    .isEqualTo(completePreferredLocation.getEpimmsId());
+                sent1.extracting("responseCourtCode")
+                    .isEqualTo(completePreferredLocation.getCourtLocationCode());
+                sent1.extracting("reasonForHearingAtSpecificCourt")
+                    .isEqualTo("Reason");
+            }
+
+            @Test
+            void oneVTwo_SecondDefendantReplies() {
+                DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
+                DynamicList preferredCourt = DynamicList.builder()
+                    .listItems(locationValues.getListItems())
+                    .value(locationValues.getListItems().get(0))
+                    .build();
+                when(toggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
+                Party defendant1 = Party.builder()
+                    .type(Party.Type.COMPANY)
+                    .companyName("company")
+                    .build();
+                CaseData caseData = CaseData.builder()
+                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .ccdCaseReference(354L)
+                    .respondent1(defendant1)
+                    .respondent1Copy(defendant1)
+                    .respondent1DQ(
+                        Respondent1DQ.builder()
+                            .respondToCourtLocation(
+                                RequestedCourt.builder()
+                                    .responseCourtLocations(preferredCourt)
+                                    .reasonForHearingAtSpecificCourt("Reason")
+                                    .build()
+                            )
+                            .build()
+                    )
+                    .respondent2DQ(
+                        Respondent2DQ.builder()
+                            .respondToCourtLocation2(
+                                RequestedCourt.builder()
+                                    .responseCourtLocations(preferredCourt)
+                                    .reasonForHearingAtSpecificCourt("Reason123")
+                                    .build()
+                            )
+                            .build()
+                    )
+                    .showConditionFlags(EnumSet.of(
+                        DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1,
+                        DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2
+                    ))
+                    .build();
+                CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+
+                List<LocationRefData> locations = List.of(LocationRefData.builder().build());
+                when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                    .thenReturn(locations);
+                LocationRefData completePreferredLocation = LocationRefData.builder()
+                    .regionId("regionId")
+                    .epimmsId("epimms")
+                    .courtLocationCode("code")
+                    .build();
+                when(courtLocationUtils.findPreferredLocationData(
+                    locations, preferredCourt
+                )).thenReturn(completePreferredLocation);
+                StateFlow flow = mock(StateFlow.class);
+                when(flow.isFlagSet(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES)).thenReturn(true);
+                when(stateFlowEngine.evaluate(caseData)).thenReturn(flow);
+                when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), any(CaseRole.class)))
+                    .thenReturn(true);
+                UserInfo userInfo = UserInfo.builder().uid("798").build();
+                when(userService.getUserInfo(anyString())).thenReturn(userInfo);
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                AbstractObjectAssert<?, ?> sent2 = assertThat(response.getData())
+                    .extracting("respondent2DQRequestedCourt");
+                sent2.extracting("caseLocation")
+                    .extracting("region")
+                    .isEqualTo(completePreferredLocation.getRegionId());
+                sent2.extracting("caseLocation")
+                    .extracting("baseLocation")
+                    .isEqualTo(completePreferredLocation.getEpimmsId());
+                sent2.extracting("responseCourtCode")
+                    .isEqualTo(completePreferredLocation.getCourtLocationCode());
+                sent2.extracting("reasonForHearingAtSpecificCourt")
+                    .isEqualTo("Reason123");
+            }
         }
     }
 
@@ -535,6 +860,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
         }
 
+        /**
+         * if solicitor says that each defendant gets their response but then chooses the same
+         * option from full defence/part admit/full admit/counterclaim, then it is not different response.
+         */
         @Test
         void shouldSetMultiPartyResponseTypeFlags_1v2_sameSolicitor_DifferentResponse() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -552,7 +881,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
                 .isEqualTo("FULL_DEFENCE");
             assertThat(response.getData()).extracting("sameSolicitorSameResponse")
-                .isEqualTo("No");
+                .isEqualTo("Yes");
         }
 
         @Test
@@ -586,7 +915,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
-                .isEqualTo("FULL_DEFENCE");
+                .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
         }
     }
 
@@ -830,8 +1159,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponseFullDefenceFullAdmission() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atState1v2SameSolicitorDivergentResponseSpec(RespondentResponseTypeSpec.FULL_DEFENCE,
-                                                              RespondentResponseTypeSpec.FULL_ADMISSION)
+                .atState1v2SameSolicitorDivergentResponseSpec(
+                    RespondentResponseTypeSpec.FULL_DEFENCE,
+                    RespondentResponseTypeSpec.FULL_ADMISSION
+                )
                 .respondent2(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(YES)
                 .build();
@@ -845,17 +1176,23 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             body.append("<br>The defendants have chosen different responses and the claim cannot continue online.")
                 .append("<br>Use form N9A to admit, or form N9B to counterclaim. Do not create a new claim to "
                             + "counterclaim.")
-                .append(String.format("%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
-                                      format("https://www.gov.uk/respond-money-claim")))
-                .append(String.format("<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
-                                      format("https://www.gov.uk/respond-money-claim")))
+                .append(String.format(
+                    "%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
+                    format("https://www.gov.uk/respond-money-claim")
+                ))
+                .append(String.format(
+                    "<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
+                    format("https://www.gov.uk/respond-money-claim")
+                ))
                 .append("<br><br>Post the completed form to:")
                 .append("<br><br>County Court Business Centre<br>St. Katherine's House")
                 .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format("# The defendants have chosen their responses%n## Claim number <br>%s",
-                                                claimNumber))
+                    .confirmationHeader(format(
+                        "# The defendants have chosen their responses%n## Claim number <br>%s",
+                        claimNumber
+                    ))
                     .confirmationBody(body.toString())
                     .build());
         }
@@ -863,8 +1200,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponsePartAdmissionFullAdmission() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atState1v2SameSolicitorDivergentResponseSpec(RespondentResponseTypeSpec.PART_ADMISSION,
-                                                              RespondentResponseTypeSpec.FULL_ADMISSION)
+                .atState1v2SameSolicitorDivergentResponseSpec(
+                    RespondentResponseTypeSpec.PART_ADMISSION,
+                    RespondentResponseTypeSpec.FULL_ADMISSION
+                )
                 .respondent2(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(YES)
                 .build();
@@ -878,17 +1217,23 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             body.append("<br>The defendants have chosen different responses and the claim cannot continue online.")
                 .append("<br>Use form N9A to admit, or form N9B to counterclaim. Do not create a new claim to "
                             + "counterclaim.")
-                .append(String.format("%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
-                                      format("https://www.gov.uk/respond-money-claim")))
-                .append(String.format("<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
-                                      format("https://www.gov.uk/respond-money-claim")))
+                .append(String.format(
+                    "%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
+                    format("https://www.gov.uk/respond-money-claim")
+                ))
+                .append(String.format(
+                    "<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
+                    format("https://www.gov.uk/respond-money-claim")
+                ))
                 .append("<br><br>Post the completed form to:")
                 .append("<br><br>County Court Business Centre<br>St. Katherine's House")
                 .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format("# The defendants have chosen their responses%n## Claim number <br>%s",
-                                                claimNumber))
+                    .confirmationHeader(format(
+                        "# The defendants have chosen their responses%n## Claim number <br>%s",
+                        claimNumber
+                    ))
                     .confirmationBody(body.toString())
                     .build());
         }
@@ -896,8 +1241,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponseCounterClaimFullAdmission() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atState1v2SameSolicitorDivergentResponseSpec(RespondentResponseTypeSpec.COUNTER_CLAIM,
-                                                              RespondentResponseTypeSpec.FULL_ADMISSION)
+                .atState1v2SameSolicitorDivergentResponseSpec(
+                    RespondentResponseTypeSpec.COUNTER_CLAIM,
+                    RespondentResponseTypeSpec.FULL_ADMISSION
+                )
                 .respondent2(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(YES)
                 .build();
@@ -911,17 +1258,23 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             body.append("<br>The defendants have chosen different responses and the claim cannot continue online.")
                 .append("<br>Use form N9A to admit, or form N9B to counterclaim. Do not create a new claim to "
                             + "counterclaim.")
-                .append(String.format("%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
-                                      format("https://www.gov.uk/respond-money-claim")))
-                .append(String.format("<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
-                                      format("https://www.gov.uk/respond-money-claim")))
+                .append(String.format(
+                    "%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
+                    format("https://www.gov.uk/respond-money-claim")
+                ))
+                .append(String.format(
+                    "<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
+                    format("https://www.gov.uk/respond-money-claim")
+                ))
                 .append("<br><br>Post the completed form to:")
                 .append("<br><br>County Court Business Centre<br>St. Katherine's House")
                 .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format("# The defendants have chosen their responses%n## Claim number <br>%s",
-                                               claimNumber))
+                    .confirmationHeader(format(
+                        "# The defendants have chosen their responses%n## Claim number <br>%s",
+                        claimNumber
+                    ))
                     .confirmationBody(body.toString())
                     .build());
         }
@@ -929,8 +1282,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedResponse_when1v2SameSolicitorDivergentResponseCounterClaimPartAdmission() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atState1v2SameSolicitorDivergentResponseSpec(RespondentResponseTypeSpec.COUNTER_CLAIM,
-                                                              RespondentResponseTypeSpec.PART_ADMISSION)
+                .atState1v2SameSolicitorDivergentResponseSpec(
+                    RespondentResponseTypeSpec.COUNTER_CLAIM,
+                    RespondentResponseTypeSpec.PART_ADMISSION
+                )
                 .respondent2(PartyBuilder.builder().individual().build())
                 .respondent2SameLegalRepresentative(YES)
                 .build();
@@ -944,17 +1299,23 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             body.append("<br>The defendants have chosen different responses and the claim cannot continue online.")
                 .append("<br>Use form N9A to admit, or form N9B to counterclaim. Do not create a new claim to "
                             + "counterclaim.")
-                .append(String.format("%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
-                                      format("https://www.gov.uk/respond-money-claim")))
-                .append(String.format("<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
-                                      format("https://www.gov.uk/respond-money-claim")))
+                .append(String.format(
+                    "%n%n<a href=\"%s\" target=\"_blank\">Download form N9A (opens in a new tab)</a>",
+                    format("https://www.gov.uk/respond-money-claim")
+                ))
+                .append(String.format(
+                    "<br><a href=\"%s\" target=\"_blank\">Download form N9B (opens in a new tab)</a>",
+                    format("https://www.gov.uk/respond-money-claim")
+                ))
                 .append("<br><br>Post the completed form to:")
                 .append("<br><br>County Court Business Centre<br>St. Katherine's House")
                 .append("<br>21-27 St.Katherine Street<br>Northampton<br>NN1 2LH");
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format("# The defendants have chosen their responses%n## Claim number <br>%s",
-                                               claimNumber))
+                    .confirmationHeader(format(
+                        "# The defendants have chosen their responses%n## Claim number <br>%s",
+                        claimNumber
+                    ))
                     .confirmationBody(body.toString())
                     .build());
         }
@@ -999,4 +1360,53 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains("You've chosen to counterclaim - this means your defence cannot continue online.");
         }
     }
+
+    @Nested
+    class ValidateDateOfBirth {
+
+        @Test
+        void when1v1_thenSameSolSameResponseNull() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "confirm-details");
+            when(dateOfBirthValidator.validate(any())).thenReturn(Collections.emptyList());
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData())
+                .doesNotHaveToString("sameSolicitorSameResponse");
+        }
+    }
+
+    @Nested
+    class AboutToStart {
+
+        @Test
+        void shouldPopulateCourtLocations() {
+            CaseData caseData = CaseData.builder().build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+
+            List<LocationRefData> locations = List.of(LocationRefData.builder()
+                                                          .build());
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                .thenReturn(locations);
+            when(toggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
+            DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
+            when(courtLocationUtils.getLocationsFromList(locations))
+                .thenReturn(locationValues);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            System.out.println(response.getData());
+
+            assertThat(response.getData())
+                .extracting("respondToCourtLocation")
+                .extracting("responseCourtLocations")
+                .extracting("list_items").asList()
+                .extracting("label")
+                .containsExactly(locationValues.getListItems().get(0).getLabel());
+        }
+    }
+
 }

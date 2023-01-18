@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.prd.model.Organisation;
-import uk.gov.hmcts.reform.prd.model.ProfessionalUsersEntityResponse;
 
 import java.util.Optional;
 
@@ -23,7 +22,6 @@ public class OrganisationService {
     private final AuthTokenGenerator authTokenGenerator;
     private final UserService userService;
     private final PrdAdminUserConfiguration userConfig;
-    private final CustomScopeIdamTokenGeneratorService tokenGenerator;
 
     //WARNING! below function findOrganisation is being used by both damages and specified claims,
     // changes to this code may break one of the claim journeys, check with respective teams before changing it
@@ -44,17 +42,6 @@ public class OrganisationService {
         String authToken = userService.getAccessToken(userConfig.getUsername(), userConfig.getPassword());
         try {
             return ofNullable(organisationApi.findOrganisationById(authToken, authTokenGenerator.generate(), id));
-        } catch (FeignException.NotFound ex) {
-            log.error("Organisation not found", ex);
-            return Optional.empty();
-        }
-    }
-
-    public Optional<ProfessionalUsersEntityResponse> findUsersInOrganisation(String orgId) {
-        String authToken = tokenGenerator.getAccessToken(userConfig.getUsername(), userConfig.getPassword());
-
-        try {
-            return ofNullable(organisationApi.findUsersByOrganisation(authToken, authTokenGenerator.generate(), orgId));
         } catch (FeignException.NotFound ex) {
             log.error("Organisation not found", ex);
             return Optional.empty();

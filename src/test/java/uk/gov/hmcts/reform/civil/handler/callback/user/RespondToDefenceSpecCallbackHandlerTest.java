@@ -17,45 +17,69 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
-import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
+import uk.gov.hmcts.reform.civil.model.dq.Hearing;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
@@ -66,7 +90,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     JacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class,
     UnavailableDateValidator.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    CourtLocationUtils.class,
+    LocationHelper.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -82,6 +108,90 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private Time time;
 
+    @MockBean
+    private CourtLocationUtils courtLocationUtils;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
+    @MockBean
+    private LocationRefDataService locationRefDataService;
+
+    @Nested
+    class AboutToStart {
+
+        @Test
+        void shouldPopulateInitialData() {
+            var params = callbackParamsOf(
+                CaseData.builder()
+                    .respondent1(Party.builder()
+                                     .type(Party.Type.COMPANY)
+                                     .companyName("company name")
+                                     .build())
+                    .build(),
+                ABOUT_TO_START
+            );
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("respondent1Copy")
+                .isNotNull();
+            assertThat(response.getData()).extracting("claimantResponseScenarioFlag")
+                .isNotNull();
+        }
+
+        @Test
+        void shouldPopulateInitialDataV1() {
+            var params = callbackParamsOf(
+                CallbackVersion.V_1,
+                CaseData.builder()
+                    .respondent1(Party.builder()
+                                     .type(Party.Type.COMPANY)
+                                     .companyName("company name")
+                                     .build())
+                    .build(),
+                ABOUT_TO_START
+            );
+
+            when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("respondent1Copy")
+                .isNotNull();
+            assertThat(response.getData()).extracting("claimantResponseScenarioFlag")
+                .isNotNull();
+        }
+
+        // TODO my test
+        @Test
+        void shouldPopulateCourtLocations() {
+            when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
+            when(courtLocationUtils.getLocationsFromList(any()))
+                .thenReturn(fromList(List.of("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124")));
+
+            CaseData caseData = CaseData.builder().build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            System.out.println(getCaseData(response));
+
+            DynamicList dynamicList = getCaseData(response).getApplicant1DQ()
+                .getApplicant1DQRequestedCourt().getResponseCourtLocations();
+
+            List<String> courtlist = dynamicList.getListItems().stream()
+                .map(DynamicListElement::getLabel)
+                .collect(Collectors.toList());
+
+            assertThat(courtlist).containsOnly("Site 1 - Lane 1 - 123", "Site 2 - Lane 2 - 124");
+        }
+
+        private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
+            return objectMapper.convertValue(response.getData(), CaseData.class);
+        }
+    }
+
     @Nested
     class ValidateUnavailableDates {
 
@@ -92,7 +202,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .ccdState(AWAITING_APPLICANT_INTENTION)
                 .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
                 .applicant1DQ(Applicant1DQ.builder()
-                                  .applicant1DQHearingLRspec(HearingLRspec.builder()
+                                  .applicant1DQHearingLRspec(Hearing.builder()
                                                                  .build())
                                   .build())
                 .build();
@@ -296,8 +406,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("uiStatementOfTruth")
-                .extracting("name", "role")
-                .containsExactly(null, null);
+                .doesNotHaveToString("name")
+                .doesNotHaveToString("role");
         }
     }
 
@@ -316,6 +426,26 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             mode = EnumSource.Mode.INCLUDE)
         void shouldUpdateBusinessProcess_whenAtFullDefenceState(FlowState.Main flowState) {
             var params = callbackParamsOf(
+                CaseDataBuilder.builder().atState(flowState).build(),
+                ABOUT_TO_SUBMIT
+            );
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("status", "camundaEvent")
+                .containsExactly(READY.name(), CLAIMANT_RESPONSE_SPEC.name());
+
+            assertThat(response.getData()).containsEntry("applicant1ResponseDate", localDateTime.format(ISO_DATE_TIME));
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = FlowState.Main.class,
+            names = {"FULL_DEFENCE_PROCEED", "FULL_DEFENCE_NOT_PROCEED"},
+            mode = EnumSource.Mode.INCLUDE)
+        void shouldUpdateBusinessProcess_whenAtFullDefenceStateV1(FlowState.Main flowState) {
+            var params = callbackParamsOf(
+                CallbackVersion.V_1,
                 CaseDataBuilder.builder().atState(flowState).build(),
                 ABOUT_TO_SUBMIT
             );
@@ -355,9 +485,53 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData())
                     .extracting("uiStatementOfTruth")
-                    .extracting("name", "role")
-                    .containsExactly(null, null);
+                    .doesNotHaveToString("name")
+                    .doesNotHaveToString("role");
             }
+        }
+
+        @Nested
+        class HandleCourtLocation {
+            @BeforeEach
+            void setup() {
+                when(featureToggleService.isCourtLocationDynamicListEnabled()).thenReturn(true);
+            }
+
+            @Test
+            void shouldHandleCourtLocationData() {
+                LocationRefData locationA = LocationRefData.builder()
+                    .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
+                    .courtAddress("Lane 1").postcode("123").build();
+                when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
+                    .thenReturn(locationA);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .applicant1DQ(
+                        Applicant1DQ.builder().applicant1DQRequestedCourt(
+                            RequestedCourt.builder()
+                                .responseCourtLocations(DynamicList.builder().build())
+                                .build()).build())
+                    .build();
+
+                CallbackParams callbackParams = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+
+                assertThat(response.getData())
+                    .extracting("applicant1DQRequestedCourt")
+                    .extracting("responseCourtLocations").isNull();
+
+                assertThat(response.getData())
+                    .extracting("applicant1DQRequestedCourt")
+                    .extracting("caseLocation")
+                    .extracting("region", "baseLocation")
+                    .containsExactly("regionId1", "epimmsId1");
+
+                assertThat(response.getData())
+                    .extracting("applicant1DQRequestedCourt")
+                    .extracting("responseCourtCode").isEqualTo("312");
+            }
+
         }
     }
 
@@ -380,8 +554,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getConfirmationBody())
                 .contains("contact you about what to do next");
             assertThat(response.getConfirmationHeader())
-                .contains("decided to proceed",
-                          caseData.getLegacyCaseReference());
+                .contains(
+                    "decided to proceed",
+                    caseData.getLegacyCaseReference()
+                );
         }
 
         @Test
@@ -400,9 +576,193 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getConfirmationBody())
                 .contains("not to proceed");
             assertThat(response.getConfirmationHeader())
-                .contains("not to proceed",
-                          caseData.getLegacyCaseReference());
+                .contains(
+                    "not to proceed",
+                    caseData.getLegacyCaseReference()
+                );
         }
     }
 
+    @Nested
+    class SetUpOveVOneFlag {
+
+        @Test
+        void shouldGetOneVOneFullDefenceFlagV2() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+
+            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE);
+        }
+
+        @Test
+        void shouldGetOneVOnePartAdmitFlagV2() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .specDefenceAdmittedRequired(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+
+            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_HAS_PAID);
+        }
+
+        @Test
+        void shouldGetOneVOnePartAdmitBySetDateFlagV2() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
+                .specDefenceAdmittedRequired(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+
+            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE);
+        }
+
+        @Test
+        void shouldGetOneVOneFullAdmitFlagV2() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .specDefenceFullAdmittedRequired(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID);
+        }
+
+        @Test
+        void shouldGetOneVOneFullAdmitBySetDateFlagV2() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
+                .specDefenceFullAdmittedRequired(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_BY_SET_DATE);
+        }
+
+        @Test
+        void shouldGetOneVOneCounterClaimFlagV2() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+
+            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_COUNTER_CLAIM);
+        }
+
+        @Test
+        void shouldGetNullFlagV2() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent2(PartyBuilder.builder().company().build())
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+
+            assertThat(result).isNull();
+        }
+
+        private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
+            return objectMapper.convertValue(response.getData(), CaseData.class);
+        }
+    }
+
+    @Nested
+    class SetUpPaymentDateToStringField {
+        @Test
+        void shouldSetUpPaymentDateToString() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+
+            RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec =
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build();
+
+            CaseData caseData = CaseData.builder()
+                .respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            String result = getCaseData(response).getRespondent1PaymentDateToStringSpec();
+
+            assertThat(result).isEqualTo(whenWillPay
+                                             .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)));
+        }
+
+        @Test
+        void shouldSetUpPaymentDateForResponseDateToString() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ResponseDate(LocalDateTime.now())
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            String result = getCaseData(response).getRespondent1PaymentDateToStringSpec();
+
+            assertThat(result).isEqualTo(whenWillPay
+                                             .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)));
+        }
+
+        private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
+            return objectMapper.convertValue(response.getData(), CaseData.class);
+        }
+    }
 }

@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -27,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseCaseHandedOfflineApplicantNotificationHandler.TASK_ID_APPLICANT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASON;
@@ -49,6 +52,8 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
     private NotificationsProperties notificationsProperties;
     @MockBean
     private OrganisationService organisationService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     private DefendantResponseCaseHandedOfflineApplicantNotificationHandler handler;
@@ -195,6 +200,27 @@ class DefendantResponseCaseHandedOfflineApplicantNotificationHandlerTest extends
                     "defendant-response-case-handed-offline-applicant-notification-000DC001"
                 );
             }
+
+            @Test
+            void shouldReturnAddPropertiesSpec_wheninvoked() {
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledged()
+                    .build();
+
+                assertThat(handler.addPropertiesSpec1v2DiffSol(caseData))
+                    .containsEntry("legalOrgName", "Signer Name")
+                    .containsEntry("claimReferenceNumber", "000DC001");
+
+            }
+        }
+
+        @Test
+        void shouldReturnCorrectCamundaActivityId_whenInvoked() {
+
+            assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder()
+                .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE").build()).build()))
+                .isEqualTo(TASK_ID_APPLICANT1);
         }
     }
 

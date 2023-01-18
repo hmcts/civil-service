@@ -88,6 +88,17 @@ class CaseListSolicitorReferenceUtilsTest {
                 assertThat(getAllOrganisationPolicyReferences(caseData))
                     .isEqualTo("");
             }
+
+            @Test
+            void shouldReturnAllOrganisationReference_whenUnregisteredAndNoOrgPolicy() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDraft()
+                    .multiPartyClaimTwoDefendantSolicitorsUnregistered()
+                    .build();
+
+                assertThat(getAllOrganisationPolicyReferences(caseData))
+                    .isEqualTo("");
+            }
         }
     }
 

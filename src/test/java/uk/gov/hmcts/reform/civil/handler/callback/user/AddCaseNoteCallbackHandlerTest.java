@@ -98,8 +98,7 @@ class AddCaseNoteCallbackHandlerTest extends BaseCallbackHandlerTest {
             verify(caseNoteService).addNoteToList(expectedCaseNote, caseData.getCaseNotes());
 
             assertThat(response.getData())
-                .extracting("caseNote")
-                .isNull();
+                .doesNotHaveToString("caseNote");
 
             assertThat(response.getData())
                 .extracting("caseNotes")

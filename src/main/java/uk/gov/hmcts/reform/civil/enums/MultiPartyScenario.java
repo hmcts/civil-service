@@ -25,7 +25,7 @@ public enum MultiPartyScenario {
             return TWO_V_ONE;
         }
 
-        if (caseData.getRespondent2() != null) {
+        if (caseData.getRespondent2() != null || caseData.getRespondent2Copy() != null) {
             return (caseData.getRespondent2SameLegalRepresentative() == null
                 || caseData.getRespondent2SameLegalRepresentative().equals(NO))
                 ? ONE_V_TWO_TWO_LEGAL_REP
