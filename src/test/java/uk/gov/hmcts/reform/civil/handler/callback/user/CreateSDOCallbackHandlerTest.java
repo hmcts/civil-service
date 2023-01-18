@@ -972,14 +972,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "the contents of the bundle before it is filed. The bundle will include a case "
                                + "summary and a chronology.");
             assertThat(response.getData()).extracting("fastTrackOrderWithoutJudgement").extracting("input")
-                .isEqualTo(String.format(
-                    "This order has been made without hearing. Each party has the right to apply "
-                        + "to have this Order set aside or varied. Any such application must be "
-                        + "received by the Court (together with the appropriate fee) by 4pm "
-                        + "on %s.",
-                    date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
-                ));
-
+                .isEqualTo(String.format("Each party has the right to apply "
+                                             + "to have this Order set aside or varied. Any such application must be "
+                                             + "received by the Court (together with the appropriate fee) by 4pm "
+                                             + "on %s.",
+                                         date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))));
         }
 
         @Test
