@@ -19,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -29,30 +28,42 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWOSPEC;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
-    EvidenceUploadHandler.class,
+    EvidenceUploadApplicantHandler.class,
     JacksonAutoConfiguration.class
 })
-class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
+class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
-    private EvidenceUploadHandler handler;
+    private EvidenceUploadApplicantHandler handler;
 
     @MockBean
     private Time time;
+
+    @MockBean
+    private  CoreCaseUserService coreCaseUserService;
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
@@ -60,7 +71,7 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
     private final UploadEvidenceExpert uploadEvidenceDate = new UploadEvidenceExpert();
     private final UploadEvidenceWitness uploadEvidenceDate2 = new UploadEvidenceWitness();
 
-    private static final String PAGE_ID = "validateValues";
+    private static final String PAGE_ID = "validateValuesApplicant";
 
     @BeforeEach
     void setup() {
@@ -68,24 +79,46 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void givenAboutToStartThenReturnsAboutToStartOrSubmitCallbackResponse() {
+    void givenAboutToStart_1v2SameSolicitorWillNotChangeToRespondentTwoFlag() {
         // Given
-        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .addRespondent2(YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(YES)
+            .build();
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
         // When
-        CallbackResponse response = handler.handle(params);
-
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
         // Then
-        assertThat(response).isInstanceOf(AboutToStartOrSubmitCallbackResponse.class);
+        assertThat(response.getData()).extracting("caseTypeFlag").isNotEqualTo("RespondentTwoFields");
+    }
+
+    @Test
+    void givenAboutToStart_1v1WillNotChangeToRespondentTwoFlag() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .build();
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).willReturn(false);
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+        // Then
+        assertThat(response.getData()).extracting("caseTypeFlag").isNotEqualTo("RespondentTwoFields");
     }
 
     @ParameterizedTest
     @CsvSource({
-        "expertOption1UploadDate,documentUploadExpert1",
-        "expertOption2UploadDate,documentUploadExpert2",
-        "expertOption3UploadDate,documentUploadExpert3",
-        "expertOption4UploadDate,documentUploadExpert4"
+        "expertOptionUploadDate,documentExpertReport",
+        "expertOptionUploadDate,documentJointStatement",
+        "expertOptionUploadDate,documentQuestions",
+        "expertOptionUploadDate,documentAnswers"
     })
     void shouldNotReturnError_whenExpertOptionUploadDatePast(String dateField, String collectionField) {
         // Given
@@ -107,10 +140,10 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOption1UploadDate,documentUploadExpert1",
-        "expertOption2UploadDate,documentUploadExpert2",
-        "expertOption3UploadDate,documentUploadExpert3",
-        "expertOption4UploadDate,documentUploadExpert4"
+        "expertOptionUploadDate,documentExpertReport",
+        "expertOptionUploadDate,documentJointStatement",
+        "expertOptionUploadDate,documentQuestions",
+        "expertOptionUploadDate,documentAnswers"
     })
     void shouldNotReturnError_whenExpertOptionUploadDatePresent(String dateField, String collectionField) {
         // Given
@@ -132,13 +165,13 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOption1UploadDate,documentUploadExpert1,Invalid date: \"Expert's report\""
+        "expertOptionUploadDate,documentExpertReport,Invalid date: \"Expert's report\""
             + " date entered must not be in the future (3).",
-        "expertOption2UploadDate,documentUploadExpert2,Invalid date: \"Joint statement of experts\" "
+        "expertOptionUploadDate,documentJointStatement,Invalid date: \"Joint statement of experts\" "
             + "date entered must not be in the future (4).",
-        "expertOption3UploadDate,documentUploadExpert3,Invalid date: \"Questions for other party's expert "
+        "expertOptionUploadDate,documentQuestions,Invalid date: \"Questions for other party's expert "
             + "or joint experts\" expert statement date entered must not be in the future (5).",
-        "expertOption4UploadDate,documentUploadExpert4,Invalid date: \"Answers to questions asked by the other party\" "
+        "expertOptionUploadDate,documentAnswers,Invalid date: \"Answers to questions asked by the other party\" "
             + "date entered must not be in the future (6)."
     })
     void shouldReturnError_whenExpertOptionUploadDateFuture(String dateField, String collectionField,
@@ -162,9 +195,9 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "witnessOption1UploadDate,documentUploadWitness1,Invalid date: \"witness statement\" "
+        "witnessOptionUploadDate,documentWitnessStatement,Invalid date: \"witness statement\" "
             + "date entered must not be in the future (1).",
-        "witnessOption3UploadDate,documentUploadWitness3,Invalid date: \"Notice of the intention to rely on"
+        "witnessOptionUploadDate,documentHearsayNotice,Invalid date: \"Notice of the intention to rely on"
             + " hearsay evidence\" date entered must not be in the future (2)."
     })
     void shouldReturnError_whenWitnessOptionUploadDateInFuture(String dateField, String collectionField,
@@ -188,8 +221,8 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "witnessOption1UploadDate,documentUploadWitness1",
-        "witnessOption3UploadDate,documentUploadWitness3"
+        "witnessOptionUploadDate,documentWitnessStatement",
+        "witnessOptionUploadDate,documentHearsayNotice"
     })
     void shouldNotReturnError_whenWitnessOptionUploadDatePresent(String dateField, String collectionField) {
         // Given
@@ -211,8 +244,8 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "witnessOption1UploadDate,documentUploadWitness1",
-        "witnessOption3UploadDate,documentUploadWitness3"
+        "witnessOptionUploadDate,documentWitnessStatement",
+        "witnessOptionUploadDate,documentHearsayNotice"
     })
     void shouldNotReturnError_whenWitnessOptionUploadDatePast(String dateField, String collectionField) {
         // Given
@@ -234,8 +267,8 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "witnessOption1UploadDate,documentUploadWitness1,Invalid date: \"witness statement\" date entered must not be in the future (1).",
-        "witnessOption3UploadDate,documentUploadWitness3,Invalid date: \"Notice of the intention to rely on hearsay evidence\" " +
+        "witnessOptionUploadDate,documentWitnessStatement,Invalid date: \"witness statement\" date entered must not be in the future (1).",
+        "witnessOptionUploadDate,documentHearsayNotice,Invalid date: \"Notice of the intention to rely on hearsay evidence\" " +
             "date entered must not be in the future (2)."
     })
     void shouldReturnError_whenOneDateIsInFutureForWitnessStatements(String dateField, String collectionField, String errorMessage) {
@@ -261,13 +294,13 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "expertOption1UploadDate,documentUploadExpert1,Invalid date: \"Expert's report\""
+        "expertOptionUploadDate,documentExpertReport,Invalid date: \"Expert's report\""
             + " date entered must not be in the future (3).",
-        "expertOption2UploadDate,documentUploadExpert2,Invalid date: \"Joint statement of experts\" "
+        "expertOptionUploadDate,documentJointStatement,Invalid date: \"Joint statement of experts\" "
             + "date entered must not be in the future (4).",
-        "expertOption3UploadDate,documentUploadExpert3,Invalid date: \"Questions for other party's expert "
+        "expertOptionUploadDate,documentQuestions,Invalid date: \"Questions for other party's expert "
             + "or joint experts\" expert statement date entered must not be in the future (5).",
-        "expertOption4UploadDate,documentUploadExpert4,Invalid date: \"Answers to questions asked by the other party\" "
+        "expertOptionUploadDate,documentAnswers,Invalid date: \"Answers to questions asked by the other party\" "
             + "date entered must not be in the future (6)."
     })
     void shouldReturnError_whenOneDateIsInFutureForExpertStatements(String dateField, String collectionField, String errorMessage) {
@@ -336,7 +369,7 @@ class EvidenceUploadHandlerTest extends BaseCallbackHandlerTest {
         handler.register(registerTarget);
 
         // Then
-        assertThat(registerTarget).containsExactly(entry(EVIDENCE_UPLOAD.name(), handler));
+        assertThat(registerTarget).containsExactly(entry(EVIDENCE_UPLOAD_APPLICANT.name(), handler));
     }
 
     private <T, A> T invoke(T target, String method, A argument) {
