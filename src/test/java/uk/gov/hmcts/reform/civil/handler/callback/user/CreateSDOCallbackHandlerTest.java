@@ -610,8 +610,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).doesNotHaveToString("fastTrackJudgementDeductionValue");
 
             assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input1")
-                .isEqualTo("Documents will be disclosed by uploading to the Digital Portal a list with a disclosure "
-                               + "statement by 4pm on");
+                .isEqualTo("Standard disclosure shall be provided by the parties by uploading to the Digital "
+                               + "Portal their list of documents by 4pm on");
             assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("date1")
                 .isEqualTo(LocalDate.now().plusWeeks(4).toString());
             assertThat(response.getData()).extracting("fastTrackDisclosureOfDocuments").extracting("input2")
@@ -630,13 +630,16 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input1")
                 .isEqualTo("Each party must upload to the Digital Portal copies of the statements of all witnesses of "
                                + "fact on whom they intend to rely.");
-            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").doesNotHaveToString("input2");
-            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").doesNotHaveToString("input3");
+            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input2")
+                .isEqualTo("3");
+            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input3")
+                .isEqualTo("3");
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input4")
                 .isEqualTo("For this limitation, a party is counted as a witness.");
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input5")
                 .isEqualTo("Each witness statement should be no more than");
-            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").doesNotHaveToString("input6");
+            assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input6")
+                .isEqualTo("10");
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input7")
                 .isEqualTo("A4 pages. Statements should be double spaced using a font size of 12.");
             assertThat(response.getData()).extracting("fastTrackWitnessOfFact").extracting("input8")
