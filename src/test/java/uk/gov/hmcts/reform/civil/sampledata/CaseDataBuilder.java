@@ -4102,7 +4102,6 @@ public class CaseDataBuilder {
         cosUIStatement.add("CERTIFIED");
         if (setCos1) {
             CertificateOfService.CertificateOfServiceBuilder cos1Builder = CertificateOfService.builder()
-                .cosUISenderStatementOfTruthLabel(cosUIStatement)
                 .cosDateOfServiceForDefendant(cos1Date);
             if (file1) {
                 cos1Builder.cosEvidenceDocument(files);
@@ -4111,7 +4110,6 @@ public class CaseDataBuilder {
         }
         if (setCos2) {
             CertificateOfService.CertificateOfServiceBuilder cos2Builder = CertificateOfService.builder()
-                .cosUISenderStatementOfTruthLabel(cosUIStatement)
                 .cosDateOfServiceForDefendant(cos2Date);
             if (file2) {
                 cos2Builder.cosEvidenceDocument(files2);
