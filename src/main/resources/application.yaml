@@ -164,6 +164,7 @@ notifications:
   claimantSolicitorConfirmsToProceed: "bf16b060-17b6-4d06-8367-e26a538a4911"
   claimantSolicitorConfirmsNotToProceed: "8d2b0c8c-7cb2-4559-ba2c-a2ed5f7982be"
   claimantSolicitorClaimContinuingOnline: "d6c71e08-a9c3-405c-8873-4370d4bdcca3"
+  claimantSolicitorSpecCaseWillProgressOffline: "cf44ff15-4958-4c0d-b0d4-fed9a7692d00"
   claimantSolicitorClaimContinuingOnlineCos: "4825eb5d-4678-496e-8d19-203288dd598f"
   solicitorCaseTakenOffline: "5f1f497e-e1e0-40e0-8296-a0a1341f1e8c"
   solicitorLitigationFriendAdded: "bad02653-df70-4a33-9b02-d42d30c5022c"
