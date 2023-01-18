@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -349,7 +350,7 @@ class RoboticsNotificationServiceTest {
             .atState(FlowState.Main.FULL_DEFENCE)
             .respondent2Responds1v2SameSol(FULL_DEFENCE)
             .respondentResponseIsSame(YES)
-            .respondent2DQ(Respondent2DQ.builder().build())
+            .respondent1DQ(Respondent1DQ.builder().build())
             .respondent2ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
             .build();
         if (caseData.getRespondent2OrgRegistered() != null
