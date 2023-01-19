@@ -144,7 +144,7 @@ allprojects {
       url "https://jitpack.io"
     }
     maven {
-      url  "https://repo.maven.apache.org/maven2"
+      url  "https://repo.spring.io/libs-milestone"
     }
     maven {
       url "https://jitpack.io"
@@ -358,7 +358,7 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
 
-  implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-bom', version: versions.springStatemachine
+  implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-core', version: versions.springStatemachine
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
