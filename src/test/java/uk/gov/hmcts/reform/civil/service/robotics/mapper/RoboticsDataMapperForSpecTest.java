@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisationCollectionItem;
@@ -30,7 +30,7 @@ import java.util.List;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class RoboticsDataMapperForSpecTest {
 
     @InjectMocks
@@ -75,10 +75,10 @@ public class RoboticsDataMapperForSpecTest {
 
         RoboticsCaseDataSpec mapped = mapper.toRoboticsCaseData(caseData);
 
-        Assert.assertEquals(mapped.getHeader().getCaseNumber(), caseData.getLegacyCaseReference());
-        Assert.assertTrue(mapped.getLitigiousParties().stream()
+        Assertions.assertEquals(mapped.getHeader().getCaseNumber(), caseData.getLegacyCaseReference());
+        Assertions.assertTrue(mapped.getLitigiousParties().stream()
                               .anyMatch(p -> p.getName().equals(caseData.getApplicant1().getPartyName())));
-        Assert.assertTrue(mapped.getLitigiousParties().stream()
+        Assertions.assertTrue(mapped.getLitigiousParties().stream()
                               .anyMatch(p -> p.getName().equals(caseData.getRespondent1().getPartyName())));
     }
 
@@ -134,7 +134,7 @@ public class RoboticsDataMapperForSpecTest {
 
         RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData);
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
             List.of(
                 NoticeOfChange.builder().litigiousPartyID("001").dateOfNoC(app1NocDate.format(ISO_DATE)).build(),
                 NoticeOfChange.builder().litigiousPartyID("002").dateOfNoC(res1NocDate.format(ISO_DATE)).build(),
@@ -175,7 +175,7 @@ public class RoboticsDataMapperForSpecTest {
 
         RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData);
 
-        Assert.assertNull(roboticsCaseData.getNoticeOfChange());
+        Assertions.assertNull(roboticsCaseData.getNoticeOfChange());
     }
 
     private PreviousOrganisationCollectionItem buildPreviousOrganisation(String name, LocalDateTime fromDate) {
