@@ -14,17 +14,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class UploadEvidenceWitness {
 
-    private String witnessOption1Name;
-    private LocalDate witnessOption1UploadDate;
-    private Document witnessOption1;
-
-    private String witnessOption2Name;
-    private Document witnessOption2;
-
-    private String witnessOption3Name;
-    private LocalDate witnessOption3UploadDate;
-    private Document witnessOption3;
-
-    private Document witnessOption4;
-
+    private String witnessOptionName;
+    private LocalDate witnessOptionUploadDate;
+    private Document witnessOptionDocument;
 }
