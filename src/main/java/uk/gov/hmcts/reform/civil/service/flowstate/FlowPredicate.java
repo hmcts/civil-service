@@ -421,13 +421,24 @@ public class FlowPredicate {
         caseData.getTakenOfflineByStaffDate() != null;
 
     public static final Predicate<CaseData> takenOfflineByStaffAfterClaimIssue = caseData ->
-        caseData.getTakenOfflineByStaffDate() != null
-            && caseData.getClaimNotificationDate() == null
+        getPredicateTakenOfflineByStaffAfterClaimIssue(caseData);
+
+    public static final boolean getPredicateTakenOfflineByStaffAfterClaimIssue(CaseData caseData) {
+        // In case of SPEC claim ClaimNotificationDate will be set even when the case is issued
+        // In case of UNSPEC ClaimNotificationDate will be set only after notification step
+        boolean basePredicate = caseData.getTakenOfflineByStaffDate() != null
             && caseData.getClaimDetailsNotificationDate() == null
             && caseData.getRespondent1AcknowledgeNotificationDate() == null
             && caseData.getRespondent1ResponseDate() == null
             && caseData.getClaimNotificationDeadline() != null
             && caseData.getClaimNotificationDeadline().isAfter(LocalDateTime.now());
+
+        if (isSpecCaseCategory(caseData, caseData.getCaseAccessCategory() != null)) {
+            return basePredicate && caseData.getClaimNotificationDate() != null;
+        }
+
+        return basePredicate && caseData.getClaimNotificationDate() == null;
+    }
 
     public static final Predicate<CaseData> takenOfflineByStaffAfterClaimNotified = caseData ->
         caseData.getTakenOfflineByStaffDate() != null

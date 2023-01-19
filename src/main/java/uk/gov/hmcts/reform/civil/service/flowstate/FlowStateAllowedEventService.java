@@ -43,8 +43,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SP
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
@@ -179,8 +180,9 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
-                EVIDENCE_UPLOAD,
+                EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
+                EVIDENCE_UPLOAD_RESPONDENT,
                 CREATE_CLAIM_SPEC_AFTER_PAYMENT,
                 CREATE_CLAIM_AFTER_PAYMENT
             )
@@ -206,8 +208,9 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
-                EVIDENCE_UPLOAD,
-                migrateCase
+                EVIDENCE_UPLOAD_APPLICANT,
+                migrateCase,
+                EVIDENCE_UPLOAD_RESPONDENT
             )
         ),
 
@@ -236,8 +239,9 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_JUDGE,
                 HEARING_FEE_UNPAID,
                 HEARING_SCHEDULED,
-                EVIDENCE_UPLOAD,
-                migrateCase
+                EVIDENCE_UPLOAD_APPLICANT,
+                migrateCase,
+                EVIDENCE_UPLOAD_RESPONDENT
             )
         ),
 
@@ -713,8 +717,9 @@ public class FlowStateAllowedEventService {
                 HEARING_SCHEDULED,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
-                EVIDENCE_UPLOAD,
+                EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
+                EVIDENCE_UPLOAD_RESPONDENT,
                 CREATE_CLAIM_SPEC_AFTER_PAYMENT,
                 CREATE_CLAIM_AFTER_PAYMENT
             )
@@ -744,8 +749,9 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 HEARING_SCHEDULED,
                 EVIDENCE_UPLOAD_JUDGE,
-                EVIDENCE_UPLOAD,
-                migrateCase
+                EVIDENCE_UPLOAD_APPLICANT,
+                migrateCase,
+                EVIDENCE_UPLOAD_RESPONDENT
             )
         ),
         entry(
