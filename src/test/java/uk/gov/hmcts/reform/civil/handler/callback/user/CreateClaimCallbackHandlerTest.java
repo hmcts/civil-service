@@ -1613,30 +1613,30 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .confirmationBody(body)
                         .build());
             }
-        }
 
-        @Test
-        void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentationAndPBAv3IsOn() {
-            Mockito.when(featureToggleService.isPbaV3Enabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified()
-                .multiPartyClaimOneDefendantSolicitor().build();
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+            @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentationAndPBAv3IsOn() {
+                Mockito.when(featureToggleService.isPbaV3Enabled()).thenReturn(true);
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified()
+                    .multiPartyClaimOneDefendantSolicitor().build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            String body = format(
-                CONFIRMATION_SUMMARY_PBA_V3,
-                format("/cases/case-details/%s#CaseDocuments", CASE_ID)
-            ) + exitSurveyContentService.applicantSurvey();
+                String body = format(
+                    CONFIRMATION_SUMMARY_PBA_V3,
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID)
+                ) + exitSurveyContentService.applicantSurvey();
 
-            assertThat(response).usingRecursiveComparison().isEqualTo(
-                SubmittedCallbackResponse.builder()
-                    .confirmationHeader(format(
-                        "# Your claim has been received%n## Claim number: %s",
-                        REFERENCE_NUMBER
-                    ))
-                    .confirmationBody(body)
-                    .build());
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# Your claim has been received%n## Claim number: %s",
+                            REFERENCE_NUMBER
+                        ))
+                        .confirmationBody(body)
+                        .build());
+            }
         }
 
         @Nested
