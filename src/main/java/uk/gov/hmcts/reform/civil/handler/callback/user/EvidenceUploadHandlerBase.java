@@ -278,57 +278,57 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
         if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORONE)
             || coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORONESPEC)) {
-            setCategoryId(caseData.getDocumentDisclosureListRes(), document -> document.getValue().getDocumentUpload(), "documentDisclosureListRes");
-            setCategoryId(caseData.getDocumentForDisclosureRes(), document -> document.getValue().getDocumentUpload(), "documentsForDisclosureRes");
-            setCategoryId(caseData.getDocumentWitnessStatementRes(), document -> document.getValue().getWitnessOptionDocument(), "documentWitnessStatementRes");
-            setCategoryId(caseData.getDocumentWitnessSummaryRes(), document -> document.getValue().getWitnessOptionDocument(), "documentWitnessSummaryRes");
-            setCategoryId(caseData.getDocumentHearsayNoticeRes(), document -> document.getValue().getWitnessOptionDocument(), "documentHearsayNoticeRes");
-            setCategoryId(caseData.getDocumentReferredInStatementRes(), document -> document.getValue().getDocumentUpload(), "documentReferredInStatementRes");
-            setCategoryId(caseData.getDocumentExpertReportRes(), document -> document.getValue().getExpertDocument(), "documentExpertReport");
-            setCategoryId(caseData.getDocumentJointStatementRes(), document -> document.getValue().getExpertDocument(), "documentJointStatementRes");
-            setCategoryId(caseData.getDocumentQuestionsRes(), document -> document.getValue().getExpertDocument(), "documentQuestionsRes");
-            setCategoryId(caseData.getDocumentAnswersRes(), document -> document.getValue().getExpertDocument(), "documentAnswersRes");
-            setCategoryId(caseData.getDocumentCaseSummaryRes(), document -> document.getValue().getDocumentUpload(), "documentCaseSummaryRes");
-            setCategoryId(caseData.getDocumentSkeletonArgumentRes(), document -> document.getValue().getDocumentUpload(), "documentSkeletonArgumentRes");
-            setCategoryId(caseData.getDocumentAuthoritiesRes(), document -> document.getValue().getDocumentUpload(), "documentAuthoritiesRes");
-            setCategoryId(caseData.getDocumentCostsRes(), document -> document.getValue().getDocumentUpload(), "documentCostsRes");
-            setCategoryId(caseData.getDocumentEvidenceForTrialRes(), document -> document.getValue().getDocumentUpload(), "documentEvidenceForTrialRes");
+            setCategoryId(caseData.getDocumentDisclosureListRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneDisclosureList");
+            setCategoryId(caseData.getDocumentForDisclosureRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneDisclosure");
+            setCategoryId(caseData.getDocumentWitnessStatementRes(), document -> document.getValue().getWitnessOptionDocument(), "RespondentWitnessDocuments");
+            setCategoryId(caseData.getDocumentWitnessSummaryRes(), document -> document.getValue().getWitnessOptionDocument(), "RespondentOneWitnessSummary");
+            setCategoryId(caseData.getDocumentHearsayNoticeRes(), document -> document.getValue().getWitnessOptionDocument(), "RespondentOneWitnessHearsay");
+            setCategoryId(caseData.getDocumentReferredInStatementRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneWitnessReferred");
+            setCategoryId(caseData.getDocumentExpertReportRes(), document -> document.getValue().getExpertDocument(), "RespondentOneExpertReport");
+            setCategoryId(caseData.getDocumentJointStatementRes(), document -> document.getValue().getExpertDocument(), "RespondentOneExpertJointStatement");
+            setCategoryId(caseData.getDocumentQuestionsRes(), document -> document.getValue().getExpertDocument(), "RespondentOneExpertQuestions");
+            setCategoryId(caseData.getDocumentAnswersRes(), document -> document.getValue().getExpertDocument(), "RespondentOneExpertAnswers");
+            setCategoryId(caseData.getDocumentCaseSummaryRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneTrialSummary");
+            setCategoryId(caseData.getDocumentSkeletonArgumentRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneTrialSkeleton");
+            setCategoryId(caseData.getDocumentAuthoritiesRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneTrialAuthorities");
+            setCategoryId(caseData.getDocumentCostsRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneTrialCosts");
+            setCategoryId(caseData.getDocumentEvidenceForTrialRes(), document -> document.getValue().getDocumentUpload(), "RespondentOneTrialDocumentEvidence");
 
         }
         if (coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)
             || coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(), userInfo.getUid(), RESPONDENTSOLICITORTWOSPEC)) {
-            setCategoryId(caseData.getDocumentDisclosureListRes2(), document -> document.getValue().getDocumentUpload(), "documentDisclosureListRes2");
-            setCategoryId(caseData.getDocumentForDisclosureRes2(), document -> document.getValue().getDocumentUpload(), "documentsForDisclosureRes2");
-            setCategoryId(caseData.getDocumentWitnessStatementRes2(), document -> document.getValue().getWitnessOptionDocument(), "documentWitnessStatementRes2");
-            setCategoryId(caseData.getDocumentWitnessSummaryRes2(), document -> document.getValue().getWitnessOptionDocument(), "documentWitnessSummaryRes2");
-            setCategoryId(caseData.getDocumentHearsayNoticeRes2(), document -> document.getValue().getWitnessOptionDocument(), "documentHearsayNoticeRes2");
-            setCategoryId(caseData.getDocumentReferredInStatementRes2(), document -> document.getValue().getDocumentUpload(), "documentReferredInStatementRes2");
-            setCategoryId(caseData.getDocumentExpertReportRes2(), document -> document.getValue().getExpertDocument(), "documentExpertReport");
-            setCategoryId(caseData.getDocumentJointStatementRes2(), document -> document.getValue().getExpertDocument(), "documentJointStatementRes2");
-            setCategoryId(caseData.getDocumentQuestionsRes2(), document -> document.getValue().getExpertDocument(), "documentQuestionsRes2");
-            setCategoryId(caseData.getDocumentAnswersRes2(), document -> document.getValue().getExpertDocument(), "documentAnswersRes2");
-            setCategoryId(caseData.getDocumentCaseSummaryRes2(), document -> document.getValue().getDocumentUpload(), "documentCaseSummaryRes2");
-            setCategoryId(caseData.getDocumentSkeletonArgumentRes2(), document -> document.getValue().getDocumentUpload(), "documentSkeletonArgumentRes2");
-            setCategoryId(caseData.getDocumentAuthoritiesRes2(), document -> document.getValue().getDocumentUpload(), "documentAuthoritiesRes2");
-            setCategoryId(caseData.getDocumentCostsRes2(), document -> document.getValue().getDocumentUpload(), "documentCostsRes2");
-            setCategoryId(caseData.getDocumentEvidenceForTrialRes2(), document -> document.getValue().getDocumentUpload(), "documentEvidenceForTrialRes2");
+            setCategoryId(caseData.getDocumentDisclosureListRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoDisclosureList");
+            setCategoryId(caseData.getDocumentForDisclosureRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoDisclosure");
+            setCategoryId(caseData.getDocumentWitnessStatementRes2(), document -> document.getValue().getWitnessOptionDocument(), "RespondentTwoWitnessDocuments");
+            setCategoryId(caseData.getDocumentWitnessSummaryRes2(), document -> document.getValue().getWitnessOptionDocument(), "RespondentTwoWitnessSummary");
+            setCategoryId(caseData.getDocumentHearsayNoticeRes2(), document -> document.getValue().getWitnessOptionDocument(), "RespondentTwoWitnessHearsay");
+            setCategoryId(caseData.getDocumentReferredInStatementRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoWitnessReferred");
+            setCategoryId(caseData.getDocumentExpertReportRes2(), document -> document.getValue().getExpertDocument(), "RespondentTwoExpertReport");
+            setCategoryId(caseData.getDocumentJointStatementRes2(), document -> document.getValue().getExpertDocument(), "RespondentTwoExpertJointStatement");
+            setCategoryId(caseData.getDocumentQuestionsRes2(), document -> document.getValue().getExpertDocument(), "RespondentTwoExpertQuestions");
+            setCategoryId(caseData.getDocumentAnswersRes2(), document -> document.getValue().getExpertDocument(), "RespondentTwoExpertAnswers");
+            setCategoryId(caseData.getDocumentCaseSummaryRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoTrialSummary");
+            setCategoryId(caseData.getDocumentSkeletonArgumentRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoTrialSkeleton");
+            setCategoryId(caseData.getDocumentAuthoritiesRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoTrialAuthorities");
+            setCategoryId(caseData.getDocumentCostsRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoTrialCosts");
+            setCategoryId(caseData.getDocumentEvidenceForTrialRes2(), document -> document.getValue().getDocumentUpload(), "RespondentTwoTriaDocumentEvidence");
 
         } else {
-            setCategoryId(caseData.getDocumentDisclosureList(), document -> document.getValue().getDocumentUpload(), "documentDisclosureList");
-            setCategoryId(caseData.getDocumentForDisclosure(), document -> document.getValue().getDocumentUpload(), "documentsForDisclosure");
-            setCategoryId(caseData.getDocumentWitnessStatement(), document -> document.getValue().getWitnessOptionDocument(), "documentWitnessStatement");
-            setCategoryId(caseData.getDocumentWitnessSummary(), document -> document.getValue().getWitnessOptionDocument(), "documentWitnessSummary");
-            setCategoryId(caseData.getDocumentHearsayNotice(), document -> document.getValue().getWitnessOptionDocument(), "documentHearsayNotice");
-            setCategoryId(caseData.getDocumentReferredInStatement(), document -> document.getValue().getDocumentUpload(), "documentReferredInStatement");
-            setCategoryId(caseData.getDocumentExpertReport(), document -> document.getValue().getExpertDocument(), "documentExpertReport");
-            setCategoryId(caseData.getDocumentJointStatement(), document -> document.getValue().getExpertDocument(), "documentJointStatement");
-            setCategoryId(caseData.getDocumentQuestions(), document -> document.getValue().getExpertDocument(), "documentQuestions");
-            setCategoryId(caseData.getDocumentAnswers(), document -> document.getValue().getExpertDocument(), "documentAnswers");
-            setCategoryId(caseData.getDocumentCaseSummary(), document -> document.getValue().getDocumentUpload(), "documentCaseSummary");
-            setCategoryId(caseData.getDocumentSkeletonArgument(), document -> document.getValue().getDocumentUpload(), "documentSkeletonArgument");
-            setCategoryId(caseData.getDocumentAuthorities(), document -> document.getValue().getDocumentUpload(), "documentAuthorities");
-            setCategoryId(caseData.getDocumentCosts(), document -> document.getValue().getDocumentUpload(), "documentCosts");
-            setCategoryId(caseData.getDocumentEvidenceForTrial(), document -> document.getValue().getDocumentUpload(), "documentEvidenceForTrial");
+            setCategoryId(caseData.getDocumentDisclosureList(), document -> document.getValue().getDocumentUpload(), "ApplicantDisclosureList");
+            setCategoryId(caseData.getDocumentForDisclosure(), document -> document.getValue().getDocumentUpload(), "ApplicantDisclosure");
+            setCategoryId(caseData.getDocumentWitnessStatement(), document -> document.getValue().getWitnessOptionDocument(), "ApplicantWitnessStatement");
+            setCategoryId(caseData.getDocumentWitnessSummary(), document -> document.getValue().getWitnessOptionDocument(), "ApplicantWitnessSummary");
+            setCategoryId(caseData.getDocumentHearsayNotice(), document -> document.getValue().getWitnessOptionDocument(), "ApplicantWitnessHearsay");
+            setCategoryId(caseData.getDocumentReferredInStatement(), document -> document.getValue().getDocumentUpload(), "ApplicantWitnessReferred");
+            setCategoryId(caseData.getDocumentExpertReport(), document -> document.getValue().getExpertDocument(), "ApplicantExpertReport");
+            setCategoryId(caseData.getDocumentJointStatement(), document -> document.getValue().getExpertDocument(), "ApplicantExpertJointStatement");
+            setCategoryId(caseData.getDocumentQuestions(), document -> document.getValue().getExpertDocument(), "ApplicantExpertQuestions");
+            setCategoryId(caseData.getDocumentAnswers(), document -> document.getValue().getExpertDocument(), "ApplicantExpertAnswers");
+            setCategoryId(caseData.getDocumentCaseSummary(), document -> document.getValue().getDocumentUpload(), "ApplicantTrialSummary");
+            setCategoryId(caseData.getDocumentSkeletonArgument(), document -> document.getValue().getDocumentUpload(), "ApplicantTrialSkeleton");
+            setCategoryId(caseData.getDocumentAuthorities(), document -> document.getValue().getDocumentUpload(), "ApplicantTrialAuthorities");
+            setCategoryId(caseData.getDocumentCosts(), document -> document.getValue().getDocumentUpload(), "ApplicantTrialDocuments");
+            setCategoryId(caseData.getDocumentEvidenceForTrial(), document -> document.getValue().getDocumentUpload(), "ApplicantTrialDocumentEvidence");
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

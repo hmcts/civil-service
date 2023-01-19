@@ -959,7 +959,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getDocumentForDisclosureRes2().get(0).getValue().getDocumentUpload()
-                       .getCategoryID()).isEqualTo("documentsForDisclosureRes2");
+                       .getCategoryID()).isEqualTo("RespondentTwoDisclosure");
     }
 
     @Test
@@ -984,7 +984,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getDocumentForDisclosureRes2().get(0).getValue().getDocumentUpload()
-                       .getCategoryID()).isEqualTo("documentsForDisclosureRes2");
+                       .getCategoryID()).isEqualTo("RespondentTwoDisclosure");
     }
 
     @Test
@@ -1010,7 +1010,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getDocumentAnswersRes().get(0).getValue().getExpertDocument()
-                       .getCategoryID()).isEqualTo("documentAnswersRes");
+                       .getCategoryID()).isEqualTo("RespondentOneExpertAnswers");
     }
 
     @Test
@@ -1036,7 +1036,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getDocumentQuestionsRes().get(0).getValue().getExpertDocument()
-                       .getCategoryID()).isEqualTo("documentQuestionsRes");
+                       .getCategoryID()).isEqualTo("RespondentOneExpertQuestions");
     }
 
     @Test

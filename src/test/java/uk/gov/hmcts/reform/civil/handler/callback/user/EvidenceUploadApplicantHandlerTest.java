@@ -444,7 +444,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getDocumentHearsayNotice().get(0).getValue().getWitnessOptionDocument()
-                       .getCategoryID()).isEqualTo("documentHearsayNotice");
+                       .getCategoryID()).isEqualTo("ApplicantWitnessHearsay");
     }
 
     @Test
