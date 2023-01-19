@@ -319,7 +319,7 @@ jacocoTestReport.dependsOn {
 
 def versions = [
   junit              : '5.7.0',
-  junitPlatform      : '1.8.1',
+  junitPlatform      : '1.9.1',
   reformLogging      : '5.1.5',
   springBoot         : springBoot.class.package.implementationVersion,
   springStatemachine : '3.0.0',
@@ -465,6 +465,12 @@ dependencies {
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
+
+  testImplementation(platform('org.junit:junit-bom:5.9.1'))
+  testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
+    exclude group: 'junit', module: 'junit'
+    exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+  }
 
 }
 
