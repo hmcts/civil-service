@@ -63,7 +63,7 @@ public class RaisingClaimAgainstLitigantInPersonForSpecNotificationHandler exten
 
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getClaimantSolicitorCaseWillProgressOffline(),
+            notificationsProperties.getClaimantSolicitorSpecCaseWillProgressOffline(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
