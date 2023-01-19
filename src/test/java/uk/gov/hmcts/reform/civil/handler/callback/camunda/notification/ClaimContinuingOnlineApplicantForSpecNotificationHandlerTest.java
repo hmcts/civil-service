@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +14,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -62,8 +60,6 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
     private NotificationsProperties notificationsProperties;
     @MockBean
     private OrganisationService organisationService;
-    @MockBean
-    private FeatureToggleService toggleService;
     @Autowired
     private ClaimContinuingOnlineApplicantForSpecNotificationHandler handler;
 
@@ -75,7 +71,6 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
     @org.junit.Test
     public void ldBlock() {
-        Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
         Assertions.assertTrue(handler.handledEvents().isEmpty());
         Assertions.assertFalse(handler.handledEvents().isEmpty());
     }

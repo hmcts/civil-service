@@ -72,12 +72,11 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
     PrdAdminUserConfiguration userConfig;
     @MockBean
     private Time time;
+    @Autowired
+    private NotifyRoboticsOnContinuousFeedHandler handler;
 
     @Nested
     class ValidJsonPayload {
-
-        @Autowired
-        private NotifyRoboticsOnContinuousFeedHandler handler;
 
         @Test
         void shouldNotifyRobotics_whenNoSchemaErrors() {
@@ -93,7 +92,6 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentAdmitPartOfClaimFastTrack()
                 .build();
-            when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
             caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             handler.handle(params);
@@ -107,8 +105,6 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
 
         @MockBean
         private JsonSchemaValidationService validationService;
-        @Autowired
-        private NotifyRoboticsOnContinuousFeedHandler handler;
 
         @Test
         void shouldThrowJsonSchemaValidationException_whenSchemaErrors() {

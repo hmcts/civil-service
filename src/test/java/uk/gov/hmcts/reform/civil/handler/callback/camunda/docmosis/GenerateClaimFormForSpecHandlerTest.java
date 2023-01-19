@@ -85,7 +85,6 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
 
     @Test
     public void ldBlock() {
-        when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
         Assert.assertTrue(handler.handledEvents().isEmpty());
         Assert.assertFalse(handler.handledEvents().isEmpty());
     }

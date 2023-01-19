@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -72,8 +71,6 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
     @MockBean
     private OrganisationService organisationService;
     @MockBean
-    private FeatureToggleService toggleService;
-    @MockBean
     private PinInPostConfiguration pinInPostConfiguration;
     @MockBean
     private BulkPrintService bulkPrintService;
@@ -91,7 +88,6 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
 
     @org.junit.Test
     public void ldBlock() {
-        when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
         assertTrue(handler.handledEvents().isEmpty());
         assertFalse(handler.handledEvents().isEmpty());
     }

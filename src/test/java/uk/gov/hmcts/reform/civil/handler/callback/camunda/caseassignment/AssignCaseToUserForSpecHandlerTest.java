@@ -56,7 +56,6 @@ class AssignCaseToUserForSpecHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void ldBlock() {
-        when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
         Assert.assertTrue(handler.handledEvents().isEmpty());
         Assert.assertFalse(handler.handledEvents().isEmpty());
     }

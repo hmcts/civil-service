@@ -155,7 +155,6 @@ class RoboticsNotificationServiceTest {
                 .respondent2Represented(YES)
                 .build();
         }
-        when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
         when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
@@ -284,7 +283,6 @@ class RoboticsNotificationServiceTest {
             ).build())
             .build();
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(roboticsCaseData);
-        when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
         when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
 
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
@@ -327,7 +325,6 @@ class RoboticsNotificationServiceTest {
             ).build())
             .build();
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(roboticsCaseData);
-        when(featureToggleService.isLrSpecEnabled()).thenThrow(new RuntimeException());
         when(featureToggleService.isSpecRpaContinuousFeedEnabled()).thenReturn(true);
 
         boolean multiPartyScenario = isMultiPartyScenario(caseData);

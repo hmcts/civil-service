@@ -101,7 +101,6 @@ class StateFlowEngineTest {
     @BeforeEach
     void setup() {
         when(featureToggleService.isRpaContinuousFeedEnabled()).thenReturn(true);
-        when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
     }
 
     @Nested

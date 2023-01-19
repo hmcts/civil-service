@@ -56,10 +56,6 @@ public class FeatureToggleService {
         );
     }
 
-    public boolean isLrSpecEnabled() {
-        return isFeatureEnabled("specified-lr-journey");
-    }
-
     public boolean isSdoEnabled() {
         return isFeatureEnabled("enableSDO");
     }

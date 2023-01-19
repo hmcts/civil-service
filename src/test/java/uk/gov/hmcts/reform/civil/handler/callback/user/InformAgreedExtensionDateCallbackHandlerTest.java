@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -80,9 +79,6 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
 
     @MockBean
     private Time time;
-
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @MockBean
     private CoreCaseUserService coreCaseUserService;
@@ -286,7 +282,6 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
                                                        .SPEC_ACKNOWLEDGEMENT_OF_SERVICE)
                                      .build())
                 .build();
-            when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
             when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -529,7 +524,6 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
                 .respondent1ResponseDeadline(responseDeadline)
                 .build().toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM)
                 .build();
-            when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);

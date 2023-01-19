@@ -54,8 +54,7 @@ public class RoboticsNotificationService {
 
     private boolean canSendEmailSpec() {
         try {
-            return toggleService.isLrSpecEnabled()
-                && toggleService.isSpecRpaContinuousFeedEnabled();
+            return toggleService.isSpecRpaContinuousFeedEnabled();
         } catch (Throwable e) {
             log.error("Exception on launchdarkly check", e);
             return false;

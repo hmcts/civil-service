@@ -178,7 +178,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     public void ldBlock() {
-        Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
         Assertions.assertTrue(handler.handledEvents().isEmpty());
         Assertions.assertFalse(handler.handledEvents().isEmpty());
     }
