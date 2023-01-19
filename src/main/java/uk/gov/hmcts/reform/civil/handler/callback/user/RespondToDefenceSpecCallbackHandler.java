@@ -148,13 +148,20 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return updatedCaseData.build();
     }
 
+    private boolean isPartPaymentRejectedOrItsFullDefenceResponse(CaseData caseData) {
+        if(NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())
+            || (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)
+            && !(NO.equals(caseData.getApplicant1ProceedWithClaim()))
+            && !(NO.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())))) {
+            return true;
+        }
+        return false;
+    }
+
     private CaseData setApplicantDefenceResponseDocFlag(CaseData caseData) {
         var updatedCaseData = caseData.toBuilder();
 
-        if (NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())
-            || (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)
-                && !(NO.equals(caseData.getApplicant1ProceedWithClaim()))
-                && !(NO.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())))) {
+        if (isPartPaymentRejectedOrItsFullDefenceResponse(caseData)) {
             updatedCaseData.applicantDefenceResponseDocument(YES);
         } else {
             updatedCaseData.applicantDefenceResponseDocument(NO);
