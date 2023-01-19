@@ -1273,6 +1273,16 @@ class FlowPredicateTest {
         }
 
         @Test
+        void shouldReturnTrue_whenCaseDataAtStateTakenOfflineAfterClaimIssueSpec() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineByStaff()
+                .setClaimNotificationDate()
+                .setSuperClaimTypeToSpecClaim().build();
+
+            assertTrue(takenOfflineByStaffAfterClaimIssue.test(caseData));
+        }
+
+        @Test
         void shouldReturnTrue_whenCaseDataAtStateTakenOfflineAfterClaimNotified() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterClaimNotified().build();
             assertTrue(takenOfflineByStaffAfterClaimNotified.test(caseData));
