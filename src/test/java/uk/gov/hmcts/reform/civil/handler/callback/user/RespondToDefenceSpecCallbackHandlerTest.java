@@ -391,10 +391,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MidEventCallbackSetApplicantRoutesFlag {
 
-        private static final String PAGE_ID = "set-applicant-route_flags";
+        private static final String PAGE_ID = "set-applicant-route-flags";
 
         @Test
-        void shouldSetApplicantDefenceRespDoc_whenClaimantRejectPartPaymentPlan() {
+        void shouldSetApplicantRouteFlag_whenClaimantRejectPartPaymentPlan() {
             CaseData caseData = CaseDataBuilder.builder()
                 .getApplicant1AcceptAdmitAmountPaidSpec(NO)
                 .build();
@@ -403,12 +403,28 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNull();
-            assertThat(response.getData().get("applicantDefenceResponseDocument"))
+            assertThat(response.getData().get("applicantDefenceResponseDocumentAndDQFlag"))
                 .isEqualTo("Yes");
         }
 
         @Test
-        void shouldNotSetApplicantDefenceRespDoc_whenClaimantAcceptPartPaymentPlan() {
+        void shouldSetApplicantRouteFlag_whenItsFullDefence() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .applicant1ProceedWithClaim(YES)
+                .applicant1ProceedWithClaimSpec2v1(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData().get("applicantDefenceResponseDocumentAndDQFlag"))
+                .isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldNotSetApplicantRouteFlag_whenClaimantAcceptPartPaymentPlan() {
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .getApplicant1AcceptAdmitAmountPaidSpec(YES)
@@ -418,7 +434,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNull();
-            assertThat(response.getData().get("applicantDefenceResponseDocument"))
+            assertThat(response.getData().get("applicantDefenceResponseDocumentAndDQFlag"))
                 .isEqualTo("No");
         }
     }

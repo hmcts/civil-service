@@ -95,7 +95,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
             .put(callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag)
-            .put(callbackKey(V_1, MID, "set-applicant-route_flags"), this::setApplicantRouteFlags)
+            .put(callbackKey(V_1, MID, "set-applicant-route-flags"), this::setApplicantRouteFlags)
             .put(callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false))
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true))
             .put(callbackKey(ABOUT_TO_START), this::populateCaseData)
@@ -162,9 +162,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         var updatedCaseData = caseData.toBuilder();
 
         if (isPartPaymentRejectedOrItsFullDefenceResponse(caseData)) {
-            updatedCaseData.applicantDefenceResponseDocument(YES);
+            updatedCaseData.applicantDefenceResponseDocumentAndDQFlag(YES);
         } else {
-            updatedCaseData.applicantDefenceResponseDocument(NO);
+            updatedCaseData.applicantDefenceResponseDocumentAndDQFlag(NO);
         }
         return updatedCaseData.build();
     }
