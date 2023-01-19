@@ -149,7 +149,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private boolean isPartPaymentRejectedOrItsFullDefenceResponse(CaseData caseData) {
-        if(NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())
+        if (NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())
             || (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)
             && !(NO.equals(caseData.getApplicant1ProceedWithClaim()))
             && !(NO.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())))) {
