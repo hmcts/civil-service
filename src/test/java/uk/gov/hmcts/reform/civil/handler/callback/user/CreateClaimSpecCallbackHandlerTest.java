@@ -174,6 +174,17 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+    @Test
+    void shouldAddFeatureToggleToData_whenInvoked() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getData())
+            .extracting("featureToggleWA")
+            .isEqualTo("WA3.5");
+    }
+
     @Nested
     class MidEventEligibilityCallback {
 
