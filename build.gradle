@@ -144,7 +144,7 @@ allprojects {
       url "https://jitpack.io"
     }
     maven {
-      url  "https://repo.spring.io/libs-milestone"
+      url  "https://repo.maven.apache.org/maven2"
     }
     maven {
       url "https://jitpack.io"
