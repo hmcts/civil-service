@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
@@ -85,6 +86,9 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         + "\n"
         + "This action cannot currently be performed because it has either already"
         + " been completed or another action must be completed first.";
+
+    public static final String DOC_SERVED_DATE_OLDER_THAN_14DAYS =
+        "Date of Service should not be more than 14 days old";
 
     @Nested
     class AboutToStartCallback {
@@ -205,13 +209,12 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldThrowError_whenNotifyingDate_futureDate() {
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v1LiP(CertificateOfService.builder()
                                                 .cosDateOfServiceForDefendant(LocalDate.now().plusDays(2))
                                                 .build())
                 .build();
-
+            when(time.now()).thenReturn(LocalDateTime.now());
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -219,25 +222,18 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldThrowError_when_cosDefendant1isNull() {
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimNotified1v1LiP(null)
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors()).isEmpty();
-        }
-
-        @Test
         void shouldNot_ThrowError_whenNotifyingDate_isCurrentDate() {
+            ArrayList<String> cosUIStatement = new ArrayList<>();
+            cosUIStatement.add("CERTIFIED");
+            LocalDate cosNotifyDate = LocalDate.now();
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v1LiP(CertificateOfService.builder()
                                                 .cosDateOfServiceForDefendant(LocalDate.now())
                                                 .build())
                 .build();
+            when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
+                .thenReturn(cosNotifyDate.plusDays(14).atTime(END_OF_BUSINESS_DAY));
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -247,15 +243,18 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNot_ThrowError_whenNotifyingDate_isPastDate() {
+        void shouldNot_ThrowError_whenNotifyingDate_isPastDate_notOlderThan14days() {
+            LocalDate cosNotifyDate = LocalDate.now().minusDays(3);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v1LiP(CertificateOfService.builder()
-                                                .cosDateOfServiceForDefendant(LocalDate.now().minusDays(3))
+                                                .cosDateOfServiceForDefendant(cosNotifyDate)
                                                 .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
+            when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
+                .thenReturn(cosNotifyDate.plusDays(14).atTime(16, 0));
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isEmpty();
@@ -267,6 +266,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidEventValidateCosDefendant2Callback {
 
         private static final String PAGE_ID = "validateCosNotifyClaimDef2";
+        LocalDateTime claimDetailsNotificationDeadline = LocalDateTime.of(2021, 5, 15, 16, 0, 0);
 
         @Test
         void shouldThrowError_whenNotifyingDate_futureDate() {
@@ -277,35 +277,74 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                 .cosDateOfServiceForDefendant(LocalDate.now().plusDays(2))
                                                 .build())
                 .build();
-
+            when(time.now()).thenReturn(LocalDateTime.now());
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).contains(DOC_SERVED_DATE_IN_FUTURE);
         }
 
         @Test
-        void shouldThrowError_when_cosDefendant1isNull() {
+        void should_ThrowError_whenCosServiceDate_is14thDay_afterBusinessDayEndTime() {
+
+            LocalDate cosNotifyDate = LocalDate.of(2021, 5, 1);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
-                .cosNotifyClaimDefendant2(null)
+                .cosNotifyClaimDefendant2(CertificateOfService.builder()
+                                              .cosDateOfServiceForDefendant(cosNotifyDate)
+                                              .build())
                 .build();
+
+            when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 15, 16, 05));
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(16, 05)))
+                .thenReturn(claimDetailsNotificationDeadline);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors()).isEmpty();
+
+            assertThat(response.getErrors()).contains(DOC_SERVED_DATE_OLDER_THAN_14DAYS);
         }
 
         @Test
         void shouldNot_ThrowError_whenNotifyingDate_isCurrentDate() {
+            ArrayList<String> cosUIStatement = new ArrayList<>();
+            cosUIStatement.add("CERTIFIED");
+            LocalDate cosNotifyDate = LocalDate.now();
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
                 .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                                .cosDateOfServiceForDefendant(LocalDate.now())
+                                                .cosDateOfServiceForDefendant(cosNotifyDate)
                                                 .build())
                 .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
+                .thenReturn(cosNotifyDate.plusDays(14).atTime(END_OF_BUSINESS_DAY));
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNot_ThrowError_whenCosServiceDate_notOlderThan14Days() {
+            LocalDate cosNotifyDate = LocalDate.now().minusDays(5);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified1v2RespondentLiP()
+                .cosNotifyClaimDefendant2(CertificateOfService.builder()
+                                                .cosDateOfServiceForDefendant(cosNotifyDate)
+                                                .build())
+                .build();
+
+            when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
+
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
+                .thenReturn(cosNotifyDate.plusDays(14).atTime(END_OF_BUSINESS_DAY));
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -315,13 +354,22 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldNot_ThrowError_whenNotifyingDate_isPastDate() {
+        void shouldNot_ThrowError_whenCosServiceDate_is14thDay_beforeBusinessDayEndTime() {
+
+            LocalDate cosNotifyDate = LocalDate.of(2021, 5, 1);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
                 .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                                .cosDateOfServiceForDefendant(LocalDate.now().minusDays(3))
-                                                .build())
+                                              .cosDateOfServiceForDefendant(cosNotifyDate)
+                                              .build())
                 .build();
+
+            when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 15, 15, 05));
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
+                .thenReturn(claimDetailsNotificationDeadline);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -368,7 +416,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             }
 
             @Test
-            void shouldSetClaimDetailsNotificationAsNotificationDeadlineAt_when14DaysIsAfterThe4MonthDeadline() {
+            void shouldSetClaimNotificationAsNotificationDeadlineAt_when14DaysIsAfterThe4MonthDeadline() {
                 LocalDateTime claimNotificationDeadline = notificationDate.minusDays(5);
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
                     .claimNotificationDeadline(claimNotificationDeadline)
@@ -380,8 +428,8 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
-                    .containsEntry("claimDetailsNotificationDeadline", deadline.format(ISO_DATE_TIME))
-                    .containsEntry("nextDeadline", deadline.format(ISO_DATE));
+                    .containsEntry("claimDetailsNotificationDeadline", claimNotificationDeadline.format(ISO_DATE_TIME))
+                    .containsEntry("nextDeadline", claimNotificationDeadline.format(ISO_DATE));
             }
 
             @Test
@@ -404,7 +452,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Nested
         class SubmittedOnDeadlineDay {
 
-            LocalDateTime claimNotificationDeadline = LocalDateTime.of(2021, 4, 6, 23, 59, 59);
+            LocalDateTime claimNotificationDeadline = LocalDateTime.of(2021, 4, 16, 23, 59, 59);
             LocalDateTime claimDetailsNotificationDeadline = LocalDateTime.of(2021, 4, 15, 15, 15, 59);
             LocalDateTime expectedDeadline = claimDetailsNotificationDeadline;
 
@@ -442,6 +490,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
                     .claimNotificationDeadline(claimNotificationDeadline)
                     .build();
+
                 CallbackParams params = CallbackParamsBuilder.builder().of(
                     CallbackType.ABOUT_TO_SUBMIT,
                     caseData
@@ -458,34 +507,40 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDate cosNotifyDate = LocalDate.of(2021, 4, 2);
 
                 when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
-
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atStartOfDay()))
+                when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified1v2RespondentLiP()
                     .cosNotifyClaimDefendant1(CertificateOfService.builder()
                                                   .cosDateOfServiceForDefendant(cosNotifyDate)
                                                   .build())
+                    .claimNotificationDeadline(claimNotificationDeadline)
                     .addRespondent2(YesOrNo.YES)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
                     CallbackType.ABOUT_TO_SUBMIT,
                     caseData
                 ).build();
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData responseData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(responseData.getCosNotifyClaimDefendant1()
+                               .getCosSenderStatementOfTruthLabel().contains("CERTIFIED"));
                 assertThat(response.getData())
-                    .containsEntry("claimDetailsNotificationDeadline",
-                                   expectedDeadline.format(ISO_DATE_TIME));
+                    .containsEntry(
+                        "claimDetailsNotificationDeadline",
+                        expectedDeadline.format(ISO_DATE_TIME)
+                    );
             }
 
             @Test
             void shouldSetDetailsNotificationDeadline_Cos_1v2_whenLipDefendant2() {
 
                 LocalDate cosNotifyDate = LocalDate.of(2021, 4, 2);
-
                 when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atStartOfDay()))
+                when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified1v2RespondentLiP()
@@ -495,12 +550,17 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1Represented(YesOrNo.YES)
                     .respondent2Represented(YesOrNo.NO)
                     .addRespondent2(YesOrNo.YES)
+                    .claimNotificationDeadline(claimNotificationDeadline)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
                     CallbackType.ABOUT_TO_SUBMIT,
                     caseData
                 ).build();
+
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData responseData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(responseData.getCosNotifyClaimDefendant2()
+                               .getCosSenderStatementOfTruthLabel().contains("CERTIFIED"));
 
                 assertThat(response.getData())
                     .containsEntry("claimDetailsNotificationDeadline", expectedDeadline.format(ISO_DATE_TIME));
@@ -509,11 +569,12 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldSetDetailsNotificationDeadline_Cos_1v2_bothDefendantsLip_def1NotifiedEarlier() {
 
-                LocalDate cosDef1NotifyDate = LocalDate.of(2021, 4, 2);
+                LocalDate cosDef1NotifyDate = LocalDate.of(2021, 5, 1);
                 LocalDate cosDef2NotifyDate = LocalDate.of(2021, 5, 2);
+                when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
 
                 when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDef1NotifyDate.atStartOfDay()))
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDef1NotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified1v2RespondentLiP()
@@ -526,6 +587,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1Represented(YesOrNo.NO)
                     .respondent2Represented(YesOrNo.NO)
                     .addRespondent2(YesOrNo.YES)
+                    .claimNotificationDeadline(claimNotificationDeadline)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
                     CallbackType.ABOUT_TO_SUBMIT,
@@ -541,10 +603,11 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldSetDetailsNotificationDeadline_Cos_1v2_bothDefendantsLip_def2NotifiedEarlier() {
 
                 LocalDate cosDef1NotifyDate = LocalDate.of(2021, 5, 2);
-                LocalDate cosDef2NotifyDate = LocalDate.of(2021, 4, 2);
+                LocalDate cosDef2NotifyDate = LocalDate.of(2021, 4, 28);
 
+                when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
                 when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDef2NotifyDate.atStartOfDay()))
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDef2NotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified1v2RespondentLiP()
@@ -557,6 +620,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1Represented(YesOrNo.NO)
                     .respondent2Represented(YesOrNo.NO)
                     .addRespondent2(YesOrNo.YES)
+                    .claimNotificationDeadline(claimNotificationDeadline)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
                     CallbackType.ABOUT_TO_SUBMIT,
@@ -574,8 +638,9 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDate cosDef1NotifyDate = LocalDate.of(2021, 4, 2);
                 LocalDate cosDef2NotifyDate = LocalDate.of(2021, 4, 2);
 
+                when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
                 when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDef1NotifyDate.atStartOfDay()))
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDef1NotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified1v2RespondentLiP()
@@ -588,6 +653,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1Represented(YesOrNo.NO)
                     .respondent2Represented(YesOrNo.NO)
                     .addRespondent2(YesOrNo.YES)
+                    .claimNotificationDeadline(claimNotificationDeadline)
                     .build();
                 CallbackParams params = CallbackParamsBuilder.builder().of(
                     CallbackType.ABOUT_TO_SUBMIT,
@@ -602,11 +668,11 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldSetDetailsNotificationDeadline_Cos_1v1_whenLipDefendant() {
 
-                LocalDate cosNotifyDate = LocalDate.of(2021, 4, 2);
-
+                LocalDate cosNotifyDate = LocalDate.of(2021, 4, 26);
+                when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
                 when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
 
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atStartOfDay()))
+                when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
                 CaseData caseData = CaseDataBuilder.builder()
