@@ -49,8 +49,6 @@ public class CertificateOfService {
     private String cosSenderFirm;
     @JsonProperty("cosSenderStatementOfTruthLabel")
     private List<String> cosSenderStatementOfTruthLabel;
-    @JsonProperty("cosUISenderStatementOfTruthLabel")
-    private List<String> cosUISenderStatementOfTruthLabel;
     @JsonProperty("cosDocSaved")
     private YesOrNo cosDocSaved;
 }
