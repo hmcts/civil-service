@@ -3891,6 +3891,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder setClaimNotificationDate() {
+        claimNotificationDate = issueDate.plusDays(1).atStartOfDay();
+        return this;
+    }
+
     public CaseDataBuilder setSuperClaimTypeToUnspecClaim() {
         this.superClaimType = UNSPEC_CLAIM;
         return this;
