@@ -41,8 +41,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SP
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_PAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
@@ -50,8 +51,11 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_PIN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_CUI_FOR_DEADLINE_EXTENSION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_CUI_FOR_DEADLINE_EXTENSION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
@@ -174,8 +178,9 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
-                EVIDENCE_UPLOAD,
-                migrateCase
+                EVIDENCE_UPLOAD_APPLICANT,
+                migrateCase,
+                EVIDENCE_UPLOAD_RESPONDENT
             )
         ),
 
@@ -199,8 +204,9 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
-                EVIDENCE_UPLOAD,
-                migrateCase
+                EVIDENCE_UPLOAD_APPLICANT,
+                migrateCase,
+                EVIDENCE_UPLOAD_RESPONDENT
             )
         ),
 
@@ -230,9 +236,10 @@ public class FlowStateAllowedEventService {
                 HEARING_FEE_UNPAID,
                 HEARING_FEE_PAID,
                 HEARING_SCHEDULED,
-                EVIDENCE_UPLOAD,
+                SERVICE_REQUEST_RECEIVED,
+                EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
-                SERVICE_REQUEST_RECEIVED
+                EVIDENCE_UPLOAD_RESPONDENT
             )
         ),
 
@@ -682,8 +689,11 @@ public class FlowStateAllowedEventService {
                 ACKNOWLEDGEMENT_OF_SERVICE,
                 INFORM_AGREED_EXTENSION_DATE,
                 INFORM_AGREED_EXTENSION_DATE_SPEC,
+                NOTIFY_DEFENDANT_CUI_FOR_DEADLINE_EXTENSION,
+                NOTIFY_CLAIMANT_CUI_FOR_DEADLINE_EXTENSION,
                 DEFENDANT_RESPONSE_SPEC,
                 DEFENDANT_RESPONSE_CUI,
+                RESET_PIN,
                 DISMISS_CLAIM,
                 DISCONTINUE_CLAIM,
                 WITHDRAW_CLAIM,
@@ -693,8 +703,9 @@ public class FlowStateAllowedEventService {
                 HEARING_SCHEDULED,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
-                EVIDENCE_UPLOAD,
-                migrateCase
+                EVIDENCE_UPLOAD_APPLICANT,
+                migrateCase,
+                EVIDENCE_UPLOAD_RESPONDENT
             )
         ),
         entry(
@@ -707,6 +718,7 @@ public class FlowStateAllowedEventService {
                 INFORM_AGREED_EXTENSION_DATE_SPEC,
                 DEFENDANT_RESPONSE_SPEC,
                 DEFENDANT_RESPONSE_CUI,
+                RESET_PIN,
                 NOTIFY_DEFENDANT_OF_CLAIM_DETAILS,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,
@@ -721,8 +733,9 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 HEARING_SCHEDULED,
                 EVIDENCE_UPLOAD_JUDGE,
-                EVIDENCE_UPLOAD,
-                migrateCase
+                EVIDENCE_UPLOAD_APPLICANT,
+                migrateCase,
+                EVIDENCE_UPLOAD_RESPONDENT
             )
         ),
         entry(
@@ -937,6 +950,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 DEFENDANT_RESPONSE_SPEC,
                 DEFENDANT_RESPONSE_CUI,
+                RESET_PIN,
                 ACKNOWLEDGE_CLAIM,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
@@ -960,6 +974,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 DEFENDANT_RESPONSE_SPEC,
                 DEFENDANT_RESPONSE_CUI,
+                RESET_PIN,
                 migrateCase
             )
         )

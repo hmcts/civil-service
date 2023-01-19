@@ -86,6 +86,10 @@ public class FeatureToggleService {
         return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), false);
     }
 
+    public boolean isCaseFlagsEnabled() {
+        return internalClient.boolVariation("case-flags", createLDUser().build(), false);
+    }
+
     public boolean isPinInPostEnabled() {
         return internalClient.boolVariation("pin-in-post", createLDUser().build(), false);
     }
