@@ -294,6 +294,7 @@ jacocoTestReport.dependsOn {
   subprojects*.test
 }
 
+
 def versions = [
   junit              : '5.7.0',
   junitPlatform      : '1.8.1',
