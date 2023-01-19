@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -1437,7 +1436,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondentResponseIsSame(YesOrNo.NO)
                     .systemGeneratedCaseDocuments(new ArrayList<>())
                     .build();
-                Assert.assertThrows(
+                Assertions.assertThrows(
                     IllegalArgumentException.class,
                     () -> generator.generateDQFor1v2DiffSol(caseData, BEARER_TOKEN, null)
                 );
@@ -1462,7 +1461,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondent2ResponseDate(null)
                     .systemGeneratedCaseDocuments(new ArrayList<>())
                     .build();
-                Assert.assertThrows(
+                Assertions.assertThrows(
                     NullPointerException.class,
                     () -> generator.generateDQFor1v2DiffSol(caseData, BEARER_TOKEN, "TWO")
                 );
