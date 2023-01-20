@@ -129,6 +129,6 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
             && caseData.getRespondentSolicitor1EmailAddress() == null)
             || ((!isRespondentSolicitorRegistered(caseData)
             && caseData.getRespondent1().getPartyEmail() == null))
-        );
+            );
     }
 }
