@@ -561,7 +561,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
-            .experts(getExperts(dq))
+            .experts("SMALL_CLAIM".equals(caseData.getResponseClaimTrack()) ? getSmallClaimExperts(dq, caseData) :
+                         getExperts(dq))
             .witnesses(getWitnesses(dq))
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
@@ -587,7 +588,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
-            .experts(getExperts(dq))
+            .experts("SMALL_CLAIM".equals(caseData.getResponseClaimTrack()) ? getSmallClaimExperts(dq, caseData) :
+                         getExperts(dq))
             .witnesses(getWitnesses(dq))
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
