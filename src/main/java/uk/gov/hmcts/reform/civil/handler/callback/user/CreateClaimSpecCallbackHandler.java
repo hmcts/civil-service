@@ -201,10 +201,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(MID, "validate-spec-defendant2-legal-rep-email"), this::validateSpecRespondent2RepEmail)
             .build();
     }
-//TODO: you need to split the code from the code reuvew into V1 callbacks, it looks like its done here but they both
-// have the same code, i think thats wrong, send it to doug for lols, the code in the v1 needs to be what the if
-// statement is basically, then once theye all split the build should go green, then you can look at pointing the PR
-// to camunda and look at getting ccd working
+
     @Override
     public List<CaseEvent> handledEvents() {
         if (toggleService.isLrSpecEnabled()) {
