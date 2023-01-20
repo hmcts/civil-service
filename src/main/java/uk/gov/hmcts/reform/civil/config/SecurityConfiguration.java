@@ -29,6 +29,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "caseworker-civil",
         "caseworker-civil-solicitor",
         "caseworker",
+        "caseworker-caa",
+        "caseworker-approver",
         "citizen"
     };
 
