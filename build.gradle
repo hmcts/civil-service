@@ -322,7 +322,7 @@ def versions = [
   junitPlatform      : '1.9.1',
   reformLogging      : '5.1.5',
   springBoot         : springBoot.class.package.implementationVersion,
-  springStatemachine : '3.0.0',
+  springStatemachine : '3.0.0.M2',
   springfoxSwagger   : '2.9.2',
   lombok             : '1.18.24',
   pact               : '3.5.24',
@@ -465,12 +465,6 @@ dependencies {
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
-
-  testImplementation(platform('org.junit:junit-bom:5.9.1'))
-  testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
-    exclude group: 'junit', module: 'junit'
-    exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-  }
 
 }
 
