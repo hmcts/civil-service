@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -16,6 +14,9 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.validation.DeadlineExtensionValidator;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
@@ -60,7 +61,7 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest {
     }
 
     @Test
-    void shouldContainExtendResponseDeadlineEvent_whenPinAndPostEnabled(){
+    void shouldContainExtendResponseDeadlineEvent_whenPinAndPostEnabled() {
         given(toggleService.isPinInPostEnabled()).willReturn(true);
         assertTrue(handler.handledEvents().contains(CaseEvent.EXTEND_RESPONSE_DEADLINE));
     }
