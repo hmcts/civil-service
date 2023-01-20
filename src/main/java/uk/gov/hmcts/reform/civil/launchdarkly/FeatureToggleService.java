@@ -31,11 +31,6 @@ public class FeatureToggleService {
         return internalClient.boolVariation(feature, user, false);
     }
 
-    public boolean isOrganisationOnboarded(String orgId) {
-        LDUser ldUser = createLDUser().custom("orgId", orgId).build();
-        return internalClient.boolVariation("isOrganisationOnboarded", ldUser, false);
-    }
-
     public boolean isRpaContinuousFeedEnabled() {
         return internalClient.boolVariation("rpaContinuousFeed", createLDUser().build(), false);
     }
