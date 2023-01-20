@@ -67,7 +67,7 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest {
     }
 
     @Test
-    void shouldNotContaineExendResponseDeadlineEvent_whenPinAndPostDisabled() {
+    void shouldNotContainExendResponseDeadlineEvent_whenPinAndPostDisabled() {
         given(toggleService.isPinInPostEnabled()).willReturn(false);
         assertFalse(handler.handledEvents().contains(CaseEvent.EXTEND_RESPONSE_DEADLINE));
     }
