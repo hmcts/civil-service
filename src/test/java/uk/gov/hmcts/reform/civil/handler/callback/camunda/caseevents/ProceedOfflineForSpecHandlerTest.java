@@ -15,7 +15,6 @@ class ProceedOfflineForSpecHandlerTest {
     @Autowired
     private ProceedOfflineForSpecCallbackHandler handler;
 
-
     @Test
     void ldBlock() {
         Assertions.assertTrue(handler.handledEvents().isEmpty());

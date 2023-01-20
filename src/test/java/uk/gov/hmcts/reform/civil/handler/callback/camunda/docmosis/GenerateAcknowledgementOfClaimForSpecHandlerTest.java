@@ -20,7 +20,6 @@ class GenerateAcknowledgementOfClaimForSpecHandlerTest {
     @MockBean
     private AcknowledgementOfClaimGeneratorForSpec acknowledgementOfClaimGenerator;
 
-
     @Test
     void ldBlock() {
         Assertions.assertTrue(handler.handledEvents().isEmpty());

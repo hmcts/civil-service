@@ -44,7 +44,6 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest {
     @MockBean
     private UserService userService;
 
-
     @Test
     void ldBlock() {
         Assertions.assertTrue(handler.handledEvents().isEmpty());

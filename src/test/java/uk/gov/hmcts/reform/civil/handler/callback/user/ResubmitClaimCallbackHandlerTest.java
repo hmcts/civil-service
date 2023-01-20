@@ -38,7 +38,6 @@ class ResubmitClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private ExitSurveyContentService exitSurveyContentService;
 
-
     @Nested
     class AboutToSubmitCallback {
 

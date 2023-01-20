@@ -20,7 +20,6 @@ class ClaimIssueForSpecHandlerTest {
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
 
-
     @Test
     void ldBlock() {
         Assertions.assertTrue(handler.handledEvents().isEmpty());
