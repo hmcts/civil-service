@@ -1,15 +1,17 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.Assert;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -43,6 +45,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.fetchDefendantName;
 
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     AgreedExtensionDateApplicantForSpecNotificationHandler.class,
     JacksonAutoConfiguration.class
@@ -67,8 +70,8 @@ public class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallback
     @Test
     public void ldBlock() {
         Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assert.assertTrue(handler.handledEvents().isEmpty());
-        Assert.assertFalse(handler.handledEvents().isEmpty());
+        Assertions.assertTrue(handler.handledEvents().isEmpty());
+        Assertions.assertFalse(handler.handledEvents().isEmpty());
     }
 
     @Nested
@@ -105,7 +108,7 @@ public class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallback
                     caseData.getRespondentSolicitor1AgreedDeadlineExtension());
             }
 
-            @Test
+            @org.junit.jupiter.api.Test
             void shouldNotifyApplicantSolicitor_whenInvoked() {
                 invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_FOR_SPEC");
 
@@ -117,7 +120,7 @@ public class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallback
                 );
             }
 
-            @Test
+            @org.junit.jupiter.api.Test
             void shouldNotifyRespondentSolicitor1_whenInvoked() {
                 invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_FOR_SPEC_CC");
 
@@ -129,7 +132,7 @@ public class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallback
                 );
             }
 
-            @Test
+            @org.junit.jupiter.api.Test
             void shouldNotifyRespondentSolicitor2_whenInvoked() {
                 invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_RESPONDENT2_FOR_AGREED_EXTENSION_DATE_FOR_SPEC_CC");
 
@@ -209,7 +212,7 @@ public class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallback
                 );
             }
 
-            @Test
+            @org.junit.jupiter.api.Test
             void shouldNotifyWithCorrectExtensionDate_when1v2DSRespondentSolicitor1ExtendsFirst() {
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
@@ -230,7 +233,7 @@ public class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallback
                 );
             }
 
-            @Test
+            @org.junit.jupiter.api.Test
             void shouldNotifyWithCorrectExtensionDate_whenRespondentSolicitor2ExtendsFirst() {
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
@@ -252,7 +255,7 @@ public class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallback
                 );
             }
 
-            @Test
+            @org.junit.jupiter.api.Test
             void shouldNotifyWithCorrectExtensionDate_when1v2SameSolicitorExtends() {
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
@@ -302,7 +305,7 @@ public class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallback
         }
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
             "NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_FOR_SPEC").build()).build()))
