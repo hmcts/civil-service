@@ -47,7 +47,7 @@ public class FailedPaymentApplicantForSpecNotificationHandlerTest extends BaseCa
     @Autowired
     private FailedPaymentApplicantForSpecNotificationHandler handler;
 
-    @org.junit.Test
+    @Test
     public void ldBlock() {
         Assertions.assertTrue(handler.handledEvents().isEmpty());
         Assertions.assertFalse(handler.handledEvents().isEmpty());
