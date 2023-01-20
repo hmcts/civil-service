@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
     JacksonAutoConfiguration.class
 })
 public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
+
     @MockBean
     private NotificationService notificationService;
     @MockBean
