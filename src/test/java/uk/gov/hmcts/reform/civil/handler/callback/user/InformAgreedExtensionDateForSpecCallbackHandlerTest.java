@@ -1,12 +1,13 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -15,6 +16,8 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.validation.DeadlineExtensionValidator;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {
     InformAgreedExtensionDateForSpecCallbackHandler.class,
@@ -51,8 +54,20 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest {
 
     @Test
     void ldBlock() {
-        Mockito.when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assertions.assertTrue(handler.handledEvents().isEmpty());
-        Assertions.assertFalse(handler.handledEvents().isEmpty());
+        when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
+        assertTrue(handler.handledEvents().isEmpty());
+        assertFalse(handler.handledEvents().isEmpty());
+    }
+
+    @Test
+    void shouldContainExtendResponseDeadlineEvent_whenPinAndPostEnabled(){
+        given(toggleService.isPinInPostEnabled()).willReturn(true);
+        assertTrue(handler.handledEvents().contains(CaseEvent.EXTEND_RESPONSE_DEADLINE));
+    }
+
+    @Test
+    void shouldNotContaineExendResponseDeadlineEvent_whenPinAndPostDisabled() {
+        given(toggleService.isPinInPostEnabled()).willReturn(false);
+        assertFalse(handler.handledEvents().contains(CaseEvent.EXTEND_RESPONSE_DEADLINE));
     }
 }
