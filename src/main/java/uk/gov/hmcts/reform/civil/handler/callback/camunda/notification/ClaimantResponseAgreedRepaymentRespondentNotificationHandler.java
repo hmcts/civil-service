@@ -59,11 +59,7 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
     private CallbackResponse notifyRespondent1ForAgreedRepayment(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if ((isRespondentSolicitorRegistered(caseData)
-            && caseData.getRespondentSolicitor1EmailAddress() == null)
-            || ((!isRespondentSolicitorRegistered(caseData)
-            && caseData.getRespondent1().getPartyEmail() == null
-            ))) {
+        if (isRespondentOrSolicitorHasNoEmail(caseData)) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
@@ -117,11 +113,7 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
 
     public String getRespondentLegalOrganizationName(String id) {
         Optional<Organisation> organisation = organisationService.findOrganisationById(id);
-        String respondentLegalOrganizationName = null;
-        if (organisation.isPresent()) {
-            respondentLegalOrganizationName = organisation.get().getName();
-        }
-        return respondentLegalOrganizationName;
+        return organisation.map(Organisation::getName).orElse(null);
     }
 
     public boolean isRespondentNotRepresented(CaseData caseData) {
@@ -130,5 +122,13 @@ public class ClaimantResponseAgreedRepaymentRespondentNotificationHandler extend
 
     public boolean isRespondentSolicitorRegistered(CaseData caseData) {
         return YesOrNo.YES.equals(caseData.getRespondent1OrgRegistered());
+    }
+
+    public boolean isRespondentOrSolicitorHasNoEmail(CaseData caseData) {
+        return ((isRespondentSolicitorRegistered(caseData)
+            && caseData.getRespondentSolicitor1EmailAddress() == null)
+            || ((!isRespondentSolicitorRegistered(caseData)
+            && caseData.getRespondent1().getPartyEmail() == null))
+        );
     }
 }

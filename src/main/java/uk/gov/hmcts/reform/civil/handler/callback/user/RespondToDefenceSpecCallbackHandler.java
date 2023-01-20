@@ -90,7 +90,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService featureToggleService;
     private final LocationHelper locationHelper;
-    private final String datePattern = "dd MMMM yyyy";
+    private static final String datePattern = "dd MMMM yyyy";
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -297,11 +297,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
             updatedCaseData.respondent1PaymentDateToStringSpec(setUpPayDateToString(caseData));
 
-            BigDecimal howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
-                .map(RespondToClaim::getHowMuchWasPaid).orElse(null);
-            if (howMuchWasPaid != null) {
-                updatedCaseData.partAdmitPaidValuePounds(MonetaryConversions.penniesToPounds(howMuchWasPaid));
-            }
+            Optional<BigDecimal> howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
+                .map(RespondToClaim::getHowMuchWasPaid);
+
+            howMuchWasPaid.ifPresent(howMuchWasPaidValue ->
+                                         updatedCaseData.partAdmitPaidValuePounds(
+                                             MonetaryConversions.penniesToPounds(howMuchWasPaidValue)));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -449,7 +450,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private CallbackResponse validatePaymentDate(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = new ArrayList<>();
+        List<String> errors = new ArrayList<>(1);
 
         if (checkPastDateValidation(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())) {
             errors.add("Enter a date that is today or in the future");
