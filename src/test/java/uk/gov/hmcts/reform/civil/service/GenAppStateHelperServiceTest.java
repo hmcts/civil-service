@@ -3,12 +3,12 @@ package uk.gov.hmcts.reform.civil.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -32,7 +32,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAIN_CASE_CLOSED;
 import static uk.gov.hmcts.reform.civil.service.GenAppStateHelperService.RequiredState.APPLICATION_CLOSED;
 import static uk.gov.hmcts.reform.civil.service.GenAppStateHelperService.RequiredState.APPLICATION_PROCEEDS_OFFLINE;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     GenAppStateHelperService.class, JacksonAutoConfiguration.class,
     CaseDetailsConverter.class
@@ -60,79 +60,81 @@ class GenAppStateHelperServiceTest {
 
         private void setupForApplicationClosed() {
             when(coreCaseDataService.getCase(1234L))
-                    .thenReturn(getCaseDetails(1234L, "APPLICATION_CLOSED", APPLICATION_CLOSED));
+                .thenReturn(getCaseDetails(1234L, "APPLICATION_CLOSED", APPLICATION_CLOSED));
 
             when(coreCaseDataService.getCase(2345L))
-                    .thenReturn(getCaseDetails(2345L, "ORDER_MADE", APPLICATION_CLOSED));
+                .thenReturn(getCaseDetails(2345L, "ORDER_MADE", APPLICATION_CLOSED));
 
             when(coreCaseDataService.getCase(3456L))
-                    .thenReturn(getCaseDetails(3456L, "APPLICATION_CLOSED", APPLICATION_CLOSED));
+                .thenReturn(getCaseDetails(3456L, "APPLICATION_CLOSED", APPLICATION_CLOSED));
 
             when(coreCaseDataService.getCase(4567L))
-                    .thenReturn(getCaseDetails(4567L, "APPLICATION_CLOSED", APPLICATION_CLOSED));
+                .thenReturn(getCaseDetails(4567L, "APPLICATION_CLOSED", APPLICATION_CLOSED));
 
             when(coreCaseDataService.getCase(5678L))
-                    .thenReturn(getCaseDetails(5678L, "APPLICATION_CLOSED", APPLICATION_CLOSED));
+                .thenReturn(getCaseDetails(5678L, "APPLICATION_CLOSED", APPLICATION_CLOSED));
 
             when(coreCaseDataService.getCase(6789L))
-                    .thenReturn(getCaseDetails(6789L, "APPLICATION_CLOSED", APPLICATION_CLOSED));
+                .thenReturn(getCaseDetails(6789L, "APPLICATION_CLOSED", APPLICATION_CLOSED));
 
             when(coreCaseDataService.getCase(7890L))
-                    .thenReturn(getCaseDetails(7890L, "APPLICATION_DISMISSED", APPLICATION_CLOSED));
+                .thenReturn(getCaseDetails(7890L, "APPLICATION_DISMISSED", APPLICATION_CLOSED));
 
             when(coreCaseDataService.getCase(8910L))
-                    .thenReturn(getCaseDetails(8910L, "PROCEEDS_IN_HERITAGE", APPLICATION_CLOSED));
+                .thenReturn(getCaseDetails(8910L, "PROCEEDS_IN_HERITAGE", APPLICATION_CLOSED));
 
             when(coreCaseDataService.getCase(1011L))
-                    .thenReturn(getCaseDetails(1011L, "APPLICATION_CLOSED", APPLICATION_CLOSED));
+                .thenReturn(getCaseDetails(1011L, "APPLICATION_CLOSED", APPLICATION_CLOSED));
         }
 
         private void setupForApplicationOffline() {
             when(coreCaseDataService.getCase(1234L))
-                    .thenReturn(getCaseDetails(1234L, "PROCEEDS_IN_HERITAGE", APPLICATION_PROCEEDS_OFFLINE));
+                .thenReturn(getCaseDetails(1234L, "PROCEEDS_IN_HERITAGE", APPLICATION_PROCEEDS_OFFLINE));
 
             when(coreCaseDataService.getCase(2345L))
-                    .thenReturn(getCaseDetails(2345L, "ORDER_MADE", APPLICATION_PROCEEDS_OFFLINE));
+                .thenReturn(getCaseDetails(2345L, "ORDER_MADE", APPLICATION_PROCEEDS_OFFLINE));
 
             when(coreCaseDataService.getCase(3456L))
-                    .thenReturn(getCaseDetails(3456L, "PROCEEDS_IN_HERITAGE", APPLICATION_PROCEEDS_OFFLINE));
+                .thenReturn(getCaseDetails(3456L, "PROCEEDS_IN_HERITAGE", APPLICATION_PROCEEDS_OFFLINE));
 
             when(coreCaseDataService.getCase(4567L))
-                    .thenReturn(getCaseDetails(4567L, "PROCEEDS_IN_HERITAGE", APPLICATION_PROCEEDS_OFFLINE));
+                .thenReturn(getCaseDetails(4567L, "PROCEEDS_IN_HERITAGE", APPLICATION_PROCEEDS_OFFLINE));
 
             when(coreCaseDataService.getCase(5678L))
-                    .thenReturn(getCaseDetails(5678L, "PROCEEDS_IN_HERITAGE", APPLICATION_PROCEEDS_OFFLINE));
+                .thenReturn(getCaseDetails(5678L, "PROCEEDS_IN_HERITAGE", APPLICATION_PROCEEDS_OFFLINE));
 
             when(coreCaseDataService.getCase(6789L))
-                    .thenReturn(getCaseDetails(6789L, "PROCEEDS_IN_HERITAGE", APPLICATION_PROCEEDS_OFFLINE));
+                .thenReturn(getCaseDetails(6789L, "PROCEEDS_IN_HERITAGE", APPLICATION_PROCEEDS_OFFLINE));
 
             when(coreCaseDataService.getCase(7890L))
-                    .thenReturn(getCaseDetails(7890L, "APPLICATION_DISMISSED", APPLICATION_PROCEEDS_OFFLINE));
+                .thenReturn(getCaseDetails(7890L, "APPLICATION_DISMISSED", APPLICATION_PROCEEDS_OFFLINE));
 
             when(coreCaseDataService.getCase(8910L))
-                    .thenReturn(getCaseDetails(8910L, "PROCEEDS_IN_HERITAGE", APPLICATION_PROCEEDS_OFFLINE));
+                .thenReturn(getCaseDetails(8910L, "PROCEEDS_IN_HERITAGE", APPLICATION_PROCEEDS_OFFLINE));
 
             when(coreCaseDataService.getCase(1011L))
-                    .thenReturn(getCaseDetails(1011L, "PROCEEDS_IN_HERITAGE", APPLICATION_PROCEEDS_OFFLINE));
+                .thenReturn(getCaseDetails(1011L, "PROCEEDS_IN_HERITAGE", APPLICATION_PROCEEDS_OFFLINE));
 
             when(coreCaseDataService.getCase(1112L))
-                    .thenReturn(getCaseDetails(1011L, "APPLICATION_CLOSED", APPLICATION_PROCEEDS_OFFLINE));
+                .thenReturn(getCaseDetails(1011L, "APPLICATION_CLOSED", APPLICATION_PROCEEDS_OFFLINE));
         }
 
         @Test
         public void updateApplicationDetailsListsToReflectLatestApplicationStatusChange_AC() {
             setupForApplicationClosed();
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                    .getTestCaseDataWithDetails(CaseData.builder().build(),
-                            true,
-                            true,
-                            true, true,
-                            getOriginalStatusOfGeneralApplication_applicationClosed());
+                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                                            true,
+                                            true,
+                                            true, true,
+                                            getOriginalStatusOfGeneralApplication_applicationClosed()
+                );
 
             CaseData updatedData = service.updateApplicationDetailsInClaim(
-                    caseData,
-                    APPLICATION_CLOSED_TEXT,
-                    APPLICATION_CLOSED);
+                caseData,
+                APPLICATION_CLOSED_TEXT,
+                APPLICATION_CLOSED
+            );
 
             assertStatusChangeApplicationClosed(updatedData, "1234", true);
             assertStatusChangeApplicationClosed(updatedData, "2345", false);
@@ -149,16 +151,18 @@ class GenAppStateHelperServiceTest {
         public void noUpdatesToCaseDataIfThereAreNoGeneralApplications_AC() {
             setupForApplicationClosed();
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                    .getTestCaseDataWithDetails(CaseData.builder().build(),
-                            false,
-                            false,
-                            false, false,
-                            Map.of());
+                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                                            false,
+                                            false,
+                                            false, false,
+                                            Map.of()
+                );
 
             CaseData response = service.updateApplicationDetailsInClaim(
-                    caseData,
-                    APPLICATION_CLOSED_TEXT,
-                    APPLICATION_CLOSED);
+                caseData,
+                APPLICATION_CLOSED_TEXT,
+                APPLICATION_CLOSED
+            );
 
             CaseData updatedData = mapper.convertValue(response, CaseData.class);
 
@@ -172,19 +176,21 @@ class GenAppStateHelperServiceTest {
         @Test
         public void noUpdateToApplicationDetailsListsWhenApplicationClosedDateNotSet() {
             when(coreCaseDataService.getCase(9999L))
-                    .thenReturn(getCaseDetails(1234L, "PROCEEDS_IN_HERITAGE", APPLICATION_CLOSED));
+                .thenReturn(getCaseDetails(1234L, "PROCEEDS_IN_HERITAGE", APPLICATION_CLOSED));
             Map<String, String> applications = new HashMap<>();
             applications.put("9999", "Application Submitted - Awaiting Judicial Decision");
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                    .getTestCaseDataWithDetails(CaseData.builder().build(),
-                            true,
-                            true,
-                            true, true,
-                            applications);
+                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                                            true,
+                                            true,
+                                            true, true,
+                                            applications
+                );
             CaseData updatedData = service.updateApplicationDetailsInClaim(
-                    caseData,
-                    APPLICATION_CLOSED_TEXT,
-                    APPLICATION_CLOSED);
+                caseData,
+                APPLICATION_CLOSED_TEXT,
+                APPLICATION_CLOSED
+            );
 
             assertStatusChangeApplicationClosed(updatedData, "9999", false);
         }
@@ -193,16 +199,18 @@ class GenAppStateHelperServiceTest {
         public void updateApplicationDetailsListsToReflectLatestApplicationStatusChange_AO() {
             setupForApplicationOffline();
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                    .getTestCaseDataWithDetails(CaseData.builder().build(),
-                            true,
-                            true,
-                            true, true,
-                            getOriginalStatusOfGeneralApplication_applicationOffline());
+                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                                            true,
+                                            true,
+                                            true, true,
+                                            getOriginalStatusOfGeneralApplication_applicationOffline()
+                );
 
             CaseData updatedData = service.updateApplicationDetailsInClaim(
-                    caseData,
-                    APPLICATION_OFFLINE_TEXT,
-                    APPLICATION_PROCEEDS_OFFLINE);
+                caseData,
+                APPLICATION_OFFLINE_TEXT,
+                APPLICATION_PROCEEDS_OFFLINE
+            );
 
             assertStatusChangeApplicationOffline(updatedData, "1234", true);
             assertStatusChangeApplicationOffline(updatedData, "2345", false);
@@ -220,16 +228,18 @@ class GenAppStateHelperServiceTest {
         public void noUpdatesToCaseDataIfThereAreNoGeneralApplications_AO() {
             setupForApplicationOffline();
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                    .getTestCaseDataWithDetails(CaseData.builder().build(),
-                            false,
-                            false,
-                            false, false,
-                            Map.of());
+                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                                            false,
+                                            false,
+                                            false, false,
+                                            Map.of()
+                );
 
             CaseData response = service.updateApplicationDetailsInClaim(
-                    caseData,
-                    APPLICATION_OFFLINE_TEXT,
-                    APPLICATION_PROCEEDS_OFFLINE);
+                caseData,
+                APPLICATION_OFFLINE_TEXT,
+                APPLICATION_PROCEEDS_OFFLINE
+            );
 
             CaseData updatedData = mapper.convertValue(response, CaseData.class);
 
@@ -243,19 +253,21 @@ class GenAppStateHelperServiceTest {
         @Test
         public void noUpdateToApplicationDetailsListsWhenApplicationOfflineDateNotSet() {
             when(coreCaseDataService.getCase(9999L))
-                    .thenReturn(getCaseDetails(1234L, "PROCEEDS_IN_HERITAGE", APPLICATION_PROCEEDS_OFFLINE));
+                .thenReturn(getCaseDetails(1234L, "PROCEEDS_IN_HERITAGE", APPLICATION_PROCEEDS_OFFLINE));
             Map<String, String> applications = new HashMap<>();
             applications.put("9999", "Application Submitted - Awaiting Judicial Decision");
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                    .getTestCaseDataWithDetails(CaseData.builder().build(),
-                            true,
-                            true,
-                            true, true,
-                            applications);
+                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                                            true,
+                                            true,
+                                            true, true,
+                                            applications
+                );
             CaseData updatedData = service.updateApplicationDetailsInClaim(
-                    caseData,
-                    APPLICATION_OFFLINE_TEXT,
-                    APPLICATION_PROCEEDS_OFFLINE);
+                caseData,
+                APPLICATION_OFFLINE_TEXT,
+                APPLICATION_PROCEEDS_OFFLINE
+            );
 
             assertStatusChangeApplicationClosed(updatedData, "9999", false);
         }
@@ -268,16 +280,16 @@ class GenAppStateHelperServiceTest {
 
             if (shouldApplicationBeInClosedState) {
                 assertThat(getGADetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                        .isEqualTo(APPLICATION_CLOSED_TEXT);
+                    .isEqualTo(APPLICATION_CLOSED_TEXT);
                 assertThat(getGARespDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                        .isEqualTo(APPLICATION_CLOSED_TEXT);
+                    .isEqualTo(APPLICATION_CLOSED_TEXT);
                 assertThat(getGARespTwoDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
                     .isEqualTo(APPLICATION_CLOSED_TEXT);
             } else {
                 assertThat(getGADetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                        .isNotEqualTo(APPLICATION_CLOSED_TEXT);
+                    .isNotEqualTo(APPLICATION_CLOSED_TEXT);
                 assertThat(getGARespDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                        .isNotEqualTo(APPLICATION_CLOSED_TEXT);
+                    .isNotEqualTo(APPLICATION_CLOSED_TEXT);
                 assertThat(getGARespTwoDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
                     .isNotEqualTo(APPLICATION_CLOSED_TEXT);
             }
@@ -291,16 +303,16 @@ class GenAppStateHelperServiceTest {
 
             if (shouldApplicationBeInOfflineState) {
                 assertThat(getGADetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                        .isEqualTo(APPLICATION_OFFLINE_TEXT);
+                    .isEqualTo(APPLICATION_OFFLINE_TEXT);
                 assertThat(getGARespDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                        .isEqualTo(APPLICATION_OFFLINE_TEXT);
+                    .isEqualTo(APPLICATION_OFFLINE_TEXT);
                 assertThat(getGARespTwoDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
                     .isEqualTo(APPLICATION_OFFLINE_TEXT);
             } else {
                 assertThat(getGADetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                        .isNotEqualTo(APPLICATION_OFFLINE_TEXT);
+                    .isNotEqualTo(APPLICATION_OFFLINE_TEXT);
                 assertThat(getGARespDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
-                        .isNotEqualTo(APPLICATION_OFFLINE_TEXT);
+                    .isNotEqualTo(APPLICATION_OFFLINE_TEXT);
                 assertThat(getGARespTwoDetailsFromUpdatedCaseData(updatedData, childCaseRef).getCaseState())
                     .isNotEqualTo(APPLICATION_OFFLINE_TEXT);
             }
@@ -309,19 +321,19 @@ class GenAppStateHelperServiceTest {
         private GeneralApplicationsDetails getGADetailsFromUpdatedCaseData(CaseData caseData,
                                                                            String gaCaseRef) {
             Optional<Element<GeneralApplicationsDetails>> first = caseData.getClaimantGaAppDetails().stream()
-                    .filter(ga -> gaCaseRef.equals(ga.getValue().getCaseLink().getCaseReference())).findFirst();
+                .filter(ga -> gaCaseRef.equals(ga.getValue().getCaseLink().getCaseReference())).findFirst();
             return first.map(Element::getValue).orElse(null);
         }
 
         private GADetailsRespondentSol getGARespDetailsFromUpdatedCaseData(CaseData caseData,
                                                                            String gaCaseRef) {
             Optional<Element<GADetailsRespondentSol>> first = caseData.getRespondentSolGaAppDetails().stream()
-                    .filter(ga -> gaCaseRef.equals(ga.getValue().getCaseLink().getCaseReference())).findFirst();
+                .filter(ga -> gaCaseRef.equals(ga.getValue().getCaseLink().getCaseReference())).findFirst();
             return first.map(Element::getValue).orElse(null);
         }
 
         private GADetailsRespondentSol getGARespTwoDetailsFromUpdatedCaseData(CaseData caseData,
-                                                                           String gaCaseRef) {
+                                                                              String gaCaseRef) {
             Optional<Element<GADetailsRespondentSol>> first = caseData.getRespondentSolTwoGaAppDetails().stream()
                 .filter(ga -> gaCaseRef.equals(ga.getValue().getCaseLink().getCaseReference())).findFirst();
             return first.map(Element::getValue).orElse(null);
@@ -350,9 +362,9 @@ class GenAppStateHelperServiceTest {
         }
 
         private CaseDetails getCaseDetails(
-                long ccdRef,
-                String caseState,
-                GenAppStateHelperService.RequiredState gaFlow) {
+            long ccdRef,
+            String caseState,
+            GenAppStateHelperService.RequiredState gaFlow) {
             Map<String, Object> dataMap = new HashMap<>();
             dataMap.put("generalAppDetailsOfOrder", "Some Value");
             if (APPLICATION_CLOSED.equals(gaFlow)) {
@@ -376,11 +388,12 @@ class GenAppStateHelperServiceTest {
         @Test
         void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplication() {
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                    .getTestCaseDataWithDetails(CaseData.builder().build(),
-                            true,
-                            true,
-                            true, true,
-                            getOriginalStatusOfGeneralApplication());
+                .getTestCaseDataWithDetails(CaseData.builder().build(),
+                                            true,
+                                            true,
+                                            true, true,
+                                            getOriginalStatusOfGeneralApplication()
+                );
 
             service.triggerEvent(caseData, MAIN_CASE_CLOSED);
 
