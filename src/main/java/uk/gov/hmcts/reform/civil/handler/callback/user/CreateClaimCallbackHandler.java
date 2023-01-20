@@ -94,6 +94,13 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         + "months of the claim being issued. The exact date when you must notify the claim details will be provided "
         + "when you first notify the Defendant legal representative of the claim.";
 
+    public static final String CONFIRMATION_SUMMARY_PBA_V3 = "<br/>[Download the sealed claim form](%s)"
+        + "%n%nYour claim will not be issued until payment has been made via the Service Request Tab. Once payment is "
+        + "confirmed you will receive an email. The email will also include the date when you need to notify the Defendant "
+        + "legal representative of the claim.%n%nYou must notify the Defendant legal representative of the claim within 4 "
+        + "months of the claim being issued. The exact date when you must notify the claim details will be provided "
+        + "when you first notify the Defendant legal representative of the claim.";
+
     public static final String LIP_CONFIRMATION_BODY = "<br />Your claim will not be issued until payment is confirmed."
         + " Once payment is confirmed you will receive an email. The claim will then progress offline."
         + "%n%nTo continue the claim you need to send the <a href=\"%s\" target=\"_blank\">sealed claim form</a>, "
@@ -560,7 +567,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         if (toggleService.isCertificateOfServiceEnabled()) {
             return format(
                 areRespondentsRepresentedAndRegistered(caseData)
-                    ? CONFIRMATION_SUMMARY
+                    ? getConfirmationSummary()
                     : LIP_CONFIRMATION_BODY_COS,
                 format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
                 claimIssueConfiguration.getResponsePackLink()
@@ -568,11 +575,19 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         } else {
             return format(
                 areRespondentsRepresentedAndRegistered(caseData)
-                    ? CONFIRMATION_SUMMARY
+                    ? getConfirmationSummary()
                     : LIP_CONFIRMATION_BODY,
                 format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
                 claimIssueConfiguration.getResponsePackLink()
             ) + exitSurveyContentService.applicantSurvey();
+        }
+    }
+
+    private String getConfirmationSummary() {
+        if (toggleService.isPbaV3Enabled()) {
+            return CONFIRMATION_SUMMARY_PBA_V3;
+        } else {
+            return CONFIRMATION_SUMMARY;
         }
     }
 

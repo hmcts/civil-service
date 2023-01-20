@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -75,6 +76,7 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY_PBA_V3;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY_COS;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -1590,6 +1592,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentation() {
+                Mockito.when(featureToggleService.isPbaV3Enabled()).thenReturn(false);
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
                     .multiPartyClaimOneDefendantSolicitor().build();
@@ -1598,6 +1601,30 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 String body = format(
                     CONFIRMATION_SUMMARY,
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID)
+                ) + exitSurveyContentService.applicantSurvey();
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# Your claim has been received%n## Claim number: %s",
+                            REFERENCE_NUMBER
+                        ))
+                        .confirmationBody(body)
+                        .build());
+            }
+
+            @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentationAndPBAv3IsOn() {
+                Mockito.when(featureToggleService.isPbaV3Enabled()).thenReturn(true);
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified()
+                    .multiPartyClaimOneDefendantSolicitor().build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                String body = format(
+                    CONFIRMATION_SUMMARY_PBA_V3,
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID)
                 ) + exitSurveyContentService.applicantSurvey();
 

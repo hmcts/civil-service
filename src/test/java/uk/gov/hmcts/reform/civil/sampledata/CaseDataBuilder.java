@@ -4436,6 +4436,7 @@ public class CaseDataBuilder {
             .trialHearingTrialDJ(trialHearingTrialDJ)
             .disposalHearingJudgesRecitalDJ(disposalHearingJudgesRecitalDJ)
             .trialHearingJudgesRecitalDJ(trialHearingJudgesRecitalDJ)
+            .claimIssuedPBADetails(srPbaDetails)
             .changeOfRepresentation(changeOfRepresentation)
             .changeOrganisationRequestField(changeOrganisationRequest)
             .unassignedCaseListDisplayOrganisationReferences(unassignedCaseListDisplayOrganisationReferences)
