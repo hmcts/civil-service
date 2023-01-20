@@ -344,4 +344,11 @@ public class CaseDataParent implements MappableObject {
     private final CertificateOfService cosNotifyClaimDefendant1;
     private final CertificateOfService cosNotifyClaimDefendant2;
 
+    private final List<Element<DQPartyFlagStructure>> applicantSolicitorExperts;
+    private final List<Element<DQPartyFlagStructure>> respondentSolicitor1Experts;
+    private final List<Element<DQPartyFlagStructure>> respondentSolicitor2Experts;
+    private final List<Element<DQPartyFlagStructure>> applicantSolicitorWitnesses;
+    private final List<Element<DQPartyFlagStructure>> respondentSolicitor1Witnesses;
+    private final List<Element<DQPartyFlagStructure>> respondentSolicitor2Witnesses;
+
 }

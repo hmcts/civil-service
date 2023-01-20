@@ -46,6 +46,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -143,6 +144,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private final CoreCaseUserService coreCaseUserService;
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
+    private final CaseFlagsInitialiser caseFlagsInitialiser;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -1737,11 +1739,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Respondent1DQ.Respondent1DQBuilder dq = caseData.getRespondent1DQ().toBuilder()
-                .respondent1DQStatementOfTruth(statementOfTruth)
-                .respondent1DQWitnesses(Witnesses.builder()
-                                            .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
-                                            .details(caseData.getRespondent1DQWitnessesDetailsSpec())
-                                            .build());
+                .respondent1DQStatementOfTruth(statementOfTruth);
+
+            if (caseData.getRespondent1DQWitnessesRequiredSpec() != null) {
+                dq.respondent1DQWitnesses(Witnesses.builder()
+                                                .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
+                                                .details(caseData.getRespondent1DQWitnessesDetailsSpec())
+                                                .build());
+            }
             if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
                 handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
             }
@@ -1765,6 +1770,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 updatedData.build().getRespondent2DQ().toBuilder().respondent2DQWitnesses(
                     caseData.getRespondent2DQWitnessesSmallClaim()).build());
         }
+
+        caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_SPEC, updatedData);
 
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
