@@ -549,7 +549,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     private DirectionsQuestionnaireForm getRespondent2TemplateData(CaseData caseData, String defendantIdentifier) {
         DQ dq = caseData.getRespondent2DQ();
 
-        return DirectionsQuestionnaireForm.builder()
+        return  DirectionsQuestionnaireForm.builder()
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .referenceNumber(caseData.getLegacyCaseReference())
             .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData))
@@ -572,6 +572,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .statementOfTruth(dq.getStatementOfTruth())
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(caseData.getAllocatedTrack())
+            .requestedCourt(getRequestedCourt(dq))
             .build();
     }
 
@@ -599,6 +600,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .statementOfTruth(dq.getStatementOfTruth())
             .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
             .allocatedTrack(caseData.getAllocatedTrack())
+            .requestedCourt(dq.getRequestedCourt())
             .build();
     }
 
