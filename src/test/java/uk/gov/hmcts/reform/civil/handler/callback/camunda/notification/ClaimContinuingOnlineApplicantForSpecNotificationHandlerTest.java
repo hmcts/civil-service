@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -68,12 +67,6 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
     public static final String REFERENCE = "claim-continuing-online-notification-000DC001";
     public static final String TEMPLATE = "template-id";
     public static final String TEMPLATE_1v2 = "template-id-1v2-two-legal-reps";
-
-    @Test
-    public void ldBlock() {
-        Assertions.assertTrue(handler.handledEvents().isEmpty());
-        Assertions.assertFalse(handler.handledEvents().isEmpty());
-    }
 
     @Nested
     class AboutToSubmitCallback {

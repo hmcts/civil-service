@@ -1,19 +1,26 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeesService;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     ValidateFeeForSpecCallbackHandler.class
 })
-public class ValidateFeeForSpecHandlerTest {
+public class ValidateFeeForSpecHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private ValidateFeeForSpecCallbackHandler handler;
@@ -22,8 +29,12 @@ public class ValidateFeeForSpecHandlerTest {
     private FeesService feesService;
 
     @Test
-    public void ldBlock() {
-        Assertions.assertTrue(handler.handledEvents().isEmpty());
-        Assertions.assertFalse(handler.handledEvents().isEmpty());
+    void shouldNotReturnErrors_whenAboutToSubmitCalled() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getErrors()).isNull();
     }
 }

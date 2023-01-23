@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -46,12 +45,6 @@ public class FailedPaymentApplicantForSpecNotificationHandlerTest extends BaseCa
     private OrganisationService organisationService;
     @Autowired
     private FailedPaymentApplicantForSpecNotificationHandler handler;
-
-    @Test
-    public void ldBlock() {
-        Assertions.assertTrue(handler.handledEvents().isEmpty());
-        Assertions.assertFalse(handler.handledEvents().isEmpty());
-    }
 
     @Nested
     class AboutToSubmitCallback {

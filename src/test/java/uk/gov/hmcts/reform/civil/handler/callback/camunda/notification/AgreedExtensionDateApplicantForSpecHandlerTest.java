@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -56,12 +55,6 @@ public class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallback
     @MockBean
     private OrganisationService organisationService;
 
-    @Test
-    public void ldBlock() {
-        Assertions.assertTrue(handler.handledEvents().isEmpty());
-        Assertions.assertFalse(handler.handledEvents().isEmpty());
-    }
-
     @Nested
     class AboutToSubmitCallback {
 
@@ -96,7 +89,7 @@ public class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallback
                     caseData.getRespondentSolicitor1AgreedDeadlineExtension());
             }
 
-            @org.junit.jupiter.api.Test
+            @Test
             void shouldNotifyApplicantSolicitor_whenInvoked() {
                 invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_FOR_SPEC");
 
@@ -108,7 +101,7 @@ public class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallback
                 );
             }
 
-            @org.junit.jupiter.api.Test
+            @Test
             void shouldNotifyRespondentSolicitor1_whenInvoked() {
                 invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_FOR_SPEC_CC");
 
@@ -148,7 +141,7 @@ public class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallback
         }
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
             "NOTIFY_APPLICANT_SOLICITOR1_FOR_AGREED_EXTENSION_DATE_FOR_SPEC").build()).build()))

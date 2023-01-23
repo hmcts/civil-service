@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -82,12 +81,6 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
     private FeatureToggleService toggleService;
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
-
-    @Test
-    public void ldBlock() {
-        Assertions.assertTrue(handler.handledEvents().isEmpty());
-        Assertions.assertFalse(handler.handledEvents().isEmpty());
-    }
 
     private static final CaseDocument CLAIM_FORM =
         CaseDocument.builder()

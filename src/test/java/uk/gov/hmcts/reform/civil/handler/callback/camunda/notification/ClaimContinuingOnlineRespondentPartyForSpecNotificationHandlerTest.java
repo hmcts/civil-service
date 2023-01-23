@@ -34,8 +34,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -85,12 +83,6 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
 
     public static final String TASK_ID_Respondent1 = "CreateClaimContinuingOnlineNotifyRespondent1ForSpec";
     private static final byte[] LETTER_CONTENT = new byte[]{1, 2, 3, 4};
-
-    @Test
-    public void ldBlock() {
-        assertTrue(handler.handledEvents().isEmpty());
-        assertFalse(handler.handledEvents().isEmpty());
-    }
 
     @Nested
     class AboutToSubmitCallback {
