@@ -85,6 +85,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("all")
 public class CreateClaimCallbackHandler extends CallbackHandler implements ParticularsOfClaimValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_CLAIM);
