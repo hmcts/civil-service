@@ -4082,7 +4082,7 @@ class EventHistoryMapperTest {
                         .litigiousPartyID("001")
                         .eventDetails(EventDetails.builder()
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
-                                          .preferredCourtCode(courtLocations.isEmpty() ? null : courtLocations.stream()
+                                          .preferredCourtCode(courtLocations.isEmpty() ? "" : courtLocations.stream()
                                                                   .filter(id -> id.getCourtTypeId().equals(
                                                                       CIVIL_COURT_TYPE_ID))
                                                                   .collect(Collectors.toList()).get(0)
@@ -4091,7 +4091,7 @@ class EventHistoryMapperTest {
                                           .build())
                         .eventDetailsText(mapper.prepareEventDetailsText(
                             caseData.getApplicant1DQ(),
-                            courtLocations.isEmpty() ? null : courtLocations.stream()
+                            courtLocations.isEmpty() ? "" : courtLocations.stream()
                                 .filter(id -> id.getCourtTypeId().equals(
                                     CIVIL_COURT_TYPE_ID))
                                 .collect(Collectors.toList()).get(0)
@@ -4182,7 +4182,7 @@ class EventHistoryMapperTest {
                         .litigiousPartyID("001")
                         .eventDetails(EventDetails.builder()
                                           .stayClaim(mapper.isStayClaim(caseData.getApplicant1DQ()))
-                                          .preferredCourtCode(courtLocations.isEmpty() ? null : courtLocations.stream()
+                                          .preferredCourtCode(courtLocations.isEmpty() ? "" : courtLocations.stream()
                                                                   .filter(id -> id.getCourtTypeId().equals(
                                                                       CIVIL_COURT_TYPE_ID))
                                                                   .collect(Collectors.toList()).get(0)
