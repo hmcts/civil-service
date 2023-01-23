@@ -666,7 +666,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 List<LocationRefData> locations = new ArrayList<>();
                 locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
                                   .courtName("Court Name").region("Region").regionId("regionId1").courtVenueId("000")
-                                  .courtTypeId("10").courtLocationCode("5")
+                                  .courtTypeId("10")
                                   .epimmsId("4532").build());
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
