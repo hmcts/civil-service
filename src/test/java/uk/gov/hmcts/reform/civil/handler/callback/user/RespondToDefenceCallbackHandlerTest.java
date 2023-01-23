@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -59,6 +60,7 @@ import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -635,7 +637,12 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                     .courtLocation()
                     .build();
-
+                List<LocationRefData> locations = new ArrayList<>();
+                locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
+                                  .courtName("Court Name").region("Region").regionId("regionId1").courtVenueId("000")
+                                  .courtTypeId("10").courtLocationCode("121")
+                                  .epimmsId("000000").build());
+                when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
 
@@ -643,12 +650,12 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 assertThat(response.getData()).extracting("applicant1DQRequestedCourt")
                     .extracting("responseCourtCode")
-                    .isEqualTo("127");
+                    .isEqualTo("121");
 
                 assertThat(response.getData()).extracting("applicant1DQRequestedCourt")
                     .extracting("caseLocation")
                     .extracting("region", "baseLocation")
-                    .containsExactly("regionId1", "epimmsId1");
+                    .containsExactly("2", "000000");
             }
         }
 
