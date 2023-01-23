@@ -36,7 +36,7 @@ import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -229,7 +229,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v1LiP(CertificateOfService.builder()
                                                 .cosDateOfServiceForDefendant(LocalDate.now())
-                                                .cosUISenderStatementOfTruthLabel(cosUIStatement)
                                                 .build())
                 .build();
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
@@ -239,9 +238,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData responseData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(responseData.getCosNotifyClaimDefendant1()
-                           .getCosUISenderStatementOfTruthLabel() == null);
+
             assertThat(response.getErrors()).isEmpty();
         }
 
@@ -277,8 +274,8 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
                 .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                                .cosDateOfServiceForDefendant(LocalDate.now().plusDays(2))
-                                                .build())
+                                              .cosDateOfServiceForDefendant(LocalDate.now().plusDays(2))
+                                              .build())
                 .build();
             when(time.now()).thenReturn(LocalDateTime.now());
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -319,9 +316,8 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
                 .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                                .cosDateOfServiceForDefendant(cosNotifyDate)
-                                                .cosUISenderStatementOfTruthLabel(cosUIStatement)
-                                                .build())
+                                              .cosDateOfServiceForDefendant(cosNotifyDate)
+                                              .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -329,9 +325,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
                 .thenReturn(cosNotifyDate.plusDays(14).atTime(END_OF_BUSINESS_DAY));
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData responseData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(responseData.getCosNotifyClaimDefendant2()
-                           .getCosUISenderStatementOfTruthLabel() == null);
             assertThat(response.getErrors()).isEmpty();
         }
 
@@ -342,8 +335,8 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
                 .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                                .cosDateOfServiceForDefendant(cosNotifyDate)
-                                                .build())
+                                              .cosDateOfServiceForDefendant(cosNotifyDate)
+                                              .build())
                 .build();
 
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
@@ -510,8 +503,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldSetDetailsNotificationDeadline_Cos_1v2_whenLipDefendant1() {
-                ArrayList<String> cosUIStatement = new ArrayList<>();
-                cosUIStatement.add("CERTIFIED");
+
                 LocalDate cosNotifyDate = LocalDate.of(2021, 4, 2);
 
                 when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
@@ -522,7 +514,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified1v2RespondentLiP()
                     .cosNotifyClaimDefendant1(CertificateOfService.builder()
                                                   .cosDateOfServiceForDefendant(cosNotifyDate)
-                                                  .cosUISenderStatementOfTruthLabel(cosUIStatement)
                                                   .build())
                     .claimNotificationDeadline(claimNotificationDeadline)
                     .addRespondent2(YesOrNo.YES)
@@ -536,8 +527,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CaseData responseData = mapper.convertValue(response.getData(), CaseData.class);
                 assertThat(responseData.getCosNotifyClaimDefendant1()
                                .getCosSenderStatementOfTruthLabel().contains("CERTIFIED"));
-                assertThat(responseData.getCosNotifyClaimDefendant1()
-                               .getCosUISenderStatementOfTruthLabel() == null);
                 assertThat(response.getData())
                     .containsEntry(
                         "claimDetailsNotificationDeadline",
@@ -548,8 +537,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldSetDetailsNotificationDeadline_Cos_1v2_whenLipDefendant2() {
 
-                ArrayList<String> cosUIStatement = new ArrayList<>();
-                cosUIStatement.add("CERTIFIED");
                 LocalDate cosNotifyDate = LocalDate.of(2021, 4, 2);
                 when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
                 when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
@@ -559,7 +546,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified1v2RespondentLiP()
                     .cosNotifyClaimDefendant2(CertificateOfService.builder()
                                                   .cosDateOfServiceForDefendant(cosNotifyDate)
-                                                  .cosUISenderStatementOfTruthLabel(cosUIStatement)
                                                   .build())
                     .respondent1Represented(YesOrNo.YES)
                     .respondent2Represented(YesOrNo.NO)
@@ -575,8 +561,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CaseData responseData = mapper.convertValue(response.getData(), CaseData.class);
                 assertThat(responseData.getCosNotifyClaimDefendant2()
                                .getCosSenderStatementOfTruthLabel().contains("CERTIFIED"));
-                assertThat(responseData.getCosNotifyClaimDefendant2()
-                               .getCosUISenderStatementOfTruthLabel() == null);
+
                 assertThat(response.getData())
                     .containsEntry("claimDetailsNotificationDeadline", expectedDeadline.format(ISO_DATE_TIME));
             }
@@ -934,8 +919,8 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
                 .cosNotifyClaimDefendant2(CertificateOfService.builder()
-                                                           .cosDateOfServiceForDefendant(LocalDate.now())
-                                                           .build())
+                                              .cosDateOfServiceForDefendant(LocalDate.now())
+                                              .build())
                 .build();
             when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
