@@ -943,7 +943,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             ? caseData.getResponseClaimExpertSpecRequired()
             : caseData.getResponseClaimExpertSpecRequired2();
         if (isClaimantResponse(caseData)) {
-            expertRequired = caseData.getApplicant1ClaimExpertSpecRequired();
+            expertRequired = caseData.getApplicantMPClaimExpertSpecRequired() != null
+                ? caseData.getApplicantMPClaimExpertSpecRequired() : caseData.getApplicant1ClaimExpertSpecRequired();
         }
         Expert expertDetails;
         if (experts != null) {
