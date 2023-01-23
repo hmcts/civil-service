@@ -657,6 +657,26 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .extracting("region", "baseLocation")
                     .containsExactly("2", "000000");
             }
+
+            @Test
+            void updateApplicant1DQRequestedCourtWhenNoCourtLocationIsReturnedByRefData() {
+                CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                    .courtLocation()
+                    .build();
+                List<LocationRefData> locations = new ArrayList<>();
+                locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
+                                  .courtName("Court Name").region("Region").regionId("regionId1").courtVenueId("000")
+                                  .courtTypeId("10").courtLocationCode("5")
+                                  .epimmsId("4532").build());
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                    callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+                System.out.println(response.getData());
+
+                assertThat(response.getData()).extracting("applicant1DQRequestedCourt")
+                    .extracting("responseCourtCode")
+                    .isEqualTo(null);
+            }
         }
 
         @Nested
