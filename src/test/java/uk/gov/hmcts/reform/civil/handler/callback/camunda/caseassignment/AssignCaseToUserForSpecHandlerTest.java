@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -53,12 +52,6 @@ class AssignCaseToUserForSpecHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private FeatureToggleService toggleService;
-
-    @Test
-    void ldBlock() {
-        Assertions.assertTrue(handler.handledEvents().isEmpty());
-        Assertions.assertFalse(handler.handledEvents().isEmpty());
-    }
 
     @Nested
     class AssignHmctsServiceId {
