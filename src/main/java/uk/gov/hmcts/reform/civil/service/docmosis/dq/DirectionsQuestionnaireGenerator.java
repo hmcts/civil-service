@@ -288,7 +288,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
         builder.fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
-            .experts(!specAndSmallClaim ? getExperts(dq) : getSmallClaimExperts(dq, caseData))
+            .experts(!specAndSmallClaim ? getExperts(dq) : getSmallClaimExperts(dq, caseData, null))
             .witnesses(witnesses)
             .witnessesIncludingDefendants(witnessesIncludingDefendants)
             .hearing(getHearing(dq))
@@ -561,8 +561,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
-            .experts("SMALL_CLAIM".equals(caseData.getResponseClaimTrack()) ? getSmallClaimExperts(dq, caseData) :
-                         getExperts(dq))
+            .experts("SMALL_CLAIM".equals(caseData.getResponseClaimTrack())
+                         ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
             .witnesses(getWitnesses(dq))
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
@@ -588,8 +588,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
             .disclosureOfElectronicDocuments(dq.getDisclosureOfElectronicDocuments())
             .disclosureOfNonElectronicDocuments(dq.getDisclosureOfNonElectronicDocuments())
-            .experts("SMALL_CLAIM".equals(caseData.getResponseClaimTrack()) ? getSmallClaimExperts(dq, caseData) :
-                         getExperts(dq))
+            .experts("SMALL_CLAIM".equals(caseData.getResponseClaimTrack())
+                         ? getSmallClaimExperts(dq, caseData, defendantIdentifier) : getExperts(dq))
             .witnesses(getWitnesses(dq))
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
@@ -935,9 +935,11 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .build();
     }
 
-    private Experts getSmallClaimExperts(DQ dq, CaseData caseData) {
+    private Experts getSmallClaimExperts(DQ dq, CaseData caseData, String defendantIdentifier) {
         var experts = dq.getSmallClaimExperts();
-        YesOrNo expertRequired = caseData.getResponseClaimExpertSpecRequired();
+        YesOrNo expertRequired = defendantIdentifier == null || defendantIdentifier.equals("ONE")
+            ? caseData.getResponseClaimExpertSpecRequired()
+            : caseData.getResponseClaimExpertSpecRequired2();
         if (isClaimantResponse(caseData)) {
             expertRequired = caseData.getApplicant1ClaimExpertSpecRequired();
         }
