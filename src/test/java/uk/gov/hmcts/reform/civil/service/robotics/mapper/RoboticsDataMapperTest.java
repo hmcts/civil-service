@@ -331,6 +331,17 @@ class RoboticsDataMapperTest {
     }
 
     @Test
+    void shouldReturnEmptyStringWhenPreferredCourtCodeisUnavailableFromLocationRefData() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
+        List<LocationRefData> courtLocations = new ArrayList<>();
+        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(courtLocations);
+
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getHeader().getPreferredCourtCode()).isEqualTo("");
+    }
+
+    @Test
     void shouldMapExpectedNoticeOfChangeData_whenCaseGoesOffline() {
         when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
 
