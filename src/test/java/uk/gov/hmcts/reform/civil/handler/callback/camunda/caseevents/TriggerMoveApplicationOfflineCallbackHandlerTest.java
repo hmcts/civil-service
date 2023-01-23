@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -30,7 +30,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_PROCEEDS_IN_HERITAGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_APPLICATION_PROCEEDS_IN_HERITAGE;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     TriggerMoveApplicationOfflineCallbackHandler.class,
     JacksonAutoConfiguration.class
@@ -51,11 +51,12 @@ class TriggerMoveApplicationOfflineCallbackHandlerTest extends BaseCallbackHandl
     @Test
     void shouldTriggerGeneralApplicationEvent_whenCaseHasGeneralApplication() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().build(),
-                        true,
-                        true,
-                        true, true,
-                        getOriginalStatusOfGeneralApplication());
+            .getTestCaseDataWithDetails(CaseData.builder().build(),
+                                        true,
+                                        true,
+                                        true, true,
+                                        getOriginalStatusOfGeneralApplication()
+            );
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -80,15 +81,16 @@ class TriggerMoveApplicationOfflineCallbackHandlerTest extends BaseCallbackHandl
     @Test
     void triggerGeneralApplicationEventThrowsException_HandleFailure() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-                .getTestCaseDataWithDetails(CaseData.builder().ccdCaseReference(1234L).build(),
-                        true,
-                        true,
-                        true, true,
-                        getOriginalStatusOfGeneralApplication());
+            .getTestCaseDataWithDetails(CaseData.builder().ccdCaseReference(1234L).build(),
+                                        true,
+                                        true,
+                                        true, true,
+                                        getOriginalStatusOfGeneralApplication()
+            );
         String expectedErrorMessage = "Could not trigger event to take application offline under the case: "
-                + caseData.getCcdCaseReference();
+            + caseData.getCcdCaseReference();
         when(helperService.triggerEvent(any(CaseData.class), eq(APPLICATION_PROCEEDS_IN_HERITAGE)))
-                .thenThrow(new RuntimeException());
+            .thenThrow(new RuntimeException());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
