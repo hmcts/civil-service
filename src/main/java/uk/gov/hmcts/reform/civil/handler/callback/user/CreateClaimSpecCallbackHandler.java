@@ -180,6 +180,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
+            .put(callbackKey(V_1, SUBMITTED), this::buildConfirmationPba3)
             .put(callbackKey(MID, "respondent1"), this::validateRespondent1Address)
             .put(callbackKey(MID, "respondent2"), this::validateRespondent2Address)
             .put(callbackKey(MID, "amount-breakup"), this::calculateTotalClaimAmount)
@@ -200,7 +201,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(MID, "validate-spec-defendant2-legal-rep-email"), this::validateSpecRespondent2RepEmail)
             .build();
     }
-
+//TODO: you need to split the code from the code reuvew into V1 callbacks, it looks like its done here but they both
+// have the same code, i think thats wrong, send it to doug for lols, the code in the v1 needs to be what the if
+// statement is basically, then once theye all split the build should go green, then you can look at pointing the PR
+// to camunda and look at getting ccd working
     @Override
     public List<CaseEvent> handledEvents() {
         if (toggleService.isLrSpecEnabled()) {
@@ -522,6 +526,23 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 .build();
         }
     }
+    // ------------------------------------V1 method ----------------------------------
+    private SubmittedCallbackResponse buildConfirmationPba3(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (null != callbackParams.getRequest().getEventId()
+            && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
+            return SubmittedCallbackResponse.builder()
+                .confirmationHeader(getSpecHeader(caseData))
+                .confirmationBody(getSpecBody(caseData))
+                .build();
+        } else {
+            return SubmittedCallbackResponse.builder()
+                .confirmationHeader(getHeader(caseData))
+                .confirmationBody(getBody(caseData))
+                .build();
+        }
+    }
+    // -------------------------------------------------------------------------------
 
     private String getHeader(CaseData caseData) {
         if (areRespondentsRepresentedAndRegistered(caseData)
@@ -548,6 +569,23 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             formattedServiceDeadline
         ) + exitSurveyContentService.applicantSurvey();
     }
+
+    // ------------------------------------V1 method ----------------------------------------
+    private String getBodyV1(CaseData caseData) {
+        LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
+        String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
+
+        return format(
+            (areRespondentsRepresentedAndRegistered(caseData)
+                || isPinInPostCaseMatched(caseData))
+                ? getConfirmationSummary()
+                : LIP_CONFIRMATION_BODY,
+            format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
+            claimIssueConfiguration.getResponsePackLink(),
+            formattedServiceDeadline
+        ) + exitSurveyContentService.applicantSurvey();
+    }
+    //---------------------------------------------------------------------------
 
     private String getConfirmationSummary() {
         if (featureToggleService.isPbaV3Enabled()) {
