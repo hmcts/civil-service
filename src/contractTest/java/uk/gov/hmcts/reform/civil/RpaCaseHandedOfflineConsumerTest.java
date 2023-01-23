@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
@@ -70,7 +71,11 @@ class RpaCaseHandedOfflineConsumerTest extends BaseRpaTest {
     @MockBean
     PrdAdminUserConfiguration userConfig;
     @MockBean
+    LocationRefDataService locationRefDataService;
+    @MockBean
     private Time time;
+
+    private static final String BEARER_TOKEN = "Bearer Token";
 
     LocalDateTime localDateTime;
 
@@ -89,7 +94,7 @@ class RpaCaseHandedOfflineConsumerTest extends BaseRpaTest {
             .atState(FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED)
             .legacyCaseReference("100DC001")
             .build();
-        String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+        String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
         System.out.println("PAYLOAD");
         System.out.println(payload);
@@ -121,7 +126,7 @@ class RpaCaseHandedOfflineConsumerTest extends BaseRpaTest {
                                 .build()).build()))
                     .build())
             .build();
-        String payload = roboticsDataMapper.toRoboticsCaseData(caseData).toJsonString();
+        String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
 
         System.out.println("PAYLOAD");
         System.out.println(payload);
