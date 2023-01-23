@@ -69,6 +69,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
@@ -165,7 +166,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(MID, "populateClaimantSolicitor"), this::populateClaimantSolicitor)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
-            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
+            .put(callbackKey(V_2, ABOUT_TO_SUBMIT), this::submitClaimV1)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -480,6 +481,118 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
+    //----------------------------------v1 method-------------------------
+    private CallbackResponse submitClaimV1(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        List<String> validationErrors;
+
+        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
+            validationErrors = validateCourtChoice(caseData);
+        } else {
+            validationErrors = validateCourtTextOld(caseData);
+        }
+
+        if (validationErrors.size() > 0) {
+            return AboutToStartOrSubmitCallbackResponse.builder().errors(validationErrors).build();
+        }
+
+        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
+        CaseData.CaseDataBuilder dataBuilder = getSharedDataV1(callbackParams);
+        addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder);
+
+        if (caseData.getRespondent1OrgRegistered() == YES
+            && caseData.getRespondent1Represented() == YES
+            && caseData.getRespondent2SameLegalRepresentative() == YES) {
+            // Predicate: Def1 registered, Def 2 unregistered.
+            // This is required to ensure mutual exclusion in 1v2 same solicitor case.
+            dataBuilder.respondent2OrgRegistered(YES);
+        }
+
+        // moving statement of truth value to correct field, this was not possible in mid event.
+        // resetting statement of truth to make sure it's empty the next time it appears in the UI.
+        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
+        dataBuilder
+            .uiStatementOfTruth(StatementOfTruth.builder().build())
+            .applicantSolicitor1ClaimStatementOfTruth(statementOfTruth)
+            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+
+        // data for case list and unassigned list
+        dataBuilder
+            .allPartyNames(getAllPartyNames(caseData))
+            .unassignedCaseListDisplayOrganisationReferences(getAllOrganisationPolicyReferences(caseData))
+            .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData));
+
+        if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
+        }
+
+        dataBuilder.claimStarted(null);
+
+        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
+            handleCourtLocationData(caseData, dataBuilder, callbackParams);
+        }
+
+        if (V_1.equals(callbackParams.getVersion())
+            && toggleService.isAccessProfilesEnabled()) {
+            dataBuilder.caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+        }
+
+        if (toggleService.isNoticeOfChangeEnabled()) {
+            // LiP are not represented or registered
+            OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
+        }
+
+        // temporarily default to yes for CIV-2659
+        if (YES.equals(caseData.getRespondent1Represented()) && caseData.getRespondent1OrgRegistered() == null) {
+            dataBuilder.respondent1OrgRegistered(YES);
+        }
+
+        if (YES.equals(caseData.getRespondent2Represented()) && caseData.getRespondent2OrgRegistered() == null) {
+            dataBuilder.respondent2OrgRegistered(YES);
+        }
+
+        //assign casemanagementcategory to the case and assign casenamehmctsinternal
+        if (V_1.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {
+
+            //casename
+            dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
+
+            //case management category
+            CaseManagementCategoryElement civil =
+                CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
+            List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
+            itemList.add(element(civil));
+            dataBuilder.caseManagementCategory(
+                CaseManagementCategory.builder().value(civil).list_items(itemList).build());
+            log.info("Case management equals: " + caseData.getCaseManagementCategory());
+            log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
+        }
+        //Adding variables for feature Certificate of Service
+        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCertificateOfServiceEnabled()) {
+            if (caseData.getRespondent1Represented().equals(NO)) {
+                dataBuilder.defendant1LIPAtClaimIssued(YES);
+            } else {
+                dataBuilder.defendant1LIPAtClaimIssued(NO);
+            }
+
+            if (YES.equals(caseData.getAddRespondent2())) {
+                if (caseData.getRespondent2Represented() == NO) {
+                    dataBuilder.defendant2LIPAtClaimIssued(YES);
+                } else {
+                    dataBuilder.defendant2LIPAtClaimIssued(NO);
+                }
+            }
+        }
+
+        dataBuilder.ccdState(CaseState.PENDING_CASE_ISSUED);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(dataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+    //--------------------------------------
+
     private String getAllPartyNames(CaseData caseData) {
         return format("%s%s V %s%s",
                       caseData.getApplicant1().getPartyName(),
@@ -520,6 +633,35 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
         return dataBuilder;
     }
+
+    //----------------------------v1 method --------------------------
+    private CaseData.CaseDataBuilder getSharedDataV1(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
+        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        IdamUserDetails.IdamUserDetailsBuilder idam = IdamUserDetails.builder().id(userDetails.getId());
+        CorrectEmail applicantSolicitor1CheckEmail = caseData.getApplicantSolicitor1CheckEmail();
+        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
+
+        if (applicantSolicitor1CheckEmail.isCorrect()) {
+            dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1CheckEmail.getEmail()).build());
+        } else {
+            IdamUserDetails applicantSolicitor1UserDetails = caseData.getApplicantSolicitor1UserDetails();
+            dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1UserDetails.getEmail()).build());
+        }
+
+        dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
+        dataBuilder.submittedDate(time.now());
+        dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
+
+        dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM));
+
+
+        //set check email field to null for GDPR
+        dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
+        return dataBuilder;
+    }
+    //--------------------------------
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
