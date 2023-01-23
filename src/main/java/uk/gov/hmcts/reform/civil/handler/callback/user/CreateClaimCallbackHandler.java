@@ -656,7 +656,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM));
 
-
         //set check email field to null for GDPR
         dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
         return dataBuilder;
