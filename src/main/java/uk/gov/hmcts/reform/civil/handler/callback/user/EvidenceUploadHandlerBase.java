@@ -327,7 +327,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             setCategoryId(caseData.getDocumentCaseSummary(), document -> document.getValue().getDocumentUpload(), "ApplicantTrialSummary");
             setCategoryId(caseData.getDocumentSkeletonArgument(), document -> document.getValue().getDocumentUpload(), "ApplicantTrialSkeleton");
             setCategoryId(caseData.getDocumentAuthorities(), document -> document.getValue().getDocumentUpload(), "ApplicantTrialAuthorities");
-            setCategoryId(caseData.getDocumentCosts(), document -> document.getValue().getDocumentUpload(), "ApplicantTrialDocuments");
+            setCategoryId(caseData.getDocumentCosts(), document -> document.getValue().getDocumentUpload(), "ApplicantTrialCosts");
             setCategoryId(caseData.getDocumentEvidenceForTrial(), document -> document.getValue().getDocumentUpload(), "ApplicantTrialDocumentEvidence");
         }
 
