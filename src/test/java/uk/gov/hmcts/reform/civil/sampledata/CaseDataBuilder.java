@@ -2720,6 +2720,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimantFullDefence() {
+        atStateRespondentRespondToClaim(RespondentResponseType.FULL_DEFENCE);
+        respondentSharedClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant1-defence.pdf").build())
+            .build();
+        applicant1DQWithLocation();
+        applicant1ResponseDate = LocalDateTime.now().minusDays(1);
+        return this;
+    }
+
     public CaseDataBuilder atStateRespondentFullDefenceRespondent2() {
         atStateRespondent2RespondToClaim(RespondentResponseType.FULL_DEFENCE);
         respondent2 = PartyBuilder.builder().individual().build();
@@ -4347,5 +4357,4 @@ public class CaseDataBuilder {
             .caseAccessCategory(caseAccessCategory)
             .build();
     }
-
 }
