@@ -1462,7 +1462,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .legacyCaseReference("000MC001")
                     .build();
-                CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).request(
+                CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).version(V_1).request(
                         CallbackRequest.builder().eventId(CREATE_CLAIM_SPEC.name()).build())
                     .build();
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -1510,7 +1510,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .legacyCaseReference("000MC001")
                     .build();
-                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
                 String body = format(

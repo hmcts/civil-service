@@ -1620,7 +1620,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
                     .multiPartyClaimOneDefendantSolicitor().build();
-                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
                 String body = format(

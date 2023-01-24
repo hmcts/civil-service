@@ -168,6 +168,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(V_2, ABOUT_TO_SUBMIT), params -> submitClaim(params, true))
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
+            .put(callbackKey(V_1, SUBMITTED), params -> buildConfirmation(params, true))
             .build();
     }
 
@@ -557,11 +558,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     //--------------------------------
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        return buildConfirmation(callbackParams, false);
+    }
+
+    //---------v1 callback overloaded, return to single param
+    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams, boolean isV1Callback) {
         CaseData caseData = callbackParams.getCaseData();
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(getHeader(caseData))
-            .confirmationBody(getBody(caseData))
+            .confirmationBody(getBody(caseData, isV1Callback))
             .build();
     }
 
@@ -598,11 +604,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
     }
 
-    private String getBody(CaseData caseData) {
+    //------remove bool for v1 callback----------
+    private String getBody(CaseData caseData, boolean isV1Callback) {
         if (toggleService.isCertificateOfServiceEnabled()) {
             return format(
                 areRespondentsRepresentedAndRegistered(caseData)
-                    ? getConfirmationSummary()
+                    ? getConfirmationSummary(isV1Callback)
                     : LIP_CONFIRMATION_BODY_COS,
                 format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
                 claimIssueConfiguration.getResponsePackLink()
@@ -610,7 +617,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         } else {
             return format(
                 areRespondentsRepresentedAndRegistered(caseData)
-                    ? getConfirmationSummary()
+                    ? getConfirmationSummary(isV1Callback)
                     : LIP_CONFIRMATION_BODY,
                 format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
                 claimIssueConfiguration.getResponsePackLink()
@@ -618,8 +625,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
     }
 
-    private String getConfirmationSummary() {
-        if (toggleService.isPbaV3Enabled()) {
+    //------remove v1 bool-------
+    private String getConfirmationSummary(boolean isV1Callback) {
+        if (toggleService.isPbaV3Enabled() && isV1Callback) {
             return CONFIRMATION_SUMMARY_PBA_V3;
         } else {
             return CONFIRMATION_SUMMARY;
