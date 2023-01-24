@@ -21,6 +21,8 @@ public class RoboticsDataUtil {
     public static final String APPLICANT2_ID = "004";
     public static final String RESPONDENT2_SOLICITOR_ID = "003";
 
+    public static final String CIVIL_COURT_TYPE_ID = "10";
+
     private RoboticsDataUtil() {
         // NoOp
     }
