@@ -75,6 +75,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
@@ -178,9 +179,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
-            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaimV1)
+            .put(callbackKey(V_2, ABOUT_TO_SUBMIT), this::submitClaimV1)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
-            .put(callbackKey(V_1, SUBMITTED), this::buildConfirmationPba3)
+            .put(callbackKey(V_1, SUBMITTED), params -> buildConfirmation(params, true))
             .put(callbackKey(MID, "respondent1"), this::validateRespondent1Address)
             .put(callbackKey(MID, "respondent2"), this::validateRespondent2Address)
             .put(callbackKey(MID, "amount-breakup"), this::calculateTotalClaimAmount)
@@ -610,38 +611,25 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     //----------------------------------------------------
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        if (null != callbackParams.getRequest().getEventId()
-            && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
-            return SubmittedCallbackResponse.builder()
-                .confirmationHeader(getSpecHeader(caseData))
-                .confirmationBody(getSpecBody(caseData))
-                .build();
-        } else {
-            return SubmittedCallbackResponse.builder()
-                .confirmationHeader(getHeader(caseData))
-                .confirmationBody(getBody(caseData))
-                .build();
-        }
+        return buildConfirmation(callbackParams, false);
     }
 
-    // ------------------------------------V1 method ----------------------------------
-    private SubmittedCallbackResponse buildConfirmationPba3(CallbackParams callbackParams) {
+    //--------v1 callback overloaded, return to single param
+    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams, boolean isV1Callback) {
         CaseData caseData = callbackParams.getCaseData();
         if (null != callbackParams.getRequest().getEventId()
             && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
             return SubmittedCallbackResponse.builder()
                 .confirmationHeader(getSpecHeader(caseData))
-                .confirmationBody(getSpecBody(caseData))
+                .confirmationBody(getSpecBody(caseData, isV1Callback))
                 .build();
         } else {
             return SubmittedCallbackResponse.builder()
                 .confirmationHeader(getHeader(caseData))
-                .confirmationBody(getBody(caseData))
+                .confirmationBody(getBody(caseData, isV1Callback))
                 .build();
         }
     }
-    // -------------------------------------------------------------------------------
 
     private String getHeader(CaseData caseData) {
         if (areRespondentsRepresentedAndRegistered(caseData)
@@ -654,14 +642,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         );
     }
 
-    private String getBody(CaseData caseData) {
+    private String getBody(CaseData caseData, boolean isV1Callback) {
         LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
         String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
 
         return format(
             (areRespondentsRepresentedAndRegistered(caseData)
                 || isPinInPostCaseMatched(caseData))
-                ? getConfirmationSummary()
+                ? getConfirmationSummary(isV1Callback)
                 : LIP_CONFIRMATION_BODY,
             format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
             claimIssueConfiguration.getResponsePackLink(),
@@ -669,25 +657,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         ) + exitSurveyContentService.applicantSurvey();
     }
 
-    // ------------------------------------V1 method ----------------------------------------
-    private String getBodyV1(CaseData caseData) {
-        LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
-        String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
-
-        return format(
-            (areRespondentsRepresentedAndRegistered(caseData)
-                || isPinInPostCaseMatched(caseData))
-                ? getConfirmationSummary()
-                : LIP_CONFIRMATION_BODY,
-            format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
-            claimIssueConfiguration.getResponsePackLink(),
-            formattedServiceDeadline
-        ) + exitSurveyContentService.applicantSurvey();
-    }
-    //---------------------------------------------------------------------------
-
-    private String getConfirmationSummary() {
-        if (featureToggleService.isPbaV3Enabled()) {
+    private String getConfirmationSummary(boolean isV1Callback) {
+        if (featureToggleService.isPbaV3Enabled() && isV1Callback) {
             return CONFIRMATION_SUMMARY_PBA_V3;
         } else {
             return CONFIRMATION_SUMMARY;
@@ -858,14 +829,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         );
     }
 
-    private String getSpecBody(CaseData caseData) {
+    private String getSpecBody(CaseData caseData, boolean isV1Callback) {
         LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
         String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
 
         return format(
             (areRespondentsRepresentedAndRegistered(caseData)
                 || isPinInPostCaseMatched(caseData))
-                ? getSpecConfirmationSummary()
+                ? getSpecConfirmationSummary(isV1Callback)
                 : SPEC_LIP_CONFIRMATION_BODY,
             format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
             claimIssueConfiguration.getResponsePackLink(),
@@ -876,8 +847,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         ) + exitSurveyContentService.applicantSurvey();
     }
 
-    private String getSpecConfirmationSummary() {
-        if (featureToggleService.isPbaV3Enabled()) {
+    private String getSpecConfirmationSummary(boolean isV1Callback) {
+        if (featureToggleService.isPbaV3Enabled() && isV1Callback) {
             return SPEC_CONFIRMATION_SUMMARY_PBA_V3;
         } else {
             return SPEC_CONFIRMATION_SUMMARY;
