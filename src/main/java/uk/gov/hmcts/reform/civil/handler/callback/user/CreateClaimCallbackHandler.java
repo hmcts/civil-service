@@ -500,33 +500,29 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData(); //NOSONAR
+        CaseData caseData = callbackParams.getCaseData();
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString()); //NOSONAR
-        IdamUserDetails.IdamUserDetailsBuilder idam = IdamUserDetails.builder().id(userDetails.getId()); //NOSONAR
-        CorrectEmail applicantSolicitor1CheckEmail = caseData.getApplicantSolicitor1CheckEmail(); //NOSONAR
-        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder(); //NOSONAR
+        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        IdamUserDetails.IdamUserDetailsBuilder idam = IdamUserDetails.builder().id(userDetails.getId());
+        CorrectEmail applicantSolicitor1CheckEmail = caseData.getApplicantSolicitor1CheckEmail();
+        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
 
-        if (applicantSolicitor1CheckEmail.isCorrect()) { //NOSONAR
-            dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1CheckEmail.getEmail()).build()); //NOSONAR
+        if (applicantSolicitor1CheckEmail.isCorrect()) {
+            dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1CheckEmail.getEmail()).build());
         } else {
-            IdamUserDetails applicantSolicitor1UserDetails = caseData.getApplicantSolicitor1UserDetails(); //NOSONAR
-            dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1UserDetails.getEmail()).build()); //NOSONAR
+            IdamUserDetails applicantSolicitor1UserDetails = caseData.getApplicantSolicitor1UserDetails();
+            dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1UserDetails.getEmail()).build());
         }
 
-        dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber()); //NOSONAR
-        dataBuilder.submittedDate(time.now()); //NOSONAR
-        dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType())); //NOSONAR
+        dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
+        dataBuilder.submittedDate(time.now());
+        dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
 
-        if (!toggleService.isPbaV3Enabled()) { //NOSONAR
-            dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM)); //NOSONAR
-        } else {
-            dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM)); //NOSONAR
-        }
+        dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM));
 
         //set check email field to null for GDPR
-        dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build()); //NOSONAR
-        return dataBuilder; //NOSONAR
+        dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
+        return dataBuilder;
     }
 
     //----------------------------v1 method --------------------------
@@ -549,7 +545,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         dataBuilder.submittedDate(time.now());
         dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
 
-        dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM));
+        if (!toggleService.isPbaV3Enabled()) {
+            dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM));
+        } else {
+            dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
+        }
 
         //set check email field to null for GDPR
         dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
