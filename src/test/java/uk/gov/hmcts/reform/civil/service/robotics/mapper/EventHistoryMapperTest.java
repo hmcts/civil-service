@@ -2892,14 +2892,14 @@ class EventHistoryMapperTest {
                     .dateReceived(caseData.getRespondent2ResponseDate())
                     .litigiousPartyID("003")
                     .eventDetailsText(mapper.prepareFullDefenceEventText(
-                        caseData.getRespondent2DQ(),
+                        caseData.getRespondent1DQ(),
                         caseData,
                         true,
                         caseData.getRespondent2()
                     ))
                     .eventDetails(EventDetails.builder()
-                                      .stayClaim(mapper.isStayClaim(caseData.getRespondent2DQ()))
-                                      .preferredCourtCode(mapper.getPreferredCourtCode(caseData.getRespondent2DQ()))
+                                      .stayClaim(mapper.isStayClaim(caseData.getRespondent1DQ()))
+                                      .preferredCourtCode(mapper.getPreferredCourtCode(caseData.getRespondent1DQ()))
                                       .preferredCourtName("")
                                       .build())
                     .build()

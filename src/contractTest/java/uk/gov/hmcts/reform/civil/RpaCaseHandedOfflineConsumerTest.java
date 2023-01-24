@@ -74,7 +74,9 @@ class RpaCaseHandedOfflineConsumerTest extends BaseRpaTest {
     LocationRefDataService locationRefDataService;
     @MockBean
     private Time time;
+
     private static final String BEARER_TOKEN = "Bearer Token";
+
     LocalDateTime localDateTime;
 
     @BeforeEach

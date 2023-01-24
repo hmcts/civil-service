@@ -81,6 +81,7 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.REPLY_TO_DEFENC
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
@@ -1377,7 +1378,7 @@ public class EventHistoryMapper {
                 ));
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
                 Party respondent2 = caseData.getRespondent2();
-                Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
+                Respondent1DQ respondent2DQ = caseData.getRespondent1DQ();
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
 
