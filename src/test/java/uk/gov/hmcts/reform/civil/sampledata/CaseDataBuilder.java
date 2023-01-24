@@ -92,6 +92,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
@@ -158,6 +159,7 @@ public class CaseDataBuilder {
     protected SolicitorReferences solicitorReferences;
     protected String respondentSolicitor2Reference;
     protected CourtLocation courtLocation;
+    protected LocationRefData locationRefData;
     protected Party applicant1;
     protected Party applicant2;
     protected YesOrNo applicant1LitigationFriendRequired;
@@ -546,7 +548,10 @@ public class CaseDataBuilder {
             .respondent1DQExperts(Experts.builder().expertRequired(NO).build())
             .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
             .respondent1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .respondent1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
+            .respondent1DQHearingSupport(HearingSupport.builder()
+                                             .supportRequirements(YES)
+                                             .supportRequirementsAdditional("Additional support needed")
+                                             .requirements(List.of()).build())
             .respondent1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
             .respondent1DQLanguage(WelshLanguageRequirements.builder().build())
             .respondent1DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
@@ -789,7 +794,10 @@ public class CaseDataBuilder {
             .applicant1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
             .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .applicant1DQRequestedCourt(RequestedCourt.builder().build())
-            .applicant1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
+            .applicant1DQHearingSupport(HearingSupport.builder()
+                                            .supportRequirements(YES)
+                                            .supportRequirementsAdditional("Additional support needed")
+                                            .requirements(List.of()).build())
             .applicant1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
             .applicant1DQLanguage(WelshLanguageRequirements.builder().build())
             .applicant1DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
@@ -975,7 +983,10 @@ public class CaseDataBuilder {
             .applicant2DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
             .applicant2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .applicant2DQRequestedCourt(RequestedCourt.builder().build())
-            .applicant2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
+            .applicant2DQHearingSupport(HearingSupport.builder()
+                                            .supportRequirements(YES)
+                                            .supportRequirementsAdditional("Additional support needed")
+                                            .requirements(List.of()).build())
             .applicant2DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
             .applicant2DQLanguage(WelshLanguageRequirements.builder().build())
             .applicant2DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build())
@@ -1690,8 +1701,8 @@ public class CaseDataBuilder {
         this.courtLocation = CourtLocation.builder()
             .applicantPreferredCourt("127")
             .caseLocation(CaseLocation.builder()
-                              .region("regionId1")
-                              .baseLocation("epimmsId1")
+                              .region("2")
+                              .baseLocation("000000")
                               .build())
             .build();
         return this;
@@ -1705,6 +1716,10 @@ public class CaseDataBuilder {
         courtLocation = CourtLocation.builder()
             .applicantPreferredCourtLocationList(
                 DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
+            .caseLocation(CaseLocation.builder()
+                              .region("10")
+                              .baseLocation("214320")
+                              .build())
             .build();
         claimValue = ClaimValue.builder()
             .statementOfValueInPennies(BigDecimal.valueOf(10000000))
@@ -2267,19 +2282,19 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder updateOrgPolicyAfterNoC(boolean isApplicant, boolean isRespondent2) {
+    public CaseDataBuilder updateOrgPolicyAfterNoC(boolean isApplicant, boolean isRespondent2, String newOrgId) {
         if (isApplicant) {
             applicant1OrganisationPolicy = OrganisationPolicy.builder()
-                .organisation(Organisation.builder().organisationID("1234").build())
+                .organisation(Organisation.builder().organisationID(newOrgId).build())
                 .orgPolicyCaseAssignedRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName()).build();
         } else {
             if (isRespondent2) {
                 respondent2OrganisationPolicy = OrganisationPolicy.builder()
-                    .organisation(Organisation.builder().organisationID("1234").build())
+                    .organisation(Organisation.builder().organisationID(newOrgId).build())
                     .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName()).build();
             } else {
                 respondent1OrganisationPolicy = OrganisationPolicy.builder()
-                    .organisation(Organisation.builder().organisationID("1234").build())
+                    .organisation(Organisation.builder().organisationID(newOrgId).build())
                     .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()).build();
             }
         }
@@ -3788,6 +3803,14 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder multiPartyClaimTwoDefendantsLiP() {
+        this.addRespondent2 = YES;
+        this.respondent2 = PartyBuilder.builder().individual().build();
+        this.respondent2Represented = NO;
+        this.respondent1Represented = NO;
+        return this;
+    }
+
     public CaseDataBuilder multiPartyClaimTwoDefendantSolicitorsForSdoMP() {
         this.addRespondent2 = YES;
         this.respondent2 = PartyBuilder.builder().individual().build();
@@ -3851,6 +3874,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder setSuperClaimTypeToSpecClaim() {
         this.superClaimType = SPEC_CLAIM;
+        return this;
+    }
+
+    public CaseDataBuilder setClaimNotificationDate() {
+        claimNotificationDate = issueDate.plusDays(1).atStartOfDay();
         return this;
     }
 
@@ -4079,7 +4107,6 @@ public class CaseDataBuilder {
         cosUIStatement.add("CERTIFIED");
         if (setCos1) {
             CertificateOfService.CertificateOfServiceBuilder cos1Builder = CertificateOfService.builder()
-                .cosUISenderStatementOfTruthLabel(cosUIStatement)
                 .cosDateOfServiceForDefendant(cos1Date);
             if (file1) {
                 cos1Builder.cosEvidenceDocument(files);
@@ -4088,7 +4115,6 @@ public class CaseDataBuilder {
         }
         if (setCos2) {
             CertificateOfService.CertificateOfServiceBuilder cos2Builder = CertificateOfService.builder()
-                .cosUISenderStatementOfTruthLabel(cosUIStatement)
                 .cosDateOfServiceForDefendant(cos2Date);
             if (file2) {
                 cos2Builder.cosEvidenceDocument(files2);
@@ -4315,9 +4341,10 @@ public class CaseDataBuilder {
             .disposalHearingFinalDisposalHearingTimeDJ(disposalHearingFinalDisposalHearingTimeDJ)
             .trialHearingTimeDJ(trialHearingTimeDJ)
             .trialOrderMadeWithoutHearingDJ(trialOrderMadeWithoutHearingDJ)
-            //Certificate of Service
-            .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
-            .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
+                //Certificate of Service
+                .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
+                .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
+            .caseAccessCategory(caseAccessCategory)
             .build();
     }
 

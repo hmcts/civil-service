@@ -76,6 +76,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -111,13 +112,17 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
         + "receive an email. The email will also include the date that the defendants have to respond.";
 
-    public static final String SPEC_LIP_CONFIRMATION_BODY = "<br />When payment is confirmed your claim will be issued "
+    public static final String SPEC_LIP_CONFIRMATION_BODY = "<br />When the payment is confirmed your claim will be issued "
         + "and you'll be notified by email. The claim will then progress offline."
-        + "%n%nTo continue the claim you need to send the:<ul> <li> <a href=\"%s\" target=\"_blank\">sealed claim form</a> "
-        + "</li><li><a href=\"%s\" target=\"_blank\">response pack</a></li><li> and any supporting documents </li></ul>to "
-        + "the defendant within 4 months. "
-        + "%n%nOnce you have served the claim, send the Certificate of Service and supporting documents to the County"
-        + " Court Claims Centre.";
+        + "%n%nOnce the claim has been issued, you will need to serve the claim upon the "
+        + "defendant which must include a response pack"
+        + "%n%nYou will need to send the following:<ul style=\"margin-bottom : 0px;\"> <li> <a href=\"%s\" target=\"_blank\">sealed claim form</a> "
+        + "</li><li><a href=\"%s\" target=\"_blank\">response pack</a></li><ul style=\"list-style-type:circle\"><li><a href=\"%s\" target=\"_blank\">N9A</a></li>"
+        + "<li><a href=\"%s\" target=\"_blank\">N9B</a></li></ul><li>and any supporting documents</li></ul>"
+        + "to the defendant within 4 months."
+        + "%n%nFollowing this, you will to file a Certificate of Service and supporting documents "
+        + "to : <a href=\"mailto:OCMCNton@justice.gov.uk\">OCMCNton@justice.gov.uk</a>. The Certificate of Service form can be found here:"
+        + "%n%n<ul><li><a href=\"%s\" target=\"_blank\">N215</a></li></ul>";
 
     private final ClaimIssueConfiguration claimIssueConfiguration;
     private final ExitSurveyContentService exitSurveyContentService;
@@ -392,6 +397,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder.respondent2Represented(respondent2Represented);
         }
 
+        addOrgPolicy2ForSameLegalRepresentative(dataBuilder.build(), dataBuilder);
+
         if (isPinInPostCaseMatched(caseData)) {
             dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         }
@@ -428,9 +435,33 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
         }
 
+        CaseData temporaryCaseData = dataBuilder.build();
+
+        if (temporaryCaseData.getRespondent1OrgRegistered() == YES
+            && temporaryCaseData.getRespondent1Represented() == YES
+            && temporaryCaseData.getRespondent2SameLegalRepresentative() == YES) {
+            // Predicate: Def1 registered, Def 2 unregistered.
+            // This is required to ensure mutual exclusion in 1v2 same solicitor case.
+            dataBuilder.respondent2OrgRegistered(YES);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void addOrgPolicy2ForSameLegalRepresentative(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+        if (caseData.getRespondent2SameLegalRepresentative() == YES) {
+            OrganisationPolicy.OrganisationPolicyBuilder organisationPolicy2Builder = OrganisationPolicy.builder();
+
+            OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
+            organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
+                .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
+                .build();
+
+            organisationPolicy2Builder.orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
+            caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2Builder.build());
+        }
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
@@ -677,6 +708,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 : SPEC_LIP_CONFIRMATION_BODY,
             format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
             claimIssueConfiguration.getResponsePackLink(),
+            claimIssueConfiguration.getN9aLink(),
+            claimIssueConfiguration.getN9bLink(),
+            claimIssueConfiguration.getN215Link(),
             formattedServiceDeadline
         ) + exitSurveyContentService.applicantSurvey();
     }
