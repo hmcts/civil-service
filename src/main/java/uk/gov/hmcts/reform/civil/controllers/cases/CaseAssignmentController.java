@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.PinDto;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService;
@@ -44,10 +45,10 @@ public class CaseAssignmentController {
         @ApiResponse(code = 401, message = "Not Authorized"),
         @ApiResponse(code = 400, message = "Bad Request")})
     public ResponseEntity<CaseDetails> validateCaseAndPin(
-        @PathVariable("caseReference") String caseReference, @RequestBody String pin) {
+        @PathVariable("caseReference") String caseReference, @RequestBody PinDto pin) {
         log.info("case reference {}", caseReference);
         CaseDetails caseDetails = caseByLegacyReferenceSearchService.getCaseDataByLegacyReference(caseReference);
-        defendantPinToPostLRspecService.validatePin(caseDetails, pin);
+        defendantPinToPostLRspecService.validatePin(caseDetails, pin.getPin());
         return new ResponseEntity<>(caseDetails, HttpStatus.OK);
     }
 
