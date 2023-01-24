@@ -294,7 +294,8 @@ class FlowPredicateTest {
 
         @Test
         void shouldResolve_whenOnlyOneUnrepresentedDefendant() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant()
+                .defendant1LIPAtClaimIssued(YES).build();
 
             assertTrue(certificateOfServiceEnabled.test(caseData));
             assertTrue(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
@@ -303,7 +304,8 @@ class FlowPredicateTest {
 
         @Test
         void shouldResolve_whenFirstDefendantUnrepresented() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1()
+                .defendant1LIPAtClaimIssued(YES).build();
 
             assertTrue(certificateOfServiceEnabled.test(caseData));
             assertFalse(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
@@ -313,7 +315,9 @@ class FlowPredicateTest {
 
         @Test
         void shouldResolve_whenSecondDefendantUnrepresented() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant2().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssuedUnrepresentedDefendant2()
+                .defendant2LIPAtClaimIssued(YES).build();
 
             assertTrue(certificateOfServiceEnabled.test(caseData));
             assertFalse(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
@@ -323,7 +327,10 @@ class FlowPredicateTest {
 
         @Test
         void shouldResolve_whenBothDefendantsUnrepresented() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .defendant1LIPAtClaimIssued(YES)
+                .defendant2LIPAtClaimIssued(YES)
+                .atStateClaimIssuedUnrepresentedDefendants().build();
 
             assertTrue(certificateOfServiceEnabled.test(caseData));
             assertFalse(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
@@ -1261,6 +1268,16 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenCaseDataAtStateTakenOfflineAfterClaimIssue() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff().build();
+
+            assertTrue(takenOfflineByStaffAfterClaimIssue.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateTakenOfflineAfterClaimIssueSpec() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineByStaff()
+                .setClaimNotificationDate()
+                .setSuperClaimTypeToSpecClaim().build();
 
             assertTrue(takenOfflineByStaffAfterClaimIssue.test(caseData));
         }

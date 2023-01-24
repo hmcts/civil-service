@@ -9,13 +9,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
+import uk.gov.hmcts.reform.ccd.model.PreviousOrganisationCollectionItem;
 import uk.gov.hmcts.reform.civil.assertion.CustomAssertions;
 import uk.gov.hmcts.reform.civil.config.PrdAdminUserConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
+import uk.gov.hmcts.reform.civil.model.robotics.NoticeOfChange;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -23,14 +28,17 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.prd.model.DxAddress;
 import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -80,7 +88,9 @@ class RoboticsDataMapperTest {
     PrdAdminUserConfiguration userConfig;
     @MockBean
     private Time time;
-
+    @MockBean
+    LocationRefDataService locationRefDataService;
+    private static final String BEARER_TOKEN = "Bearer Token";
     LocalDateTime localDateTime;
 
     @BeforeEach
@@ -97,7 +107,7 @@ class RoboticsDataMapperTest {
     void shouldMapToRoboticsCaseData_whenHandOffPointIsUnrepresentedDefendant() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
 
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
     }
@@ -116,7 +126,7 @@ class RoboticsDataMapperTest {
                                                          .build())
             .build();
 
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
     }
@@ -125,7 +135,7 @@ class RoboticsDataMapperTest {
     void shouldMapToRoboticsCaseData_whenOrganisationPolicyIsPresent() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
 
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
@@ -149,7 +159,7 @@ class RoboticsDataMapperTest {
     void atStatePaymentSuccessfulWithCopyOrganisationIdPresent() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessfulWithCopyOrganisationOnly().build();
 
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
@@ -185,7 +195,7 @@ class RoboticsDataMapperTest {
             .respondentSolicitor1ServiceAddress(solicitorServiceAddress)
             .build();
 
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
@@ -212,7 +222,7 @@ class RoboticsDataMapperTest {
             .respondentSolicitor1OrganisationDetails(null)
             .respondent1OrganisationIDCopy(null).build();
 
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(1);
@@ -227,7 +237,7 @@ class RoboticsDataMapperTest {
     @Test
     void shouldThrowNullPointerException_whenCaseDataIsNull() {
         assertThrows(NullPointerException.class, () ->
-                         mapper.toRoboticsCaseData(null),
+                         mapper.toRoboticsCaseData(null, BEARER_TOKEN),
                      "caseData cannot be null"
         );
     }
@@ -238,7 +248,7 @@ class RoboticsDataMapperTest {
             .applicant2(PartyBuilder.builder().individual().build())
             .addApplicant2(YES)
             .build();
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getLitigiousParties()).hasSize(3);
     }
@@ -249,7 +259,7 @@ class RoboticsDataMapperTest {
             .respondent2(PartyBuilder.builder().company().build())
             .addRespondent2(YES)
             .build();
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getLitigiousParties()).hasSize(3);
     }
@@ -261,7 +271,7 @@ class RoboticsDataMapperTest {
             .addRespondent2(YES)
             .respondent2Represented(YES)
             .build();
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(3);
     }
@@ -274,7 +284,7 @@ class RoboticsDataMapperTest {
             .respondent2Represented(YES)
             .respondent2SameLegalRepresentative(YES)
             .build();
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
     }
@@ -288,7 +298,7 @@ class RoboticsDataMapperTest {
             .respondent2OrgRegistered(NO)
             .build();
 
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(3);
     }
@@ -300,8 +310,100 @@ class RoboticsDataMapperTest {
             .addRespondent2(YES)
             .respondent2Represented(NO)
             .build();
-        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData);
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
+    }
+
+    @Test
+    void shouldMapToRoboticsCaseDataWhenPreferredCourtCodeFetchedFromRefData() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
+        List<LocationRefData> courtLocations = new ArrayList<>();
+        courtLocations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
+                               .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
+                               .courtTypeId("10").courtLocationCode("121")
+                               .epimmsId("000000").build());
+        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(courtLocations);
+
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getHeader().getPreferredCourtCode()).isEqualTo("121");
+    }
+
+    @Test
+    void shouldMapExpectedNoticeOfChangeData_whenCaseGoesOffline() {
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePaymentSuccessful()
+            .build().toBuilder()
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+            .build();
+        var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
+        var res1NocDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
+        var res2NocDate = LocalDateTime.parse("2022-03-01T12:00:00.000550439");
+
+        caseData = caseData.toBuilder()
+            .applicant1OrganisationPolicy(
+                caseData.getApplicant1OrganisationPolicy().toBuilder()
+                    .previousOrganisations(List.of(buildPreviousOrganisation("App 1 org", app1NocDate)))
+                    .build())
+        .respondent1OrganisationPolicy(
+            caseData.getApplicant1OrganisationPolicy().toBuilder()
+                .previousOrganisations(List.of(buildPreviousOrganisation("Res 1 org", res1NocDate)))
+                .build())
+        .respondent2OrganisationPolicy(
+            caseData.getApplicant1OrganisationPolicy().toBuilder()
+                .previousOrganisations(List.of(buildPreviousOrganisation("Res 2 org", res2NocDate)))
+                .build())
+            .build();
+
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
+        assertThat(roboticsCaseData.getNoticeOfChange()).isEqualTo(
+            List.of(
+                NoticeOfChange.builder().litigiousPartyID("001").dateOfNoC(app1NocDate.format(ISO_DATE)).build(),
+                NoticeOfChange.builder().litigiousPartyID("002").dateOfNoC(res1NocDate.format(ISO_DATE)).build(),
+                NoticeOfChange.builder().litigiousPartyID("003").dateOfNoC(res2NocDate.format(ISO_DATE)).build())
+        );
+    }
+
+    @Test
+    void shouldNotPopulateNoticeOfChangeSection_whenCaseIsStillOnline() {
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
+        var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
+        var res1NocDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
+        var res2NocDate = LocalDateTime.parse("2022-03-01T12:00:00.000550439");
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStatePaymentSuccessful()
+            .build().toBuilder()
+            .ccdState(CaseState.AWAITING_CASE_DETAILS_NOTIFICATION)
+            .build();
+
+        caseData = caseData.toBuilder()
+            .applicant1OrganisationPolicy(
+                caseData.getApplicant1OrganisationPolicy().toBuilder()
+                    .previousOrganisations(List.of(buildPreviousOrganisation("App 1 org", app1NocDate)))
+                    .build())
+            .respondent1OrganisationPolicy(
+                caseData.getApplicant1OrganisationPolicy().toBuilder()
+                    .previousOrganisations(List.of(buildPreviousOrganisation("Res 1 org", res1NocDate)))
+                    .build())
+            .respondent2OrganisationPolicy(
+                caseData.getApplicant1OrganisationPolicy().toBuilder()
+                    .previousOrganisations(List.of(buildPreviousOrganisation("Res 2 org", res2NocDate)))
+                    .build())
+            .build();
+
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
+        assertThat(roboticsCaseData.getNoticeOfChange()).isNull();
+    }
+
+    private PreviousOrganisationCollectionItem buildPreviousOrganisation(String name, LocalDateTime toDate) {
+        return PreviousOrganisationCollectionItem.builder().value(
+            PreviousOrganisation.builder().organisationName(name).toTimestamp(toDate).build()).build();
     }
 }

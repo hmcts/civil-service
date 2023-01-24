@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -31,6 +33,7 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
@@ -76,10 +79,11 @@ import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_ADMI
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.RECEIPT_OF_PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.REPLY_TO_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.STATES_PAID;
-import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT2_ID;
-import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.APPLICANT_ID;
-import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT2_ID;
-import static uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper.RESPONDENT_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseTypeForRespondent;
@@ -101,6 +105,7 @@ public class EventHistoryMapper {
     private final StateFlowEngine stateFlowEngine;
     private final FeatureToggleService featureToggleService;
     private final EventHistorySequencer eventHistorySequencer;
+    private final LocationRefDataService locationRefDataService;
     private final Time time;
     public static final String BS_REF = "Breathing space reference";
     public static final String BS_START_DT = "actual start date";
@@ -1005,6 +1010,10 @@ public class EventHistoryMapper {
                 .collect(Collectors.toList());
             builder.directionsQuestionnaireFiled(dqForProceedingApplicantsSpec);
         } else {
+            List<LocationRefData> courtLocations = (locationRefDataService
+                .getCourtLocationsByEpimmsId(
+                    CallbackParams.Params.BEARER_TOKEN.toString(),
+                    caseData.getCourtLocation().getCaseLocation().getBaseLocation()));
             List<Event> dqForProceedingApplicants = IntStream.range(0, applicantDetails.size())
                 .mapToObj(index ->
                               Event.builder()
@@ -1014,13 +1023,21 @@ public class EventHistoryMapper {
                                   .litigiousPartyID(applicantDetails.get(index).getLitigiousPartyID())
                                   .eventDetails(EventDetails.builder()
                                                     .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
-                                                    .preferredCourtCode(caseData.getCourtLocation()
-                                                                            .getApplicantPreferredCourt())
+                                                    .preferredCourtCode(courtLocations.isEmpty()
+                                                                            ? null : courtLocations.stream()
+                                                        .filter(id -> id.getCourtTypeId().equals(
+                                                            CIVIL_COURT_TYPE_ID))
+                                                        .collect(Collectors.toList()).get(0)
+                                                        .getCourtLocationCode())
                                                     .preferredCourtName("")
                                                     .build())
                                   .eventDetailsText(prepareEventDetailsText(
                                       applicantDetails.get(index).getDq(),
-                                      caseData.getCourtLocation().getApplicantPreferredCourt()
+                                      courtLocations.isEmpty() ? null : courtLocations.stream()
+                                          .filter(id -> id.getCourtTypeId().equals(
+                                              CIVIL_COURT_TYPE_ID))
+                                          .collect(Collectors.toList()).get(0)
+                                          .getCourtLocationCode()
                                   ))
                                   .build())
                 .collect(Collectors.toList());
@@ -1360,7 +1377,7 @@ public class EventHistoryMapper {
                 ));
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
                 Party respondent2 = caseData.getRespondent2();
-                Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
+                Respondent1DQ respondent2DQ = caseData.getRespondent1DQ();
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
 

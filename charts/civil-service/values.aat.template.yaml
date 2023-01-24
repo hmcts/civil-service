@@ -133,11 +133,13 @@ ccd:
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
       ingressHost: gateway-${SERVICE_FQDN}
       ingressIP: ${INGRESS_IP}
-      keyVaults: []
+      disableKeyVaults: true
   ccd-data-store-api:
     java:
       imagePullPolicy: Always
       devcpuRequests: 500m
+      devmemoryRequests: 2048Mi
+      devmemoryLimits: 4096Mi
       environment:
         CASE_DOCUMENT_AM_API_ATTACH_DOCUMENT_ENABLED: false
         DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
@@ -157,7 +159,7 @@ ccd:
         CCD_MULTIPARTY_EVENTS: DEFENDANT_RESPONSE,ACKNOWLEDGE_CLAIM,CLAIMANT_RESPONSE
         RELEASE_REVISION: "{{ .Release.Revision }}"
         ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
-      keyVaults: []
+      disableKeyVaults: true
       ingressHost: civil-service-data-store-staging-aat.service.core-compute-aat.internal
   ccd-definition-store-api:
     java:
@@ -171,7 +173,7 @@ ccd:
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
         RELEASE_REVISION: "{{ .Release.Revision }}"
-      keyVaults: []
+      disableKeyVaults: true
       ingressHost: civil-service-definition-store-staging-aat.service.core-compute-aat.internal
 
   postgresql:
