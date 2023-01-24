@@ -166,7 +166,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(MID, "populateClaimantSolicitor"), this::populateClaimantSolicitor)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
-            .put(callbackKey(V_2, ABOUT_TO_SUBMIT), this::submitClaimV1)
+            .put(callbackKey(V_2, ABOUT_TO_SUBMIT), params -> submitClaim(params, true))
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
@@ -372,117 +372,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        List<String> validationErrors;
-
-        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
-            validationErrors = validateCourtChoice(caseData);
-        } else {
-            validationErrors = validateCourtTextOld(caseData);
-        }
-
-        if (validationErrors.size() > 0) {
-            return AboutToStartOrSubmitCallbackResponse.builder().errors(validationErrors).build();
-        }
-
-        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams); //NOSONAR
-        addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder); //NOSONAR
-
-        if (caseData.getRespondent1OrgRegistered() == YES //NOSONAR
-            && caseData.getRespondent1Represented() == YES //NOSONAR
-            && caseData.getRespondent2SameLegalRepresentative() == YES) { //NOSONAR
-            // Predicate: Def1 registered, Def 2 unregistered.
-            // This is required to ensure mutual exclusion in 1v2 same solicitor case.
-            dataBuilder.respondent2OrgRegistered(YES); //NOSONAR
-        }
-
-        // moving statement of truth value to correct field, this was not possible in mid event.
-        // resetting statement of truth to make sure it's empty the next time it appears in the UI.
-        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth(); //NOSONAR
-        dataBuilder
-            .uiStatementOfTruth(StatementOfTruth.builder().build()) //NOSONAR
-            .applicantSolicitor1ClaimStatementOfTruth(statementOfTruth) //NOSONAR
-            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1()); //NOSONAR
-
-        // data for case list and unassigned list
-        dataBuilder//NOSONAR
-            .allPartyNames(getAllPartyNames(caseData)) //NOSONAR
-            .unassignedCaseListDisplayOrganisationReferences(getAllOrganisationPolicyReferences(caseData)) //NOSONAR
-            .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData)); //NOSONAR
-
-        if (ofNullable(caseData.getRespondent2()).isPresent()) { //NOSONAR
-            dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2()); //NOSONAR
-        }
-
-        dataBuilder.claimStarted(null); //NOSONAR
-
-        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) { //NOSONAR
-            handleCourtLocationData(caseData, dataBuilder, callbackParams); //NOSONAR
-        }
-
-        if (V_1.equals(callbackParams.getVersion()) //NOSONAR
-            && toggleService.isAccessProfilesEnabled()) { //NOSONAR
-            dataBuilder.caseAccessCategory(CaseCategory.UNSPEC_CLAIM); //NOSONAR
-        }
-
-        if (toggleService.isNoticeOfChangeEnabled()) { //NOSONAR
-            // LiP are not represented or registered
-            OrgPolicyUtils.addMissingOrgPolicies(dataBuilder); //NOSONAR
-        }
-
-        // temporarily default to yes for CIV-2659
-        if (YES.equals(caseData.getRespondent1Represented()) && caseData.getRespondent1OrgRegistered() == null) { //NOSONAR
-            dataBuilder.respondent1OrgRegistered(YES); //NOSONAR
-        }
-
-        if (YES.equals(caseData.getRespondent2Represented()) && caseData.getRespondent2OrgRegistered() == null) { //NOSONAR
-            dataBuilder.respondent2OrgRegistered(YES); //NOSONAR
-        }
-
-        //assign casemanagementcategory to the case and assign casenamehmctsinternal
-        if (V_1.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) { //NOSONAR
-
-            //casename
-            dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString()); //NOSONAR
-
-            //case management category
-            CaseManagementCategoryElement civil =
-                CaseManagementCategoryElement.builder().code("Civil").label("Civil").build(); //NOSONAR
-            List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>(); //NOSONAR
-            itemList.add(element(civil)); //NOSONAR
-            dataBuilder.caseManagementCategory(//NOSONAR
-                CaseManagementCategory.builder().value(civil).list_items(itemList).build()); //NOSONAR
-            log.info("Case management equals: " + caseData.getCaseManagementCategory()); //NOSONAR
-            log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal()); //NOSONAR
-        }
-        //Adding variables for feature Certificate of Service
-        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCertificateOfServiceEnabled()) { //NOSONAR
-            if (caseData.getRespondent1Represented().equals(NO)) { //NOSONAR
-                dataBuilder.defendant1LIPAtClaimIssued(YES); //NOSONAR
-            } else {
-                dataBuilder.defendant1LIPAtClaimIssued(NO); //NOSONAR
-            }
-
-            if (YES.equals(caseData.getAddRespondent2())) { //NOSONAR
-                if (caseData.getRespondent2Represented() == NO) { //NOSONAR
-                    dataBuilder.defendant2LIPAtClaimIssued(YES); //NOSONAR
-                } else {
-                    dataBuilder.defendant2LIPAtClaimIssued(NO); //NOSONAR
-                }
-            }
-        }
-
-        dataBuilder.ccdState(CaseState.PENDING_CASE_ISSUED); //NOSONAR
-
-        return AboutToStartOrSubmitCallbackResponse.builder() //NOSONAR
-            .data(dataBuilder.build().toMap(objectMapper)) //NOSONAR
-            .build(); //NOSONAR
+        return submitClaim(callbackParams, false);
     }
 
     //----------------------------------v1 method-------------------------
-    private CallbackResponse submitClaimV1(CallbackParams callbackParams) {
+    private CallbackResponse submitClaim(CallbackParams callbackParams, boolean isV1Callback) {
         CaseData caseData = callbackParams.getCaseData();
 
         List<String> validationErrors;
@@ -498,7 +392,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
 
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        CaseData.CaseDataBuilder dataBuilder = getSharedDataV1(callbackParams);
+        CaseData.CaseDataBuilder dataBuilder = isV1Callback ? getSharedDataV1(callbackParams) : getSharedData(callbackParams);
         addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder);
 
         if (caseData.getRespondent1OrgRegistered() == YES
