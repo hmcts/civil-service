@@ -20,6 +20,9 @@ import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
@@ -4461,6 +4464,14 @@ class EventHistoryMapperTest {
                         .atState(FlowState.Main.FULL_DEFENCE_PROCEED, MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                         .atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2()
                         .respondentResponseIsSame(YES)
+                        .respondent1DQ(Respondent1DQ.builder()
+                                           .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
+                                                                                         .oneMonthStayRequested(YES)
+                                                                                         .build())
+                                           .respondent1DQRequestedCourt(RequestedCourt.builder()
+                                                                            .responseCourtCode("444")
+                                                                            .build())
+                                           .build())
                         .build();
                     if (caseData.getRespondent2OrgRegistered() != null
                         && caseData.getRespondent2Represented() == null) {
@@ -4603,6 +4614,14 @@ class EventHistoryMapperTest {
                         .atState(TAKEN_OFFLINE_SDO_NOT_DRAWN)
                         .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                         .respondentResponseIsSame(YES)
+                        .respondent1DQ(Respondent1DQ.builder()
+                                           .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
+                                                                                         .oneMonthStayRequested(YES)
+                                                                                         .build())
+                                           .respondent1DQRequestedCourt(RequestedCourt.builder()
+                                                                            .responseCourtCode("444")
+                                                                            .build())
+                                           .build())
                         .build();
                     if (caseData.getRespondent2OrgRegistered() != null
                         && caseData.getRespondent2Represented() == null) {
@@ -4747,6 +4766,14 @@ class EventHistoryMapperTest {
                         .atState(FULL_DEFENCE_PROCEED)
                         .atStateApplicantProceedAllMediation(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                         .respondentResponseIsSame(YES)
+                        .respondent1DQ(Respondent1DQ.builder()
+                                           .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
+                                                                                         .oneMonthStayRequested(YES)
+                                                                                         .build())
+                                           .respondent1DQRequestedCourt(RequestedCourt.builder()
+                                                                            .responseCourtCode("444")
+                                                                            .build())
+                                           .build())
                         .build();
                     if (caseData.getRespondent2OrgRegistered() != null
                         && caseData.getRespondent2Represented() == null) {
