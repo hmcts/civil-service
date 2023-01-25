@@ -55,13 +55,19 @@ def publishRpaContract() {
   sh """ ./gradlew pactPublish """
 }
 
+def checkForEnableHelmLabel(branch_name) {
+  return new GithubAPI(this).getLabelsbyPattern(branch_name, "enableHelm").contains("enableHelm")
+}
+
 withPipeline(type, product, component) {
 
   onPR {
     env.ENVIRONMENT = "preview"
     env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     loadVaultSecrets(secrets)
-    enableCleanupOfHelmReleaseOnSuccess()
+    if (!checkForEnableHelmLabel(env.BRANCH_NAME)) {
+      enableCleanupOfHelmReleaseAlways();
+    }
   }
   onMaster {
     loadVaultSecrets(secrets)
