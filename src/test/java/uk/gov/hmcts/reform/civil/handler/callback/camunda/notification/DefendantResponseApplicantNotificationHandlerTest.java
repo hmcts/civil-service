@@ -217,7 +217,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 final CaseData finalCaseData = caseData;
                 verify(notificationService).sendMail(
                     ArgumentMatchers.eq("applicantsolicitor@example.com"),
-                    ArgumentMatchers.eq("templateImm-id"),
+                    ArgumentMatchers.eq("spec-claimant-template-id"),
                     ArgumentMatchers.argThat(map -> {
                         Map<String, String> expected = getNotificationDataMapSpec(finalCaseData);
                         return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
