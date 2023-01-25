@@ -300,7 +300,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                     .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
                     .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ
                                                       .builder()
-                                                      .hearingTemporaryLocation(
+                                                      .hearingPreferredLocation(
                                                           DynamicList.builder().listItems(temporaryLocationList)
                                                               .value(DynamicListElement.builder().label("Loc - 1 - 1")
                                                                          .build())
@@ -337,8 +337,10 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                     .addRespondent2(NO)
                     .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
-                    .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().hearingTemporaryLocation(
-                        DynamicList.builder().build()).build())
+                    .hearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().hearingPreferredLocation(
+                        DynamicList.builder().value(DynamicListElement.builder().label("loc1").code("loc1").build())
+                            .listItems(List.of(DynamicListElement.builder().label("loc1").code("loc1").build()))
+                            .build()).build())
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
