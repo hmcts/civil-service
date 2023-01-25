@@ -92,6 +92,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
@@ -158,6 +159,7 @@ public class CaseDataBuilder {
     protected SolicitorReferences solicitorReferences;
     protected String respondentSolicitor2Reference;
     protected CourtLocation courtLocation;
+    protected LocationRefData locationRefData;
     protected Party applicant1;
     protected Party applicant2;
     protected YesOrNo applicant1LitigationFriendRequired;
@@ -1699,8 +1701,8 @@ public class CaseDataBuilder {
         this.courtLocation = CourtLocation.builder()
             .applicantPreferredCourt("127")
             .caseLocation(CaseLocation.builder()
-                              .region("regionId1")
-                              .baseLocation("epimmsId1")
+                              .region("2")
+                              .baseLocation("000000")
                               .build())
             .build();
         return this;
@@ -1714,6 +1716,10 @@ public class CaseDataBuilder {
         courtLocation = CourtLocation.builder()
             .applicantPreferredCourtLocationList(
                 DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
+            .caseLocation(CaseLocation.builder()
+                              .region("10")
+                              .baseLocation("214320")
+                              .build())
             .build();
         claimValue = ClaimValue.builder()
             .statementOfValueInPennies(BigDecimal.valueOf(10000000))
@@ -3871,6 +3877,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder setClaimNotificationDate() {
+        claimNotificationDate = issueDate.plusDays(1).atStartOfDay();
+        return this;
+    }
+
     public CaseDataBuilder setSuperClaimTypeToUnspecClaim() {
         this.superClaimType = UNSPEC_CLAIM;
         return this;
@@ -4096,7 +4107,6 @@ public class CaseDataBuilder {
         cosUIStatement.add("CERTIFIED");
         if (setCos1) {
             CertificateOfService.CertificateOfServiceBuilder cos1Builder = CertificateOfService.builder()
-                .cosUISenderStatementOfTruthLabel(cosUIStatement)
                 .cosDateOfServiceForDefendant(cos1Date);
             if (file1) {
                 cos1Builder.cosEvidenceDocument(files);
@@ -4105,7 +4115,6 @@ public class CaseDataBuilder {
         }
         if (setCos2) {
             CertificateOfService.CertificateOfServiceBuilder cos2Builder = CertificateOfService.builder()
-                .cosUISenderStatementOfTruthLabel(cosUIStatement)
                 .cosDateOfServiceForDefendant(cos2Date);
             if (file2) {
                 cos2Builder.cosEvidenceDocument(files2);
