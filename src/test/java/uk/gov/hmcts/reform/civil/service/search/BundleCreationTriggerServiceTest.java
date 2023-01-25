@@ -16,7 +16,7 @@ class BundleCreationTriggerServiceTest extends ElasticSearchServiceTest {
 
     @BeforeEach
     void setup() {
-        searchService = new HearingFeeDueSearchService(coreCaseDataService);
+        searchService = new BundleCreationTriggerService(coreCaseDataService);
     }
 
     @Override
@@ -24,7 +24,7 @@ class BundleCreationTriggerServiceTest extends ElasticSearchServiceTest {
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                        .must(matchQuery("data.hearingDueDate",LocalDate.now().plusWeeks(3)))
+                        .must(matchQuery("data.hearingDate",LocalDate.now().plusWeeks(3)))
                         .must(boolQuery().must(matchQuery("state", "HEARING_READINESS"))));
             return new Query(query, List.of("reference"), fromValue);
     }
