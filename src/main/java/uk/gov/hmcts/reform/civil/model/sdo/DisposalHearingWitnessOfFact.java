@@ -14,10 +14,6 @@ import javax.validation.constraints.Future;
 @AllArgsConstructor
 public class DisposalHearingWitnessOfFact {
 
-    private String input1;
-    @Future(message = "The date entered must be in the future")
-    private LocalDate date1;
-    private String input2;
     private String input3;
     private LocalDate date2;
     private String input4;
