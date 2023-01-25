@@ -280,11 +280,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
         caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
 
-        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
-
         caseDataBuilder.claimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
 
         if (!toggleService.isPbaV3Enabled()) {
+            List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
             caseDataBuilder.applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
                 .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
         }
