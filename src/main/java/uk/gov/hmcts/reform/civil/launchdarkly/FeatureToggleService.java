@@ -33,31 +33,23 @@ public class FeatureToggleService {
 
     public boolean isOrganisationOnboarded(String orgId) {
         LDUser ldUser = createLDUser().custom("orgId", orgId).build();
-        return internalClient.boolVariation("isOrganisationOnboarded", ldUser, false);
+        return true;
     }
 
     public boolean isRpaContinuousFeedEnabled() {
-        return internalClient.boolVariation("rpaContinuousFeed", createLDUser().build(), false);
+        return true;
     }
 
     public boolean isSpecRpaContinuousFeedEnabled() {
-        return internalClient.boolVariation(
-            "specified-rpa-continuous-feed",
-            createLDUser().build(),
-            false
-        );
+        return true;
     }
 
     public boolean isGlobalSearchEnabled() {
-        return internalClient.boolVariation(
-            "global-search-specified",
-            createLDUser().build(),
-            false
-        );
+        return true;
     }
 
     public boolean isLrSpecEnabled() {
-        return isFeatureEnabled("specified-lr-journey");
+        return true;
     }
 
     public boolean isSdoEnabled() {
@@ -65,7 +57,7 @@ public class FeatureToggleService {
     }
 
     public boolean isGeneralApplicationsEnabled() {
-        return internalClient.boolVariation("general_applications_enabled", createLDUser().build(), false);
+        return false;
     }
 
     public LDUser.Builder createLDUser() {
@@ -75,7 +67,7 @@ public class FeatureToggleService {
     }
 
     public boolean isNoticeOfChangeEnabled() {
-        return internalClient.boolVariation("notice-of-change", createLDUser().build(), false);
+        return false;
     }
 
     public boolean isHearingAndListingSDOEnabled() {
@@ -83,32 +75,31 @@ public class FeatureToggleService {
     }
 
     public boolean isCourtLocationDynamicListEnabled() {
-        return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), false);
+        return true;
     }
 
     public boolean isCaseFlagsEnabled() {
-        return internalClient.boolVariation("case-flags", createLDUser().build(), false);
+        return false;
     }
 
     public boolean isPinInPostEnabled() {
-        return internalClient.boolVariation("pin-in-post", createLDUser().build(), false);
+        return false;
     }
 
     public boolean isAccessProfilesEnabled() {
-        return internalClient.boolVariation("access-profiles", createLDUser().build(), false);
+        return true;
     }
 
     public boolean isPbaV3Enabled() {
-        return internalClient.boolVariation("pba-version-3-ways-to-pay", createLDUser().build(), false);
+        return false;
     }
 
     public boolean isSDOEnabled() {
-        return internalClient.boolVariation("enableSDO", createLDUser().build(), false);
+        return false;
     }
 
     public boolean isCertificateOfServiceEnabled() {
-        return internalClient.boolVariation("isCertificateOfServiceEnabled",
-                                            createLDUser().build(), false);
+        return false;
     }
 
     private void close() {
