@@ -136,7 +136,7 @@ public class RoboticsNotificationService {
             return roboticsEmailConfiguration.getSpecRecipient();
         }
         String recipient = isMultiParty ? roboticsEmailConfiguration
-            .getRecipient() : roboticsEmailConfiguration.getRecipient();
+            .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
 
         log.info(String.format("EMAIl:--------- %s", recipient));
         return recipient;
