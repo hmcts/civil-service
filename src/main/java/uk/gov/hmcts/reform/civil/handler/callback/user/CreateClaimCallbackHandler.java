@@ -186,8 +186,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
             caseDataBuilder
                 .courtLocation(CourtLocation.builder()
-                   .applicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations))
-                   .build());
+                                   .applicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations))
+                                   .build());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -200,11 +200,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         Optional<Organisation> organisation = organisationService.findOrganisation(authToken);
         organisation.ifPresent(value -> caseDataBuilder.applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                 .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                 .organisationID(value.getOrganisationIdentifier()).build())
-                 .orgPolicyReference(null)
-                 .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
-                 .build()));
+                                                                                         .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                                                           .organisationID(value.getOrganisationIdentifier()).build())
+                                                                                         .orgPolicyReference(null)
+                                                                                         .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
+                                                                                         .build()));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
@@ -382,7 +382,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         List<String> validationErrors;
 
-        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
+        if (V_2.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
             validationErrors = validateCourtChoice(caseData);
         } else {
             validationErrors = validateCourtTextOld(caseData);
@@ -428,7 +428,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             handleCourtLocationData(caseData, dataBuilder, callbackParams);
         }
 
-        if (V_1.equals(callbackParams.getVersion())
+        if (V_2.equals(callbackParams.getVersion())
             && toggleService.isAccessProfilesEnabled()) {
             dataBuilder.caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
         }
@@ -448,7 +448,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
 
         //assign casemanagementcategory to the case and assign casenamehmctsinternal
-        if (V_1.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {
+        if (V_2.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {
 
             //casename
             dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
@@ -464,7 +464,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
         }
         //Adding variables for feature Certificate of Service
-        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCertificateOfServiceEnabled()) {
+        if (V_2.equals(callbackParams.getVersion()) && toggleService.isCertificateOfServiceEnabled()) {
             if (caseData.getRespondent1Represented().equals(NO)) {
                 dataBuilder.defendant1LIPAtClaimIssued(YES);
             } else {
@@ -496,7 +496,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                       caseData.getRespondent1().getPartyName(),
                       YES.equals(caseData.getAddRespondent2())
                           && NO.equals(caseData.getRespondent2SameLegalRepresentative())
-                            ? ", " + caseData.getRespondent2().getPartyName() : "");
+                          ? ", " + caseData.getRespondent2().getPartyName() : "");
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
@@ -684,12 +684,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             participantString.append(caseData.getApplicant1().getPartyName())
                 .append(" and ").append(caseData.getApplicant2().getPartyName()).append(" v ")
                 .append(caseData.getRespondent1()
-                .getPartyName());
+                            .getPartyName());
 
         } else {
             participantString.append(caseData.getApplicant1().getPartyName()).append(" v ")
                 .append(caseData.getRespondent1()
-                .getPartyName());
+                            .getPartyName());
         }
         return participantString;
 
