@@ -29,10 +29,10 @@ import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
@@ -43,7 +43,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -61,7 +60,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 
 @Service
@@ -77,6 +75,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final Time time;
     private final FeatureToggleService featureToggleService;
     private final LocationRefDataService locationRefDataService;
+    private final LocationRefDataUtil locationRefDataUtil;
     private final LocationHelper locationHelper;
 
     @Override
@@ -241,15 +240,14 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 applicant1DQBuilder.applicant1DQStatementOfTruth(statementOfTruth);
 
                 if (featureToggleService.isCourtLocationDynamicListEnabled()) {
-                    List<LocationRefData> courtLocations = (locationRefDataService
-                        .getCourtLocationsByEpimmsId(CallbackParams.Params.BEARER_TOKEN.toString(),
-                                                     caseData.getCourtLocation().getCaseLocation().getBaseLocation()));
+                    String responseCourtCode = locationRefDataUtil.getPreferredCourtCode(
+                        caseData,
+                        CallbackParams.Params.BEARER_TOKEN.toString()
+                    );
                     applicant1DQBuilder.applicant1DQRequestedCourt(
                         RequestedCourt.builder()
                             .caseLocation(caseData.getCourtLocation().getCaseLocation())
-                            .responseCourtCode(courtLocations.isEmpty() ? "" : courtLocations.stream()
-                                                   .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
-                                                   .collect(Collectors.toList()).get(0).getCourtLocationCode())
+                            .responseCourtCode(responseCourtCode)
                             .build());
                 }
 
