@@ -382,7 +382,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         List<String> validationErrors;
 
-        if (V_2.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
+        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
             validationErrors = validateCourtChoice(caseData);
         } else {
             validationErrors = validateCourtTextOld(caseData);
@@ -428,7 +428,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             handleCourtLocationData(caseData, dataBuilder, callbackParams);
         }
 
-        if (V_2.equals(callbackParams.getVersion())
+        if (V_1.equals(callbackParams.getVersion())
             && toggleService.isAccessProfilesEnabled()) {
             dataBuilder.caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
         }
@@ -448,7 +448,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
 
         //assign casemanagementcategory to the case and assign casenamehmctsinternal
-        if (V_2.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {
+        if (V_1.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {
 
             //casename
             dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
@@ -464,7 +464,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
         }
         //Adding variables for feature Certificate of Service
-        if (V_2.equals(callbackParams.getVersion()) && toggleService.isCertificateOfServiceEnabled()) {
+        if (V_1.equals(callbackParams.getVersion()) && toggleService.isCertificateOfServiceEnabled()) {
             if (caseData.getRespondent1Represented().equals(NO)) {
                 dataBuilder.defendant1LIPAtClaimIssued(YES);
             } else {
