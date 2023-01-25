@@ -203,7 +203,11 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
     public Map<String, String> addPropertiesSpec(CaseData caseData, CaseEvent caseEvent) {
         if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE)) {
-            if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY) {
+            if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
+                && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
+                caseData.getRespondent2ClaimResponseTypeForSpec()))
+            ) {
                 String shouldBePaidBy = caseData.getRespondToClaimAdmitPartLRspec()
                     .getWhenWillThisAmountBePaid().getDayOfMonth()
                     + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getMonth()
