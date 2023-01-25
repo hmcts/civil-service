@@ -417,7 +417,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         }
 
-        if (V_1.equals(callbackParams.getVersion())
+        if (V_2.equals(callbackParams.getVersion())
             && toggleService.isCourtLocationDynamicListEnabled()) {
             dataBuilder.caseManagementLocation(CaseLocation.builder().region(regionId).baseLocation(epimmsId).build());
         }
@@ -425,13 +425,13 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
         ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
 
-        if (V_1.equals(callbackParams.getVersion())
+        if (V_2.equals(callbackParams.getVersion())
             && toggleService.isAccessProfilesEnabled()) {
             dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
         }
 
         //assign case management category to the case and caseNameHMCTSinternal
-        if (V_1.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {
+        if (V_2.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {
             dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
 
             CaseManagementCategoryElement civil =
@@ -488,7 +488,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         }
 
-        if (V_1.equals(callbackParams.getVersion())
+        if (V_2.equals(callbackParams.getVersion())
             && toggleService.isCourtLocationDynamicListEnabled()) {
             dataBuilder.caseManagementLocation(CaseLocation.builder().region(regionId).baseLocation(epimmsId).build());
         }
@@ -496,13 +496,13 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
         ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
 
-        if (V_1.equals(callbackParams.getVersion())
+        if (V_2.equals(callbackParams.getVersion())
             && toggleService.isAccessProfilesEnabled()) {
             dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
         }
 
         //assign case management category to the case and caseNameHMCTSinternal
-        if (V_1.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {
+        if (V_2.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {
             dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
 
             CaseManagementCategoryElement civil =
