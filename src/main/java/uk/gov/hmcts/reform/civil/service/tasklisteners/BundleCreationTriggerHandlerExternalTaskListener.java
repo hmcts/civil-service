@@ -12,7 +12,7 @@ public class BundleCreationTriggerHandlerExternalTaskListener {
     private static final String TOPIC = "BUNDLE_CREATION_CHECK";
 
     @Autowired
-    private BundleCreationTriggerHandlerExternalTaskListener(BundleCreationTriggerHandler  bundleCreationTriggerHandler ,
+    private BundleCreationTriggerHandlerExternalTaskListener(BundleCreationTriggerHandler bundleCreationTriggerHandler,
                                                            ExternalTaskClient client) {
         TopicSubscriptionBuilder subscriptionBuilder = client.subscribe(TOPIC);
         subscriptionBuilder.handler(bundleCreationTriggerHandler).open();
