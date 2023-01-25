@@ -40,7 +40,6 @@ public class CaseAssignmentController {
 
     private final CaseLegacyReferenceSearchService caseByLegacyReferenceSearchService;
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
-    private final PiPLetterGenerator piPLetterGenerator;
     private final AssignCaseService assignCaseService;
 
     @PostMapping(path = {
@@ -75,9 +74,4 @@ public class CaseAssignmentController {
         return new ResponseEntity<>("ok", HttpStatus.OK);
     }
 
-    @PostMapping(value = "/pipLetter", produces = MediaType.APPLICATION_PDF_VALUE)
-    public @ResponseBody
-    byte[] downloadLetter(@RequestBody CaseData caseData) {
-        return piPLetterGenerator.downloadLetter(caseData);
-    }
 }
