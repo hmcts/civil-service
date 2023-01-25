@@ -18,13 +18,10 @@ public class AssignCaseService {
     private final UserService userService;
     private final OrganisationService organisationService;
 
-    public void assignCase( String authorisation, String caseId, Optional<CaseRole> caseRole){
-        log.info("in the assign case service");
+    public void assignCase(String authorisation, String caseId, Optional<CaseRole> caseRole) {
         String userId = userService.getUserInfo(authorisation).getUid();
-
         String organisationId = organisationService.findOrganisation(authorisation)
             .map(Organisation::getOrganisationIdentifier).orElse(null);
-        log.info(organisationId);
         coreCaseUserService.assignCase(
             caseId,
             userId,
