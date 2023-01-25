@@ -55,6 +55,10 @@ def publishRpaContract() {
   sh """ ./gradlew pactPublish """
 }
 
+def checkForEnableHelmLabel(branch_name) {
+  return new GithubAPI(this).getLabelsbyPattern(branch_name, "enableHelm").contains("enableHelm")
+}
+
 withPipeline(type, product, component) {
 
   onPR {
