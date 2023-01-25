@@ -100,10 +100,12 @@ public class DeadlinesCalculator {
 
     public LocalDate calculateWhenToBePaid(LocalDateTime responseDate) {
         LocalDateTime dateTime = responseDate;
+        LocalDate checkingIfWorkingday;
         if (is4pmOrAfter(responseDate)) {
             dateTime = responseDate.plusDays(1);
         }
         int daysToAdd = 5;
-        return calculateFirstWorkingDay(dateTime.toLocalDate()).plusDays(daysToAdd);
+        dateTime = dateTime.plusDays(daysToAdd);
+        return workingDayIndicator.getNextWorkingDay(dateTime.toLocalDate());
     }
 }

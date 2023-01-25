@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.properties.notification.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.NotificationService;
@@ -138,7 +139,11 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
         String emailTemplate;
         if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE)) {
 
-            if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY) {
+            if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
+                && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                    || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
+                        caseData.getRespondent2ClaimResponseTypeForSpec()))
+            ) {
                 emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
             } else {
                 emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
