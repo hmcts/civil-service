@@ -44,7 +44,7 @@ public class FeatureToggleService {
         return internalClient.boolVariation(
             "specified-rpa-continuous-feed",
             createLDUser().build(),
-            false
+            true
         );
     }
 
