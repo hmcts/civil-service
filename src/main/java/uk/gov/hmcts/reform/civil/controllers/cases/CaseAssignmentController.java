@@ -63,12 +63,11 @@ public class CaseAssignmentController {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 401, message = "Not Authorized"),
         @ApiResponse(code = 400, message = "Bad Request")})
-    public ResponseEntity<String> assignCaseToDefendant(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
+    public void assignCaseToDefendant(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
                                                         @PathVariable("caseId") String caseId,
                                                         @PathVariable("caseRole") Optional<CaseRole> caseRole) {
         log.info("assigning case with id: {}", caseId);
         assignCaseService.assignCase(authorisation, caseId, caseRole);
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
