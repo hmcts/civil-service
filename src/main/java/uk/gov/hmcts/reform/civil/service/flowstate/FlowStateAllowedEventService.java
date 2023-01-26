@@ -67,6 +67,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_OR
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
@@ -245,7 +246,8 @@ public class FlowStateAllowedEventService {
                 SERVICE_REQUEST_RECEIVED,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
-                EVIDENCE_UPLOAD_RESPONDENT
+                EVIDENCE_UPLOAD_RESPONDENT,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
@@ -475,7 +477,8 @@ public class FlowStateAllowedEventService {
                 SERVICE_REQUEST_RECEIVED,
                 REFER_TO_JUDGE,
                 migrateCase,
-                TAKE_CASE_OFFLINE
+                TAKE_CASE_OFFLINE,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
@@ -712,7 +715,6 @@ public class FlowStateAllowedEventService {
                 HEARING_SCHEDULED,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
-
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
@@ -900,7 +902,8 @@ public class FlowStateAllowedEventService {
                 HEARING_FEE_PAID,
                 REFER_TO_JUDGE,
                 migrateCase,
-                TAKE_CASE_OFFLINE
+                TAKE_CASE_OFFLINE,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
