@@ -68,7 +68,7 @@ public class CaseAssignmentController {
                                                         @PathVariable("caseRole") Optional<CaseRole> caseRole) {
         log.info("assigning case with id", caseId);
         assignCaseService.assignCase(authorisation, caseId, caseRole);
-        return new ResponseEntity<>("ok", HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
