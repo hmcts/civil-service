@@ -18,21 +18,19 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_RESPONDENT_LITIGANT_IN_PERSON_SPEC;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
-public class RaisingClaimAgainstLitigantInPersonForSpecNotificationHandler extends CallbackHandler
+public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandler extends CallbackHandler
     implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS =
-        List.of(
-            NOTIFY_APPLICANT_SOLICITOR1_FOR_RESPONDENT_LITIGANT_IN_PERSON_SPEC
-        );
-    public static final String TASK_ID = "CreateClaimProceedsOfflineNotifyApplicantSolicitor1ForSpec";
-    private static final String REFERENCE_TEMPLATE = "applicant-create-case-handed-offline-notification-%s";
-
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_APPLICANT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC);
+    public static final String TASK_ID_Applicant1 = "CreateClaimContinuingOnlineNotifyApplicant1ForSpec";
+    private static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final FeatureToggleService toggleService;
@@ -40,13 +38,13 @@ public class RaisingClaimAgainstLitigantInPersonForSpecNotificationHandler exten
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantSolicitorCaseHandedOffline
+            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantForClaimContinuingOnline
         );
     }
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        return TASK_ID_Applicant1;
     }
 
     @Override
@@ -58,24 +56,32 @@ public class RaisingClaimAgainstLitigantInPersonForSpecNotificationHandler exten
         }
     }
 
-    private CallbackResponse notifyApplicantSolicitorCaseHandedOffline(CallbackParams callbackParams) {
+    private CallbackResponse notifyApplicantForClaimContinuingOnline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        generateEmail(caseData);
 
-        notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getClaimantSolicitorSpecCaseWillProgressOffline(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
-
-        return AboutToStartOrSubmitCallbackResponse.builder().build();
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .build();
     }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+            ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            PARTY_REFERENCES, buildPartiesReferences(caseData)
+            RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline()
+                                                   .toLocalDate(), DATE)
+        );
+    }
+
+    private void generateEmail(CaseData caseData) {
+        notificationService.sendMail(
+            caseData.getApplicant1().getPartyEmail(),
+            notificationsProperties.getClaimantClaimContinuingOnlineForSpec(),
+            addProperties(caseData),
+            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
     }
 }

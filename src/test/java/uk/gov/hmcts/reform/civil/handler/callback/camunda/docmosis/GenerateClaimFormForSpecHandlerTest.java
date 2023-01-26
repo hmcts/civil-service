@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -86,8 +86,8 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
     @Test
     public void ldBlock() {
         when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assert.assertTrue(handler.handledEvents().isEmpty());
-        Assert.assertFalse(handler.handledEvents().isEmpty());
+        Assertions.assertTrue(handler.handledEvents().isEmpty());
+        Assertions.assertFalse(handler.handledEvents().isEmpty());
     }
 
     private static final CaseDocument CLAIM_FORM =
