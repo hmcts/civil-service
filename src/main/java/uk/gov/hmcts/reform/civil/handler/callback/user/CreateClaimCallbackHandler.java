@@ -613,7 +613,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         if (toggleService.isCertificateOfServiceEnabled()) {
             return format(
                 areRespondentsRepresentedAndRegistered(caseData)
-                    ? CONFIRMATION_SUMMARY
+                    ? getConfirmationSummary(isV1Callback)
                     : LIP_CONFIRMATION_BODY_COS,
                 format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
                 claimIssueConfiguration.getResponsePackLink()
@@ -621,7 +621,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         } else {
             return format(
                 areRespondentsRepresentedAndRegistered(caseData)
-                    ? CONFIRMATION_SUMMARY
+                    ? getConfirmationSummary(isV1Callback)
                     : LIP_CONFIRMATION_BODY,
                 format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
                 claimIssueConfiguration.getResponsePackLink()
@@ -630,6 +630,14 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     //------remove v1 bool-------
+    private String getConfirmationSummary(boolean isV1Callback) {
+        if (toggleService.isPbaV3Enabled() && isV1Callback) {
+            return CONFIRMATION_SUMMARY_PBA_V3;
+        } else {
+            return CONFIRMATION_SUMMARY;
+        }
+    }
+
     private List<String> validateCourtChoice(CaseData caseData) {
         List<String> errorsMessages = new ArrayList<>();
         // Tactical fix. We have an issue where null courtLocation is being submitted.
