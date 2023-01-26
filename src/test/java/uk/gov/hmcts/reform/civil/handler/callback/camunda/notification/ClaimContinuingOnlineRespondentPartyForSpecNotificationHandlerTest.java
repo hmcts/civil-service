@@ -3,12 +3,12 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
@@ -56,7 +56,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_REFERENCE;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler.class,
     JacksonAutoConfiguration.class,
@@ -89,7 +89,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
     public static final String TASK_ID_Respondent1 = "CreateClaimContinuingOnlineNotifyRespondent1ForSpec";
     private static final byte[] LETTER_CONTENT = new byte[]{1, 2, 3, 4};
 
-    @org.junit.Test
+    @Test
     public void ldBlock() {
         when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
         assertTrue(handler.handledEvents().isEmpty());
@@ -144,10 +144,12 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
 
             handler.handle(params);
             verify(bulkPrintService)
-                .printLetter(LETTER_CONTENT,
-                             caseData.getLegacyCaseReference(),
-                             caseData.getLegacyCaseReference(),
-                             "first-contact-pack");
+                .printLetter(
+                    LETTER_CONTENT,
+                    caseData.getLegacyCaseReference(),
+                    caseData.getLegacyCaseReference(),
+                    "first-contact-pack"
+                );
         }
 
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
