@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
+import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.model.Address;
@@ -2707,6 +2708,23 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateRespondent1v2AdmintPart_FullDefence() {
         respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
         respondent2ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_DEFENCE;
+        return this;
+    }
+
+    public CaseDataBuilder atStateRespondentFullDefenceWithHearingSupport() {
+        atStateRespondentRespondToClaim(RespondentResponseType.FULL_DEFENCE);
+        respondent1DQ = Respondent1DQ.builder()
+            .respondent1DQHearingSupport(HearingSupport.builder()
+                                             .requirements(List.of(SupportRequirements.values()))
+                                             .languageToBeInterpreted("English")
+                                             .signLanguageRequired("Spanish")
+                                             .otherSupport("other support")
+                                             .supportRequirements(YES)
+                                             .supportRequirementsAdditional("additional support").build()).build();
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant1-defence.pdf").build())
+            .build();
+        respondent1ResponseDate = LocalDateTime.now().minusDays(1);
         return this;
     }
 

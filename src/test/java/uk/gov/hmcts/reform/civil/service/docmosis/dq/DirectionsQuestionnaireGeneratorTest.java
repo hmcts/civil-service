@@ -2168,7 +2168,7 @@ class DirectionsQuestionnaireGeneratorTest {
         @Test
         void checkStatementOfTruthTextForDefendent() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateRespondentFullDefence()
+                .atStateRespondentFullDefenceWithHearingSupport()
                 .build()
                 .toBuilder()
                 .businessProcess(BusinessProcess.builder()
