@@ -177,7 +177,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
+            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(MID, "respondent1"), this::validateRespondent1Address)
             .put(callbackKey(MID, "respondent2"), this::validateRespondent2Address)

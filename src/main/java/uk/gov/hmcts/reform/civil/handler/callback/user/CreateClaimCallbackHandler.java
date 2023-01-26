@@ -486,7 +486,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                       caseData.getRespondent1().getPartyName(),
                       YES.equals(caseData.getAddRespondent2())
                           && NO.equals(caseData.getRespondent2SameLegalRepresentative())
-                          ? ", " + caseData.getRespondent2().getPartyName() : "");
+                            ? ", " + caseData.getRespondent2().getPartyName() : "");
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
