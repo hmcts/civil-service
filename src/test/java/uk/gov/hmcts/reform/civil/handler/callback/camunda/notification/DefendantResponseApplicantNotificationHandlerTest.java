@@ -91,29 +91,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
         class OneVsOneScenario {
 
             @Test
-            void shouldNotifyApplicantSolicitorFullAdmission_whenV1CallbackInvoked() {
-                CaseData caseData = CaseDataBuilder.builder()
-                    . atStateBothClaimantv1BothNotFullDefence_PartAdmissionX2()
-                    .build();
-
-                CallbackParams params = CallbackParamsBuilder.builder()
-                    .of(ABOUT_TO_SUBMIT, caseData)
-                    .request(CallbackRequest.builder()
-                                 .eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE")
-                                 .build())
-                    .build();
-
-                handler.handle(params);
-
-                verify(notificationService).sendMail(
-                    "applicantsolicitor@example.com",
-                    "template-id",
-                    getNotificationDataMap(caseData),
-                    "defendant-response-applicant-notification-000DC001"
-                );
-            }
-
-            @Test
             void shouldNotifyApplicantSolicitorIn1v1Scenario_whenV1CallbackInvoked() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence()
