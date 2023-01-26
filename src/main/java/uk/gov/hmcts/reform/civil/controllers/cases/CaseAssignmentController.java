@@ -15,14 +15,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.PinDto;
 import uk.gov.hmcts.reform.civil.service.AssignCaseService;
-import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService;
 
@@ -67,8 +64,8 @@ public class CaseAssignmentController {
         @ApiResponse(code = 401, message = "Not Authorized"),
         @ApiResponse(code = 400, message = "Bad Request")})
     public ResponseEntity<String> assignCaseToDefendant(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
-                                      @PathVariable("caseId") String caseId,
-                                      @PathVariable("caseRole") Optional<CaseRole> caseRole){
+                                                        @PathVariable("caseId") String caseId,
+                                                        @PathVariable("caseRole") Optional<CaseRole> caseRole) {
         log.info("assigning case with id", caseId);
         assignCaseService.assignCase(authorisation, caseId, caseRole);
         return new ResponseEntity<>("ok", HttpStatus.OK);
