@@ -16,6 +16,7 @@ public class UploadEvidenceExpert {
 
     private String expertOptionName;
     private String expertOptionExpertise;
+    private String expertOptionExpertises;
     private String expertOptionOtherParty;
     private String expertDocumentQuestion;
     private String expertDocumentAnswer;
