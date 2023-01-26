@@ -265,7 +265,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 );
             }
 
-
             @Test
             void shouldNotifyRespondentSolicitorSpec_whenInvokedWithCcEvent() {
                 CaseData caseData = CaseDataBuilder.builder()
