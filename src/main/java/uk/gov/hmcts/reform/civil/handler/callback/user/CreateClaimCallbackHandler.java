@@ -382,7 +382,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         List<String> validationErrors;
 
-        if (V_2.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
+        if ((V_2.equals(callbackParams.getVersion()) || V_1.equals(callbackParams.getVersion()))
+            && toggleService.isCourtLocationDynamicListEnabled()) {
             validationErrors = validateCourtChoice(caseData);
         } else {
             validationErrors = validateCourtTextOld(caseData);
@@ -424,11 +425,12 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         dataBuilder.claimStarted(null);
 
-        if (V_2.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
+        if ((V_2.equals(callbackParams.getVersion()) || V_1.equals(callbackParams.getVersion()))
+            && toggleService.isCourtLocationDynamicListEnabled()) {
             handleCourtLocationData(caseData, dataBuilder, callbackParams);
         }
 
-        if (V_2.equals(callbackParams.getVersion())
+        if ((V_2.equals(callbackParams.getVersion()) || V_1.equals(callbackParams.getVersion()))
             && toggleService.isAccessProfilesEnabled()) {
             dataBuilder.caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
         }
@@ -448,7 +450,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
 
         //assign casemanagementcategory to the case and assign casenamehmctsinternal
-        if (V_2.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {
+        if ((V_2.equals(callbackParams.getVersion()) || V_1.equals(callbackParams.getVersion()))
+            && toggleService.isGlobalSearchEnabled()) {
 
             //casename
             dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
@@ -464,7 +467,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
         }
         //Adding variables for feature Certificate of Service
-        if (V_2.equals(callbackParams.getVersion()) && toggleService.isCertificateOfServiceEnabled()) {
+        if ((V_2.equals(callbackParams.getVersion()) || V_1.equals(callbackParams.getVersion()))
+            && toggleService.isCertificateOfServiceEnabled()) {
             if (caseData.getRespondent1Represented().equals(NO)) {
                 dataBuilder.defendant1LIPAtClaimIssued(YES);
             } else {
@@ -609,7 +613,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         if (toggleService.isCertificateOfServiceEnabled()) {
             return format(
                 areRespondentsRepresentedAndRegistered(caseData)
-                    ? getConfirmationSummary(isV1Callback)
+                    ? CONFIRMATION_SUMMARY
                     : LIP_CONFIRMATION_BODY_COS,
                 format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
                 claimIssueConfiguration.getResponsePackLink()
@@ -617,7 +621,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         } else {
             return format(
                 areRespondentsRepresentedAndRegistered(caseData)
-                    ? getConfirmationSummary(isV1Callback)
+                    ? CONFIRMATION_SUMMARY
                     : LIP_CONFIRMATION_BODY,
                 format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
                 claimIssueConfiguration.getResponsePackLink()
@@ -626,14 +630,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     //------remove v1 bool-------
-    private String getConfirmationSummary(boolean isV1Callback) {
-        if (toggleService.isPbaV3Enabled() && isV1Callback) {
-            return CONFIRMATION_SUMMARY_PBA_V3;
-        } else {
-            return CONFIRMATION_SUMMARY;
-        }
-    }
-
     private List<String> validateCourtChoice(CaseData caseData) {
         List<String> errorsMessages = new ArrayList<>();
         // Tactical fix. We have an issue where null courtLocation is being submitted.
