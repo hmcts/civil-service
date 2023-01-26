@@ -113,7 +113,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 );
             }
 
-
             @Test
             void shouldNotifyApplicantSolicitor_whenV1CallbackInvoked() {
                 CaseData caseData = CaseDataBuilder.builder()
@@ -649,7 +648,4 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             .containsEntry("claimReferenceNumber",  "000DC001")
             .containsEntry("defendantName", "my company");
     }
-
-
-
 }
