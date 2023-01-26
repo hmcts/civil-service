@@ -165,7 +165,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(MID, "populateClaimantSolicitor"), this::populateClaimantSolicitor)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
+            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(V_2, ABOUT_TO_SUBMIT), params -> submitClaim(params, true))
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(V_1, SUBMITTED), params -> buildConfirmation(params, true))
@@ -377,7 +377,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     //----------------------------------v1 method-------------------------
-    private CallbackResponse submitClaim(CallbackParams callbackParams, boolean isV1Callback) {
+    private CallbackResponse submitClaim(CallbackParams callbackParams, boolean isV2Callback) {
         CaseData caseData = callbackParams.getCaseData();
 
         List<String> validationErrors;
@@ -394,7 +394,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
 
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        CaseData.CaseDataBuilder dataBuilder = isV1Callback ? getSharedDataV1(callbackParams) : getSharedData(callbackParams);
+        CaseData.CaseDataBuilder dataBuilder = isV2Callback ? getSharedDataV1(callbackParams) : getSharedData(callbackParams);
         addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder);
 
         if (caseData.getRespondent1OrgRegistered() == YES
