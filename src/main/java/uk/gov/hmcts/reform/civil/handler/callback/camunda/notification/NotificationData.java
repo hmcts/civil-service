@@ -51,6 +51,7 @@ public interface NotificationData {
     String AMOUNT_OF_COSTS = "amountOfCosts";
     String AMOUNT_PAID = "amountPaidBeforeJudgment";
     String AMOUNT_OF_JUDGMENT = "amountOfJudgment";
+    String RESPONDENT = "respondent";
 
     // CUI Pin in Post
     String CLAIMANT_NAME = "claimantName";
