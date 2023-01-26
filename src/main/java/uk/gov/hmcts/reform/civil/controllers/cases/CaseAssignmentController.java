@@ -69,7 +69,7 @@ public class CaseAssignmentController {
     public ResponseEntity<String> assignCaseToDefendant(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
                                       @PathVariable("caseId") String caseId,
                                       @PathVariable("caseRole") Optional<CaseRole> caseRole){
-        log.info("hit the assign case controller - case reference {}", caseId);
+        log.info("assigning case with id", caseId);
         assignCaseService.assignCase(authorisation, caseId, caseRole);
         return new ResponseEntity<>("ok", HttpStatus.OK);
     }
