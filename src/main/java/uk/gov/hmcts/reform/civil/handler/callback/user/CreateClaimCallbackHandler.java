@@ -395,6 +395,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         CaseData.CaseDataBuilder dataBuilder = isV2Callback ? getSharedDataV1(callbackParams) : getSharedData(callbackParams);
+
         addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder);
 
         if (caseData.getRespondent1OrgRegistered() == YES
