@@ -8,10 +8,10 @@ maintainers:
 
 dependencies:
   - name: java
-    version: 4.0.4
+    version: 4.0.8
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
   - name: ccd
-    version: 8.0.17
+    version: v8.0.23
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd.enabled
   - name: xui-webapp

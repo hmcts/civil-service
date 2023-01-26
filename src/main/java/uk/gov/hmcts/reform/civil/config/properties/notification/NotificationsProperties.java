@@ -57,6 +57,9 @@ public class NotificationsProperties {
     private String claimantSolicitorCaseWillProgressOffline;
 
     @NotEmpty
+    private String claimantSolicitorSpecCaseWillProgressOffline;
+
+    @NotEmpty
     private String claimantSolicitorAgreedExtensionDate;
 
     @NotEmpty
@@ -79,6 +82,9 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String claimantSolicitorClaimContinuingOnline1v2ForSpec;
+
+    @NotEmpty
+    private String claimantClaimContinuingOnlineForSpec;
 
     @NotEmpty
     private String respondentSolicitorClaimContinuingOnlineForSpec;
@@ -204,5 +210,8 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String claimantSolicitorClaimContinuingOnlineCos;
+
+    @NotEmpty
+    private String evidenceUploadTemplate;
 
 }
