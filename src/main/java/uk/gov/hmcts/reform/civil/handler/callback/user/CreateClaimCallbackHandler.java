@@ -532,10 +532,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     //----------------------------v1 method --------------------------
     private CaseData.CaseDataBuilder getSharedDataV2(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
+        //second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         IdamUserDetails.IdamUserDetailsBuilder idam = IdamUserDetails.builder().id(userDetails.getId());
+
+        CaseData caseData = callbackParams.getCaseData();
         CorrectEmail applicantSolicitor1CheckEmail = caseData.getApplicantSolicitor1CheckEmail();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
 
