@@ -208,8 +208,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
                 if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                     || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
-                    caseData.getRespondent2ClaimResponseTypeForSpec()) )
-                {
+                    caseData.getRespondent2ClaimResponseTypeForSpec())) {
                     String shouldBePaidBy = caseData.getRespondToClaimAdmitPartLRspec()
                         .getWhenWillThisAmountBePaid().getDayOfMonth()
                         + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getMonth()
