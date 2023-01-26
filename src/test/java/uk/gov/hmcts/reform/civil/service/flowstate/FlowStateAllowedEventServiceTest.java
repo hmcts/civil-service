@@ -43,7 +43,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
@@ -208,7 +210,9 @@ class FlowStateAllowedEventServiceTest {
                         INITIATE_GENERAL_APPLICATION,
                         CREATE_SDO,
                         NotSuitable_SDO,
-                        migrateCase
+                        migrateCase,
+                        CREATE_CLAIM_AFTER_PAYMENT,
+                        CREATE_CLAIM_SPEC_AFTER_PAYMENT
                     }
                 ),
                 of(
@@ -230,9 +234,12 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         EVIDENCE_UPLOAD_JUDGE,
+                        CREATE_CLAIM_AFTER_PAYMENT,
+                        CREATE_CLAIM_SPEC_AFTER_PAYMENT,
                         EVIDENCE_UPLOAD_APPLICANT,
                         migrateCase,
                         EVIDENCE_UPLOAD_RESPONDENT
+
                     }
                 ),
                 of(
