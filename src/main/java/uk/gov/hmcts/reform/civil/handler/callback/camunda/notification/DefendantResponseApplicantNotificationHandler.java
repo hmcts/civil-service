@@ -203,21 +203,31 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
     public Map<String, String> addPropertiesSpec(CaseData caseData, CaseEvent caseEvent) {
         if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE)) {
-            if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
-                && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
-                caseData.getRespondent2ClaimResponseTypeForSpec()))
-            ) {
-                String shouldBePaidBy = caseData.getRespondToClaimAdmitPartLRspec()
-                    .getWhenWillThisAmountBePaid().getDayOfMonth()
-                    + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getMonth()
-                    + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getYear();
-                return Map.of(
-                CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                WHEN_WILL_BE_PAID_IMMEDIATELY, shouldBePaidBy
-                );
+
+            if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY) {
+
+                if (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+                    || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
+                    caseData.getRespondent2ClaimResponseTypeForSpec()) )
+                {
+                    String shouldBePaidBy = caseData.getRespondToClaimAdmitPartLRspec()
+                        .getWhenWillThisAmountBePaid().getDayOfMonth()
+                        + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getMonth()
+                        + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getYear();
+                    return Map.of(
+                        CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
+                        CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                        RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                        WHEN_WILL_BE_PAID_IMMEDIATELY, shouldBePaidBy
+                    );
+                }  else {
+                    return Map.of(
+                        CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
+                        CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                        RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+                    );
+                }
+
             } else {
                 return Map.of(
                     CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
