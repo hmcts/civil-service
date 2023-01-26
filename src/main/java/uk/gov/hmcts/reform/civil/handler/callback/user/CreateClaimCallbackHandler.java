@@ -376,7 +376,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         return submitClaim(callbackParams, false);
     }
 
-    //----------------------------------v1 method-------------------------
+    //----------------------------------v2 method-------------------------
     private CallbackResponse submitClaim(CallbackParams callbackParams, boolean isV2Callback) {
         CaseData caseData = callbackParams.getCaseData();
 
@@ -394,7 +394,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
 
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        CaseData.CaseDataBuilder dataBuilder = isV2Callback ? getSharedDataV1(callbackParams) :
+        CaseData.CaseDataBuilder dataBuilder = isV2Callback ? getSharedDataV2(callbackParams) :
             getSharedData(callbackParams);
         addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder);
 
@@ -531,7 +531,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     //----------------------------v1 method --------------------------
-    private CaseData.CaseDataBuilder getSharedDataV1(CallbackParams callbackParams) {
+    private CaseData.CaseDataBuilder getSharedDataV2(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
@@ -546,15 +546,15 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1UserDetails.getEmail()).build());
         }
 
-        dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
-        dataBuilder.submittedDate(time.now());
-        dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
-
         if (!toggleService.isPbaV3Enabled()) {
             dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM));
         } else {
             dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
         }
+
+        dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
+        dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
+        dataBuilder.submittedDate(time.now());
 
         //set check email field to null for GDPR
         dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
@@ -563,8 +563,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     //--------------------------------
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
         return buildConfirmation(callbackParams, false);
     }
 
