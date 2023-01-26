@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -59,7 +60,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         this.userService = userService;
     }
 
-    abstract CallbackResponse validateValues(CaseData caseData);
+    abstract CallbackResponse validateValues(CallbackParams callbackParams, CaseData caseData);
 
     abstract CallbackResponse createShowCondition(CaseData caseData);
 
@@ -89,6 +90,9 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         //For case which are 1v1, 2v1 and 1v2 (same solicitor) we show respondent fields for documents to be uploaded,
         //if a case is 1v2 and different solicitors we want to sure separate fields for each respondent solicitor,
         // below creates a show condition for these fields if user is respondent 2 solicitor
+        //default flag for respondent 1 solicitor
+        caseDataBuilder.caseTypeFlag("do_not_show");
+        //set flag for respondent2
         if (coreCaseUserService.userHasCaseRole(caseData
                                                    .getCcdCaseReference()
                                                    .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)
@@ -178,77 +182,60 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     }
 
     CallbackResponse validate(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        return validateValues(callbackParams.getCaseData());
+        return validateValues(callbackParams, callbackParams.getCaseData());
     }
 
-    CallbackResponse validateValuesParty(List<Element<UploadEvidenceWitness>> uploadEvidenceWitness1,
+    CallbackResponse validateValuesParty(List<Element<UploadEvidenceDocumentType>> uploadEvidenceDocumentType,
+                                         List<Element<UploadEvidenceWitness>> uploadEvidenceWitness1,
                                          List<Element<UploadEvidenceWitness>> uploadEvidenceWitness3,
+                                         List<Element<UploadEvidenceDocumentType>> witnessDocumentReferred,
                                          List<Element<UploadEvidenceExpert>> uploadEvidenceExpert1,
                                          List<Element<UploadEvidenceExpert>> uploadEvidenceExpert2,
                                          List<Element<UploadEvidenceExpert>> uploadEvidenceExpert3,
                                          List<Element<UploadEvidenceExpert>> uploadEvidenceExpert4,
-                                         List<Element<UploadEvidenceWitness>> uploadEvidenceWitness1respondent2,
-                                         List<Element<UploadEvidenceWitness>> uploadEvidenceWitness3respondent2,
-                                         List<Element<UploadEvidenceExpert>> uploadEvidenceExpert1respondent2,
-                                         List<Element<UploadEvidenceExpert>> uploadEvidenceExpert2respondent2,
-                                         List<Element<UploadEvidenceExpert>> uploadEvidenceExpert3respondent2,
-                                         List<Element<UploadEvidenceExpert>> uploadEvidenceExpert4respondent2) {
+                                         List<Element<UploadEvidenceDocumentType>> trialDocumentEvidence) {
         List<String> errors = new ArrayList<>();
+
+        checkDateCorrectness(time, errors, uploadEvidenceDocumentType, date -> date.getValue()
+                                 .getDocumentIssuedDate(),
+                             "Invalid date: \"Documents for disclosure\" "
+                                 + "date entered must not be in the future (1).");
 
         checkDateCorrectness(time, errors, uploadEvidenceWitness1, date -> date.getValue()
                                  .getWitnessOptionUploadDate(),
                              "Invalid date: \"witness statement\" "
-                                 + "date entered must not be in the future (1).");
+                                 + "date entered must not be in the future (2).");
         checkDateCorrectness(time, errors, uploadEvidenceWitness3, date -> date.getValue()
                                  .getWitnessOptionUploadDate(),
                              "Invalid date: \"Notice of the intention to rely on hearsay evidence\" "
-                                 + "date entered must not be in the future (2).");
+                                 + "date entered must not be in the future (3).");
+
+        checkDateCorrectness(time, errors, witnessDocumentReferred, date -> date.getValue()
+                                 .getDocumentIssuedDate(),
+                             "Invalid date: \"Documents referred to in the statement\" "
+                                 + "date entered must not be in the future (4).");
 
         checkDateCorrectness(time, errors, uploadEvidenceExpert1, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Expert's report\""
-                                 + " date entered must not be in the future (3).");
+                                 + " date entered must not be in the future (5).");
         checkDateCorrectness(time, errors, uploadEvidenceExpert2, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Joint statement of experts\" "
-                                 + "date entered must not be in the future (4).");
+                                 + "date entered must not be in the future (6).");
         checkDateCorrectness(time, errors, uploadEvidenceExpert3, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Questions for other party's expert or joint experts\" "
-                                 + "expert statement date entered must not be in the future (5).");
+                                 + "expert statement date entered must not be in the future (7).");
         checkDateCorrectness(time, errors, uploadEvidenceExpert4, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Answers to questions asked by the other party\" "
-                                 + "date entered must not be in the future (6).");
+                                 + "date entered must not be in the future (8).");
 
-        // date checks for respondent 2 fields
-
-        checkDateCorrectness(time, errors, uploadEvidenceWitness1respondent2, date -> date.getValue()
-                                 .getWitnessOptionUploadDate(),
-                             "Invalid date: \"witness statement\" "
-                                 + "date entered must not be in the future (1).");
-        checkDateCorrectness(time, errors, uploadEvidenceWitness3respondent2, date -> date.getValue()
-                                 .getWitnessOptionUploadDate(),
-                             "Invalid date: \"Notice of the intention to rely on hearsay evidence\" "
-                                 + "date entered must not be in the future (2).");
-
-        checkDateCorrectness(time, errors, uploadEvidenceExpert1respondent2, date -> date.getValue()
-                                 .getExpertOptionUploadDate(),
-                             "Invalid date: \"Expert's report\""
-                                 + " date entered must not be in the future (3).");
-        checkDateCorrectness(time, errors, uploadEvidenceExpert2respondent2, date -> date.getValue()
-                                 .getExpertOptionUploadDate(),
-                             "Invalid date: \"Joint statement of experts\" "
-                                 + "date entered must not be in the future (4).");
-        checkDateCorrectness(time, errors, uploadEvidenceExpert3respondent2, date -> date.getValue()
-                                 .getExpertOptionUploadDate(),
-                             "Invalid date: \"Questions for other party's expert or joint experts\" "
-                                 + "expert statement date entered must not be in the future (5).");
-        checkDateCorrectness(time, errors, uploadEvidenceExpert4respondent2, date -> date.getValue()
-                                 .getExpertOptionUploadDate(),
-                             "Invalid date: \"Answers to questions asked by the other party\" "
-                                 + "date entered must not be in the future (6).");
+        checkDateCorrectness(time, errors, trialDocumentEvidence, date -> date.getValue()
+                                 .getDocumentIssuedDate(),
+                             "Invalid date: \"Documentary evidence for trial\" "
+                                 + "date entered must not be in the future (9).");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -272,6 +259,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         applyDocumentUploadDate(caseDataBuilder, time.now());
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();

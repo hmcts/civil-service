@@ -5,5 +5,6 @@ public enum EvidenceUploadTrial {
     CASE_SUMMARY,
     SKELETON_ARGUMENT,
     AUTHORITIES,
+    COSTS,
     DOCUMENTARY
 }
