@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -70,11 +71,13 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY_PBA_V3;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.LIP_CONFIRMATION_BODY_COS;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -968,7 +971,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
 
             given(idamClient.getUserDetails(any()))
@@ -1003,7 +1006,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
 
             given(idamClient.getUserDetails(any()))
@@ -1054,7 +1057,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldClearClaimStartedFlag_whenInvoked() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(V_1, caseData.toBuilder().claimStarted(YES).build(), ABOUT_TO_SUBMIT));
+                callbackParamsOf(V_2, caseData.toBuilder().claimStarted(YES).build(), ABOUT_TO_SUBMIT));
 
             assertThat(response.getData())
                 .doesNotContainEntry("claimStarted", YES);
@@ -1065,7 +1068,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative().build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(
-                    V_1,
+                    V_2,
                     caseData,
                     ABOUT_TO_SUBMIT
                 ));
@@ -1091,7 +1094,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative().build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(
-                    V_1,
+                    V_2,
                     caseData,
                     ABOUT_TO_SUBMIT
                 ));
@@ -1112,7 +1115,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(
-                    V_1,
+                    V_2,
                     caseData,
                     ABOUT_TO_SUBMIT
                 ));
@@ -1129,7 +1132,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(
-                    V_1,
+                    V_2,
                     caseData,
                     ABOUT_TO_SUBMIT
                 ));
@@ -1146,7 +1149,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+                callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData().get("caseNameHmctsInternal"))
                 .isEqualTo("Mr. John Rambo v Mr. Sole Trader and Mr. John Rambo");
@@ -1160,7 +1163,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+                callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData().get("caseNameHmctsInternal"))
                 .isEqualTo("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader");
@@ -1174,7 +1177,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+                callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData().get("caseNameHmctsInternal"))
                 .isEqualTo("Mr. John Rambo v Mr. Sole Trader");
@@ -1189,7 +1192,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
                 caseData = CaseDataBuilder.builder().atStateClaimSubmitted1v1AndNoRespondentRepresented().build();
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+                    callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData()).extracting("defendant1LIPAtClaimIssued")
                     .isEqualTo("Yes");
@@ -1204,7 +1207,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+                    callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData()).extracting("defendant1LIPAtClaimIssued")
                     .isEqualTo("No");
@@ -1220,7 +1223,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+                    callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData()).extracting("defendant1LIPAtClaimIssued")
                     .isEqualTo("Yes");
@@ -1234,7 +1237,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 caseData = CaseDataBuilder.builder().atStateClaimSubmittedNoRespondentRepresented().build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+                    callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData()).extracting("defendant1LIPAtClaimIssued")
                     .isEqualTo("Yes");
@@ -1268,7 +1271,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                         .build())
                     .build();
 
-                params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+                params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
@@ -1297,7 +1300,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                         .build())
                     .build();
 
-                CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+                CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
@@ -1325,7 +1328,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(
-                        V_1,
+                        V_2,
                         data,
                         ABOUT_TO_SUBMIT
                     ));
@@ -1360,7 +1363,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+                    callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData())
                     .containsEntry("allPartyNames", "Mr. John Rambo V Mr. Sole Trader, Mr. John Rambo");
@@ -1374,7 +1377,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+                    callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData())
                     .containsEntry("allPartyNames", "Mr. John Rambo, Mr. Jason Rambo V Mr. Sole Trader");
@@ -1431,7 +1434,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+                callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData())
                 .containsEntry("unassignedCaseListDisplayOrganisationReferences",
@@ -1447,7 +1450,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(V_1, data, ABOUT_TO_SUBMIT));
+                callbackParamsOf(V_2, data, ABOUT_TO_SUBMIT));
 
             assertThat(response.getErrors()).containsOnly("Court location code is required");
         }
@@ -1459,7 +1462,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                callbackParamsOf(V_1, data, ABOUT_TO_SUBMIT));
+                callbackParamsOf(V_2, data, ABOUT_TO_SUBMIT));
 
             assertThat(response.getErrors()).containsOnly("Court location code is required");
         }
@@ -1479,7 +1482,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+                    callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData())
                     .extracting("respondent2OrganisationPolicy")
@@ -1501,7 +1504,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                    callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT));
+                    callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT));
 
                 assertThat(response.getData())
                     .extracting("respondent1OrganisationPolicy")
@@ -1590,6 +1593,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentation() {
+                Mockito.when(featureToggleService.isPbaV3Enabled()).thenReturn(false);
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
                     .multiPartyClaimOneDefendantSolicitor().build();
@@ -1598,6 +1602,30 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 String body = format(
                     CONFIRMATION_SUMMARY,
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID)
+                ) + exitSurveyContentService.applicantSurvey();
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# Your claim has been received%n## Claim number: %s",
+                            REFERENCE_NUMBER
+                        ))
+                        .confirmationBody(body)
+                        .build());
+            }
+
+            @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentationAndPBAv3IsOn() {
+                Mockito.when(featureToggleService.isPbaV3Enabled()).thenReturn(true);
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified()
+                    .multiPartyClaimOneDefendantSolicitor().build();
+                CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                String body = format(
+                    CONFIRMATION_SUMMARY_PBA_V3,
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID)
                 ) + exitSurveyContentService.applicantSurvey();
 

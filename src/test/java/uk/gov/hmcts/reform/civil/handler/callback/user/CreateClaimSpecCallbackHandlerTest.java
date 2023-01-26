@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +13,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -80,16 +80,20 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.CONFIRMATION_SUMMARY;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.CONFIRMATION_SUMMARY_PBA_V3;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.LIP_CONFIRMATION_BODY;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.SPEC_CONFIRMATION_SUMMARY;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.SPEC_CONFIRMATION_SUMMARY_PBA_V3;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     CreateClaimSpecCallbackHandler.class,
     JacksonAutoConfiguration.class,
@@ -121,6 +125,18 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         + "%n%nOnce you have served the claim, send the Certificate of Service and supporting documents to the County"
         + " Court Claims Centre.";
 
+    public static final String SPEC_LIP_CONFIRMATION_SCREEN = "<br />When the payment is confirmed your claim will be issued "
+        + "and you'll be notified by email. The claim will then progress offline."
+        + "%n%nOnce the claim has been issued, you will need to serve the claim upon the "
+        + "defendant which must include a response pack"
+        + "%n%nYou will need to send the following:<ul style=\"margin-bottom : 0px;\"> <li> <a href=\"%s\" target=\"_blank\">sealed claim form</a> "
+        + "</li><li><a href=\"%s\" target=\"_blank\">response pack</a></li><ul style=\"list-style-type:circle\"><li><a href=\"%s\" target=\"_blank\">N9A</a></li>"
+        + "<li><a href=\"%s\" target=\"_blank\">N9B</a></li></ul><li>and any supporting documents</li></ul>"
+        + "to the defendant within 4 months."
+        + "%n%nFollowing this, you will to file a Certificate of Service and supporting documents "
+        + "to : <a href=\"mailto:OCMCNton@justice.gov.uk\">OCMCNton@justice.gov.uk</a>. The Certificate of Service form can be found here:"
+        + "%n%n<ul><li><a href=\"%s\" target=\"_blank\">N215</a></li></ul>";
+
     @MockBean
     private Time time;
     @MockBean
@@ -147,6 +163,15 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Value("${civil.response-pack-url}")
     private String responsePackLink;
+
+    @Value("${civil.n9a-url}")
+    private String n9aLink;
+
+    @Value("${civil.n9b-url}")
+    private String n9bLink;
+
+    @Value("${civil.n215-url}")
+    private String n215Link;
 
     @MockBean
     private FeatureToggleService toggleService;
@@ -1106,7 +1131,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
 
             given(idamClient.getUserDetails(any()))
@@ -1236,7 +1261,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAssignCaseName1v2_whenCaseIs1v2GlobalSearchEnabled() {
             when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("caseNameHmctsInternal"))
@@ -1249,7 +1274,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAssignCaseName2v1_whenCaseIs2v1GlobalSearchEnabled() {
             when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("caseNameHmctsInternal"))
@@ -1262,7 +1287,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAssignCaseName1v1_whenCaseIs1v1GlobalSearchEnabled() {
             when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
-            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("caseNameHmctsInternal"))
@@ -1408,14 +1433,89 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentation() {
+                Mockito.when(toggleService.isPbaV3Enabled()).thenReturn(false);
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                    .legacyCaseReference("000MC001")
+                    .build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).request(
+                        CallbackRequest.builder().eventId(CREATE_CLAIM_SPEC.name()).build())
+                    .build();
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                String body = format(
+                    SPEC_CONFIRMATION_SUMMARY,
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID)
+                ) + exitSurveyContentService.applicantSurvey();
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# Your claim has been received%n## Claim number: %s",
+                            REFERENCE_NUMBER
+                        ))
+                        .confirmationBody(body)
+                        .build());
+            }
+
+            @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentationAndPBAv3IsOn() {
+                Mockito.when(toggleService.isPbaV3Enabled()).thenReturn(true);
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                    .legacyCaseReference("000MC001")
+                    .build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).version(V_1).request(
+                        CallbackRequest.builder().eventId(CREATE_CLAIM_SPEC.name()).build())
+                    .build();
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                String body = format(
+                    SPEC_CONFIRMATION_SUMMARY_PBA_V3,
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID)
+                ) + exitSurveyContentService.applicantSurvey();
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# Your claim has been received%n## Claim number: %s",
+                            REFERENCE_NUMBER
+                        ))
+                        .confirmationBody(body)
+                        .build());
+            }
+
+            @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentationAndEventIdMissing() {
+                Mockito.when(toggleService.isPbaV3Enabled()).thenReturn(false);
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .legacyCaseReference("000MC001")
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
                 String body = format(
                     CONFIRMATION_SUMMARY,
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID)
+                ) + exitSurveyContentService.applicantSurvey();
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format(
+                            "# Your claim has been received%n## Claim number: %s",
+                            REFERENCE_NUMBER
+                        ))
+                        .confirmationBody(body)
+                        .build());
+            }
+
+            @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentationAndPBAv3IsOnAndEventIdMissing() {
+                Mockito.when(toggleService.isPbaV3Enabled()).thenReturn(true);
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                    .legacyCaseReference("000MC001")
+                    .build();
+                CallbackParams params = callbackParamsOf(V_1, caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                String body = format(
+                    CONFIRMATION_SUMMARY_PBA_V3,
                     format("/cases/case-details/%s#CaseDocuments", CASE_ID)
                 ) + exitSurveyContentService.applicantSurvey();
 
@@ -1454,6 +1554,33 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                         ) + exitSurveyContentService.applicantSurvey())
                         .build());
             }
+        }
+
+        @Test
+        void shouldReturnExpectedConfirmationPage() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1Represented(YES)
+                .respondent1OrgRegistered(NO)
+                .legacyCaseReference("000MC001")
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_CLAIM_SPEC.name()).build())
+                .build();
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# Your claim has been received and will progress offline%n## "
+                                                   + "Claim number: %s", REFERENCE_NUMBER))
+                    .confirmationBody(format(
+                        SPEC_LIP_CONFIRMATION_SCREEN,
+                        format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                        responsePackLink,
+                        n9aLink,
+                        n9bLink,
+                        n215Link
+                    ) + exitSurveyContentService.applicantSurvey())
+                    .build());
         }
     }
 }
