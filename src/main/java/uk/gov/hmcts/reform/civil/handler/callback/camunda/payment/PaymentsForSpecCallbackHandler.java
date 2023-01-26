@@ -27,6 +27,7 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAKE_PBA_PAYMENT_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
@@ -74,7 +75,8 @@ public class PaymentsForSpecCallbackHandler extends CallbackHandler {
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         try {
-            var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken).getReference();
+            var paymentReference = paymentsService.createCreditAccountPayment(caseData, authToken)
+                .getPaymentReference();
             PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
                 .map(PaymentDetails::toBuilder)
                 .orElse(PaymentDetails.builder())
@@ -106,6 +108,7 @@ public class PaymentsForSpecCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .errors(errors)
+            .state(CASE_ISSUED.toString())
             .build();
     }
 
