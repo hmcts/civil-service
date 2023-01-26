@@ -25,6 +25,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
@@ -154,7 +156,9 @@ public class FlowStateAllowedEventService {
                     INITIATE_GENERAL_APPLICATION,
                     CREATE_SDO,
                     NotSuitable_SDO,
-                    migrateCase
+                    migrateCase,
+                    CREATE_CLAIM_SPEC_AFTER_PAYMENT,
+                    CREATE_CLAIM_AFTER_PAYMENT
             )
         ),
 
@@ -177,6 +181,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
+                CREATE_CLAIM_SPEC_AFTER_PAYMENT,
+                CREATE_CLAIM_AFTER_PAYMENT,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT
@@ -658,6 +664,20 @@ public class FlowStateAllowedEventService {
         ),
 
         entry(
+            CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+            List.of(NOC_REQUEST,
+                    APPLY_NOC_DECISION,
+                    ADD_CASE_NOTE,
+                    INITIATE_GENERAL_APPLICATION,
+                    CREATE_SDO,
+                    NotSuitable_SDO,
+                    migrateCase,
+                    CREATE_CLAIM_SPEC_AFTER_PAYMENT,
+                    CREATE_CLAIM_AFTER_PAYMENT
+            )
+        ),
+
+        entry(
             CLAIM_ISSUED_PAYMENT_FAILED.fullName(),
             List.of(
                 ENTER_BREATHING_SPACE_SPEC,
@@ -700,6 +720,8 @@ public class FlowStateAllowedEventService {
                 HEARING_SCHEDULED,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
+                CREATE_CLAIM_SPEC_AFTER_PAYMENT,
+                CREATE_CLAIM_AFTER_PAYMENT,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT
