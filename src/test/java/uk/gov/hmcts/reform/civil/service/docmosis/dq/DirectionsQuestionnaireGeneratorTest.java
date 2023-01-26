@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.FutureApplications;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -2167,6 +2168,12 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void checkStatementOfTruthTextForDefendent() {
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
+                              .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
+                              .courtTypeId("10").courtLocationCode("121")
+                              .epimmsId("000000").build());
+            when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceWithHearingSupport()
                 .build()

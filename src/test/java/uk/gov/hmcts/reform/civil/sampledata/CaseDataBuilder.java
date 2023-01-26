@@ -2714,6 +2714,14 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateRespondentFullDefenceWithHearingSupport() {
         atStateRespondentRespondToClaim(RespondentResponseType.FULL_DEFENCE);
         respondent1DQ = Respondent1DQ.builder()
+            .respondent1DQRequestedCourt(
+                RequestedCourt.builder()
+                    .responseCourtCode("121")
+                    .reasonForHearingAtSpecificCourt("test")
+                    .caseLocation(CaseLocation.builder()
+                                      .region("2")
+                                      .baseLocation("000000")
+                                      .build()).build())
             .respondent1DQHearingSupport(HearingSupport.builder()
                                              .requirements(List.of(SupportRequirements.values()))
                                              .languageToBeInterpreted("English")
