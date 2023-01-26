@@ -75,7 +75,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
@@ -100,6 +102,13 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + "months of the claim being issued. The exact date when you must notify the claim details will be provided "
         + "when you first notify the Defendant legal representative of the claim.";
 
+    public static final String CONFIRMATION_SUMMARY_PBA_V3 = "<br/>[Download the sealed claim form](%s)"
+        + "%n%nYour claim will not be issued until payment has been made via the Service Request Tab. Once payment is "
+        + "confirmed you will receive an email. The email will also include the date when you need to notify the Defendant "
+        + "legal representative of the claim.%n%nYou must notify the Defendant legal representative of the claim within 4 "
+        + "months of the claim being issued. The exact date when you must notify the claim details will be provided "
+        + "when you first notify the Defendant legal representative of the claim.";
+
     public static final String LIP_CONFIRMATION_BODY = "<br />Your claim will not be issued until payment is confirmed."
         + " Once payment is confirmed you will receive an email. The claim will then progress offline."
         + "%n%nTo continue the claim you need to send the <a href=\"%s\" target=\"_blank\">sealed claim form</a>, "
@@ -111,6 +120,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     public static final String SPEC_CONFIRMATION_SUMMARY = "<br/>[Download the sealed claim form](%s)"
         + "%n%nYour claim will not be issued until payment is confirmed. Once payment is confirmed you will "
         + "receive an email. The email will also include the date that the defendants have to respond.";
+
+    public static final String SPEC_CONFIRMATION_SUMMARY_PBA_V3 = "<br/>[Download the sealed claim form](%s)"
+        + "%n%nYour claim will not be issued until payment has been made via the Service Request Tab. Once payment is "
+        + "confirmed you will receive an email. The email will also include the date that the defendants have to respond.";
 
     public static final String SPEC_LIP_CONFIRMATION_BODY = "<br />When the payment is confirmed your claim will be issued "
         + "and you'll be notified by email. The claim will then progress offline."
@@ -130,6 +143,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final SpecReferenceNumberRepository specReferenceNumberRepository;
     private final DateOfBirthValidator dateOfBirthValidator;
     private final FeesService feesService;
+    private final FeatureToggleService featureToggleService;
     private final OrganisationService organisationService;
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final IdamClient idamClient;
@@ -141,7 +155,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final InterestCalculator interestCalculator;
     private final FeatureToggleService toggleService;
     private final StateFlowEngine stateFlowEngine;
-    private final FeatureToggleService featureToggleService;
 
     @Value("${court-location.specified-claim.region-id}")
     private String regionId;
@@ -166,8 +179,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
-            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
+            .put(callbackKey(V_2, ABOUT_TO_SUBMIT), this::submitClaimV1)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
+            .put(callbackKey(V_1, SUBMITTED), params -> buildConfirmation(params, true))
             .put(callbackKey(MID, "respondent1"), this::validateRespondent1Address)
             .put(callbackKey(MID, "respondent2"), this::validateRespondent2Address)
             .put(callbackKey(MID, "amount-breakup"), this::calculateTotalClaimAmount)
@@ -403,7 +417,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         }
 
-        if (V_1.equals(callbackParams.getVersion())
+        if (V_2.equals(callbackParams.getVersion())
             && toggleService.isCourtLocationDynamicListEnabled()) {
             dataBuilder.caseManagementLocation(CaseLocation.builder().region(regionId).baseLocation(epimmsId).build());
         }
@@ -411,13 +425,13 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
         ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
 
-        if (V_1.equals(callbackParams.getVersion())
+        if (V_2.equals(callbackParams.getVersion())
             && toggleService.isAccessProfilesEnabled()) {
             dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
         }
 
         //assign case management category to the case and caseNameHMCTSinternal
-        if (V_1.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {
+        if (V_2.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {
             dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
 
             CaseManagementCategoryElement civil =
@@ -449,6 +463,78 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
     }
+
+    //---------------------------v1 method ------------------------
+    private CallbackResponse submitClaimV1(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
+        CaseData.CaseDataBuilder dataBuilder = getSharedDataV1(callbackParams);
+
+        // moving statement of truth value to correct field, this was not possible in mid event.
+        // resetting statement of truth to make sure it's empty the next time it appears in the UI.
+        StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
+        dataBuilder.uiStatementOfTruth(StatementOfTruth.builder().build());
+        dataBuilder.applicantSolicitor1ClaimStatementOfTruth(statementOfTruth);
+        if (callbackParams.getRequest().getEventId() != null) {
+            var respondent1Represented = caseData.getSpecRespondent1Represented();
+            dataBuilder.respondent1Represented(respondent1Represented);
+            var respondent2Represented = caseData.getSpecRespondent2Represented();
+            dataBuilder.respondent2Represented(respondent2Represented);
+        }
+
+        addOrgPolicy2ForSameLegalRepresentative(dataBuilder.build(), dataBuilder);
+
+        if (isPinInPostCaseMatched(caseData)) {
+            dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
+        }
+
+        if (V_2.equals(callbackParams.getVersion())
+            && toggleService.isCourtLocationDynamicListEnabled()) {
+            dataBuilder.caseManagementLocation(CaseLocation.builder().region(regionId).baseLocation(epimmsId).build());
+        }
+
+        dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+        ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
+
+        if (V_2.equals(callbackParams.getVersion())
+            && toggleService.isAccessProfilesEnabled()) {
+            dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
+        }
+
+        //assign case management category to the case and caseNameHMCTSinternal
+        if (V_2.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {
+            dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
+
+            CaseManagementCategoryElement civil =
+                CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
+            List<Element<CaseManagementCategoryElement>> itemList = new ArrayList<>();
+            itemList.add(element(civil));
+            dataBuilder.caseManagementCategory(
+                CaseManagementCategory.builder().value(civil).list_items(itemList).build());
+            log.info("Case management equals: " + caseData.getCaseManagementCategory());
+            log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
+
+        }
+
+        if (featureToggleService.isNoticeOfChangeEnabled()) {
+            OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
+        }
+
+        CaseData temporaryCaseData = dataBuilder.build();
+
+        if (temporaryCaseData.getRespondent1OrgRegistered() == YES
+            && temporaryCaseData.getRespondent1Represented() == YES
+            && temporaryCaseData.getRespondent2SameLegalRepresentative() == YES) {
+            // Predicate: Def1 registered, Def 2 unregistered.
+            // This is required to ensure mutual exclusion in 1v2 same solicitor case.
+            dataBuilder.respondent2OrgRegistered(YES);
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(dataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+    //------------------------------------------
 
     private void addOrgPolicy2ForSameLegalRepresentative(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
         if (caseData.getRespondent2SameLegalRepresentative() == YES) {
@@ -491,18 +577,56 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         return dataBuilder;
     }
 
+    //------------------------------------v1 method-----------------------------
+    private CaseData.CaseDataBuilder getSharedDataV1(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
+        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        IdamUserDetails.IdamUserDetailsBuilder idam = IdamUserDetails.builder().id(userDetails.getId());
+        CorrectEmail applicantSolicitor1CheckEmail = caseData.getApplicantSolicitor1CheckEmail();
+        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
+
+        if (applicantSolicitor1CheckEmail != null && applicantSolicitor1CheckEmail.isCorrect()) {
+            dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1CheckEmail.getEmail()).build());
+        } else {
+            IdamUserDetails applicantSolicitor1UserDetails = caseData.getApplicantSolicitor1UserDetails();
+            dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1UserDetails.getEmail()).build());
+        }
+
+        dataBuilder.submittedDate(time.now());
+
+        if (null != callbackParams.getRequest().getEventId()) {
+            dataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
+            if (!featureToggleService.isPbaV3Enabled()) {
+                dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC));
+            } else {
+                dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST));
+            }
+        }
+
+        //set check email field to null for GDPR
+        dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
+        return dataBuilder;
+    }
+    //----------------------------------------------------
+
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        return buildConfirmation(callbackParams, false);
+    }
+
+    //--------v1 callback overloaded, return to single param
+    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams, boolean isV1Callback) {
         CaseData caseData = callbackParams.getCaseData();
         if (null != callbackParams.getRequest().getEventId()
             && callbackParams.getRequest().getEventId().equals("CREATE_CLAIM_SPEC")) {
             return SubmittedCallbackResponse.builder()
                 .confirmationHeader(getSpecHeader(caseData))
-                .confirmationBody(getSpecBody(caseData))
+                .confirmationBody(getSpecBody(caseData, isV1Callback))
                 .build();
         } else {
             return SubmittedCallbackResponse.builder()
                 .confirmationHeader(getHeader(caseData))
-                .confirmationBody(getBody(caseData))
+                .confirmationBody(getBody(caseData, isV1Callback))
                 .build();
         }
     }
@@ -518,19 +642,27 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         );
     }
 
-    private String getBody(CaseData caseData) {
+    private String getBody(CaseData caseData, boolean isV1Callback) {
         LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
         String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
 
         return format(
             (areRespondentsRepresentedAndRegistered(caseData)
                 || isPinInPostCaseMatched(caseData))
-                ? CONFIRMATION_SUMMARY
+                ? getConfirmationSummary(isV1Callback)
                 : LIP_CONFIRMATION_BODY,
             format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
             claimIssueConfiguration.getResponsePackLink(),
             formattedServiceDeadline
         ) + exitSurveyContentService.applicantSurvey();
+    }
+
+    private String getConfirmationSummary(boolean isV1Callback) {
+        if (featureToggleService.isPbaV3Enabled() && isV1Callback) {
+            return CONFIRMATION_SUMMARY_PBA_V3;
+        } else {
+            return CONFIRMATION_SUMMARY;
+        }
     }
 
     private CallbackResponse validateRespondentAddress(CallbackParams params, Function<CaseData, Party> getRespondent) {
@@ -674,10 +806,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         PaymentDetails updatedDetails = PaymentDetails.builder().customerReference(customerReference).build();
         caseDataBuilder.claimIssuedPaymentDetails(updatedDetails);
 
-        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)))
-            .applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
+        caseDataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)));
+
+        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        caseDataBuilder.applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
             .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO)
             .totalInterest(interest);
 
@@ -697,14 +830,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         );
     }
 
-    private String getSpecBody(CaseData caseData) {
+    private String getSpecBody(CaseData caseData, boolean isV1Callback) {
         LocalDateTime serviceDeadline = LocalDate.now().plusDays(112).atTime(23, 59);
         String formattedServiceDeadline = formatLocalDateTime(serviceDeadline, DATE_TIME_AT);
 
         return format(
             (areRespondentsRepresentedAndRegistered(caseData)
                 || isPinInPostCaseMatched(caseData))
-                ? SPEC_CONFIRMATION_SUMMARY
+                ? getSpecConfirmationSummary(isV1Callback)
                 : SPEC_LIP_CONFIRMATION_BODY,
             format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
             claimIssueConfiguration.getResponsePackLink(),
@@ -713,6 +846,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             claimIssueConfiguration.getN215Link(),
             formattedServiceDeadline
         ) + exitSurveyContentService.applicantSurvey();
+    }
+
+    private String getSpecConfirmationSummary(boolean isV1Callback) {
+        if (featureToggleService.isPbaV3Enabled() && isV1Callback) {
+            return SPEC_CONFIRMATION_SUMMARY_PBA_V3;
+        } else {
+            return SPEC_CONFIRMATION_SUMMARY;
+        }
     }
 
     private CallbackResponse validateSpecRespondentRepEmail(CallbackParams callbackParams) {
