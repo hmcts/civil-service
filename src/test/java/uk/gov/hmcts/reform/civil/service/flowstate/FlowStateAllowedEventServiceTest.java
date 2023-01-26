@@ -62,6 +62,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
@@ -279,7 +280,8 @@ class FlowStateAllowedEventServiceTest {
                         HEARING_SCHEDULED,
                         EVIDENCE_UPLOAD_APPLICANT,
                         migrateCase,
-                        EVIDENCE_UPLOAD_RESPONDENT
+                        EVIDENCE_UPLOAD_RESPONDENT,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
@@ -494,7 +496,8 @@ class FlowStateAllowedEventServiceTest {
                         HEARING_FEE_UNPAID,
                         REFER_TO_JUDGE,
                         migrateCase,
-                        TAKE_CASE_OFFLINE
+                        TAKE_CASE_OFFLINE,
+                        GENERATE_DIRECTIONS_ORDER
                     }
                 ),
                 of(
