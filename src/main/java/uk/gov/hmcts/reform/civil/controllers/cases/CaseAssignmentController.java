@@ -55,7 +55,7 @@ public class CaseAssignmentController {
         return new ResponseEntity<>(caseDetails, HttpStatus.OK);
     }
 
-    @PostMapping(path = {
+    @PostMapping(path = "/case/{caseId}/{caseRole}")
         "/case/{caseId}/{caseRole}"
     })
     @ApiOperation("Assigns case to defendant")
