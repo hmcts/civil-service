@@ -85,19 +85,31 @@ public class NocNotificationUtils {
     }
 
     public static String getOtherSolicitor1Email(CaseData caseData) {
-        return getOtherSolicitor1(caseData).getEmail();
+        if (getOtherSolicitor1(caseData) != null) {
+            return getOtherSolicitor1(caseData).getEmail();
+        }
+        return null;
     }
 
     public static String getOtherSolicitor1Name(CaseData caseData) {
-        return getOtherSolicitor1(caseData).getOrgId();
+        if (getOtherSolicitor1(caseData) != null) {
+            return getOtherSolicitor1(caseData).getOrgId();
+        }
+        return null;
     }
 
     public static String getOtherSolicitor2Email(CaseData caseData) {
-        return getOtherSolicitor2(caseData).getEmail();
+        if (getOtherSolicitor2(caseData) != null) {
+            return getOtherSolicitor2(caseData).getEmail();
+        }
+        return null;
     }
 
     public static String getOtherSolicitor2Name(CaseData caseData) {
-        return getOtherSolicitor2(caseData).getOrgId();
+        if (getOtherSolicitor2(caseData) != null) {
+            return getOtherSolicitor2(caseData).getOrgId();
+        }
+        return null;
     }
 
     private static boolean isRespondent2NewSolicitor(CaseData caseData) {
