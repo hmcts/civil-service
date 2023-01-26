@@ -586,13 +586,13 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
     }
 
     @Test
-    void shoulldReturnPartyInformationFifthScenerio_whenCaseEventIsInvoked() {
+    void shoulldReturnPartyInformationSixScenerio_whenCaseEventIsInvoked() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged().build();
         caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM)
             .respondent1DQ(Respondent1DQ.builder().build())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
             .build();
 
@@ -602,5 +602,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             .containsEntry("claimReferenceNumber",  "000DC001")
             .containsEntry("defendantName", "my company");
     }
+
+
 
 }
