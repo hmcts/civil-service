@@ -159,6 +159,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 );
             }
 
+            //Indu Comment
             @Test
             void shouldNotifyApplicantSolicitorSpec_whenInvoked() {
 
@@ -169,7 +170,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                      .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                      .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
                      .respondToClaimAdmitPartLRspec(
-                        RespondToClaimAdmitPartLRspec.builder()
+                         RespondToClaimAdmitPartLRspec.builder()
                             .whenWillThisAmountBePaid(whenWillPay)
                             .build()
                      )
@@ -193,6 +194,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 );
             }
 
+            // Indu commented
             @Test
             void shouldNotifyApplicantSolicitorSpecImmediately_whenInvoked() {
 
@@ -200,7 +202,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged()
                     .build().toBuilder()
-                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                     .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
                     .respondToClaimAdmitPartLRspec(
                         RespondToClaimAdmitPartLRspec.builder()
@@ -217,7 +219,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 final CaseData finalCaseData = caseData;
                 verify(notificationService).sendMail(
                     ArgumentMatchers.eq("applicantsolicitor@example.com"),
-                    ArgumentMatchers.eq("spec-claimant-template-id"),
+                    ArgumentMatchers.eq("templateImm-id"),
                     ArgumentMatchers.argThat(map -> {
                         Map<String, String> expected = getNotificationDataMapSpec(finalCaseData);
                         return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
