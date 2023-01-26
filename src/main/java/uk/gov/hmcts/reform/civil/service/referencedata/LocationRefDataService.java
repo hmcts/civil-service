@@ -94,6 +94,22 @@ public class LocationRefDataService {
         return new ArrayList<>();
     }
 
+    public List<LocationRefData> getCourtLocationsByEpimmsId(String authToken, String epimmsId) {
+        try {
+            ResponseEntity<List<LocationRefData>> responseEntity = restTemplate.exchange(
+                buildURIforCourtLocation(epimmsId),
+                HttpMethod.GET,
+                getHeaders(authToken),
+                new ParameterizedTypeReference<>() {
+                }
+            );
+            return responseEntity.getBody();
+        } catch (Exception e) {
+            log.error("Location Reference Data Lookup Failed - " + e.getMessage(), e);
+        }
+        return new ArrayList<>();
+    }
+
     private URI buildURI() {
         String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
@@ -118,6 +134,13 @@ public class LocationRefDataService {
             .queryParam("is_case_management_location", "Y")
             .queryParam("court_type_id", "10")
             .queryParam("location_type", "Court");
+        return builder.buildAndExpand(new HashMap<>()).toUri();
+    }
+
+    private URI buildURIforCourtLocation(String epimmsId) {
+        String queryURL = lrdConfiguration.getUrl() + lrdConfiguration.getEndpoint();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(queryURL)
+            .queryParam("epimms_id", epimmsId);
         return builder.buildAndExpand(new HashMap<>()).toUri();
     }
 

@@ -25,6 +25,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.AMEND_PARTY_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
@@ -62,6 +64,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
@@ -153,7 +156,9 @@ public class FlowStateAllowedEventService {
                     INITIATE_GENERAL_APPLICATION,
                     CREATE_SDO,
                     NotSuitable_SDO,
-                    migrateCase
+                    migrateCase,
+                    CREATE_CLAIM_SPEC_AFTER_PAYMENT,
+                    CREATE_CLAIM_AFTER_PAYMENT
             )
         ),
 
@@ -176,6 +181,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
+                CREATE_CLAIM_SPEC_AFTER_PAYMENT,
+                CREATE_CLAIM_AFTER_PAYMENT,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT
@@ -235,7 +242,8 @@ public class FlowStateAllowedEventService {
                 HEARING_SCHEDULED,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
-                EVIDENCE_UPLOAD_RESPONDENT
+                EVIDENCE_UPLOAD_RESPONDENT,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
@@ -460,7 +468,8 @@ public class FlowStateAllowedEventService {
                 HEARING_FEE_UNPAID,
                 REFER_TO_JUDGE,
                 migrateCase,
-                TAKE_CASE_OFFLINE
+                TAKE_CASE_OFFLINE,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
@@ -655,6 +664,20 @@ public class FlowStateAllowedEventService {
         ),
 
         entry(
+            CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+            List.of(NOC_REQUEST,
+                    APPLY_NOC_DECISION,
+                    ADD_CASE_NOTE,
+                    INITIATE_GENERAL_APPLICATION,
+                    CREATE_SDO,
+                    NotSuitable_SDO,
+                    migrateCase,
+                    CREATE_CLAIM_SPEC_AFTER_PAYMENT,
+                    CREATE_CLAIM_AFTER_PAYMENT
+            )
+        ),
+
+        entry(
             CLAIM_ISSUED_PAYMENT_FAILED.fullName(),
             List.of(
                 ENTER_BREATHING_SPACE_SPEC,
@@ -697,6 +720,8 @@ public class FlowStateAllowedEventService {
                 HEARING_SCHEDULED,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
+                CREATE_CLAIM_SPEC_AFTER_PAYMENT,
+                CREATE_CLAIM_AFTER_PAYMENT,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT
@@ -874,7 +899,8 @@ public class FlowStateAllowedEventService {
                 HEARING_FEE_UNPAID,
                 REFER_TO_JUDGE,
                 migrateCase,
-                TAKE_CASE_OFFLINE
+                TAKE_CASE_OFFLINE,
+                GENERATE_DIRECTIONS_ORDER
             )
         ),
 
