@@ -432,7 +432,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
 
         if ((V_2.equals(callbackParams.getVersion()) || V_1.equals(callbackParams.getVersion()))
-            && toggleService.isCourtLocationDynamicListEnabled()) {
+            && toggleService.isAccessProfilesEnabled()) {
             dataBuilder.caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
         }
 
@@ -452,7 +452,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         //assign casemanagementcategory to the case and assign casenamehmctsinternal
         if ((V_2.equals(callbackParams.getVersion()) || V_1.equals(callbackParams.getVersion()))
-            && toggleService.isCourtLocationDynamicListEnabled()) {
+            && toggleService.isGlobalSearchEnabled()) {
 
             //casename
             dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
@@ -469,7 +469,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
         //Adding variables for feature Certificate of Service
         if ((V_2.equals(callbackParams.getVersion()) || V_1.equals(callbackParams.getVersion()))
-            && toggleService.isCourtLocationDynamicListEnabled()) {
+            && toggleService.isCertificateOfServiceEnabled()) {
             if (caseData.getRespondent1Represented().equals(NO)) {
                 dataBuilder.defendant1LIPAtClaimIssued(YES);
             } else {
