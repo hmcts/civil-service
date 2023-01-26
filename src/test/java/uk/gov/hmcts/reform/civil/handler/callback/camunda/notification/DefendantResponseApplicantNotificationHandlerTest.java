@@ -168,7 +168,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                      .atStateNotificationAcknowledged()
                      .build().toBuilder()
                      .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                     .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
                      .respondToClaimAdmitPartLRspec(
                          RespondToClaimAdmitPartLRspec.builder()
                             .whenWillThisAmountBePaid(whenWillPay)
@@ -565,4 +566,41 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             .containsEntry("claimReferenceNumber",  "000DC001")
             .containsEntry("defendantName", "my company");
     }
+
+    @Test
+    void shoulldReturnPartyInformationFourthScenerio_whenCaseEventIsInvoked() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged().build();
+        caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM)
+            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
+            .build();
+
+        assertThat(handler.addPropertiesSpec(caseData,
+                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC))
+            .containsEntry("legalOrgName", "Signer Name")
+            .containsEntry("claimReferenceNumber",  "000DC001")
+            .containsEntry("defendantName", "my company");
+    }
+
+    @Test
+    void shoulldReturnPartyInformationFifthScenerio_whenCaseEventIsInvoked() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged().build();
+        caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM)
+            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("my company").build())
+            .build();
+
+        assertThat(handler.addPropertiesSpec(caseData,
+                                             CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC))
+            .containsEntry("legalOrgName", "Signer Name")
+            .containsEntry("claimReferenceNumber",  "000DC001")
+            .containsEntry("defendantName", "my company");
+    }
+
 }
