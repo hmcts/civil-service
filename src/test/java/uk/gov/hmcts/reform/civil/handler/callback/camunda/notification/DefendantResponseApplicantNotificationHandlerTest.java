@@ -203,6 +203,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                     .atStateNotificationAcknowledged()
                     .build().toBuilder()
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                     .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
                     .respondToClaimAdmitPartLRspec(
                         RespondToClaimAdmitPartLRspec.builder()
@@ -228,6 +229,42 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                     ArgumentMatchers.eq("defendant-response-applicant-notification-000DC001")
                 );
             }
+
+            @Test
+            void shouldNotifyApplicantSolicitorSpecImmediatelyScenerio2_whenInvoked() {
+
+                LocalDate whenWillPay = LocalDate.now().plusMonths(1);
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledged()
+                    .build().toBuilder()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                    .respondToClaimAdmitPartLRspec(
+                        RespondToClaimAdmitPartLRspec.builder()
+                            .whenWillThisAmountBePaid(whenWillPay)
+                            .build()
+                    )
+                    .build();
+                caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM).build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                        CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE").build())
+                    .build();
+
+                handler.handle(params);
+                final CaseData finalCaseData = caseData;
+                verify(notificationService).sendMail(
+                    ArgumentMatchers.eq("applicantsolicitor@example.com"),
+                    ArgumentMatchers.eq("templateImm-id"),
+                    ArgumentMatchers.argThat(map -> {
+                        Map<String, String> expected = getNotificationDataMapSpec(finalCaseData);
+                        return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
+                            && map.get(CLAIM_LEGAL_ORG_NAME_SPEC).equals(expected.get(CLAIM_LEGAL_ORG_NAME_SPEC));
+                    }),
+                    ArgumentMatchers.eq("defendant-response-applicant-notification-000DC001")
+                );
+            }
+
 
             @Test
             void shouldNotifyRespondentSolicitorSpec_whenInvokedWithCcEvent() {
