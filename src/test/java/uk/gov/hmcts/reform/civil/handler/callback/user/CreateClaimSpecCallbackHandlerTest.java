@@ -82,6 +82,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimSpecCallbackHandler.CONFIRMATION_SUMMARY;
@@ -1207,7 +1208,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
 
             given(idamClient.getUserDetails(any()))
@@ -1228,8 +1229,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddCaseReferenceSubmittedDateAndAllocatedTrack_whenInvoked() {
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                    CallbackRequest.builder().eventId(CREATE_CLAIM_SPEC.name()).build())
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).version(V_2).request(
+                    CallbackRequest.builder().eventId(CREATE_SERVICE_REQUEST.name()).build())
                 .build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -1261,7 +1262,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAssignCaseName1v2_whenCaseIs1v2GlobalSearchEnabled() {
             when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v2_andNotifyBothSolicitors().build();
-            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("caseNameHmctsInternal"))
@@ -1274,7 +1275,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAssignCaseName2v1_whenCaseIs2v1GlobalSearchEnabled() {
             when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted2v1RespondentRegistered().build();
-            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("caseNameHmctsInternal"))
@@ -1287,7 +1288,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAssignCaseName1v1_whenCaseIs1v1GlobalSearchEnabled() {
             when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
-            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData().get("caseNameHmctsInternal"))
@@ -1320,7 +1321,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                         .build())
                     .build();
 
-                params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
@@ -1349,7 +1350,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                         .build())
                     .build();
 
-                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 assertThat(response.getData())
@@ -1377,6 +1378,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(
+                        V_1,
                         data,
                         ABOUT_TO_SUBMIT
                     ));
