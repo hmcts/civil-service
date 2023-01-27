@@ -133,7 +133,6 @@ class DirectionsQuestionnaireGeneratorTest {
     @Autowired
     private DirectionsQuestionnaireGenerator generator;
 
-
     @Nested
     class RespondentOne {
 
