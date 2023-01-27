@@ -48,6 +48,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -126,8 +127,12 @@ class DirectionsQuestionnaireGeneratorTest {
     @MockBean
     private FeatureToggleService featureToggleService;
 
+    @MockBean
+    private LocationRefDataService locationRefDataService;
+
     @Autowired
     private DirectionsQuestionnaireGenerator generator;
+
 
     @Nested
     class RespondentOne {
