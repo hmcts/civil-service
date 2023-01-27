@@ -80,15 +80,18 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
 
         @Test
         void shouldSetRespondent1FlagToYes_whenOneRespondentRepresentative() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .addRespondent2(NO)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
+            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
+            // Then
             assertThat(response.getErrors()).isNull();
             assertThat(response.getData()).extracting("isRespondent1").isEqualTo("Yes");
         }

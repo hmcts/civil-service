@@ -46,15 +46,19 @@ class ClaimIssueForSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldAddClaimNotificationDeadline_whenClaimIsIssued() {
+        // Given
         when(deadlinesCalculator.addMonthsToDateAtMidnight(eq(4), any(LocalDate.class)))
             .thenReturn(deadline);
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued()
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+        // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+        // Then
         assertThat(updatedData.getClaimNotificationDeadline()).isEqualTo(deadline);
     }
 }

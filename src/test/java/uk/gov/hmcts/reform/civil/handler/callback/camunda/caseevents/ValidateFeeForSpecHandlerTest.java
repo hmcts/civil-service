@@ -30,11 +30,14 @@ public class ValidateFeeForSpecHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldNotReturnErrors_whenAboutToSubmitCalled() {
+        // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+        // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+        // Then
         assertThat(response.getErrors()).isNull();
     }
 }

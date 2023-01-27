@@ -57,11 +57,14 @@ public class FailedPaymentApplicantForSpecNotificationHandlerTest extends BaseCa
 
         @Test
         void shouldNotifyClaimantSolicitor_whenInvoked() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
+            // When
             handler.handle(params);
 
+            // Then
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "template-id",

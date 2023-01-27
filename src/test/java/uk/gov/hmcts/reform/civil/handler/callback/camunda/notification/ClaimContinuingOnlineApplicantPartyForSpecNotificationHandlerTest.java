@@ -78,11 +78,14 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
 
         @Test
         void shouldNotifyApplicant1_whenInvoked() {
+            // Given
             CaseData caseData = getCaseData("testorg@email.com");
             CallbackParams params = getCallbackParams(caseData);
 
+            // When
             handler.handle(params);
 
+            // Then
             verify(notificationService).sendMail(
                 "testorg@email.com",
                 "template-id",

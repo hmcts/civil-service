@@ -48,11 +48,14 @@ class ResubmitClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcess_whenInvoked() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
@@ -66,12 +69,15 @@ class ResubmitClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcess_whenInvoked_spec() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim()
                 .build().toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent")
@@ -85,12 +91,15 @@ class ResubmitClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcess_whenInvoked_spec_blocked() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim()
                 .build().toBuilder().superClaimType(SuperClaimType.SPEC_CLAIM).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response.getData())
                 .doesNotHaveToString("businessProcess");
         }
@@ -101,12 +110,16 @@ class ResubmitClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1Represented(NO).build();
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
+            // Then
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
                     .confirmationHeader("# Claim pending")

@@ -102,11 +102,14 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
 
         @Test
         void shouldNotifyRespondent1Solicitor_whenInvoked() {
+            // Given
             CaseData caseData = getCaseData("testorg@email.com");
             CallbackParams params = getCallbackParams(caseData);
 
+            // When
             handler.handle(params);
 
+            // Then
             verify(notificationService).sendMail(
                 "testorg@email.com",
                 "template-id",
@@ -117,20 +120,28 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
 
         @Test
         void shouldNotNotifyRespondent1Solicitor_whenNoEmailiIsEntered() {
+            // Given
             CaseData caseData = getCaseData(null);
             CallbackParams params = getCallbackParams(caseData);
 
+            // When
             handler.handle(params);
+
+            // Then
             verify(notificationService, never()).sendMail(any(), any(), any(), any());
         }
 
         @Test
         void shouldGenerateAndPrintLetterSuccessfully() {
+            // Given
             given(pipLetterGenerator.downloadLetter(any())).willReturn(LETTER_CONTENT);
             CaseData caseData = getCaseData("testorg@email.com");
             CallbackParams params = getCallbackParams(caseData);
 
+            // When
             handler.handle(params);
+
+            // Then
             verify(bulkPrintService)
                 .printLetter(
                     LETTER_CONTENT,

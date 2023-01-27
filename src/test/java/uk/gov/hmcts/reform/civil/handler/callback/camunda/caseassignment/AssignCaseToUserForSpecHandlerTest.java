@@ -68,8 +68,13 @@ class AssignCaseToUserForSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnSupplementaryDataWhenGlobalSearchEnabled() {
+            // Given
             when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
+
+            // When
             handler.handle(params);
+
+            // Then
             verify(coreCaseDataService).setSupplementaryData(1594901956117591L, supplementaryData());
         }
 

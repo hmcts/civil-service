@@ -73,6 +73,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
 
         @Test
         void shouldNotifyRespondent1Solicitor_whenInvoked() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .respondentSolicitor1OrganisationDetails(SolicitorOrganisationDetails.builder()
                                                              .email("testorg@email.com")
@@ -86,8 +87,10 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_CONTINUING_ONLINE_SPEC")
                     .build()).build();
 
+            // When
             handler.handle(params);
 
+            // Then
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
                 "template-id",
@@ -98,6 +101,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
 
         @Test
         void shouldNotifyRespondent2Solicitor_whenInvoked() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .respondentSolicitor2OrganisationDetails(SolicitorOrganisationDetails.builder()
                                                              .email("testorg@email.com")
@@ -111,8 +115,10 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest exten
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_CONTINUING_ONLINE_SPEC")
                     .build()).build();
 
+            // When
             handler.handle(params);
 
+            // Then
             verify(notificationService).sendMail(
                 "respondentsolicitor2@example.com",
                 "template-id",

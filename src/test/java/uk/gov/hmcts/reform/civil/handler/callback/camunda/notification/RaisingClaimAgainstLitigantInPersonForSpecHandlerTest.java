@@ -48,11 +48,14 @@ public class RaisingClaimAgainstLitigantInPersonForSpecHandlerTest {
 
     @Test
     void shouldNotifyApplicantSolicitor_whenInvoked() {
+        // Given
         CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
+        // When
         handler.handle(params);
 
+        // Then
         verify(notificationService).sendMail(
             "applicantsolicitor@example.com",
             TEMPLATE_ID,

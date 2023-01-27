@@ -82,6 +82,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
         @Test
         void shouldNotifyClaimantSolicitor_in1v1_whenInvoked() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -90,12 +91,14 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
                              .build())
                 .build();
 
+            // When
             handler.handle(params);
 
             Map<String, String> expectedProperties = getNotificationDataMap(caseData);
             expectedProperties.put(RESPONSE_DEADLINE, formatLocalDateTime(
                 caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
 
+            // Then
             verify(notificationService).sendMail(
                 APPLICANT_SOLICITOR_EMAIL,
                 TEMPLATE,
@@ -106,6 +109,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
         @Test
         void shouldNotifyClaimantSolicitor_when1v2_SameLegalRep() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimOneDefendantSolicitor()
@@ -118,8 +122,10 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
                              .build())
                 .build();
 
+            // When
             handler.handle(params);
 
+            // Then
             verify(notificationService).sendMail(
                 APPLICANT_SOLICITOR_EMAIL,
                 TEMPLATE_1v2,
@@ -130,6 +136,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
         @Test
         void shouldNotifyClaimantSolicitor_when1v2_TwoLegalReps() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimTwoDefendantSolicitors()
@@ -142,8 +149,10 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
                              .build())
                 .build();
 
+            // When
             handler.handle(params);
 
+            // Then
             verify(notificationService).sendMail(
                 APPLICANT_SOLICITOR_EMAIL,
                 TEMPLATE_1v2,
@@ -154,6 +163,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
         @Test
         void shouldNotifyClaimantSolicitor_in2v1() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimTwoApplicants()
@@ -165,12 +175,14 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
                              .build())
                 .build();
 
+            // When
             handler.handle(params);
 
             Map<String, String> expectedProperties = getNotificationDataMap(caseData);
             expectedProperties.put(RESPONSE_DEADLINE, formatLocalDateTime(
                 caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
 
+            // Then
             verify(notificationService).sendMail(
                 APPLICANT_SOLICITOR_EMAIL,
                 TEMPLATE,

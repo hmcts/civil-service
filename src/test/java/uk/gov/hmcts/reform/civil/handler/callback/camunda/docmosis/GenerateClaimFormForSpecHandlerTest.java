@@ -157,15 +157,18 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
 
         @Test
         void shouldGenerateClaimForm_whenOneVsOne_andDefendantRepresentedSpecClaim() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssued().build().toBuilder()
                 .specRespondent1Represented(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+            // Then
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
             assertThat(updatedData.getIssueDate()).isEqualTo(issueDate);
 

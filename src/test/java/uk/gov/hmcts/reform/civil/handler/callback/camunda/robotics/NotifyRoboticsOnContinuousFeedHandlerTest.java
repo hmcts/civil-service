@@ -77,18 +77,22 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
     @MockBean
     LocationRefDataService locationRefDataService;
 
+    @Autowired
+    private NotifyRoboticsOnContinuousFeedHandler handler;
+
     @Nested
     class ValidJsonPayload {
 
-        @Autowired
-        private NotifyRoboticsOnContinuousFeedHandler handler;
-
         @Test
         void shouldNotifyRobotics_whenNoSchemaErrors() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            // When
             handler.handle(params);
 
+            // Then
             verify(roboticsNotificationService).notifyRobotics(caseData, false,
                                                                params.getParams().get(BEARER_TOKEN).toString()
             );
@@ -96,13 +100,17 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
 
         @Test
         void shouldNotifyRoboticsSpecClaim_whenNoSchemaErrors() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentAdmitPartOfClaimFastTrack()
                 .build();
             caseData = caseData.toBuilder().superClaimType(SPEC_CLAIM).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            // When
             handler.handle(params);
 
+            // Then
             verify(roboticsNotificationService).notifyRobotics(caseData, false,
                                                                params.getParams().get(BEARER_TOKEN).toString()
             );
@@ -114,8 +122,6 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
 
         @MockBean
         private JsonSchemaValidationService validationService;
-        @Autowired
-        private NotifyRoboticsOnContinuousFeedHandler handler;
 
         @Test
         void shouldThrowJsonSchemaValidationException_whenSchemaErrors() {

@@ -28,10 +28,13 @@ class GenerateAcknowledgementOfClaimForSpecHandlerTest extends BaseCallbackHandl
 
     @Test
     void shouldReturnCorrectActivityId_whenRequested() {
+        // Given
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
 
+        // When
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+        // Then
         assertThat(handler.camundaActivityId(params)).isEqualTo("AcknowledgeClaimGenerateAcknowledgementOfClaimForSpec");
     }
 }
