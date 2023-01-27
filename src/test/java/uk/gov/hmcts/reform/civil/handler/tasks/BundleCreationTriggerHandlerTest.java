@@ -10,8 +10,7 @@ import org.mockito.Mock;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
-import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
+import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -63,7 +62,7 @@ class BundleCreationTriggerHandlerTest {
     }
 
     @Test
-    void shouldEmitHearingFeePaidEvent_whenCasesFoundPaid() {
+    void shouldEmitBundleCreationTriggerEvent_whenCasesFoundPaid() {
         long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDuePaid().build();
         Map<String, Object> data = Map.of("data", caseData);
@@ -75,12 +74,12 @@ class BundleCreationTriggerHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(applicationEventPublisher).publishEvent(new HearingFeePaidEvent(caseId));
+        verify(applicationEventPublisher).publishEvent(new BundleCreationTriggerEvent(caseId));
         verify(externalTaskService).complete(mockTask);
     }
 
     @Test
-    void shouldEmitHearingFeePaidEvent_whenCasesFoundUnpaid() {
+    void shouldEmitBundleCreationTriggerEvent_whenCasesFoundUnpaid() {
         long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDueUnpaid().build();
         Map<String, Object> data = Map.of("data", caseData);
@@ -92,7 +91,7 @@ class BundleCreationTriggerHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(applicationEventPublisher).publishEvent(new HearingFeeUnpaidEvent(caseId));
+        verify(applicationEventPublisher).publishEvent(new BundleCreationTriggerEvent(caseId));
         verify(externalTaskService).complete(mockTask);
     }
 
