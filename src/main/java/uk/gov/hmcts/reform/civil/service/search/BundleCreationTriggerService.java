@@ -11,22 +11,22 @@ import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
-import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 @Service
-public class BundleCreationTriggerService extends ElasticSearchService{
+public class BundleCreationTriggerService extends ElasticSearchService {
 
     private static final int BUNDLE_CREATION_TIME_RANGE = 3;
-    public BundleCreationTriggerService(CoreCaseDataService coreCaseDataService){
+
+    public BundleCreationTriggerService(CoreCaseDataService coreCaseDataService) {
         super(coreCaseDataService);
     }
 
-    public Query query(int startIndex){
+    public Query query(int startIndex) {
         return new Query(
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
-                            .must(matchQuery("data.hearingDate",LocalDate.now().plusWeeks(BUNDLE_CREATION_TIME_RANGE)))
+                            .must(matchQuery("data.hearingDate", LocalDate.now().plusWeeks(BUNDLE_CREATION_TIME_RANGE)))
                             .must(beState(CaseState.HEARING_READINESS))
                 ), List.of("reference"), startIndex
         );
