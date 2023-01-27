@@ -14,7 +14,8 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class BundleCreationTriggerHandler implements BaseExternalTaskHandler{
+public class BundleCreationTriggerHandler implements BaseExternalTaskHandler {
+
     private final BundleCreationTriggerService bundleCreationTriggerService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
