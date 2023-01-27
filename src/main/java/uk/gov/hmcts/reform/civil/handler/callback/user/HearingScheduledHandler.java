@@ -164,6 +164,7 @@ public class HearingScheduledHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (nonNull(caseData.getListingOrRelisting())
             && caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
+            Fee hearingFee = Fee.builder().code("FEE0202").version("4").build();
             if (LocalDate.now().isBefore(caseData.getHearingDate().minusWeeks(4))) {
                 caseDataBuilder.hearingDueDate(
                     HearingUtils.addBusinessDays(
@@ -175,23 +176,19 @@ public class HearingScheduledHandler extends CallbackHandler {
             }
             switch (caseData.getAllocatedTrack()) {
                 case SMALL_CLAIM:
-
-                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
-
+                    hearingFee.setCalculatedAmountInPence(new BigDecimal(54500));
                     break;
                 case FAST_CLAIM:
-                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(
-                        HearingUtils.getFastTrackFee(
-                            caseData.getClaimFee().getCalculatedAmountInPence().intValue())).build());
+                    hearingFee.setCalculatedAmountInPence(HearingUtils.getFastTrackFee(
+                        caseData.getClaimValue().getStatementOfValueInPennies().intValue()));
                     break;
                 case MULTI_CLAIM:
-
-                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(117500)).build());
-
+                    hearingFee.setCalculatedAmountInPence(new BigDecimal(117500));
                     break;
                 default:
-                    caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(0)).build());
+                    hearingFee.setCalculatedAmountInPence(new BigDecimal(0));
             }
+            caseDataBuilder.hearingFee(hearingFee).build();
         }
         if (nonNull(caseData.getHearingLocation())) {
             DynamicList locationList = caseData.getHearingLocation();

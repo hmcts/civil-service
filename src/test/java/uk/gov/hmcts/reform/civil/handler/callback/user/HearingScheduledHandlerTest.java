@@ -164,8 +164,7 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getHearingFee()).isEqualTo(
-
-                Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
+                Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(54500)).build());
 
         }
 
@@ -185,8 +184,7 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getHearingFee()).isEqualTo(
-
-                Fee.builder().calculatedAmountInPence(new BigDecimal(117500)).build());
+                Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(117500)).build());
 
         }
 
@@ -206,8 +204,7 @@ public class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getHearingFee()).isEqualTo(
-
-                Fee.builder().calculatedAmountInPence(new BigDecimal(2700)).build());
+                Fee.builder().code("FEE0202").version("4").calculatedAmountInPence(new BigDecimal(34600)).build());
 
         }
     }

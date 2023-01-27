@@ -61,7 +61,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
             var serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
                 .getServiceRequestReference();
 
-            if (caseData.getHearingDate() != null) {
+            if (caseData.getHearingDueDate() != null) {
                 caseData = caseData.toBuilder()
                     .hearingFeePBADetails(SRPbaDetails.builder()
                                                   .applicantsPbaAccounts(caseData.getApplicantSolicitor1PbaAccounts())
