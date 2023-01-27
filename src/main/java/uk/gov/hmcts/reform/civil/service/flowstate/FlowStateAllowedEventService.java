@@ -701,6 +701,7 @@ public class FlowStateAllowedEventService {
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,
                 ADD_OR_AMEND_CLAIM_DOCUMENTS,
+                ADD_CASE_NOTE,
                 AMEND_PARTY_DETAILS,
                 ACKNOWLEDGEMENT_OF_SERVICE,
                 INFORM_AGREED_EXTENSION_DATE,
