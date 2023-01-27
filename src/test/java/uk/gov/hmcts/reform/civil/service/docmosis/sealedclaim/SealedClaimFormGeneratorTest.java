@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,6 +79,8 @@ class SealedClaimFormGeneratorTest {
     private RepresentativeService representativeService;
     @MockBean
     private LocationRefDataService locationRefDataService;
+    @MockBean
+    LocationRefDataUtil locationRefDataUtil;
 
     @BeforeEach
     void setup() {

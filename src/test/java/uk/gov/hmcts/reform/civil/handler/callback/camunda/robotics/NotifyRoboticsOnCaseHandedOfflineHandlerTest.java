@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.robotics.JsonSchemaValidationService;
 import uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
@@ -73,6 +72,8 @@ class NotifyRoboticsOnCaseHandedOfflineHandlerTest extends BaseCallbackHandlerTe
     @MockBean
     FeatureToggleService featureToggleService;
     @MockBean
+    LocationRefDataUtil locationRefDataUtil;
+    @MockBean
     PrdAdminUserConfiguration userConfig;
 
     @Nested
@@ -118,7 +119,6 @@ class NotifyRoboticsOnCaseHandedOfflineHandlerTest extends BaseCallbackHandlerTe
 
         @Test
         void shouldThrowJsonSchemaValidationException_whenSchemaErrors() {
-            when(validationService.validate(anyString())).thenReturn(Set.of(new ValidationMessage.Builder().build()));
             when(validationService.validate(anyString())).thenReturn(Set.of(new ValidationMessage.Builder().build()));
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();

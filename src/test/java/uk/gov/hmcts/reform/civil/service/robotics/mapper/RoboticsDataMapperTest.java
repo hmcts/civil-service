@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.prd.model.DxAddress;
@@ -90,6 +91,8 @@ class RoboticsDataMapperTest {
     private Time time;
     @MockBean
     LocationRefDataService locationRefDataService;
+    @MockBean
+    LocationRefDataUtil locationRefDataUtil;
     private static final String BEARER_TOKEN = "Bearer Token";
     LocalDateTime localDateTime;
 
@@ -317,27 +320,29 @@ class RoboticsDataMapperTest {
 
     @Test
     void shouldMapToRoboticsCaseDataWhenPreferredCourtCodeFetchedFromRefData() {
-        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
+        final CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
         List<LocationRefData> courtLocations = new ArrayList<>();
         courtLocations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
                                .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
                                .courtTypeId("10").courtLocationCode("121")
                                .epimmsId("000000").build());
         when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(courtLocations);
-
+        when(locationRefDataUtil.getPreferredCourtCode(any(), any())).thenReturn("127");
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
-        assertThat(roboticsCaseData.getHeader().getPreferredCourtCode()).isEqualTo("121");
+        assertThat(roboticsCaseData.getHeader().getPreferredCourtCode()).isEqualTo("127");
     }
 
     @Test
     void shouldReturnEmptyStringWhenPreferredCourtCodeisUnavailableFromLocationRefData() {
-        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
+        final CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
         List<LocationRefData> courtLocations = new ArrayList<>();
         courtLocations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
                                .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
                                .courtTypeId("10")
                                .epimmsId("9088").build());
+        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(courtLocations);
+        when(locationRefDataUtil.getPreferredCourtCode(any(), any())).thenReturn("");
 
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);

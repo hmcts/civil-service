@@ -72,6 +72,7 @@ class RpaCaseHandedOfflineConsumerTest extends BaseRpaTest {
     PrdAdminUserConfiguration userConfig;
     @MockBean
     LocationRefDataService locationRefDataService;
+
     @MockBean
     private Time time;
 
