@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.civil.service.PaymentRequestUpdateCallbackService;
 
@@ -28,7 +29,7 @@ public class ServiceRequestUpdateCallbackController {
         @ApiResponse(code = 400, message = "Bad Request")})
     public void serviceRequestUpdate(@RequestBody ServiceRequestUpdateDto serviceRequestUpdateDto) {
         try {
-            requestUpdateCallbackService.processCallback(serviceRequestUpdateDto);
+            requestUpdateCallbackService.processCallback(serviceRequestUpdateDto, FeeType.HEARING.name());
         } catch (Exception ex) {
             log.error(
                 "Payment callback is unsuccessful for the CaseID: {}",
@@ -36,5 +37,4 @@ public class ServiceRequestUpdateCallbackController {
             );
         }
     }
-
 }

@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.config;
 
 import com.launchdarkly.sdk.server.LDClient;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -19,10 +19,10 @@ public class LaunchDarklyConfigurationTest {
         String key = "sdkkey";
         Boolean offline = false;
         LDClient client = configuration.ldClient(key, offline, null);
-        Assert.assertEquals(client.isOffline(), offline.booleanValue());
+        Assertions.assertEquals(client.isOffline(), offline.booleanValue());
 
         client = configuration.ldClient(key, offline, new String[0]);
-        Assert.assertEquals(client.isOffline(), offline.booleanValue());
+        Assertions.assertEquals(client.isOffline(), offline.booleanValue());
     }
 
     @Test
@@ -32,7 +32,7 @@ public class LaunchDarklyConfigurationTest {
         LDClient client = configuration.ldClient(key, offline, new String[]{
             "AFileThatDoesNotExist"
         });
-        Assert.assertEquals(client.isOffline(), offline.booleanValue());
+        Assertions.assertEquals(client.isOffline(), offline.booleanValue());
     }
 
     @Test
@@ -44,7 +44,7 @@ public class LaunchDarklyConfigurationTest {
             LDClient client = configuration.ldClient(key, offline, new String[]{
                 "AFileThatDoesNotExist"
             });
-            Assert.assertEquals(client.isOffline(), offline.booleanValue());
+            Assertions.assertEquals(client.isOffline(), offline.booleanValue());
         }
     }
 }

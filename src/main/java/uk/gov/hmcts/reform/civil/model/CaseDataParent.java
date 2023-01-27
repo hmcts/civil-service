@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +10,7 @@ import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -28,6 +30,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -35,6 +38,7 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
+import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
@@ -121,7 +125,11 @@ public class CaseDataParent implements MappableObject {
     // for witness
     private final YesOrNo respondent1DQWitnessesRequiredSpec;
     private final List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
+    private final Witnesses applicant1DQWitnessesSmallClaim;
+    private final Witnesses respondent1DQWitnessesSmallClaim;
+    private final Witnesses respondent2DQWitnessesSmallClaim;
 
+    @Deprecated
     private final LocalDateTime addLegalRepDeadline;
 
     @Builder.Default
@@ -156,6 +164,7 @@ public class CaseDataParent implements MappableObject {
     private final DynamicList disposalHearingMethodInPerson;
     private final DynamicList fastTrackMethodInPerson;
     private final DynamicList smallClaimsMethodInPerson;
+    private final DynamicList hearingMethod;
     private final YesOrNo drawDirectionsOrderRequired;
     private final YesOrNo drawDirectionsOrderSmallClaims;
     private final ClaimsTrack claimsTrack;
@@ -189,6 +198,7 @@ public class CaseDataParent implements MappableObject {
     private SmallClaimsJudgesRecital smallClaimsJudgesRecital;
     private SmallClaimsNotes smallClaimsNotes;
     private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
+    private SDOHearingNotes sdoHearingNotes;
     private ReasonNotSuitableSDO reasonNotSuitableSDO;
     private final List<SmallTrack> smallClaims;
     private final SmallClaimsMethod smallClaimsMethod;
@@ -290,12 +300,14 @@ public class CaseDataParent implements MappableObject {
      */
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal respondToAdmittedClaimOwingAmountPounds2;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal partAdmitPaidValuePounds;
 
     @JsonProperty("CaseAccessCategory")
     private final CaseCategory caseAccessCategory;
 
     private final ChangeOrganisationRequest changeOrganisationRequestField;
-    private final List<Element<ChangeOfRepresentation>> changeOfRepresentation;
+    private final ChangeOfRepresentation changeOfRepresentation;
 
     /**
      * Adding for PiP to citizen UI.
@@ -305,7 +317,43 @@ public class CaseDataParent implements MappableObject {
     private final ScheduledHearing nextHearingDetails;
 
     private final String respondent1EmailAddress;
+    private final YesOrNo applicant1Represented;
+
+    /**
+     * Adding for LR ITP Update.
+     */
+    private final ResponseOneVOneShowTag showResponseOneVOneFlag;
+    private final YesOrNo applicant1AcceptAdmitAmountPaidSpec;
+    private final YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec;
+    private final YesOrNo applicant1AcceptPartAdmitPaymentPlanSpec;
+    private final CaseDocument respondent1ClaimResponseDocumentSpec;
+    private final CaseDocument respondent2ClaimResponseDocumentSpec;
+    private final String respondent1PaymentDateToStringSpec;
+    private final LocalDate applicant1RequestedPaymentDateForDefendantSpec;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal applicant1SuggestInstalmentsPaymentAmountForDefendantSpec;
+    private final PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
+    private final LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
+    private final String currentDateboxDefendantSpec;
+    private final YesOrNo ccjPaymentPaidSomeOption;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal ccjPaymentPaidSomeAmount;
 
     private final String migrationId;
+
+    @JsonIgnore
+    public boolean isApplicantNotRepresented() {
+        return  this.applicant1Represented == YesOrNo.NO;
+    }
+
+    /**
+     * Adding for Certificate of Service.
+     */
+    private final CertificateOfService cosNotifyClaimDetails1;
+    private final CertificateOfService cosNotifyClaimDetails2;
+    private final YesOrNo defendant1LIPAtClaimIssued;
+    private final YesOrNo defendant2LIPAtClaimIssued;
+    private final CertificateOfService cosNotifyClaimDefendant1;
+    private final CertificateOfService cosNotifyClaimDefendant2;
 
 }

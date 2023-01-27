@@ -16,12 +16,12 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -259,59 +260,6 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isEqualTo(null);
         }
 
-    }
-
-    @Nested
-    class MidEventForN245FormNameValidation extends LocationRefSampleDataBuilder {
-
-        private static final String VALIDATE_N245_FORM_NAME = "ga-validate-n245form-name";
-        private static final String N245_FILE_NAME = "Statement of incomings and outgoings";
-        private static final String N245_FILE_NAME_ERROR = "File should be named "
-            + "as \"Statement of incomings and outgoings\"";
-
-        @Test
-        void shouldThrowErrorsWhenFormNameDoesNot_Matches() {
-            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
-            CaseData caseData = CaseDataBuilder
-                .builder()
-                .generalAppN245FormUpload(Document.builder().documentFileName("capture.pdf").build())
-                .generalAppType(GAApplicationType.builder().types(types).build()).build();
-
-            when(initiateGeneralAppService.validateFileName(caseData
-                                                                .getGeneralAppN245FormUpload()
-                                                                .getDocumentFileName(), N245_FILE_NAME))
-                .thenCallRealMethod();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_N245_FORM_NAME);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors().size()).isEqualTo(1);
-
-            assertThat(response.getErrors().get(0)).isEqualTo(N245_FILE_NAME_ERROR);
-        }
-
-        @Test
-        void shouldNotCauseAnyErrorsWhenFormNameMatchesForMultipleTypes() {
-            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_JUDGEMENT);
-
-            CaseData caseData = CaseDataBuilder
-                .builder()
-                .generalAppN245FormUpload(Document.builder()
-                                              .documentFileName("Statement of incomings and outgoings.pdf").build())
-                .generalAppType(GAApplicationType.builder().types(types).build()).build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_N245_FORM_NAME);
-
-            when(initiateGeneralAppService.validateFileName(caseData
-                                                                .getGeneralAppN245FormUpload()
-                                                                .getDocumentFileName(), N245_FILE_NAME))
-                .thenCallRealMethod();
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors()).isEmpty();
-        }
     }
 
     @Nested
@@ -852,9 +800,14 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotReturnErrors_whenRespondentSolAssignedToCase() {
+
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
+                              .courtName("Court Name").region("Region").build());
+            given(locationRefDataService.getCourtLocationsForGeneralApplication(any())).willReturn(locations);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
-            given(locationRefDataService.getCourtLocations(any())).willReturn(getSampleCourLocations());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -868,14 +821,18 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getGeneralAppHearingDetails()).isNotNull();
             assertThat(dynamicList).isNotNull();
             assertThat(locationsFromDynamicList(dynamicList))
-                    .containsOnly("ABCD - RG0 0 AL", "PQRS - GU0 0EE", "WXYZ - EW0 0HE", "LMNO - NE0 0BH");
+                    .containsOnly("siteName - court Address - post code");
         }
 
         @Test
         void shouldReturnErrors_whenNoRespondentSolAssignedToCase() {
+
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
+                              .courtName("Court Name").region("Region").build());
+            given(locationRefDataService.getCourtLocationsForGeneralApplication(any())).willReturn(locations);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             given(initiateGeneralAppService.respondentAssigned(any())).willReturn(false);
-            given(locationRefDataService.getCourtLocations(any())).willReturn(getSampleCourLocations());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 

@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
+import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
@@ -64,8 +65,19 @@ public class FlowPredicate {
             || (caseData.getRespondent2OrgRegistered() == YES && caseData.getRespondent1OrgRegistered() == NO));
 
     // have to use this for now because cannot use featureToggleService.isNoticeOfChangeEnabled() as predicate
-    public static final Predicate<CaseData> noticeOfChangeEnabledAndLiP = caseData ->
-        caseData.getAddLegalRepDeadline() != null;
+    public static final Predicate<CaseData> noticeOfChangeEnabled = caseData ->
+        (caseData.getDefendant1LIPAtClaimIssued() != null
+            && caseData.getDefendant1LIPAtClaimIssued() == YES)
+            ||
+            (caseData.getDefendant2LIPAtClaimIssued() != null
+                && caseData.getDefendant2LIPAtClaimIssued() == YES);
+    // certificateOfServiceEnabled predicate will be removed when CoS go live.
+    public static final Predicate<CaseData> certificateOfServiceEnabled = caseData ->
+        (caseData.getDefendant1LIPAtClaimIssued() != null
+        && caseData.getDefendant1LIPAtClaimIssued() == YES)
+            ||
+            (caseData.getDefendant2LIPAtClaimIssued() != null
+            && caseData.getDefendant2LIPAtClaimIssued() == YES);
 
     public static final Predicate<CaseData> claimSubmittedBothRespondentUnrepresented = caseData ->
         caseData.getSubmittedDate() != null
@@ -128,7 +140,7 @@ public class FlowPredicate {
             && caseData.getClaimIssuedPaymentDetails().getStatus() == FAILED);
 
     public static final Predicate<CaseData> paymentSuccessful = caseData ->
-        caseData.getPaymentSuccessfulDate() != null;
+        caseData.getPaymentSuccessfulDate() != null || caseData.getClaimIssuedPaymentDetails().getStatus() == SUCCESS;
 
     public static final Predicate<CaseData> pendingClaimIssued = caseData ->
         caseData.getIssueDate() != null
@@ -402,17 +414,31 @@ public class FlowPredicate {
     public static final Predicate<CaseData> takenOfflineBySystem = caseData ->
         caseData.getTakenOfflineDate() != null;
 
+    public static final Predicate<CaseData> takenOfflineAfterSDO = caseData ->
+        caseData.getTakenOfflineDate() != null;
+
     public static final Predicate<CaseData> takenOfflineByStaff = caseData ->
         caseData.getTakenOfflineByStaffDate() != null;
 
     public static final Predicate<CaseData> takenOfflineByStaffAfterClaimIssue = caseData ->
-        caseData.getTakenOfflineByStaffDate() != null
-            && caseData.getClaimNotificationDate() == null
+        getPredicateTakenOfflineByStaffAfterClaimIssue(caseData);
+
+    public static final boolean getPredicateTakenOfflineByStaffAfterClaimIssue(CaseData caseData) {
+        // In case of SPEC claim ClaimNotificationDate will be set even when the case is issued
+        // In case of UNSPEC ClaimNotificationDate will be set only after notification step
+        boolean basePredicate = caseData.getTakenOfflineByStaffDate() != null
             && caseData.getClaimDetailsNotificationDate() == null
             && caseData.getRespondent1AcknowledgeNotificationDate() == null
             && caseData.getRespondent1ResponseDate() == null
             && caseData.getClaimNotificationDeadline() != null
             && caseData.getClaimNotificationDeadline().isAfter(LocalDateTime.now());
+
+        if (isSpecCaseCategory(caseData, caseData.getCaseAccessCategory() != null)) {
+            return basePredicate && caseData.getClaimNotificationDate() != null;
+        }
+
+        return basePredicate && caseData.getClaimNotificationDate() == null;
+    }
 
     public static final Predicate<CaseData> takenOfflineByStaffAfterClaimNotified = caseData ->
         caseData.getTakenOfflineByStaffDate() != null
@@ -564,15 +590,11 @@ public class FlowPredicate {
             && caseData.getClaimDetailsNotificationDate() == null
             && caseData.getClaimNotificationDate() != null;
 
-    public static final Predicate<CaseData> pastAddLegalRepDeadline = (caseData) ->
-        // when notify change is merged, replace with this code
-        // caseData.getAddLegalRepDeadline() != null && caseData.getAddLegalRepDeadline().isBefore(LocalDateTime.now());
-        caseData.getAddLegalRepDeadline() == null
-            ? true
-            : caseData.getAddLegalRepDeadline().isBefore(LocalDateTime.now());
-
     public static final Predicate<CaseData> claimDismissedByCamunda = caseData ->
         caseData.getClaimDismissedDate() != null;
+
+    public static final Predicate<CaseData> caseDismissedPastHearingFeeDue = caseData ->
+        caseData.getCaseDismissedHearingFeeDueDate() != null;
 
     public static final Predicate<CaseData> fullAdmissionSpec = caseData ->
         getPredicateForResponseTypeSpec(caseData, RespondentResponseTypeSpec.FULL_ADMISSION);

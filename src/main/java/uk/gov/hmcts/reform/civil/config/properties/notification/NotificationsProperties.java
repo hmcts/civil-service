@@ -43,10 +43,21 @@ public class NotificationsProperties {
     private String failedPaymentForSpec;
 
     @NotEmpty
-    private String solicitorClaimDismissed;
+    private String solicitorClaimDismissedWithin4Months;
+
+    @NotEmpty
+    private String solicitorClaimDismissedWithin14Days;
+
+    @NotEmpty
+    private String solicitorClaimDismissedWithinDeadline;
+
+    @NotEmpty String solicitorHearingFeeUnpaid;
 
     @NotEmpty
     private String claimantSolicitorCaseWillProgressOffline;
+
+    @NotEmpty
+    private String claimantSolicitorSpecCaseWillProgressOffline;
 
     @NotEmpty
     private String claimantSolicitorAgreedExtensionDate;
@@ -71,6 +82,9 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String claimantSolicitorClaimContinuingOnline1v2ForSpec;
+
+    @NotEmpty
+    private String claimantClaimContinuingOnlineForSpec;
 
     @NotEmpty
     private String respondentSolicitorClaimContinuingOnlineForSpec;
@@ -136,6 +150,12 @@ public class NotificationsProperties {
     private String respondentSolicitorCounterClaimForSpec;
 
     @NotEmpty
+    private String respondentDeadlineExtension;
+
+    @NotEmpty
+    private String claimantDeadlineExtension;
+
+    @NotEmpty
     private String respondentSolicitor1DefaultJudgmentRequested;
 
     @NotEmpty
@@ -157,6 +177,8 @@ public class NotificationsProperties {
     private String standardDirectionOrderDJTemplate;
 
     @NotEmpty
+    private String caseworkerDefaultJudgmentRequested;
+
     private String respondentChangeOfAddressNotificationTemplate;
 
     @NotEmpty
@@ -170,5 +192,20 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String respondentLipResponseSubmissionTemplate;
+
+    @NotEmpty
+    private String hearingListedFeeClaimantLrTemplate;
+
+    @NotEmpty
+    private String hearingListedNoFeeClaimantLrTemplate;
+
+    @NotEmpty
+    private String hearingListedNoFeeDefendantLrTemplate;
+
+    @NotEmpty
+    private String claimantSolicitorClaimContinuingOnlineCos;
+
+    @NotEmpty
+    private String evidenceUploadTemplate;
 
 }
