@@ -79,7 +79,7 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
             .claimValue(caseData.getClaimValue().formData())
             .statementOfTruth(caseData.getApplicantSolicitor1ClaimStatementOfTruth())
             .claimDetails(caseData.getDetailsOfClaim())
-            .hearingCourtLocation(courtLocations.isEmpty() ? null : courtLocations.stream()
+            .hearingCourtLocation(courtLocations.isEmpty() ? "" : courtLocations.stream()
                 .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
                 .collect(Collectors.toList()).get(0).getCourtName())
             .referenceNumber(caseData.getLegacyCaseReference())
