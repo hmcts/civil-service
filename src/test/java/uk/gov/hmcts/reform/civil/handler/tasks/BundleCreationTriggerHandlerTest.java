@@ -10,13 +10,12 @@ import org.mockito.Mock;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
-import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
+import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
+import uk.gov.hmcts.reform.civil.service.search.BundleCreationTriggerService;
 
 import java.util.List;
 import java.util.Map;
@@ -41,7 +40,7 @@ class BundleCreationTriggerHandlerTest {
     private ExternalTaskService externalTaskService;
 
     @Mock
-    private HearingFeeDueSearchService searchService;
+    private BundleCreationTriggerService searchService;
 
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
@@ -53,7 +52,7 @@ class BundleCreationTriggerHandlerTest {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
-    private HearingFeeDueHandler handler;
+    private BundleCreationTriggerHandler handler;
 
     @BeforeEach
     void init() {
@@ -63,9 +62,9 @@ class BundleCreationTriggerHandlerTest {
     }
 
     @Test
-    void shouldEmitHearingFeePaidEvent_whenCasesFoundPaid() {
+    void shouldEmitBundleCreationEvent_whenCasesFound() {
         long caseId = 1L;
-        CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDuePaid().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build();
         Map<String, Object> data = Map.of("data", caseData);
         List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
 
@@ -75,29 +74,12 @@ class BundleCreationTriggerHandlerTest {
 
         handler.execute(mockTask, externalTaskService);
 
-        verify(applicationEventPublisher).publishEvent(new HearingFeePaidEvent(caseId));
+        verify(applicationEventPublisher).publishEvent(new BundleCreationTriggerEvent(caseId));
         verify(externalTaskService).complete(mockTask);
     }
 
     @Test
-    void shouldEmitHearingFeePaidEvent_whenCasesFoundUnpaid() {
-        long caseId = 1L;
-        CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDueUnpaid().build();
-        Map<String, Object> data = Map.of("data", caseData);
-        List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
-
-        when(searchService.getCases()).thenReturn(caseDetails);
-        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.get(0));
-        when(caseDetailsConverter.toCaseData(caseDetails.get(0))).thenReturn(caseData);
-
-        handler.execute(mockTask, externalTaskService);
-
-        verify(applicationEventPublisher).publishEvent(new HearingFeeUnpaidEvent(caseId));
-        verify(externalTaskService).complete(mockTask);
-    }
-
-    @Test
-    void shouldNotEmitTakeCaseOfflineEvent_WhenNoCasesFound() {
+    void shouldNotEmitBundleCreationEvent_WhenNoCasesFound() {
         when(searchService.getCases()).thenReturn(List.of());
 
         handler.execute(mockTask, externalTaskService);
