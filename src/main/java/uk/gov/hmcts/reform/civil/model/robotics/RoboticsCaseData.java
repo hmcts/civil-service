@@ -15,4 +15,5 @@ public class RoboticsCaseData implements ToJsonString {
     private String particularsOfClaim;
     private ClaimDetails claimDetails;
     private EventHistory events;
+    private List<NoticeOfChange> noticeOfChange;
 }

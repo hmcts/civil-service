@@ -14,7 +14,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_ISSUED;
 
 @SpringBootTest(classes = {
     CreateClaimSpecAfterPaymentCallbackHandler.class,
@@ -33,7 +32,6 @@ class CreateClaimSpecAfterPaymentCallbackHandlerTest extends BaseCallbackHandler
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         assertThat(response.getErrors()).isNull();
-        assertThat(response.getState()).isEqualTo(CASE_ISSUED.toString());
     }
 
     @Test

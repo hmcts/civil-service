@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import java.util.Map;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
@@ -52,13 +53,12 @@ public class PaymentRequestUpdateCallbackService {
                                                                                    .getCcdCaseNumber()));
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
             caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
-            if (feeType.equals(FeeType.HEARING.name()) || (feeType.equals(FeeType.CLAIMISSUED.name())
-                && isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled() ? true : false))) {
+            if (feeType.equals(FeeType.HEARING.name()) || feeType.equals(FeeType.CLAIMISSUED.name())) {
                 createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType);
             }
 
         } else {
-            log.error("Service request status is not PAID for Case id {}",
+            log.info("Service request status is not PAID for Case id {}",
                       serviceRequestUpdateDto.getCcdCaseNumber());
         }
     }
@@ -67,7 +67,7 @@ public class PaymentRequestUpdateCallbackService {
 
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
             caseId,
-            getEventNameFromFeeType(feeType)
+            getEventNameFromFeeType(caseData, feeType)
         );
 
         CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
@@ -84,16 +84,16 @@ public class PaymentRequestUpdateCallbackService {
         );
 
         coreCaseDataService.submitUpdate(caseId, caseDataContent);
-        if (feeType.equals(FeeType.HEARING.name())) {
-            coreCaseDataService.triggerEvent(caseData.getCcdCaseReference(), SERVICE_REQUEST_RECEIVED);
-        }
     }
 
-    private CaseEvent getEventNameFromFeeType(String feeType) {
+    private CaseEvent getEventNameFromFeeType(CaseData caseData, String feeType) {
         if (feeType.equals(FeeType.HEARING.name())) {
             return SERVICE_REQUEST_RECEIVED;
-        } else {
+        } else if (feeType.equals(FeeType.CLAIMISSUED.name())
+                   && isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
             return CREATE_CLAIM_SPEC_AFTER_PAYMENT;
+        } else {
+            return CREATE_CLAIM_AFTER_PAYMENT;
         }
     }
 
