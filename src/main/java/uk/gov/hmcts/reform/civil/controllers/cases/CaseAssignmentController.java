@@ -55,14 +55,8 @@ public class CaseAssignmentController {
         return new ResponseEntity<>(caseDetails, HttpStatus.OK);
     }
 
-    @PostMapping(path = {
-        "/case/{caseId}/{caseRole}"
-    })
+    @PostMapping(path = "/case/{caseId}/{caseRole}" )
     @ApiOperation("Assigns case to defendant")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 401, message = "Not Authorized"),
-        @ApiResponse(code = 400, message = "Bad Request")})
     public void assignCaseToDefendant(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
                                       @PathVariable("caseId") String caseId,
                                       @PathVariable("caseRole") Optional<CaseRole> caseRole) {
