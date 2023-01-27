@@ -89,10 +89,8 @@ public class TrialReadyRespondentNotificationHandler extends CallbackHandler imp
                 caseData.getRespondentSolicitor2Reference();
         }
         return Map.of(
-            HEARING_OR_TRIAL, addTrialOrHearing(caseData),
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIMANT_DEFENDANT_REFERENCE, defRefNumber
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
 
     }

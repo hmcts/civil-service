@@ -73,10 +73,8 @@ public class TrialReadyApplicantNotificationHandler extends CallbackHandler impl
         }
 
         return Map.of(
-            HEARING_OR_TRIAL, addTrialOrHearing(caseData),
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIMANT_DEFENDANT_REFERENCE, claimRefNumber
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
     }
 

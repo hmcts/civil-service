@@ -68,10 +68,8 @@ class TrialReadyApplicantNotificationHandlerTest extends BaseCallbackHandlerTest
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
-                HEARING_OR_TRIAL, addTrialOrHearing(caseData),
                 HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                CLAIMANT_DEFENDANT_REFERENCE, caseData.getSolicitorReferences().getApplicantSolicitor1Reference()
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
             );
         }
     }

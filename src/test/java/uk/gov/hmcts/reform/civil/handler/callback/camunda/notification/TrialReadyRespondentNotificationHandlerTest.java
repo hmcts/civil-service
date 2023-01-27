@@ -116,17 +116,13 @@ class TrialReadyRespondentNotificationHandlerTest extends BaseCallbackHandlerTes
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             if (isRespondentSolicitor1 == false) {
                 return Map.of(
-                    HEARING_OR_TRIAL, addTrialOrHearing(caseData),
                     HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
-                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                    CLAIMANT_DEFENDANT_REFERENCE, caseData.getSolicitorReferences().getRespondentSolicitor2Reference()
+                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
                 );
             } else {
                 return Map.of(
-                    HEARING_OR_TRIAL, addTrialOrHearing(caseData),
                     HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE),
-                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                    CLAIMANT_DEFENDANT_REFERENCE, caseData.getSolicitorReferences().getRespondentSolicitor1Reference()
+                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
                 );
             }
         }
