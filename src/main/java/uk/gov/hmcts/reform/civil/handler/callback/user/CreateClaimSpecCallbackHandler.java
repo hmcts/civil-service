@@ -177,7 +177,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(MID, "repOrgPolicy"), this::validateRespondentSolicitorOrgPolicy)
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
-            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .put(callbackKey(MID, "respondent1"), this::validateRespondent1Address)
             .put(callbackKey(MID, "respondent2"), this::validateRespondent2Address)
@@ -414,21 +414,19 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             dataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         }
 
-        if (V_1.equals(callbackParams.getVersion())
-            && toggleService.isCourtLocationDynamicListEnabled()) {
+        if (toggleService.isCourtLocationDynamicListEnabled()) {
             dataBuilder.caseManagementLocation(CaseLocation.builder().region(regionId).baseLocation(epimmsId).build());
         }
 
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
         ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
 
-        if (V_1.equals(callbackParams.getVersion())
-            && toggleService.isAccessProfilesEnabled()) {
+        if (toggleService.isAccessProfilesEnabled()) {
             dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
         }
 
         //assign case management category to the case and caseNameHMCTSinternal
-        if (V_1.equals(callbackParams.getVersion()) && toggleService.isGlobalSearchEnabled()) {
+        if (toggleService.isGlobalSearchEnabled()) {
             dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
 
             CaseManagementCategoryElement civil =
@@ -500,12 +498,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                 dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST));
             }
         }
-
         //set check email field to null for GDPR
         dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
         return dataBuilder;
     }
 
+    //--------v1 callback overloaded, return to single param
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (null != callbackParams.getRequest().getEventId()
