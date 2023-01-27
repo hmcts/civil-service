@@ -49,6 +49,20 @@ cmc-claim-store:
   api:
     url: ${CLAIM_STORE_URL:http://localhost:8765}
 
+
+serviceRequest:
+  api:
+    callback-url : ${SERVICE_REQUEST_UPDATE:}
+    site_id : AAA7
+    service : CIVIL
+
+serviceRequestClaimIssued:
+  api:
+    callback-url: ${SERVICE_REQUEST_UPDATE_CLAIM_ISSUED:}
+    site_id: AAA7
+    service: CIVIL
+
+
 send-letter:
   url: ${SEND_LETTER_URL:http://localhost:8765}
 
@@ -95,6 +109,7 @@ payments:
     service: CIVIL
     spec_site_id: AAA6
     spec_service: SPEC
+    url: http://localhost:8765
 
 idam:
   s2s-auth:
@@ -296,6 +311,18 @@ genApp:
 payments:
   api:
     url: http://localhost:8765
+
+serviceRequest:
+  api:
+    callback-url : http://localhost:4000/service-request-update
+    site_id : AAA7
+    service : CIVIL
+
+serviceRequestClaimIssued:
+  api:
+    callback-url: http://localhost:4000/service-request-update-claim-issued
+    site_id: AAA7
+    service: CIVIL
 
 idam:
   web:
