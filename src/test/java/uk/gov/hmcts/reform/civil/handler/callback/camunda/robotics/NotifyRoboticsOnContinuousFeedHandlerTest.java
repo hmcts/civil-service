@@ -80,6 +80,9 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
     @Autowired
     private NotifyRoboticsOnContinuousFeedHandler handler;
 
+    @MockBean
+    private JsonSchemaValidationService validationService;
+
     @Nested
     class ValidJsonPayload {
 
@@ -119,9 +122,6 @@ class NotifyRoboticsOnContinuousFeedHandlerTest extends BaseCallbackHandlerTest 
 
     @Nested
     class InValidJsonPayload {
-
-        @MockBean
-        private JsonSchemaValidationService validationService;
 
         @Test
         void shouldThrowJsonSchemaValidationException_whenSchemaErrors() {
