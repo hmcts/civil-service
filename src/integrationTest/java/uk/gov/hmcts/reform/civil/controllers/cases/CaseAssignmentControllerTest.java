@@ -67,7 +67,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
-    void givenCorrectParams_whenAssignClaim_shouldReturnStatusOk(){
+    void givenCorrectParams_whenAssignClaim_shouldReturnStatusOk() {
         doPost("authorization", "", ASSIGN_CASE, "123", "RESPONDENTSOLICITORONE")
             .andExpect(status().isOk());
     }
