@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.bundle.BundleData;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleDetails;
 import uk.gov.hmcts.reform.civil.model.bundle.BundlingInformation;
 import uk.gov.hmcts.reform.civil.model.bundle.DocumentLink;
+import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -75,6 +76,11 @@ public class BundleCreationTriggerEventHandlerTest {
                                                         .builder()
                                                         .expertDocument(Document.builder().documentBinaryUrl(testUrl)
                                                                             .documentFileName(testFileName).build()).build()));
+        List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
+        otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
+                                                       .builder()
+                                                       .documentUpload(Document.builder().documentBinaryUrl(testUrl)
+                                                                           .documentFileName(testFileName).build()).build()));
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         CaseDocument caseDocumentClaim =
             CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).documentLink(Document.builder().documentUrl(
@@ -95,15 +101,15 @@ public class BundleCreationTriggerEventHandlerTest {
             .documentWitnessStatement(witnessEvidenceDocs)
             .documentWitnessSummary(witnessEvidenceDocs)
             .documentHearsayNotice(witnessEvidenceDocs)
-            .documentReferredInStatement(witnessEvidenceDocs)
+            .documentReferredInStatement(otherEvidenceDocs)
             .documentWitnessStatementRes(witnessEvidenceDocs)
             .documentWitnessSummaryRes(witnessEvidenceDocs)
             .documentHearsayNoticeRes(witnessEvidenceDocs)
-            .documentReferredInStatementRes(witnessEvidenceDocs)
+            .documentReferredInStatementRes(otherEvidenceDocs)
             .documentWitnessStatementRes2(witnessEvidenceDocs)
             .documentWitnessSummaryRes2(witnessEvidenceDocs)
             .documentHearsayNoticeRes2(witnessEvidenceDocs)
-            .documentReferredInStatementRes2(witnessEvidenceDocs)
+            .documentReferredInStatementRes2(otherEvidenceDocs)
             .documentExpertReport(expertEvidenceDocs)
             .documentJointStatement(expertEvidenceDocs)
             .documentAnswers(expertEvidenceDocs)
