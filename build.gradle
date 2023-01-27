@@ -114,7 +114,7 @@ allprojects {
       // Solves CVE-2022-31159, happens only on local builds when running dependencyCheck gradle task
       dependencySet(
         group: 'com.amazonaws',
-        version: '1.12.261'
+        version: '1.12.392'
       ) {
         entry 'aws-java-sdk-core'
         entry 'aws-java-sdk-kms'
@@ -240,6 +240,12 @@ task runSpecApiTests(type: Exec, description: 'Runs Spec functional tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:api-spec'
 }
 
+task runSdoApiTests(type: Exec, description: 'Runs SDO functional tests.') {
+  onlyIf {
+    return System.env.ENVIRONMENT == 'preview'
+  }
+  commandLine '/usr/bin/yarn', '--silent', 'test:api-sdo'
+}
 
 task runApiTests(type: Exec, description: 'Runs Api tests.') {
   commandLine '/usr/bin/yarn', '--silent', 'test:api-unspec'
@@ -280,7 +286,8 @@ task smoke(description: 'Runs the smoke tests.') {
 }
 
 task functional(description: 'Runs the functional tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity, runSpecApiTests, runApiTests))
+  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset, installDependencies, checkDependenciesIntegrity,
+    runSpecApiTests, runApiTests))
 }
 
 task crossbrowser(description: 'Runs the crossbrowser tests.') {
@@ -322,7 +329,7 @@ def versions = [
   junitPlatform      : '1.8.1',
   reformLogging      : '5.1.5',
   springBoot         : springBoot.class.package.implementationVersion,
-  springStatemachine : '3.0.0.M2',
+  springStatemachine : '3.2.0',
   springfoxSwagger   : '2.9.2',
   lombok             : '1.18.24',
   pact               : '3.5.24',
@@ -359,6 +366,8 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
 
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-core', version: versions.springStatemachine
+  implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
+
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
@@ -384,7 +393,7 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.3'
   implementation group: 'com.github.hmcts', name: 'fees-java-client', version: '0.0.6'
-  implementation group: 'com.github.hmcts', name: 'payments-java-client', version: '1.4.1'
+  implementation group: 'com.github.hmcts', name: 'payments-java-client', version: '1.5.2'
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
   implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '3.19.0-RELEASE'
@@ -480,7 +489,7 @@ bootJar {
 }
 
 wrapper {
-    distributionType = Wrapper.DistributionType.ALL
+  distributionType = Wrapper.DistributionType.ALL
 }
 
 task runAndPublishConsumerPactTests(type: Test){

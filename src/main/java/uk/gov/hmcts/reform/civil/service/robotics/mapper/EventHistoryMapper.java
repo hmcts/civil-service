@@ -1024,7 +1024,7 @@ public class EventHistoryMapper {
                                   .eventDetails(EventDetails.builder()
                                                     .stayClaim(isStayClaim(applicantDetails.get(index).getDq()))
                                                     .preferredCourtCode(courtLocations.isEmpty()
-                                                                            ? null : courtLocations.stream()
+                                                                            ? "" : courtLocations.stream()
                                                         .filter(id -> id.getCourtTypeId().equals(
                                                             CIVIL_COURT_TYPE_ID))
                                                         .collect(Collectors.toList()).get(0)
@@ -1033,8 +1033,8 @@ public class EventHistoryMapper {
                                                     .build())
                                   .eventDetailsText(prepareEventDetailsText(
                                       applicantDetails.get(index).getDq(),
-                                      courtLocations.isEmpty() ? null : courtLocations.stream()
-                                          .filter(id -> id.getCourtTypeId().equals(
+                                      courtLocations.isEmpty() ? "" : courtLocations.stream()
+                                      .filter(id -> id.getCourtTypeId().equals(
                                               CIVIL_COURT_TYPE_ID))
                                           .collect(Collectors.toList()).get(0)
                                           .getCourtLocationCode()
@@ -1377,7 +1377,7 @@ public class EventHistoryMapper {
                 ));
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
                 Party respondent2 = caseData.getRespondent2();
-                Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
+                Respondent1DQ respondent2DQ = caseData.getRespondent1DQ();
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
 

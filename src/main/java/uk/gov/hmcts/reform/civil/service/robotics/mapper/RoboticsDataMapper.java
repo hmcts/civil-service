@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
@@ -37,13 +39,24 @@ import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_SOLICITOR_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_SOLICITOR_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_SOLICITOR_ID;
 import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPounds;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RoboticsDataMapper {
+
 
     public static final String APPLICANT_SOLICITOR_ID = "001";
     public static final String RESPONDENT_SOLICITOR_ID = "002";
@@ -62,13 +75,19 @@ public class RoboticsDataMapper {
 
     public RoboticsCaseData toRoboticsCaseData(CaseData caseData, String authToken) {
         requireNonNull(caseData);
-        return RoboticsCaseData.builder()
+        var roboticsBuilder = RoboticsCaseData.builder()
             .header(buildCaseHeader(caseData, authToken))
             .litigiousParties(buildLitigiousParties(caseData))
             .solicitors(buildSolicitors(caseData))
             .claimDetails(buildClaimDetails(caseData))
-            .events(eventHistoryMapper.buildEvents(caseData))
-            .build();
+            .events(eventHistoryMapper.buildEvents(caseData));
+
+        if (featureToggleService.isNoticeOfChangeEnabled()
+            && caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM) {
+            roboticsBuilder.noticeOfChange(RoboticsDataUtil.buildNoticeOfChange(caseData));
+        }
+
+        return roboticsBuilder.build();
     }
 
     private ClaimDetails buildClaimDetails(CaseData caseData) {
@@ -97,13 +116,17 @@ public class RoboticsDataMapper {
 
     public String getPreferredCourtCode(CaseData caseData, String authToken) {
         List<LocationRefData> courtLocations = locationRefDataService.getCourtLocationsByEpimmsId(
-                authToken, caseData.getCourtLocation().getCaseLocation().getBaseLocation());
+            authToken, caseData.getCourtLocation().getCaseLocation().getBaseLocation());
+
         if (!courtLocations.isEmpty()) {
             return courtLocations.stream()
                 .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
                 .collect(Collectors.toList()).get(0).getCourtLocationCode();
+        } else {
+            log.info("Court location not found");
+            return "";
         }
-        return null;
+
     }
 
     private String buildAllocatedTrack(AllocatedTrack allocatedTrack) {
