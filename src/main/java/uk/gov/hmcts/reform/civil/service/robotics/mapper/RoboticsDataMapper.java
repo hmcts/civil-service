@@ -101,8 +101,6 @@ public class RoboticsDataMapper {
             .build();
     }
 
-
-
     private String buildAllocatedTrack(AllocatedTrack allocatedTrack) {
         switch (allocatedTrack) {
             case FAST_CLAIM:
