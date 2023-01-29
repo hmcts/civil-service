@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.math.BigDecimal;
@@ -87,6 +88,9 @@ class EventHistoryMapperTest {
     @MockBean
     private LocationRefDataService locationRefDataService;
 
+    @MockBean
+    LocationRefDataUtil locationRefDataUtil;
+
     @Autowired
     EventHistoryMapper mapper;
 
@@ -106,7 +110,7 @@ class EventHistoryMapperTest {
                           .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
                           .courtTypeId("10").courtLocationCode("121")
                           .epimmsId("000000").build());
-        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(courtLocations);
+        when(locationRefDataUtil.getPreferredCourtCode(any(), any())).thenReturn("121");
     }
 
     @Nested
