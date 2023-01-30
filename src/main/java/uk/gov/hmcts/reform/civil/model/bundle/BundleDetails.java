@@ -19,6 +19,9 @@ public class BundleDetails {
     private String stitchingFailureMessage;
     private String fileName;
 
+    private String createdOn;
+    private String bundleHearingDate;
+
     @JsonCreator
     public BundleDetails(@JsonProperty("id") String id,
                          @JsonProperty("title") String title,
@@ -26,7 +29,9 @@ public class BundleDetails {
                          @JsonProperty("stitchStatus") String stitchStatus,
                          @JsonProperty("stitchedDocument") DocumentLink stitchedDocument,
                          @JsonProperty("stitchingFailureMessage") String stitchingFailureMessage,
-                         @JsonProperty("fileName") String fileName) {
+                         @JsonProperty("fileName") String fileName,
+                         @JsonProperty("createdOn") String createdOn,
+                         @JsonProperty("bundleHearingDate") String bundleHearingDate) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -34,5 +39,7 @@ public class BundleDetails {
         this.stitchedDocument = stitchedDocument;
         this.stitchingFailureMessage = stitchingFailureMessage;
         this.fileName = fileName;
+        this.createdOn = createdOn;
+        this.bundleHearingDate = bundleHearingDate;
     }
 }

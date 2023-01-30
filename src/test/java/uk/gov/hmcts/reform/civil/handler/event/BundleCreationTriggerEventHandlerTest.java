@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.model.bundle.Bundle;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleData;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleDetails;
-import uk.gov.hmcts.reform.civil.model.bundle.BundlingInformation;
 import uk.gov.hmcts.reform.civil.model.bundle.DocumentLink;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
@@ -64,7 +63,7 @@ public class BundleCreationTriggerEventHandlerTest {
     public void setup() {
         List<Bundle> bundleList = new ArrayList<>();
         bundleList.add(Bundle.builder().value(BundleDetails.builder().stitchedDocument(DocumentLink.builder().build())
-                                                  .stitchStatus("New").build()).build());
+                                                  .stitchStatus("New").createdOn("2023-01-01").build()).build());
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
         witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
                                                          .builder()
@@ -132,11 +131,10 @@ public class BundleCreationTriggerEventHandlerTest {
             .respondent2(Party.builder().partyName("respondent2").type(Party.Type.INDIVIDUAL).build())
             .hearingDate(LocalDate.now())
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
-            .bundleInformation(BundlingInformation.builder().historicalBundles(bundleList).build())
             .build();
         caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         bundleCreateResponse =
-            BundleCreateResponse.builder().data(BundleData.builder().caseBundles(bundleList).hearingDate("2023-12-20").bundleConfiguration("test").build()).build();
+            BundleCreateResponse.builder().data(BundleData.builder().caseBundles(bundleList).build()).build();
     }
 
     @Test
