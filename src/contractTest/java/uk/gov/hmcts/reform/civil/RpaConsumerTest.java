@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.prd.client.OrganisationApi;
 
 import java.time.LocalDateTime;
@@ -79,9 +80,10 @@ class RpaConsumerTest extends BaseRpaTest {
     PrdAdminUserConfiguration userConfig;
     @MockBean
     FeatureToggleService featureToggleService;
-
     @MockBean
     LocationRefDataService locationRefDataService;
+    @MockBean
+    LocationRefDataUtil locationRefDataUtil;
     @MockBean
     private Time time;
 
@@ -98,7 +100,7 @@ class RpaConsumerTest extends BaseRpaTest {
                           .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
                           .courtTypeId("10").courtLocationCode("121")
                           .epimmsId("000000").build());
-        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
+        when(locationRefDataUtil.getPreferredCourtCode(any(), any())).thenReturn("127");
     }
 
     @Nested
