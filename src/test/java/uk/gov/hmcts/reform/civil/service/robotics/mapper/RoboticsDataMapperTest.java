@@ -144,6 +144,7 @@ class RoboticsDataMapperTest {
         assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
         assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
         assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
+        assertThat(firstSolicitor.getContactEmailAddress()).isEqualTo("applicantsolicitor@example.com");
         CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
             .isEqualTo(firstSolicitor.getAddresses().getContactAddress());
 
@@ -151,6 +152,7 @@ class RoboticsDataMapperTest {
         assertThat(secondSolicitor.getOrganisationId()).isEqualTo("QWERTY R");
         assertThat(secondSolicitor.getName()).isEqualTo("Org Name");
         assertThat(secondSolicitor.getContactDX()).isEqualTo("DX 12345");
+        assertThat(secondSolicitor.getContactEmailAddress()).isEqualTo("respondentsolicitor@example.com");
         CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
             .isEqualTo(secondSolicitor.getAddresses().getContactAddress());
     }
@@ -168,6 +170,7 @@ class RoboticsDataMapperTest {
         assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
         assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
         assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
+        assertThat(firstSolicitor.getContactEmailAddress()).isEqualTo("applicantsolicitor@example.com");
         CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
             .isEqualTo(firstSolicitor.getAddresses().getContactAddress());
 
@@ -175,6 +178,7 @@ class RoboticsDataMapperTest {
         assertThat(secondSolicitor.getOrganisationId()).isEqualTo("QWERTY R");
         assertThat(secondSolicitor.getName()).isEqualTo("Org Name");
         assertThat(secondSolicitor.getContactDX()).isEqualTo("DX 12345");
+        assertThat(secondSolicitor.getContactEmailAddress()).isEqualTo("respondentsolicitor@example.com");
         CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
             .isEqualTo(secondSolicitor.getAddresses().getContactAddress());
     }
@@ -204,6 +208,7 @@ class RoboticsDataMapperTest {
         assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
         assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
         assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
+        assertThat(firstSolicitor.getContactEmailAddress()).isEqualTo("applicantsolicitor@example.com");
         CustomAssertions.assertThat(List.of(contactInformation))
             .isEqualTo(firstSolicitor.getAddresses().getContactAddress());
 
@@ -211,6 +216,7 @@ class RoboticsDataMapperTest {
         assertThat(secondSolicitor.getOrganisationId()).isEqualTo("QWERTY R");
         assertThat(secondSolicitor.getName()).isEqualTo("Org Name");
         assertThat(secondSolicitor.getContactDX()).isEqualTo("DX 12345");
+        assertThat(secondSolicitor.getContactEmailAddress()).isEqualTo("respondentsolicitor@example.com");
         CustomAssertions.assertThat(List.of(contactInformation))
             .isEqualTo(secondSolicitor.getAddresses().getContactAddress());
     }
@@ -230,6 +236,7 @@ class RoboticsDataMapperTest {
         assertThat(applicantSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
         assertThat(applicantSolicitor.getName()).isEqualTo("Org Name");
         assertThat(applicantSolicitor.getContactDX()).isEqualTo("DX 12345");
+        assertThat(applicantSolicitor.getContactEmailAddress()).isEqualTo("applicantsolicitor@example.com");
         CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
             .isEqualTo(applicantSolicitor.getAddresses().getContactAddress());
     }
@@ -290,6 +297,43 @@ class RoboticsDataMapperTest {
     }
 
     @Test
+    void shouldMapToRoboticsCaseDataWhen2ndDefendantIsRepresentedDifferentSolicitor() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .respondent2(PartyBuilder.builder().company().build())
+            .addRespondent2(YES)
+            .respondent2Represented(YES)
+            .respondent2SameLegalRepresentative(NO)
+            .build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getSolicitors()).hasSize(3);
+
+        var firstSolicitor = roboticsCaseData.getSolicitors().get(0);
+        assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
+        assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
+        assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
+        assertThat(firstSolicitor.getContactEmailAddress()).isEqualTo("applicantsolicitor@example.com");
+        CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
+            .isEqualTo(firstSolicitor.getAddresses().getContactAddress());
+
+        var secondSolicitor = roboticsCaseData.getSolicitors().get(1);
+        assertThat(secondSolicitor.getOrganisationId()).isEqualTo("QWERTY R");
+        assertThat(secondSolicitor.getName()).isEqualTo("Org Name");
+        assertThat(secondSolicitor.getContactDX()).isEqualTo("DX 12345");
+        assertThat(secondSolicitor.getContactEmailAddress()).isEqualTo("respondentsolicitor@example.com");
+        CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
+            .isEqualTo(secondSolicitor.getAddresses().getContactAddress());
+
+        var thirdSolicitor = roboticsCaseData.getSolicitors().get(2);
+        assertThat(thirdSolicitor.getOrganisationId()).isEqualTo("QWERTY R2");
+        assertThat(thirdSolicitor.getName()).isEqualTo("Org Name");
+        assertThat(thirdSolicitor.getContactDX()).isEqualTo("DX 12345");
+        assertThat(thirdSolicitor.getContactEmailAddress()).isEqualTo("respondentsolicitor2@example.com");
+        CustomAssertions.assertThat(List.of(CONTACT_INFORMATION))
+            .isEqualTo(thirdSolicitor.getAddresses().getContactAddress());
+    }
+
+    @Test
     void shouldMapToRoboticsCaseDataWhen2ndDefendantIsRepresentedNotRegistered() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
             .respondent2(PartyBuilder.builder().company().build())
@@ -328,6 +372,20 @@ class RoboticsDataMapperTest {
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getHeader().getPreferredCourtCode()).isEqualTo("121");
+    }
+
+    @Test
+    void shouldReturnEmptyStringWhenPreferredCourtCodeisUnavailableFromLocationRefData() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
+        List<LocationRefData> courtLocations = new ArrayList<>();
+        courtLocations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
+                               .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
+                               .courtTypeId("10")
+                               .epimmsId("9088").build());
+
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getHeader().getPreferredCourtCode()).isEqualTo("");
     }
 
     @Test

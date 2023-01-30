@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -51,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_SOLICITOR_ID;
 import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPounds;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RoboticsDataMapper {
@@ -104,13 +106,15 @@ public class RoboticsDataMapper {
 
     public String getPreferredCourtCode(CaseData caseData, String authToken) {
         List<LocationRefData> courtLocations = locationRefDataService.getCourtLocationsByEpimmsId(
-                authToken, caseData.getCourtLocation().getCaseLocation().getBaseLocation());
+            authToken, caseData.getCourtLocation().getCaseLocation().getBaseLocation());
         if (!courtLocations.isEmpty()) {
             return courtLocations.stream()
                 .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
                 .collect(Collectors.toList()).get(0).getCourtLocationCode();
+        } else {
+            log.info("Court location not found");
+            return "";
         }
-        return null;
     }
 
     private String buildAllocatedTrack(AllocatedTrack allocatedTrack) {
@@ -153,6 +157,7 @@ public class RoboticsDataMapper {
             .id(id)
             .isPayee(false)
             .organisationId(organisationId)
+            .contactEmailAddress(caseData.getRespondentSolicitor1EmailAddress())
             .reference(ofNullable(caseData.getSolicitorReferences())
                            .map(SolicitorReferences::getRespondentSolicitor1Reference)
                            .orElse(null)
@@ -341,6 +346,7 @@ public class RoboticsDataMapper {
             .id(id)
             .isPayee(false)
             .organisationId(organisationId)
+            .contactEmailAddress(caseData.getRespondentSolicitor2EmailAddress())
             .reference(caseData.getRespondentSolicitor2Reference());
 
         if (organisationId != null) {
