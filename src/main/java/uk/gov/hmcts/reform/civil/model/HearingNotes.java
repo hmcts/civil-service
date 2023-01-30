@@ -8,6 +8,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class HearingNotes {
+
     private final LocalDate date;
     private final String notes;
 

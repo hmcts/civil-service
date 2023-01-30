@@ -125,7 +125,7 @@ public class HearingUtils {
     }
 
     public static HearingNotes getHearingNotes(CaseData caseData) {
-        if(caseData.getDisposalHearingHearingNotes() != null) {
+        if (caseData.getDisposalHearingHearingNotes() != null) {
             return formatHearingNote(caseData.getDisposalHearingHearingNotes());
         } else if (caseData.getFastTrackHearingNotes() != null) {
             return formatHearingNote(caseData.getFastTrackHearingNotes().getInput());
