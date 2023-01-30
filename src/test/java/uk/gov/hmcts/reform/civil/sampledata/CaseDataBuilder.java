@@ -4247,7 +4247,7 @@ public class CaseDataBuilder {
         return this;
     }
 
-      public CaseDataBuilder ccjPaymentPaidSomeAmount(BigDecimal ccjPaymentPaidSomeAmount) {
+    public CaseDataBuilder ccjPaymentPaidSomeAmount(BigDecimal ccjPaymentPaidSomeAmount) {
         this.ccjPaymentPaidSomeAmount = ccjPaymentPaidSomeAmount;
         return this;
     }
