@@ -159,6 +159,8 @@ public class CaseDataParent implements MappableObject {
     private final DisposalHearingMethodTelephoneHearing disposalHearingMethodTelephoneHearing;
     private final DisposalHearingMethodVideoConferenceHearing disposalHearingMethodVideoConferenceHearing;
     private final List<Element<DisposalHearingAddNewDirections>> disposalHearingAddNewDirections;
+//    private final String fastTrackHearingNotes;
+    private final String hearingNotes;
 
     private final DynamicList disposalHearingMethodInPerson;
     private final DynamicList fastTrackMethodInPerson;
