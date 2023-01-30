@@ -210,6 +210,7 @@ class PaymentRequestUpdateCallbackServiceTest {
         verify(coreCaseDataService, never()).getCase(Long.valueOf(CASE_ID));
         verify(coreCaseDataService, never()).startUpdate(any(), any());
         verify(coreCaseDataService, never()).submitUpdate(any(), any());
+
     }
 
     @Test

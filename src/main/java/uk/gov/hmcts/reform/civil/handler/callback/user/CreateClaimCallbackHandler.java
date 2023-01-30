@@ -69,7 +69,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
@@ -165,10 +164,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .put(callbackKey(MID, "rep2OrgPolicy"), this::validateRespondentSolicitor2OrgPolicy)
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(MID, "populateClaimantSolicitor"), this::populateClaimantSolicitor)
-            .put(callbackKey(V_1, ABOUT_TO_SUBMIT), this::submitClaim)
-            .put(callbackKey(V_2, ABOUT_TO_SUBMIT), params -> submitClaim(params, true))
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitClaim)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
-            .put(callbackKey(V_1, SUBMITTED), params -> buildConfirmation(params, true))
             .build();
     }
 
@@ -373,17 +370,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
-        return submitClaim(callbackParams, false);
-    }
-
-    //----------------------------------v1 method-------------------------
-    private CallbackResponse submitClaim(CallbackParams callbackParams, boolean isV2Callback) {
         CaseData caseData = callbackParams.getCaseData();
 
         List<String> validationErrors;
 
-        if ((V_2.equals(callbackParams.getVersion()) || V_1.equals(callbackParams.getVersion()))
-            && toggleService.isCourtLocationDynamicListEnabled()) {
+        if (toggleService.isCourtLocationDynamicListEnabled()) {
             validationErrors = validateCourtChoice(caseData);
         } else {
             validationErrors = validateCourtTextOld(caseData);
@@ -394,8 +385,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
 
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        CaseData.CaseDataBuilder dataBuilder = isV2Callback ? getSharedDataV1(callbackParams) : getSharedData(callbackParams);
-
+        CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
         addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder);
 
         if (caseData.getRespondent1OrgRegistered() == YES
@@ -426,13 +416,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         dataBuilder.claimStarted(null);
 
-        if ((V_2.equals(callbackParams.getVersion()) || V_1.equals(callbackParams.getVersion()))
-            && toggleService.isCourtLocationDynamicListEnabled()) {
+        if (toggleService.isCourtLocationDynamicListEnabled()) {
             handleCourtLocationData(caseData, dataBuilder, callbackParams);
         }
 
-        if ((V_2.equals(callbackParams.getVersion()) || V_1.equals(callbackParams.getVersion()))
-            && toggleService.isAccessProfilesEnabled()) {
+        if (toggleService.isAccessProfilesEnabled()) {
             dataBuilder.caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
         }
 
@@ -451,8 +439,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
 
         //assign casemanagementcategory to the case and assign casenamehmctsinternal
-        if ((V_2.equals(callbackParams.getVersion()) || V_1.equals(callbackParams.getVersion()))
-            && toggleService.isGlobalSearchEnabled()) {
+        if (toggleService.isGlobalSearchEnabled()) {
 
             //casename
             dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
@@ -468,8 +455,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
         }
         //Adding variables for feature Certificate of Service
-        if ((V_2.equals(callbackParams.getVersion()) || V_1.equals(callbackParams.getVersion()))
-            && toggleService.isCertificateOfServiceEnabled()) {
+        if (toggleService.isCertificateOfServiceEnabled()) {
             if (caseData.getRespondent1Represented().equals(NO)) {
                 dataBuilder.defendant1LIPAtClaimIssued(YES);
             } else {
@@ -491,7 +477,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
     }
-    //--------------------------------------
 
     private String getAllPartyNames(CaseData caseData) {
         return format("%s%s V %s%s",
@@ -501,14 +486,15 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                       caseData.getRespondent1().getPartyName(),
                       YES.equals(caseData.getAddRespondent2())
                           && NO.equals(caseData.getRespondent2SameLegalRepresentative())
-                          ? ", " + caseData.getRespondent2().getPartyName() : "");
+                            ? ", " + caseData.getRespondent2().getPartyName() : "");
     }
 
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
+        //second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         IdamUserDetails.IdamUserDetailsBuilder idam = IdamUserDetails.builder().id(userDetails.getId());
+
+        CaseData caseData = callbackParams.getCaseData();
         CorrectEmail applicantSolicitor1CheckEmail = caseData.getApplicantSolicitor1CheckEmail();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
 
@@ -518,37 +504,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             IdamUserDetails applicantSolicitor1UserDetails = caseData.getApplicantSolicitor1UserDetails();
             dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1UserDetails.getEmail()).build());
         }
-
-        dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
-        dataBuilder.submittedDate(time.now());
-        dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
-
-        dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM));
-
-        //set check email field to null for GDPR
-        dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
-        return dataBuilder;
-    }
-
-    //----------------------------v1 method --------------------------
-    private CaseData.CaseDataBuilder getSharedDataV1(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        IdamUserDetails.IdamUserDetailsBuilder idam = IdamUserDetails.builder().id(userDetails.getId());
-        CorrectEmail applicantSolicitor1CheckEmail = caseData.getApplicantSolicitor1CheckEmail();
-        CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
-
-        if (applicantSolicitor1CheckEmail.isCorrect()) {
-            dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1CheckEmail.getEmail()).build());
-        } else {
-            IdamUserDetails applicantSolicitor1UserDetails = caseData.getApplicantSolicitor1UserDetails();
-            dataBuilder.applicantSolicitor1UserDetails(idam.email(applicantSolicitor1UserDetails.getEmail()).build());
-        }
-
-        dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
-        dataBuilder.submittedDate(time.now());
-        dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
 
         if (!toggleService.isPbaV3Enabled()) {
             dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM));
@@ -556,23 +511,21 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             dataBuilder.businessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
         }
 
+        dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
+        dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
+        dataBuilder.submittedDate(time.now());
+
         //set check email field to null for GDPR
         dataBuilder.applicantSolicitor1CheckEmail(CorrectEmail.builder().build());
         return dataBuilder;
     }
-    //--------------------------------
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        return buildConfirmation(callbackParams, false);
-    }
-
-    //---------v1 callback overloaded, return to single param
-    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams, boolean isV1Callback) {
         CaseData caseData = callbackParams.getCaseData();
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(getHeader(caseData))
-            .confirmationBody(getBody(caseData, isV1Callback))
+            .confirmationBody(getBody(caseData))
             .build();
     }
 
@@ -610,11 +563,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     }
 
     //------remove bool for v1 callback----------
-    private String getBody(CaseData caseData, boolean isV1Callback) {
+    private String getBody(CaseData caseData) {
         if (toggleService.isCertificateOfServiceEnabled()) {
             return format(
                 areRespondentsRepresentedAndRegistered(caseData)
-                    ? getConfirmationSummary(isV1Callback)
+                    ? getConfirmationSummary()
                     : LIP_CONFIRMATION_BODY_COS,
                 format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
                 claimIssueConfiguration.getResponsePackLink()
@@ -622,7 +575,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         } else {
             return format(
                 areRespondentsRepresentedAndRegistered(caseData)
-                    ? getConfirmationSummary(isV1Callback)
+                    ? getConfirmationSummary()
                     : LIP_CONFIRMATION_BODY,
                 format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
                 claimIssueConfiguration.getResponsePackLink()
@@ -630,9 +583,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
     }
 
-    //------remove v1 bool-------
-    private String getConfirmationSummary(boolean isV1Callback) {
-        if (toggleService.isPbaV3Enabled() && isV1Callback) {
+    private String getConfirmationSummary() {
+        if (toggleService.isPbaV3Enabled()) {
             return CONFIRMATION_SUMMARY_PBA_V3;
         } else {
             return CONFIRMATION_SUMMARY;
