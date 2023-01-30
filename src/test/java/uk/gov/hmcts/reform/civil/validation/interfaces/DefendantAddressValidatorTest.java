@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.validation.interfaces;
 
-import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -29,7 +29,7 @@ public class DefendantAddressValidatorTest {
         }
     };
 
-    @Before
+    @BeforeEach
     public void prepare() {
         Mockito.reset(postcodeValidator);
     }

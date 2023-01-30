@@ -43,7 +43,6 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
-
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -68,6 +67,8 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_2V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N181_MULTIPARTY_SAME_SOL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HNL_DQ_RESPONSE_1V1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HNL_DQ_RESPONSE_2V1;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
@@ -96,7 +97,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                 templateId = featureToggleService.isHearingAndListingSDOEnabled()
                     ? DocmosisTemplates.CLAIMANT_RESPONSE_SPEC_HNL : DocmosisTemplates.CLAIMANT_RESPONSE_SPEC;
             } else {
-                templateId = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
+                templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                    ? DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_HNL : DocmosisTemplates.DEFENDANT_RESPONSE_SPEC;
             }
         } else {
             templateId = getDocmosisTemplate(caseData);
@@ -114,23 +116,27 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
     }
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
-        DocmosisTemplates templateId = N181;
+        DocmosisTemplates templateId = featureToggleService.isHearingAndListingSDOEnabled()
+            ? HNL_DQ_RESPONSE_1V1 : N181;
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
                 if (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData)) {
-                    templateId = N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
+                    templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                        ? DocmosisTemplates.HNL_DQ_RESPONSE_1V2_DS : N181_CLAIMANT_MULTIPARTY_DIFF_SOLICITOR;
                 }
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
-                    templateId = N181_MULTIPARTY_SAME_SOL;
+                    templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                        ? DocmosisTemplates.HNL_DQ_RESPONSE_1V2_SS : N181_MULTIPARTY_SAME_SOL;
                 }
                 break;
             case TWO_V_ONE:
                 if (!isClaimantResponse(caseData)
                     || (isClaimantResponse(caseData) && isClaimantMultipartyProceed(caseData))) {
-                    templateId = N181_2V1;
+                    templateId = featureToggleService.isHearingAndListingSDOEnabled()
+                        ? DocmosisTemplates.HNL_DQ_RESPONSE_2V1 : N181_2V1;
                 }
                 break;
             default:
@@ -142,7 +148,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                                               String authorisation,
                                                               String respondent) {
         DocmosisTemplates templateId = TWO_V_ONE.equals(MultiPartyScenario
-                                                            .getMultiPartyScenario(caseData)) ? N181_2V1 : N181;
+                                                            .getMultiPartyScenario(caseData)) ? N181_2V1 :
+            (featureToggleService.isHearingAndListingSDOEnabled() ? HNL_DQ_RESPONSE_2V1 : N181);
         DirectionsQuestionnaireForm templateData;
 
         if (respondent.equals("ONE")) {
@@ -153,7 +160,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             throw new IllegalArgumentException("Respondent argument is expected to be one of ONE or TWO");
         }
 
-        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N181);
+        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
+            templateData, featureToggleService.isHearingAndListingSDOEnabled() ? HNL_DQ_RESPONSE_1V1 : N181);
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
@@ -168,7 +176,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                                           String respondent) {
         // TODO check if this is the correct template, I just copy-pasted from generateDQFor1v2SingleSolDiffResponse
         DocmosisTemplates templateId = TWO_V_ONE.equals(MultiPartyScenario
-                                                            .getMultiPartyScenario(caseData)) ? N181_2V1 : N181;
+                                                            .getMultiPartyScenario(caseData)) ? N181_2V1 :
+            (featureToggleService.isHearingAndListingSDOEnabled() ? HNL_DQ_RESPONSE_2V1 : N181);
         String fileName = getFileName(caseData, templateId);
         LocalDateTime responseDate;
         if ("ONE".equals(respondent)) {
@@ -197,7 +206,8 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             templateData = getRespondent2TemplateData(caseData, "TWO");
         }
 
-        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, N181);
+        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
+            templateData, featureToggleService.isHearingAndListingSDOEnabled() ? HNL_DQ_RESPONSE_1V1 : N181);
         CaseDocument document = documentManagementService.uploadDocument(
             authorisation,
             new PDF(getFileName(caseData, templateId), docmosisDocument.getBytes(),
@@ -236,7 +246,6 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     @Override
     public DirectionsQuestionnaireForm getTemplateData(CaseData caseData) {
-
         boolean claimantResponseLRspec = isClaimantResponse(caseData)
             && isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled());
 
@@ -337,33 +346,75 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
                                ofNullable(litigationFriend)
                                    .map(LitigationFriend::getFullName)
                                    .orElse(""))
+                           .phoneNumber(applicant.getPartyPhone())
+                           .emailAddress(applicant.getPartyEmail())
                            .build());
     }
 
     private Party getApplicant2DQParty(CaseData caseData) {
 
         var applicant = caseData.getApplicant2();
-        return Party.builder()
+        var litigationFriend = caseData.getApplicant2LitigationFriend();
+        var applicant2PartyBuilder = Party.builder()
             .name(applicant.getPartyName())
-            .primaryAddress(applicant.getPrimaryAddress())
+            .primaryAddress(caseData.getApplicant1().getPrimaryAddress())
+            .emailAddress(applicant.getPartyEmail())
+            .phoneNumber(applicant.getPartyPhone())
+            .representative(representativeService
+                                .getApplicantRepresentative(caseData))
+            // remove litigationFriendName when HNL toggle is enabled
             .litigationFriendName(
-                ofNullable(caseData.getApplicant2LitigationFriend())
+                ofNullable(litigationFriend)
                     .map(LitigationFriend::getFullName)
                     .orElse(""))
-            .build();
+            .litigationFriendFirstName(
+                ofNullable(litigationFriend)
+                    .map(LitigationFriend::getFirstName)
+                    .orElse(""))
+            .litigationFriendLastName(
+                ofNullable(litigationFriend)
+                    .map(LitigationFriend::getLastName)
+                    .orElse(""))
+            .litigationFriendPhoneNumber(ofNullable(litigationFriend)
+                                                         .map(LitigationFriend::getPhoneNumber)
+                                                         .orElse(""))
+            .litigationFriendEmailAddress(ofNullable(litigationFriend)
+                                              .map(LitigationFriend::getEmailAddress)
+                                              .orElse(""));
+        return applicant2PartyBuilder.build();
     }
 
     private Party getApplicant1DQParty(CaseData caseData) {
-        var applicant = caseData.getApplicant1();
 
-        return Party.builder()
+        var applicant = caseData.getApplicant1();
+        var litigationFriend = caseData.getApplicant1LitigationFriend();
+        var applicant1PartyBuilder = Party.builder()
             .name(applicant.getPartyName())
-            .primaryAddress(applicant.getPrimaryAddress())
+            .primaryAddress(caseData.getApplicant1().getPrimaryAddress())
+            .emailAddress(applicant.getPartyEmail())
+            .phoneNumber(applicant.getPartyPhone())
+            .representative(representativeService
+                                .getApplicantRepresentative(caseData))
+            // remove litigationFriendName when HNL toggle is enabled
             .litigationFriendName(
-                ofNullable(caseData.getApplicant1LitigationFriend())
+                ofNullable(litigationFriend)
                     .map(LitigationFriend::getFullName)
                     .orElse(""))
-            .build();
+            .litigationFriendFirstName(
+                ofNullable(litigationFriend)
+                    .map(LitigationFriend::getFirstName)
+                    .orElse(""))
+            .litigationFriendLastName(
+                ofNullable(litigationFriend)
+                    .map(LitigationFriend::getLastName)
+                    .orElse(""))
+            .litigationFriendPhoneNumber(ofNullable(litigationFriend)
+                                             .map(LitigationFriend::getPhoneNumber)
+                                             .orElse(""))
+            .litigationFriendEmailAddress(ofNullable(litigationFriend)
+                                              .map(LitigationFriend::getEmailAddress)
+                                              .orElse(""));
+        return applicant1PartyBuilder.build();
     }
 
     private void setApplicants(DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder,
@@ -514,6 +565,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .witnesses(getWitnesses(dq))
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
+            .support(dq.getHearingSupport())
             .furtherInformation(dq.getFurtherInformation())
             .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
@@ -539,6 +591,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             .witnesses(getWitnesses(dq))
             .hearing(getHearing(dq))
             .hearingSupport(getHearingSupport(dq))
+            .support(dq.getHearingSupport())
             .furtherInformation(dq.getFurtherInformation())
             .welshLanguageRequirements(getWelshLanguageRequirements(dq))
             .statementOfTruth(dq.getStatementOfTruth())
@@ -639,100 +692,222 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
             }
 
             if (isProceedingAgainstRespondent1(caseData)) {
-                respondents.add(Party.builder()
-                                    .name(caseData.getRespondent1().getPartyName())
-                                    .emailAddress(caseData.getRespondent1().getPartyEmail())
-                                    .phoneNumber(caseData.getRespondent1().getPartyPhone())
-                                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-                                    .representative(representativeService
-                                                        .getRespondent1Representative(caseData))
-                                    .litigationFriendName(
-                                        ofNullable(caseData.getRespondent1LitigationFriend())
-                                            .map(LitigationFriend::getFullName)
-                                            .orElse(""))
-                                    .build());
+                var respondent = caseData.getRespondent1();
+                var litigationFriend = caseData.getRespondent1LitigationFriend();
+                var respondent1PartyBuilder = Party.builder()
+                    .name(respondent.getPartyName())
+                    .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                    .emailAddress(respondent.getPartyEmail())
+                    .phoneNumber(respondent.getPartyPhone())
+                    .representative(representativeService
+                                        .getRespondent1Representative(caseData))
+                    // remove litigationFriendName when HNL toggle is enabled
+                    .litigationFriendName(
+                        ofNullable(litigationFriend)
+                            .map(LitigationFriend::getFullName)
+                            .orElse(""))
+                    .litigationFriendFirstName(
+                        ofNullable(litigationFriend)
+                            .map(LitigationFriend::getFirstName)
+                            .orElse(""))
+                    .litigationFriendLastName(
+                        ofNullable(litigationFriend)
+                            .map(LitigationFriend::getLastName)
+                            .orElse(""))
+                    .litigationFriendPhoneNumber(ofNullable(litigationFriend)
+                                                     .map(LitigationFriend::getPhoneNumber)
+                                                     .orElse(""))
+                    .litigationFriendEmailAddress(ofNullable(litigationFriend)
+                                                      .map(LitigationFriend::getEmailAddress)
+                                                      .orElse(""));
+                respondents.add(respondent1PartyBuilder.build());
             }
+
             if (isProceedingAgainstRespondent2(caseData)) {
-                respondents.add(Party.builder()
-                                    .name(caseData.getRespondent2().getPartyName())
-                                    .emailAddress(caseData.getRespondent2().getPartyEmail())
-                                    .phoneNumber(caseData.getRespondent2().getPartyPhone())
-                                    .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
-                                    .representative(representativeService
-                                                        .getRespondent2Representative(caseData))
-                                    .litigationFriendName(
-                                        ofNullable(caseData.getRespondent2LitigationFriend())
-                                            .map(LitigationFriend::getFullName)
-                                            .orElse(""))
-                                    .build());
+                var respondent = caseData.getRespondent2();
+                var litigationFriend = caseData.getRespondent2LitigationFriend();
+                var respondent2PartyBuilder = Party.builder()
+                    .name(respondent.getPartyName())
+                    .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
+                    .emailAddress(respondent.getPartyEmail())
+                    .phoneNumber(respondent.getPartyPhone())
+                    .representative(representativeService
+                                        .getRespondent2Representative(caseData))
+                    // remove litigationFriendName when HNL toggle is enabled
+                    .litigationFriendName(
+                        ofNullable(litigationFriend)
+                            .map(LitigationFriend::getFullName)
+                            .orElse(""))
+                    .litigationFriendFirstName(
+                        ofNullable(litigationFriend)
+                            .map(LitigationFriend::getFirstName)
+                            .orElse(""))
+                    .litigationFriendLastName(
+                        ofNullable(litigationFriend)
+                            .map(LitigationFriend::getLastName)
+                            .orElse(""))
+                    .litigationFriendPhoneNumber(ofNullable(litigationFriend)
+                                                     .map(LitigationFriend::getPhoneNumber)
+                                                     .orElse(""))
+                    .litigationFriendEmailAddress(ofNullable(litigationFriend)
+                                                      .map(LitigationFriend::getEmailAddress)
+                                                      .orElse(""));
+                respondents.add(respondent2PartyBuilder.build());
             }
             return respondents;
         }
 
         if (respondent2HasSameLegalRep(caseData)) {
             if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == YES) {
-                return List.of(
-                    Party.builder()
+                var respondent1Party = Party.builder()
                         .name(caseData.getRespondent1().getPartyName())
                         .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                        .emailAddress(caseData.getRespondent1().getPartyEmail())
+                        .phoneNumber(caseData.getRespondent1().getPartyPhone())
                         .representative(representativeService.getRespondent1Representative(caseData))
+                         // remove litigationFriendName when HNL toggle is enabled
+                         .litigationFriendName(
+                            ofNullable(caseData.getRespondent1LitigationFriend())
+                                .map(LitigationFriend::getFullName)
+                                .orElse(""))
+                        .litigationFriendFirstName(
+                        ofNullable(caseData.getRespondent1LitigationFriend())
+                                .map(LitigationFriend::getFirstName)
+                                .orElse(""))
+                        .litigationFriendLastName(
+                             ofNullable(caseData.getRespondent1LitigationFriend())
+                                .map(LitigationFriend::getLastName)
+                                .orElse(""))
+                        .litigationFriendPhoneNumber(ofNullable(caseData.getRespondent1LitigationFriend())
+                                                         .map(LitigationFriend::getPhoneNumber)
+                                                         .orElse(""))
+                        .litigationFriendEmailAddress(ofNullable(caseData.getRespondent1LitigationFriend())
+                                                      .map(LitigationFriend::getEmailAddress)
+                                                      .orElse(""));
+
+                var respondent2Party = Party.builder()
+                        .name(caseData.getRespondent2().getPartyName())
+                        .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
+                        .emailAddress(caseData.getRespondent2().getPartyEmail())
+                        .phoneNumber(caseData.getRespondent2().getPartyPhone())
+                        .representative(representativeService.getRespondent2Representative(caseData))
+                    // remove litigationFriendName when HNL toggle is enabled
+                    .litigationFriendName(
+                        ofNullable(caseData.getRespondent2LitigationFriend())
+                            .map(LitigationFriend::getFullName)
+                            .orElse(""))
+                    .litigationFriendFirstName(
+                        ofNullable(caseData.getRespondent2LitigationFriend())
+                            .map(LitigationFriend::getFirstName)
+                            .orElse(""))
+                    .litigationFriendLastName(
+                        ofNullable(caseData.getRespondent2LitigationFriend())
+                            .map(LitigationFriend::getLastName)
+                            .orElse(""))
+                    .litigationFriendPhoneNumber(ofNullable(caseData.getRespondent2LitigationFriend())
+                                                     .map(LitigationFriend::getPhoneNumber)
+                                                     .orElse(""))
+                    .litigationFriendEmailAddress(ofNullable(caseData.getRespondent2LitigationFriend())
+                                                      .map(LitigationFriend::getEmailAddress)
+                                                      .orElse(""));
+
+                return List.of(respondent1Party.build(), respondent2Party.build());
+            } else if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
+                if ("ONE".equals(defendantIdentifier)) {
+                    // TODO add specific test to check below party
+                    var respondent1Party = Party.builder()
+                            .name(caseData.getRespondent1().getPartyName())
+                            .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
+                            .emailAddress(caseData.getRespondent1().getPartyEmail())
+                            .phoneNumber(caseData.getRespondent1().getPartyPhone())
+                            .representative(representativeService.getRespondent1Representative(caseData))
+                        // remove litigationFriendName when HNL toggle is enabled
                         .litigationFriendName(
                             ofNullable(caseData.getRespondent1LitigationFriend())
                                 .map(LitigationFriend::getFullName)
                                 .orElse(""))
-                        .build(),
-                    Party.builder()
-                        .name(caseData.getRespondent2().getPartyName())
-                        .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
-                        .representative(representativeService.getRespondent2Representative(caseData))
+                        .litigationFriendFirstName(
+                            ofNullable(caseData.getRespondent1LitigationFriend())
+                                .map(LitigationFriend::getFirstName)
+                                .orElse(""))
+                        .litigationFriendLastName(
+                            ofNullable(caseData.getRespondent1LitigationFriend())
+                                .map(LitigationFriend::getLastName)
+                                .orElse(""))
+                            .litigationFriendPhoneNumber(ofNullable(caseData.getRespondent1LitigationFriend())
+                                                         .map(LitigationFriend::getPhoneNumber)
+                                                         .orElse(""))
+                            .litigationFriendEmailAddress(ofNullable(caseData.getRespondent1LitigationFriend())
+                                                          .map(LitigationFriend::getEmailAddress)
+                                                          .orElse(""));
+                    return List.of(respondent1Party.build());
+                } else if ("TWO".equals(defendantIdentifier)) {
+                    var respondent2Party = Party.builder()
+                                       .name(caseData.getRespondent2().getPartyName())
+                                       .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
+                        .emailAddress(caseData.getRespondent2().getPartyEmail())
+                        .phoneNumber(caseData.getRespondent2().getPartyPhone())
+                        .representative(representativeService.getRespondent1Representative(caseData))
+                        // remove litigationFriendName when HNL toggle is enabled
                         .litigationFriendName(
                             ofNullable(caseData.getRespondent2LitigationFriend())
                                 .map(LitigationFriend::getFullName)
                                 .orElse(""))
-                        .build()
-                );
-            } else if (caseData.getRespondentResponseIsSame() != null && caseData.getRespondentResponseIsSame() == NO) {
-                if ("ONE".equals(defendantIdentifier)) {
-                    // TODO add specific test to check below party
-                    return List.of(Party.builder()
-                                       .name(caseData.getRespondent1().getPartyName())
-                                       .primaryAddress(caseData.getRespondent1().getPrimaryAddress())
-                                       .representative(representativeService.getRespondent1Representative(caseData))
-                                       .litigationFriendName(
-                                           ofNullable(caseData.getRespondent1LitigationFriend())
-                                               .map(LitigationFriend::getFullName)
-                                               .orElse(""))
-                                       .build());
-                } else if ("TWO".equals(defendantIdentifier)) {
-                    return List.of(Party.builder()
-                                       .name(caseData.getRespondent2().getPartyName())
-                                       .primaryAddress(caseData.getRespondent2().getPrimaryAddress())
-                                       .representative(representativeService.getRespondent1Representative(caseData))
-                                       .litigationFriendName(
-                                           ofNullable(caseData.getRespondent2LitigationFriend())
-                                               .map(LitigationFriend::getFullName)
-                                               .orElse(""))
-                                       .build());
+                        .litigationFriendFirstName(
+                            ofNullable(caseData.getRespondent2LitigationFriend())
+                                .map(LitigationFriend::getFirstName)
+                                .orElse(""))
+                        .litigationFriendLastName(
+                            ofNullable(caseData.getRespondent2LitigationFriend())
+                                .map(LitigationFriend::getLastName)
+                                .orElse(""))
+                        .litigationFriendPhoneNumber(ofNullable(caseData.getRespondent2LitigationFriend())
+                                                         .map(LitigationFriend::getPhoneNumber)
+                                                         .orElse(""))
+                        .litigationFriendEmailAddress(ofNullable(caseData.getRespondent2LitigationFriend())
+                                                          .map(LitigationFriend::getEmailAddress)
+                                                          .orElse(""));
+                    return List.of(respondent2Party.build());
                 }
             }
         }
+
         var respondent = caseData.getRespondent1();
         var respondentRepresentative = representativeService.getRespondent1Representative(caseData);
         var litigationFriend = caseData.getRespondent1LitigationFriend();
+
         if (isRespondent2(caseData)) {
             respondent = caseData.getRespondent2();
             respondentRepresentative = representativeService.getRespondent2Representative(caseData);
             litigationFriend = caseData.getRespondent2LitigationFriend();
         }
-        return List.of(Party.builder()
-                           .name(respondent.getPartyName())
-                           .primaryAddress(respondent.getPrimaryAddress())
-                           .representative(respondentRepresentative)
-                           .litigationFriendName(
-                               ofNullable(litigationFriend)
-                                   .map(LitigationFriend::getFullName)
-                                   .orElse(""))
-                           .build());
+
+        var respondentParty = Party.builder()
+            .name(respondent.getPartyName())
+            .primaryAddress(respondent.getPrimaryAddress())
+            .emailAddress(respondent.getPartyEmail())
+            .phoneNumber(respondent.getPartyPhone())
+            .representative(respondentRepresentative)
+            // remove litigationFriendName when HNL toggle is enabled
+            .litigationFriendName(
+                ofNullable(litigationFriend)
+                    .map(LitigationFriend::getFullName)
+                    .orElse(""))
+            .litigationFriendFirstName(
+                ofNullable(litigationFriend)
+                    .map(LitigationFriend::getFirstName)
+                    .orElse(""))
+            .litigationFriendLastName(
+                ofNullable(litigationFriend)
+                    .map(LitigationFriend::getLastName)
+                    .orElse(""))
+            .litigationFriendPhoneNumber(ofNullable(litigationFriend)
+                                             .map(LitigationFriend::getPhoneNumber)
+                                             .orElse(""))
+            .litigationFriendEmailAddress(ofNullable(litigationFriend)
+                                              .map(LitigationFriend::getEmailAddress)
+                                              .orElse(""));
+        return List.of(respondentParty.build());
     }
 
     private boolean respondent2HasSameLegalRep(CaseData caseData) {
