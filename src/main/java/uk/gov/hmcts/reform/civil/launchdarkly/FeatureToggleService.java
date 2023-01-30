@@ -57,7 +57,7 @@ public class FeatureToggleService {
     }
 
     public boolean isLrSpecEnabled() {
-        return isFeatureEnabled("specified-lr-journey");
+        return internalClient.boolVariation("specified-lr-journey", createLDUser().build(), true);
     }
 
     public boolean isSdoEnabled() {
@@ -83,7 +83,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCourtLocationDynamicListEnabled() {
-        return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), false);
+        return internalClient.boolVariation("court-location-dynamic-list", createLDUser().build(), true);
     }
 
     public boolean isCaseFlagsEnabled() {
@@ -95,7 +95,7 @@ public class FeatureToggleService {
     }
 
     public boolean isAccessProfilesEnabled() {
-        return internalClient.boolVariation("access-profiles", createLDUser().build(), false);
+        return internalClient.boolVariation("access-profiles", createLDUser().build(), true);
     }
 
     public boolean isPbaV3Enabled() {

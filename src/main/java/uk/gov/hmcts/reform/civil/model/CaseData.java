@@ -604,6 +604,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String expertReportFlag;
     private final String expertJointFlag;
     private final String trialAuthorityFlag;
+    private final String trialCostsFlag;
     private final String trialDocumentaryFlag;
     private final List<EvidenceUploadWitness> witnessSelectionEvidenceRes;
     private final List<EvidenceUploadWitness> witnessSelectionEvidenceSmallClaimRes;
