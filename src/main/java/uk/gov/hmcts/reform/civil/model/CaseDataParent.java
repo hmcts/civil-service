@@ -10,6 +10,7 @@ import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -298,6 +300,8 @@ public class CaseDataParent implements MappableObject {
      */
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal respondToAdmittedClaimOwingAmountPounds2;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal partAdmitPaidValuePounds;
 
     @JsonProperty("CaseAccessCategory")
     private final CaseCategory caseAccessCategory;
@@ -314,6 +318,26 @@ public class CaseDataParent implements MappableObject {
 
     private final String respondent1EmailAddress;
     private final YesOrNo applicant1Represented;
+
+    /**
+     * Adding for LR ITP Update.
+     */
+    private final ResponseOneVOneShowTag showResponseOneVOneFlag;
+    private final YesOrNo applicant1AcceptAdmitAmountPaidSpec;
+    private final YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec;
+    private final YesOrNo applicant1AcceptPartAdmitPaymentPlanSpec;
+    private final CaseDocument respondent1ClaimResponseDocumentSpec;
+    private final CaseDocument respondent2ClaimResponseDocumentSpec;
+    private final String respondent1PaymentDateToStringSpec;
+    private final LocalDate applicant1RequestedPaymentDateForDefendantSpec;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal applicant1SuggestInstalmentsPaymentAmountForDefendantSpec;
+    private final PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
+    private final LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
+    private final String currentDateboxDefendantSpec;
+    private final YesOrNo ccjPaymentPaidSomeOption;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal ccjPaymentPaidSomeAmount;
 
     private final String migrationId;
 

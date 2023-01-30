@@ -215,25 +215,20 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder
             .disposalHearingWitnessOfFactDJ(DisposalHearingWitnessOfFactDJ
                                                 .builder()
-                                                .input1("The claimant shall serve on every other party the witness "
-                                                            + "statements of all witnesses of fact"
-                                                            + " on whose evidence reliance is to be placed by 4pm on")
+                                                .input1("The claimant must upload to the Digital Portal copies of "
+                                                            + "the witness statements of all witnesses "
+                                                            + "of fact on whose evidence reliance is "
+                                                            + "to be placed by 4pm on ")
                                                 .date1(LocalDate.now().plusWeeks(4))
                                                 .input2("The provisions of CPR 32.6 apply to such evidence.")
-                                                .input3("The claimant must upload to the Digital Portal copies of the "
-                                                            + "witness statements of all witnesses whose evidence they "
-                                                            + "wish the court to consider when deciding the amount of "
-                                                            + "damages by 4pm on ")
-                                                .date2(LocalDate.now().plusWeeks(4))
-                                                .input4("The provisions of CPR 32.6 apply to such evidence.")
-                                                .input5("Any application by the defendant in relation to CPR 32.7 "
+                                                .input3("Any application by the defendant in relation to CPR 32.7 "
                                                             + "must be made by 4pm on")
-                                                .date3(LocalDate.now().plusWeeks(2))
-                                                .input6("and must be accompanied by proposed directions for allocation"
+                                                .date2(LocalDate.now().plusWeeks(2))
+                                                .input4("and must be accompanied by proposed directions for allocation"
                                                             + " and listing for trial on quantum. This is because"
                                                             + " cross-examination will cause the hearing to exceed"
-                                                            + " the 30-minute maximum time estimate for a disposal"
-                                                            + " hearing")
+                                                            + " the 30 minute maximum time estimate for a disposal"
+                                                            + " hearing.")
                                                 .build());
 
         caseDataBuilder.disposalHearingMedicalEvidenceDJ(DisposalHearingMedicalEvidenceDJ
@@ -329,11 +324,12 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         // existing cases
         if (featureToggleService.isHearingAndListingSDOEnabled()) {
             caseDataBuilder.disposalHearingOrderMadeWithoutHearingDJ(DisposalHearingOrderMadeWithoutHearingDJ
-                                                   .builder()
-                                                   .input(String.format("Each party has the right to apply to have this"
-                                                              + " order set aside or varied. Any such application must "
-                                                              + "be received by the Court "
-                                                              + "(together with the appropriate fee) by 4pm on %s.",
+                                                   .builder().input(String.format(
+                                                            "This order has been made without a hearing. "
+                                                           + "Each party has the right to apply to have this Order "
+                                                           + "set aside or varied. Any such application must "
+                                                           + "be received by the Court "
+                                                           + "(together with the appropriate fee) by 4pm on %s.",
                                                           deadlinesCalculator.plusWorkingDays(LocalDate.now(), 5)
                                                               .format(DateTimeFormatter
                                                                           .ofPattern("dd MMMM yyyy", Locale.ENGLISH))))
@@ -353,9 +349,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder
             .trialHearingDisclosureOfDocumentsDJ(TrialHearingDisclosureOfDocuments
                                                      .builder()
-                                                     .input1("Documents will be disclosed by uploading to the Digital "
-                                                                 + "Portal a list with a disclosure"
-                                                                 + " statement by 4pm on")
+                                                     .input1("Standard disclosure shall be provided by "
+                                                                 + "the parties by uploading to the digital "
+                                                                 + "portal their lists of documents by 4pm on")
                                                      .date1(LocalDate.now().plusWeeks(4))
                                                      .input2("Any request to inspect a document, or for a copy of a "
                                                                  + "document, shall be made directly to the other"
@@ -376,8 +372,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                              .input1("Each party must upload to the Digital Portal copies of the "
                                                          + "statements of all witnesses of fact on whom they "
                                                          + "intend to rely.")
+                                             .input2("3")
+                                             .input3("3")
                                              .input4("For this limitation, a party is counted as witness.")
                                              .input5("Each witness statement should be no more than")
+                                             .input6("10")
                                              .input7("A4 pages. Statements should be double spaced "
                                                          + "using a font size of 12.")
                                              .input8("Witness statements shall be uploaded to the "
@@ -404,14 +403,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                            + "case on periodical payments. "
                                                            + "then they must do so in the respective schedule "
                                                            + "and counter-schedule")
-                                               .input4("Upon it being noted that the schedule of loss "
-                                                           + "contains no claim for continuing loss and is "
-                                                           + "therefore final, no further schedule of loss shall"
-                                                           + " be uploaded without permission to amend. "
-                                                           + "The defendant shall upload to the Digital Portal"
-                                                           + " an up-to-date counter "
-                                                           + "schedule of loss by 4pm on")
-                                               .date3(LocalDate.now().plusWeeks(12))
                                                .build());
 
         caseDataBuilder.trialHearingTrialDJ(TrialHearingTrial
@@ -448,7 +439,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         if (featureToggleService.isHearingAndListingSDOEnabled()) {
             caseDataBuilder.trialOrderMadeWithoutHearingDJ(TrialOrderMadeWithoutHearingDJ.builder()
                                                .input(String.format(
-                                                       "Each party has the right to apply to have this Order "
+                                                       "This order has been made without a hearing. "
+                                                       + "Each party has the right to apply to have this Order "
                                                        + "set aside or varied. Any such application must be "
                                                        + "received by the Court "
                                                        + "(together with the appropriate fee) by 4pm on %s.",
@@ -474,10 +466,10 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                  .input1("The claimant must prepare a Scott Schedule of the defects,"
                                                              + " items of damage "
                                                              + "or any other relevant matters")
-                                                 .input2("The columns should be headed: \n - Item; \n - "
-                                                             + "Alleged Defect; "
-                                                             + "\n - Claimant's costing;\n - Defendant's"
-                                                             + " response;\n - Defendant's costing;"
+                                                 .input2("The columns should be headed: \n - Item \n - "
+                                                             + "Alleged Defect "
+                                                             + "\n - Claimant's costing\n - Defendant's"
+                                                             + " response\n - Defendant's costing"
                                                              + " \n - Reserved for Judge's use")
                                                  .input3("The claimant must upload to the Digital Portal the "
                                                              + "Scott Schedule with the relevant "
@@ -591,9 +583,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.trialHousingDisrepair(TrialHousingDisrepair.builder()
                                                   .input1("The claimant must prepare a Scott Schedule of the items "
                                                               + "in disrepair")
-                                                  .input2("The columns should be headed: \n - Item; \n - "
-                                                              + "Alleged disrepair; "
-                                                              + "\n - Defendant's Response; \n - "
+                                                  .input2("The columns should be headed: \n - Item \n - "
+                                                              + "Alleged disrepair "
+                                                              + "\n - Defendant's Response \n - "
                                                               + "Reserved for Judge's Use")
                                                   .input3("The claimant must upload to the Digital Portal the "
                                                               + "Scott Schedule with the relevant columns "
