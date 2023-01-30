@@ -3,12 +3,12 @@ package uk.gov.hmcts.reform.civil.utils;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.HearingNotes;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -120,12 +120,11 @@ public class HearingUtils {
         return hearingTimeBuilder.toString();
     }
 
-    public static String formatHearingNote(String hearingNotes) {
-        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        return String.format("%s - %s", date, hearingNotes);
+    public static HearingNotes formatHearingNote(String hearingNotes) {
+        return HearingNotes.builder().date(LocalDate.now()).notes(hearingNotes).build();
     }
 
-    public static String getHearingNotes(CaseData caseData) {
+    public static HearingNotes getHearingNotes(CaseData caseData) {
         if(caseData.getDisposalHearingHearingNotes() != null) {
             return formatHearingNote(caseData.getDisposalHearingHearingNotes());
         } else if (caseData.getFastTrackHearingNotes() != null) {
