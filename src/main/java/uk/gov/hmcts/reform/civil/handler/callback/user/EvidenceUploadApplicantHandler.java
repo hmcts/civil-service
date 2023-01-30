@@ -6,6 +6,7 @@ import java.util.Collections;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -27,19 +28,16 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
     }
 
     @Override
-    CallbackResponse validateValues(CaseData caseData) {
-        return super.validateValuesParty(caseData.getDocumentWitnessStatement(),
+    CallbackResponse validateValues(CallbackParams callbackParams, CaseData caseData) {
+        return validateValuesParty(caseData.getDocumentForDisclosure(),
+                                   caseData.getDocumentWitnessStatement(),
                                    caseData.getDocumentHearsayNotice(),
+                                   caseData.getDocumentReferredInStatement(),
                                    caseData.getDocumentExpertReport(),
                                    caseData.getDocumentJointStatement(),
                                    caseData.getDocumentQuestions(),
                                    caseData.getDocumentAnswers(),
-                                   caseData.getDocumentWitnessStatementRes2(),
-                                   caseData.getDocumentHearsayNoticeRes2(),
-                                   caseData.getDocumentExpertReportRes2(),
-                                   caseData.getDocumentJointStatementRes2(),
-                                   caseData.getDocumentQuestionsRes2(),
-                                   caseData.getDocumentAnswersRes2());
+                                   caseData.getDocumentEvidenceForTrial());
     }
 
     void applyDocumentUploadDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, LocalDateTime now) {
