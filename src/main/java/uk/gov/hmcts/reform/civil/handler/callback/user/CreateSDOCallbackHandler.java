@@ -88,6 +88,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
 @Service
 @RequiredArgsConstructor
@@ -798,6 +799,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             generatedDocuments.add(element(document));
             dataBuilder.systemGeneratedCaseDocuments(generatedDocuments);
         }
+
+        dataBuilder.hearingNotes(getHearingNotes(caseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))

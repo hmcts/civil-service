@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -117,5 +118,26 @@ public class HearingUtils {
         StringBuilder hearingTimeBuilder = new StringBuilder(hearingTime);
         hearingTimeBuilder.insert(2, ':');
         return hearingTimeBuilder.toString();
+    }
+
+    public static String formatHearingNote(String hearingNotes) {
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        return String.format("%s - %s", date, hearingNotes);
+    }
+
+    public static String getHearingNotes(CaseData caseData) {
+        if(caseData.getDisposalHearingHearingNotes() != null) {
+            return formatHearingNote(caseData.getDisposalHearingHearingNotes());
+        } else if (caseData.getFastTrackHearingNotes() != null) {
+            return formatHearingNote(caseData.getFastTrackHearingNotes().getInput());
+        } else if (caseData.getDisposalHearingHearingNotesDJ() != null) {
+            return formatHearingNote(caseData.getDisposalHearingHearingNotesDJ().getInput());
+        } else if (caseData.getSdoHearingNotes() != null) {
+            return formatHearingNote(caseData.getSdoHearingNotes().getInput());
+        } else if (caseData.getTrialHearingHearingNotesDJ() != null) {
+            return formatHearingNote(caseData.getTrialHearingHearingNotesDJ().getInput());
+        } else {
+            return null;
+        }
     }
 }
