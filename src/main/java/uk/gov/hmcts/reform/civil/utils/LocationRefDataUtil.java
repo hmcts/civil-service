@@ -19,6 +19,7 @@ public class LocationRefDataUtil {
 
     @Autowired
     public LocationRefDataUtil(LocationRefDataService locationRefDataService) {
+
         this.locationRefDataService = locationRefDataService;
     }
 
