@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
+import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
 @Slf4j
 @Component
@@ -24,6 +25,9 @@ public class LocationRefDataUtil {
     }
 
     public String getPreferredCourtCode(CaseData caseData, String authToken) {
+        if (isSpecCaseCategory(caseData, caseData.getCaseAccessCategory() != null)) {
+            return "";
+        }
         if (caseData.getCourtLocation().getCaseLocation() == null) {
             return caseData.getCourtLocation().getApplicantPreferredCourt();
         } else {
