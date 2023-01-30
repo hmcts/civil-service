@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.civil.enums.DefendantResponseStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -32,5 +33,5 @@ public class DashboardClaimInfo {
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate responseDeadline;
 
+    private DefendantResponseStatus defendantResponseStatus;
 }
-

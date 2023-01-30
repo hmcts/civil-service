@@ -10,22 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.ClaimType;
-import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
-import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
-import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
-import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.enums.dj.CaseManagementOrderAdditional;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
@@ -645,5 +630,32 @@ public class CaseData extends CaseDataParent implements MappableObject {
             )
             .filter(Objects::nonNull)
             .findFirst().orElse(null);
+    }
+
+    public DefendantResponseStatus getDefendantResponseStatus() {
+        DefendantResponseStatus status = null;
+
+        if(respondent1ClaimResponseType == null)
+            status = DefendantResponseStatus.NO_RESPONSE;
+//        if(moreTimeRequested)
+//            status = DefendantResponseStatus.MORE_TIME_REQUESTED;
+        if(defenceAdmitPartPaymentTimeRouteRequired != RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            status = DefendantResponseStatus.ELIGIBLE_FOR_CCJ;
+//        if(moneyReceivedOn != null && countyCourtJudgmentRequestedAt != null && isCCJPaidWithinMonth())
+//            status = DefendantResponseStatus.PAID_IN_FULL_CCJ_CANCELLED;
+//        if(moneyReceivedOn != null && countyCourtJudgmentRequestedAt != null)
+//            status = DefendantResponseStatus.PAID_IN_FULL_CCJ_SATISFIED;
+//        if(moneyReceivedOn != null)
+//            status = DefendantResponseStatus.PAID_IN_FULL;
+//        if(admissionPayImmediatelyPastPaymentDate != null && claimantResponse == null)
+//            status = DefendantResponseStatus.ELIGIBLE_FOR_CCJ_AFTER_FULL_ADMIT_PAY_IMMEDIATELY_PAST_DEADLINE;
+//        if(hasClaimantRespondedStatesPaid())
+//            status = DefendantResponseStatus.CLAIMANT_ACCEPTED_STATES_PAID;
+//        if(claimantResponse != null && countyCourtJudgmentRequestedAt != null)
+//            status = DefendantResponseStatus.REDETERMINATION_BY_JUDGE;
+//        if(state == ClaimState.TRANSFERRED)
+//            status = DefendantResponseStatus.TRANSFERRED;
+
+        return status;
     }
 }
