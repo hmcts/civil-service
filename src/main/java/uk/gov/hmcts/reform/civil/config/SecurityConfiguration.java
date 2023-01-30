@@ -29,6 +29,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "caseworker-civil",
         "caseworker-civil-solicitor",
         "caseworker",
+        "caseworker-caa",
+        "caseworker-approver",
         "citizen"
     };
 
@@ -48,6 +50,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/loggers/**",
         "/assignment/**",
         "/service-request-update",
+        "/service-request-update-claim-issued",
         "/case/document/downloadSealedDoc"
     };
 

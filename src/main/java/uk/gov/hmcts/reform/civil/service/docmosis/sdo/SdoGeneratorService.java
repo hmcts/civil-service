@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmall;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentManagementService;
@@ -20,6 +22,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -63,9 +66,10 @@ public class SdoGeneratorService {
 
         return documentManagementService.uploadDocument(
             authorisation,
-            new PDF(getFileName(docmosisTemplate, caseData),
-                    docmosisDocument.getBytes(),
-                    DocumentType.SDO_ORDER
+            new PDF(
+                getFileName(docmosisTemplate, caseData),
+                docmosisDocument.getBytes(),
+                DocumentType.SDO_ORDER
             )
         );
     }
@@ -152,8 +156,11 @@ public class SdoGeneratorService {
         if (featuretoggleService.isHearingAndListingSDOEnabled()) {
             sdoDocumentBuilder
                 .disposalOrderWithoutHearing(caseData.getDisposalOrderWithoutHearing())
-                .disposalHearingTime(caseData.getDisposalHearingHearingTime())
-                .disposalHearingTimeEstimate(caseData.getDisposalHearingHearingTime().getTime().getLabel());
+                .disposalHearingTime(caseData.getDisposalHearingHearingTime());
+            if (caseData.getDisposalHearingHearingTime().getTime() != null) {
+                sdoDocumentBuilder.disposalHearingTimeEstimate(
+                    caseData.getDisposalHearingHearingTime().getTime().getLabel());
+            }
         }
 
         return sdoDocumentBuilder.build();
@@ -257,9 +264,11 @@ public class SdoGeneratorService {
         if (featuretoggleService.isHearingAndListingSDOEnabled()) {
             sdoDocumentFormBuilder
                 .fastTrackOrderWithoutJudgement(caseData.getFastTrackOrderWithoutJudgement())
-                .fastTrackHearingTime(caseData.getFastTrackHearingTime())
-                .fastTrackHearingTimeEstimate(
-                    caseData.getFastTrackHearingTime().getHearingDuration().getLabel());
+                .fastTrackHearingTime(caseData.getFastTrackHearingTime());
+            Optional.ofNullable(caseData.getFastTrackHearingTime())
+                .map(FastTrackHearingTime::getHearingDuration)
+                .map(FastTrackHearingTimeEstimate::getLabel)
+                .ifPresent(sdoDocumentFormBuilder::fastTrackHearingTimeEstimate);
         }
 
         return sdoDocumentFormBuilder.build();
