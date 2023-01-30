@@ -527,7 +527,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-    private void buildJudgmentAmountSummaryDetails(CaseData caseData, CaseData.CaseDataBuilder<?,?> updatedCaseData) {
+    private void buildJudgmentAmountSummaryDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         BigDecimal claimFee =  MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
         BigDecimal paidAmount = (caseData.getCcjPaymentPaidSomeOption() == YesOrNo.YES) ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentPaidSomeAmount()) : ZERO;
         BigDecimal subTotal = caseData.getTotalClaimAmount().add(claimFee).add(caseData.getTotalInterest());
