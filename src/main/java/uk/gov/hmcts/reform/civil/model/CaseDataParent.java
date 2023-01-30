@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -9,6 +10,7 @@ import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -123,7 +125,7 @@ public class CaseDataParent implements MappableObject {
     // for witness
     private final YesOrNo respondent1DQWitnessesRequiredSpec;
     private final List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
-
+    private final Witnesses applicant1DQWitnessesSmallClaim;
     private final Witnesses respondent1DQWitnessesSmallClaim;
     private final Witnesses respondent2DQWitnessesSmallClaim;
 
@@ -298,6 +300,8 @@ public class CaseDataParent implements MappableObject {
      */
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal respondToAdmittedClaimOwingAmountPounds2;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal partAdmitPaidValuePounds;
 
     @JsonProperty("CaseAccessCategory")
     private final CaseCategory caseAccessCategory;
@@ -313,6 +317,7 @@ public class CaseDataParent implements MappableObject {
     private final ScheduledHearing nextHearingDetails;
 
     private final String respondent1EmailAddress;
+    private final YesOrNo applicant1Represented;
 
     /**
      * Adding for LR ITP Update.
@@ -324,8 +329,13 @@ public class CaseDataParent implements MappableObject {
     private final CaseDocument respondent1ClaimResponseDocumentSpec;
     private final CaseDocument respondent2ClaimResponseDocumentSpec;
     private final String respondent1PaymentDateToStringSpec;
+    private final LocalDate applicant1RequestedPaymentDateForDefendantSpec;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private final BigDecimal applicant1SuggestInstalmentsPaymentAmountForDefendantSpec;
+    private final PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
+    private final LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
+    private final String currentDateboxDefendantSpec;
     private final YesOrNo ccjPaymentPaidSomeOption;
-
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal ccjPaymentPaidSomeAmount;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
@@ -340,6 +350,11 @@ public class CaseDataParent implements MappableObject {
     private final BigDecimal ccjJudgmentAmountInterestToDate;
 
     private final String migrationId;
+
+    @JsonIgnore
+    public boolean isApplicantNotRepresented() {
+        return  this.applicant1Represented == YesOrNo.NO;
+    }
 
     /**
      * Adding for Certificate of Service.

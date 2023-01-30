@@ -49,7 +49,7 @@ class HearingFeeUnpaidRespondentNotificationHandlerTest {
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getSolicitorHearingFeeUnpaid()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getRespondentHearingFeeUnpaid()).thenReturn(TEMPLATE_ID);
         }
 
         @Test

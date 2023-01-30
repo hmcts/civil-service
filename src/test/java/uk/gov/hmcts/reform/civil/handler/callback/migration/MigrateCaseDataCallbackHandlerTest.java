@@ -113,7 +113,7 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
             LocationRefData.builder().epimmsId("1234").region("1").build());
         when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "court4")).thenReturn(
             LocationRefData.builder().epimmsId("1234").region("1").build());
-        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "127")).thenReturn(
+        when(locationRefDataService.getCourtLocation("BEARER_TOKEN", "121")).thenReturn(
             LocationRefData.builder().epimmsId("1234").region("1").build());
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler

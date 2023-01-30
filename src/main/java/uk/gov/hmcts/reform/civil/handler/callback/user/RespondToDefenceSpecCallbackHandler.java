@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
@@ -41,17 +42,20 @@ import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.WitnessesValidator;
 
-import java.math.BigDecimal;
-import static java.math.BigDecimal.ZERO;
 import java.time.format.DateTimeFormatter;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.lang.String.format;
+import static java.math.BigDecimal.ZERO;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -68,6 +72,9 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -85,6 +92,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService featureToggleService;
     private final LocationHelper locationHelper;
+    private static final String datePattern = "dd MMMM yyyy";
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -99,6 +107,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
             .put(callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag)
+            .put(callbackKey(V_1, MID, "validate-respondent-payment-date"), this::validatePaymentDate)
+            .put(callbackKey(V_1, MID, "get-payment-date"), this::getPaymentDate)
+            .put(callbackKey(V_1, MID, "validate-suggest-instalments"), this::suggestInstalmentsValidation)
             .put(callbackKey(V_1, MID, "validate-amount-paid"), this::validateAmountPaid)
             .put(callbackKey(ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, false))
             .put(callbackKey(V_1, ABOUT_TO_SUBMIT), params -> aboutToSubmit(params, true))
@@ -204,6 +215,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 }
             }
 
+            if (featureToggleService.isHearingAndListingSDOEnabled()) {
+                dq.applicant1DQWitnesses(builder.build().getApplicant1DQWitnessesSmallClaim());
+            }
+
             builder.applicant1DQ(dq.build());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             builder.uiStatementOfTruth(StatementOfTruth.builder().build());
@@ -283,6 +298,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
             updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
             updatedCaseData.respondent1PaymentDateToStringSpec(setUpPayDateToString(caseData));
+
+            BigDecimal howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
+                .map(RespondToClaim::getHowMuchWasPaid).orElse(null);
+            if (howMuchWasPaid != null) {
+                updatedCaseData.partAdmitPaidValuePounds(MonetaryConversions.penniesToPounds(howMuchWasPaid));
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -381,11 +402,16 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (caseData.getRespondToClaimAdmitPartLRspec() != null
             && caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null) {
             return caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()
-                .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
+                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
+        }
+        if (caseData.getRespondToAdmittedClaim() != null
+            && caseData.getRespondToAdmittedClaim().getWhenWasThisAmountPaid() != null) {
+            return caseData.getRespondToAdmittedClaim().getWhenWasThisAmountPaid()
+                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
         }
         if (caseData.getRespondent1ResponseDate() != null) {
             return caseData.getRespondent1ResponseDate().plusDays(5)
-                .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH));
+                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
         }
         return null;
     }
@@ -422,18 +448,76 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID;
     }
 
+    private CallbackResponse validatePaymentDate(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+
+        if (checkPastDateValidation(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())) {
+            errors.add("Enter a date that is today or in the future");
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse getPaymentDate(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        //Set the hint date for repayment to be 30 days in the future
+        String formattedDeadline = formatLocalDateTime(LocalDateTime.now().plusDays(30), DATE);
+        caseDataBuilder.currentDateboxDefendantSpec(formattedDeadline);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse suggestInstalmentsValidation(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+
+        //Check repayment amount requested is less than the overall claim amount
+        BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
+        BigDecimal regularRepaymentAmountPennies = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
+        BigDecimal regularRepaymentAmountPounds = MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies);
+
+        if (regularRepaymentAmountPounds.compareTo(ZERO) <= 0) {
+            errors.add("Enter an amount of £1 or more");
+        }
+
+        if (regularRepaymentAmountPounds.compareTo(totalClaimAmount.subtract(BigDecimal.ONE)) > 0) {
+            errors.add("Enter a valid amount for equal instalments");
+        }
+
+        LocalDate eligibleDate;
+        formatLocalDate(eligibleDate = LocalDate.now().plusDays(30), DATE);
+        if (caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec().isBefore(eligibleDate.plusDays(
+            1))) {
+            errors.add("Selected date must be after " + formatLocalDate(eligibleDate, DATE));
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private boolean checkPastDateValidation(LocalDate localDate) {
+        return localDate != null && localDate.isBefore(LocalDate.now());
+    }
+
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
-        if (caseData.getCcjPaymentPaidSomeAmount() != null) {
-            if (caseData.getCcjPaymentPaidSomeAmount()
-                .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0) {
-                errors.add("The amount paid must be less than the full claim amount.");
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .errors(errors)
-                    .build();
-            }
+        if (caseData.getCcjPaymentPaidSomeAmount() != null && caseData.getCcjPaymentPaidSomeAmount()
+            .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0) {
+            errors.add("The amount paid must be less than the full claim amount.");
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
         }
 
         buildJudgmentAmountSummaryDetails(caseData, updatedCaseData);
@@ -443,7 +527,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-    private void buildJudgmentAmountSummaryDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+    private void buildJudgmentAmountSummaryDetails(CaseData caseData, CaseData.CaseDataBuilder<?,?> updatedCaseData) {
         BigDecimal claimFee =  MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
         BigDecimal paidAmount = (caseData.getCcjPaymentPaidSomeOption() == YesOrNo.YES) ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentPaidSomeAmount()) : ZERO;
         BigDecimal subTotal = caseData.getTotalClaimAmount().add(claimFee).add(caseData.getTotalInterest());
