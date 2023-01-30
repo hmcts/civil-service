@@ -343,10 +343,9 @@ public class CaseDataBuilder {
     private DisposalHearingBundleDJ disposalHearingBundleDJ;
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private TrialHearingTrial trialHearingTrialDJ;
+    private LocalDate hearingDueDate;
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
-    private LocalDate hearingDueDate;
-
     private CaseLocation caseManagementLocation;
     private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
     private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
@@ -374,6 +373,8 @@ public class CaseDataBuilder {
 
     private TrialHearingTimeDJ trialHearingTimeDJ;
     private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
+
+    private BigDecimal ccjPaymentPaidSomeAmount;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1371,6 +1372,7 @@ public class CaseDataBuilder {
         ccdState = CASE_DISMISSED;
         caseDismissedHearingFeeDueDate = LocalDateTime.now();
         hearingDate = hearingDueDate.plusWeeks(2);
+
         return this;
     }
 
@@ -4244,6 +4246,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder ccjPaymentPaidSomeAmount(BigDecimal ccjPaymentPaidSomeAmount) {
+        this.ccjPaymentPaidSomeAmount = ccjPaymentPaidSomeAmount;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -4467,6 +4474,7 @@ public class CaseDataBuilder {
                 .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
                 .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
             .caseAccessCategory(caseAccessCategory)
+            .ccjPaymentPaidSomeAmount(ccjPaymentPaidSomeAmount)
             .build();
     }
 
