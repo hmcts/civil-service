@@ -232,6 +232,8 @@ notifications:
   respondentCcjNotificationTemplate: "98ca0ea8-ee90-46b4-a361-dcca12a2ff47"
   respondentSolicitorCcjNotificationTemplate: "5047af9d-bf50-4476-b41b-24fc96b8a7d8"
 
+  noticeOfChangeFormerSolicitor: "de751f1b-9348-40be-b3c5-a275616a7cf5"
+  noticeOfChangeOtherParties: "80a327da-8124-40a5-bec4-fe0d64e28a91"
   evidenceUploadTemplate: "bd1c9ee5-92a4-49a9-a61f-ff671960b029"
 
 sendgrid:
