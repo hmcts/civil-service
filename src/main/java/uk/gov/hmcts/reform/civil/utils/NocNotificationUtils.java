@@ -85,29 +85,33 @@ public class NocNotificationUtils {
     }
 
     public static String getOtherSolicitor1Email(CaseData caseData) {
-        if (getOtherSolicitor1(caseData) != null) {
-            return getOtherSolicitor1(caseData).getEmail();
+        RecipientData otherSolicitor1 = getOtherSolicitor1(caseData);
+        if (otherSolicitor1 != null) {
+            return otherSolicitor1.getEmail();
         }
         return null;
     }
 
     public static String getOtherSolicitor1Name(CaseData caseData) {
-        if (getOtherSolicitor1(caseData) != null) {
-            return getOtherSolicitor1(caseData).getOrgId();
+        RecipientData otherSolicitor1 = getOtherSolicitor1(caseData);
+        if (otherSolicitor1 != null) {
+            return otherSolicitor1.getOrgId();
         }
         return null;
     }
 
     public static String getOtherSolicitor2Email(CaseData caseData) {
-        if (getOtherSolicitor2(caseData) != null) {
-            return getOtherSolicitor2(caseData).getEmail();
+        RecipientData otherSolicitor2 = getOtherSolicitor2(caseData);
+        if (otherSolicitor2 != null) {
+            return otherSolicitor2.getEmail();
         }
         return null;
     }
 
     public static String getOtherSolicitor2Name(CaseData caseData) {
-        if (getOtherSolicitor2(caseData) != null) {
-            return getOtherSolicitor2(caseData).getOrgId();
+        RecipientData otherSolicitor2 = getOtherSolicitor2(caseData);
+        if (otherSolicitor2 != null) {
+            return otherSolicitor2.getOrgId();
         }
         return null;
     }
