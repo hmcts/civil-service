@@ -13,6 +13,7 @@ import java.util.List;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 
 @Service
@@ -32,7 +33,7 @@ public class HearingFeeDueSearchService extends ElasticSearchService {
                                                                                     .toString()))
                             .must(beState(HEARING_READINESS)))
                 .should(boolQuery()
-                            .must(rangeQuery("data.hearingFee.calculatedAmountInPence").lte("0"))
+                            .mustNot(existsQuery("data.hearingFee"))
                             .must(beState(HEARING_READINESS))),
             List.of("reference"),
             startIndex
