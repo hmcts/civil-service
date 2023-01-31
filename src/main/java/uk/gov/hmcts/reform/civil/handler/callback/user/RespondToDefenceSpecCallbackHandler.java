@@ -70,6 +70,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
@@ -451,6 +452,78 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>(1);
+
+        if (checkPastDateValidation(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())) {
+            errors.add("Enter a date that is today or in the future");
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse getPaymentDate(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        //Set the hint date for repayment to be 30 days in the future
+        String formattedDeadline = formatLocalDateTime(LocalDateTime.now().plusDays(30), DATE);
+        caseDataBuilder.currentDateboxDefendantSpec(formattedDeadline);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse suggestInstalmentsValidation(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+
+        //Check repayment amount requested is less than the overall claim amount
+        BigDecimal totalClaimAmount = caseData.getTotalClaimAmount();
+        BigDecimal regularRepaymentAmountPennies = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
+        BigDecimal regularRepaymentAmountPounds = MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies);
+
+        if (regularRepaymentAmountPounds.compareTo(BigDecimal.ZERO) <= 0) {
+            errors.add("Enter an amount of £1 or more");
+        }
+
+        if (regularRepaymentAmountPounds.compareTo(totalClaimAmount.subtract(BigDecimal.ONE)) > 0) {
+            errors.add("Enter a valid amount for equal instalments");
+        }
+
+        LocalDate eligibleDate;
+        formatLocalDate(eligibleDate = LocalDate.now().plusDays(30), DATE);
+        if (caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec().isBefore(eligibleDate.plusDays(
+            1))) {
+            errors.add("Selected date must be after " + formatLocalDate(eligibleDate, DATE));
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private boolean checkPastDateValidation(LocalDate localDate) {
+        return localDate != null && localDate.isBefore(LocalDate.now());
+    }
+
+    private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+        if (caseData.getCcjPaymentPaidSomeAmount() != null && caseData.getCcjPaymentPaidSomeAmount()
+            .compareTo(new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))) > 0) {
+            errors.add("The amount paid must be less than the full claim amount.");
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse validatePaymentDate(CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
 
         if (checkPastDateValidation(caseData.getApplicant1RequestedPaymentDateForDefendantSpec())) {
             errors.add("Enter a date that is today or in the future");

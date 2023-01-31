@@ -118,7 +118,17 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CallbackResponse gaValidateType(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)) {
+
+        List<String> errors = new ArrayList<>();
+
+        var generalAppTypes = caseData.getGeneralAppType().getTypes();
+        if (generalAppTypes.size() > 1
+            && generalAppTypes.contains(GeneralApplicationTypes.VARY_JUDGEMENT)) {
+            errors.add("It is not possible to select an additional application type when applying to vary judgment");
+        }
+
+        if (generalAppTypes.size() == 1
+            && generalAppTypes.contains(GeneralApplicationTypes.VARY_JUDGEMENT)) {
             caseDataBuilder.generalAppVaryJudgementType(YesOrNo.YES);
         } else {
             caseDataBuilder.generalAppVaryJudgementType(YesOrNo.NO);
@@ -126,6 +136,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
+            .errors(errors)
             .build();
     }
 
