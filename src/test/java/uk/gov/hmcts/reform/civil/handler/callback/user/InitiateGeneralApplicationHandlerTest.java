@@ -225,7 +225,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData responseCaseData = getCaseData(response);
 
             assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(NO);
-            assertThat(response.getErrors()).isEqualTo(null);
+            assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
@@ -241,7 +241,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData responseCaseData = getCaseData(response);
 
             assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(YES);
-            assertThat(response.getErrors()).isEqualTo(null);
+            assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
@@ -256,10 +256,10 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData responseCaseData = getCaseData(response);
 
-            assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(YES);
-            assertThat(response.getErrors()).isEqualTo(null);
+            assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(NO);
+            assertThat(response.getErrors().size()).isEqualTo(1);
+            assertThat(response.getErrors().get(0).equals("It is not possible to select an additional application type when applying to vary judgment"));
         }
-
     }
 
     @Nested

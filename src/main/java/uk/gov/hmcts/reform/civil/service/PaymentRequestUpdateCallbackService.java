@@ -72,6 +72,7 @@ public class PaymentRequestUpdateCallbackService {
 
         CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
         BusinessProcess businessProcess = null;
+
         if (feeType.equals(FeeType.HEARING.name())) {
             businessProcess = startEventData.getBusinessProcess()
                 .updateActivityId(serviceRequestReceived);
