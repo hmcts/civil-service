@@ -343,10 +343,9 @@ public class CaseDataBuilder {
     private DisposalHearingBundleDJ disposalHearingBundleDJ;
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private TrialHearingTrial trialHearingTrialDJ;
+    private LocalDate hearingDueDate;
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
-    private LocalDate hearingDueDate;
-
     private CaseLocation caseManagementLocation;
     private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
     private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
@@ -1373,6 +1372,7 @@ public class CaseDataBuilder {
         ccdState = CASE_DISMISSED;
         caseDismissedHearingFeeDueDate = LocalDateTime.now();
         hearingDate = hearingDueDate.plusWeeks(2);
+
         return this;
     }
 
