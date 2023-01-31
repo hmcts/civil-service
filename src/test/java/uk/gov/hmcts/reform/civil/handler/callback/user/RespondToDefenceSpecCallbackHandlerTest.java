@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
@@ -53,6 +54,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
 import java.math.BigDecimal;
@@ -868,6 +870,31 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).contains("The amount paid must be less than the full claim amount.");
+        }
+
+        @Test
+        void shouldSetTheJudgmentSummaryDetailsToProceed() {
+            Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
+            BigDecimal interestAmount = new BigDecimal(100);
+            CaseData caseData = CaseDataBuilder.builder()
+                .ccjPaymentPaidSomeAmount(new BigDecimal(10000))
+                .ccjPaymentPaidSomeOption(YesOrNo.YES)
+                .totalClaimAmount(new BigDecimal(1000))
+                .claimFee(fee)
+                .totalInterest(interestAmount)
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            BigDecimal claimFee = getCaseData(response).getCcjJudgmentAmountClaimFee();
+            assertThat(claimFee).isEqualTo(MonetaryConversions.penniesToPounds(fee.getCalculatedAmountInPence()));
+
+            BigDecimal subTotal = getCaseData(response).getCcjJudgmentSummarySubtotalAmount();
+            assertThat(subTotal).isEqualTo(caseData.getTotalClaimAmount().add(caseData.getTotalInterest()).add(caseData.getClaimFee().toFeeDto().getCalculatedAmount()));
+
+            BigDecimal finalTotal = getCaseData(response).getCcjJudgmentTotalStillOwed();
+            assertThat(finalTotal).isEqualTo(subTotal.subtract(new BigDecimal(100)));
         }
     }
 }
