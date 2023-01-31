@@ -107,6 +107,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .put(callbackKey(MID, "statement-of-truth"), this::resetStatementOfTruth)
             .put(callbackKey(MID, "validate-unavailable-dates"), this::validateUnavailableDates)
             .put(callbackKey(MID, "set-applicant1-proceed-flag"), this::setApplicant1ProceedFlag)
+            .put(callbackKey(V_1, MID, "set-applicant-route-flags"), this::setApplicantRouteFlags)
             .put(callbackKey(V_1, MID, "validate-respondent-payment-date"), this::validatePaymentDate)
             .put(callbackKey(V_1, MID, "get-payment-date"), this::getPaymentDate)
             .put(callbackKey(V_1, MID, "validate-suggest-instalments"), this::suggestInstalmentsValidation)
@@ -146,14 +147,49 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse setApplicant1ProceedFlag(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        CaseData updatedCaseData = setApplicant1ProceedFlagToYes(callbackParams.getCaseData());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.toMap(objectMapper))
+            .build();
+    }
+
+    private CaseData setApplicant1ProceedFlagToYes(CaseData caseData) {
         var updatedCaseData = caseData.toBuilder();
+
         if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))
             && YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
             updatedCaseData.applicant1ProceedWithClaim(YES);
         }
+        return updatedCaseData.build();
+    }
+
+    private boolean isPartPaymentRejectedOrItsFullDefenceResponse(CaseData caseData) {
+        if (NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec())
+            || (caseData.getRespondent1ClaimResponseTypeForSpec().equals(RespondentResponseTypeSpec.FULL_DEFENCE)
+            && !(NO.equals(caseData.getApplicant1ProceedWithClaim()))
+            && !(NO.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())))) {
+            return true;
+        }
+        return false;
+    }
+
+    private CaseData setApplicantDefenceResponseDocFlag(CaseData caseData) {
+        var updatedCaseData = caseData.toBuilder();
+
+        if (isPartPaymentRejectedOrItsFullDefenceResponse(caseData)) {
+            updatedCaseData.applicantDefenceResponseDocumentAndDQFlag(YES);
+        } else {
+            updatedCaseData.applicantDefenceResponseDocumentAndDQFlag(NO);
+        }
+        return updatedCaseData.build();
+    }
+
+    private CallbackResponse setApplicantRouteFlags(CallbackParams callbackParams) {
+        CaseData updatedCaseData = setApplicantDefenceResponseDocFlag(setApplicant1ProceedFlagToYes(callbackParams.getCaseData()));
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(objectMapper))
+            .data(updatedCaseData.toMap(objectMapper))
             .build();
     }
 

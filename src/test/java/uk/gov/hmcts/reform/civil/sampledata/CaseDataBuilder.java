@@ -377,6 +377,7 @@ public class CaseDataBuilder {
     private BigDecimal ccjPaymentPaidSomeAmount;
     private YesOrNo ccjPaymentPaidSomeOption;
     private BigDecimal totalInterest;
+    private YesOrNo applicant1AcceptAdmitAmountPaidSpec;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -4268,6 +4269,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder getApplicant1AcceptAdmitAmountPaidSpec(YesOrNo isPartPayAccepted) {
+        this.applicant1AcceptAdmitAmountPaidSpec = isPartPayAccepted;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -4493,6 +4499,7 @@ public class CaseDataBuilder {
             .ccjPaymentPaidSomeAmount(ccjPaymentPaidSomeAmount)
             .ccjPaymentPaidSomeOption(ccjPaymentPaidSomeOption)
             .totalInterest(totalInterest)
+            .applicant1AcceptAdmitAmountPaidSpec(applicant1AcceptAdmitAmountPaidSpec)
             .build();
     }
 }

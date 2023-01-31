@@ -349,6 +349,7 @@ public class CaseDataParent implements MappableObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal ccjJudgmentAmountInterestToDate;
 
+    private final YesOrNo applicantDefenceResponseDocumentAndDQFlag;
     private final String migrationId;
 
     @JsonIgnore
