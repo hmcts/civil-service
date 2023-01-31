@@ -43,7 +43,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
         void shouldThrowError_whenOrgToAddIsNull() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
-                .changeOfRepresentation(true, false, null, "QWERTY A")
+                .changeOfRepresentation(true, false, null, "QWERTY A", null)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -89,7 +89,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-                .changeOfRepresentation(true, false, NEW_ORG_ID, "QWERTY A")
+                .changeOfRepresentation(true, false, NEW_ORG_ID, "QWERTY A", null)
                 .changeOrganisationRequestField(true, false, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
                 .setCaseListDisplayDefendantSolicitorReferences(true)
@@ -123,7 +123,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-                .changeOfRepresentation(false, false, NEW_ORG_ID, "QWERTY R")
+                .changeOfRepresentation(false, false, NEW_ORG_ID, "QWERTY R", null)
                 .changeOrganisationRequestField(false, false, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
                 .setCaseListDisplayDefendantSolicitorReferences(true)
@@ -156,7 +156,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v1LiP()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-                .changeOfRepresentation(false, false, NEW_ORG_ID, null)
+                .changeOfRepresentation(false, false, NEW_ORG_ID, null, null)
                 .changeOrganisationRequestField(true, false, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
                 .build();
@@ -185,7 +185,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .atStateClaimIssued()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .multiPartyClaimTwoDefendantSolicitors()
-                .changeOfRepresentation(false, true, NEW_ORG_ID, "QWERTY R2")
+                .changeOfRepresentation(false, true, NEW_ORG_ID, "QWERTY R2", null)
                 .changeOrganisationRequestField(false, true, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(false, true, NEW_ORG_ID)
                 .setCaseListDisplayDefendantSolicitorReferences(false)
@@ -221,7 +221,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .atStateClaimIssued()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .multiPartyClaimTwoDefendantSolicitors()
-                .changeOfRepresentation(false, true, "QWERTY R", "QWERTY R2")
+                .changeOfRepresentation(false, true, "QWERTY R", "QWERTY R2", null)
                 .changeOrganisationRequestField(false, true, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(false, true, "QWERTY R")
                 .build();
@@ -251,7 +251,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .atStateClaimIssued()
                 .multiPartyClaimOneDefendantSolicitor()
-                .changeOfRepresentation(false, true, NEW_ORG_ID, "QWERTY R")
+                .changeOfRepresentation(false, true, NEW_ORG_ID, "QWERTY R", null)
                 .changeOrganisationRequestField(false, true, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(false, true, NEW_ORG_ID)
                 .build();
@@ -281,7 +281,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateClaimIssued1v2Respondent2LiP()
-                .changeOfRepresentation(false, true, NEW_ORG_ID, null)
+                .changeOfRepresentation(false, true, NEW_ORG_ID, null, null)
                 .changeOrganisationRequestField(false, true, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(false, true, NEW_ORG_ID)
                 .build();
@@ -312,7 +312,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .multiPartyClaimTwoDefendantsLiP()
                 .atStateClaimIssued1v2Respondent2LiP()
                 .atStateClaimIssued1v1LiP()
-                .changeOfRepresentation(false, true, NEW_ORG_ID, null)
+                .changeOfRepresentation(false, true, NEW_ORG_ID, null, null)
                 .changeOrganisationRequestField(false, true, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(false, true, NEW_ORG_ID)
                 .build();
@@ -341,7 +341,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                .changeOfRepresentation(true, false, NEW_ORG_ID, "QWERTY A")
+                .changeOfRepresentation(true, false, NEW_ORG_ID, "QWERTY A", null)
                 .changeOrganisationRequestField(true, false, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
                 .setCaseListDisplayDefendantSolicitorReferences(true)
@@ -372,7 +372,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                .changeOfRepresentation(false, false, NEW_ORG_ID, "QWERTY R")
+                .changeOfRepresentation(false, false, NEW_ORG_ID, "QWERTY R", null)
                 .changeOrganisationRequestField(false, false, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
                 .setCaseListDisplayDefendantSolicitorReferences(true)
@@ -403,7 +403,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v1LiP()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
-                .changeOfRepresentation(false, false, NEW_ORG_ID, null)
+                .changeOfRepresentation(false, false, NEW_ORG_ID, null, null)
                 .changeOrganisationRequestField(false, false, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
                 .build();
@@ -430,7 +430,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .atStateClaimIssued()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .multiPartyClaimTwoDefendantSolicitors()
-                .changeOfRepresentation(false, true, NEW_ORG_ID, "QWERTY R2")
+                .changeOfRepresentation(false, true, NEW_ORG_ID, "QWERTY R2", null)
                 .changeOrganisationRequestField(false, true, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(false, true, NEW_ORG_ID)
                 .setCaseListDisplayDefendantSolicitorReferences(false)
@@ -464,7 +464,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .atStateClaimIssued()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .multiPartyClaimTwoDefendantSolicitors()
-                .changeOfRepresentation(false, true, "QWERTY R", "QWERTY R2")
+                .changeOfRepresentation(false, true, "QWERTY R", "QWERTY R2", null)
                 .changeOrganisationRequestField(false, true, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(false, true, "QWERTY R")
                 .build();
@@ -492,7 +492,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .atStateClaimIssued()
                 .multiPartyClaimOneDefendantSolicitor()
-                .changeOfRepresentation(false, true, NEW_ORG_ID, "QWERTY R")
+                .changeOfRepresentation(false, true, NEW_ORG_ID, "QWERTY R", null)
                 .changeOrganisationRequestField(false, true, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(false, true, NEW_ORG_ID)
                 .build();
@@ -520,7 +520,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .multiPartyClaimTwoDefendantSolicitors()
                 .atStateClaimIssued1v2Respondent2LiP()
-                .changeOfRepresentation(false, true, NEW_ORG_ID, null)
+                .changeOfRepresentation(false, true, NEW_ORG_ID, null, null)
                 .changeOrganisationRequestField(false, true, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(false, true, NEW_ORG_ID)
                 .build();
@@ -549,7 +549,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .multiPartyClaimTwoDefendantsLiP()
                 .atStateClaimIssued1v2Respondent2LiP()
                 .atStateClaimIssued1v1LiP()
-                .changeOfRepresentation(false, true, NEW_ORG_ID, null)
+                .changeOfRepresentation(false, true, NEW_ORG_ID, null, null)
                 .changeOrganisationRequestField(false, true, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(false, true, NEW_ORG_ID)
                 .build();
