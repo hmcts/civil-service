@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateRequest;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
 
-@FeignClient(name = "bundle", url = "${stitching.api.url}", configuration =
+@FeignClient(name = "bundle", url = "${bundle.api.url}", configuration =
     FeignClientProperties.FeignClientConfiguration.class)
 public interface BundleApiClient {
 
