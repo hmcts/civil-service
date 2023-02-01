@@ -94,9 +94,12 @@ import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.chrono.ChronoLocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
@@ -687,30 +690,34 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     public DefendantResponseStatus getDefendantResponseStatus() {
-        DefendantResponseStatus status = null;
-
+        if(defenceAdmitPartPaymentTimeRouteRequired != null && defenceAdmitPartPaymentTimeRouteRequired != RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            return DefendantResponseStatus.ELIGIBLE_FOR_CCJ;
+        if(respondent1ClaimResponsePaymentAdmissionForSpec == RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT
+            && respondent1DQ.getResponseClaimCourtLocationRequired() != null)
+            return DefendantResponseStatus.CLAIMANT_ACCEPTED_STATES_PAID;
+        if(respondent1ClaimResponsePaymentAdmissionForSpec == RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT)
+            return DefendantResponseStatus.PAID_IN_FULL;
+        if(applicant1ProceedWithClaim != null && respondent1DQ.getResponseClaimCourtLocationRequired() != null)
+            return DefendantResponseStatus.REDETERMINATION_BY_JUDGE;
+        if(respondToClaim != null && respondToClaim.getWhenWasThisAmountPaid() != null && respondent1DQ != null && respondent1DQ.getResponseClaimCourtLocationRequired() != null && isCCJPaidWithinMonth())
+            return DefendantResponseStatus.PAID_IN_FULL_CCJ_CANCELLED;
+        if(respondToClaim != null && respondToClaim.getWhenWasThisAmountPaid() != null && respondent1DQ != null && respondent1DQ.getResponseClaimCourtLocationRequired() != null)
+            return DefendantResponseStatus.PAID_IN_FULL_CCJ_SATISFIED;
+        if(respondent1ClaimResponseType == RespondentResponseType.FULL_ADMISSION &&
+            defenceAdmitPartPaymentTimeRouteRequired == RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY &&
+            respondToClaim.getWhenWasThisAmountPaid() != null)
+            return DefendantResponseStatus.ELIGIBLE_FOR_CCJ_AFTER_FULL_ADMIT_PAY_IMMEDIATELY_PAST_DEADLINE;
+        if(respondent1TimeExtensionDate != null)
+            return DefendantResponseStatus.MORE_TIME_REQUESTED;
+        if(ccdState == CaseState.JUDICIAL_REFERRAL)
+            return DefendantResponseStatus.TRANSFERRED;
         if(respondent1ClaimResponseType == null)
-            status = DefendantResponseStatus.NO_RESPONSE;
-        if(defenceAdmitPartPaymentTimeRouteRequired != RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            status = DefendantResponseStatus.ELIGIBLE_FOR_CCJ;
-        if(respondent1ClaimResponsePaymentAdmissionForSpec == RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT)
-            status = DefendantResponseStatus.PAID_IN_FULL;
-        if(respondent1ClaimResponsePaymentAdmissionForSpec == RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT)
-            status = DefendantResponseStatus.CLAIMANT_ACCEPTED_STATES_PAID;
-        if(applicant1ProceedWithClaim != null && courtLocation!= null)
-            status = DefendantResponseStatus.REDETERMINATION_BY_JUDGE;
+            return DefendantResponseStatus.NO_RESPONSE;
 
-//        if(moreTimeRequested)
-//            status = DefendantResponseStatus.MORE_TIME_REQUESTED;
-//        if(moneyReceivedOn != null && countyCourtJudgmentRequestedAt != null && isCCJPaidWithinMonth())
-//            status = DefendantResponseStatus.PAID_IN_FULL_CCJ_CANCELLED;
-//        if(moneyReceivedOn != null && countyCourtJudgmentRequestedAt != null)
-//            status = DefendantResponseStatus.PAID_IN_FULL_CCJ_SATISFIED;
-//        if(admissionPayImmediatelyPastPaymentDate != null && claimantResponse == null)
-//            status = DefendantResponseStatus.ELIGIBLE_FOR_CCJ_AFTER_FULL_ADMIT_PAY_IMMEDIATELY_PAST_DEADLINE;
-//        if(state == ClaimState.TRANSFERRED)
-//            status = DefendantResponseStatus.TRANSFERRED;
+        return null;
+    }
 
-        return status;
+    private boolean isCCJPaidWithinMonth() {
+        return respondToClaim.getWhenWasThisAmountPaid().isBefore(ChronoLocalDate.from(hearingDate));
     }
 }
