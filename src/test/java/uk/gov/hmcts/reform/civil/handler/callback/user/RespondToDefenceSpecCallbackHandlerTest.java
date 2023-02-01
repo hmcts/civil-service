@@ -926,11 +926,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetTheJudgmentSummaryDetailsToProceed() {
             Fee fee = Fee.builder().version("1").code("CODE").calculatedAmountInPence(BigDecimal.valueOf(100)).build();
-            BigDecimal interestAmount = new BigDecimal(100);
+            BigDecimal interestAmount = BigDecimal.valueOf(100);
             CaseData caseData = CaseDataBuilder.builder()
-                .ccjPaymentPaidSomeAmount(new BigDecimal(10000))
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
                 .ccjPaymentPaidSomeOption(YesOrNo.YES)
-                .totalClaimAmount(new BigDecimal(1000))
+                .totalClaimAmount(BigDecimal.valueOf(1000))
                 .claimFee(fee)
                 .totalInterest(interestAmount)
                 .build();
@@ -945,7 +945,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(subTotal).isEqualTo(caseData.getTotalClaimAmount().add(caseData.getTotalInterest()).add(caseData.getClaimFee().toFeeDto().getCalculatedAmount()));
 
             BigDecimal finalTotal = getCaseData(response).getCcjJudgmentTotalStillOwed();
-            assertThat(finalTotal).isEqualTo(subTotal.subtract(new BigDecimal(100)));
+            assertThat(finalTotal).isEqualTo(subTotal.subtract(BigDecimal.valueOf(100)));
         }
     }
 }
