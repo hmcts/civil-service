@@ -63,28 +63,28 @@ public class CmcClaim {
     }
 
     public DefendantResponseStatus getDefendantResponseStatus(){
-        if(response == null)
-            status = DefendantResponseStatus.NO_RESPONSE;
-        if(moreTimeRequested)
-            status = DefendantResponseStatus.MORE_TIME_REQUESTED;
         if(isEligibleForCCJ())
-            status = DefendantResponseStatus.ELIGIBLE_FOR_CCJ;
-        if(moneyReceivedOn != null && countyCourtJudgmentRequestedAt != null && isCCJPaidWithinMonth())
-            status = DefendantResponseStatus.PAID_IN_FULL_CCJ_CANCELLED;
-        if(moneyReceivedOn != null && countyCourtJudgmentRequestedAt != null)
-            status = DefendantResponseStatus.PAID_IN_FULL_CCJ_SATISFIED;
-        if(moneyReceivedOn != null)
-            status = DefendantResponseStatus.PAID_IN_FULL;
-        if(admissionPayImmediatelyPastPaymentDate != null && claimantResponse == null)
-            status = DefendantResponseStatus.ELIGIBLE_FOR_CCJ_AFTER_FULL_ADMIT_PAY_IMMEDIATELY_PAST_DEADLINE;
+            return DefendantResponseStatus.ELIGIBLE_FOR_CCJ;
         if(hasClaimantRespondedStatesPaid())
-            status = DefendantResponseStatus.CLAIMANT_ACCEPTED_STATES_PAID;
+            return DefendantResponseStatus.CLAIMANT_ACCEPTED_STATES_PAID;
         if(claimantResponse != null && countyCourtJudgmentRequestedAt != null)
-            status = DefendantResponseStatus.REDETERMINATION_BY_JUDGE;
+            return DefendantResponseStatus.REDETERMINATION_BY_JUDGE;
+        if(moneyReceivedOn != null && countyCourtJudgmentRequestedAt != null && isCCJPaidWithinMonth())
+            return DefendantResponseStatus.PAID_IN_FULL_CCJ_CANCELLED;
+        if(moneyReceivedOn != null && countyCourtJudgmentRequestedAt != null)
+            return DefendantResponseStatus.PAID_IN_FULL_CCJ_SATISFIED;
+        if(moneyReceivedOn != null)
+            return DefendantResponseStatus.PAID_IN_FULL;
+        if(admissionPayImmediatelyPastPaymentDate != null && claimantResponse == null)
+            return DefendantResponseStatus.ELIGIBLE_FOR_CCJ_AFTER_FULL_ADMIT_PAY_IMMEDIATELY_PAST_DEADLINE;
+        if(moreTimeRequested)
+            return DefendantResponseStatus.MORE_TIME_REQUESTED;
         if(state == ClaimState.TRANSFERRED)
-            status = DefendantResponseStatus.TRANSFERRED;
+            return DefendantResponseStatus.TRANSFERRED;
+        if(response == null)
+            return DefendantResponseStatus.NO_RESPONSE;
 
-        return status;
+        return null;
     }
 
     private boolean isEligibleForCCJ() {
@@ -93,8 +93,8 @@ public class CmcClaim {
 
     private boolean hasClaimantRespondedStatesPaid() {
         return claimantResponse != null && claimantResponse == ClaimantResponse.ACCEPTATION &&
-            ((response.getResponseType() == RespondentResponseType.PART_ADMISSION && response.paymentDeclaration != null) ||
-                (response.getResponseType() == RespondentResponseType.FULL_DEFENCE && response.getDefenceType() == DefenceType.ALREADY_PAID && response.paymentDeclaration != null));
+            ((response != null && response.getResponseType() == RespondentResponseType.PART_ADMISSION && response.paymentDeclaration != null) ||
+            (response != null && response.getResponseType() == RespondentResponseType.FULL_DEFENCE && response.getDefenceType() == DefenceType.ALREADY_PAID && response.paymentDeclaration != null));
     }
 
     private boolean isCCJPaidWithinMonth() {

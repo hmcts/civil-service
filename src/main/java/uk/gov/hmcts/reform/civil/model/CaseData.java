@@ -689,6 +689,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .findFirst().orElse(null);
     }
 
+    @JsonIgnore
     public DefendantResponseStatus getDefendantResponseStatus() {
         if(defenceAdmitPartPaymentTimeRouteRequired != null && defenceAdmitPartPaymentTimeRouteRequired != RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             return DefendantResponseStatus.ELIGIBLE_FOR_CCJ;
