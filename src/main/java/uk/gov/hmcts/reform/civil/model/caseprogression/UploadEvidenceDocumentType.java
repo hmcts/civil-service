@@ -6,12 +6,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 
+import java.time.LocalDate;
+
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class UploadEvidenceDisclosure {
+public class UploadEvidenceDocumentType {
 
-    private Document disclosureOption1;
-    private Document disclosureOption2;
+    private String typeOfDocument;
+    private LocalDate documentIssuedDate;
+    private Document documentUpload;
 }
+

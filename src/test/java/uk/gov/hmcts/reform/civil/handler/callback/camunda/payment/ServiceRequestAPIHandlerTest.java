@@ -88,7 +88,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(paymentServiceResponse.builder()
-                                .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
+                            .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 

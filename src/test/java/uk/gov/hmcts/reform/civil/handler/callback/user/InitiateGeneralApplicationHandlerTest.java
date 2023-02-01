@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
@@ -35,6 +36,7 @@ import uk.gov.hmcts.reform.prd.model.Organisation;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -223,7 +225,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData responseCaseData = getCaseData(response);
 
             assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(NO);
-            assertThat(response.getErrors()).isEqualTo(null);
+            assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
@@ -239,7 +241,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             CaseData responseCaseData = getCaseData(response);
 
             assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(YES);
-            assertThat(response.getErrors()).isEqualTo(null);
+            assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
@@ -254,10 +256,10 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData responseCaseData = getCaseData(response);
 
-            assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(YES);
-            assertThat(response.getErrors()).isEqualTo(null);
+            assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(NO);
+            assertThat(response.getErrors().size()).isEqualTo(1);
+            assertThat(response.getErrors().get(0).equals("It is not possible to select an additional application type when applying to vary judgment"));
         }
-
     }
 
     @Nested
@@ -798,9 +800,14 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotReturnErrors_whenRespondentSolAssignedToCase() {
+
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
+                              .courtName("Court Name").region("Region").build());
+            given(locationRefDataService.getCourtLocationsForGeneralApplication(any())).willReturn(locations);
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
-            given(locationRefDataService.getCourtLocations(any())).willReturn(getSampleCourLocations());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -814,14 +821,18 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getGeneralAppHearingDetails()).isNotNull();
             assertThat(dynamicList).isNotNull();
             assertThat(locationsFromDynamicList(dynamicList))
-                    .containsOnly("ABCD - RG0 0 AL", "PQRS - GU0 0EE", "WXYZ - EW0 0HE", "LMNO - NE0 0BH");
+                    .containsOnly("siteName - court Address - post code");
         }
 
         @Test
         void shouldReturnErrors_whenNoRespondentSolAssignedToCase() {
+
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
+                              .courtName("Court Name").region("Region").build());
+            given(locationRefDataService.getCourtLocationsForGeneralApplication(any())).willReturn(locations);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             given(initiateGeneralAppService.respondentAssigned(any())).willReturn(false);
-            given(locationRefDataService.getCourtLocations(any())).willReturn(getSampleCourLocations());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 

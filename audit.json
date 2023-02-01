@@ -69,5 +69,10 @@
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/fees/claim/1.2_GET",: "ignore",
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/fees/hearing/1.2_GET": "ignore",
   "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/locations/courtLocations_GET": "ignore",
-  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/assignment/pipLetter_POST": "ignore"
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/assignment/pipLetter_POST": "ignore",
+  "100001_Unexpected Content-Type was returned_http://civil-service-aat.service.core-compute-aat.internal/case/document/downloadSealedDoc_POST": "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/feature-toggle/isCertificateOfServiceEnabled_GET": "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/eventHistory_POST": "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/flowstate_POST": "ignore",
+  "100000_A Client Error response code was returned by the server_http://civil-service-aat.service.core-compute-aat.internal/testing-support/rpaJson_POST": "ignore"
 }

@@ -70,7 +70,6 @@ class PaymentRequestUpdateCallbackServiceTest {
 
     @BeforeEach
     public void setup() {
-
         when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
         when(featureToggleService.isAccessProfilesEnabled()).thenReturn(true);
     }
@@ -210,6 +209,7 @@ class PaymentRequestUpdateCallbackServiceTest {
         verify(coreCaseDataService, never()).getCase(Long.valueOf(CASE_ID));
         verify(coreCaseDataService, never()).startUpdate(any(), any());
         verify(coreCaseDataService, never()).submitUpdate(any(), any());
+
     }
 
     @Test

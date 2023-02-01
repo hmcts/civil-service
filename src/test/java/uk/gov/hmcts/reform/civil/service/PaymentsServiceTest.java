@@ -85,7 +85,7 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestShouldNotThrowAnError_whenValidCaseDataIsProvided() {
-        CaseData caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithPBADetails();
+        CaseData caseData = CaseDataBuilder.builder().buildMakePaymentsCaseData();
         paymentsService.validateRequest(caseData);
         assertThat(caseData).isNotNull();
     }
@@ -158,7 +158,7 @@ class PaymentsServiceTest {
     }
 
     @Test
-        void shouldCreateCreditAccountPayment_whenValidCaseDetails() {
+    void shouldCreateCreditAccountPayment_whenValidCaseDetails() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
                 .organisationID("OrgId").build();
         SRPbaDetails hfPbaDetails = SRPbaDetails.builder()

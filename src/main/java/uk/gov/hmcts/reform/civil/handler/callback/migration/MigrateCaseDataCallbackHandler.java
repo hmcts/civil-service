@@ -73,7 +73,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
                 caseDataBuilder
             );
         }
-        caseMigrationUtility.migrateRespondentAndApplicantDQUnSpec(
+        caseMigrationUtility.migrateRespondentAndApplicantDQ(
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
             oldCaseData,
             caseDataBuilder,
