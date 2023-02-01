@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -70,30 +71,32 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldMakePaymentServiceRequestForClaimFee_whenInvoked() {
+        void shouldMakePaymentServiceRequestForClaimFee_whenInvoked() throws Exception {
+            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataPreServiceRequest();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(paymentServiceResponse.builder()
-                            .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
+                                .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
-            assertThat(extractResponseCaseData(response).getClaimIssuedPBADetails().getServiceReqReference())
+            assertThat(extractClaimFeePaymentDetailsFromResponse(response).getServiceReqReference())
                 .isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
         }
 
         @Test
-        void shouldMakePaymentServiceRequestForHearingFee_whenInvoked() {
+        void shouldMakePaymentServiceRequestForHearingFee_whenInvoked() throws Exception {
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDate();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(paymentServiceResponse.builder()
-                            .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
+                                .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
-            assertThat(extractResponseCaseData(response).getHearingFeePBADetails().getServiceReqReference())
+            assertThat(extractHearingFeePaymentDetailsFromResponse(response).getServiceReqReference())
                 .isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
         }
 
@@ -103,7 +106,15 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
-    private CaseData extractResponseCaseData(AboutToStartOrSubmitCallbackResponse response) {
-        return objectMapper.convertValue(response.getData(), CaseData.class);
+    private SRPbaDetails
+    extractClaimFeePaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
+        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+        return responseCaseData.getClaimIssuedPBADetails();
+    }
+
+    private SRPbaDetails
+    extractHearingFeePaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
+        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+        return responseCaseData.getHearingFeePBADetails();
     }
 }
