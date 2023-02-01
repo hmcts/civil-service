@@ -343,10 +343,9 @@ public class CaseDataBuilder {
     private DisposalHearingBundleDJ disposalHearingBundleDJ;
     private DisposalHearingFinalDisposalHearingDJ disposalHearingFinalDisposalHearingDJ;
     private TrialHearingTrial trialHearingTrialDJ;
+    private LocalDate hearingDueDate;
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
-    private LocalDate hearingDueDate;
-
     private CaseLocation caseManagementLocation;
     private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
     private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
@@ -374,6 +373,8 @@ public class CaseDataBuilder {
 
     private TrialHearingTimeDJ trialHearingTimeDJ;
     private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
+
+    private BigDecimal ccjPaymentPaidSomeAmount;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1371,6 +1372,7 @@ public class CaseDataBuilder {
         ccdState = CASE_DISMISSED;
         caseDismissedHearingFeeDueDate = LocalDateTime.now();
         hearingDate = hearingDueDate.plusWeeks(2);
+
         return this;
     }
 
@@ -1571,6 +1573,32 @@ public class CaseDataBuilder {
             .phoneNumber("0123456789")
             .address(AddressBuilder.defaults().build())
             .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1() {
+        atStateClaimDetailsNotified();
+        changeOfRepresentation(false, false, "New-sol-id", "Previous-sol-id", "previous-solicitor@example.com");
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeLip() {
+        atStateClaimDetailsNotified();
+        changeOfRepresentation(false, false, "New-sol-id", null, null);
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeOtherSol1Lip() {
+        atStateClaimDetailsNotified();
+        changeOfRepresentation(true, false, "New-sol-id", null, null);
+        respondent1OrganisationPolicy = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeOtherSol2Lip() {
+        atStateClaimDetailsNotified();
+        changeOfRepresentation(true, false, "New-sol-id", null, null);
+        respondent2OrganisationPolicy = null;
         return this;
     }
 
@@ -2288,17 +2316,22 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder changeOfRepresentation(boolean isApplicant, boolean isRespondent2Replaced,
-                                                  String newOrgID, String oldOrgId) {
+                                                  String newOrgID, String oldOrgId, String formerSolicitorEmail) {
         String caseRole = isApplicant ? CaseRole.APPLICANTSOLICITORONE.getFormattedName() :
             isRespondent2Replaced ? CaseRole.RESPONDENTSOLICITORTWO.getFormattedName() :
                 CaseRole.RESPONDENTSOLICITORONE.getFormattedName();
-        ChangeOfRepresentation newChange = ChangeOfRepresentation.builder()
+        ChangeOfRepresentation.ChangeOfRepresentationBuilder newChangeBuilder = ChangeOfRepresentation.builder()
             .caseRole(caseRole)
             .organisationToAddID(newOrgID)
             .organisationToRemoveID(oldOrgId)
-            .timestamp(LocalDateTime.now())
-            .build();
-        changeOfRepresentation = newChange;
+            .timestamp(LocalDateTime.now());
+        if (oldOrgId != null) {
+            newChangeBuilder.organisationToRemoveID(oldOrgId);
+        }
+        if (formerSolicitorEmail != null) {
+            newChangeBuilder.formerRepresentationEmailAddress(formerSolicitorEmail);
+        }
+        changeOfRepresentation = newChangeBuilder.build();
         return this;
     }
 
@@ -4244,6 +4277,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder ccjPaymentPaidSomeAmount(BigDecimal ccjPaymentPaidSomeAmount) {
+        this.ccjPaymentPaidSomeAmount = ccjPaymentPaidSomeAmount;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -4467,6 +4505,7 @@ public class CaseDataBuilder {
                 .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
                 .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
             .caseAccessCategory(caseAccessCategory)
+            .ccjPaymentPaidSomeAmount(ccjPaymentPaidSomeAmount)
             .build();
     }
 
