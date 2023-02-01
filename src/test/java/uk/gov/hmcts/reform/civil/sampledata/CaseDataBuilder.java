@@ -4146,7 +4146,17 @@ public class CaseDataBuilder {
             .build();
     }
 
-    public CaseData buildMakePaymentsCaseDataPreServiceRequest() {
+    public CaseData buildMakePaymentsCaseDataWithoutClaimIssuedPbaDetails() {
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            .organisationID("OrgId").build();
+
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .build();
+    }
+
+    public CaseData buildMakePaymentsCaseDataWithoutServiceRequestReference() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
 
@@ -4179,6 +4189,17 @@ public class CaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .hearingDate(LocalDate.now().plusWeeks(2))
+            .build();
+    }
+
+    public CaseData buildMakePaymentsCaseDataWithHearingDateWithoutClaimIssuedPbaDetails() {
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            .organisationID("OrgId").build();
+
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .hearingDate(LocalDate.now().plusWeeks(2))
             .build();
