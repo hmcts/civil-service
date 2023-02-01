@@ -566,7 +566,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         if (toggleService.isCertificateOfServiceEnabled()) {
             return format(
                 areRespondentsRepresentedAndRegistered(caseData)
-                    ? CONFIRMATION_SUMMARY
+                    ? getConfirmationSummary()
                     : LIP_CONFIRMATION_BODY_COS,
                 format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
                 claimIssueConfiguration.getResponsePackLink()
@@ -574,11 +574,19 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         } else {
             return format(
                 areRespondentsRepresentedAndRegistered(caseData)
-                    ? CONFIRMATION_SUMMARY
+                    ? getConfirmationSummary()
                     : LIP_CONFIRMATION_BODY,
                 format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference()),
                 claimIssueConfiguration.getResponsePackLink()
             ) + exitSurveyContentService.applicantSurvey();
+        }
+    }
+
+    private String getConfirmationSummary() {
+        if (toggleService.isPbaV3Enabled()) {
+            return CONFIRMATION_SUMMARY_PBA_V3;
+        } else {
+            return CONFIRMATION_SUMMARY;
         }
     }
 
