@@ -1577,6 +1577,32 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeRespondent1() {
+        atStateClaimDetailsNotified();
+        changeOfRepresentation(false, false, "New-sol-id", "Previous-sol-id", "previous-solicitor@example.com");
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeLip() {
+        atStateClaimDetailsNotified();
+        changeOfRepresentation(false, false, "New-sol-id", null, null);
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeOtherSol1Lip() {
+        atStateClaimDetailsNotified();
+        changeOfRepresentation(true, false, "New-sol-id", null, null);
+        respondent1OrganisationPolicy = null;
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimDetailsNotifiedWithNoticeOfChangeOtherSol2Lip() {
+        atStateClaimDetailsNotified();
+        changeOfRepresentation(true, false, "New-sol-id", null, null);
+        respondent2OrganisationPolicy = null;
+        return this;
+    }
+
     public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
         addRespondent2 = YES;
@@ -2291,17 +2317,22 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder changeOfRepresentation(boolean isApplicant, boolean isRespondent2Replaced,
-                                                  String newOrgID, String oldOrgId) {
+                                                  String newOrgID, String oldOrgId, String formerSolicitorEmail) {
         String caseRole = isApplicant ? CaseRole.APPLICANTSOLICITORONE.getFormattedName() :
             isRespondent2Replaced ? CaseRole.RESPONDENTSOLICITORTWO.getFormattedName() :
                 CaseRole.RESPONDENTSOLICITORONE.getFormattedName();
-        ChangeOfRepresentation newChange = ChangeOfRepresentation.builder()
+        ChangeOfRepresentation.ChangeOfRepresentationBuilder newChangeBuilder = ChangeOfRepresentation.builder()
             .caseRole(caseRole)
             .organisationToAddID(newOrgID)
             .organisationToRemoveID(oldOrgId)
-            .timestamp(LocalDateTime.now())
-            .build();
-        changeOfRepresentation = newChange;
+            .timestamp(LocalDateTime.now());
+        if (oldOrgId != null) {
+            newChangeBuilder.organisationToRemoveID(oldOrgId);
+        }
+        if (formerSolicitorEmail != null) {
+            newChangeBuilder.formerRepresentationEmailAddress(formerSolicitorEmail);
+        }
+        changeOfRepresentation = newChangeBuilder.build();
         return this;
     }
 

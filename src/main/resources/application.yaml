@@ -231,6 +231,8 @@ notifications:
   hearingListedNoFeeDefendantLrTemplate: "81216268-36e6-4e0e-b510-24067ad32f24"
   solicitorTrialReady: "2502bb5e-8d04-4669-8fca-6a2154e91f9a"
 
+  noticeOfChangeFormerSolicitor: "de751f1b-9348-40be-b3c5-a275616a7cf5"
+  noticeOfChangeOtherParties: "80a327da-8124-40a5-bec4-fe0d64e28a91"
   evidenceUploadTemplate: "bd1c9ee5-92a4-49a9-a61f-ff671960b029"
 
 sendgrid:
