@@ -204,6 +204,12 @@ public class NotificationsProperties {
     private String hearingListedNoFeeDefendantLrTemplate;
 
     @NotEmpty
+    private String noticeOfChangeFormerSolicitor;
+
+    @NotEmpty
+    private String noticeOfChangeOtherParties;
+
+    @NotEmpty
     private String claimantSolicitorClaimContinuingOnlineCos;
 
     @NotEmpty
