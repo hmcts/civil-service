@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_API;
@@ -102,6 +103,16 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldNotMakePaymentServiceRequestForClaimFee_whenInvokedWithClaimIssuedPbaDetails() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            verifyNoInteractions(paymentsService);
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            String serviceRequestReference = responseCaseData.getClaimIssuedPBADetails().getServiceReqReference();
+            assertThat(serviceRequestReference).isEqualTo(CaseDataBuilder.CUSTOMER_REFERENCE);
+        }
+
+        @Test
         void shouldMakePaymentServiceRequestForHearingFee_whenInvoked() {
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDate();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -131,6 +142,18 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             String serviceRequestReference = responseCaseData.getHearingFeePBADetails().getServiceReqReference();
             assertThat(serviceRequestReference).isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
+        }
+
+        @Test
+        void shouldNotMakePaymentServiceRequestForHearingFee_whenInvokedWithClaimIssuedPbaDetails() {
+            caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDateWithHearingFeePBADetails();
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            verifyNoInteractions(paymentsService);
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            String serviceRequestReference = responseCaseData.getHearingFeePBADetails().getServiceReqReference();
+            assertThat(serviceRequestReference).isEqualTo(CaseDataBuilder.CUSTOMER_REFERENCE);
         }
 
         @Test
