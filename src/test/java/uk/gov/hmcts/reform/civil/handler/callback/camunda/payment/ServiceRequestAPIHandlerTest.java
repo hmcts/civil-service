@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -81,8 +80,9 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
-            assertThat(extractClaimFeePaymentDetailsFromResponse(response).getServiceReqReference())
-                .isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            String serviceRequestReference = responseCaseData.getClaimIssuedPBADetails().getServiceReqReference();
+            assertThat(serviceRequestReference).isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
         }
 
         @Test
@@ -96,25 +96,14 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
-            assertThat(extractHearingFeePaymentDetailsFromResponse(response).getServiceReqReference())
-                .isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+            String serviceRequestReference = responseCaseData.getHearingFeePBADetails().getServiceReqReference();
+            assertThat(serviceRequestReference).isEqualTo(SUCCESSFUL_PAYMENT_REFERENCE);
         }
 
         @Test
         void handleEventsReturnsTheExpectedCallbackEvent() {
             assertThat(handler.handledEvents()).contains(CREATE_SERVICE_REQUEST_API);
-        }
-
-        private SRPbaDetails
-        extractClaimFeePaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
-            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-            return responseCaseData.getClaimIssuedPBADetails();
-        }
-
-        private SRPbaDetails
-        extractHearingFeePaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
-            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-            return responseCaseData.getHearingFeePBADetails();
         }
     }
 }
