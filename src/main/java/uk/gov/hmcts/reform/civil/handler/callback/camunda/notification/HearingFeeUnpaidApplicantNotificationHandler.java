@@ -58,7 +58,7 @@ public class HearingFeeUnpaidApplicantNotificationHandler extends CallbackHandle
 
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getSolicitorHearingFeeUnpaid(),
+            notificationsProperties.getApplicantHearingFeeUnpaid(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -71,7 +71,6 @@ public class HearingFeeUnpaidApplicantNotificationHandler extends CallbackHandle
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE)
-
         );
     }
 }
