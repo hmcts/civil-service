@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.utils.CaseMigrationUtility;
 
 import java.util.Collections;
@@ -58,13 +58,13 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
 
             caseMigrationUtility.migrateCaseManagementLocation(
                 caseDataBuilder,
-                CaseLocation.builder().baseLocation("420219").region("2").build()
+                CaseLocationCivil.builder().baseLocation("420219").region("2").build()
             );
         } else {
             log.info("Process UNSPEC claim: {}", oldCaseData.getCcdCaseReference());
             caseMigrationUtility.migrateCaseManagementLocation(
                 caseDataBuilder,
-                CaseLocation.builder().baseLocation("192280").region("4").build()
+                CaseLocationCivil.builder().baseLocation("192280").region("4").build()
             );
             caseMigrationUtility.migrateGS(oldCaseData, caseDataBuilder);
             caseMigrationUtility.migrateUnspecCourtLocation(
@@ -77,7 +77,7 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
             oldCaseData,
             caseDataBuilder,
-            CaseLocation.builder().baseLocation("420219").region("2").build()
+            CaseLocationCivil.builder().baseLocation("420219").region("2").build()
         );
         log.info("Add migration ID: {}", oldCaseData.getCcdCaseReference());
         caseDataBuilder.migrationId(MIGRATION_ID_VALUE);

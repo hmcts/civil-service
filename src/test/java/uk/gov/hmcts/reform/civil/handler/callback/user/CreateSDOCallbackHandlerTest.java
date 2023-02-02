@@ -31,7 +31,7 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.Document;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
@@ -421,7 +421,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                       RequestedCourt.builder()
                                           .responseCourtCode("court3")
                                           .caseLocation(
-                                              CaseLocation.builder()
+                                              CaseLocationCivil.builder()
                                                   .baseLocation("dummy base")
                                                   .region("dummy region")
                                                   .build()

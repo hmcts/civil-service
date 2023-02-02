@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -41,7 +41,7 @@ public class CaseMigrationUtility {
 
     // Applicable for both spec and unspec
     public void migrateCaseManagementLocation(CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                                              CaseLocation caseLocation) {
+                                              CaseLocationCivil caseLocation) {
 
         caseDataBuilder.caseManagementLocation(caseLocation);
 
@@ -69,7 +69,7 @@ public class CaseMigrationUtility {
                 oldCaseData.getCcdCaseReference()
             );
 
-            CaseLocation caseLocation = CaseLocation.builder()
+            CaseLocationCivil caseLocation = CaseLocationCivil.builder()
                 .baseLocation(refData.getEpimmsId())
                 .region(refData.getRegionId())
                 .build();
@@ -90,7 +90,7 @@ public class CaseMigrationUtility {
 
     public void migrateRespondentAndApplicantDQ(String authToken, CaseData oldCaseData,
                                                 CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                                                CaseLocation caseLocation) {
+                                                CaseLocationCivil caseLocation) {
         log.info("CaseCategory is : {}", oldCaseData.getCaseAccessCategory());
 
         if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
@@ -109,7 +109,7 @@ public class CaseMigrationUtility {
     // Applicable for Respondent1 and Respondent2
     private void migrateRespondent1DQ(String authToken, CaseData oldCaseData,
                                       CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                                      CaseLocation caseLocation) {
+                                      CaseLocationCivil caseLocation) {
 
         Respondent1DQ respondent1DQ = oldCaseData.getRespondent1DQ();
         if (ofNullable(respondent1DQ).isPresent()
@@ -129,7 +129,7 @@ public class CaseMigrationUtility {
                      refdata.getCourtLocationCode(),
                      refdata.getRegionId(), refdata.getEpimmsId(), oldCaseData.getCcdCaseReference()
             );
-            CaseLocation location = CaseLocation.builder()
+            CaseLocationCivil location = CaseLocationCivil.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegionId()).build();
 
             caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
@@ -171,7 +171,7 @@ public class CaseMigrationUtility {
 
     private void migrateRespondent2DQ(String authToken, CaseData oldCaseData,
                                       CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                                      CaseLocation caseLocation) {
+                                      CaseLocationCivil caseLocation) {
         log.info("migrateRespondent2DQ Migrate respondent 2 DQ start: {}", oldCaseData.getCcdCaseReference());
         Respondent2DQ respondent2DQ = oldCaseData.getRespondent2DQ();
         if (ofNullable(respondent2DQ).isPresent()
@@ -191,7 +191,7 @@ public class CaseMigrationUtility {
                      refdata.getRegionId(), refdata.getEpimmsId(),
                      oldCaseData.getCcdCaseReference()
             );
-            CaseLocation location = CaseLocation.builder()
+            CaseLocationCivil location = CaseLocationCivil.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegionId()).build();
 
             caseDataBuilder.respondent2DQ(respondent2DQ.builder()
@@ -231,7 +231,7 @@ public class CaseMigrationUtility {
 
     private void migrateRespondent1DQUnspec(String authToken, CaseData oldCaseData,
                                             CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                                            CaseLocation caseLocation) {
+                                            CaseLocationCivil caseLocation) {
         log.info("Migrate respondent 1 DQ start unpec: {}", oldCaseData.getCcdCaseReference());
         Respondent1DQ respondent1DQ = oldCaseData.getRespondent1DQ();
         if (ofNullable(respondent1DQ).isPresent()
@@ -253,7 +253,7 @@ public class CaseMigrationUtility {
                          " {} region : {} ,baseLocation {}, ref {} ", refdata.getCourtLocationCode(),
                      refdata.getRegionId(), refdata.getEpimmsId(), oldCaseData.getCcdCaseReference()
             );
-            CaseLocation location = CaseLocation.builder()
+            CaseLocationCivil location = CaseLocationCivil.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegionId()).build();
 
             caseDataBuilder.respondent1DQ(respondent1DQ.toBuilder()
@@ -281,7 +281,7 @@ public class CaseMigrationUtility {
 
     private void migrateRespondent2DQUnSpec(String authToken, CaseData oldCaseData,
                                             CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                                            CaseLocation caseLocation) {
+                                            CaseLocationCivil caseLocation) {
         log.info("migrateRespondent2DQUnSpec: Migrate respondent 1 DQ start unpec: {}",
                  oldCaseData.getCcdCaseReference());
         Respondent2DQ respondent2DQ = oldCaseData.getRespondent2DQ();
@@ -301,7 +301,7 @@ public class CaseMigrationUtility {
                          " {} region : {} ,baseLocation {}, ref {} ", refdata.getCourtLocationCode(),
                      refdata.getRegionId(), refdata.getEpimmsId(), oldCaseData.getCcdCaseReference()
             );
-            CaseLocation location = CaseLocation.builder()
+            CaseLocationCivil location = CaseLocationCivil.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegionId()).build();
 
             caseDataBuilder.respondent2DQ(respondent2DQ.builder()
@@ -325,7 +325,7 @@ public class CaseMigrationUtility {
     // Applicable for Respondent1 and Respondent2
     private void migrateApplicant1DQ(String authToken, CaseData oldCaseData,
                                      CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                                     CaseLocation caseLocation) {
+                                     CaseLocationCivil caseLocation) {
         if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
             migrateSpecApplicant1DQ(oldCaseData, authToken, caseDataBuilder, caseLocation);
         } else {
@@ -336,7 +336,7 @@ public class CaseMigrationUtility {
     private void migrateSpecApplicant1DQ(CaseData oldCaseData,
                                          String authToken,
                                          CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
-                                         CaseLocation caseLocation) {
+                                         CaseLocationCivil caseLocation) {
         Applicant1DQ applicant1DQ = oldCaseData.getApplicant1DQ();
         //if court location was selected in applicant DQ for spec claim
         if (ofNullable(applicant1DQ).isPresent()
@@ -355,7 +355,7 @@ public class CaseMigrationUtility {
                      refdata.getCourtLocationCode(),
                      refdata.getRegionId(), refdata.getEpimmsId(), oldCaseData.getCcdCaseReference()
             );
-            CaseLocation location = CaseLocation.builder()
+            CaseLocationCivil location = CaseLocationCivil.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegionId()).build();
 
             caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
@@ -401,7 +401,7 @@ public class CaseMigrationUtility {
                      refData.getCourtLocationCode(),
                      refData.getRegionId(), refData.getEpimmsId(), oldCaseData.getCcdCaseReference()
             );
-            CaseLocation caseLocation = CaseLocation.builder().baseLocation(refData.getEpimmsId())
+            CaseLocationCivil caseLocation = CaseLocationCivil.builder().baseLocation(refData.getEpimmsId())
                 .region(refData.getRegionId()).build();
             caseDataBuilder.applicant1DQ(applicant1DQ.toBuilder()
                                              .applicant1DQRequestedCourt(
@@ -419,7 +419,7 @@ public class CaseMigrationUtility {
     /*private static void migrateApplicant2DQ(String authToken, CaseData oldCaseData,
                                             CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                             LocationRefDataService locationRefDataService,
-                                            CaseLocation caseLocation) {
+                                            CaseLocationCivil caseLocation) {
 
         Applicant2DQ applicant2DQ = oldCaseData.getApplicant2DQ();
         if (ofNullable(applicant2DQ).isPresent()
@@ -432,7 +432,7 @@ public class CaseMigrationUtility {
                     .getResponseCourtCode()
             );
 
-            CaseLocation location =  CaseLocation.builder()
+            CaseLocationCivil location =  CaseLocationCivil.builder()
                 .baseLocation(refdata.getEpimmsId()).region(refdata.getRegionId()).build();
 
             caseDataBuilder.applicant2DQ(applicant2DQ.toBuilder()
@@ -454,7 +454,7 @@ public class CaseMigrationUtility {
                     authToken,
                     oldCaseData.getCourtLocation().getApplicantPreferredCourt()
                 );
-                 caseLocation = CaseLocation.builder().baseLocation(refData.getEpimmsId())
+                 caseLocation = CaseLocationCivil.builder().baseLocation(refData.getEpimmsId())
                     .region(refData.getRegionId()).build();
 
                 caseDataBuilder.applicant2DQ(applicant2DQ.toBuilder()
