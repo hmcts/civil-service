@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.ListingOrRelisting;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
 @Service
@@ -161,8 +162,15 @@ public class HearingScheduledHandler extends CallbackHandler {
 
     private CallbackResponse getDueDateAndFee(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
+        String state = null;
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        if (caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
+        if (nonNull(caseData.getHearingLocation())) {
+            DynamicList locationList = caseData.getHearingLocation();
+            locationList.setListItems(null);
+            caseDataBuilder.hearingLocation(locationList);
+        }
+        if (nonNull(caseData.getListingOrRelisting())
+            && caseData.getListingOrRelisting().equals(ListingOrRelisting.LISTING)) {
             if (LocalDate.now().isBefore(caseData.getHearingDate().minusWeeks(4))) {
                 caseDataBuilder.hearingDueDate(
                     HearingUtils.addBusinessDays(
@@ -174,7 +182,9 @@ public class HearingScheduledHandler extends CallbackHandler {
             }
             switch (caseData.getAllocatedTrack()) {
                 case SMALL_CLAIM:
+
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(54500)).build());
+
                     break;
                 case FAST_CLAIM:
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(
@@ -182,23 +192,27 @@ public class HearingScheduledHandler extends CallbackHandler {
                             caseData.getClaimFee().getCalculatedAmountInPence().intValue())).build());
                     break;
                 case MULTI_CLAIM:
+
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(117500)).build());
+
                     break;
                 default:
                     caseDataBuilder.hearingFee(Fee.builder().calculatedAmountInPence(new BigDecimal(0)).build());
             }
+            state = "HEARING_READINESS";
+            caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .state(state)
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
+        } else {
+            state = "PREPARE_FOR_HEARING_CONDUCT_HEARING";
+            caseDataBuilder.businessProcess(BusinessProcess.ready(PREPARE_FOR_HEARING_CONDUCT_HEARING));
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .state(state)
+                .data(caseDataBuilder.build().toMap(objectMapper))
+                .build();
         }
-        if (nonNull(caseData.getHearingLocation())) {
-            DynamicList locationList = caseData.getHearingLocation();
-            locationList.setListItems(null);
-            caseDataBuilder.hearingLocation(locationList);
-        }
-        var state = "HEARING_READINESS";
-        caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .state(state)
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
     }
 
     private List<String> isFutureDate(LocalDateTime hearingDateTime) {
