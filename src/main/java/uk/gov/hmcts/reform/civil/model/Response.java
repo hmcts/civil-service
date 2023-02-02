@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.model;
 
-
 import lombok.Getter;
 import uk.gov.hmcts.reform.civil.enums.DefenceType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
