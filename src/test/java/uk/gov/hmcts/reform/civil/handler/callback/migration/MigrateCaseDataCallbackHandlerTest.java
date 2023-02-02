@@ -30,7 +30,6 @@ public class MigrateCaseDataCallbackHandlerTest extends BaseCallbackHandlerTest 
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-
     }
 
     @Test
