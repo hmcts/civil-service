@@ -12,15 +12,18 @@ public class ClaimIssueConfiguration {
     private final String n9aLink;
     private final String n9bLink;
     private final String n215Link;
+    private final String n225Link;
 
     public ClaimIssueConfiguration(@Value("${civil.response-pack-url}") String responsePackLink,
                                    @Value("${civil.n9a-url}") String n9aLink,
                                    @Value("${civil.n9b-url}") String n9bLink,
-                                   @Value("${civil.n215-url}") String n215Link) {
+                                   @Value("${civil.n215-url}") String n215Link,
+                                   @Value("${civil.n225-url}") String n225Link) {
         this.responsePackLink = responsePackLink;
         this.n9aLink = n9aLink;
         this.n9bLink = n9bLink;
         this.n215Link = n215Link;
+        this.n225Link = n225Link;
     }
 }
 

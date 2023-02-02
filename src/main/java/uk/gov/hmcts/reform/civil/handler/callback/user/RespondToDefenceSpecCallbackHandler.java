@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -68,6 +69,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.SuperClaimType.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -91,6 +93,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final CourtLocationUtils courtLocationUtils;
     private final FeatureToggleService featureToggleService;
     private final LocationHelper locationHelper;
+    private final ClaimIssueConfiguration claimIssueConfiguration;
     private static final String datePattern = "dd MMMM yyyy";
 
     @Override
@@ -320,28 +323,30 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         if (featureToggleService.isSdoEnabled() && !AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
             caseData.toBuilder().ccdState(CaseState.JUDICIAL_REFERRAL).build();
+        } else if (isdefendatFullAdmitPayImmidietely(caseData)) {
+            caseData.toBuilder().ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).build();
         }
 
         SubmittedCallbackResponse.SubmittedCallbackResponseBuilder responseBuilder =
             SubmittedCallbackResponse.builder();
 
-        responseBuilder.confirmationBody(
-                CaseDataToTextGenerator.getTextFor(
-                    confirmationTextGenerators.stream(),
-                    () -> getDefaultConfirmationText(caseData),
-                    caseData
-                ))
-            .confirmationHeader(
-                CaseDataToTextGenerator.getTextFor(
-                    confirmationHeaderGenerators.stream(),
-                    () -> getDefaultConfirmationHeader(caseData),
-                    caseData
-                ));
-
+            responseBuilder.confirmationBody(
+                    CaseDataToTextGenerator.getTextFor(
+                        confirmationTextGenerators.stream(),
+                        () -> getDefaultConfirmationText(caseData),
+                        caseData
+                    ))
+                .confirmationHeader(
+                    CaseDataToTextGenerator.getTextFor(
+                        confirmationHeaderGenerators.stream(),
+                        () -> getDefaultConfirmationHeader(caseData),
+                        caseData
+                    ));
         return responseBuilder.build();
     }
 
     private String getDefaultConfirmationText(CaseData caseData) {
+        String claimNumber = caseData.getLegacyCaseReference();
         if (YesOrNo.YES.equals(caseData.getApplicant1ProceedWithClaim())
             || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
             return "<h2 class=\"govuk-heading-m\">What happens next</h2>"
@@ -507,6 +512,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return localDate != null && localDate.isBefore(LocalDate.now());
     }
 
+    private boolean isdefendatFullAdmitPayImmidietely(CaseData caseData) {
+        return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
+            &&  caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
+            && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()));
+    }
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
