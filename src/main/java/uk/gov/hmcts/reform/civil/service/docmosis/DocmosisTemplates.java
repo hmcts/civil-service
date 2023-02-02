@@ -30,6 +30,9 @@ public enum DocmosisTemplates {
     DEFENDANT_RESPONSE_SPEC_SEALED_1v2(
         "CV-SPC-HRN-ENG-01064.docx", "%s_response_sealed_form.pdf"
     ),
+    DEFENDANT_RESPONSE_LIP_SPEC(
+        "CV-SPC-CUI-ENG-01064.docx", "%s_response_sealed_form.pdf"
+    ),
     LIP_CLAIM_FORM("CV-UNS-CLM-ENG-01096.docx", "litigant_in_person_claim_form_%s.pdf"),
     DJ_SDO_DISPOSAL("CV-UNS-DEC-ENG-01132.docx", "Order_disposal_%s.pdf"),
     DJ_SDO_TRIAL("CV-UNS-DEC-ENG-01133.docx", "Order_trial_%s.pdf"),
