@@ -22,4 +22,5 @@ public class RequestedCourt {
     private final String reasonForHearingAtSpecificCourt;
     private final DynamicList responseCourtLocations;
     private final CaseLocation caseLocation;
+    private final String responseCourtName;
 }
