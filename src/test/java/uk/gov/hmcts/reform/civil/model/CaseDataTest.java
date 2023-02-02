@@ -1,9 +1,13 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.civil.enums.*;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.DefendantResponseStatus;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 
 import java.time.LocalDate;
