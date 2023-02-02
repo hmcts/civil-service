@@ -734,6 +734,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
         }
         if (respondent1ClaimResponseType == RespondentResponseType.FULL_ADMISSION
             && defenceAdmitPartPaymentTimeRouteRequired == RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY
+            && respondToClaim != null
             && respondToClaim.getWhenWasThisAmountPaid() != null) {
             return DefendantResponseStatus.ELIGIBLE_FOR_CCJ_AFTER_FULL_ADMIT_PAY_IMMEDIATELY_PAST_DEADLINE;
         }
