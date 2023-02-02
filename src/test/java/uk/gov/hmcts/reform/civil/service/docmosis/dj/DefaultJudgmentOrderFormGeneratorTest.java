@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,65 +63,13 @@ public class DefaultJudgmentOrderFormGeneratorTest {
     @Autowired
     private DefaultJudgmentOrderFormGenerator generator;
 
-    @BeforeEach
-    void setup() {
-        when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(false);
-    }
-
-    @Test
-    void shouldDefaultJudgmentDisposalOrderFormGeneratorOneForm_whenValidDataIsProvided() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_DISPOSAL)))
-            .thenReturn(new DocmosisDocument(DJ_SDO_DISPOSAL.getDocumentTitle(), bytes));
-        when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposal, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
-            .thenReturn(CASE_DOCUMENT_DISPOSAL);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .atStateClaimIssuedDisposalHearing()
-            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
-            .atStateClaimIssuedDisposalSDOVideoCall()
-            .atStateClaimIssuedDisposalHearingInPerson()
-            .build();
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-        assertThat(caseDocument).isNotNull();
-        verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposal, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
-    }
-
     @Test
     void shouldDefaultJudgmentTrialOrderFormGenerator_whenValidDataIsProvided() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
-            .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
-        when(documentManagementService
-                 .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
-            .thenReturn(CASE_DOCUMENT_TRIAL);
-        when(featureToggleService.isHearingAndListingSDOEnabled())
-            .thenReturn(false);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
-            .atStateClaimIssuedTrialHearing()
-            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
-            .atStateClaimIssuedTrialSDOInPersonHearing()
-            .atStateClaimIssuedTrialLocationInPerson()
-            .atStateClaimIssuedTrialHearingInfo()
-            .build();
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
-
-        assertThat(caseDocument).isNotNull();
-        verify(documentManagementService)
-            .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER));
-    }
-
-    @Test
-    void shouldDefaultJudgmentTrialOrderFormGeneratorHNLisEnabled_whenValidDataIsProvided() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_HNL_TRIAL)))
             .thenReturn(new DocmosisDocument(DJ_SDO_HNL_TRIAL.getDocumentTitle(), bytes));
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileNameTrial, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_TRIAL);
-        when(featureToggleService.isHearingAndListingSDOEnabled())
-            .thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .atStateClaimIssuedTrialHearing()
@@ -146,7 +93,6 @@ public class DefaultJudgmentOrderFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DISPOSAL_HNL, bytes, DEFAULT_JUDGMENT_SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_DISPOSAL);
-        when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .atStateClaimIssuedDisposalHearing()
