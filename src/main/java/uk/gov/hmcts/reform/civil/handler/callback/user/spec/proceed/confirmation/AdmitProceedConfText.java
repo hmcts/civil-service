@@ -8,12 +8,15 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.time.LocalDate;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
 @Component
 @RequiredArgsConstructor
@@ -29,18 +32,19 @@ public class AdmitProceedConfText implements RespondToResponseConfirmationTextGe
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
         if (isdefendatFullAdmitPayImmidietely(caseData)) {
-            String whenBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().toString();
+            LocalDate whenBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+            String formattedWhenBePaid = formatLocalDate(whenBePaid, DATE);
             return Optional.ofNullable(format(
                       "They must make sure you have the money by %s. "
                     + "Any cheques or transfers should be clear in your account."
-                    + "<br><br>You need to tell us if you've settled the claim, for example because the defenrant has paid you."
-                    + "<br><br>You can settle for less than the full claim amount."
-                    + "<br><br><b>If you haven't been paid.</b>"
-                    + "<br><br>If the defentand has not paid you, you can request a County Court Judgement"
-                    + "by completing the following form and sending it to the email address below."
-                    + "<br><li><a href=\"%s\" target=\"_blank\">N225</a>-  Ask for judgement on a claim for a specified amount of money</li></ul>"
-                    + "<br>Email: <a href=\"mailto:OCMCNton@justice.gov.uk\">OCMCNton@justice.gov.uk</a>",
-                      whenBePaid,
+                    + "<p>You need to tell us if you've settled the claim, for example because the defenrant has paid you.</p>"
+                    + "<p>You can settle for less than the full claim amount.</p>"
+                    + "<p><h4>If you haven't been paid.</h4></p>"
+                    + "<p>If the defentand has not paid you, you can request a County Court Judgement"
+                    + "by completing the following form and sending it to the email address below.</p>"
+                    + "<p><li><a href=\"%s\" target=\"_blank\">N225 </a>- Ask for judgement on a claim for a specified amount of money</li></ul></p>"
+                    + "<p>Email: <a href=\"mailto:OCMCNton@justice.gov.uk\">OCMCNton@justice.gov.uk</a></p>",
+                      formattedWhenBePaid,
                       claimIssueConfiguration.getN225Link()
             ));
         } else if (YesOrNo.NO.equals(caseData.getApplicant1ProceedsWithClaimSpec())
