@@ -184,7 +184,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
             .getCourtLocationsForDefaultJudgments(authToken));
         caseDataBuilder.hearingSupportRequirementsDJ(
             HearingSupportRequirementsDJ.builder()
-                .hearingPreferredLocation(getLocationsFromList(locations))
+                .hearingTemporaryLocation(getLocationsFromList(locations))
                 .build());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -237,9 +237,9 @@ public class DefaultJudgementHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (Objects.nonNull(caseData.getHearingSupportRequirementsDJ())) {
             DynamicList list = formatLocationList(caseData.getHearingSupportRequirementsDJ()
-                                                      .getHearingPreferredLocation());
+                                                      .getHearingTemporaryLocation());
             HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ()
-                .toBuilder().hearingPreferredLocation(list).build();
+                .toBuilder().hearingTemporaryLocation(list).build();
             caseDataBuilder
                 .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
         }
@@ -261,10 +261,10 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     private LocationRefData fillPreferredLocationData(final List<LocationRefData> locations,
                                                                         HearingSupportRequirementsDJ data) {
-        if (Objects.isNull(data.getHearingPreferredLocation()) || Objects.isNull(locations)) {
+        if (Objects.isNull(data.getHearingTemporaryLocation()) || Objects.isNull(locations)) {
             return null;
         }
-        String locationLabel = data.getHearingPreferredLocation().getValue().getLabel();
+        String locationLabel = data.getHearingTemporaryLocation().getValue().getLabel();
         var preferredLocation =
             locations
                 .stream()
