@@ -38,66 +38,6 @@ public class MigrateCaseDataCallbackHandler extends CallbackHandler {
             .put(callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse)
             .build();
     }
-//
-//    private CallbackResponse migrateCaseData(CallbackParams callbackParams) {
-//        CaseData oldCaseData = callbackParams.getCaseData();
-//        log.info("Migrating data for case: {}", oldCaseData.getCcdCaseReference());
-//        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
-//        if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
-//            log.info("Process SPEC claim: {}", oldCaseData.getCcdCaseReference());
-//
-//            caseMigrationUtility.migrateGS(oldCaseData, caseDataBuilder
-//            );
-//
-//            caseMigrationUtility.migrateCaseManagementLocation(
-//                caseDataBuilder,
-//                CaseLocationCivil.builder().baseLocation("420219").region("2").build()
-//            );
-//        } else {
-//            log.info("Process UNSPEC claim: {}", oldCaseData.getCcdCaseReference());
-//            caseMigrationUtility.migrateCaseManagementLocation(
-//                caseDataBuilder,
-//                CaseLocationCivil.builder().baseLocation("192280").region("4").build()
-//            );
-//            caseMigrationUtility.migrateGS(oldCaseData, caseDataBuilder);
-//            caseMigrationUtility.migrateUnspecCourtLocation(
-//                callbackParams.getParams().get(BEARER_TOKEN).toString(),
-//                oldCaseData,
-//                caseDataBuilder
-//            );
-//        }
-//        caseMigrationUtility.migrateRespondentAndApplicantDQ(
-//            callbackParams.getParams().get(BEARER_TOKEN).toString(),
-//            oldCaseData,
-//            caseDataBuilder,
-//            CaseLocationCivil.builder().baseLocation("420219").region("2").build()
-//        );
-//        log.info("Add migration ID: {}", oldCaseData.getCcdCaseReference());
-//        caseDataBuilder.migrationId(MIGRATION_ID_VALUE);
-//
-//        return AboutToStartOrSubmitCallbackResponse.builder()
-//            .data(caseDataBuilder.build().toMap(objectMapper))
-//            .build();
-//
-//    }
-//
-//    private CallbackResponse migrateSupplementaryData(CallbackParams callbackParams) {
-//        CaseData oldCaseData = callbackParams.getCaseData();
-//        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
-//        if (CaseCategory.SPEC_CLAIM.equals(oldCaseData.getCaseAccessCategory())) {
-//            caseMigrationUtility.setSupplementaryData(
-//                oldCaseData.getCcdCaseReference(),
-//                "AAA6"
-//            );
-//        } else {
-//            caseMigrationUtility.setSupplementaryData(
-//                oldCaseData.getCcdCaseReference(),
-//                "AAA7"
-//            );
-//
-//        }
-//        return SubmittedCallbackResponse.builder().build();
-//    }
 
     @Override
     public List<CaseEvent> handledEvents() {
