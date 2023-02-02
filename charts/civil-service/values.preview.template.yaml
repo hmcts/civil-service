@@ -163,7 +163,7 @@ ccd:
   ccd-definition-store-api:
     java:
       imagePullPolicy: Always
-      image: hmctspublic.azurecr.io/xui/webapp:pr-1327
+      image: hmctspublic.azurecr.io/xui/webapp:latest
       devcpuRequests: 500m
       devmemoryRequests: 512Mi
       devcpuLimits: 2
