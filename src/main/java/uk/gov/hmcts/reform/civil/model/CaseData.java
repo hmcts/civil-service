@@ -487,7 +487,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final YesOrNo claimStarted;
     private final String currentDefendantName;
 
-    @JsonUnwrapped(suffix = "Breathing")
+    @JsonUnwrapped
     private final BreathingSpaceInfo breathing;
     private final String applicantVRespondentText;
 
