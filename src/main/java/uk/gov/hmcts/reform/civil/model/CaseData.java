@@ -13,7 +13,23 @@ import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 
-import uk.gov.hmcts.reform.civil.enums.*;
+import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
+import uk.gov.hmcts.reform.civil.enums.SuperClaimType;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
+import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
+import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.DefendantResponseStatus;
+import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
@@ -96,10 +112,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDate;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
@@ -691,29 +705,47 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public DefendantResponseStatus getDefendantResponseStatus() {
-        if(defenceAdmitPartPaymentTimeRouteRequired != null && defenceAdmitPartPaymentTimeRouteRequired != RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+        if (defenceAdmitPartPaymentTimeRouteRequired != null
+            && defenceAdmitPartPaymentTimeRouteRequired != RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY) {
             return DefendantResponseStatus.ELIGIBLE_FOR_CCJ;
-        if(respondent1ClaimResponsePaymentAdmissionForSpec == RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT
-            && respondent1DQ.getResponseClaimCourtLocationRequired() != null)
+        }
+        if (respondent1ClaimResponsePaymentAdmissionForSpec == RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT
+            && respondent1DQ.getResponseClaimCourtLocationRequired() != null) {
             return DefendantResponseStatus.CLAIMANT_ACCEPTED_STATES_PAID;
-        if(respondent1ClaimResponsePaymentAdmissionForSpec == RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT)
+        }
+        if (respondent1ClaimResponsePaymentAdmissionForSpec == RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT) {
             return DefendantResponseStatus.PAID_IN_FULL;
-        if(applicant1ProceedWithClaim != null && respondent1DQ.getResponseClaimCourtLocationRequired() != null)
+        }
+        if (applicant1ProceedWithClaim != null && respondent1DQ.getResponseClaimCourtLocationRequired() != null) {
             return DefendantResponseStatus.REDETERMINATION_BY_JUDGE;
-        if(respondToClaim != null && respondToClaim.getWhenWasThisAmountPaid() != null && respondent1DQ != null && respondent1DQ.getResponseClaimCourtLocationRequired() != null && isCCJPaidWithinMonth())
+        }
+        if (respondToClaim != null
+            && respondToClaim.getWhenWasThisAmountPaid() != null
+            && respondent1DQ != null
+            && respondent1DQ.getResponseClaimCourtLocationRequired() != null
+            && isCCJPaidWithinMonth()) {
             return DefendantResponseStatus.PAID_IN_FULL_CCJ_CANCELLED;
-        if(respondToClaim != null && respondToClaim.getWhenWasThisAmountPaid() != null && respondent1DQ != null && respondent1DQ.getResponseClaimCourtLocationRequired() != null)
+        }
+        if (respondToClaim != null
+            && respondToClaim.getWhenWasThisAmountPaid() != null
+            && respondent1DQ != null
+            && respondent1DQ.getResponseClaimCourtLocationRequired() != null) {
             return DefendantResponseStatus.PAID_IN_FULL_CCJ_SATISFIED;
-        if(respondent1ClaimResponseType == RespondentResponseType.FULL_ADMISSION &&
-            defenceAdmitPartPaymentTimeRouteRequired == RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY &&
-            respondToClaim.getWhenWasThisAmountPaid() != null)
+        }
+        if (respondent1ClaimResponseType == RespondentResponseType.FULL_ADMISSION
+            && defenceAdmitPartPaymentTimeRouteRequired == RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY
+            && respondToClaim.getWhenWasThisAmountPaid() != null) {
             return DefendantResponseStatus.ELIGIBLE_FOR_CCJ_AFTER_FULL_ADMIT_PAY_IMMEDIATELY_PAST_DEADLINE;
-        if(respondent1TimeExtensionDate != null)
+        }
+        if (respondent1TimeExtensionDate != null) {
             return DefendantResponseStatus.MORE_TIME_REQUESTED;
-        if(ccdState == CaseState.JUDICIAL_REFERRAL)
+        }
+        if (ccdState == CaseState.JUDICIAL_REFERRAL) {
             return DefendantResponseStatus.TRANSFERRED;
-        if(respondent1ClaimResponseType == null)
+        }
+        if (respondent1ClaimResponseType == null) {
             return DefendantResponseStatus.NO_RESPONSE;
+        }
 
         return null;
     }
