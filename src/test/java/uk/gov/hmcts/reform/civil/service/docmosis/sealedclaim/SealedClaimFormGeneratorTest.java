@@ -82,7 +82,7 @@ class SealedClaimFormGeneratorTest {
         when(representativeService.getRespondent1Representative(any())).thenReturn(representative1);
         when(representativeService.getRespondent2Representative(any())).thenReturn(representative2);
         when(representativeService.getApplicantRepresentative(any())).thenReturn(getRepresentative());
-        when(locationRefDataUtil.getPreferredCourtCode(any(), any())).thenReturn("127");
+        when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(false))).thenReturn("127");
     }
 
     @Test

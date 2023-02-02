@@ -41,6 +41,7 @@ import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -365,7 +366,7 @@ class RoboticsDataMapperTest {
     void shouldMapToRoboticsCaseDataWhenPreferredCourtCodeFetchedFromRefData() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
 
-        when(locationRefDataUtil.getPreferredCourtCode(any(), any())).thenReturn("121");
+        when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("121");
 
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
@@ -375,7 +376,7 @@ class RoboticsDataMapperTest {
     @Test
     void shouldReturnEmptyStringWhenPreferredCourtCodeisUnavailableFromLocationRefData() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
-        when(locationRefDataUtil.getPreferredCourtCode(any(), any())).thenReturn("");
+        when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("");
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getHeader().getPreferredCourtCode()).isEqualTo("");

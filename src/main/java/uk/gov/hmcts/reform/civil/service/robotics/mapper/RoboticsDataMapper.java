@@ -96,7 +96,7 @@ public class RoboticsDataMapper {
             .owningCourtCode("390")
             .owningCourtName("CCMCC")
             .caseType("PERSONAL INJURY")
-            .preferredCourtCode(locationRefDataUtil.getPreferredCourtCode(caseData, authToken))
+            .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(caseData, authToken, true))
             .caseAllocatedTo(buildAllocatedTrack(caseData.getAllocatedTrack()))
             .build();
     }
