@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmall;
 import uk.gov.hmcts.reform.civil.model.documents.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentType;
 import uk.gov.hmcts.reform.civil.model.documents.PDF;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -157,10 +159,10 @@ public class SdoGeneratorService {
             sdoDocumentBuilder
                 .disposalOrderWithoutHearing(caseData.getDisposalOrderWithoutHearing())
                 .disposalHearingTime(caseData.getDisposalHearingHearingTime());
-            if (caseData.getDisposalHearingHearingTime().getTime() != null) {
-                sdoDocumentBuilder.disposalHearingTimeEstimate(
-                    caseData.getDisposalHearingHearingTime().getTime().getLabel());
-            }
+            Optional.ofNullable(caseData.getDisposalHearingHearingTime())
+                .map(DisposalHearingHearingTime::getTime)
+                .map(DisposalHearingFinalDisposalHearingTimeEstimate::getLabel)
+                .ifPresent(sdoDocumentBuilder::disposalHearingTimeEstimate);
         }
 
         return sdoDocumentBuilder.build();
