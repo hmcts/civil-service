@@ -1,6 +1,6 @@
 # civil-service
 
-Civil CCD Callback Service. test
+Civil CCD Callback Service.
 
 ### Contents:
 
