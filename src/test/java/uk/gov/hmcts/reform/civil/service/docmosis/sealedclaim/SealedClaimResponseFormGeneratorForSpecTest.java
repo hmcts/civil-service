@@ -10,7 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseFormForSpec;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -70,7 +70,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
                                    RequestedCourt.builder()
                                        .responseCourtCode("121")
                                        .reasonForHearingAtSpecificCourt("test")
-                                       .caseLocation(CaseLocation.builder()
+                                       .caseLocation(CaseLocationCivil.builder()
                                                          .region("2")
                                                          .baseLocation("000000")
                                                          .build())
@@ -126,7 +126,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
                                .respondent2DQRequestedCourt(
                                    RequestedCourt.builder()
                                        .responseCourtCode("121")
-                                       .caseLocation(CaseLocation.builder()
+                                       .caseLocation(CaseLocationCivil.builder()
                                                          .region("2")
                                                          .baseLocation("000000")
                                                          .build())

@@ -2771,7 +2771,7 @@ public class CaseDataBuilder {
                 RequestedCourt.builder()
                     .responseCourtCode("121")
                     .reasonForHearingAtSpecificCourt("test")
-                    .caseLocation(CaseLocation.builder()
+                    .caseLocation(CaseLocationCivil.builder()
                                       .region("2")
                                       .baseLocation("000000")
                                       .build()).build())
