@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.civil.enums.DefendantResponseStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

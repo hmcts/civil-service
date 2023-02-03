@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.enums;
+package uk.gov.hmcts.reform.civil.model.citizenui;
 
 public enum DefendantResponseStatus {
     NO_RESPONSE,

@@ -3,14 +3,11 @@ package uk.gov.hmcts.reform.cmc.model;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.ClaimState;
-import uk.gov.hmcts.reform.civil.enums.ClaimantResponse;
-import uk.gov.hmcts.reform.civil.enums.DefendantResponseStatus;
+import uk.gov.hmcts.reform.civil.model.citizenui.DefendantResponseStatus;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CountyCourtJudgment;
-import uk.gov.hmcts.reform.civil.model.PaymentDeclaration;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-import uk.gov.hmcts.reform.civil.model.Response;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 
 import java.time.LocalDate;

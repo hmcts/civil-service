@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model;
+package uk.gov.hmcts.reform.cmc.model;
 
 import lombok.Getter;
 import uk.gov.hmcts.reform.civil.enums.DefenceType;

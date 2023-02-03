@@ -12,12 +12,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.ClaimantResponse;
-import uk.gov.hmcts.reform.civil.enums.DefendantResponseStatus;
+import uk.gov.hmcts.reform.civil.model.citizenui.DefendantResponseStatus;
 import uk.gov.hmcts.reform.civil.enums.ClaimState;
 import uk.gov.hmcts.reform.civil.enums.DefenceType;
 import uk.gov.hmcts.reform.civil.model.CountyCourtJudgment;
-import uk.gov.hmcts.reform.civil.model.Response;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
