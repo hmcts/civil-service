@@ -330,18 +330,18 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         SubmittedCallbackResponse.SubmittedCallbackResponseBuilder responseBuilder =
             SubmittedCallbackResponse.builder();
 
-            responseBuilder.confirmationBody(
-                    CaseDataToTextGenerator.getTextFor(
-                        confirmationTextGenerators.stream(),
-                        () -> getDefaultConfirmationText(caseData),
-                        caseData
-                    ))
-                .confirmationHeader(
-                    CaseDataToTextGenerator.getTextFor(
-                        confirmationHeaderGenerators.stream(),
-                        () -> getDefaultConfirmationHeader(caseData),
-                        caseData
-                    ));
+        responseBuilder.confirmationBody(
+                CaseDataToTextGenerator.getTextFor(
+                    confirmationTextGenerators.stream(),
+                    () -> getDefaultConfirmationText(caseData),
+                    caseData
+                ))
+            .confirmationHeader(
+                CaseDataToTextGenerator.getTextFor(
+                    confirmationHeaderGenerators.stream(),
+                    () -> getDefaultConfirmationHeader(caseData),
+                    caseData
+                ));
         return responseBuilder.build();
     }
 
@@ -517,6 +517,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             &&  caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
             && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()));
     }
+
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();

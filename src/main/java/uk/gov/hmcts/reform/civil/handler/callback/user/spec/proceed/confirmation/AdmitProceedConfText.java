@@ -39,11 +39,11 @@ public class AdmitProceedConfText implements RespondToResponseConfirmationTextGe
                     + "Any cheques or transfers should be clear in your account."
                     + "<p>You need to tell us if you've settled the claim, for example because the defenrant has paid you.</p>"
                     + "<p>You can settle for less than the full claim amount.</p>"
-                    + "<p><h4>If you haven't been paid.</h4></p>"
+                    + "<p><h3>If you haven't been paid.</h3></p>"
                     + "<p>If the defentand has not paid you, you can request a County Court Judgement"
                     + "by completing the following form and sending it to the email address below.</p>"
                     + "<p><li><a href=\"%s\" target=\"_blank\">N225 </a>- Ask for judgement on a claim for a specified amount of money</li></ul></p>"
-                    + "<p>Email: <a href=\"mailto:OCMCNton@justice.gov.uk\">OCMCNton@justice.gov.uk</a></p>",
+                    + "<p>Email: <a href=\"mailto:contactocmc@justice.gov.uk\">contactocmc@justice.gov.uk</a></p>",
                       formattedWhenBePaid,
                       claimIssueConfiguration.getN225Link()
             ));
