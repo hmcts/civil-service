@@ -29,11 +29,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.model.documents.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_DISPOSAL;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_HNL_DISPOSAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_HNL_FAST;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_HNL;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -78,7 +75,7 @@ public class SdoGeneratorServiceTest {
 
     @Test
     public void sdoSmall() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL_HNL)))
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL)))
             .thenReturn(new DocmosisDocument(SDO_SMALL.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmall, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_SMALL);
@@ -103,8 +100,8 @@ public class SdoGeneratorServiceTest {
 
     @Test
     public void shouldGenerateSdoFastTrackDocument() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_HNL_FAST)))
-            .thenReturn(new DocmosisDocument(SDO_HNL_FAST.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_FAST)))
+            .thenReturn(new DocmosisDocument(SDO_FAST.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameFast, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_FAST);
         when(idamClient.getUserDetails(any()))
@@ -129,8 +126,8 @@ public class SdoGeneratorServiceTest {
 
     @Test
     public void shouldGenerateSdoDisposalDocument() {
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_HNL_DISPOSAL)))
-            .thenReturn(new DocmosisDocument(SDO_HNL_DISPOSAL.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_DISPOSAL)))
+            .thenReturn(new DocmosisDocument(SDO_DISPOSAL.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDisposal, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_DISPOSAL);
         when(idamClient.getUserDetails(any()))

@@ -45,13 +45,13 @@ public class SdoGeneratorService {
         String judgeName = userDetails.getFullName();
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            docmosisTemplate = DocmosisTemplates.SDO_SMALL_HNL;
+            docmosisTemplate = DocmosisTemplates.SDO_SMALL;
             templateData = getTemplateDataSmall(caseData, judgeName);
         } else if (SdoHelper.isFastTrack(caseData)) {
-            docmosisTemplate = DocmosisTemplates.SDO_HNL_FAST;
+            docmosisTemplate = DocmosisTemplates.SDO_FAST;
             templateData = getTemplateDataFast(caseData, judgeName);
         } else {
-            docmosisTemplate = DocmosisTemplates.SDO_HNL_DISPOSAL;
+            docmosisTemplate = DocmosisTemplates.SDO_DISPOSAL;
             templateData = getTemplateDataDisposal(caseData, judgeName);
         }
 
