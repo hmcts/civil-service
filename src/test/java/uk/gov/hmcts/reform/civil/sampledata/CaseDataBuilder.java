@@ -63,7 +63,7 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDisposalHearingDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
@@ -346,7 +346,7 @@ public class CaseDataBuilder {
     private LocalDate hearingDueDate;
     private DisposalHearingJudgesRecitalDJ disposalHearingJudgesRecitalDJ;
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
-    private CaseLocation caseManagementLocation;
+    private CaseLocationCivil caseManagementLocation;
     private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
     private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
 
@@ -621,7 +621,7 @@ public class CaseDataBuilder {
             .respondent1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .respondent1DQRequestedCourt(RequestedCourt.builder()
                                              .responseCourtCode("444")
-                                             .caseLocation(CaseLocation.builder()
+                                             .caseLocation(CaseLocationCivil.builder()
                                                                .baseLocation("dummy base").region("dummy region")
                                                                .build()).build())
             .respondent1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
@@ -652,7 +652,7 @@ public class CaseDataBuilder {
             .respondent1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .respondent1DQRequestedCourt(RequestedCourt.builder()
                                              .responseCourtCode("444")
-                                             .caseLocation(CaseLocation.builder()
+                                             .caseLocation(CaseLocationCivil.builder()
                                                                .baseLocation("dummy base").region("dummy region")
                                                                .build()).build())
             .respondent1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
@@ -684,7 +684,7 @@ public class CaseDataBuilder {
             .respondent2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .respondent2DQRequestedCourt(RequestedCourt.builder()
                                              .responseCourtCode("444")
-                                             .caseLocation(CaseLocation.builder()
+                                             .caseLocation(CaseLocationCivil.builder()
                                                                .baseLocation("dummy base").region("dummy region")
                                                                .build()).build())
             .respondent2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
@@ -715,7 +715,7 @@ public class CaseDataBuilder {
             .respondent2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .respondent2DQRequestedCourt(RequestedCourt.builder()
                                              .responseCourtCode("444")
-                                             .caseLocation(CaseLocation.builder()
+                                             .caseLocation(CaseLocationCivil.builder()
                                                                .baseLocation("dummy base").region("dummy region")
                                                                .build()).build())
             .respondent2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
@@ -903,7 +903,7 @@ public class CaseDataBuilder {
             .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .applicant1DQRequestedCourt(RequestedCourt.builder()
                                             .responseCourtCode("court4")
-                                            .caseLocation(CaseLocation.builder()
+                                            .caseLocation(CaseLocationCivil.builder()
                                                               .baseLocation("dummy base").region("dummy region")
                                                               .build()).build())
             .applicant1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
@@ -933,7 +933,7 @@ public class CaseDataBuilder {
             .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .applicant1DQRequestedCourt(RequestedCourt.builder()
                                             .responseCourtCode("court4")
-                                            .caseLocation(CaseLocation.builder()
+                                            .caseLocation(CaseLocationCivil.builder()
                                                               .baseLocation("dummy base").region("dummy region")
                                                               .build()).build())
             .applicant1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
@@ -964,7 +964,7 @@ public class CaseDataBuilder {
             .applicant2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
             .applicant2DQRequestedCourt(RequestedCourt.builder()
                                             .responseCourtCode("court4")
-                                            .caseLocation(CaseLocation.builder()
+                                            .caseLocation(CaseLocationCivil.builder()
                                                               .baseLocation("dummy base").region("dummy region")
                                                               .build()).build())
             .applicant2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
@@ -1738,7 +1738,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder courtLocation() {
         this.courtLocation = CourtLocation.builder()
             .applicantPreferredCourt("127")
-            .caseLocation(CaseLocation.builder()
+            .caseLocation(CaseLocationCivil.builder()
                               .region("2")
                               .baseLocation("000000")
                               .build())
@@ -1754,7 +1754,7 @@ public class CaseDataBuilder {
         courtLocation = CourtLocation.builder()
             .applicantPreferredCourtLocationList(
                 DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
-            .caseLocation(CaseLocation.builder()
+            .caseLocation(CaseLocationCivil.builder()
                               .region("10")
                               .baseLocation("214320")
                               .build())
@@ -2082,7 +2082,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssuedCaseManagementLocationInPerson() {
-        caseManagementLocation = CaseLocation.builder().baseLocation("0123").region("0321").build();
+        caseManagementLocation = CaseLocationCivil.builder().baseLocation("0123").region("0321").build();
         return this;
     }
 
