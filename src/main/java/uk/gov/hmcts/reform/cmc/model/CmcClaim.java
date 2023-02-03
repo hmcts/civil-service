@@ -12,8 +12,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.model.citizenui.DefendantResponseStatus;
-import uk.gov.hmcts.reform.civil.enums.ClaimState;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatus;
 import uk.gov.hmcts.reform.civil.enums.DefenceType;
 import uk.gov.hmcts.reform.civil.model.CountyCourtJudgment;
 
@@ -54,7 +53,7 @@ public class CmcClaim {
     public LocalDateTime reDeterminationRequestedAt;
     public ClaimState state;
 
-    private DefendantResponseStatus status;
+    private DashboardClaimStatus status;
 
     public String getClaimantName() {
         return claimData.getClaimantName();
@@ -64,36 +63,36 @@ public class CmcClaim {
         return claimData.getDefendantName();
     }
 
-    public DefendantResponseStatus getDefendantResponseStatus() {
+    public DashboardClaimStatus getDefendantResponseStatus() {
         if (isEligibleForCCJ()) {
-            return DefendantResponseStatus.ELIGIBLE_FOR_CCJ;
+            return DashboardClaimStatus.ELIGIBLE_FOR_CCJ;
         }
         if (hasClaimantRespondedStatesPaid()) {
-            return DefendantResponseStatus.CLAIMANT_ACCEPTED_STATES_PAID;
+            return DashboardClaimStatus.CLAIMANT_ACCEPTED_STATES_PAID;
         }
         if (claimantResponse != null && countyCourtJudgmentRequestedAt != null) {
-            return DefendantResponseStatus.REDETERMINATION_BY_JUDGE;
+            return DashboardClaimStatus.REQUESTED_COUNTRY_COURT_JUDGEMENT;
         }
         if (moneyReceivedOn != null && countyCourtJudgmentRequestedAt != null && isCCJPaidWithinMonth()) {
-            return DefendantResponseStatus.PAID_IN_FULL_CCJ_CANCELLED;
+            return DashboardClaimStatus.PAID_IN_FULL_CCJ_CANCELLED;
         }
         if (moneyReceivedOn != null && countyCourtJudgmentRequestedAt != null) {
-            return DefendantResponseStatus.PAID_IN_FULL_CCJ_SATISFIED;
+            return DashboardClaimStatus.PAID_IN_FULL_CCJ_SATISFIED;
         }
         if (moneyReceivedOn != null) {
-            return DefendantResponseStatus.PAID_IN_FULL;
+            return DashboardClaimStatus.PAID_IN_FULL;
         }
         if (admissionPayImmediatelyPastPaymentDate != null && claimantResponse == null) {
-            return DefendantResponseStatus.ELIGIBLE_FOR_CCJ_AFTER_FULL_ADMIT_PAY_IMMEDIATELY_PAST_DEADLINE;
+            return DashboardClaimStatus.ELIGIBLE_FOR_CCJ_AFTER_FULL_ADMIT_PAY_IMMEDIATELY_PAST_DEADLINE;
         }
         if (moreTimeRequested) {
-            return DefendantResponseStatus.MORE_TIME_REQUESTED;
+            return DashboardClaimStatus.MORE_TIME_REQUESTED;
         }
         if (state == ClaimState.TRANSFERRED) {
-            return DefendantResponseStatus.TRANSFERRED;
+            return DashboardClaimStatus.TRANSFERRED;
         }
         if  (response == null) {
-            return DefendantResponseStatus.NO_RESPONSE;
+            return DashboardClaimStatus.NO_RESPONSE;
         }
 
         return null;

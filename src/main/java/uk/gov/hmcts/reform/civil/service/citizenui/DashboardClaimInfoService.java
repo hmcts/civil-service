@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CcdClaimStatusDashboardBuilder;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -58,7 +59,8 @@ public class DashboardClaimInfoService {
             .claimantName(caseData.getApplicant1().getPartyName())
             .defendantName(caseData.getRespondent1().getPartyName())
             .claimAmount(caseData.getTotalClaimAmount())
-            .defendantResponseStatus(caseData.getDefendantResponseStatus())
+            .dashboardClaimStatus(new CcdClaimStatusDashboardBuilder()
+                                         .buildDashboardClaimStatus(caseData))
             .build();
         if (caseData.getRespondent1ResponseDeadline() != null) {
             item.setResponseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate());

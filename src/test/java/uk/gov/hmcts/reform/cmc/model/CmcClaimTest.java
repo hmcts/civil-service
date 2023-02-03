@@ -2,8 +2,7 @@ package uk.gov.hmcts.reform.cmc.model;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.civil.enums.ClaimState;
-import uk.gov.hmcts.reform.civil.model.citizenui.DefendantResponseStatus;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatus;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CountyCourtJudgment;
@@ -66,9 +65,9 @@ public class CmcClaimTest {
             .response(null)
             .build();
 
-        DefendantResponseStatus status = cmcClaim.getDefendantResponseStatus();
+        DashboardClaimStatus status = cmcClaim.getDefendantResponseStatus();
 
-        Assertions.assertEquals(status, DefendantResponseStatus.NO_RESPONSE);
+        Assertions.assertEquals(status, DashboardClaimStatus.NO_RESPONSE);
     }
 
     @Test
@@ -80,9 +79,9 @@ public class CmcClaimTest {
             .ccj(ccj)
             .build();
 
-        DefendantResponseStatus status = cmcClaim.getDefendantResponseStatus();
+        DashboardClaimStatus status = cmcClaim.getDefendantResponseStatus();
 
-        Assertions.assertEquals(status, DefendantResponseStatus.ELIGIBLE_FOR_CCJ);
+        Assertions.assertEquals(status, DashboardClaimStatus.ELIGIBLE_FOR_CCJ);
     }
 
     @Test
@@ -95,9 +94,9 @@ public class CmcClaimTest {
             .response(response)
             .build();
 
-        DefendantResponseStatus status = cmcClaim.getDefendantResponseStatus();
+        DashboardClaimStatus status = cmcClaim.getDefendantResponseStatus();
 
-        Assertions.assertEquals(status, DefendantResponseStatus.CLAIMANT_ACCEPTED_STATES_PAID);
+        Assertions.assertEquals(status, DashboardClaimStatus.CLAIMANT_ACCEPTED_STATES_PAID);
     }
 
     @Test
@@ -109,9 +108,9 @@ public class CmcClaimTest {
             .countyCourtJudgmentRequestedAt(LocalDateTime.of(2022, 3, 22, 10, 30))
             .build();
 
-        DefendantResponseStatus status = cmcClaim.getDefendantResponseStatus();
+        DashboardClaimStatus status = cmcClaim.getDefendantResponseStatus();
 
-        Assertions.assertEquals(status, DefendantResponseStatus.REDETERMINATION_BY_JUDGE);
+        Assertions.assertEquals(status, DashboardClaimStatus.REQUESTED_COUNTRY_COURT_JUDGEMENT);
     }
 
     @Test
@@ -121,9 +120,9 @@ public class CmcClaimTest {
             .countyCourtJudgmentRequestedAt(LocalDateTime.of(2022, 3, 20, 10, 30))
             .build();
 
-        DefendantResponseStatus status = cmcClaim.getDefendantResponseStatus();
+        DashboardClaimStatus status = cmcClaim.getDefendantResponseStatus();
 
-        Assertions.assertEquals(status, DefendantResponseStatus.PAID_IN_FULL_CCJ_CANCELLED);
+        Assertions.assertEquals(status, DashboardClaimStatus.PAID_IN_FULL_CCJ_CANCELLED);
     }
 
     @Test
@@ -133,9 +132,9 @@ public class CmcClaimTest {
             .countyCourtJudgmentRequestedAt(LocalDateTime.of(2022, 3, 20, 10, 30))
             .build();
 
-        DefendantResponseStatus status = cmcClaim.getDefendantResponseStatus();
+        DashboardClaimStatus status = cmcClaim.getDefendantResponseStatus();
 
-        Assertions.assertEquals(status, DefendantResponseStatus.PAID_IN_FULL_CCJ_SATISFIED);
+        Assertions.assertEquals(status, DashboardClaimStatus.PAID_IN_FULL_CCJ_SATISFIED);
     }
 
     @Test
@@ -145,9 +144,9 @@ public class CmcClaimTest {
             .claimantResponse(null)
             .build();
 
-        DefendantResponseStatus status = caseData.getDefendantResponseStatus();
+        DashboardClaimStatus status = caseData.getDefendantResponseStatus();
 
-        Assertions.assertEquals(status, DefendantResponseStatus.ELIGIBLE_FOR_CCJ_AFTER_FULL_ADMIT_PAY_IMMEDIATELY_PAST_DEADLINE);
+        Assertions.assertEquals(status, DashboardClaimStatus.ELIGIBLE_FOR_CCJ_AFTER_FULL_ADMIT_PAY_IMMEDIATELY_PAST_DEADLINE);
     }
 
     @Test
@@ -156,9 +155,9 @@ public class CmcClaimTest {
             .moreTimeRequested(true)
             .build();
 
-        DefendantResponseStatus status = caseData.getDefendantResponseStatus();
+        DashboardClaimStatus status = caseData.getDefendantResponseStatus();
 
-        Assertions.assertEquals(status, DefendantResponseStatus.MORE_TIME_REQUESTED);
+        Assertions.assertEquals(status, DashboardClaimStatus.MORE_TIME_REQUESTED);
     }
 
     @Test
@@ -167,8 +166,8 @@ public class CmcClaimTest {
             .state(ClaimState.TRANSFERRED)
             .build();
 
-        DefendantResponseStatus status = caseData.getDefendantResponseStatus();
+        DashboardClaimStatus status = caseData.getDefendantResponseStatus();
 
-        Assertions.assertEquals(status, DefendantResponseStatus.TRANSFERRED);
+        Assertions.assertEquals(status, DashboardClaimStatus.TRANSFERRED);
     }
 }

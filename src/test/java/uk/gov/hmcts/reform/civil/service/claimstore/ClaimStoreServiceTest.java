@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.model.citizenui.DefendantResponseStatus;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatus;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
 import uk.gov.hmcts.reform.cmc.model.ClaimData;
@@ -48,8 +48,8 @@ public class ClaimStoreServiceTest {
                                                                                             .responseDeadline(
                                                                                                 RESPONSE_DEADLINE)
                                                                                             .ocmc(true)
-                                                                                            .defendantResponseStatus(
-                                                                                                DefendantResponseStatus.NO_RESPONSE)
+                                                                                            .dashboardClaimStatus(
+                                                                                                DashboardClaimStatus.NO_RESPONSE)
                                                                                             .build());
 
     @BeforeEach

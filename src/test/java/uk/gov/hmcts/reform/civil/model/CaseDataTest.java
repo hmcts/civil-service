@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.model;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.model.citizenui.DefendantResponseStatus;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatus;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
@@ -37,9 +37,9 @@ public class CaseDataTest {
             .respondent1ClaimResponseType(null)
             .build();
 
-        DefendantResponseStatus status = caseData.getDefendantResponseStatus();
+        DashboardClaimStatus status = caseData.getDefendantResponseStatus();
 
-        Assertions.assertEquals(status, DefendantResponseStatus.NO_RESPONSE);
+        Assertions.assertEquals(status, DashboardClaimStatus.NO_RESPONSE);
     }
 
     @Test
@@ -48,9 +48,9 @@ public class CaseDataTest {
             .builder()
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE).build();
 
-        DefendantResponseStatus status = caseData.getDefendantResponseStatus();
+        DashboardClaimStatus status = caseData.getDefendantResponseStatus();
 
-        Assertions.assertEquals(status, DefendantResponseStatus.ELIGIBLE_FOR_CCJ);
+        Assertions.assertEquals(status, DashboardClaimStatus.ELIGIBLE_FOR_CCJ);
     }
 
     @Test
@@ -62,9 +62,9 @@ public class CaseDataTest {
             .respondent1DQ(respondent1DQ)
             .build();
 
-        DefendantResponseStatus status = caseData.getDefendantResponseStatus();
+        DashboardClaimStatus status = caseData.getDefendantResponseStatus();
 
-        Assertions.assertEquals(status, DefendantResponseStatus.CLAIMANT_ACCEPTED_STATES_PAID);
+        Assertions.assertEquals(status, DashboardClaimStatus.CLAIMANT_ACCEPTED_STATES_PAID);
     }
 
     @Test
@@ -76,9 +76,9 @@ public class CaseDataTest {
             .respondent1DQ(respondent1DQ)
             .build();
 
-        DefendantResponseStatus status = caseData.getDefendantResponseStatus();
+        DashboardClaimStatus status = caseData.getDefendantResponseStatus();
 
-        Assertions.assertEquals(status, DefendantResponseStatus.REDETERMINATION_BY_JUDGE);
+        Assertions.assertEquals(status, DashboardClaimStatus.REQUESTED_COUNTRY_COURT_JUDGEMENT);
     }
 
     @Test
@@ -95,9 +95,9 @@ public class CaseDataTest {
             .hearingDate(LocalDate.of(2022, 11, 22))
             .build();
 
-        DefendantResponseStatus status = caseData.getDefendantResponseStatus();
+        DashboardClaimStatus status = caseData.getDefendantResponseStatus();
 
-        Assertions.assertEquals(status, DefendantResponseStatus.PAID_IN_FULL_CCJ_CANCELLED);
+        Assertions.assertEquals(status, DashboardClaimStatus.PAID_IN_FULL_CCJ_CANCELLED);
     }
 
     @Test
@@ -114,9 +114,9 @@ public class CaseDataTest {
             .hearingDate(LocalDate.of(2022, 9, 22))
             .build();
 
-        DefendantResponseStatus status = caseData.getDefendantResponseStatus();
+        DashboardClaimStatus status = caseData.getDefendantResponseStatus();
 
-        Assertions.assertEquals(status, DefendantResponseStatus.PAID_IN_FULL_CCJ_SATISFIED);
+        Assertions.assertEquals(status, DashboardClaimStatus.PAID_IN_FULL_CCJ_SATISFIED);
     }
 
     @Test
@@ -131,9 +131,9 @@ public class CaseDataTest {
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .build();
 
-        DefendantResponseStatus status = caseData.getDefendantResponseStatus();
+        DashboardClaimStatus status = caseData.getDefendantResponseStatus();
 
-        Assertions.assertEquals(status, DefendantResponseStatus.ELIGIBLE_FOR_CCJ_AFTER_FULL_ADMIT_PAY_IMMEDIATELY_PAST_DEADLINE);
+        Assertions.assertEquals(status, DashboardClaimStatus.ELIGIBLE_FOR_CCJ_AFTER_FULL_ADMIT_PAY_IMMEDIATELY_PAST_DEADLINE);
     }
 
     @Test
@@ -142,9 +142,9 @@ public class CaseDataTest {
             .respondent1TimeExtensionDate(LocalDateTime.of(2023, 11, 20, 11, 11))
             .build();
 
-        DefendantResponseStatus status = caseData.getDefendantResponseStatus();
+        DashboardClaimStatus status = caseData.getDefendantResponseStatus();
 
-        Assertions.assertEquals(status, DefendantResponseStatus.MORE_TIME_REQUESTED);
+        Assertions.assertEquals(status, DashboardClaimStatus.MORE_TIME_REQUESTED);
     }
 
     @Test
@@ -153,8 +153,8 @@ public class CaseDataTest {
             .ccdState(CaseState.JUDICIAL_REFERRAL)
             .build();
 
-        DefendantResponseStatus status = caseData.getDefendantResponseStatus();
+        DashboardClaimStatus status = caseData.getDefendantResponseStatus();
 
-        Assertions.assertEquals(status, DefendantResponseStatus.TRANSFERRED);
+        Assertions.assertEquals(status, DashboardClaimStatus.TRANSFERRED);
     }
 }
