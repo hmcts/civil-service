@@ -6,6 +6,8 @@ import lombok.Data;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 
+import java.time.LocalDateTime;
+
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 
@@ -17,9 +19,11 @@ public class BusinessProcess {
     private BusinessProcessStatus status;
     private String activityId;
     private String camundaEvent;
+    private LocalDateTime createdOn;
 
     public static BusinessProcess ready(CaseEvent caseEvent) {
-        return BusinessProcess.builder().status(READY).camundaEvent(caseEvent.name()).build();
+        return BusinessProcess.builder().status(READY).camundaEvent(caseEvent.name()).createdOn(LocalDateTime.now())
+            .build();
     }
 
     @JsonIgnore
