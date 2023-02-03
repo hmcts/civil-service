@@ -74,11 +74,6 @@ public class FeatureToggleService {
         return false;
     }
 
-
-    public boolean isHearingAndListingLegalRepEnabled() {
-        return true;
-    }
-
     public boolean isCourtLocationDynamicListEnabled() {
         return true;
     }
