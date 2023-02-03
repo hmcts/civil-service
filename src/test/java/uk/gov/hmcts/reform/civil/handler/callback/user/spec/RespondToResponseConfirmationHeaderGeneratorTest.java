@@ -9,8 +9,12 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendNotProceedConfHeader;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmation.DefendProceedConfHeader;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 
+import java.time.LocalDate;
 import java.util.List;
+
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 
 public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDataToTextGeneratorTest
     .CaseDataToTextGeneratorIntentionConfig<RespondToResponseConfirmationHeaderGenerator> {
@@ -25,6 +29,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
         Class<? extends RespondToResponseConfirmationHeaderGenerator>>>
         getCasesToExpectedImplementation() {
         return List.of(
+            Pair.of(buildFullAdmitPayImmediatelyProceedCaseData(), AdmitProceedConfHeader.class),
             Pair.of(buildFullAdmitProceedCaseData(), AdmitProceedConfHeader.class),
             Pair.of(buildFullAdmitNotProceedCaseData(), AdmitNotProceedConfHeader.class),
             Pair.of(buildPartAdmitProceedCaseData(), AdmitProceedConfHeader.class),
@@ -58,6 +63,18 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
             .legacyCaseReference("claimNumber")
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .build();
+    }
+
+    public static CaseData buildFullAdmitPayImmediatelyProceedCaseData() {
+        return CaseData.builder()
+            .superClaimType(SuperClaimType.SPEC_CLAIM)
+            .legacyCaseReference("claimNumber")
+            .applicant1ProceedWithClaim(YesOrNo.YES)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                               .whenWillThisAmountBePaid(LocalDate.now()).build())
             .build();
     }
 

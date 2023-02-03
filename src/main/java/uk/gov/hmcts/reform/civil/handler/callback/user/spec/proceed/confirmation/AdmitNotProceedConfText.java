@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmatio
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
@@ -20,8 +19,6 @@ public class AdmitNotProceedConfText implements RespondToResponseConfirmationTex
         RespondentResponseTypeSpec.FULL_ADMISSION,
         RespondentResponseTypeSpec.PART_ADMISSION
     );
-
-    private final ClaimIssueConfiguration claimIssueConfiguration;
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {

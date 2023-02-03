@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResp
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildFullDefenceProceedCaseData;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildPartAdmitNotProceedCaseData;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildPartAdmitProceedCaseData;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGeneratorTest.buildFullAdmitPayImmediatelyProceedCaseData;
 
 public class RespondToResponseConfirmationTextGeneratorTest implements CaseDataToTextGeneratorTest
     .CaseDataToTextGeneratorIntentionConfig<RespondToResponseConfirmationTextGenerator> {
@@ -29,6 +30,7 @@ public class RespondToResponseConfirmationTextGeneratorTest implements CaseDataT
         Class<? extends RespondToResponseConfirmationTextGenerator>>>
         getCasesToExpectedImplementation() {
         return List.of(
+            Pair.of(buildFullAdmitPayImmediatelyProceedCaseData(), AdmitProceedConfText.class),
             Pair.of(buildFullAdmitProceedCaseData(), AdmitProceedConfText.class),
             Pair.of(buildFullAdmitNotProceedCaseData(), AdmitNotProceedConfText.class),
             Pair.of(buildPartAdmitProceedCaseData(), AdmitProceedConfText.class),

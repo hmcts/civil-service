@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.spec.proceed.confirmatio
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
@@ -27,8 +26,6 @@ public class AdmitProceedConfText implements RespondToResponseConfirmationTextGe
         RespondentResponseTypeSpec.PART_ADMISSION
     );
 
-    private final ClaimIssueConfiguration claimIssueConfiguration;
-
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
         if (isdefendatFullAdmitPayImmidietely(caseData)) {
@@ -45,7 +42,7 @@ public class AdmitProceedConfText implements RespondToResponseConfirmationTextGe
                     + "<p><li><a href=\"%s\" target=\"_blank\">N225 </a>- Ask for judgement on a claim for a specified amount of money</li></ul></p>"
                     + "<p>Email: <a href=\"mailto:contactocmc@justice.gov.uk\">contactocmc@justice.gov.uk</a></p>",
                       formattedWhenBePaid,
-                      claimIssueConfiguration.getN225Link()
+                      "https://formfinder.hmctsformfinder.justice.gov.uk/n225-eng.pdf"
             ));
         } else if (YesOrNo.NO.equals(caseData.getApplicant1ProceedsWithClaimSpec())
             || !ADMISSION.contains(caseData.getRespondent1ClaimResponseTypeForSpec())) {
