@@ -76,7 +76,7 @@ public class CmcClaimTest {
         ccj.paymentDetails = new PaymentDetails();
         CmcClaim cmcClaim = CmcClaim
             .builder()
-            .ccj(ccj)
+            .countyCourtJudgment(ccj)
             .build();
 
         DashboardClaimStatus status = cmcClaim.getDefendantResponseStatus();

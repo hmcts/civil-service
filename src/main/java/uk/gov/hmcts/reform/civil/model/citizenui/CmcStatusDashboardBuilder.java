@@ -6,56 +6,56 @@ public class CmcStatusDashboardBuilder extends DashboardClaimStatusBuilder<CmcCl
 
     @Override
     public boolean hasResponsePending(CmcClaim claim) {
-        return false;
+        return claim.isResponseDeadlineOnTime();
     }
 
     @Override
     public boolean hasResponsePendingOverdue(CmcClaim claim) {
-        return false;
+        return claim.hasResponseDeadlinePassed();
     }
 
     @Override
     public boolean hasResponseDueToday(CmcClaim claim) {
-        return false;
+        return claim.isResponseDeadlineToday();
     }
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayImmediately(CmcClaim claim) {
-        return false;
+        return claim.responseIsFullAdmitAndPayImmediately();
     }
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayBySetDate(CmcClaim claim) {
-        return false;
+        return claim.responseIsFullAdmitAndPayBySetDate();
     }
 
     @Override
     public boolean defendantRespondedWithFullAdmitAndPayByInstallments(CmcClaim claim) {
-        return false;
+        return claim.responseIsFullAdmitAndPayByInstallments();
     }
 
     @Override
     public boolean responseDeadlineHasBeenExtended(CmcClaim claim) {
-        return false;
+        return claim.isMoreTimeRequested();
     }
 
     @Override
     public boolean isEligibleForCCJ(CmcClaim claim) {
-        return false;
+        return claim.isEligibleForCCJ();
     }
 
     @Override
     public boolean claimantConfirmedDefendantPaid(CmcClaim claim) {
-        return false;
+        return claim.claimantAcceptedDefendantResponse();
     }
 
     @Override
     public boolean isSentToCourt(CmcClaim claim) {
-        return false;
+        return claim.isTransferred();
     }
 
     @Override
     public boolean claimantRequestedCountyCourtJudgement(CmcClaim claim) {
-        return false;
+        return claim.getClaimantResponse() != null && claim.getCountyCourtJudgmentRequestedAt() != null;
     }
 }
