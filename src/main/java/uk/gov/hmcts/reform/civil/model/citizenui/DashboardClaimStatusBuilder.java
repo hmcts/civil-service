@@ -1,4 +1,5 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -6,13 +7,13 @@ public abstract class DashboardClaimStatusBuilder<T> {
 
     public DashboardClaimStatus buildDashboardClaimStatus(T claim) {
         Optional<DashboardClaimStatusMatcher> statusMatched = getDashboardStatusMatches(claim).stream()
-          .filter(dashboardClaimStatusMatcher -> dashboardClaimStatusMatcher.isMatched())
-          .findFirst();
+            .filter(dashboardClaimStatusMatcher -> dashboardClaimStatusMatcher.isMatched())
+            .findFirst();
         return statusMatched.map(matcher -> matcher.getStatus())
             .orElse(DashboardClaimStatus.NO_STATUS);
     }
 
-    private List<DashboardClaimStatusMatcher> getDashboardStatusMatches(T claim){
+    private List<DashboardClaimStatusMatcher> getDashboardStatusMatches(T claim) {
         return List.of(
             new DashboardClaimStatusMatcher(
                 DashboardClaimStatus.MORE_TIME_REQUESTED,
@@ -25,16 +26,24 @@ public abstract class DashboardClaimStatusBuilder<T> {
                 DashboardClaimStatus.ADMIT_PAY_IMMEDIATELY,
                 defendantRespondedWithFullAdmitAndPayImmediately(claim)
             ),
-            new DashboardClaimStatusMatcher(DashboardClaimStatus.ADMIT_PAY_BY_SET_DATE,
-                                            defendantRespondedWithFullAdmitAndPayBySetDate(claim)),
-            new DashboardClaimStatusMatcher(DashboardClaimStatus.ADMIT_PAY_INSTALLMENTS,
-                                            defendantRespondedWithFullAdmitAndPayByInstallments(claim)),
-            new DashboardClaimStatusMatcher(DashboardClaimStatus.CLAIMANT_ACCEPTED_STATES_PAID,
-                                            claimantConfirmedDefendantPaid(claim)),
+            new DashboardClaimStatusMatcher(
+                DashboardClaimStatus.ADMIT_PAY_BY_SET_DATE,
+                defendantRespondedWithFullAdmitAndPayBySetDate(claim)
+            ),
+            new DashboardClaimStatusMatcher(
+                DashboardClaimStatus.ADMIT_PAY_INSTALLMENTS,
+                defendantRespondedWithFullAdmitAndPayByInstallments(claim)
+            ),
+            new DashboardClaimStatusMatcher(
+                DashboardClaimStatus.CLAIMANT_ACCEPTED_STATES_PAID,
+                claimantConfirmedDefendantPaid(claim)
+            ),
             new DashboardClaimStatusMatcher(DashboardClaimStatus.ELIGIBLE_FOR_CCJ, isEligibleForCCJ(claim)),
             new DashboardClaimStatusMatcher(DashboardClaimStatus.TRANSFERRED, isSentToCourt(claim)),
-            new DashboardClaimStatusMatcher(DashboardClaimStatus.REQUESTED_COUNTRY_COURT_JUDGEMENT,
-                                            claimantRequestedCountyCourtJudgement(claim))
+            new DashboardClaimStatusMatcher(
+                DashboardClaimStatus.REQUESTED_COUNTRY_COURT_JUDGEMENT,
+                claimantRequestedCountyCourtJudgement(claim)
+            )
         );
     }
 
