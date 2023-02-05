@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @Builder(toBuilder = true)
@@ -19,8 +22,8 @@ public class BundleDetails {
     private String stitchingFailureMessage;
     private String fileName;
 
-    private String createdOn;
-    private String bundleHearingDate;
+    private LocalDateTime createdOn;
+    private LocalDate bundleHearingDate;
 
     @JsonCreator
     public BundleDetails(@JsonProperty("id") String id,
@@ -30,8 +33,8 @@ public class BundleDetails {
                          @JsonProperty("stitchedDocument") DocumentLink stitchedDocument,
                          @JsonProperty("stitchingFailureMessage") String stitchingFailureMessage,
                          @JsonProperty("fileName") String fileName,
-                         @JsonProperty("createdOn") String createdOn,
-                         @JsonProperty("bundleHearingDate") String bundleHearingDate) {
+                         @JsonProperty("createdOn") LocalDateTime createdOn,
+                         @JsonProperty("bundleHearingDate") LocalDate bundleHearingDate) {
         this.id = id;
         this.title = title;
         this.description = description;

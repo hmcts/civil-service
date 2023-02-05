@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,7 +64,7 @@ public class BundleCreationTriggerEventHandlerTest {
     public void setup() {
         List<Bundle> bundleList = new ArrayList<>();
         bundleList.add(Bundle.builder().value(BundleDetails.builder().stitchedDocument(DocumentLink.builder().build())
-                                                  .stitchStatus("New").createdOn("2023-01-01").build()).build());
+                                                  .stitchStatus("New").createdOn(LocalDateTime.now()).build()).build());
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
         witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
                                                          .builder()

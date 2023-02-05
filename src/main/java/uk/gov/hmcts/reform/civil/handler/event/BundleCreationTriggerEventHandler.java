@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +18,7 @@ import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +38,7 @@ public class BundleCreationTriggerEventHandler {
     @EventListener
     public void sendBundleCreationTrigger(BundleCreationTriggerEvent event) throws Exception {
         BundleCreateResponse bundleCreateResponse  = bundleCreationService.createBundle(event);
-        log.info("bundle response : " + new ObjectMapper().writeValueAsString(bundleCreateResponse));
+        log.info("bundle response : " + new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(bundleCreateResponse));
         if (null != bundleCreateResponse && null != bundleCreateResponse.getData() && null != bundleCreateResponse.getData().getCaseBundles()) {
 
             String caseId = event.getCaseId().toString();
@@ -47,8 +46,8 @@ public class BundleCreationTriggerEventHandler {
             CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails().getData());
             moveExistingCaseBundlesToHistoricalBundles(caseData);
             bundleCreateResponse.getData().getCaseBundles().forEach(bundle -> {
-                bundle.getValue().setCreatedOn(DateTimeFormatter.ISO_OFFSET_DATE_TIME
-                                                   .format(ZonedDateTime.now(ZoneId.of("Europe/London"))).toString());
+                bundle.getValue().setCreatedOn(LocalDateTime.now());
+                bundle.getValue().setBundleHearingDate(caseData.getHearingDate());
             });
             caseData.setCaseBundlesInfo(bundleCreateResponse.getData().getCaseBundles());
             CaseDataContent caseContent = getCaseContent(caseData, startEventResponse);
