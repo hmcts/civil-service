@@ -1,33 +1,41 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
+import java.util.List;
+import java.util.Optional;
 
 public abstract class DashboardClaimStatusBuilder<T> {
 
     public DashboardClaimStatus buildDashboardClaimStatus(T claim) {
-        DashboardClaimStatus status = null;
-        if (hasResponsePending(claim)) {
-            status = DashboardClaimStatus.NO_RESPONSE;
-        } else if (hasResponsePendingOverdue(claim)) {
-            status = DashboardClaimStatus.RESPONSE_OVERDUE;
-        } else if (hasResponseDueToday(claim)) {
-            status = DashboardClaimStatus.RESPONSE_DUE_NOW;
-        } else if (defendantRespondedWithFullAdmitAndPayImmediately(claim)) {
-            status = DashboardClaimStatus.ADMIT_PAY_IMMEDIATELY;
-        } else if (defendantRespondedWithFullAdmitAndPayBySetDate(claim)) {
-            status = DashboardClaimStatus.ADMIT_PAY_BY_SET_DATE;
-        } else if (defendantRespondedWithFullAdmitAndPayByInstallments(claim)) {
-            status = DashboardClaimStatus.ADMIT_PAY_INSTALLMENTS;
-        } else if (responseDeadlineHasBeenExtended(claim)) {
-            status = DashboardClaimStatus.MORE_TIME_REQUESTED;
-        } else if (isEligibleForCCJ(claim)) {
-            status = DashboardClaimStatus.ELIGIBLE_FOR_CCJ;
-        } else if (claimantConfirmedDefendantPaid(claim)) {
-            status = DashboardClaimStatus.CLAIMANT_ACCEPTED_STATES_PAID;
-        } else if (isSentToCourt(claim)) {
-            status = DashboardClaimStatus.TRANSFERRED;
-        } else if (claimantRequestedCountyCourtJudgement(claim)) {
-            status = DashboardClaimStatus.REQUESTED_COUNTRY_COURT_JUDGEMENT;
-        }
-        return status;
+        Optional<DashboardClaimStatusMatcher> statusMatched = getDashboardStatusMatches(claim).stream()
+          .filter(dashboardClaimStatusMatcher -> dashboardClaimStatusMatcher.isMatched())
+          .findFirst();
+        return statusMatched.map(matcher -> matcher.getStatus())
+            .orElse(DashboardClaimStatus.NO_STATUS);
+    }
+
+    private List<DashboardClaimStatusMatcher> getDashboardStatusMatches(T claim){
+        return List.of(
+            new DashboardClaimStatusMatcher(
+                DashboardClaimStatus.MORE_TIME_REQUESTED,
+                responseDeadlineHasBeenExtended(claim)
+            ),
+            new DashboardClaimStatusMatcher(DashboardClaimStatus.RESPONSE_OVERDUE, hasResponsePendingOverdue(claim)),
+            new DashboardClaimStatusMatcher(DashboardClaimStatus.RESPONSE_DUE_NOW, hasResponseDueToday(claim)),
+            new DashboardClaimStatusMatcher(DashboardClaimStatus.NO_RESPONSE, hasResponsePending(claim)),
+            new DashboardClaimStatusMatcher(
+                DashboardClaimStatus.ADMIT_PAY_IMMEDIATELY,
+                defendantRespondedWithFullAdmitAndPayImmediately(claim)
+            ),
+            new DashboardClaimStatusMatcher(DashboardClaimStatus.ADMIT_PAY_BY_SET_DATE,
+                                            defendantRespondedWithFullAdmitAndPayBySetDate(claim)),
+            new DashboardClaimStatusMatcher(DashboardClaimStatus.ADMIT_PAY_INSTALLMENTS,
+                                            defendantRespondedWithFullAdmitAndPayByInstallments(claim)),
+            new DashboardClaimStatusMatcher(DashboardClaimStatus.CLAIMANT_ACCEPTED_STATES_PAID,
+                                            claimantConfirmedDefendantPaid(claim)),
+            new DashboardClaimStatusMatcher(DashboardClaimStatus.ELIGIBLE_FOR_CCJ, isEligibleForCCJ(claim)),
+            new DashboardClaimStatusMatcher(DashboardClaimStatus.TRANSFERRED, isSentToCourt(claim)),
+            new DashboardClaimStatusMatcher(DashboardClaimStatus.REQUESTED_COUNTRY_COURT_JUDGEMENT,
+                                            claimantRequestedCountyCourtJudgement(claim))
+        );
     }
 
     public abstract boolean hasResponsePending(T claim);

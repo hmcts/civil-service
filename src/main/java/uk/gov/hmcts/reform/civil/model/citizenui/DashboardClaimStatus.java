@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 public enum DashboardClaimStatus {
+    NO_STATUS,
     NO_RESPONSE,
     RESPONSE_OVERDUE,
     RESPONSE_DUE_NOW,
