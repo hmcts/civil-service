@@ -1008,9 +1008,9 @@ public class EventHistoryMapper {
                 .collect(Collectors.toList());
             builder.directionsQuestionnaireFiled(dqForProceedingApplicantsSpec);
         } else {
-            String preferredCourtCode = locationRefDataUtil.getPreferredCourtCode(
+            String preferredCourtCode = locationRefDataUtil.getPreferredCourtData(
                 caseData,
-                CallbackParams.Params.BEARER_TOKEN.toString()
+                CallbackParams.Params.BEARER_TOKEN.toString(), true
             );
 
             List<Event> dqForProceedingApplicants = IntStream.range(0, applicantDetails.size())

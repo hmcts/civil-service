@@ -240,9 +240,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 applicant1DQBuilder.applicant1DQStatementOfTruth(statementOfTruth);
 
                 if (featureToggleService.isCourtLocationDynamicListEnabled()) {
-                    String responseCourtCode = locationRefDataUtil.getPreferredCourtCode(
+                    String responseCourtCode = locationRefDataUtil.getPreferredCourtData(
                         caseData,
-                        CallbackParams.Params.BEARER_TOKEN.toString()
+                        CallbackParams.Params.BEARER_TOKEN.toString(), true
                     );
                     applicant1DQBuilder.applicant1DQRequestedCourt(
                         RequestedCourt.builder()

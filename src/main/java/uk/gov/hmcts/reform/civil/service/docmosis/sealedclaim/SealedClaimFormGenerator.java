@@ -66,9 +66,9 @@ public class SealedClaimFormGenerator implements TemplateDataGenerator<SealedCla
     public SealedClaimForm getTemplateData(CaseData caseData) {
         Optional<SolicitorReferences> solicitorReferences = ofNullable(caseData.getSolicitorReferences());
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        String hearingCourtLocation = locationRefDataUtil.getPreferredCourtCode(
+        String hearingCourtLocation = locationRefDataUtil.getPreferredCourtData(
             caseData,
-            CallbackParams.Params.BEARER_TOKEN.toString());
+            CallbackParams.Params.BEARER_TOKEN.toString(), true);
         SealedClaimForm.SealedClaimFormBuilder sealedClaimFormBuilder = SealedClaimForm.builder()
             .applicants(getApplicants(caseData, multiPartyScenario))
             .respondents(getRespondents(caseData, multiPartyScenario))

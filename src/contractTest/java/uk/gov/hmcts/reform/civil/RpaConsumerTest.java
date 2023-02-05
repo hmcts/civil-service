@@ -42,6 +42,7 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
@@ -100,7 +101,7 @@ class RpaConsumerTest extends BaseRpaTest {
                           .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
                           .courtTypeId("10").courtLocationCode("121")
                           .epimmsId("000000").build());
-        when(locationRefDataUtil.getPreferredCourtCode(any(), any())).thenReturn("127");
+        when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("127");
     }
 
     @Nested

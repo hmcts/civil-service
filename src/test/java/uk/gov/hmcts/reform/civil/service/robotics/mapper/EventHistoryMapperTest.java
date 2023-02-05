@@ -50,6 +50,7 @@ import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
@@ -110,7 +111,7 @@ class EventHistoryMapperTest {
                           .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
                           .courtTypeId("10").courtLocationCode("121")
                           .epimmsId("000000").build());
-        when(locationRefDataUtil.getPreferredCourtCode(any(), any())).thenReturn("121");
+        when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("121");
     }
 
     @Nested

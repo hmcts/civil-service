@@ -24,7 +24,7 @@ public class LocationRefDataUtil {
         this.locationRefDataService = locationRefDataService;
     }
 
-    public String getPreferredCourtCode(CaseData caseData, String authToken) {
+    public String getPreferredCourtData(CaseData caseData, String authToken, boolean isCourtCodeRequired) {
         if (isSpecCaseCategory(caseData, caseData.getCaseAccessCategory() != null)) {
             return "";
         }
@@ -37,7 +37,8 @@ public class LocationRefDataUtil {
                 return courtLocations.stream()
                     .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
                     .findFirst()
-                    .map(LocationRefData::getCourtLocationCode)
+                    .map(locationRefData -> isCourtCodeRequired
+                        ? locationRefData.getCourtLocationCode() : locationRefData.getCourtName())
                     .orElse("");
             } else {
                 log.info("Court location not found");
