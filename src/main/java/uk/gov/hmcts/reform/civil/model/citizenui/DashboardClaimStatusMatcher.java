@@ -12,7 +12,4 @@ public class DashboardClaimStatusMatcher {
     private DashboardClaimStatus status;
     private boolean matched;
 
-    public boolean isMatched(){
-        return this.matched;
-    }
 }
