@@ -4,12 +4,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 
 @Service
 public class CaseReadyBusinessProcessSearchService extends ElasticSearchService {
@@ -21,8 +20,7 @@ public class CaseReadyBusinessProcessSearchService extends ElasticSearchService 
     public Query query(int startIndex) {
         return new Query(
             boolQuery().must(matchQuery("data.businessProcess.status", "READY"))
-                .must(rangeQuery("data.businessProcess.createdOn").lt(LocalDateTime.now().minusMinutes(5)
-                                                               .toString())),
+                .must(rangeQuery("data.businessProcess.createdOn").lt("now-5m")),
             List.of(),
             startIndex
         );
