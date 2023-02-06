@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
@@ -11,11 +12,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.CaseAssignmentApi;
 
+import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
 
@@ -31,8 +35,23 @@ public class NoticeOfChangeRequestCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::checkCaseStateNoC)
             .put(callbackKey(SUBMITTED), this::checkNoticeOfChangeApproval)
             .build();
+    }
+
+    private CallbackResponse checkCaseStateNoC(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseState getCaseStateNOC = caseData.getCcdState();
+
+        List<String> errorMessage = new ArrayList<>();
+        if (invalidNocStates.contains(getCaseStateNOC)) {
+            errorMessage.add("Invalid case state for NoC");
+
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errorMessage).build();
+        }
+        return emptyCallbackResponse(callbackParams);
     }
 
     private CallbackResponse checkNoticeOfChangeApproval(CallbackParams callbackParams) {
