@@ -120,7 +120,8 @@ public class InformAgreedExtensionDateForSpecCallbackHandler extends CallbackHan
                 .respondent1TimeExtensionDate(time.now())
                 .respondent1ResponseDeadline(newDeadline)
                 .respondent2TimeExtensionDate(time.now())
-                .respondent2ResponseDeadline(newDeadline);
+                .respondent2ResponseDeadline(newDeadline)
+                .respondentSolicitor2AgreedDeadlineExtension(caseData.getRespondentSolicitor1AgreedDeadlineExtension());
         } else if (solicitorRepresentsOnlyRespondent2(callbackParams)) {
             caseDataBuilder
                 .respondent2TimeExtensionDate(time.now())

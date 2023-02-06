@@ -20,8 +20,9 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -65,6 +66,15 @@ public class CaseDataBuilderSpec {
     protected YesOrNo addApplicant2;
     protected YesOrNo addRespondent2;
     protected YesOrNo respondent2SameLegalRepresentative;
+
+    protected LocalDateTime respondent1ResponseDeadline;
+    protected LocalDateTime respondent2ResponseDeadline;
+
+    //Deadline extension
+    protected LocalDate respondentSolicitor1AgreedDeadlineExtension;
+    protected LocalDate respondentSolicitor2AgreedDeadlineExtension;
+    protected LocalDateTime respondent1TimeExtensionDate;
+    protected LocalDateTime respondent2TimeExtensionDate;
 
     //dates
     protected LocalDateTime submittedDate;
@@ -158,6 +168,36 @@ public class CaseDataBuilderSpec {
 
     public CaseDataBuilderSpec caseReference(Long ccdCaseReference) {
         this.ccdCaseReference = ccdCaseReference;
+        return this;
+    }
+
+    public CaseDataBuilderSpec respondent1ResponseDeadline(LocalDateTime deadline) {
+        this.respondent1ResponseDeadline = deadline;
+        return this;
+    }
+
+    public CaseDataBuilderSpec respondent2ResponseDeadline(LocalDateTime deadline) {
+        this.respondent2ResponseDeadline = deadline;
+        return this;
+    }
+
+    public CaseDataBuilderSpec respondent1TimeExtensionDate(LocalDateTime extensionDate) {
+        this.respondent1TimeExtensionDate = extensionDate;
+        return this;
+    }
+
+    public CaseDataBuilderSpec respondent2TimeExtensionDate(LocalDateTime extensionDate) {
+        this.respondent2TimeExtensionDate = extensionDate;
+        return this;
+    }
+
+    public CaseDataBuilderSpec respondentSolicitor1AgreedDeadlineExtension(LocalDate extensionDate) {
+        this.respondentSolicitor1AgreedDeadlineExtension = extensionDate;
+        return this;
+    }
+
+    public CaseDataBuilderSpec respondentSolicitor2AgreedDeadlineExtension(LocalDate extensionDate) {
+        this.respondentSolicitor2AgreedDeadlineExtension = extensionDate;
         return this;
     }
 
@@ -341,6 +381,16 @@ public class CaseDataBuilderSpec {
         respondent2Represented = YES;
         respondent1OrgRegistered = NO;
         respondent2OrgRegistered = NO;
+        return this;
+    }
+
+    public CaseDataBuilderSpec atStateClaim1v2SameSolicitorTimeExtension() {
+        atStateClaimSubmittedTwoRespondentSameSolicitorSpec();
+        respondent1ResponseDeadline = RESPONSE_DEADLINE;
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        respondent1TimeExtensionDate = submittedDate.plusDays(1);
+        respondentSolicitor1AgreedDeadlineExtension = LocalDate.now();
+
         return this;
     }
 
