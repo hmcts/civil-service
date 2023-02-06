@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.CaseAssignmentApi;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -34,8 +33,6 @@ public class NoticeOfChangeRequestCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(NOC_REQUEST);
 
-    private static final List<CaseState> invalidNocStates = Arrays.asList(PENDING_CASE_ISSUED, CASE_DISMISSED, PROCEEDS_IN_HERITAGE_SYSTEM);
-
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseAssignmentApi caseAssignmentApi;
 
@@ -48,11 +45,10 @@ public class NoticeOfChangeRequestCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse checkCaseStateNoC(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseState getCaseStateNOC = caseData.getCcdState();
+        List<CaseState> invalidNocStates = Arrays.asList(PENDING_CASE_ISSUED, CASE_DISMISSED, PROCEEDS_IN_HERITAGE_SYSTEM);
 
         List<String> errorMessage = new ArrayList<>();
-        if (invalidNocStates.contains(getCaseStateNOC)) {
+        if (invalidNocStates.contains(callbackParams.getCaseData().getCcdState())) {
             errorMessage.add("Invalid case state for NoC");
 
             return AboutToStartOrSubmitCallbackResponse.builder()
