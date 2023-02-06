@@ -351,14 +351,14 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 + "We'll review the case and contact you about what to do next.<br>"
                 + format(
                 "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
-                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                format("/cases/case-details/%s#Claim documents", claimNumber)
             );
         } else {
             return "<h2 class=\"govuk-heading-m\">What happens next</h2>"
                 + "You've decided not to proceed and the case will end.<br>"
                 + format(
                 "%n%n<a href=\"%s\" target=\"_blank\">View Directions questionnaire</a>",
-                format("/cases/case-details/%s#Claim documents", caseData.getCcdCaseReference())
+                format("/cases/case-details/%s#Claim documents", claimNumber)
             );
         }
     }
