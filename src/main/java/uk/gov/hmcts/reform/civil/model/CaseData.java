@@ -289,7 +289,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final ResponseDocument respondent1SpecDefenceResponseDocument;
     private final ResponseDocument respondent2SpecDefenceResponseDocument;
 
-
     public RespondentResponseTypeSpec getRespondent1ClaimResponseTypeForSpec() {
 
         if (respondent1ClaimResponseTypeForSpec == null) {
