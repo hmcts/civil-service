@@ -60,7 +60,7 @@ public class CaseFlagUtils {
     public static LitigationFriend updateLitFriend(String roleOnCase, LitigationFriend litFriendToUpdate) {
         return litFriendToUpdate != null ? litFriendToUpdate.getFlags() != null ? litFriendToUpdate
             : litFriendToUpdate.toBuilder().flags(createFlags(
-            // LitigationFriend was updated to split fullName into firstname and lastname for H&L =================
+            // LitigationFriend was updated to split fullName into firstname and lastname for H&L ==================
             // ToDo: Remove the use of fullName after H&L changes are default =====================================
             litFriendToUpdate.getFullName() != null ? litFriendToUpdate.getFullName()
                 // ====================================================================================================
