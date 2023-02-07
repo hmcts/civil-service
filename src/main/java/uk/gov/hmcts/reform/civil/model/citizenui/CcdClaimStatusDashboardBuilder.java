@@ -15,7 +15,7 @@ public class CcdClaimStatusDashboardBuilder extends DashboardClaimStatusBuilder<
 
     @Override
     public boolean hasResponsePendingOverdue(CaseData claim) {
-        return claim.getRespondent1ResponseDeadline().isAfter(LocalDate.now().atTime(16, 1, 0))
+        return  claim.getRespondent1ResponseDeadline() != null && claim.getRespondent1ResponseDeadline().isAfter(LocalDate.now().atTime(16, 1, 0))
             && claim.hasBreathingSpace();
     }
 

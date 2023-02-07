@@ -12,7 +12,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatus;
 import uk.gov.hmcts.reform.civil.model.CountyCourtJudgment;
 
 import java.math.BigDecimal;
@@ -48,10 +47,7 @@ public class CmcClaim {
     private CountyCourtJudgment countyCourtJudgment;
     private LocalDate admissionPayImmediatelyPastPaymentDate;
     private ClaimantResponse claimantResponse;
-    private LocalDateTime reDeterminationRequestedAt;
     private ClaimState state;
-
-    private DashboardClaimStatus status;
 
     public String getClaimantName() {
         return claimData.getClaimantName();
@@ -79,7 +75,7 @@ public class CmcClaim {
     @JsonIgnore
     public boolean claimantAcceptedDefendantResponse(){
         return claimantResponse != null
-            && claimantResponse == ClaimantResponse.ACCEPTATION;
+            && claimantResponse.getType() != null && claimantResponse.getType() == ClaimantResponseType.ACCEPTATION;
     }
 
     @JsonIgnore
