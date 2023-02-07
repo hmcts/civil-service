@@ -1823,21 +1823,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     updatedCaseData.build().getRespondent1ResponseDate(),
                     DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                 )));
-        Optional.ofNullable(caseData.getRespondent2SpecDefenceResponseDocument())
-            .map(ResponseDocument::getFile).ifPresent(respondent2ClaimDocument -> defendantUploads.add(
-                buildElemCaseDocument(respondent2ClaimDocument, "Defendant 2",
-                                      updatedCaseData.build().getRespondent2ResponseDate(),
-                                      DocumentType.DEFENDANT_DEFENCE
-                )));
-        Optional.ofNullable(caseData.getRespondent2DQ())
-            .map(Respondent2DQ::getRespondent2DQDraftDirections)
-            .ifPresent(respondent2DQ -> defendantUploads.add(
-                buildElemCaseDocument(
-                    respondent2DQ,
-                    "Defendant 2",
-                    updatedCaseData.build().getRespondent2ResponseDate(),
-                    DocumentType.DEFENDANT_DRAFT_DIRECTIONS
-                )));
+
         if (!defendantUploads.isEmpty()) {
             updatedCaseData.defendantResponseDocuments(defendantUploads);
         }
