@@ -14,7 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.referencedata.LRDConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 
 import java.net.URI;
@@ -183,13 +183,13 @@ public class LocationRefDataService {
     }
 
     /**
-     * Centralized creation of CaseLocation from LocationRefData to reduce the places it can be done.
+     * Centralized creation of CaseLocationCivil from LocationRefData to reduce the places it can be done.
      *
      * @param location mandatory
      * @return case location built from location
      */
-    public static CaseLocation buildCaseLocation(LocationRefData location) {
-        return CaseLocation.builder()
+    public static CaseLocationCivil buildCaseLocation(LocationRefData location) {
+        return CaseLocationCivil.builder()
             .region(location.getRegionId())
             .baseLocation(location.getEpimmsId())
             .build();
