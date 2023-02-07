@@ -44,7 +44,7 @@ public class BundleCreationTriggerEventHandler {
             String caseId = event.getCaseId().toString();
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, CREATE_BUNDLE);
             CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails().getData());
-            moveExistingCaseBundlesToHistoricalBundles(caseData);
+            //moveExistingCaseBundlesToHistoricalBundles(caseData);
             bundleCreateResponse.getData().getCaseBundles().forEach(bundle -> {
                 bundle.getValue().setCreatedOn(LocalDateTime.now());
                 bundle.getValue().setBundleHearingDate(caseData.getHearingDate());
