@@ -538,7 +538,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 "defendantName", "Mr. Sole Trader",
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
-                "payImmediately", "1 FEBRUARY 2023;"
+                "payImmediately", "12 FEBRUARY 2023;"
 
             );
         }
@@ -634,7 +634,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             .containsEntry("legalOrgName", "Signer Name")
             .containsEntry("claimReferenceNumber",  "000DC001")
             .containsEntry("defendantName", "Mr. John Rambo")
-            .containsEntry("payImmediately", "1 FEBRUARY 2023");
+            .containsEntry("payImmediately", "12 FEBRUARY 2023");
 
     }
 
@@ -662,7 +662,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             .containsEntry("legalOrgName", "Signer Name")
             .containsEntry("claimReferenceNumber",  "000DC001")
             .containsEntry("defendantName", "Mr. John Rambo")
-            .containsEntry("payImmediately", "1 FEBRUARY 2023");;
+            .containsEntry("payImmediately", "12 FEBRUARY 2023");;
 
     }
 }
