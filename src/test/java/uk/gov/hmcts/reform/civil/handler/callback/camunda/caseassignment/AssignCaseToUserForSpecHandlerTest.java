@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -57,8 +57,8 @@ class AssignCaseToUserForSpecHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void ldBlock() {
         when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assert.assertTrue(handler.handledEvents().isEmpty());
-        Assert.assertFalse(handler.handledEvents().isEmpty());
+        Assertions.assertTrue(handler.handledEvents().isEmpty());
+        Assertions.assertFalse(handler.handledEvents().isEmpty());
     }
 
     @Nested
@@ -71,7 +71,7 @@ class AssignCaseToUserForSpecHandlerTest extends BaseCallbackHandlerTest {
 
             Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
             });
-            params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(dataMap, CallbackType.SUBMITTED);
         }
 
         @Test

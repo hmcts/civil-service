@@ -21,13 +21,17 @@ import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -43,6 +47,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -50,9 +55,13 @@ import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static java.time.LocalDateTime.now;
@@ -65,9 +74,11 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
@@ -573,4 +584,289 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+    @Nested
+    class SetUpOveVOneFlag {
+
+        @Test
+        void shouldGetOneVOneFullDefenceFlagV2() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+
+            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE);
+        }
+
+        @Test
+        void shouldGetOneVOnePartAdmitFlagV2() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .specDefenceAdmittedRequired(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+
+            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_HAS_PAID);
+        }
+
+        @Test
+        void shouldGetOneVOnePartAdmitBySetDateFlagV2() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
+                .specDefenceAdmittedRequired(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+
+            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE);
+        }
+
+        @Test
+        void shouldGetOneVOneFullAdmitFlagV2() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .specDefenceFullAdmittedRequired(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID);
+        }
+
+        @Test
+        void shouldGetOneVOneFullAdmitBySetDateFlagV2() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
+                .specDefenceFullAdmittedRequired(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_BY_SET_DATE);
+        }
+
+        @Test
+        void shouldGetOneVOneCounterClaimFlagV2() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.COUNTER_CLAIM)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+
+            assertThat(result).isEqualTo(ResponseOneVOneShowTag.ONE_V_ONE_COUNTER_CLAIM);
+        }
+
+        @Test
+        void shouldGetNullFlagV2() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            CaseData caseData = CaseData.builder()
+                .respondent2(PartyBuilder.builder().company().build())
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            ResponseOneVOneShowTag result = getCaseData(response).getShowResponseOneVOneFlag();
+
+            assertThat(result).isNull();
+        }
+
+        private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
+            return objectMapper.convertValue(response.getData(), CaseData.class);
+        }
+    }
+
+    @Nested
+    class SetUpPaymentDateToStringField {
+        @Test
+        void shouldSetUpPaymentDateToString() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+
+            RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec =
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build();
+
+            CaseData caseData = CaseData.builder()
+                .respondToClaimAdmitPartLRspec(respondToClaimAdmitPartLRspec)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            String result = getCaseData(response).getRespondent1PaymentDateToStringSpec();
+
+            assertThat(result).isEqualTo(whenWillPay
+                                             .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)));
+        }
+
+        @Test
+        void shouldSetUpPaymentDateToStringForPartAdmitPaid() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+
+            RespondToClaim respondToAdmittedClaim =
+                RespondToClaim.builder()
+                    .howMuchWasPaid(null)
+                    .whenWasThisAmountPaid(whenWillPay)
+                    .build();
+
+            CaseData caseData = CaseData.builder()
+                .respondToAdmittedClaim(respondToAdmittedClaim)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            String result = getCaseData(response).getRespondent1PaymentDateToStringSpec();
+
+            assertThat(result).isEqualTo(whenWillPay
+                                             .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)));
+        }
+
+        @Test
+        void shouldSetUpPaymentDateForResponseDateToString() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+
+            CaseData caseData = CaseData.builder()
+                .respondent1ResponseDate(LocalDateTime.now())
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            String result = getCaseData(response).getRespondent1PaymentDateToStringSpec();
+
+            assertThat(result).isEqualTo(whenWillPay
+                                             .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)));
+        }
+
+        private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
+            return objectMapper.convertValue(response.getData(), CaseData.class);
+        }
+    }
+
+    @Nested
+    class PaymentDateValidationCallback {
+
+        private static final String PAGE_ID = "validate-respondent-payment-date";
+
+        @Test
+        void shouldReturnError_whenPastPaymentDate() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .applicant1RequestedPaymentDateForDefendantSpec(LocalDate.now().minusDays(15))
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0)).isEqualTo("Enter a date that is today or in the future");
+        }
+
+        @Test
+        void shouldNotReturnError_whenFuturePaymentDate() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .applicant1RequestedPaymentDateForDefendantSpec(LocalDate.now().plusDays(15))
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
+    class SetUpPaymentAmountField {
+
+        @Test
+        void shouldConvertPartAdmitPaidValueFromPenniesToPounds() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            RespondToClaim respondToAdmittedClaim =
+                RespondToClaim.builder()
+                    .howMuchWasPaid(BigDecimal.valueOf(1050))
+                    .build();
+
+            CaseData caseData = CaseData.builder()
+                .respondToAdmittedClaim(respondToAdmittedClaim)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            BigDecimal result = getCaseData(response).getPartAdmitPaidValuePounds();
+
+            assertThat(result).isEqualTo(new BigDecimal("10.50"));
+        }
+    }
+
+    private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
+        return objectMapper.convertValue(response.getData(), CaseData.class);
+    }
+
+    @Nested
+    class MidEventCallbackValidateAmountPaidFlag {
+
+        private static final String PAGE_ID = "validate-amount-paid";
+
+        @Test
+        void shouldSetApplicant1Proceed_whenCaseIs2v1AndApplicantIntendsToProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .ccjPaymentPaidSomeAmount(new BigDecimal(150000))
+                .totalClaimAmount(new BigDecimal(1000))
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains("The amount paid must be less than the full claim amount.");
+        }
+    }
 }

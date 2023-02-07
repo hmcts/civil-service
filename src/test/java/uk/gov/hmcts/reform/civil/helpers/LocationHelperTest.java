@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -48,7 +48,7 @@ public class LocationHelperTest {
         helper.updateCaseManagementLocation(updatedData, requestedCourt, () -> locations);
         Assertions.assertThat(updatedData.build().getCaseManagementLocation())
             .isNotNull()
-            .isEqualTo(CaseLocation.builder()
+            .isEqualTo(CaseLocationCivil.builder()
                            .region("regionId")
                            .baseLocation("epimms")
                            .build());
@@ -162,7 +162,7 @@ public class LocationHelperTest {
 
         Assertions.assertThat(court.isPresent()).isTrue();
         Assertions.assertThat(court.get().getCaseLocation())
-            .isEqualTo(CaseLocation.builder()
+            .isEqualTo(CaseLocationCivil.builder()
                            .baseLocation(CCMCC_EPIMS)
                            .region(CCMCC_REGION_ID).build());
     }
@@ -184,7 +184,7 @@ public class LocationHelperTest {
 
         Assertions.assertThat(court.isPresent()).isTrue();
         Assertions.assertThat(court.get().getCaseLocation())
-            .isEqualTo(CaseLocation.builder()
+            .isEqualTo(CaseLocationCivil.builder()
                            .baseLocation(CCMCC_EPIMS)
                            .region(CCMCC_REGION_ID).build());
     }

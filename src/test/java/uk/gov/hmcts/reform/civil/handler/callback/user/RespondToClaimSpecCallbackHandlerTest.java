@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -529,6 +530,66 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("respondent2").extracting("primaryAddress")
                 .extracting("AddressLine3").isEqualTo("address line 3");
+        }
+
+        @Test
+        void defendantResponsePopulatesWitnessesData() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).thenReturn(true);
+
+            var res1witnesses = Witnesses.builder().details(
+                wrapElements(
+                    Witness.builder()
+                        .firstName("Witness")
+                        .lastName("One")
+                        .emailAddress("test-witness-one@example.com")
+                        .phoneNumber("07865456789")
+                        .reasonForWitness("great reasons")
+                        .build())
+            ).build();
+
+            var res2witnesses = Witnesses.builder().details(
+                wrapElements(
+                    Witness.builder()
+                        .firstName("Witness")
+                        .lastName("Two")
+                        .emailAddress("test-witness-two@example.com")
+                        .phoneNumber("07532628263")
+                        .reasonForWitness("good reasons")
+                        .build())
+            ).build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .respondent2DQ()
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
+                .addRespondent2(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSRespondent2HomeAddressRequired(NO)
+                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
+                .build().toBuilder()
+                .respondent1DQWitnessesSmallClaim(res1witnesses)
+                .respondent2DQWitnessesSmallClaim(res2witnesses)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                .thenReturn(LocalDateTime.now());
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getData())
+                .extracting("respondent1DQWitnesses")
+                .isEqualTo(new ObjectMapper().convertValue(res1witnesses, new TypeReference<>() {
+                }));
+            assertThat(response.getData())
+                .extracting("respondent2DQWitnesses")
+                .isEqualTo(new ObjectMapper().convertValue(res2witnesses, new TypeReference<>() {
+                }));
         }
     }
 

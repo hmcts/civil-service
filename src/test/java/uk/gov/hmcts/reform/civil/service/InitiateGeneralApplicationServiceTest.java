@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
@@ -84,7 +84,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     private static final Applicant1DQ applicant1DQ =
             Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
                     .responseCourtCode("applicant1DQRequestedCourt")
-                                                                  .caseLocation(CaseLocation.builder()
+                                                                  .caseLocation(CaseLocationCivil.builder()
                                                                                     .region("2")
                                                                                     .baseLocation("00000")
                                                                                     .build())
@@ -92,7 +92,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     private static final Respondent1DQ respondent1DQ =
             Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
                     .responseCourtCode("respondent1DQRequestedCourt")
-                                                                    .caseLocation(CaseLocation.builder()
+                                                                    .caseLocation(CaseLocationCivil.builder()
                                                                                       .region("2")
                                                                                       .baseLocation("11111")
                                                                                       .build())
@@ -100,7 +100,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     private static final Respondent2DQ respondent2DQ =
         Respondent2DQ.builder().respondent2DQRequestedCourt(RequestedCourt.builder()
                                                                 .responseCourtCode("respondent2DQRequestedCourt")
-                                                                .caseLocation(CaseLocation.builder()
+                                                                .caseLocation(CaseLocationCivil.builder()
                                                                                   .region("3")
                                                                                   .baseLocation("22222")
                                                                                   .build())

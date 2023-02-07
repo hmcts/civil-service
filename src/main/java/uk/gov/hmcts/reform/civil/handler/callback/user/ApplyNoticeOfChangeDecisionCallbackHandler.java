@@ -55,6 +55,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
 
     private CallbackResponse applyNoticeOfChangeDecision(CallbackParams callbackParams) {
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
+        CaseData preDecisionCaseData = objectMapper.convertValue(caseDetails.getData(), CaseData.class);
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
         updateOrgPoliciesForLiP(callbackParams.getRequest().getCaseDetails());
@@ -65,13 +66,18 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
             DecisionRequest.decisionRequest(caseDetails)
         );
 
-        CaseData updatedCaseData = objectMapper.convertValue(applyDecision.getData(), CaseData.class);
-        CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = updatedCaseData.toBuilder();
-        updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(updatedCaseData, updatedCaseDataBuilder);
+        CaseData postDecisionCaseData = objectMapper.convertValue(applyDecision.getData(), CaseData.class);
+        CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = postDecisionCaseData.toBuilder();
+
+        updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(
+            updatedCaseDataBuilder,
+            preDecisionCaseData.getChangeOrganisationRequestField()
+        );
+
         updatedCaseDataBuilder
             .businessProcess(BusinessProcess.ready(APPLY_NOC_DECISION))
             .changeOfRepresentation(getChangeOfRepresentation(
-                    callbackParams.getCaseData().getChangeOrganisationRequestField(), updatedCaseData));
+                    callbackParams.getCaseData().getChangeOrganisationRequestField(), postDecisionCaseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseDataBuilder.build().toMap(objectMapper)).build();
@@ -83,7 +89,9 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
             .organisationToRemoveID(getChangedOrg(caseData, corFieldBeforeNoC))
             .organisationToAddID(corFieldBeforeNoC.getOrganisationToAdd().getOrganisationID())
             .caseRole(corFieldBeforeNoC.getCaseRoleId().getValue().getCode())
-            .timestamp(corFieldBeforeNoC.getRequestTimestamp());
+            .timestamp(corFieldBeforeNoC.getRequestTimestamp())
+            .formerRepresentationEmailAddress(
+                getFormerEmail(corFieldBeforeNoC.getCaseRoleId().getValue().getCode(), caseData));
 
         if (corFieldBeforeNoC.getOrganisationToRemove() != null) {
             builder.organisationToRemoveID(corFieldBeforeNoC.getOrganisationToRemove().getOrganisationID());
@@ -103,21 +111,19 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
      *
      * <p>This value will be deleted in the next callback UpdateCaseDetailsAfterNoCHandler</p>
      *
-     * @param updatedCaseData updatedCaseData
-     * @param updatedcaseDataBuilder updatedcaseDataBuilder
+     * @param updatedCaseDataBuilder updatedcaseDataBuilder
+     * @param changeOrganisationRequest preDecisionCor
      */
     private void updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(
-        CaseData updatedCaseData,
-        CaseData.CaseDataBuilder<?, ?> updatedcaseDataBuilder) {
-        ChangeOrganisationRequest updatedcor = updatedCaseData.getChangeOrganisationRequestField();
-        if (updatedcor == null) {
-            updatedcaseDataBuilder
-                .changeOrganisationRequestField(ChangeOrganisationRequest.builder()
-                                                   .organisationToAdd(Organisation.builder()
-                                                                          .organisationID(
-                                                                              ORG_ID_FOR_AUTO_APPROVAL).build())
-                                                                      .build());
-        }
+        CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder,
+        ChangeOrganisationRequest preDecisionCor) {
+        updatedCaseDataBuilder
+                .changeOrganisationRequestField(
+                    ChangeOrganisationRequest.builder()
+                        .createdBy(preDecisionCor.getCreatedBy())
+                        .organisationToAdd(
+                            Organisation.builder().organisationID(ORG_ID_FOR_AUTO_APPROVAL).build()).build());
+
     }
 
     /** The ChangeOrganisationRequest field has a node called OrganisationToRemove.
@@ -181,6 +187,17 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
                     return respondent2OrganisationIDCopy;
                 }
             }
+        }
+        return null;
+    }
+
+    private String getFormerEmail(String caseRole, CaseData caseData) {
+        if (caseRole.equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName())) {
+            return caseData.getApplicantSolicitor1UserDetails().getEmail();
+        } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
+            return caseData.getRespondentSolicitor1EmailAddress();
+        } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
+            return caseData.getRespondentSolicitor2EmailAddress();
         }
         return null;
     }
