@@ -76,6 +76,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_OR
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
 @Service
 @RequiredArgsConstructor
@@ -622,6 +623,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 .ifPresent(caseDataBuilder::locationName);
 
         }
+
+        caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
