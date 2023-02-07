@@ -46,6 +46,11 @@ public class CmcStatusDashboardBuilder extends DashboardClaimStatusBuilder<CmcCl
 
     @Override
     public boolean claimantConfirmedDefendantPaid(CmcClaim claim) {
+        return claim.getMoneyReceivedOn() != null || claim.isCCJSatisfied();
+    }
+
+    @Override
+    public boolean claimIsSettled(CmcClaim claim) {
         return claim.claimantAcceptedDefendantResponse();
     }
 

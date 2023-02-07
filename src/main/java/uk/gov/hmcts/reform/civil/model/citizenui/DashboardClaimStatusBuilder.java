@@ -43,7 +43,8 @@ public abstract class DashboardClaimStatusBuilder<T> {
             new DashboardClaimStatusMatcher(
                 DashboardClaimStatus.REQUESTED_COUNTRY_COURT_JUDGEMENT,
                 claimantRequestedCountyCourtJudgement(claim)
-            )
+            ),
+            new DashboardClaimStatusMatcher(DashboardClaimStatus.SETTLED, claimIsSettled(claim))
         );
     }
 
@@ -64,6 +65,8 @@ public abstract class DashboardClaimStatusBuilder<T> {
     public abstract boolean isEligibleForCCJ(T claim);
 
     public abstract boolean claimantConfirmedDefendantPaid(T claim);
+
+    public abstract boolean claimIsSettled(T claim);
 
     public abstract boolean isSentToCourt(T claim);
 

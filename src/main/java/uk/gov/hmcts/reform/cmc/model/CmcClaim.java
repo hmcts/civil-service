@@ -115,6 +115,11 @@ public class CmcClaim {
         return claimData.hasBreathingSpace();
     }
 
+    @JsonIgnore
+    public boolean isCCJSatisfied() {
+        return moneyReceivedOn != null && countyCourtJudgmentRequestedAt != null;
+    }
+
     private boolean isResponseIsPastFourPmToday() {
         return getResponseDeadline().isEqual(LocalDate.now())
             && LocalDateTime.now().isAfter(LocalDate.now().atTime(16, 0, 0));

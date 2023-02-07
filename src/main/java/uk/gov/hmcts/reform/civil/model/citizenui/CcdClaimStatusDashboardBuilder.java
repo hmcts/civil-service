@@ -53,6 +53,11 @@ public class CcdClaimStatusDashboardBuilder extends DashboardClaimStatusBuilder<
 
     @Override
     public boolean claimantConfirmedDefendantPaid(CaseData claim) {
+        return claim.getRespondent1CourtOrderPayment() != null && claim.respondent1PaidInFull();
+    }
+
+    @Override
+    public boolean claimIsSettled(CaseData claim) {
         return claim.respondent1PaidInFull() || claim.isRepsonseAcceptedByClaimant();
     }
 
