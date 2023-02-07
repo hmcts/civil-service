@@ -37,6 +37,7 @@ public class BundleCreationTriggerEventHandler {
 
     @EventListener
     public void sendBundleCreationTrigger(BundleCreationTriggerEvent event) throws Exception {
+        log.info("EventId in bundle trigger is :" + event.getCaseId());
         BundleCreateResponse bundleCreateResponse  = bundleCreationService.createBundle(event);
         log.info("bundle api response : " + new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(bundleCreateResponse));
         if (null != bundleCreateResponse && null != bundleCreateResponse.getData() && null != bundleCreateResponse.getData().getCaseBundles()) {
@@ -50,8 +51,9 @@ public class BundleCreationTriggerEventHandler {
                 bundle.getValue().setBundleHearingDate(caseData.getHearingDate());
             });
             caseData.setCaseBundlesInfo(bundleCreateResponse.getData().getCaseBundles());
+            log.info("caseData.getCaseBundlesInfo :" + caseData.getCaseBundlesInfo());
             CaseDataContent caseContent = getCaseContent(caseData, startEventResponse);
-            coreCaseDataService.submitUpdate(event.getCaseId().toString(), caseContent);
+            coreCaseDataService.submitUpdate(caseId, caseContent);
             log.info("*** Bundle created successfully for the case id: {}", caseData.getCcdCaseReference());
         }
     }
