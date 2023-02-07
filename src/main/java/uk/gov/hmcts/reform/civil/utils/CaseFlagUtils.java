@@ -31,7 +31,6 @@ public class CaseFlagUtils {
     public static String APPLICANT_SOLICITOR_WITNESS = "Applicant solicitor witness";
     public static String APPLICANT_SOLICITOR_EXPERT = "Applicant solicitor expert";
 
-
     private CaseFlagUtils() {
         //NO-OP
     }
@@ -74,7 +73,8 @@ public class CaseFlagUtils {
         String roleOnCase) {
         List<Element<DQPartyFlagStructure>> list = new ArrayList<>();
         for (Witness witness : witnessList) {
-            DQPartyFlagStructure build = createDQPartiesCaseFlagsField(witness.getFirstName(), witness.getLastName(), roleOnCase);
+            DQPartyFlagStructure build = createDQPartiesCaseFlagsField(witness.getFirstName(), witness.getLastName(),
+                                                                       roleOnCase);
             list.add(element(build));
         }
         return list;
@@ -85,7 +85,8 @@ public class CaseFlagUtils {
         String roleOnCase) {
         List<Element<DQPartyFlagStructure>> list = new ArrayList<>();
         for (Expert expert : expertList) {
-            DQPartyFlagStructure build = createDQPartiesCaseFlagsField(expert.getFirstName(), expert.getLastName(), roleOnCase);
+            DQPartyFlagStructure build = createDQPartiesCaseFlagsField(expert.getFirstName(), expert.getLastName(),
+                                                                       roleOnCase);
             list.add(element(build));
         }
         return list;

@@ -52,13 +52,13 @@ public class CaseFlagsInitialiser {
             case DEFENDANT_RESPONSE_SPEC:
             case DEFENDANT_RESPONSE: {
                 addRespondentDQPartiesFlagStructure(dataBuilder, caseData);
+                break;
             }
-            break;
             case CLAIMANT_RESPONSE:
             case CLAIMANT_RESPONSE_SPEC: {
                 addApplicantExpertAndWitnessFlagsStructure(dataBuilder, caseData);
+                break;
             }
-            break;
             default:
         }
     }
