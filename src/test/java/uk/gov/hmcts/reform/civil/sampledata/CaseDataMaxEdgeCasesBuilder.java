@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -49,7 +49,7 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
             .applicantPreferredCourt("127")
             .applicantPreferredCourtLocationList(
                 DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
-            .caseLocation(CaseLocation.builder()
+            .caseLocation(CaseLocationCivil.builder()
                               .region("4")
                               .baseLocation("000000")
                               .build())
