@@ -267,8 +267,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.disposalHearingHearingTime(tempDisposalHearingHearingTime).build();
 
             DisposalOrderWithoutHearing disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
-                .input(String.format(
-                    "Each party has the right to apply to have this Order set "
+                .input(String.format("This order has been made without hearing. "
+                        + "Each party has the right to apply to have this Order set "
                         + "aside or varied. Any such application must be received "
                         + "by the Court (together with the appropriate fee) "
                         + "by 4pm on %s.",
@@ -388,8 +388,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         if (featureToggleService.isHearingAndListingSDOEnabled()) {
             FastTrackOrderWithoutJudgement tempFastTrackOrderWithoutJudgement = FastTrackOrderWithoutJudgement.builder()
-                .input(String.format(
-                    "Each party has the right to apply "
+                .input(String.format("This order has been made without hearing. "
+                        + "Each party has the right to apply "
                         + "to have this Order set aside or varied. Any such application must be "
                         + "received by the Court (together with the appropriate fee) by 4pm "
                         + "on %s.",
@@ -569,7 +569,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         SmallClaimsNotes.SmallClaimsNotesBuilder tempSmallClaimsNotes = SmallClaimsNotes.builder();
         if (featureToggleService.isHearingAndListingSDOEnabled()) {
-            tempSmallClaimsNotes.input("Each party has the right to apply to have this Order set aside or varied. "
+            tempSmallClaimsNotes.input("This order has been made without hearing. "
+                                           + "Each party has the right to apply to have this Order set aside or varied. "
                                            + "Any such application must be received by the Court "
                                            + "(together with the appropriate fee) by 4pm on "
                                            + DateFormatHelper.formatLocalDate(
