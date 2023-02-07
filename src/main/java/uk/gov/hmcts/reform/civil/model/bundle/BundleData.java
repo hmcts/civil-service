@@ -12,11 +12,11 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class BundleData {
 
-    @JsonProperty("caseBundles")
+    @JsonProperty("caseBundlesInfo")
     public List<Bundle> caseBundles;
 
     @JsonCreator
-    public BundleData(@JsonProperty("caseBundles") List<Bundle> caseBundles) {
+    public BundleData(@JsonProperty("caseBundlesInfo") List<Bundle> caseBundles) {
         this.caseBundles = caseBundles;
     }
 }

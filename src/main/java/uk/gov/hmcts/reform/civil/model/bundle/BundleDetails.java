@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import uk.gov.hmcts.reform.civil.model.documents.Document;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,7 +19,7 @@ public class BundleDetails {
     private String title;
     private String description;
     private String stitchStatus;
-    private DocumentLink stitchedDocument;
+    private Document stitchedDocument;
     private String stitchingFailureMessage;
     private String fileName;
 
@@ -30,7 +31,7 @@ public class BundleDetails {
                          @JsonProperty("title") String title,
                          @JsonProperty("description") String description,
                          @JsonProperty("stitchStatus") String stitchStatus,
-                         @JsonProperty("stitchedDocument") DocumentLink stitchedDocument,
+                         @JsonProperty("stitchedDocument") Document stitchedDocument,
                          @JsonProperty("stitchingFailureMessage") String stitchingFailureMessage,
                          @JsonProperty("fileName") String fileName,
                          @JsonProperty("createdOn") LocalDateTime createdOn,
