@@ -48,13 +48,14 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
+import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingAddNewDirectionsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
@@ -133,6 +134,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final GAStatementOfTruth generalAppStatementOfTruth;
     private final GAHearingDetails generalAppHearingDetails;
     private final GASolicitorDetailsGAspec generalAppApplnSolicitor;
+    private final SRPbaDetails hearingFeePBADetails;
+    private final SRPbaDetails claimIssuedPBADetails;
+    private final String applicantPartyName;
+
     private final YesOrNo generalAppVaryJudgementType;
     private final GAHearingDateGAspec generalAppHearingDate;
     private final Document generalAppN245FormUpload;
@@ -450,7 +455,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String detailsOfDirection;
 
     private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
-    private final CaseLocation caseManagementLocation;
+    private final CaseLocationCivil caseManagementLocation;
     private final CaseManagementCategory caseManagementCategory;
     private final String locationName;
     private final DynamicList defendantDetailsSpec;
@@ -608,53 +613,55 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<EvidenceUploadTrial> trialSelectionEvidenceRes;
     private final List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaimRes;
     //applicant
-    private final List<Element<Document>> documentDisclosureList;
-    private final List<Element<Document>> documentForDisclosure;
+    private final List<Element<UploadEvidenceDocumentType>> documentDisclosureList;
+    private final List<Element<UploadEvidenceDocumentType>> documentForDisclosure;
     private final List<Element<UploadEvidenceWitness>> documentWitnessStatement;
     private final List<Element<UploadEvidenceWitness>> documentWitnessSummary;
     private final List<Element<UploadEvidenceWitness>> documentHearsayNotice;
-    private final List<Element<UploadEvidenceWitness>> documentReferredInStatement;
+    private final List<Element<UploadEvidenceDocumentType>> documentReferredInStatement;
     private final List<Element<UploadEvidenceExpert>> documentExpertReport;
     private final List<Element<UploadEvidenceExpert>> documentJointStatement;
     private final List<Element<UploadEvidenceExpert>> documentQuestions;
     private final List<Element<UploadEvidenceExpert>> documentAnswers;
-    private final List<Element<Document>> documentCaseSummary;
-    private final List<Element<Document>> documentSkeletonArgument;
-    private final List<Element<Document>> documentAuthorities;
-    private final List<Element<Document>> documentEvidenceForTrial;
+    private final List<Element<UploadEvidenceDocumentType>> documentCaseSummary;
+    private final List<Element<UploadEvidenceDocumentType>> documentSkeletonArgument;
+    private final List<Element<UploadEvidenceDocumentType>> documentAuthorities;
+    private final List<Element<UploadEvidenceDocumentType>> documentCosts;
+    private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrial;
     private final LocalDateTime caseDocumentUploadDate;
     //respondent
-    private final List<Element<Document>> documentDisclosureListRes;
-    private final List<Element<Document>> documentForDisclosureRes;
+    private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListRes;
+    private final List<Element<UploadEvidenceDocumentType>> documentForDisclosureRes;
     private final List<Element<UploadEvidenceWitness>> documentWitnessStatementRes;
     private final List<Element<UploadEvidenceWitness>> documentWitnessSummaryRes;
     private final List<Element<UploadEvidenceWitness>> documentHearsayNoticeRes;
-    private final List<Element<UploadEvidenceWitness>> documentReferredInStatementRes;
+    private final List<Element<UploadEvidenceDocumentType>> documentReferredInStatementRes;
     private final List<Element<UploadEvidenceExpert>> documentExpertReportRes;
     private final List<Element<UploadEvidenceExpert>> documentJointStatementRes;
     private final List<Element<UploadEvidenceExpert>> documentQuestionsRes;
     private final List<Element<UploadEvidenceExpert>> documentAnswersRes;
-    private final List<Element<Document>> documentCaseSummaryRes;
-    private final List<Element<Document>> documentSkeletonArgumentRes;
-    private final List<Element<Document>> documentAuthoritiesRes;
-    private final List<Element<Document>> documentEvidenceForTrialRes;
+    private final List<Element<UploadEvidenceDocumentType>> documentCaseSummaryRes;
+    private final List<Element<UploadEvidenceDocumentType>> documentSkeletonArgumentRes;
+    private final List<Element<UploadEvidenceDocumentType>> documentAuthoritiesRes;
+    private final List<Element<UploadEvidenceDocumentType>> documentCostsRes;
+    private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialRes;
     //these fields are shown if the solicitor is for respondent 2 and respondents have different solicitors
-    private final List<Element<Document>> documentDisclosureListRes2;
-    private final List<Element<Document>> documentForDisclosureRes2;
+    private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListRes2;
+    private final List<Element<UploadEvidenceDocumentType>> documentForDisclosureRes2;
     private final List<Element<UploadEvidenceWitness>> documentWitnessStatementRes2;
     private final List<Element<UploadEvidenceWitness>> documentWitnessSummaryRes2;
     private final List<Element<UploadEvidenceWitness>> documentHearsayNoticeRes2;
-    private final List<Element<UploadEvidenceWitness>> documentReferredInStatementRes2;
+    private final List<Element<UploadEvidenceDocumentType>> documentReferredInStatementRes2;
     private final List<Element<UploadEvidenceExpert>> documentExpertReportRes2;
     private final List<Element<UploadEvidenceExpert>> documentJointStatementRes2;
     private final List<Element<UploadEvidenceExpert>> documentQuestionsRes2;
     private final List<Element<UploadEvidenceExpert>> documentAnswersRes2;
-    private final List<Element<Document>> documentCaseSummaryRes2;
-    private final List<Element<Document>> documentSkeletonArgumentRes2;
-    private final List<Element<Document>> documentAuthoritiesRes2;
-    private final List<Element<Document>> documentEvidenceForTrialRes2;
+    private final List<Element<UploadEvidenceDocumentType>> documentCaseSummaryRes2;
+    private final List<Element<UploadEvidenceDocumentType>> documentSkeletonArgumentRes2;
+    private final List<Element<UploadEvidenceDocumentType>> documentAuthoritiesRes2;
+    private final List<Element<UploadEvidenceDocumentType>> documentCostsRes2;
+    private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialRes2;
     private final LocalDateTime caseDocumentUploadDateRes;
-
     private final Flags caseFlags;
 
     /**

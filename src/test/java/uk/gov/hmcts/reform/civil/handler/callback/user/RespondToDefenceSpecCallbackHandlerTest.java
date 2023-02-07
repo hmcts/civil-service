@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -51,9 +52,11 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -116,6 +119,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private LocationRefDataService locationRefDataService;
+
+    @MockBean
+    private CaseFlagsInitialiser caseFlagsInitialiser;
 
     @Nested
     class AboutToStart {
@@ -742,6 +748,32 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldSetUpPaymentDateToStringForPartAdmitPaid() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+
+            RespondToClaim respondToAdmittedClaim =
+                RespondToClaim.builder()
+                    .howMuchWasPaid(null)
+                    .whenWasThisAmountPaid(whenWillPay)
+                    .build();
+
+            CaseData caseData = CaseData.builder()
+                .respondToAdmittedClaim(respondToAdmittedClaim)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            String result = getCaseData(response).getRespondent1PaymentDateToStringSpec();
+
+            assertThat(result).isEqualTo(whenWillPay
+                                             .format(DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)));
+        }
+
+        @Test
         void shouldSetUpPaymentDateForResponseDateToString() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
@@ -763,6 +795,83 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
             return objectMapper.convertValue(response.getData(), CaseData.class);
+        }
+    }
+
+    @Nested
+    class PaymentDateValidationCallback {
+
+        private static final String PAGE_ID = "validate-respondent-payment-date";
+
+        @Test
+        void shouldReturnError_whenPastPaymentDate() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .applicant1RequestedPaymentDateForDefendantSpec(LocalDate.now().minusDays(15))
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0)).isEqualTo("Enter a date that is today or in the future");
+        }
+
+        @Test
+        void shouldNotReturnError_whenFuturePaymentDate() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .applicant1RequestedPaymentDateForDefendantSpec(LocalDate.now().plusDays(15))
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
+    class SetUpPaymentAmountField {
+
+        @Test
+        void shouldConvertPartAdmitPaidValueFromPenniesToPounds() {
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+
+            RespondToClaim respondToAdmittedClaim =
+                RespondToClaim.builder()
+                    .howMuchWasPaid(BigDecimal.valueOf(1050))
+                    .build();
+
+            CaseData caseData = CaseData.builder()
+                .respondToAdmittedClaim(respondToAdmittedClaim)
+                .build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            BigDecimal result = getCaseData(response).getPartAdmitPaidValuePounds();
+
+            assertThat(result).isEqualTo(new BigDecimal("10.50"));
+        }
+    }
+
+    private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
+        return objectMapper.convertValue(response.getData(), CaseData.class);
+    }
+
+    @Nested
+    class MidEventCallbackValidateAmountPaidFlag {
+
+        private static final String PAGE_ID = "validate-amount-paid";
+
+        @Test
+        void shouldSetApplicant1Proceed_whenCaseIs2v1AndApplicantIntendsToProceed() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .ccjPaymentPaidSomeAmount(new BigDecimal(150000))
+                .totalClaimAmount(new BigDecimal(1000))
+                .build();
+            CallbackParams params = callbackParamsOf(V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains("The amount paid must be less than the full claim amount.");
         }
     }
 }

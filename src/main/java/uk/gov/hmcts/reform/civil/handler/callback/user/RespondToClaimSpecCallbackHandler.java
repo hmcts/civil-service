@@ -1739,14 +1739,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             // moving statement of truth value to correct field, this was not possible in mid event.
             StatementOfTruth statementOfTruth = caseData.getUiStatementOfTruth();
             Respondent1DQ.Respondent1DQBuilder dq = caseData.getRespondent1DQ().toBuilder()
-                .respondent1DQStatementOfTruth(statementOfTruth);
-
-            if (caseData.getRespondent1DQWitnessesRequiredSpec() != null) {
-                dq.respondent1DQWitnesses(Witnesses.builder()
-                                                .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
-                                                .details(caseData.getRespondent1DQWitnessesDetailsSpec())
-                                                .build());
-            }
+                .respondent1DQStatementOfTruth(statementOfTruth)
+                .respondent1DQWitnesses(Witnesses.builder()
+                                            .witnessesToAppear(caseData.getRespondent1DQWitnessesRequiredSpec())
+                                            .details(caseData.getRespondent1DQWitnessesDetailsSpec())
+                                            .build());
             if (V_1.equals(callbackParams.getVersion()) && toggleService.isCourtLocationDynamicListEnabled()) {
                 handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
             }

@@ -50,6 +50,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/loggers/**",
         "/assignment/**",
         "/service-request-update",
+        "/service-request-update-claim-issued",
         "/case/document/downloadSealedDoc"
     };
 
