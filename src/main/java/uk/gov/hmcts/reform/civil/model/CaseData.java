@@ -730,7 +730,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean hasBreathingSpace(){
-        return getBreathing().getEnter() != null
+        return getBreathing() != null && getBreathing().getEnter() != null
             && getBreathing().getEnter().getExpectedEnd().isBefore(LocalDate.now());
     }
 
