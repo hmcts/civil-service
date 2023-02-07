@@ -11,7 +11,7 @@ public class CmcStatusDashboardBuilder extends DashboardClaimStatusBuilder<CmcCl
 
     @Override
     public boolean hasResponsePendingOverdue(CmcClaim claim) {
-        return claim.hasResponseDeadlinePassed();
+        return claim.hasResponseDeadlinePassed() && claim.hasBreathingSpace();
     }
 
     @Override

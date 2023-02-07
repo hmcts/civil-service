@@ -72,7 +72,8 @@ public class CmcClaim {
 
     @JsonIgnore
     public boolean isEligibleForCCJ() {
-        return countyCourtJudgment != null && countyCourtJudgment.paymentDetails != null;
+        return countyCourtJudgment == null
+            && hasResponseDeadlinePassed();
     }
 
     @JsonIgnore
@@ -99,14 +100,27 @@ public class CmcClaim {
 
     @JsonIgnore
     public boolean hasResponseDeadlinePassed(){
-        return !hasResponse() && getResponseDeadline().isAfter(LocalDate.now());
+        return !hasResponse() && (getResponseDeadline().isAfter(LocalDate.now())
+            || isResponseIsPastFourPmToday());
     }
 
+    @JsonIgnore
     public boolean isResponseDeadlineToday() {
-        return !hasResponse() && getResponseDeadline().equals(LocalDate.now());
+        return !hasResponse() && getResponseDeadline().isEqual(LocalDate.now())
+            && LocalDateTime.now().isBefore(LocalDate.now().atTime(16, 0, 0));
     }
 
+    @JsonIgnore
     public boolean isResponseDeadlineOnTime() {
         return !hasResponse() && getResponseDeadline().isBefore(LocalDate.now());
+    }
+    @JsonIgnore
+    public boolean hasBreathingSpace() {
+        return claimData.hasBreathingSpace();
+    }
+
+    private boolean isResponseIsPastFourPmToday() {
+        return getResponseDeadline().isEqual(LocalDate.now())
+            && LocalDateTime.now().isAfter(LocalDate.now().atTime(16, 0, 0));
     }
 }

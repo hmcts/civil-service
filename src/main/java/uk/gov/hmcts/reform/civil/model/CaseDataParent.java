@@ -356,4 +356,11 @@ public class CaseDataParent implements MappableObject {
     private final CertificateOfService cosNotifyClaimDefendant1;
     private final CertificateOfService cosNotifyClaimDefendant2;
 
+    @JsonIgnore
+    public boolean isRepsonseAcceptedByClaimant(){
+       return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES ||
+           applicant1AcceptFullAdmitPaymentPlanSpec == YesOrNo.YES ||
+           applicant1AcceptPartAdmitPaymentPlanSpec == YesOrNo.YES;
+    }
+
 }
