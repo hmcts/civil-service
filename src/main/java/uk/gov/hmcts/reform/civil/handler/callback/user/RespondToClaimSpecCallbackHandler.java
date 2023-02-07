@@ -1823,7 +1823,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     updatedCaseData.build().getRespondent1ResponseDate(),
                     DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                 )));
-
         if (!defendantUploads.isEmpty()) {
             updatedCaseData.defendantResponseDocuments(defendantUploads);
         }
