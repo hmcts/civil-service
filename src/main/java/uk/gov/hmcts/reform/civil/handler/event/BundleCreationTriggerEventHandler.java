@@ -38,7 +38,7 @@ public class BundleCreationTriggerEventHandler {
     @EventListener
     public void sendBundleCreationTrigger(BundleCreationTriggerEvent event) throws Exception {
         BundleCreateResponse bundleCreateResponse  = bundleCreationService.createBundle(event);
-        log.info("bundle response : " + new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(bundleCreateResponse));
+        log.info("bundle api response : " + new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(bundleCreateResponse));
         if (null != bundleCreateResponse && null != bundleCreateResponse.getData() && null != bundleCreateResponse.getData().getCaseBundles()) {
 
             String caseId = event.getCaseId().toString();
