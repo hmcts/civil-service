@@ -24,8 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_SUBMITTED;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.*;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -191,6 +190,25 @@ class StateFlowEngineSpecTest {
 
         // Then: The corresponding flag in the StateFlow must be set to true
         assertThat(stateFlow.getFlags()).contains(entry(flagName, true));
+    }
+
+    @ParameterizedTest(name = "{index}: The state is transitioned correctly from CLAIM_SUBMITTED"
+                        + " to CLAIM_ISSUED_PAYMENT_SUCCESSFUL")
+    @MethodSource("caseDataStream")
+    void shouldReturnClaimIssuedPaymentSuccessful_whenCaseDataAtStateClaimSubmitted(CaseData caseData) {
+        // When
+        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+        // Then Claim will go through state SPEC_DRAFT and finish at state CLAIM_SUBMITTED
+        assertThat(stateFlow.getState())
+            .extracting(State::getName)
+            .isNotNull()
+            .isEqualTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
+        assertThat(stateFlow.getStateHistory())
+            .hasSize(2)
+            .extracting(State::getName)
+            .containsExactly(
+                SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
     }
 }
 
