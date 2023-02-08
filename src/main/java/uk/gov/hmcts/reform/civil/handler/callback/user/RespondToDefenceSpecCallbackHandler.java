@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
-import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
@@ -269,11 +268,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse populateCaseData(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        LocalDate whenBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+
         CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
-        updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
-        updatedCaseData.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                                          .formattedWhenWillThisAmountBePaid(formatLocalDate(whenBePaid, DATE)).build());
+
         if (V_1.equals(callbackParams.getVersion())
             && featureToggleService.isAccessProfilesEnabled()) {
             updatedCaseData.respondent1Copy(caseData.getRespondent1())

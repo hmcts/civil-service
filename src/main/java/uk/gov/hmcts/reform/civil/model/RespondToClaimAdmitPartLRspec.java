@@ -15,11 +15,9 @@ public class RespondToClaimAdmitPartLRspec {
     @FutureOrPresent(message = "Date for when will the amount be paid must be today or in the future.",
         groups = PaymentDateGroup.class)
     private final LocalDate whenWillThisAmountBePaid;
-    private final String formattedWhenWillThisAmountBePaid;
 
     @JsonCreator
-    public RespondToClaimAdmitPartLRspec(LocalDate whenWillThisAmountBePaid, String formattedWhenWillThisAmountBePaid) {
+    public RespondToClaimAdmitPartLRspec(LocalDate whenWillThisAmountBePaid) {
         this.whenWillThisAmountBePaid = whenWillThisAmountBePaid;
-        this.formattedWhenWillThisAmountBePaid = formattedWhenWillThisAmountBePaid;
     }
 }
