@@ -36,7 +36,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWOSPEC;
 
 abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
@@ -98,7 +97,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                                    .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)
             || coreCaseUserService.userHasCaseRole(caseData
                                                     .getCcdCaseReference()
-                                                    .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWOSPEC)) {
+                                                    .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
 
             caseDataBuilder.caseTypeFlag("RespondentTwoFields");
         }
