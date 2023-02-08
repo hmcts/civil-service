@@ -4446,7 +4446,6 @@ public class CaseDataBuilder {
             .respondent1ClaimResponseTypeForSpec(respondent1ClaimResponseTypeForSpec)
             .respondToAdmittedClaim(respondToClaim)
             .responseClaimAdmitPartEmployer(responseClaimAdmitPartEmployer)
-            .caseAccessCategory(caseAccessCategory)
             //case progression
             .hearingFeePaymentDetails(hearingFeePaymentDetails)
             //workaround fields
@@ -4524,7 +4523,6 @@ public class CaseDataBuilder {
                 //Certificate of Service
                 .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
                 .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
-            .caseAccessCategory(caseAccessCategory)
             .ccjPaymentPaidSomeAmount(ccjPaymentPaidSomeAmount)
             .build();
     }
