@@ -29,9 +29,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.noc.DecisionRequest;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -61,9 +58,9 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
     private static final String CHANGE_ORGANISATION_REQUEST_FIELD = "changeOrganisationRequestField";
     private static final String ORG_ID_FOR_AUTO_APPROVAL =
         "org id to persist updated change organisation request field";
-    private static final String RESPONDENT_ONE_ORG_POLICY  = "respondent1OrganisationPolicy";
-    private static final String RESPONDENT_TWO_ORG_POLICY  = "respondent2OrganisationPolicy";
-    private static final String APPLICANT_ONE_ORG_POLICY  = "applicant1OrganisationPolicy";
+    private static final String RESPONDENT_ONE_ORG_POLICY = "respondent1OrganisationPolicy";
+    private static final String RESPONDENT_TWO_ORG_POLICY = "respondent2OrganisationPolicy";
+    private static final String APPLICANT_ONE_ORG_POLICY = "applicant1OrganisationPolicy";
     private static final String NEW_ORG_ID = "new org id";
     private static final String REQUESTER_EMAIL = "requester.email@example.com";
 
@@ -86,21 +83,27 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                     .changeOrganisationRequestField(false, false, "1234", "QWERTY R", REQUESTER_EMAIL)
                     .build();
-                CallbackParams params = callbackParamsOf(caseData,
-                                                         CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                                         ABOUT_TO_SUBMIT);
+                CallbackParams params = callbackParamsOf(
+                    caseData,
+                    CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                    ABOUT_TO_SUBMIT
+                );
 
                 CaseDetails caseDetailsAfterNoCApplied =
-                    caseDetailsAfterNoCApplied(CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                                                                    RESPONDENT_ONE_ORG_POLICY);
+                    caseDetailsAfterNoCApplied(
+                        CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                        RESPONDENT_ONE_ORG_POLICY
+                    );
 
-                when(caseAssignmentApi.applyDecision(params.getParams().get(BEARER_TOKEN).toString(),
-                                                     authTokenGenerator.generate(),
-                                                     DecisionRequest.decisionRequest(
-                                                         params.getRequest().getCaseDetails())))
+                when(caseAssignmentApi.applyDecision(
+                    params.getParams().get(BEARER_TOKEN).toString(),
+                    authTokenGenerator.generate(),
+                    DecisionRequest.decisionRequest(
+                        params.getRequest().getCaseDetails())
+                ))
                     .thenReturn(
                         AboutToStartOrSubmitCallbackResponse.builder()
-                        .data(caseDetailsAfterNoCApplied.getData()).build());
+                            .data(caseDetailsAfterNoCApplied.getData()).build());
 
                 AboutToStartOrSubmitCallbackResponse response =
                     (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -115,18 +118,24 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                     .changeOrganisationRequestField(false, false, "1234", null, REQUESTER_EMAIL)
                     .build();
-                CallbackParams params = callbackParamsOf(caseData,
-                                                         CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                                         ABOUT_TO_SUBMIT);
+                CallbackParams params = callbackParamsOf(
+                    caseData,
+                    CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                    ABOUT_TO_SUBMIT
+                );
 
                 CaseDetails caseDetailsAfterNoCApplied =
-                    caseDetailsAfterNoCApplied(CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                               RESPONDENT_ONE_ORG_POLICY);
+                    caseDetailsAfterNoCApplied(
+                        CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                        RESPONDENT_ONE_ORG_POLICY
+                    );
 
-                when(caseAssignmentApi.applyDecision(params.getParams().get(BEARER_TOKEN).toString(),
-                                                     authTokenGenerator.generate(),
-                                                     DecisionRequest.decisionRequest(
-                                                         params.getRequest().getCaseDetails())))
+                when(caseAssignmentApi.applyDecision(
+                    params.getParams().get(BEARER_TOKEN).toString(),
+                    authTokenGenerator.generate(),
+                    DecisionRequest.decisionRequest(
+                        params.getRequest().getCaseDetails())
+                ))
                     .thenReturn(
                         AboutToStartOrSubmitCallbackResponse.builder()
                             .data(caseDetailsAfterNoCApplied.getData()).build());
@@ -145,21 +154,27 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
                     .changeOrganisationRequestField(false, false, "1234", null, REQUESTER_EMAIL)
                     .build();
                 caseData = caseData.toBuilder().respondent1OrganisationIDCopy(null).build();
-                CallbackParams params = callbackParamsOf(caseData,
-                                                         CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                                         ABOUT_TO_SUBMIT);
+                CallbackParams params = callbackParamsOf(
+                    caseData,
+                    CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                    ABOUT_TO_SUBMIT
+                );
 
                 CaseDetails caseDetailsAfterNoCApplied =
-                    caseDetailsAfterNoCApplied(CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                               RESPONDENT_ONE_ORG_POLICY);
+                    caseDetailsAfterNoCApplied(
+                        CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                        RESPONDENT_ONE_ORG_POLICY
+                    );
 
-                when(caseAssignmentApi.applyDecision(params.getParams().get(BEARER_TOKEN).toString(),
-                                                     authTokenGenerator.generate(),
-                                                     DecisionRequest.decisionRequest(
-                                                         params.getRequest().getCaseDetails())))
+                when(caseAssignmentApi.applyDecision(
+                    params.getParams().get(BEARER_TOKEN).toString(),
+                    authTokenGenerator.generate(),
+                    DecisionRequest.decisionRequest(
+                        params.getRequest().getCaseDetails())
+                ))
                     .thenReturn(
                         AboutToStartOrSubmitCallbackResponse.builder()
-                        .data(caseDetailsAfterNoCApplied.getData()).build());
+                            .data(caseDetailsAfterNoCApplied.getData()).build());
 
                 AboutToStartOrSubmitCallbackResponse response =
                     (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -174,21 +189,27 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                     .changeOrganisationRequestField(true, false, "1234", "QWERTY A", REQUESTER_EMAIL)
                     .build();
-                CallbackParams params = callbackParamsOf(caseData,
-                                                         CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                                         ABOUT_TO_SUBMIT);
+                CallbackParams params = callbackParamsOf(
+                    caseData,
+                    CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                    ABOUT_TO_SUBMIT
+                );
 
                 CaseDetails caseDetailsAfterNoCApplied =
-                    caseDetailsAfterNoCApplied(CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                               APPLICANT_ONE_ORG_POLICY);
+                    caseDetailsAfterNoCApplied(
+                        CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                        APPLICANT_ONE_ORG_POLICY
+                    );
 
-                when(caseAssignmentApi.applyDecision(params.getParams().get(BEARER_TOKEN).toString(),
-                                                     authTokenGenerator.generate(),
-                                                     DecisionRequest.decisionRequest(
-                                                         params.getRequest().getCaseDetails())))
+                when(caseAssignmentApi.applyDecision(
+                    params.getParams().get(BEARER_TOKEN).toString(),
+                    authTokenGenerator.generate(),
+                    DecisionRequest.decisionRequest(
+                        params.getRequest().getCaseDetails())
+                ))
                     .thenReturn(
                         AboutToStartOrSubmitCallbackResponse.builder()
-                        .data(caseDetailsAfterNoCApplied.getData()).build());
+                            .data(caseDetailsAfterNoCApplied.getData()).build());
 
                 AboutToStartOrSubmitCallbackResponse response =
                     (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -208,21 +229,27 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
                     .multiPartyClaimTwoDefendantSolicitors()
                     .changeOrganisationRequestField(true, false, "1234", "QWERTY A", REQUESTER_EMAIL)
                     .build();
-                CallbackParams params = callbackParamsOf(caseData,
-                                                         CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                                         ABOUT_TO_SUBMIT);
+                CallbackParams params = callbackParamsOf(
+                    caseData,
+                    CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                    ABOUT_TO_SUBMIT
+                );
 
                 CaseDetails caseDetailsAfterNoCApplied =
-                    caseDetailsAfterNoCApplied(CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                               APPLICANT_ONE_ORG_POLICY);
+                    caseDetailsAfterNoCApplied(
+                        CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                        APPLICANT_ONE_ORG_POLICY
+                    );
 
-                when(caseAssignmentApi.applyDecision(params.getParams().get(BEARER_TOKEN).toString(),
-                                                     authTokenGenerator.generate(),
-                                                     DecisionRequest.decisionRequest(
-                                                         params.getRequest().getCaseDetails())))
+                when(caseAssignmentApi.applyDecision(
+                    params.getParams().get(BEARER_TOKEN).toString(),
+                    authTokenGenerator.generate(),
+                    DecisionRequest.decisionRequest(
+                        params.getRequest().getCaseDetails())
+                ))
                     .thenReturn(
                         AboutToStartOrSubmitCallbackResponse.builder()
-                        .data(caseDetailsAfterNoCApplied.getData()).build());
+                            .data(caseDetailsAfterNoCApplied.getData()).build());
 
                 AboutToStartOrSubmitCallbackResponse response =
                     (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -238,21 +265,27 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
                     .multiPartyClaimTwoDefendantSolicitors()
                     .changeOrganisationRequestField(false, false, "1234", "QWERTY R", REQUESTER_EMAIL)
                     .build();
-                CallbackParams params = callbackParamsOf(caseData,
-                                                         CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                                         ABOUT_TO_SUBMIT);
+                CallbackParams params = callbackParamsOf(
+                    caseData,
+                    CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                    ABOUT_TO_SUBMIT
+                );
 
                 CaseDetails caseDetailsAfterNoCApplied =
-                    caseDetailsAfterNoCApplied(CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                               RESPONDENT_ONE_ORG_POLICY);
+                    caseDetailsAfterNoCApplied(
+                        CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                        RESPONDENT_ONE_ORG_POLICY
+                    );
 
-                when(caseAssignmentApi.applyDecision(params.getParams().get(BEARER_TOKEN).toString(),
-                                                     authTokenGenerator.generate(),
-                                                     DecisionRequest.decisionRequest(
-                                                         params.getRequest().getCaseDetails())))
+                when(caseAssignmentApi.applyDecision(
+                    params.getParams().get(BEARER_TOKEN).toString(),
+                    authTokenGenerator.generate(),
+                    DecisionRequest.decisionRequest(
+                        params.getRequest().getCaseDetails())
+                ))
                     .thenReturn(
                         AboutToStartOrSubmitCallbackResponse.builder()
-                        .data(caseDetailsAfterNoCApplied.getData()).build());
+                            .data(caseDetailsAfterNoCApplied.getData()).build());
 
                 AboutToStartOrSubmitCallbackResponse response =
                     (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -268,21 +301,27 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
                     .multiPartyClaimTwoDefendantSolicitors()
                     .changeOrganisationRequestField(false, true, "1234", "QWERTY R2", REQUESTER_EMAIL)
                     .build();
-                CallbackParams params = callbackParamsOf(caseData,
-                                                         CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                                         ABOUT_TO_SUBMIT);
+                CallbackParams params = callbackParamsOf(
+                    caseData,
+                    CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                    ABOUT_TO_SUBMIT
+                );
 
                 CaseDetails caseDetailsAfterNoCApplied =
-                    caseDetailsAfterNoCApplied(CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                               RESPONDENT_TWO_ORG_POLICY);
+                    caseDetailsAfterNoCApplied(
+                        CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                        RESPONDENT_TWO_ORG_POLICY
+                    );
 
-                when(caseAssignmentApi.applyDecision(params.getParams().get(BEARER_TOKEN).toString(),
-                                                     authTokenGenerator.generate(),
-                                                     DecisionRequest.decisionRequest(
-                                                         params.getRequest().getCaseDetails())))
+                when(caseAssignmentApi.applyDecision(
+                    params.getParams().get(BEARER_TOKEN).toString(),
+                    authTokenGenerator.generate(),
+                    DecisionRequest.decisionRequest(
+                        params.getRequest().getCaseDetails())
+                ))
                     .thenReturn(
                         AboutToStartOrSubmitCallbackResponse.builder()
-                        .data(caseDetailsAfterNoCApplied.getData()).build());
+                            .data(caseDetailsAfterNoCApplied.getData()).build());
 
                 AboutToStartOrSubmitCallbackResponse response =
                     (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -297,24 +336,30 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                     .multiPartyClaimOneDefendantSolicitor()
                     .changeOrganisationRequestField(false, false,
-                                                    "1234", "QWERTY R", REQUESTER_EMAIL)
+                                                    "1234", "QWERTY R", REQUESTER_EMAIL
+                    )
                     .build();
-                CallbackParams params = callbackParamsOf(caseData,
-                                                         CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                                         ABOUT_TO_SUBMIT);
+                CallbackParams params = callbackParamsOf(
+                    caseData,
+                    CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                    ABOUT_TO_SUBMIT
+                );
 
                 CaseDetails caseDetailsAfterNoCApplied =
-                    caseDetailsAfterNoCApplied(CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                               RESPONDENT_ONE_ORG_POLICY);
+                    caseDetailsAfterNoCApplied(
+                        CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                        RESPONDENT_ONE_ORG_POLICY
+                    );
 
                 when(caseAssignmentApi.applyDecision(
                     params.getParams().get(BEARER_TOKEN).toString(),
                     authTokenGenerator.generate(),
                     DecisionRequest.decisionRequest(
-                        params.getRequest().getCaseDetails())))
+                        params.getRequest().getCaseDetails())
+                ))
                     .thenReturn(
                         AboutToStartOrSubmitCallbackResponse.builder()
-                        .data(caseDetailsAfterNoCApplied.getData()).build());
+                            .data(caseDetailsAfterNoCApplied.getData()).build());
 
                 AboutToStartOrSubmitCallbackResponse response =
                     (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -330,21 +375,27 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
                     .multiPartyClaimOneDefendantSolicitor()
                     .changeOrganisationRequestField(false, true, "1234", "QWERTY R2", REQUESTER_EMAIL)
                     .build();
-                CallbackParams params = callbackParamsOf(caseData,
-                                                         CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                                         ABOUT_TO_SUBMIT);
+                CallbackParams params = callbackParamsOf(
+                    caseData,
+                    CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                    ABOUT_TO_SUBMIT
+                );
 
                 CaseDetails caseDetailsAfterNoCApplied =
-                    caseDetailsAfterNoCApplied(CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                               RESPONDENT_TWO_ORG_POLICY);
+                    caseDetailsAfterNoCApplied(
+                        CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                        RESPONDENT_TWO_ORG_POLICY
+                    );
 
-                when(caseAssignmentApi.applyDecision(params.getParams().get(BEARER_TOKEN).toString(),
-                                                     authTokenGenerator.generate(),
-                                                     DecisionRequest.decisionRequest(
-                                                         params.getRequest().getCaseDetails())))
+                when(caseAssignmentApi.applyDecision(
+                    params.getParams().get(BEARER_TOKEN).toString(),
+                    authTokenGenerator.generate(),
+                    DecisionRequest.decisionRequest(
+                        params.getRequest().getCaseDetails())
+                ))
                     .thenReturn(
                         AboutToStartOrSubmitCallbackResponse.builder()
-                        .data(caseDetailsAfterNoCApplied.getData()).build());
+                            .data(caseDetailsAfterNoCApplied.getData()).build());
 
                 AboutToStartOrSubmitCallbackResponse response =
                     (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -360,18 +411,24 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
                     .multiPartyClaimTwoDefendantSolicitors()
                     .changeOrganisationRequestField(false, true, "1234", null, REQUESTER_EMAIL)
                     .build();
-                CallbackParams params = callbackParamsOf(caseData,
-                                                         CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                                         ABOUT_TO_SUBMIT);
+                CallbackParams params = callbackParamsOf(
+                    caseData,
+                    CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                    ABOUT_TO_SUBMIT
+                );
 
                 CaseDetails caseDetailsAfterNoCApplied =
-                    caseDetailsAfterNoCApplied(CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                               RESPONDENT_TWO_ORG_POLICY);
+                    caseDetailsAfterNoCApplied(
+                        CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                        RESPONDENT_TWO_ORG_POLICY
+                    );
 
-                when(caseAssignmentApi.applyDecision(params.getParams().get(BEARER_TOKEN).toString(),
-                                                     authTokenGenerator.generate(),
-                                                     DecisionRequest.decisionRequest(
-                                                         params.getRequest().getCaseDetails()))).thenReturn(
+                when(caseAssignmentApi.applyDecision(
+                    params.getParams().get(BEARER_TOKEN).toString(),
+                    authTokenGenerator.generate(),
+                    DecisionRequest.decisionRequest(
+                        params.getRequest().getCaseDetails())
+                )).thenReturn(
                     AboutToStartOrSubmitCallbackResponse.builder()
                         .data(caseDetailsAfterNoCApplied.getData()).build()
                 );
@@ -390,20 +447,26 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
                     .changeOrganisationRequestField(false, true, "1234", null, REQUESTER_EMAIL)
                     .build();
                 caseData = caseData.toBuilder().respondent2OrganisationIDCopy(null).build();
-                CallbackParams params = callbackParamsOf(caseData,
-                                                         CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                                         ABOUT_TO_SUBMIT);
+                CallbackParams params = callbackParamsOf(
+                    caseData,
+                    CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                    ABOUT_TO_SUBMIT
+                );
 
                 CaseDetails caseDetailsAfterNoCApplied =
-                    caseDetailsAfterNoCApplied(CaseDetails.builder().data(caseData.toMap(mapper)).build(),
-                                               RESPONDENT_TWO_ORG_POLICY);
+                    caseDetailsAfterNoCApplied(
+                        CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                        RESPONDENT_TWO_ORG_POLICY
+                    );
 
-                when(caseAssignmentApi.applyDecision(params.getParams().get(BEARER_TOKEN).toString(),
-                                                     authTokenGenerator.generate(),
-                                                     DecisionRequest.decisionRequest(
-                                                         params.getRequest().getCaseDetails()))).thenReturn(
-                                                             AboutToStartOrSubmitCallbackResponse.builder()
-                                                                 .data(caseDetailsAfterNoCApplied.getData()).build()
+                when(caseAssignmentApi.applyDecision(
+                    params.getParams().get(BEARER_TOKEN).toString(),
+                    authTokenGenerator.generate(),
+                    DecisionRequest.decisionRequest(
+                        params.getRequest().getCaseDetails())
+                )).thenReturn(
+                    AboutToStartOrSubmitCallbackResponse.builder()
+                        .data(caseDetailsAfterNoCApplied.getData()).build()
                 );
 
                 AboutToStartOrSubmitCallbackResponse response =
@@ -507,8 +570,10 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
 
         @NotNull
         private CaseDetails caseDetailsAfterNoCApplied(CaseDetails caseDetails, String applicantOrRespondentOrgPolicy) {
-            caseDetails.getData().put(CHANGE_ORGANISATION_REQUEST_FIELD,
-                                      ChangeOrganisationRequest.builder().createdBy(REQUESTER_EMAIL).build());
+            caseDetails.getData().put(
+                CHANGE_ORGANISATION_REQUEST_FIELD,
+                ChangeOrganisationRequest.builder().createdBy(REQUESTER_EMAIL).build()
+            );
             caseDetails.getData().put(applicantOrRespondentOrgPolicy, OrganisationPolicy.builder()
                 .organisation(Organisation.builder()
                                   .organisationID(NEW_ORG_ID)
@@ -539,10 +604,16 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
 
         private void assertCamundaEventIsReady(AboutToStartOrSubmitCallbackResponse response) {
             assertThat(response.getData())
-                .containsEntry("businessProcess", Map.of(
-                    "status", "READY",
-                    "camundaEvent", "APPLY_NOC_DECISION"
-                ));
+                .extracting("businessProcess")
+                .extracting("status", "camundaEvent")
+                .containsOnly("READY", "APPLY_NOC_DECISION");
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("createdOn")
+                .asString().matches(
+                    "((19|2[0-9])[0-9]{2})-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T" +
+                        "(([0-1][0-9])|([2][0-3])):([0-5][0-9]):([0-5][0-9]).\\d{5,}");
         }
     }
 }
