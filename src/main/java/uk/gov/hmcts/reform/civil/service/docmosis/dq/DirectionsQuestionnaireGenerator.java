@@ -503,7 +503,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGenerator<D
 
     private RequestedCourt getRequestedCourt(DQ dq) {
         RequestedCourt rc = dq.getRequestedCourt();
-        if (rc != null && null != rc.getCaseLocation()) {
+        if (null != rc && null != rc.getCaseLocation()) {
             List<LocationRefData> courtLocations = (locationRefDataService
                 .getCourtLocationsByEpimmsId(
                     CallbackParams.Params.BEARER_TOKEN.toString(),
