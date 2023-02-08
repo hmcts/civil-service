@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Value;
+import uk.gov.hmcts.reform.civil.model.Bundle;
+
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -12,11 +14,11 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class BundleData {
 
-    @JsonProperty("caseBundlesInfo")
+    @JsonProperty("caseBundles")
     public List<Bundle> caseBundles;
 
     @JsonCreator
-    public BundleData(@JsonProperty("caseBundlesInfo") List<Bundle> caseBundles) {
+    public BundleData(@JsonProperty("caseBundles") List<Bundle> caseBundles) {
         this.caseBundles = caseBundles;
     }
 }

@@ -12,8 +12,9 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.bundle.Bundle;
+import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
@@ -21,8 +22,9 @@ import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_BUNDLE;
 
 @Slf4j
@@ -45,43 +47,34 @@ public class BundleCreationTriggerEventHandler {
             String caseId = event.getCaseId().toString();
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, CREATE_BUNDLE);
             CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails().getData());
-            //moveExistingCaseBundlesToHistoricalBundles(caseData);
+            List<IdValue<Bundle>> newBundles = new ArrayList<>();
+
             bundleCreateResponse.getData().getCaseBundles().forEach(bundle -> {
-                bundle.getValue().setCreatedOn(LocalDateTime.now());
-                bundle.getValue().setBundleHearingDate(caseData.getHearingDate());
+                bundle.setCreatedOn(Optional.of(LocalDateTime.now()));
+                bundle.setBundleHearingDate(Optional.of(caseData.getHearingDate()));
+                newBundles.add(new IdValue<>(bundle.getId(),
+                                             bundle));
+
             });
-            caseData.setCaseBundlesInfo(bundleCreateResponse.getData().getCaseBundles());
-            log.info("caseData.getCaseBundlesInfo :" + caseData.getCaseBundlesInfo());
-            CaseDataContent caseContent = getCaseContent(caseData, startEventResponse);
+            List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
+            caseBundles.addAll(newBundles);
+            log.info("caseData.getCaseBundles :" + caseBundles);
+            CaseDataContent caseContent = getCaseContent(caseBundles, startEventResponse);
             coreCaseDataService.submitUpdate(caseId, caseContent);
-            log.info("*** Bundle created successfully for the case id: {}", caseData.getCcdCaseReference());
+            log.info("caseData updated for caseId :" + caseId);
         }
     }
 
-    private CaseDataContent getCaseContent(CaseData caseData, StartEventResponse startEventResponse) {
+    private CaseDataContent getCaseContent(List<IdValue<Bundle>> caseBundles, StartEventResponse startEventResponse) {
+        Map<String, Object> data = startEventResponse.getCaseDetails().getData();
+        data.put("caseBundles", caseBundles);
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder()
                        .id(startEventResponse.getEventId())
                        .summary("bundle created")
                        .build())
-            .data(caseData)
+            .data(data)
             .build();
-    }
-
-    private void moveExistingCaseBundlesToHistoricalBundles(CaseData caseData) {
-        List<Bundle> historicalBundles = new ArrayList<>();
-        List<Bundle> existingBundleInformation = caseData.getCaseBundlesInfo();
-        List<Bundle> historicBundleInformation = caseData.getHistoricalBundles();
-        if (nonNull(existingBundleInformation)) {
-            if (nonNull(existingBundleInformation)) {
-                historicalBundles.addAll(existingBundleInformation);
-            }
-            if (nonNull(historicBundleInformation)) {
-                historicalBundles.addAll(historicBundleInformation);
-            }
-            caseData.setHistoricalBundles(historicalBundles);
-            //existingBundleInformation.setCaseBundles(null);
-        }
     }
 }

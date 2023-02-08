@@ -661,8 +661,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<UploadEvidenceDocumentType>> documentCostsRes2;
     private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialRes2;
     private final LocalDateTime caseDocumentUploadDateRes;
-    private List<uk.gov.hmcts.reform.civil.model.bundle.Bundle> caseBundlesInfo;
-    private List<uk.gov.hmcts.reform.civil.model.bundle.Bundle> historicalBundles;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
