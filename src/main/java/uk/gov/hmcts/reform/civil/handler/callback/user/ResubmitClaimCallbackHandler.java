@@ -57,11 +57,9 @@ public class ResubmitClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         if ("CREATE_CLAIM_SPEC".equals(callbackParams.getRequest().getEventId())
             || isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
-            if (toggleService.isLrSpecEnabled()) {
-                caseData = caseData.toBuilder()
-                    .businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC))
-                    .build();
-            }
+            caseData = caseData.toBuilder()
+                .businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC))
+                .build();
         } else {
             caseData = caseData.toBuilder()
                 .businessProcess(BusinessProcess.ready(CREATE_CLAIM))
