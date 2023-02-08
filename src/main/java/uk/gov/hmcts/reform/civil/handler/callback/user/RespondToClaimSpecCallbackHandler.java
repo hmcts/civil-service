@@ -146,11 +146,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     @Override
     public List<CaseEvent> handledEvents() {
-        if (toggleService.isLrSpecEnabled()) {
-            return EVENTS;
-        } else {
-            return Collections.emptyList();
-        }
+        return EVENTS;
     }
 
     @Override
