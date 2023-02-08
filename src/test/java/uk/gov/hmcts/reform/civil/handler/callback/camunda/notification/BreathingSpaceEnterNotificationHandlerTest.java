@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -26,7 +26,7 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class BreathingSpaceEnterNotificationHandlerTest {
 
     @InjectMocks
@@ -50,8 +50,8 @@ public class BreathingSpaceEnterNotificationHandlerTest {
         String organisationName = "organisation name";
         Mockito.when(organisationService.findOrganisationById(organisationId))
             .thenReturn(Optional.of(uk.gov.hmcts.reform.prd.model.Organisation.builder()
-                            .name(organisationName)
-                            .build()));
+                                        .name(organisationName)
+                                        .build()));
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
@@ -81,8 +81,8 @@ public class BreathingSpaceEnterNotificationHandlerTest {
             eq(templateId),
             argThat(
                 map -> map.get(NotificationData.CLAIM_REFERENCE_NUMBER).equals(caseData.getLegacyCaseReference())
-            && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
-            && map.get("defendantName").equals(caseData.getRespondent1().getPartyName())),
+                    && map.get(NotificationData.CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC).equals(organisationName)
+                    && map.get("defendantName").equals(caseData.getRespondent1().getPartyName())),
             argThat(string -> string.contains(caseData.getLegacyCaseReference()))
         );
     }
@@ -248,17 +248,17 @@ public class BreathingSpaceEnterNotificationHandlerTest {
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
             .applicant1(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .companyName("company name")
-                             .build())
+                            .type(Party.Type.COMPANY)
+                            .companyName("company name")
+                            .build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                                                 .email(recipient)
                                                 .build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(Organisation.builder()
-                                                                 .organisationID(organisationId)
-                                                                 .build())
-                                               .build())
+                                              .organisation(Organisation.builder()
+                                                                .organisationID(organisationId)
+                                                                .build())
+                                              .build())
             .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder()
                                                           .name(solicitorName)
                                                           .build())

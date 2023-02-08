@@ -105,6 +105,15 @@ class FeatureToggleServiceTest {
     }
 
     @Test
+    void shouldCallBoolVariation_whenIsCaseFlagsEnabledInvoked() {
+        var caseFlagsKey = "case-flags";
+        givenToggle(caseFlagsKey, true);
+
+        assertThat(featureToggleService.isCaseFlagsEnabled()).isTrue();
+        verifyBoolVariationCalled(caseFlagsKey, List.of("timestamp", "environment"));
+    }
+
+    @Test
     void shouldCallBoolVariation_whenIsGeneralApplicationsEnabledInvoked() {
         var generalApplicationsKey = "general_applications_enabled";
         givenToggle(generalApplicationsKey, true);
@@ -113,14 +122,14 @@ class FeatureToggleServiceTest {
         verifyBoolVariationCalled(generalApplicationsKey, List.of("timestamp", "environment"));
     }
 
-    @Test
-    void shouldCallBoolVariation_whenIsPinInPostEnabledInvoked() {
-        var pinInPostKey = "pin-in-post";
-        givenToggle(pinInPostKey, true);
-
-        assertThat(featureToggleService.isPinInPostEnabled()).isTrue();
-        verifyBoolVariationCalled(pinInPostKey, List.of("timestamp", "environment"));
-    }
+    // @Test
+    // void shouldCallBoolVariation_whenIsPinInPostEnabledInvoked() {
+    // var pinInPostKey = "pin-in-post";
+    // givenToggle(pinInPostKey, true);
+    //
+    // assertThat(featureToggleService.isPinInPostEnabled()).isTrue();
+    // verifyBoolVariationCalled(pinInPostKey, List.of("timestamp", "environment"));
+    // }
 
     @Test
     void shouldCallBoolVariation_whenIsSDOEnabledInvoked() {

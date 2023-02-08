@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -39,6 +38,7 @@ import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.FutureApplications;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
+import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -276,8 +276,18 @@ class DirectionsQuestionnaireGeneratorTest {
             @Test
             void whenCaseStateIsRespondedToClaim_shouldGetRespondentDQData() {
                 CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
-                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder()
+                                                    .fullName("Applicant LF")
+                                                    .firstName("Applicant")
+                                                    .lastName("LF")
+                                                    .phoneNumber("1234567890")
+                                                    .emailAddress("applicantLF@email.com").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder()
+                                                     .fullName("Respondent LF")
+                                                     .firstName("Respondent")
+                                                     .lastName("LF")
+                                                     .phoneNumber("1234567890")
+                                                     .emailAddress("respondentLF@email.com").build())
                     .build();
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
@@ -293,8 +303,18 @@ class DirectionsQuestionnaireGeneratorTest {
                     .toBuilder()
                     .businessProcess(BusinessProcess.builder()
                                          .camundaEvent("CLAIMANT_RESPONSE").build())
-                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
-                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder()
+                                                    .fullName("Applicant LF")
+                                                    .firstName("Applicant")
+                                                    .lastName("LF")
+                                                    .phoneNumber("1234567890")
+                                                    .emailAddress("applicantLF@email.com").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder()
+                                                     .fullName("Respondent LF")
+                                                     .firstName("Respondent")
+                                                     .lastName("LF")
+                                                     .phoneNumber("1234567890")
+                                                     .emailAddress("respondentLF@email.com").build())
                     .build();
 
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
@@ -304,9 +324,12 @@ class DirectionsQuestionnaireGeneratorTest {
             }
 
             @Test
-            void whenCaseStateIsFullDefence1v1ApplicantProceedsLRSpec_shouldGetRespondentDQData() {
+            void whenCaseStateIsFullDefence1v1ApplicantProceedsLRSpec_shouldGetApplicantDQData() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
+                    .applicant1DQWithExperts()
+                    .applicant1DQWithWitnesses()
+                    .applicant1DQWithHearingSupport()
                     .build()
                     .toBuilder()
                     .businessProcess(BusinessProcess.builder()
@@ -320,9 +343,19 @@ class DirectionsQuestionnaireGeneratorTest {
 
                 verify(representativeService).getRespondent1Representative(caseData);
                 //assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
+                assertEquals(applicant1ExpertsMock(), templateData.getExperts());
+                assertEquals(applicant1WitnessesMock(), templateData.getWitnesses());
                 assertEquals(
-                    templateData.getFileDirectionsQuestionnaire(),
-                    caseData.getApplicant1DQ().getFileDirectionQuestionnaire()
+                    templateData.getSupport(),
+                    caseData.getApplicant1DQ().getHearingSupport()
+                );
+                assertEquals(
+                    caseData.getApplicant1DQ().getFileDirectionQuestionnaire(),
+                    templateData.getFileDirectionsQuestionnaire()
+                );
+                assertEquals(
+                    templateData.getSupport(),
+                    caseData.getApplicant1DQ().getHearingSupport()
                 );
             }
 
@@ -331,6 +364,9 @@ class DirectionsQuestionnaireGeneratorTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
                     .multiPartyClaimTwoApplicants()
+                    .applicant1DQWithExperts()
+                    .applicant1DQWithWitnesses()
+                    .applicant1DQWithHearingSupport()
                     .build()
                     .toBuilder()
                     .businessProcess(BusinessProcess.builder()
@@ -346,18 +382,31 @@ class DirectionsQuestionnaireGeneratorTest {
 
                 verify(representativeService).getRespondent1Representative(caseData);
                 //assertThatDqFieldsAreCorrect(templateData, caseData.getApplicant1DQ(), caseData);
+                assertEquals(applicant1ExpertsMock(), templateData.getExperts());
+                assertEquals(applicant1WitnessesMock(), templateData.getWitnesses());
+                assertEquals(
+                    templateData.getSupport(),
+                    caseData.getApplicant1DQ().getHearingSupport()
+                );
                 assertEquals(
                     templateData.getFileDirectionsQuestionnaire(),
                     caseData.getApplicant1DQ().getFileDirectionQuestionnaire()
                 );
+                assertEquals(
+                    templateData.getSupport(),
+                    caseData.getApplicant1DQ().getHearingSupport()
+                );
             }
 
             @Test
-            void whenCaseStateIsFullDefence1v2_ONE_LR_Applicant1ProceedsLRSpec_shouldGetRespondentDQData() {
+            void whenCaseStateIsFullDefence1v2_ONE_LR_Applicant1ProceedsLRSpec_shouldGetApplicantDQData() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimOneDefendantSolicitor()
                     .atStateApplicantRespondToDefenceAndNotProceed_1v2()
                     .applicant1DQ()
+                    .applicant1DQWithExperts()
+                    .applicant1DQWithWitnesses()
+                    .applicant1DQWithHearingSupport()
                     .build()
                     .toBuilder()
                     .businessProcess(BusinessProcess.builder()
@@ -372,9 +421,19 @@ class DirectionsQuestionnaireGeneratorTest {
 
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
 
+                assertEquals(applicant1ExpertsMock(), templateData.getExperts());
+                assertEquals(applicant1WitnessesMock(), templateData.getWitnesses());
+                assertEquals(
+                    templateData.getSupport(),
+                    caseData.getApplicant1DQ().getHearingSupport()
+                );
                 assertEquals(
                     templateData.getFileDirectionsQuestionnaire(),
                     caseData.getApplicant1DQ().getFileDirectionQuestionnaire()
+                );
+                assertEquals(
+                    templateData.getSupport(),
+                    caseData.getApplicant1DQ().getHearingSupport()
                 );
             }
 
@@ -411,8 +470,18 @@ class DirectionsQuestionnaireGeneratorTest {
                     .toBuilder()
                     .businessProcess(BusinessProcess.builder()
                                          .camundaEvent("CLAIMANT_RESPONSE").build())
-                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
-                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder()
+                                                    .fullName("Applicant LF")
+                                                    .firstName("Applicant")
+                                                    .lastName("LF")
+                                                    .phoneNumber("1234567890")
+                                                    .emailAddress("applicantLF@email.com").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder()
+                                                     .fullName("Respondent LF")
+                                                     .firstName("Respondent")
+                                                     .lastName("LF")
+                                                     .phoneNumber("1234567890")
+                                                     .emailAddress("respondentLF@email.com").build())
                     .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
                     .build();
 
@@ -430,8 +499,18 @@ class DirectionsQuestionnaireGeneratorTest {
                     .toBuilder()
                     .businessProcess(BusinessProcess.builder()
                                          .camundaEvent("CLAIMANT_RESPONSE").build())
-                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
-                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder()
+                                                    .fullName("Applicant LF")
+                                                    .firstName("Applicant")
+                                                    .lastName("LF")
+                                                    .phoneNumber("1234567890")
+                                                    .emailAddress("applicantLF@email.com").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder()
+                                                     .fullName("Respondent LF")
+                                                     .firstName("Respondent")
+                                                     .lastName("LF")
+                                                     .phoneNumber("1234567890")
+                                                     .emailAddress("respondentLF@email.com").build())
                     .build();
 
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
@@ -441,15 +520,26 @@ class DirectionsQuestionnaireGeneratorTest {
             }
 
             @Test
-            void whenCaseStateIsFullDefence2v1Applicant2Proceeds_shouldGetRespondentDQData() {
+            void whenCaseStateIsFullDefence2v1Applicant2Proceeds_shouldGetApplicantDQData() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicant2RespondToDefenceAndProceed_2v1()
                     .build()
                     .toBuilder()
                     .businessProcess(BusinessProcess.builder()
                                          .camundaEvent("CLAIMANT_RESPONSE").build())
-                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
-                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder()
+                                                    .fullName("Applicant LF")
+                                                    .firstName("Applicant")
+                                                    .lastName("LF")
+                                                    .phoneNumber("1234567890")
+                                                    .emailAddress("applicantLF@email.com")
+                                                    .build())
+                    .respondent1LitigationFriend(LitigationFriend.builder()
+                                                     .fullName("Respondent LF")
+                                                     .firstName("Respondent")
+                                                     .lastName("LF")
+                                                     .phoneNumber("1234567890")
+                                                     .emailAddress("respondentLF@email.com").build())
                     .build();
 
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
@@ -465,9 +555,27 @@ class DirectionsQuestionnaireGeneratorTest {
                     .multiPartyClaimTwoApplicants()
                     .build()
                     .toBuilder()
-                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
-                    .applicant2LitigationFriend(LitigationFriend.builder().fullName("applicantTwo LF").build())
-                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder()
+                                                    .fullName("Applicant LF")
+                                                    .firstName("Applicant")
+                                                    .lastName("LF")
+                                                    .phoneNumber("1234567890")
+                                                    .emailAddress("applicantLF@email.com")
+                                                    .build())
+                    .applicant2LitigationFriend(LitigationFriend.builder()
+                                                    .fullName("ApplicantTwo LF")
+                                                    .firstName("Applicant2")
+                                                    .lastName("LF")
+                                                    .phoneNumber("1234567890")
+                                                    .emailAddress("applicant2LF@email.com")
+                                                    .build())
+                    .respondent1LitigationFriend(LitigationFriend.builder()
+                                                     .fullName("Respondent LF")
+                                                     .firstName("Respondent")
+                                                     .lastName("LF")
+                                                     .phoneNumber("1234567890")
+                                                     .emailAddress("respondentLF@email.com")
+                                                     .build())
                     .build();
 
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
@@ -512,6 +620,10 @@ class DirectionsQuestionnaireGeneratorTest {
                 uk.gov.hmcts.reform.civil.model.dq.Expert expert1 =
                     uk.gov.hmcts.reform.civil.model.dq.Expert.builder()
                         .name("Expert 1")
+                        .firstName("first")
+                        .lastName("last")
+                        .phoneNumber("07123456789")
+                        .emailAddress("test@email.com")
                         .fieldOfExpertise("expertise 1")
                         .whyRequired("Explanation")
                         .estimatedCost(BigDecimal.valueOf(10000))
@@ -533,6 +645,10 @@ class DirectionsQuestionnaireGeneratorTest {
                 assertThat(extracted.getFieldOfExpertise()).isEqualTo(expert1.getFieldOfExpertise());
                 assertThat(extracted.getWhyRequired()).isEqualTo(expert1.getWhyRequired());
                 assertThat(extracted.getFormattedCost()).isEqualTo("£100.00");
+                assertThat(extracted.getFirstName()).isEqualTo("first");
+                assertThat(extracted.getLastName()).isEqualTo("last");
+                assertThat(extracted.getPhoneNumber()).isEqualTo("07123456789");
+                assertThat(extracted.getEmailAddress()).isEqualTo("test@email.com");
             }
 
             @Test
@@ -675,6 +791,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
                                        .respondToClaimExperts(ExpertDetails.builder()
                                                                   .expertName("Mr Expert Defendant")
+                                                                  .firstName("Expert")
+                                                                  .lastName("Defendant")
+                                                                  .phoneNumber("07123456789")
+                                                                  .emailAddress("test@email.com")
                                                                   .fieldofExpertise("Roofing")
                                                                   .estimatedCost(new BigDecimal(434))
                                                                   .build())
@@ -688,6 +808,29 @@ class DirectionsQuestionnaireGeneratorTest {
 
                 assertThat(templateData.getWitnessesIncludingDefendants())
                     .isEqualTo(witnessesIncludingDefendant);
+            }
+
+            @Test
+            void whenSmallClaimSpecAndWitnesses_withHnlEnabled() {
+                when(featureToggleService.isHearingAndListingSDOEnabled()).thenReturn(true);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .applicant1DQWithWitnesses()
+                    .build()
+                    .toBuilder()
+                    .businessProcess(BusinessProcess.builder()
+                                         .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
+                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
+                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+                    .build();
+
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
+
+                assertThat(templateData.getWitnesses())
+                    .isEqualTo(applicant1WitnessesMock());
             }
 
             @Test
@@ -726,6 +869,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
                                        .respondToClaimExperts(ExpertDetails.builder()
                                                                   .expertName("Mr Expert Defendant")
+                                                                  .firstName("Expert")
+                                                                  .lastName("Defendant")
+                                                                  .phoneNumber("07123456789")
+                                                                  .emailAddress("test@email.com")
                                                                   .fieldofExpertise("Roofing")
                                                                   .estimatedCost(new BigDecimal(434))
                                                                   .build())
@@ -779,8 +926,14 @@ class DirectionsQuestionnaireGeneratorTest {
                 var applicant = caseData.getApplicant1();
                 return Party.builder()
                     .name(applicant.getPartyName())
+                    .emailAddress(applicant.getPartyEmail())
+                    .phoneNumber(applicant.getPartyPhone())
                     .primaryAddress(applicant.getPrimaryAddress())
-                    .litigationFriendName("applicant LF")
+                    .litigationFriendName("Applicant LF")
+                    .litigationFriendFirstName("Applicant")
+                    .litigationFriendLastName("LF")
+                    .litigationFriendEmailAddress("applicantLF@email.com")
+                    .litigationFriendPhoneNumber("1234567890")
                     .build();
             }
 
@@ -788,8 +941,14 @@ class DirectionsQuestionnaireGeneratorTest {
                 var applicant = caseData.getApplicant2();
                 return Party.builder()
                     .name(applicant.getPartyName())
+                    .emailAddress(applicant.getPartyEmail())
+                    .phoneNumber(applicant.getPartyPhone())
                     .primaryAddress(applicant.getPrimaryAddress())
-                    .litigationFriendName("applicantTwo LF")
+                    .litigationFriendName("ApplicantTwo LF")
+                    .litigationFriendFirstName("Applicant2")
+                    .litigationFriendLastName("LF")
+                    .litigationFriendEmailAddress("applicant2LF@email.com")
+                    .litigationFriendPhoneNumber("1234567890")
                     .build();
             }
 
@@ -797,9 +956,15 @@ class DirectionsQuestionnaireGeneratorTest {
                 var respondent = caseData.getRespondent1();
                 return List.of(Party.builder()
                                    .name(respondent.getPartyName())
+                                   .phoneNumber(respondent.getPartyPhone())
+                                   .emailAddress(respondent.getPartyEmail())
                                    .primaryAddress(respondent.getPrimaryAddress())
                                    .representative(defendant1Representative)
-                                   .litigationFriendName("respondent LF")
+                                   .litigationFriendName("Respondent LF")
+                                   .litigationFriendFirstName("Respondent")
+                                   .litigationFriendLastName("LF")
+                                   .litigationFriendEmailAddress("respondentLF@email.com")
+                                   .litigationFriendPhoneNumber("1234567890")
                                    .build());
             }
 
@@ -821,6 +986,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .stream()
                     .map(expert -> Expert.builder()
                         .name(expert.getName())
+                        .firstName(expert.getFirstName())
+                        .lastName(expert.getLastName())
+                        .phoneNumber(expert.getPhoneNumber())
+                        .emailAddress(expert.getEmailAddress())
                         .fieldOfExpertise(expert.getFieldOfExpertise())
                         .whyRequired(expert.getWhyRequired())
                         .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)
@@ -858,6 +1027,14 @@ class DirectionsQuestionnaireGeneratorTest {
                 }
             }
 
+            private HearingSupport getSupportRequirements() {
+                return HearingSupport.builder()
+                    .requirements(List.of())
+                    .supportRequirements(YES)
+                    .supportRequirementsAdditional("Additional support needed")
+                    .build();
+            }
+
             private String getHearingSupport(DQ dq) {
                 var stringBuilder = new StringBuilder();
                 ofNullable(dq.getHearingSupport())
@@ -893,6 +1070,39 @@ class DirectionsQuestionnaireGeneratorTest {
                         welshLanguageRequirements.getCourt()).map(Language::getDisplayedValue).orElse(""))
                     .documents(ofNullable(
                         welshLanguageRequirements.getDocuments()).map(Language::getDisplayedValue).orElse(""))
+                    .build();
+            }
+
+            private Experts applicant1ExpertsMock() {
+                return Experts.builder()
+                    .expertRequired(YES)
+                    .expertReportsSent(ExpertReportsSent.NO.getDisplayedValue())
+                    .jointExpertSuitable(NO)
+                    .details(List.of(
+                                 uk.gov.hmcts.reform.civil.model.docmosis.dq.Expert.builder()
+                                     .firstName("Expert")
+                                     .lastName("One")
+                                     .phoneNumber("01482764322")
+                                     .emailAddress("fast.claim.expert1@example.com")
+                                     .whyRequired("Good reasons")
+                                     .fieldOfExpertise("Some field")
+                                     .formattedCost("£100.00")
+                                     .build()
+                             )
+                    ).build();
+            }
+
+            private Witnesses applicant1WitnessesMock() {
+                return Witnesses.builder()
+                    .witnessesToAppear(YES)
+                    .details(List.of(
+                        Witness.builder()
+                            .firstName("Witness")
+                            .lastName("One")
+                            .phoneNumber("01482764322")
+                            .emailAddress("witness.one@example.com")
+                            .reasonForWitness("Saw something")
+                            .build()))
                     .build();
             }
         }
@@ -966,8 +1176,19 @@ class DirectionsQuestionnaireGeneratorTest {
             void whenRespondent2Response_shouldGetRespondentDQData() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
-                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
-                    .respondent2LitigationFriend(LitigationFriend.builder().fullName("respondent 2 LF").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder()
+                                                    .fullName("Applicant LF")
+                                                    .firstName("Applicant")
+                                                    .lastName("LF")
+                                                    .phoneNumber("1234567890")
+                                                    .emailAddress("applicantLF@email.com")
+                                                    .build())
+                    .respondent2LitigationFriend(LitigationFriend.builder()
+                                                     .fullName("respondent 2 LF")
+                                                     .firstName("Respondent2")
+                                                     .lastName("LF")
+                                                     .phoneNumber("123456789")
+                                                     .emailAddress("respondent2LF@email.com").build())
                     .respondent2ResponseDate(LocalDateTime.now())
                     .respondent2(PartyBuilder.builder().individual().build())
                     .build();
@@ -980,8 +1201,19 @@ class DirectionsQuestionnaireGeneratorTest {
             void whenRespondent2LaterResponse_shouldGetRespondentDQData() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
-                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
-                    .respondent2LitigationFriend(LitigationFriend.builder().fullName("respondent 2 LF").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder()
+                                                    .fullName("Applicant LF")
+                                                    .firstName("Applicant")
+                                                    .lastName("LF")
+                                                    .phoneNumber("1234567890")
+                                                    .emailAddress("applicantLF@email.com")
+                                                    .build())
+                    .respondent2LitigationFriend(LitigationFriend.builder()
+                                                     .fullName("respondent 2 LF")
+                                                     .firstName("Respondent2")
+                                                     .lastName("LF")
+                                                     .phoneNumber("123456789")
+                                                     .emailAddress("respondent2LF@email.com").build())
                     .respondent1ResponseDate(null)
                     .respondent2ResponseDate(LocalDateTime.now())
                     .respondent2(PartyBuilder.builder().individual().build())
@@ -995,9 +1227,26 @@ class DirectionsQuestionnaireGeneratorTest {
             void whenRespondent2SameLegalRepAndRespondentResponseSame_shouldGetRespondentDQData() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses().build().toBuilder()
-                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
-                    .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
-                    .respondent2LitigationFriend(LitigationFriend.builder().fullName("respondent 2 LF").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder()
+                                                    .fullName("Applicant LF")
+                                                    .firstName("Applicant")
+                                                    .lastName("LF")
+                                                    .phoneNumber("1234567890")
+                                                    .emailAddress("applicantLF@email.com")
+                                                    .build())
+                    .respondent1LitigationFriend(LitigationFriend.builder()
+                                                     .fullName("Respondent LF")
+                                                     .firstName("Respondent")
+                                                     .lastName("LF")
+                                                     .phoneNumber("1234567890")
+                                                     .emailAddress("respondentLF@email.com")
+                                                     .build())
+                    .respondent2LitigationFriend(LitigationFriend.builder()
+                                                     .fullName("respondent 2 LF")
+                                                     .firstName("Respondent2")
+                                                     .lastName("LF")
+                                                     .phoneNumber("123456789")
+                                                     .emailAddress("respondent2LF@email.com").build())
                     .respondent1ResponseDate(null)
                     .respondent2ResponseDate(LocalDateTime.now())
                     .respondent2(PartyBuilder.builder().individual().build())
@@ -1183,7 +1432,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondentResponseIsSame(YesOrNo.NO)
                     .systemGeneratedCaseDocuments(new ArrayList<>())
                     .build();
-                Assert.assertThrows(
+                Assertions.assertThrows(
                     IllegalArgumentException.class,
                     () -> generator.generateDQFor1v2DiffSol(caseData, BEARER_TOKEN, null)
                 );
@@ -1208,7 +1457,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondent2ResponseDate(null)
                     .systemGeneratedCaseDocuments(new ArrayList<>())
                     .build();
-                Assert.assertThrows(
+                Assertions.assertThrows(
                     NullPointerException.class,
                     () -> generator.generateDQFor1v2DiffSol(caseData, BEARER_TOKEN, "TWO")
                 );
@@ -1298,8 +1547,18 @@ class DirectionsQuestionnaireGeneratorTest {
                     .respondent2(PartyBuilder.builder().company().build())
                     .businessProcess(BusinessProcess.builder()
                                          .camundaEvent("CLAIMANT_RESPONSE").build())
-                    .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
-                    .respondent2LitigationFriend(LitigationFriend.builder().fullName("respondent 2 LF").build())
+                    .applicant1LitigationFriend(LitigationFriend.builder()
+                                                    .fullName("Applicant LF")
+                                                    .firstName("Applicant")
+                                                    .lastName("LF")
+                                                    .phoneNumber("1234567890")
+                                                    .emailAddress("applicantLF@email.com").build())
+                    .respondent2LitigationFriend(LitigationFriend.builder()
+                                                     .fullName("respondent 2 LF")
+                                                     .firstName("Respondent2")
+                                                     .lastName("LF")
+                                                     .phoneNumber("123456789")
+                                                     .emailAddress("respondent2LF@email.com").build())
                     .build();
 
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData);
@@ -1340,8 +1599,14 @@ class DirectionsQuestionnaireGeneratorTest {
                 var applicant = caseData.getApplicant1();
                 return Party.builder()
                     .name(applicant.getPartyName())
+                    .emailAddress(applicant.getPartyEmail())
+                    .phoneNumber(applicant.getPartyPhone())
                     .primaryAddress(applicant.getPrimaryAddress())
-                    .litigationFriendName("applicant LF")
+                    .litigationFriendName("Applicant LF")
+                    .litigationFriendFirstName("Applicant")
+                    .litigationFriendLastName("LF")
+                    .litigationFriendEmailAddress("applicantLF@email.com")
+                    .litigationFriendPhoneNumber("1234567890")
                     .build();
             }
 
@@ -1350,8 +1615,14 @@ class DirectionsQuestionnaireGeneratorTest {
                 return List.of(Party.builder()
                                    .name(respondent.getPartyName())
                                    .primaryAddress(respondent.getPrimaryAddress())
+                                   .phoneNumber(respondent.getPartyPhone())
+                                   .emailAddress(respondent.getPartyEmail())
                                    .representative(defendant2Representative)
                                    .litigationFriendName("respondent 2 LF")
+                                   .litigationFriendFirstName("Respondent2")
+                                   .litigationFriendLastName("LF")
+                                   .litigationFriendPhoneNumber("123456789")
+                                   .litigationFriendEmailAddress("respondent2LF@email.com")
                                    .build());
             }
 
@@ -1361,15 +1632,27 @@ class DirectionsQuestionnaireGeneratorTest {
                 return List.of(
                     Party.builder()
                         .name(respondent1.getPartyName())
+                        .phoneNumber(respondent1.getPartyPhone())
+                        .emailAddress(respondent1.getPartyEmail())
                         .primaryAddress(respondent1.getPrimaryAddress())
                         .representative(defendant1Representative)
-                        .litigationFriendName("respondent LF")
+                        .litigationFriendName("Respondent LF")
+                        .litigationFriendFirstName("Respondent")
+                        .litigationFriendLastName("LF")
+                        .litigationFriendEmailAddress("respondentLF@email.com")
+                        .litigationFriendPhoneNumber("1234567890")
                         .build(),
                     Party.builder()
                         .name(respondent2.getPartyName())
+                        .phoneNumber(respondent2.getPartyPhone())
+                        .emailAddress(respondent2.getPartyEmail())
                         .primaryAddress(respondent2.getPrimaryAddress())
                         .representative(defendant2Representative)
                         .litigationFriendName("respondent 2 LF")
+                        .litigationFriendFirstName("Respondent2")
+                        .litigationFriendLastName("LF")
+                        .litigationFriendPhoneNumber("123456789")
+                        .litigationFriendEmailAddress("respondent2LF@email.com")
                         .build()
                 );
             }
@@ -1392,6 +1675,10 @@ class DirectionsQuestionnaireGeneratorTest {
                     .stream()
                     .map(expert -> Expert.builder()
                         .name(expert.getName())
+                        .firstName(expert.getFirstName())
+                        .lastName(expert.getLastName())
+                        .phoneNumber(expert.getPhoneNumber())
+                        .emailAddress(expert.getEmailAddress())
                         .fieldOfExpertise(expert.getFieldOfExpertise())
                         .whyRequired(expert.getWhyRequired())
                         .formattedCost(NumberFormat.getCurrencyInstance(Locale.UK)

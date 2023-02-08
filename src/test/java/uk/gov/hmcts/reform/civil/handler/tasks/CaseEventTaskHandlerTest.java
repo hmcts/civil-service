@@ -48,7 +48,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -212,7 +212,12 @@ class CaseEventTaskHandlerTest {
         @Test
         void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
             String errorMessage = "there was an error";
-
+            CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .build();
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+            when(coreCaseDataService.startUpdate(any(), any()))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
             doThrow(new NotFoundException(errorMessage, new RestException(errorMessage, new Exception())))
                 .when(externalTaskService).complete(mockTask);
 
@@ -791,7 +796,7 @@ class CaseEventTaskHandlerTest {
                     caseDataBuilder.atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor()
                         .addRespondent2(YES)
                         .respondent2Represented(YES)
-                        .respondent2OrgRegistered(YES);;
+                        .respondent2OrgRegistered(YES);
                     break;
                 case TAKEN_OFFLINE_BY_STAFF:
                     caseDataBuilder.atStateTakenOfflineByStaff()
