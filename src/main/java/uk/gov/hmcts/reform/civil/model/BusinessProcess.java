@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -19,6 +21,7 @@ public class BusinessProcess {
     private BusinessProcessStatus status;
     private String activityId;
     private String camundaEvent;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createdOn;
 
     public static BusinessProcess ready(CaseEvent caseEvent) {
