@@ -530,6 +530,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String hearingNoticeListOther;
 
     private LocalDateTime caseDismissedHearingFeeDueDate;
+    private YesOrNo trialReadyNotified;
+    private YesOrNo trialReadyChecked;
 
     //default judgement SDO fields for trial/fast track
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
@@ -591,6 +593,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> generalOrderDocument;
     private final List<Element<CaseDocument>> dismissalOrderDocument;
     private final List<Element<CaseDocument>> directionOrderDocument;
+    private final List<Element<CaseDocument>> hearingOrderDocument;
 
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
@@ -668,6 +671,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<UploadEvidenceDocumentType>> documentCostsRes2;
     private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialRes2;
     private final LocalDateTime caseDocumentUploadDateRes;
+    private final HearingNotes hearingNotes;
+
+    private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
+    private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
