@@ -85,7 +85,6 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
-import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseTypeForRespondent;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseTypeForRespondentSpec;
@@ -688,7 +687,7 @@ public class EventHistoryMapper {
                 respondent.getPartyName(),
                 SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                     ? getResponseTypeForRespondentSpec(caseData, respondent)
-                    : getResponseTypeForRespondent(caseData, respondent, featureToggleService.isNoticeOfChangeEnabled())
+                    : getResponseTypeForRespondent(caseData, respondent)
             ));
         }
         return defaultText;
@@ -1492,7 +1491,7 @@ public class EventHistoryMapper {
                 + "preferredCourtCode: %s; stayClaim: %s",
             paginatedMessage,
             respondent.getPartyName(),
-            getResponseTypeForRespondent(caseData, respondent, featureToggleService.isNoticeOfChangeEnabled()),
+            getResponseTypeForRespondent(caseData, respondent),
             getPreferredCourtCode(dq),
             isStayClaim(dq)
         ));

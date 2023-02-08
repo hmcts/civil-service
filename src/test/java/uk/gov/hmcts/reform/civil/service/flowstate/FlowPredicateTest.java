@@ -1277,7 +1277,7 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineByStaff()
                 .setClaimNotificationDate()
-                .setSuperClaimTypeToSpecClaim().build();
+                .setClaimTypeToSpecClaim().build();
 
             assertTrue(takenOfflineByStaffAfterClaimIssue.test(caseData));
         }

@@ -433,7 +433,7 @@ public class FlowPredicate {
             && caseData.getClaimNotificationDeadline() != null
             && caseData.getClaimNotificationDeadline().isAfter(LocalDateTime.now());
 
-        if (isSpecCaseCategory(caseData, caseData.getCaseAccessCategory() != null)) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return basePredicate && caseData.getClaimNotificationDate() != null;
         }
 

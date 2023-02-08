@@ -162,9 +162,9 @@ public class PaymentsService {
     private CreateServiceRequestDTO buildServiceRequest(CaseData caseData) {
         String siteId = null;
 
-        if (!isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             siteId = paymentsConfiguration.getSiteId();
-        } else if (isSpecCaseCategory(caseData, featureToggleService.isAccessProfilesEnabled())) {
+        } else if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             siteId = paymentsConfiguration.getSpecSiteId();
         }
 

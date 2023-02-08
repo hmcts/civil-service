@@ -537,7 +537,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
-            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWOSPEC))).thenReturn(true);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
             var res1witnesses = Witnesses.builder().details(
                 wrapElements(

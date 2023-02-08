@@ -192,8 +192,7 @@ public class PartyUtils {
     private static Predicate<CaseData> defendantSolicitor2Reference = caseData -> caseData
         .getRespondentSolicitor2Reference() != null;
 
-    public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent,
-                                                                      boolean isAccessProfilesEnabled) {
+    public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent) {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (caseData.getRespondent1().equals(respondent)) {
                 return Optional.ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())

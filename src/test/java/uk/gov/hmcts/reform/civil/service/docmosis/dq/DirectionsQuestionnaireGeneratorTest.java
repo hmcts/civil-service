@@ -823,7 +823,7 @@ class DirectionsQuestionnaireGeneratorTest {
                                          .camundaEvent("CLAIMANT_RESPONSE_SPEC").build())
                     .applicant1LitigationFriend(LitigationFriend.builder().fullName("applicant LF").build())
                     .respondent1LitigationFriend(LitigationFriend.builder().fullName("respondent LF").build())
-                    .superClaimType(SuperClaimType.SPEC_CLAIM)
+                    .caseAccessCategory(SPEC_CLAIM)
                     .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
                     .build();
 

@@ -174,7 +174,7 @@ class PaymentsServiceTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
                 .build();
-            caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
+        caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
 
         caseData = caseData.toBuilder().claimIssuedPBADetails(hfPbaDetails).build();
         PBAServiceRequestResponse paymentResponse = paymentsService

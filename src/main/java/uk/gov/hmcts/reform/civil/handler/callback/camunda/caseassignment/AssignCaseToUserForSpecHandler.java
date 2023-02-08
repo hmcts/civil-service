@@ -27,7 +27,6 @@ import java.util.Map;
 import static java.util.Collections.singletonMap;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_CASE_TO_APPLICANT_SOLICITOR1_SPEC;
 
 @Service
@@ -48,7 +47,6 @@ public class AssignCaseToUserForSpecHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT), this::assignSolicitorCaseRole,
-            callbackKey(V_1, ABOUT_TO_SUBMIT), this::assignSolicitorCaseRoleV1,
             callbackKey(SUBMITTED), this::addSupplementaryData
         );
     }

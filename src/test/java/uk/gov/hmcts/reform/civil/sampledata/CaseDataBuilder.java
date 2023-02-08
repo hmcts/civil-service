@@ -1863,8 +1863,7 @@ public class CaseDataBuilder {
         ccdState = PENDING_CASE_ISSUED;
         ccdCaseReference = CASE_ID;
         submittedDate = SUBMITTED_DATE_TIME;
-        caseAccessCategory = CaseCategory.SPEC_CLAIM;
-        superClaimType = SPEC_CLAIM;
+        caseAccessCategory = SPEC_CLAIM;
         claimIssuedPaymentDetails = PaymentDetails.builder().customerReference("12345").build();
         return this;
     }

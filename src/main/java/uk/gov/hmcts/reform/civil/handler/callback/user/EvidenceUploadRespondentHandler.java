@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWOSPEC;
 
 @Service
 public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
@@ -37,10 +36,7 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
 
         if (coreCaseUserService.userHasCaseRole(caseData
                                                     .getCcdCaseReference()
-                                                    .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)
-            || coreCaseUserService.userHasCaseRole(caseData
-                                                       .getCcdCaseReference()
-                                                       .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWOSPEC)) {
+                                                    .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
             return validateValuesParty(caseData.getDocumentForDisclosureRes2(),
                                        caseData.getDocumentWitnessStatementRes2(),
                                        caseData.getDocumentHearsayNoticeRes2(),
