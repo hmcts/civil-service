@@ -663,6 +663,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final LocalDateTime caseDocumentUploadDateRes;
     private final HearingNotes hearingNotes;
 
+    private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
+    private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
+
     /**
      * There are several fields that can hold the I2P of applicant1 depending
      * on multiparty scenario, which complicates all conditions depending on it.
