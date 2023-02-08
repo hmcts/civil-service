@@ -20,7 +20,7 @@ public class CaseReadyBusinessProcessSearchService extends ElasticSearchService 
     public Query query(int startIndex) {
         return new Query(
             boolQuery().must(matchQuery("data.businessProcess.status", "READY"))
-                .must(rangeQuery("data.businessProcess.createdOn").lt("now-5m")),
+                .must(rangeQuery("data.businessProcess.readyOn").lt("now-5m")),
             List.of(),
             startIndex
         );
