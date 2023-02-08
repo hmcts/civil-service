@@ -89,6 +89,7 @@ xui-webapp:
       SERVICES_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw
       SERVICES_CCD_DATA_STORE_API: http://${SERVICE_NAME}-ccd-data-store-api
       SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal
+      SERVICES_PAYMENT_RETURN_URL: https://paymentoutcome-web.aat.platform.hmcts.net
       JURISDICTIONS: CIVIL
       LAUNCH_DARKLY_CLIENT_ID: ~
 
