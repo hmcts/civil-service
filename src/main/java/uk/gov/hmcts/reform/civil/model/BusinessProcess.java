@@ -22,10 +22,10 @@ public class BusinessProcess {
     private String activityId;
     private String camundaEvent;
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private LocalDateTime createdOn;
+    private LocalDateTime readyOn;
 
     public static BusinessProcess ready(CaseEvent caseEvent) {
-        return BusinessProcess.builder().status(READY).camundaEvent(caseEvent.name()).createdOn(LocalDateTime.now())
+        return BusinessProcess.builder().status(READY).camundaEvent(caseEvent.name()).readyOn(LocalDateTime.now())
             .build();
     }
 
