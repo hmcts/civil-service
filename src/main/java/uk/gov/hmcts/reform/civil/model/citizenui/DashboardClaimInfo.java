@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
 @Data
 @Builder
@@ -31,5 +33,14 @@ public class DashboardClaimInfo {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate responseDeadline;
-    private DashboardClaimStatus dashboardClaimStatus;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private LocalDate paymentDate;
+    private DashboardClaimStatus status;
+
+    public long getNumberOfDays() {
+        return Optional.of(responseDeadline).map(deadline -> ChronoUnit.DAYS.between(deadline, LocalDate.now()))
+            .orElse(0L);
+    }
 }

@@ -109,6 +109,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
@@ -717,10 +718,21 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isPayBySetDate() {
+        return defenceAdmitPartPaymentTimeRouteRequired != null
+            && defenceAdmitPartPaymentTimeRouteRequired == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
+    }
+
+    @JsonIgnore
+    public LocalDate getDateForRepayment() {
+       return Optional.of(respondToClaimAdmitPartLRspec)
+           .map(response -> response.getWhenWillThisAmountBePaid()).orElse(null);
+    }
+
+    @JsonIgnore
     public boolean isResponseFullAdmitAndPayByInstallments() {
         return isResponseFullAdmission()
-            && RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN
-            == defenceAdmitPartPaymentTimeRouteRequired;
+            && isPayBySetDate();
     }
 
     @JsonIgnore
@@ -730,7 +742,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     private boolean isResponseFullAdmission(){
-        return respondent1ClaimResponseType != null && respondent1ClaimResponseType == RespondentResponseType.FULL_ADMISSION;
+        return respondent1ClaimResponseType != null
+            && respondent1ClaimResponseType == RespondentResponseType.FULL_ADMISSION;
     }
 
 

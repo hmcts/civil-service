@@ -59,12 +59,14 @@ public class DashboardClaimInfoService {
             .claimantName(caseData.getApplicant1().getPartyName())
             .defendantName(caseData.getRespondent1().getPartyName())
             .claimAmount(caseData.getTotalClaimAmount())
-            .dashboardClaimStatus(new CcdClaimStatusDashboardBuilder()
+            .status(new CcdClaimStatusDashboardBuilder()
                                          .buildDashboardClaimStatus(caseData))
+            .paymentDate(caseData.getDateForRepayment())
             .build();
         if (caseData.getRespondent1ResponseDeadline() != null) {
             item.setResponseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate());
         }
+
         return item;
     }
 }

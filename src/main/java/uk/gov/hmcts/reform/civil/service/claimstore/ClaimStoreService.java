@@ -33,7 +33,7 @@ public class ClaimStoreService {
             .responseDeadline(cmcClaim.getResponseDeadline())
             .claimAmount(cmcClaim.getTotalAmountTillToday())
             .ocmc(true)
-            .dashboardClaimStatus(new CmcStatusDashboardBuilder()
+            .status(new CmcStatusDashboardBuilder()
                                          .buildDashboardClaimStatus(cmcClaim))
             .build()
         ).collect(Collectors.toList());

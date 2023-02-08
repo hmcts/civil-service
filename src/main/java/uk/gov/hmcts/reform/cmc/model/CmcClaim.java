@@ -12,7 +12,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
-import uk.gov.hmcts.reform.civil.model.CountyCourtJudgment;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -44,7 +44,6 @@ public class CmcClaim {
     public Response response;
     private LocalDate moneyReceivedOn;
     private LocalDateTime countyCourtJudgmentRequestedAt;
-    private CountyCourtJudgment countyCourtJudgment;
     private LocalDate admissionPayImmediatelyPastPaymentDate;
     private ClaimantResponse claimantResponse;
     private ClaimState state;
@@ -68,8 +67,7 @@ public class CmcClaim {
 
     @JsonIgnore
     public boolean isEligibleForCCJ() {
-        return countyCourtJudgment == null
-            && hasResponseDeadlinePassed();
+        return hasResponseDeadlinePassed();
     }
 
     @JsonIgnore
@@ -97,7 +95,7 @@ public class CmcClaim {
     @JsonIgnore
     public boolean hasResponseDeadlinePassed(){
         return !hasResponse() && (getResponseDeadline().isAfter(LocalDate.now())
-            || isResponseIsPastFourPmToday());
+            || isResponseDeadlinePastFourPmToday());
     }
 
     @JsonIgnore
@@ -120,7 +118,7 @@ public class CmcClaim {
         return moneyReceivedOn != null && countyCourtJudgmentRequestedAt != null;
     }
 
-    private boolean isResponseIsPastFourPmToday() {
+    private boolean isResponseDeadlinePastFourPmToday() {
         return getResponseDeadline().isEqual(LocalDate.now())
             && LocalDateTime.now().isAfter(LocalDate.now().atTime(16, 0, 0));
     }
