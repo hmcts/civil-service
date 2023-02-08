@@ -54,7 +54,7 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingAddNewDirectionsDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
@@ -454,7 +454,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String detailsOfDirection;
 
     private final HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
-    private final CaseLocation caseManagementLocation;
+    private final CaseLocationCivil caseManagementLocation;
     private final CaseManagementCategory caseManagementCategory;
     private final String locationName;
     private final DynamicList defendantDetailsSpec;
@@ -529,6 +529,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String hearingNoticeListOther;
 
     private LocalDateTime caseDismissedHearingFeeDueDate;
+    private YesOrNo trialReadyNotified;
+    private YesOrNo trialReadyChecked;
 
     //default judgement SDO fields for trial/fast track
     private TrialHearingJudgesRecital trialHearingJudgesRecitalDJ;
@@ -590,6 +592,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> generalOrderDocument;
     private final List<Element<CaseDocument>> dismissalOrderDocument;
     private final List<Element<CaseDocument>> directionOrderDocument;
+    private final List<Element<CaseDocument>> hearingOrderDocument;
 
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
@@ -661,6 +664,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<UploadEvidenceDocumentType>> documentCostsRes2;
     private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialRes2;
     private final LocalDateTime caseDocumentUploadDateRes;
+    private final HearingNotes hearingNotes;
+
+    private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
+    private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
