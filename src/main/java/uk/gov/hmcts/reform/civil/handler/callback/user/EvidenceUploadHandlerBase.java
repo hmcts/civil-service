@@ -128,6 +128,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                    List<EvidenceUploadExpert> expertJointSmallTrack,
                                    List<EvidenceUploadTrial> trialAuthorityFastTrack,
                                    List<EvidenceUploadTrial> trialAuthoritySmallTrack,
+                                   List<EvidenceUploadTrial> trialCostsFastTrack,
+                                   List<EvidenceUploadTrial> trialCostsSmallTrack,
                                    List<EvidenceUploadTrial> trialDocumentaryFastTrack,
                                    List<EvidenceUploadTrial> trialDocumentarySmallTrack
                                    ) {
@@ -142,6 +144,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         caseDataBuilder.expertReportFlag("do_not_show");
         caseDataBuilder.expertJointFlag("do_not_show");
         caseDataBuilder.trialAuthorityFlag("do_not_show");
+        caseDataBuilder.trialCostsFlag("do_not_show");
         caseDataBuilder.trialDocumentaryFlag("do_not_show");
 
         // Based on claim type being fast track or small claims, there will be two different lists to select from
@@ -170,6 +173,10 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         if (nonNull(trialAuthorityFastTrack) && trialAuthorityFastTrack.contains(EvidenceUploadTrial.AUTHORITIES)
             || nonNull(trialAuthoritySmallTrack) && trialAuthoritySmallTrack.contains(EvidenceUploadTrial.AUTHORITIES)) {
             caseDataBuilder.trialAuthorityFlag("show_trial_authority");
+        }
+        if (nonNull(trialCostsFastTrack) && trialCostsFastTrack.contains(EvidenceUploadTrial.COSTS)
+            || nonNull(trialCostsSmallTrack) && trialCostsSmallTrack.contains(EvidenceUploadTrial.COSTS)) {
+            caseDataBuilder.trialCostsFlag("show_trial_costs");
         }
         if (nonNull(trialDocumentaryFastTrack) && trialDocumentaryFastTrack.contains(EvidenceUploadTrial.DOCUMENTARY)
             || nonNull(trialDocumentarySmallTrack) && trialDocumentarySmallTrack.contains(EvidenceUploadTrial.DOCUMENTARY)) {
