@@ -42,7 +42,6 @@ class StateFlowEngineSpecTest {
 
     @BeforeEach
     void setup() {
-        given(featureToggleService.isLrSpecEnabled()).willReturn(true);
         given(featureToggleService.isSpecRpaContinuousFeedEnabled()).willReturn(false);
         given(featureToggleService.isGeneralApplicationsEnabled()).willReturn(false);
         given(featureToggleService.isCertificateOfServiceEnabled()).willReturn(false);

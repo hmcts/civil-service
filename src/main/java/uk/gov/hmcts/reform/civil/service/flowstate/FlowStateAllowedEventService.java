@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -1055,12 +1054,8 @@ public class FlowStateAllowedEventService {
 
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             || CREATE_CLAIM_SPEC.equals(caseEvent) || CREATE_LIP_CLAIM.equals(caseEvent)) {
-            if (toggleService.isLrSpecEnabled()) {
-                StateFlow stateFlow = stateFlowEngine.evaluateSpec(caseDetails);
-                return isAllowedOnStateForSpec(stateFlow.getState().getName(), caseEvent);
-            } else {
-                return false;
-            }
+            StateFlow stateFlow = stateFlowEngine.evaluateSpec(caseDetails);
+            return isAllowedOnStateForSpec(stateFlow.getState().getName(), caseEvent);
         } else {
             StateFlow stateFlow = stateFlowEngine.evaluate(caseDetails);
             return isAllowedOnState(stateFlow.getState().getName(), caseEvent);
@@ -1069,14 +1064,10 @@ public class FlowStateAllowedEventService {
 
     public List<String> getAllowedStates(CaseEvent caseEvent) {
         if (caseEvent.equals(CREATE_CLAIM_SPEC)) {
-            if (toggleService.isLrSpecEnabled()) {
-                return ALLOWED_EVENTS_ON_FLOW_STATE_SPEC.entrySet().stream()
-                    .filter(entry -> entry.getValue().contains(caseEvent))
-                    .map(Map.Entry::getKey)
-                    .collect(Collectors.toList());
-            } else {
-                return Collections.emptyList();
-            }
+            return ALLOWED_EVENTS_ON_FLOW_STATE_SPEC.entrySet().stream()
+                .filter(entry -> entry.getValue().contains(caseEvent))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
         }
         return ALLOWED_EVENTS_ON_FLOW_STATE.entrySet().stream()
             .filter(entry -> entry.getValue().contains(caseEvent))

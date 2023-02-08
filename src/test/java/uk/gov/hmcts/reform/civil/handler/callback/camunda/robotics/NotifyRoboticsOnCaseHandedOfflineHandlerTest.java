@@ -61,8 +61,14 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartySce
 @ExtendWith(SpringExtension.class)
 class NotifyRoboticsOnCaseHandedOfflineHandlerTest extends BaseCallbackHandlerTest {
 
+    @Autowired
+    private NotifyRoboticsOnCaseHandedOfflineHandler handler;
+
     @MockBean
     private RoboticsNotificationService roboticsNotificationService;
+
+    @MockBean
+    private JsonSchemaValidationService validationService;
 
     @MockBean
     OrganisationApi organisationApi;
@@ -78,28 +84,20 @@ class NotifyRoboticsOnCaseHandedOfflineHandlerTest extends BaseCallbackHandlerTe
     @Nested
     class ValidJsonPayload {
 
-        @Autowired
-        private NotifyRoboticsOnCaseHandedOfflineHandler handler;
-
         @Test
         void shouldNotifyRobotics_whenNoSchemaErrors() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             boolean multiPartyScenario = isMultiPartyScenario(caseData);
+
+            // When
             handler.handle(params);
 
+            // Then
             verify(roboticsNotificationService).notifyRobotics(caseData, multiPartyScenario,
                                                                params.getParams().get(BEARER_TOKEN).toString()
             );
-        }
-
-        @Test
-        void shouldNotNotifyRobotics_whenLrDisabled() {
-            CaseData caseData = CaseDataBuilder.builder().atStateProceedsOfflineAdmissionOrCounterClaim().build()
-                .toBuilder().caseAccessCategory(SPEC_CLAIM).build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-            boolean multiPartyScenario = isMultiPartyScenario(caseData);
-            assertThrows(UnsupportedOperationException.class, () -> handler.handle(params));
         }
     }
 
@@ -110,11 +108,6 @@ class NotifyRoboticsOnCaseHandedOfflineHandlerTest extends BaseCallbackHandlerTe
 
     @Nested
     class InValidJsonPayload {
-
-        @MockBean
-        private JsonSchemaValidationService validationService;
-        @Autowired
-        private NotifyRoboticsOnCaseHandedOfflineHandler handler;
 
         @Test
         void shouldThrowJsonSchemaValidationException_whenSchemaErrors() {

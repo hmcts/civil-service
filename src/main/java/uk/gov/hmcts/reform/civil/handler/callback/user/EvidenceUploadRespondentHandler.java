@@ -76,6 +76,8 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
                              caseData.getTrialSelectionEvidenceRes(),
                              caseData.getTrialSelectionEvidenceSmallClaimRes(),
                              caseData.getTrialSelectionEvidenceRes(),
+                             caseData.getTrialSelectionEvidenceSmallClaimRes(),
+                             caseData.getTrialSelectionEvidenceRes(),
                              caseData.getTrialSelectionEvidenceSmallClaimRes());
     }
 
