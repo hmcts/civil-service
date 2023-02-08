@@ -111,11 +111,64 @@ class RpaCaseHandedOfflineConsumerTest extends BaseRpaTest {
 
     @Test
     @SneakyThrows
-    void shouldGeneratePact_whenNoticerOfChangeAndCaseTakenOffline() {
+    void shouldGeneratePact_whenCaseDismissed() {
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atState(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE)
+            .legacyCaseReference("100DC001")
+            .build();
+        String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
+
+        System.out.println("PAYLOAD");
+        System.out.println(payload);
+
+        assertThat(payload, validateJson());
+
+        PactVerificationResult result = getPactVerificationResult(payload);
+
+        assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldGeneratePact_whenNoticeOfChangeAndCaseTakenOffline() {
         when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder()
             .atState(FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED)
+            .legacyCaseReference("100DC001")
+            .applicant1OrganisationPolicy(
+                OrganisationPolicy.builder()
+                    .organisation(Organisation.builder().organisationID("QWERTY R").build())
+                    .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
+                    .previousOrganisations(List.of(
+                        PreviousOrganisationCollectionItem.builder().value(
+                            PreviousOrganisation.builder()
+                                .organisationName("app 1 org")
+                                .toTimestamp(LocalDateTime.parse("2022-02-01T12:00:00.000550439"))
+                                .build()).build()))
+                    .build())
+            .build();
+        String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
+
+        System.out.println("PAYLOAD");
+        System.out.println(payload);
+
+        assertThat(payload, validateJson());
+
+        PactVerificationResult result = getPactVerificationResult(payload);
+
+        assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldGeneratePact_whenNoticeOfChangeAndCaseDismissed() {
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .atState(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE)
             .legacyCaseReference("100DC001")
             .applicant1OrganisationPolicy(
                 OrganisationPolicy.builder()
