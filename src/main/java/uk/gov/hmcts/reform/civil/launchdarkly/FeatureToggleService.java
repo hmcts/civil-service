@@ -61,7 +61,7 @@ public class FeatureToggleService {
     }
 
     public boolean isSdoEnabled() {
-        return true;
+        return isFeatureEnabled("enableSDO");
     }
 
     public boolean isGeneralApplicationsEnabled() {
