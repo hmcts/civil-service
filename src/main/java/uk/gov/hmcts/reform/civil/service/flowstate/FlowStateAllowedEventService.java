@@ -483,7 +483,8 @@ public class FlowStateAllowedEventService {
                 REFER_TO_JUDGE,
                 migrateCase,
                 TAKE_CASE_OFFLINE,
-                GENERATE_DIRECTIONS_ORDER
+                GENERATE_DIRECTIONS_ORDER,
+                EVIDENCE_UPLOAD_APPLICANT
             )
         ),
 
