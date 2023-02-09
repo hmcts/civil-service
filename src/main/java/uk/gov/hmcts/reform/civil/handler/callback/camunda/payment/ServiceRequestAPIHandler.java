@@ -62,11 +62,13 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
-        if (Objects.isNull(caseData.getClaimValue()) && Objects.nonNull(caseData.getTotalClaimAmount())) {
-            caseData = caseData.toBuilder().claimValue(ClaimValue.builder().statementOfValueInPennies(
-                new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))).build()).build();
+        ClaimValue claimValue = caseData.getClaimValue();
+        if (Objects.isNull(claimValue)) {
+            claimValue = ClaimValue.builder().statementOfValueInPennies(
+                new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))).build();
+
         }
-        var fee = feesService.getFeeDataByClaimValue(caseData.getClaimValue());
+        var fee = feesService.getFeeDataByClaimValue(claimValue);
         caseData = caseData.toBuilder().claimFee(fee).build();
         try {
             log.info("calling payment service request {}", caseData.getCcdCaseReference());
