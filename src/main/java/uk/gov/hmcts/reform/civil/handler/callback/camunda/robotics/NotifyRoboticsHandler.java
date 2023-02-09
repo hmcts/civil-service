@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.robotics;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.networknt.schema.ValidationMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
@@ -21,9 +22,11 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSp
 import java.util.Set;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.utils.CaseCategoryUtils.isSpecCaseCategory;
 
+@Slf4j
 @RequiredArgsConstructor
 public abstract class NotifyRoboticsHandler extends CallbackHandler {
 
@@ -39,28 +42,28 @@ public abstract class NotifyRoboticsHandler extends CallbackHandler {
         Set<ValidationMessage> errors = null;
 
         CaseData caseData = callbackParams.getCaseData();
+        String legacyCaseReference = caseData.getLegacyCaseReference();
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
         try {
 
+            log.info(String.format("Start notify robotics for %s", legacyCaseReference));
             if (isSpecCaseCategory(caseData, toggleService.isAccessProfilesEnabled())) {
-                if (toggleService.isLrSpecEnabled()) {
-                    roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
-                    errors = jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString());
-                } else {
-                    throw new UnsupportedOperationException("Specified claims are not enabled");
-                }
+                roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData);
+                errors = jsonSchemaValidationService.validate(roboticsCaseDataSpec.toJsonString());
             } else {
-                roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData);
+                log.info(String.format("Unspec robotics Data Mapping for %s", legacyCaseReference));
+                roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData,
+                                                                         callbackParams.getParams().get(BEARER_TOKEN).toString());
                 errors = jsonSchemaValidationService.validate(roboticsCaseData.toJsonString());
             }
 
             if (errors == null || errors.isEmpty()) {
-                roboticsNotificationService.notifyRobotics(caseData, multiPartyScenario);
+                log.info(String.format("Valid RPA Json payload for %s", legacyCaseReference));
+                roboticsNotificationService.notifyRobotics(caseData, multiPartyScenario,
+                                                           callbackParams.getParams().get(BEARER_TOKEN).toString());
             } else {
                 throw new JsonSchemaValidationException(
-                    format("Invalid RPA Json payload for %s", caseData.getLegacyCaseReference()),
-                    errors
-                );
+                    format("Invalid RPA Json payload for %s", legacyCaseReference), errors);
             }
         } catch (JsonProcessingException e) {
             throw new RoboticsDataException(e.getMessage(), e);

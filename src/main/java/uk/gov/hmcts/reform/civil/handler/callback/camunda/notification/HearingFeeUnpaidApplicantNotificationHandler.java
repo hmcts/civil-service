@@ -71,7 +71,6 @@ public class HearingFeeUnpaidApplicantNotificationHandler extends CallbackHandle
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             HEARING_DATE, formatLocalDate(caseData.getHearingDate(), DATE)
-
         );
     }
 }

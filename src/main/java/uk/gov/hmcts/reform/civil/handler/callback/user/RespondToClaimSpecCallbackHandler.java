@@ -33,7 +33,7 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.dq.HearingLRspec;
+import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
@@ -146,11 +146,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     @Override
     public List<CaseEvent> handledEvents() {
-        if (toggleService.isLrSpecEnabled()) {
-            return EVENTS;
-        } else {
-            return Collections.emptyList();
-        }
+        return EVENTS;
     }
 
     @Override
@@ -1561,7 +1557,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             errors = unavailableDateValidator.validateSmallClaimsHearing(smallClaimHearing);
 
         } else {
-            HearingLRspec hearingLRspec = caseData.getRespondent1DQ().getRespondent1DQHearingFastClaim();
+            Hearing hearingLRspec = caseData.getRespondent1DQ().getRespondent1DQHearingFastClaim();
             errors = unavailableDateValidator.validateFastClaimHearing(hearingLRspec);
         }
 
@@ -1752,6 +1748,18 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (solicitorHasCaseRole(callbackParams, respondentTwoCaseRoleToCheck)
             && FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())) {
             updatedData.defenceAdmitPartPaymentTimeRouteRequired(null);
+        }
+
+        if (caseData.getRespondent1DQWitnessesSmallClaim() != null) {
+            updatedData.respondent1DQ(
+                updatedData.build().getRespondent1DQ().toBuilder().respondent1DQWitnesses(
+                    caseData.getRespondent1DQWitnessesSmallClaim()).build());
+        }
+
+        if (caseData.getRespondent2DQWitnessesSmallClaim() != null) {
+            updatedData.respondent2DQ(
+                updatedData.build().getRespondent2DQ().toBuilder().respondent2DQWitnesses(
+                    caseData.getRespondent2DQWitnessesSmallClaim()).build());
         }
 
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP

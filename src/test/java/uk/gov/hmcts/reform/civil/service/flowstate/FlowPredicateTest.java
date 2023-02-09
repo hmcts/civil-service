@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDism
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterClaimAcknowledgedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotifiedExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.certificateOfServiceEnabled;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
@@ -97,18 +98,33 @@ class FlowPredicateTest {
         void shouldReturnTrue_whenCaseDataAtClaimSubmittedState() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
             assertTrue(claimSubmittedOneRespondentRepresentative.test(caseData));
+            assertFalse(certificateOfServiceEnabled.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_cos_whenCaseDataAtClaimSubmittedState() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            assertFalse(certificateOfServiceEnabled.test(caseData));
         }
 
         @Test
         void shouldReturnTrue_whenCaseDataAtClaimSubmittedOneRespondentRepresentativeState() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedOneRespondentRepresentative().build();
             assertTrue(claimSubmittedOneRespondentRepresentative.test(caseData));
+            assertFalse(certificateOfServiceEnabled.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_cos_whenCaseDataAtClaimSubmittedOneRespondentRepresentativeState() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedOneRespondentRepresentative().build();
+            assertFalse(certificateOfServiceEnabled.test(caseData));
         }
 
         @Test
         void shouldReturnFalse_whenCaseDataAtClaimSubmittedTwoRespondentRepresentativesState() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedTwoRespondentRepresentatives().build();
             assertFalse(claimSubmittedOneRespondentRepresentative.test(caseData));
+            assertFalse(certificateOfServiceEnabled.test(caseData));
         }
 
         @Test
@@ -278,16 +294,20 @@ class FlowPredicateTest {
 
         @Test
         void shouldResolve_whenOnlyOneUnrepresentedDefendant() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1UnrepresentedDefendant()
+                .defendant1LIPAtClaimIssued(YES).build();
 
+            assertTrue(certificateOfServiceEnabled.test(caseData));
             assertTrue(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
             assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
         }
 
         @Test
         void shouldResolve_whenFirstDefendantUnrepresented() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1()
+                .defendant1LIPAtClaimIssued(YES).build();
 
+            assertTrue(certificateOfServiceEnabled.test(caseData));
             assertFalse(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
             assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
             assertFalse(claimSubmittedRespondent2Unrepresented.test(caseData));
@@ -295,8 +315,11 @@ class FlowPredicateTest {
 
         @Test
         void shouldResolve_whenSecondDefendantUnrepresented() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant2().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssuedUnrepresentedDefendant2()
+                .defendant2LIPAtClaimIssued(YES).build();
 
+            assertTrue(certificateOfServiceEnabled.test(caseData));
             assertFalse(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
             assertFalse(claimSubmittedRespondent1Unrepresented.test(caseData));
             assertTrue(claimSubmittedRespondent2Unrepresented.test(caseData));
@@ -304,8 +327,12 @@ class FlowPredicateTest {
 
         @Test
         void shouldResolve_whenBothDefendantsUnrepresented() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .defendant1LIPAtClaimIssued(YES)
+                .defendant2LIPAtClaimIssued(YES)
+                .atStateClaimIssuedUnrepresentedDefendants().build();
 
+            assertTrue(certificateOfServiceEnabled.test(caseData));
             assertFalse(claimSubmittedOneUnrepresentedDefendantOnly.test(caseData));
             assertTrue(claimSubmittedRespondent1Unrepresented.test(caseData));
             assertTrue(claimSubmittedRespondent2Unrepresented.test(caseData));
@@ -1241,6 +1268,16 @@ class FlowPredicateTest {
         @Test
         void shouldReturnTrue_whenCaseDataAtStateTakenOfflineAfterClaimIssue() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff().build();
+
+            assertTrue(takenOfflineByStaffAfterClaimIssue.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataAtStateTakenOfflineAfterClaimIssueSpec() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineByStaff()
+                .setClaimNotificationDate()
+                .setSuperClaimTypeToSpecClaim().build();
 
             assertTrue(takenOfflineByStaffAfterClaimIssue.test(caseData));
         }

@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.robotics.RoboticsAddresses;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 import uk.gov.hmcts.reform.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.prd.model.DxAddress;
@@ -33,8 +34,17 @@ import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_DISMISSED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT2_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_SOLICITOR_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_SOLICITOR_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_SOLICITOR_ID;
 import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPounds;
 
 /**
@@ -45,14 +55,6 @@ import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPound
 @RequiredArgsConstructor
 public class RoboticsDataMapperForSpec {
 
-    public static final String APPLICANT_SOLICITOR_ID = "001";
-    public static final String RESPONDENT_SOLICITOR_ID = "002";
-    public static final String APPLICANT_ID = "001";
-    public static final String RESPONDENT_ID = "002";
-    public static final String RESPONDENT2_ID = "003";
-    public static final String APPLICANT2_ID = "004";
-
-    public static final String RESPONDENT2_SOLICITOR_ID = "003";
     private final RoboticsAddressMapper addressMapper;
     private final EventHistoryMapper eventHistoryMapper;
     private final OrganisationService organisationService;
@@ -66,6 +68,13 @@ public class RoboticsDataMapperForSpec {
             .solicitors(buildSolicitors(caseData))
             .claimDetails(buildClaimDetails(caseData))
             .events(eventHistoryMapper.buildEvents(caseData));
+
+        if (featureToggleService.isNoticeOfChangeEnabled()
+            && (caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM
+            || caseData.getCcdState() == CASE_DISMISSED)) {
+            builder.noticeOfChange(RoboticsDataUtil.buildNoticeOfChange(caseData));
+        }
+
         return builder.build();
     }
 

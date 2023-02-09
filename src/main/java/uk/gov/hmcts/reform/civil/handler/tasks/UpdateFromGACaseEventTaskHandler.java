@@ -1,10 +1,16 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -13,13 +19,9 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Long.parseLong;
+import static java.util.Optional.ofNullable;
 
 @RequiredArgsConstructor
 @Component
@@ -35,28 +37,44 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
 
     @Override
     public void handleTask(ExternalTask externalTask) {
-        ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
-        String generalAppCaseId = variables.getCaseId();
-        String civilCaseId = variables.getGeneralAppParentCaseLink();
+        try {
+            ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
 
-        generalAppCaseData = caseDetailsConverter.toGACaseData(coreCaseDataService
-                                                                   .getCase(parseLong(generalAppCaseId)));
+            String generalAppCaseId =
+                ofNullable(variables.getCaseId())
+                    .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
+            String civilCaseId =
+                ofNullable(variables.getGeneralAppParentCaseLink())
+                    .orElseThrow(() -> new InvalidCaseDataException(
+                        "General application parent case link not found"));
 
-        StartEventResponse startEventResponse = coreCaseDataService.startUpdate(civilCaseId, variables.getCaseEvent());
-        civilCaseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+            generalAppCaseData = caseDetailsConverter.toGACaseData(coreCaseDataService
+                                                                       .getCase(parseLong(generalAppCaseId)));
 
-        data = coreCaseDataService.submitUpdate(
-            civilCaseId,
-            CaseDataContentConverter.caseDataContentFromStartEventResponse(
-                startEventResponse,
-                getUpdatedCaseData(civilCaseData, generalAppCaseData)
-            )
-        );
+            StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
+                civilCaseId,
+                variables.getCaseEvent()
+            );
+            civilCaseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+
+            data = coreCaseDataService.submitUpdate(
+                civilCaseId,
+                CaseDataContentConverter.caseDataContentFromStartEventResponse(
+                    startEventResponse,
+                    getUpdatedCaseData(civilCaseData, generalAppCaseData)
+                )
+            );
+        } catch (NumberFormatException ne) {
+            throw new InvalidCaseDataException(
+                "Conversion to long datatype failed for general application for a case ", ne
+            );
+        } catch (IllegalArgumentException | ValueMapperException e) {
+            throw new InvalidCaseDataException("Mapper conversion failed due to incompatible types", e);
+        }
     }
 
     private Map<String, Object> getUpdatedCaseData(CaseData civilCaseData, CaseData generalAppCaseData) {
-        List<Element<CaseDocument>> generalOrderDocument = Optional
-            .ofNullable(civilCaseData.getGeneralOrderDocument())
+        List<Element<CaseDocument>> generalOrderDocument = ofNullable(civilCaseData.getGeneralOrderDocument())
             .orElse(newArrayList());
 
         if (generalAppCaseData.getGeneralOrderDocument() != null
@@ -64,8 +82,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             generalOrderDocument.addAll(generalAppCaseData.getGeneralOrderDocument());
         }
 
-        List<Element<CaseDocument>> dismissalOrderDocument = Optional
-            .ofNullable(civilCaseData.getDismissalOrderDocument())
+        List<Element<CaseDocument>> dismissalOrderDocument = ofNullable(civilCaseData.getDismissalOrderDocument())
             .orElse(newArrayList());
 
         if (generalAppCaseData.getDismissalOrderDocument() != null
@@ -73,8 +90,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             dismissalOrderDocument.addAll(generalAppCaseData.getDismissalOrderDocument());
         }
 
-        List<Element<CaseDocument>> directionOrderDocument = Optional
-            .ofNullable(civilCaseData.getDirectionOrderDocument())
+        List<Element<CaseDocument>> directionOrderDocument = ofNullable(civilCaseData.getDirectionOrderDocument())
             .orElse(newArrayList());
 
         if (generalAppCaseData.getDirectionOrderDocument() != null
@@ -82,10 +98,19 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             directionOrderDocument.addAll(generalAppCaseData.getDirectionOrderDocument());
         }
 
+        List<Element<CaseDocument>> hearingOrderDocument = ofNullable(civilCaseData.getHearingOrderDocument())
+                .orElse(newArrayList());
+
+        if (generalAppCaseData.getHearingOrderDocument() != null
+                && checkIfDocumentExists(hearingOrderDocument, generalAppCaseData.getHearingOrderDocument()) < 1) {
+            hearingOrderDocument.addAll(generalAppCaseData.getHearingOrderDocument());
+        }
+
         Map<String, Object> output = civilCaseData.toMap(mapper);
         output.put("generalOrderDocument", generalOrderDocument.isEmpty() ? null : generalOrderDocument);
         output.put("dismissalOrderDocument", dismissalOrderDocument.isEmpty() ? null : dismissalOrderDocument);
         output.put("directionOrderDocument", directionOrderDocument.isEmpty() ? null : directionOrderDocument);
+        output.put("hearingOrderDocument", hearingOrderDocument.isEmpty() ? null : hearingOrderDocument);
 
         return output;
     }
