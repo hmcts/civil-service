@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseassignment;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -54,13 +53,6 @@ class AssignCaseToUserForSpecHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private FeatureToggleService toggleService;
 
-    @Test
-    void ldBlock() {
-        when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assertions.assertTrue(handler.handledEvents().isEmpty());
-        Assertions.assertFalse(handler.handledEvents().isEmpty());
-    }
-
     @Nested
     class AssignHmctsServiceId {
 
@@ -76,8 +68,13 @@ class AssignCaseToUserForSpecHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnSupplementaryDataWhenGlobalSearchEnabled() {
+            // Given
             when(toggleService.isGlobalSearchEnabled()).thenReturn(true);
+
+            // When
             handler.handle(params);
+
+            // Then
             verify(coreCaseDataService).setSupplementaryData(1594901956117591L, supplementaryData());
         }
 
