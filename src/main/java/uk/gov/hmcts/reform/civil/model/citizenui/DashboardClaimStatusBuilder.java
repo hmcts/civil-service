@@ -15,12 +15,13 @@ public abstract class DashboardClaimStatusBuilder<T> {
 
     private List<DashboardClaimStatusMatcher> getDashboardStatusMatches(T claim) {
         return List.of(
+            new DashboardClaimStatusMatcher(DashboardClaimStatus.RESPONSE_OVERDUE, hasResponsePendingOverdue(claim)),
+            new DashboardClaimStatusMatcher(DashboardClaimStatus.ELIGIBLE_FOR_CCJ, isEligibleForCCJ(claim)),
+            new DashboardClaimStatusMatcher(DashboardClaimStatus.RESPONSE_DUE_NOW, hasResponseDueToday(claim)),
             new DashboardClaimStatusMatcher(
                 DashboardClaimStatus.MORE_TIME_REQUESTED,
                 responseDeadlineHasBeenExtended(claim)
             ),
-            new DashboardClaimStatusMatcher(DashboardClaimStatus.RESPONSE_OVERDUE, hasResponsePendingOverdue(claim)),
-            new DashboardClaimStatusMatcher(DashboardClaimStatus.RESPONSE_DUE_NOW, hasResponseDueToday(claim)),
             new DashboardClaimStatusMatcher(DashboardClaimStatus.NO_RESPONSE, hasResponsePending(claim)),
             new DashboardClaimStatusMatcher(
                 DashboardClaimStatus.ADMIT_PAY_IMMEDIATELY,
@@ -38,7 +39,7 @@ public abstract class DashboardClaimStatusBuilder<T> {
                 DashboardClaimStatus.CLAIMANT_ACCEPTED_STATES_PAID,
                 claimantConfirmedDefendantPaid(claim)
             ),
-            new DashboardClaimStatusMatcher(DashboardClaimStatus.ELIGIBLE_FOR_CCJ, isEligibleForCCJ(claim)),
+
             new DashboardClaimStatusMatcher(DashboardClaimStatus.TRANSFERRED, isSentToCourt(claim)),
             new DashboardClaimStatusMatcher(
                 DashboardClaimStatus.REQUESTED_COUNTRY_COURT_JUDGEMENT,
