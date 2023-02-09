@@ -35,10 +35,14 @@ public class BundleRequestMapper {
     public BundleCreateRequest mapCaseDataToBundleCreateRequest(CaseData caseData,
                                                                 String bundleConfigFileName, String jurisdiction,
                                                                 String caseTypeId, Long id) {
+        String fileNameIdentifier =
+            caseData.getCcdCaseReference() + "_" + DateFormatHelper.formatLocalDate(caseData.getHearingDate(),
+            "ddMMyyyy") + "_";
         BundleCreateRequest bundleCreateRequest = BundleCreateRequest.builder()
             .caseDetails(BundlingCaseDetails.builder()
                              .caseData(mapCaseData(caseData,
                                                    bundleConfigFileName, id))
+                             .filenamePrefix(fileNameIdentifier)
 
                              .build()
             )

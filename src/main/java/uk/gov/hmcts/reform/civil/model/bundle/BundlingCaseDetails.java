@@ -13,4 +13,7 @@ public class BundlingCaseDetails {
     @JsonProperty("case_data")
     public BundlingCaseData caseData;
 
+    @JsonProperty("filename_identifier")
+    public String filenamePrefix;
+
 }
