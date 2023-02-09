@@ -6,18 +6,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Value;
 
-import java.util.List;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Value
 @Builder(toBuilder = true)
-public class BundleData {
+public class Bundle {
 
-    @JsonProperty("caseBundles")
-    public List<Bundle> caseBundles;
+    private BundleDetails value;
 
     @JsonCreator
-    public BundleData(@JsonProperty("caseBundles") List<Bundle> caseBundles) {
-        this.caseBundles = caseBundles;
+    public Bundle(@JsonProperty("value") BundleDetails value) {
+        this.value = value;
     }
+
 }

@@ -50,10 +50,17 @@ public class BundleCreationTriggerEventHandler {
             List<IdValue<Bundle>> newBundles = new ArrayList<>();
 
             bundleCreateResponse.getData().getCaseBundles().forEach(bundle -> {
-                bundle.setCreatedOn(Optional.of(LocalDateTime.now()));
-                bundle.setBundleHearingDate(Optional.of(caseData.getHearingDate()));
-                newBundles.add(new IdValue<>(bundle.getId(),
-                                             bundle));
+                Bundle bundle1 =
+                    Bundle.builder().bundleHearingDate(Optional.of(caseData.getHearingDate()))
+                        .stitchedDocument(Optional.ofNullable(bundle.getValue().getStitchedDocument()))
+                        .filename(bundle.getValue().getFileName())
+                        .title(bundle.getValue().getTitle())
+                        .description(Optional.ofNullable(bundle.getValue().getDescription()).toString())
+                        .stitchStatus(Optional.ofNullable(bundle.getValue().getStitchStatus()))
+                        .createdOn(Optional.of(LocalDateTime.now()))
+                        .id(bundle.getValue().getId()).build();
+                newBundles.add(new IdValue<>(bundle.getValue().getId(),
+                                             bundle1));
 
             });
             List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();

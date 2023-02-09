@@ -11,12 +11,13 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
+import uk.gov.hmcts.reform.civil.model.bundle.Bundle;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleData;
+import uk.gov.hmcts.reform.civil.model.bundle.BundleDetails;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
@@ -34,7 +35,6 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.when;
@@ -60,10 +60,10 @@ public class BundleCreationTriggerEventHandlerTest {
 
     @BeforeEach
     public void setup() {
-        Bundle bundle1 =
-            Bundle.builder().title("Trial").id("1")
-                .stitchStatus(Optional.of("new"))
-                .stitchedDocument(null).stitchingFailureMessage(null).filename("Trial Bundle").build();
+        Bundle bundle1 = Bundle.builder().value(BundleDetails.builder().title("Trial").id("1")
+                                                    .stitchStatus("new")
+                                                    .stitchedDocument(null).stitchingFailureMessage(null).fileName(
+                                                        "Trial Bundle").build()).build();
         List<Bundle> list = new ArrayList<>();
         list.add(bundle1);
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
