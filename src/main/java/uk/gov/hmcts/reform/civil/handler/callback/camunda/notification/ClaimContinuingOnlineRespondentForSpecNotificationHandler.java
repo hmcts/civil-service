@@ -94,6 +94,7 @@ public class ClaimContinuingOnlineRespondentForSpecNotificationHandler extends C
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         } else if (YesOrNo.YES.equals(caseData.getRespondent2SameLegalRepresentative())) {
             return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseDataBuilder.build().toMap(objectMapper))
                 .state("AWAITING_RESPONDENT_ACKNOWLEDGEMENT")
                 .build();
         }
