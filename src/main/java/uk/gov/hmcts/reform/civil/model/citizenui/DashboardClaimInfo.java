@@ -45,7 +45,7 @@ public class DashboardClaimInfo {
     @JsonGetter("numberOfDays")
     public long getNumberOfDays() {
         return Optional.ofNullable(responseDeadline).filter(deadline ->
-                                                                deadline.isBefore(LocalDate.now()))
+                                                                deadline.isAfter(LocalDate.now()))
             .map(deadline ->
                      LocalDate.now().until(
                          deadline,
@@ -57,7 +57,7 @@ public class DashboardClaimInfo {
     @JsonGetter("numberOfDaysOverdue")
     public long numberOfDaysOverdue() {
         return Optional.ofNullable(responseDeadline).filter(deadline ->
-                                                                deadline.isAfter(LocalDate.now()))
+                                                                deadline.isBefore(LocalDate.now()))
             .map(deadline ->
                      deadline.until(
                          LocalDate.now(),
