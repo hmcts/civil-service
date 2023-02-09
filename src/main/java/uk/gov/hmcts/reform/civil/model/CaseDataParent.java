@@ -363,4 +363,6 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<DQPartyFlagStructure>> respondentSolicitor1Witnesses;
     private final List<Element<DQPartyFlagStructure>> respondentSolicitor2Witnesses;
 
+    private final IdamUserDetails claimantUserDetails;
+
 }
