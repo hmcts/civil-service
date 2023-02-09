@@ -300,9 +300,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             Optional<BigDecimal> howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
                 .map(RespondToClaim::getHowMuchWasPaid);
 
-            howMuchWasPaid.ifPresent(howMuchWasPaidValue ->
-                                         updatedCaseData.partAdmitPaidValuePounds(
-                                             MonetaryConversions.penniesToPounds(howMuchWasPaidValue)));
+            howMuchWasPaid.ifPresent(howMuchWasPaidValue -> updatedCaseData.partAdmitPaidValuePounds(
+                MonetaryConversions.penniesToPounds(howMuchWasPaidValue)));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
