@@ -11,13 +11,18 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
+import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -32,6 +37,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
     private static final String ERROR_MESSAGE = "Technical error occurred";
     private static final String TASK_ID = "ServiceRequestAPI";
 
+    private final FeesService feesService;
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
 
@@ -56,6 +62,12 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
+        if(Objects.isNull(caseData.getClaimValue())) {
+            caseData = caseData.toBuilder().claimValue(ClaimValue.builder().statementOfValueInPennies(
+                new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))).build()).build();
+        }
+        var fee = feesService.getFeeDataByClaimValue(caseData.getClaimValue());
+        caseData = caseData.toBuilder().claimFee(fee).build();
         try {
             log.info("calling payment service request {}", caseData.getCcdCaseReference());
             var serviceRequestReference = paymentsService.createServiceRequest(caseData, authToken)
@@ -72,7 +84,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
                 caseData = caseData.toBuilder()
                     .claimIssuedPBADetails(SRPbaDetails.builder()
                                                   .applicantsPbaAccounts(caseData.getApplicantSolicitor1PbaAccounts())
-                                                  .fee(caseData.getClaimFee())
+                                                  .fee(fee)
                                                   .serviceReqReference(serviceRequestReference).build())
                     .build();
             }

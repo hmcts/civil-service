@@ -13,16 +13,20 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeesService;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -36,6 +40,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUES
 public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
     private static final String SUCCESSFUL_PAYMENT_REFERENCE = "2022-1655915218557";
+
+    @MockBean
+    private FeesService feesService;
 
     @MockBean
     private PaymentsService paymentsService;
@@ -65,9 +72,15 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MakeServiceRequestPayments {
 
+        private final Fee feeData = Fee.builder()
+            .code("CODE")
+            .calculatedAmountInPence(BigDecimal.valueOf(100))
+            .build();
+
         @BeforeEach
         void setup() {
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            given(feesService.getFeeDataByClaimValue(any())).willReturn(feeData);
         }
 
         @Test
