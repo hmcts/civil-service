@@ -33,7 +33,7 @@ import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocation;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -202,11 +202,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     @Override
     public List<CaseEvent> handledEvents() {
-        if (toggleService.isLrSpecEnabled()) {
-            return EVENTS;
-        } else {
-            return Collections.emptyList();
-        }
+        return EVENTS;
     }
 
     private CallbackResponse eligibilityCheck(CallbackParams callbackParams) {
@@ -415,7 +411,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
 
         if (toggleService.isCourtLocationDynamicListEnabled()) {
-            dataBuilder.caseManagementLocation(CaseLocation.builder().region(regionId).baseLocation(epimmsId).build());
+            dataBuilder.caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build());
         }
 
         dataBuilder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
