@@ -283,14 +283,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         if (V_1.equals(callbackParams.getVersion()) && featureToggleService.isCourtLocationDynamicListEnabled()) {
             List<LocationRefData> locations = fetchLocationData(callbackParams);
-            updatedCaseData.applicant1DQ(Applicant1DQ.builder()
-                                             .applicant1DQRequestedCourt(
-                                                 RequestedCourt.builder()
-                                                     .responseCourtLocations(
-                                                         courtLocationUtils.getLocationsFromList(locations))
-                                                     .build()
-                                             )
-                                             .build());
+            updatedCaseData.applicant1DQ(
+                Applicant1DQ.builder().applicant1DQRequestedCourt(
+                    RequestedCourt.builder().responseCourtLocations(
+                        courtLocationUtils.getLocationsFromList(locations)).build()
+                    ).build());
         }
 
         if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
