@@ -98,10 +98,19 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             directionOrderDocument.addAll(generalAppCaseData.getDirectionOrderDocument());
         }
 
+        List<Element<CaseDocument>> hearingOrderDocument = ofNullable(civilCaseData.getHearingOrderDocument())
+                .orElse(newArrayList());
+
+        if (generalAppCaseData.getHearingOrderDocument() != null
+                && checkIfDocumentExists(hearingOrderDocument, generalAppCaseData.getHearingOrderDocument()) < 1) {
+            hearingOrderDocument.addAll(generalAppCaseData.getHearingOrderDocument());
+        }
+
         Map<String, Object> output = civilCaseData.toMap(mapper);
         output.put("generalOrderDocument", generalOrderDocument.isEmpty() ? null : generalOrderDocument);
         output.put("dismissalOrderDocument", dismissalOrderDocument.isEmpty() ? null : dismissalOrderDocument);
         output.put("directionOrderDocument", directionOrderDocument.isEmpty() ? null : directionOrderDocument);
+        output.put("hearingOrderDocument", hearingOrderDocument.isEmpty() ? null : hearingOrderDocument);
 
         return output;
     }
