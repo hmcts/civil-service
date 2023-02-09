@@ -94,6 +94,9 @@ public class NotificationsProperties {
     private String solicitorCaseTakenOffline;
 
     @NotEmpty
+    private String solicitorTrialReady;
+
+    @NotEmpty
     private String solicitorCaseTakenOfflineForSpec;
 
     @NotEmpty
@@ -202,6 +205,12 @@ public class NotificationsProperties {
 
     @NotEmpty
     private String hearingListedNoFeeDefendantLrTemplate;
+
+    @NotEmpty
+    private String noticeOfChangeFormerSolicitor;
+
+    @NotEmpty
+    private String noticeOfChangeOtherParties;
 
     @NotEmpty
     private String claimantSolicitorClaimContinuingOnlineCos;

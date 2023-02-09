@@ -28,8 +28,6 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -66,13 +64,6 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
 
     public static final String TASK_ID_Applicant1 = "CreateClaimContinuingOnlineNotifyApplicant1ForSpec";
 
-    @Test
-    public void ldBlock() {
-        when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        assertTrue(handler.handledEvents().isEmpty());
-        assertFalse(handler.handledEvents().isEmpty());
-    }
-
     @Nested
     class AboutToSubmitCallback {
         private LocalDateTime responseDeadline;
@@ -87,11 +78,14 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
 
         @Test
         void shouldNotifyApplicant1_whenInvoked() {
+            // Given
             CaseData caseData = getCaseData("testorg@email.com");
             CallbackParams params = getCallbackParams(caseData);
 
+            // When
             handler.handle(params);
 
+            // Then
             verify(notificationService).sendMail(
                 "testorg@email.com",
                 "template-id",
