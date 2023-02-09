@@ -46,8 +46,8 @@ public class CaseFlagUtils {
     private static DQPartyFlagStructure createDQPartiesCaseFlagsField(String firstName, String lastName, String roleOnCase) {
         String partyName = String.format("%s %s", firstName, lastName);
         return DQPartyFlagStructure.builder()
-            .firstName(firstName)
-            .lastName(lastName)
+            .firstName(firstName != null ? firstName : "firstname")
+            .lastName(lastName != null ? lastName : "lastname")
             .flags(createFlags(partyName, roleOnCase))
             .build();
     }
