@@ -62,6 +62,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert.EXPERT_REPORT;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert.JOINT_STATEMENT;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial.AUTHORITIES;
+import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial.COSTS;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial.DOCUMENTARY;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness.DOCUMENTS_REFERRED;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness.WITNESS_STATEMENT;
@@ -200,6 +201,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         List<EvidenceUploadTrial> trialList = new ArrayList<>();
         trialList.add(AUTHORITIES);
         trialList.add(DOCUMENTARY);
+        trialList.add(COSTS);
         return Stream.of(
             arguments(CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                           .trialSelectionEvidenceRes(trialList).build()),
@@ -276,6 +278,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         // Then
         assertThat(response.getData()).extracting("trialAuthorityFlag").isEqualTo("show_trial_authority");
         assertThat(response.getData()).extracting("trialDocumentaryFlag").isEqualTo("show_trial_documentary");
+        assertThat(response.getData()).extracting("trialCostsFlag").isEqualTo("show_trial_costs");
     }
 
     @ParameterizedTest
