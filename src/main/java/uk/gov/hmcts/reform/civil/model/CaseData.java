@@ -725,7 +725,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public LocalDate getDateForRepayment() {
-       return Optional.of(respondToClaimAdmitPartLRspec)
+       return Optional.ofNullable(respondToClaimAdmitPartLRspec)
            .map(response -> response.getWhenWillThisAmountBePaid()).orElse(null);
     }
 

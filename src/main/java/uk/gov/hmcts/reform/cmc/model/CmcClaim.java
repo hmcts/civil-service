@@ -42,6 +42,9 @@ public class CmcClaim {
     private String submitterEmail;
 
     public Response response;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate moneyReceivedOn;
     private LocalDateTime countyCourtJudgmentRequestedAt;
     private LocalDate admissionPayImmediatelyPastPaymentDate;

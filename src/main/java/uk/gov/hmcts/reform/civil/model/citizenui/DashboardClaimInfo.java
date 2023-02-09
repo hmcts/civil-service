@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
@@ -10,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -39,8 +42,27 @@ public class DashboardClaimInfo {
     private LocalDate paymentDate;
     private DashboardClaimStatus status;
 
+    @JsonGetter("numberOfDays")
     public long getNumberOfDays() {
-        return Optional.of(responseDeadline).map(deadline -> ChronoUnit.DAYS.between(deadline, LocalDate.now()))
+        return Optional.ofNullable(responseDeadline).filter(deadline ->
+                                                                deadline.isBefore(LocalDate.now()))
+            .map(deadline ->
+                     LocalDate.now().until(
+                         deadline,
+                         ChronoUnit.DAYS
+                     ))
+            .orElse(0L);
+    }
+
+    @JsonGetter("numberOfDaysOverdue")
+    public long numberOfDaysOverdue() {
+        return Optional.ofNullable(responseDeadline).filter(deadline ->
+                                                                deadline.isAfter(LocalDate.now()))
+            .map(deadline ->
+                     deadline.until(
+                         LocalDate.now(),
+                         ChronoUnit.DAYS
+                     ))
             .orElse(0L);
     }
 }

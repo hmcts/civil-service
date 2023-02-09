@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.citizenui;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -21,6 +22,7 @@ import java.util.stream.Stream;
 import static java.util.Collections.emptyList;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class DashboardClaimInfoService {
 
@@ -34,6 +36,7 @@ public class DashboardClaimInfoService {
 
     public List<DashboardClaimInfo> getClaimsForDefendant(String authorisation, String defendantId) {
         List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForDefendant(authorisation, defendantId);
+        log.info(ocmcClaims.toString());
         List<DashboardClaimInfo> ccdCases = getCases(authorisation);
         return Stream.concat(ocmcClaims.stream(), ccdCases.stream()).collect(Collectors.toList());
     }
@@ -42,6 +45,7 @@ public class DashboardClaimInfoService {
         Query query = new Query(QueryBuilders.matchAllQuery(), emptyList(), 0);
         SearchResult claims = coreCaseDataService.searchCases(query, authorisation);
         if (claims.getTotal() == 0) {
+            log.info("no claims");
             return Collections.emptyList();
         }
         return translateSearchResultToDashboardItems(claims);
@@ -61,12 +65,14 @@ public class DashboardClaimInfoService {
             .claimAmount(caseData.getTotalClaimAmount())
             .status(new CcdClaimStatusDashboardBuilder()
                                          .buildDashboardClaimStatus(caseData))
-            .paymentDate(caseData.getDateForRepayment())
             .build();
         if (caseData.getRespondent1ResponseDeadline() != null) {
             item.setResponseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate());
         }
-
+        if(caseData.getRespondToClaimAdmitPartLRspec() != null) {
+            item.setPaymentDate(caseData.getDateForRepayment());
+        }
+        log.info(item.toString());
         return item;
     }
 }
