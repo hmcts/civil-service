@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
 
 import java.util.Collections;
@@ -25,7 +24,6 @@ public class ValidateFeeForSpecCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(VALIDATE_FEE_SPEC);
     private static final String ERROR_MESSAGE = "Fee has changed since claim submitted. It needs to be validated again";
     private static final String TASK_ID = "ValidateClaimFeeForSpec";
-    private final FeatureToggleService toggleService;
     private final FeesService feesService;
 
     @Override
@@ -41,11 +39,7 @@ public class ValidateFeeForSpecCallbackHandler extends CallbackHandler {
 
     @Override
     public List<CaseEvent> handledEvents() {
-        if (toggleService.isLrSpecEnabled()) {
-            return EVENTS;
-        } else {
-            return Collections.emptyList();
-        }
+        return EVENTS;
     }
 
     private CallbackResponse validateFee(CallbackParams callbackParams) {
