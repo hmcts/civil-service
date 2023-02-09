@@ -215,4 +215,7 @@ public class NotificationsProperties {
     @NotEmpty
     private String evidenceUploadTemplate;
 
+    @NotEmpty
+    private String bundleCreationTemplate;
+
 }
