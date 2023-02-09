@@ -356,4 +356,6 @@ public class CaseDataParent implements MappableObject {
     private final CertificateOfService cosNotifyClaimDefendant1;
     private final CertificateOfService cosNotifyClaimDefendant2;
 
+    private final IdamUserDetails claimantUserDetails;
+
 }

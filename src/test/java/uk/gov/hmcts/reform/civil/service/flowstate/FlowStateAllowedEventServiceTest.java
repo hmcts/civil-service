@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -10,7 +9,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -59,6 +57,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOC_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_CLAIM_DETAILS;
@@ -68,6 +67,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TAKE_CASE_OFFLINE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
@@ -117,11 +118,11 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 })
 class FlowStateAllowedEventServiceTest {
 
-    @MockBean
-    private FeatureToggleService featureToggleService;
-
     @Autowired
     FlowStateAllowedEventService flowStateAllowedEventService;
+
+    @MockBean
+    private FeatureToggleService toggleService;
 
     static class GetFlowStateArguments implements ArgumentsProvider {
 
@@ -290,6 +291,9 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_JUDGE,
                         HEARING_FEE_UNPAID,
                         HEARING_FEE_PAID,
+                        TRIAL_READY_NOTIFICATION,
+                        TRIAL_READY_CHECK,
+                        MOVE_TO_DECISION_OUTCOME,
                         SERVICE_REQUEST_RECEIVED,
                         HEARING_SCHEDULED,
                         EVIDENCE_UPLOAD_APPLICANT,
@@ -510,6 +514,9 @@ class FlowStateAllowedEventServiceTest {
                         HEARING_SCHEDULED,
                         HEARING_FEE_UNPAID,
                         HEARING_FEE_PAID,
+                        TRIAL_READY_CHECK,
+                        TRIAL_READY_NOTIFICATION,
+                        MOVE_TO_DECISION_OUTCOME,
                         SERVICE_REQUEST_RECEIVED,
                         REFER_TO_JUDGE,
                         migrateCase,
@@ -825,9 +832,6 @@ class FlowStateAllowedEventServiceTest {
         @ParameterizedTest
         @ArgumentsSource(GetAllowedStatesForCaseEventArguments.class)
         void shouldReturnValidStatesLRspec_whenCaseEventIsGiven(CaseEvent caseEvent, String... flowStates) {
-            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(false, true);
-            assertThat(flowStateAllowedEventService.getAllowedStates(CREATE_CLAIM_SPEC))
-                .isEmpty();
             assertThat(flowStateAllowedEventService.getAllowedStates(CREATE_CLAIM_SPEC))
                 .isNotEmpty();
         }
@@ -927,11 +931,6 @@ class FlowStateAllowedEventServiceTest {
     @Nested
     class IsEventAllowedOnCaseDetails {
 
-        @BeforeEach
-        void enableSpec() {
-            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
-        }
-
         @ParameterizedTest
         @ArgumentsSource(GetAllowedStatesForCaseDetailsArguments.class)
         void shouldReturnValidStates_whenCaseEventIsGiven(
@@ -958,8 +957,6 @@ class FlowStateAllowedEventServiceTest {
             CaseDetails caseDetails,
             CaseEvent caseEvent
         ) {
-            Mockito.when(featureToggleService.isLrSpecEnabled()).thenReturn(true);
-
             assertThat(flowStateAllowedEventService.isAllowed(caseDetails, caseEvent))
                 .isEqualTo(expected);
         }
