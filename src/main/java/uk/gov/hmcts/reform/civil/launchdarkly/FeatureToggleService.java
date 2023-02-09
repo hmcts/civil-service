@@ -35,7 +35,6 @@ public class FeatureToggleService {
         return true;
     }
 
-
     public boolean isSpecRpaContinuousFeedEnabled() {
         return true;
     }
