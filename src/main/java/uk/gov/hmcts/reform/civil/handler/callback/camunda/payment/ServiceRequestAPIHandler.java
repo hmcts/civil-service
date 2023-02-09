@@ -62,7 +62,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
-        if (Objects.isNull(caseData.getClaimValue())) {
+        if (Objects.isNull(caseData.getClaimValue()) && Objects.nonNull(caseData.getTotalClaimAmount())) {
             caseData = caseData.toBuilder().claimValue(ClaimValue.builder().statementOfValueInPennies(
                 new BigDecimal(MonetaryConversions.poundsToPennies(caseData.getTotalClaimAmount()))).build()).build();
         }
