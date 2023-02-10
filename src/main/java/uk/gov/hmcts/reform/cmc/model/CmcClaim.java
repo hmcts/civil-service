@@ -46,7 +46,15 @@ public class CmcClaim {
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate moneyReceivedOn;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDateTime countyCourtJudgmentRequestedAt;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate admissionPayImmediatelyPastPaymentDate;
     private ClaimantResponse claimantResponse;
     private ClaimState state;
@@ -97,7 +105,7 @@ public class CmcClaim {
 
     @JsonIgnore
     public boolean hasResponseDeadlinePassed(){
-        return !hasResponse() && (getResponseDeadline().isAfter(LocalDate.now())
+        return !hasResponse() && (getResponseDeadline().isBefore(LocalDate.now())
             || isResponseDeadlinePastFourPmToday());
     }
 

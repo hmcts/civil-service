@@ -33,7 +33,7 @@ public class ClaimData {
 
     @JsonIgnore
     public boolean hasBreathingSpace(){
-        return breathingSpace.applies();
+        return breathingSpace != null && breathingSpace.applies();
     }
     private String getPartyName(List<CmcParty> parties) {
         if (parties.isEmpty()) {
