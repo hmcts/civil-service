@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -83,13 +82,6 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
-    @Test
-    public void ldBlock() {
-        when(toggleService.isLrSpecEnabled()).thenReturn(false, true);
-        Assertions.assertTrue(handler.handledEvents().isEmpty());
-        Assertions.assertFalse(handler.handledEvents().isEmpty());
-    }
-
     private static final CaseDocument CLAIM_FORM =
         CaseDocument.builder()
             .createdBy("John")
@@ -165,15 +157,18 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
 
         @Test
         void shouldGenerateClaimForm_whenOneVsOne_andDefendantRepresentedSpecClaim() {
+            // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssued().build().toBuilder()
                 .specRespondent1Represented(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+            // Then
             assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
             assertThat(updatedData.getIssueDate()).isEqualTo(issueDate);
 
@@ -209,12 +204,12 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
                 .specClaimTemplateDocumentFiles(new Document("fake-url",
                                                              "binary-url",
                                                              "file-name",
-                                                             null))
+                                                             null, null))
 
                 .specClaimDetailsDocumentFiles(new Document("fake-url",
                                                              "binary-url",
                                                              "file-name",
-                                                             null))
+                                                             null, null))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
