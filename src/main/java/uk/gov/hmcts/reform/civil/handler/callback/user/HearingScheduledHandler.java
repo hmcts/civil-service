@@ -207,13 +207,13 @@ public class HearingScheduledHandler extends CallbackHandler {
             }
             caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .state(String.valueOf(HEARING_READINESS))
+                .state(HEARING_READINESS.name())
                 .data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
         } else {
             caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .state(String.valueOf(PREPARE_FOR_HEARING_CONDUCT_HEARING))
+                .state(PREPARE_FOR_HEARING_CONDUCT_HEARING.name())
                 .data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
         }
