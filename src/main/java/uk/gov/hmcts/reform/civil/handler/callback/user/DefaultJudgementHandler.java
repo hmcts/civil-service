@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.referencedata.response.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationRefDataService;
@@ -121,8 +122,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         LocationRefData location = fillPreferredLocationData(locations, caseData.getHearingSupportRequirementsDJ());
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (Objects.nonNull(location)) {
-            caseDataBuilder
-                .caseManagementLocation(LocationRefDataService.buildCaseLocation(location));
+            caseDataBuilder.caseManagementLocation(LocationRefDataService.buildCaseLocation(location));
             caseDataBuilder.locationName(location.getSiteName());
         }
 
@@ -192,6 +192,8 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private CallbackResponse acceptCPR(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
         var acceptance = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance");
         var acceptance2Def = callbackParams.getRequest().getCaseDetails().getData().get("CPRAcceptance2Def");
@@ -200,6 +202,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
                            + "- if they do not apply, close this page and apply for default judgment when they do");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
             .build();
     }
@@ -232,12 +235,11 @@ public class DefaultJudgementHandler extends CallbackHandler {
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        if (Objects.nonNull(caseData.getHearingSupportRequirementsDJ())
-            && Objects.nonNull(caseData.getHearingSupportRequirementsDJ().getHearingTemporaryLocation())) {
-            DynamicList locationList = caseData.getHearingSupportRequirementsDJ().getHearingTemporaryLocation();
-            locationList.setListItems(null);
+        if (Objects.nonNull(caseData.getHearingSupportRequirementsDJ())) {
+            DynamicList list = formatLocationList(caseData.getHearingSupportRequirementsDJ()
+                                                      .getHearingTemporaryLocation());
             HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ()
-                .toBuilder().hearingTemporaryLocation(locationList).build();
+                .toBuilder().hearingTemporaryLocation(list).build();
             caseDataBuilder
                 .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
         }
@@ -276,6 +278,18 @@ public class DefaultJudgementHandler extends CallbackHandler {
             + " - " + location.getCourtAddress()
             + " - " + location.getPostcode();
         return locationLabel.equals(locationTempLabel);
+    }
+
+    private DynamicList formatLocationList(DynamicList locationList) {
+        List<DynamicListElement> list = locationList.getListItems()
+            .stream()
+            .filter(element -> checkLocationItemValue(element, locationList.getValue())).collect(
+            Collectors.toList());
+        return DynamicList.builder().value(locationList.getValue()).listItems(list).build();
+    }
+
+    private boolean checkLocationItemValue(DynamicListElement element, DynamicListElement preferredLocation) {
+        return element.getLabel().equals(preferredLocation.getLabel());
     }
 
 }
