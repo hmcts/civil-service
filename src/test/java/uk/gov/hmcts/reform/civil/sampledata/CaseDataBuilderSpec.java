@@ -348,7 +348,7 @@ public class CaseDataBuilderSpec {
         return this;
     }
 
-    public CaseDataBuilderSpec atStateSpec1v1PaymentSuccessful(){
+    public CaseDataBuilderSpec atStateSpec1v1PaymentSuccessful() {
         atStateSpec1v1ClaimSubmitted();
         ccdState = CASE_ISSUED;
         claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
@@ -357,7 +357,7 @@ public class CaseDataBuilderSpec {
         return this;
     }
 
-    public CaseDataBuilderSpec atStateSpec1v1PaymentFailed(){
+    public CaseDataBuilderSpec atStateSpec1v1PaymentFailed() {
         atStateSpec1v1ClaimSubmitted();
         claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED)
                                                             .customerReference("12345")
@@ -365,7 +365,7 @@ public class CaseDataBuilderSpec {
         return this;
     }
 
-    public CaseDataBuilderSpec atStateSpec1v2SameSolicitorBothDefendantRepresentedPaymentSuccessful(){
+    public CaseDataBuilderSpec atStateSpec1v2SameSolicitorBothDefendantRepresentedPaymentSuccessful() {
         atStateClaimSubmittedTwoRespondentSameSolicitorSpec();
         ccdState = CASE_ISSUED;
         claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
@@ -374,7 +374,7 @@ public class CaseDataBuilderSpec {
         return this;
     }
 
-    public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorBothDefendantRepresentedPaymentFailed(){
+    public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorBothDefendantRepresentedPaymentFailed() {
         atStateClaimSubmittedTwoRespondentDifferentSolicitorSpec();
         claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED)
             .customerReference("12345")
@@ -382,7 +382,7 @@ public class CaseDataBuilderSpec {
         return this;
     }
 
-    public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorOneDefendantUnrepresentedPaymentSuccessful(){
+    public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorOneDefendantUnrepresentedPaymentSuccessful() {
         atStateSpec1v2OneDefendantUnrepresentedClaimSubmitted();
         claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
             .customerReference("12345")
@@ -390,7 +390,7 @@ public class CaseDataBuilderSpec {
         return this;
     }
 
-    public CaseDataBuilderSpec atStateSpec2v1PaymentFailure(){
+    public CaseDataBuilderSpec atStateSpec2v1PaymentFailure() {
         atStateClaimSubmitted2v1();
         claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED)
             .customerReference("12345")
