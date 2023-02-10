@@ -59,4 +59,9 @@ public class BusinessProcess {
 
         return this;
     }
+
+    @JsonIgnore
+    public boolean isFinished() {
+        return this.status == BusinessProcessStatus.FINISHED;
+    }
 }

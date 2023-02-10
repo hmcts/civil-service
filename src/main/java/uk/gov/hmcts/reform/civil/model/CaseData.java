@@ -112,6 +112,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 
 @SuperBuilder(toBuilder = true)
@@ -714,7 +715,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isResponseFullAdmitAndPayBySetDate() {
         return isResponseSpecFullAdmission()
-            && RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE == defenceAdmitPartPaymentTimeRouteRequired;
+            && isPayBySetDate();
     }
 
     @JsonIgnore
@@ -739,13 +740,15 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isResponseFullAdmitAndPayByInstallments() {
         return isResponseSpecFullAdmission()
-            && isPayBySetDate();
+            && isPayByInstallment();
     }
 
     @JsonIgnore
     public boolean hasBreathingSpace() {
-        return getBreathing() != null && getBreathing().getEnter() != null
-            && getBreathing().getEnter().getExpectedEnd().isBefore(LocalDate.now());
+        return getBusinessProcess() != null
+            && getBusinessProcess().getCamundaEvent() != null
+            && getBusinessProcess().getCamundaEvent().equals(ENTER_BREATHING_SPACE_SPEC)
+            && getBusinessProcess().isFinished();
     }
 
     private boolean isResponseSpecFullAdmission() {
