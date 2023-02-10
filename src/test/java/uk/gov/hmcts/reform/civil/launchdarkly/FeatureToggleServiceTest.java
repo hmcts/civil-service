@@ -158,6 +158,15 @@ class FeatureToggleServiceTest {
         verifyBoolVariationCalled(certificateOfServiceKey, List.of("timestamp", "environment"));
     }
 
+    @Test
+    void shouldCallBoolVariation_whenFeeKeywordsEnableInvoked() {
+        var feeKeyword = "fee-keywords-enable";
+        givenToggle(feeKeyword, true);
+
+        assertThat(featureToggleService.isFeatureEnabled("fee-keywords-enable")).isTrue();
+        verifyBoolVariationCalled(feeKeyword, List.of("timestamp", "environment"));
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(ldClient.boolVariation(eq(feature), any(LDUser.class), anyBoolean()))
             .thenReturn(state);
